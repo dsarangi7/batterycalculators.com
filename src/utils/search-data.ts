@@ -327,6 +327,92 @@ export const searchData: SearchItem[] = [
     ],
   },
   {
+    title: "Fridge Battery Backup Calculator",
+    description:
+      "Calculate the battery size, inverter capacity, and backup runtime needed to keep your refrigerator running during a power outage. Prevent food spoilage with properly sized emergency backup power.",
+    url: "/fridge-battery-backup-calculator",
+    type: "calculator",
+    category: "Calculator",
+    keywords: [
+      "fridge battery backup",
+      "refrigerator backup power",
+      "fridge power outage",
+      "keep fridge running",
+      "food spoilage prevention",
+      "refrigerator battery",
+      "fridge inverter",
+      "kitchen backup power",
+    ],
+  },
+  {
+    title: "CPAP Battery Backup Calculator",
+    description:
+      "Calculate the battery size and backup runtime needed to power your CPAP machine overnight during a power outage. Ensure uninterrupted sleep apnea therapy with properly sized emergency battery backup.",
+    url: "/cpap-battery-backup-calculator",
+    type: "calculator",
+    category: "Calculator",
+    keywords: [
+      "CPAP battery backup",
+      "CPAP power outage",
+      "sleep apnea backup power",
+      "CPAP battery",
+      "CPAP overnight battery",
+      "medical device backup",
+      "CPAP camping power",
+    ],
+  },
+  {
+    title: "Sump Pump Battery Backup Calculator",
+    description:
+      "Calculate the battery size, inverter capacity, and backup runtime needed to keep your sump pump running during a power outage. Prevent basement flooding with properly sized emergency backup power.",
+    url: "/sump-pump-battery-backup-calculator",
+    type: "calculator",
+    category: "Calculator",
+    keywords: [
+      "sump pump battery backup",
+      "sump pump power outage",
+      "basement flood prevention",
+      "sump pump backup power",
+      "water pump battery",
+      "sump pump inverter",
+      "flood prevention battery",
+    ],
+  },
+  {
+    title: "Portable Power Station Runtime Calculator",
+    description:
+      "Calculate how long a portable power station will run your appliances during a power outage. Estimate runtime, compare station sizes, and plan backup power for camping, emergencies, and off-grid use.",
+    url: "/portable-power-station-runtime-calculator",
+    type: "calculator",
+    category: "Calculator",
+    keywords: [
+      "portable power station runtime",
+      "battery generator runtime",
+      "power station how long",
+      "portable battery backup",
+      "power station calculator",
+      "off-grid power",
+      "camping power station",
+    ],
+  },
+  {
+    title: "Solar Generator Sizing Calculator",
+    description:
+      "Calculate the battery capacity, solar panel wattage, and system components needed for a complete solar generator. Size your solar backup system for off-grid living, emergency preparedness, or camping.",
+    url: "/solar-generator-sizing-calculator",
+    type: "calculator",
+    category: "Calculator",
+    keywords: [
+      "solar generator sizing",
+      "solar battery system",
+      "solar backup power",
+      "off-grid solar system",
+      "solar panel sizing",
+      "solar generator calculator",
+      "renewable backup power",
+    ],
+  },
+  {
     title: "RV Battery Calculator",
     description:
       "Calculate the battery bank size you need for your RV or camper. Estimate daily consumption and required capacity.",

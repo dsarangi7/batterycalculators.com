@@ -1,0 +1,119 @@
+---
+import CalculatorLayout from '../layouts/CalculatorLayout.astro';
+import FormulaBox from '../components/FormulaBox.astro';
+import FAQSection from '../components/FAQSection.astro';
+import PowerOutageForm from '../components/PowerOutageForm.astro';
+
+const whatIs = `A CPAP battery backup calculator determines the battery capacity and runtime you need to power your CPAP machine through a full night of sleep during a power outage. CPAP machines are life-sustaining medical devices — losing power mid-sleep can cause dangerous apnea episodes. This calculator sizes your battery based on your CPAP's actual running wattage (with or without humidifier), accounting for inverter efficiency, depth-of-discharge limits, and a configurable safety margin.`;
+
+const whyItMatters = [
+  "CPAP users who lose power during sleep face immediate health risks — untreated sleep apnea causes oxygen desaturation and cardiac strain.",
+  "A CPAP with heated humidifier draws 30–60W, while without humidifier it draws only 10–30W — this 2× difference dramatically changes battery requirements.",
+  "Most CPAP users need 6–10 hours of runtime per night. Undersizing the battery leaves you without power before morning.",
+  "Camping, travel, and emergency preparedness all require portable CPAP power — but not all power stations handle the load efficiently.",
+  "Cold weather reduces lithium battery capacity by 10–30%, which can leave CPAP users short during winter outages."
+];
+
+const practicalApplications = [
+  { title: "Overnight Medical Backup", description: "Ensure your CPAP runs all night during grid outages — the most critical use case for sleep apnea patients." },
+  { title: "Camping & Travel", description: "Power your CPAP while camping, RVing, or staying in locations without reliable power." },
+  { title: "Emergency Kit Preparedness", description: "Include CPAP backup power in your household emergency kit alongside food, water, and communication devices." },
+  { title: "Hospital & Shelter Power", description: "During natural disasters, shelters may lack power for medical devices — portable battery backup ensures continuity." },
+];
+
+const expertNotes: { title: string; variant: 'engineering' | 'tip' | 'warning'; content: string }[] = [
+  { title: "Humidifier Makes a Big Difference", variant: "engineering", content: "A CPAP with heated humidifier draws 30–60W versus 10–30W without. If you can tolerate sleeping without the humidifier during emergencies, you can double your battery runtime." },
+  { title: "Verify Your Device's Actual Wattage", variant: "warning", content: "CPAP power consumption varies significantly by model and pressure setting. Check your device's power adapter label or manual for exact wattage. This calculator provides estimates — always confirm with your specific device." },
+  { title: "12V DC Direct Connection", variant: "tip", content: "Many CPAP machines can run on 12V DC directly, bypassing the inverter entirely. This eliminates inverter losses (10–15%) and extends battery runtime. Check if your CPAP has a 12V DC adapter." }
+];
+
+const trustSection = {
+  text: "This calculator uses standard electrical engineering formulas. Always confirm your CPAP's actual power requirements with the device manufacturer.",
+  link: { label: "View our methodology", href: "/methodology" }
+};
+
+const references = [
+  { title: "FDA — CPAP Device Guidance", url: "https://www.fda.gov/medical-devices/sleep-apnea/continuous-positive-airway-pressure-cpap-devices", source: "U.S. Food and Drug Administration" },
+  { title: "American Academy of Sleep Medicine", url: "https://aasm.org/resources/factsheets/sleepapnea.pdf", source: "AASM" },
+];
+
+const faqItems = [
+  { question: "What size battery do I need for a CPAP?", answer: "For 8 hours without humidifier (~20W), you need approximately 160–200 Wh usable. With humidifier (~50W), plan for 400–500 Wh. A 12V 50Ah LiFePO4 battery (640 Wh) provides a full night with margin." },
+  { question: "How long will a 100Ah battery run a CPAP?", answer: "A 12V 100Ah LiFePO4 battery (1,280 Wh) at 80% DoD provides 1,024 Wh usable. Without humidifier (~20W), it runs a CPAP for approximately 40+ hours. With humidifier (~50W), approximately 16–20 hours." },
+  { question: "Can a portable power station run a CPAP overnight?", answer: "Yes, most 300Wh+ lithium portable power stations can run a CPAP for a full night. Units with 500–1000Wh provide multiple nights. Look for DC output to avoid inverter losses." },
+  { question: "Does a CPAP humidifier increase battery usage?", answer: "Yes, significantly. A heated humidifier adds 20–40W, effectively doubling or tripling battery consumption. During emergencies, consider reducing humidity level or disabling the heater to extend runtime." },
+];
+
+const relatedCalculators = [
+  { href: "/home-power-outage-battery-backup-calculator", title: "Home Power Outage Battery Backup Calculator", description: "Full backup power calculator for all household appliances." },
+  { href: "/tools/runtime-calculator", title: "Battery Runtime Calculator", description: "Estimate discharge time from capacity and load." },
+  { href: "/tools/battery-sizing-calculator", title: "Battery Sizing Calculator", description: "Full battery bank sizing with temperature derating." },
+  { href: "/tools/solar-battery-sizing-calculator", title: "Solar Battery Sizing Calculator", description: "Size batteries paired with solar panel arrays." },
+  { href: "/tools/energy-conversion-calculator", title: "Energy Conversion Calculator", description: "Convert between Ah, Wh, and kWh at any voltage." },
+  { href: "/tools/charging-time-calculator", title: "Charging Time Calculator", description: "Estimate charge time from solar or grid." },
+  { href: "/tools/voltage-drop-calculator", title: "Voltage Drop Calculator", description: "Size wire runs to minimize voltage drop." },
+  { href: "/tools/dc-cable-loss-calculator", title: "DC Cable Loss Calculator", description: "Calculate wiring losses in DC connections." },
+];
+
+const presetAppliances = [
+  { name: "CPAP Machine", runningW: 40, surgeW: 80 }, { name: "CPAP (no humidifier)", runningW: 20, surgeW: 40 },
+  { name: "Wi-Fi Router", runningW: 12, surgeW: 12 }, { name: "LED Light", runningW: 10, surgeW: 10 },
+  { name: "Phone Charger", runningW: 15, surgeW: 15 }, { name: "Laptop", runningW: 60, surgeW: 90 },
+  { name: "Refrigerator", runningW: 150, surgeW: 600 }, { name: "Fan", runningW: 50, surgeW: 75 },
+];
+---
+
+<CalculatorLayout
+  title="CPAP Battery Backup Calculator | Battery Calculators"
+  description="Calculate the battery size and backup runtime needed to power your CPAP machine overnight during a power outage. Ensure uninterrupted sleep apnea therapy with properly sized emergency battery backup."
+  faqItems={faqItems}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+  relatedCalculators={relatedCalculators}
+>
+  <PowerOutageForm
+    presetAppliances={presetAppliances}
+    defaultBackupHours={10}
+    defaultVoltage="12"
+    defaultLoadsDescription="A CPAP machine has been pre-loaded above. Adjust settings to match your device and needs."
+    defaultLoads={[{ name: "CPAP Machine", quantity: 1 }]}
+  />
+
+  <section class="mb-16 border-t border-hairline pt-12">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+      <FormulaBox title="Mathematical Formulas">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Total Running W = Σ (Appliance Running W × Quantity)</div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Energy Required (Wh) = (Running W × Hours) / Inverter Efficiency × (1 + Safety Margin)</div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Battery Ah = Required Wh / (Battery Voltage × Depth of Discharge)</div>
+        <p class="text-xs text-muted mt-4">For CPAP backup, consider 12V DC direct connection to eliminate inverter losses and extend runtime.</p>
+      </FormulaBox>
+      <div>
+        <h2 class="text-title-lg text-primary uppercase mb-6 tracking-wider">Worked Example</h2>
+        <div class="text-body-sm text-muted flex flex-col gap-4">
+          <p><strong>Scenario:</strong> Power a CPAP with humidifier through a 10-hour night during a power outage.</p>
+          <div class="border-l-2 border-m-blue-light pl-4">
+            <p class="font-bold text-primary mb-2">Step 1: Running load</p>
+            <div class="font-mono text-primary">CPAP with humidifier: 40W × 1 = 40W</div>
+          </div>
+          <div class="border-l-2 border-m-blue-light pl-4">
+            <p class="font-bold text-primary mb-2">Step 2: Energy required</p>
+            <div class="font-mono text-primary">Raw: 40W × 10h = 400 Wh</div>
+            <div class="font-mono text-primary">After efficiency: 400 / 0.90 = 444 Wh</div>
+            <div class="font-mono text-primary">With 20% margin: 444 × 1.20 = 533 Wh</div>
+          </div>
+          <div class="border-l-2 border-m-blue-light pl-4">
+            <p class="font-bold text-primary mb-2">Step 3: Battery (12V LFP, 80% DoD)</p>
+            <div class="font-mono text-primary">Ah = 533 / (12 × 0.80) = 55.5 Ah</div>
+            <div class="font-mono text-primary font-bold mt-1">Result: 12V 60Ah LFP battery (≈768 Wh)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <FAQSection items={faqItems} />
+</CalculatorLayout>

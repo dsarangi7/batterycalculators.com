@@ -1,0 +1,125 @@
+---
+import CalculatorLayout from '../layouts/CalculatorLayout.astro';
+import FormulaBox from '../components/FormulaBox.astro';
+import FAQSection from '../components/FAQSection.astro';
+import PowerOutageForm from '../components/PowerOutageForm.astro';
+
+const whatIs = `A fridge battery backup calculator determines the battery capacity, inverter size, and backup duration you need to keep your refrigerator running during a power outage. Refrigerators are among the most critical household loads to back up — a full fridge costs $300–$600 to restock if food spoils. This calculator sizes your battery bank based on your refrigerator's actual running wattage and compressor startup surge, accounting for inverter efficiency, depth-of-discharge limits, and a configurable safety margin.`;
+
+const whyItMatters = [
+  "A standard refrigerator draws 150W but surges to 600W during compressor startup — undersizing your inverter will trip it at the worst moment.",
+  "Refrigerator compressors cycle on and off every 15–30 minutes, running 30–50% of the time. Battery sizing must account for both surge and cycling behavior.",
+  "Food spoilage begins when fridge temperatures rise above 40°F (4°C) — after just 4 hours without power, perishable food becomes unsafe.",
+  "Hurricane season, winter storms, and wildfire shutoffs regularly cause multi-day outages where keeping food cold is a top priority.",
+  "A portable power station marketed as fridge-ready may not have sufficient surge capacity to start the compressor — always verify surge ratings."
+];
+
+const practicalApplications = [
+  { title: "Hurricane & Storm Preparedness", description: "Size a battery to keep your fridge cold through 12–48 hour outages common during hurricanes and severe thunderstorms." },
+  { title: "Wildfire Public Safety Power Shutoffs", description: "Prepare for planned grid shutoffs during high fire danger. California utilities regularly de-energize lines for days." },
+  { title: "Winter Storm Backup", description: "Ice storms and blizzards can knock out power for days. A fridge backup battery prevents costly food loss." },
+  { title: "Portable Power Station Sizing", description: "Match a portable power station to your specific refrigerator before purchasing. Not all units handle compressor surge." },
+];
+
+const expertNotes: { title: string; variant: 'engineering' | 'tip' | 'warning'; content: string }[] = [
+  { title: "Refrigerator Duty Cycles", variant: "engineering", content: "A refrigerator draws 150W when the compressor runs but cycles on and off — typically running 30–50% of the time. This calculator uses continuous running wattage for conservative sizing. Real-world runtime may be 40–60% longer." },
+  { title: "Compressor Startup Surge", variant: "warning", content: "Refrigerator compressors draw 3–4× their running wattage during startup (1–3 seconds). If your inverter surge rating is too low, it will shut down when the compressor tries to start. Always verify inverter surge capacity." },
+  { title: "LiFePO4 for Fridge Backup", variant: "tip", content: "LiFePO4 batteries deliver 80–100% usable capacity and last 10× more cycles than lead-acid. For emergency fridge backup, LFP is the clear recommendation. Lead-acid at 50% DoD requires double the capacity." }
+];
+
+const trustSection = {
+  text: "This calculator uses standard electrical engineering formulas for battery system sizing. All calculations are transparent and verifiable.",
+  link: { label: "View our methodology", href: "/methodology" }
+};
+
+const references = [
+  { title: "FDA — Food Safety During Power Outages", url: "https://www.fda.gov/food/buy-store-serve-safe-food/food-safety-during-power-outages", source: "U.S. Food and Drug Administration" },
+  { title: "FEMA — Emergency Backup Power Guidance", url: "https://www.fema.gov/emergency-managers/risk-management/power/guidance", source: "Federal Emergency Management Agency" },
+];
+
+const faqItems = [
+  { question: "How long can a battery run a refrigerator?", answer: "A 12V 100Ah LiFePO4 battery (1,280 Wh) can run a standard refrigerator for 8–12 hours. Because the compressor cycles on and off, actual runtime depends on ambient temperature, fridge efficiency, and how often the door is opened." },
+  { question: "What size battery do I need for a fridge?", answer: "For 12 hours of fridge backup, plan for 1,500–3,000 Wh of usable battery capacity. A 24V 100Ah LiFePO4 battery (2,560 Wh) is a common starting point. Add a 20% safety margin." },
+  { question: "Can a portable power station run a refrigerator?", answer: "Yes, but verify two things: the unit must have at least 1,500W continuous output and 3,000W+ surge capacity to handle compressor startup. Units with 1,000–2,000 Wh can run a standard fridge for 8–14 hours." },
+  { question: "What inverter size is needed for a refrigerator?", answer: "A standard refrigerator needs a 1,500–2,000W continuous inverter with at least 3,000W surge capacity. The running load is typically 150W, but compressor startup surge can reach 600W or more." },
+  { question: "Does refrigerator size affect battery requirements?", answer: "Yes. A compact dorm fridge (60–100W) uses significantly less energy than a full-size model (150–250W). Chest freezers are more efficient due to top-opening design. Always check your specific appliance wattage." },
+];
+
+const relatedCalculators = [
+  { href: "/home-power-outage-battery-backup-calculator", title: "Home Power Outage Battery Backup Calculator", description: "Full backup power calculator for all household appliances." },
+  { href: "/tools/runtime-calculator", title: "Battery Runtime Calculator", description: "Estimate discharge time from capacity and load." },
+  { href: "/tools/battery-sizing-calculator", title: "Battery Sizing Calculator", description: "Full battery bank sizing with temperature derating." },
+  { href: "/tools/solar-battery-sizing-calculator", title: "Solar Battery Sizing Calculator", description: "Size batteries paired with solar panel arrays." },
+  { href: "/tools/energy-conversion-calculator", title: "Energy Conversion Calculator", description: "Convert between Ah, Wh, and kWh at any voltage." },
+  { href: "/tools/charging-time-calculator", title: "Charging Time Calculator", description: "Estimate charge time from solar or grid." },
+  { href: "/tools/voltage-drop-calculator", title: "Voltage Drop Calculator", description: "Size wire runs to minimize voltage drop." },
+  { href: "/tools/dc-cable-loss-calculator", title: "DC Cable Loss Calculator", description: "Calculate wiring losses in DC connections." },
+];
+
+const presetAppliances = [
+  { name: "Refrigerator", runningW: 150, surgeW: 600 }, { name: "Freezer", runningW: 120, surgeW: 500 },
+  { name: "Wi-Fi Router", runningW: 12, surgeW: 12 }, { name: "LED Light", runningW: 10, surgeW: 10 },
+  { name: "Laptop", runningW: 60, surgeW: 90 }, { name: "TV", runningW: 100, surgeW: 150 },
+  { name: "CPAP Machine", runningW: 40, surgeW: 80 }, { name: "Fan", runningW: 50, surgeW: 75 },
+  { name: "Sump Pump", runningW: 800, surgeW: 2000 }, { name: "Microwave", runningW: 1000, surgeW: 1500 },
+];
+---
+
+<CalculatorLayout
+  title="Fridge Battery Backup Calculator | Battery Calculators"
+  description="Calculate the battery size, inverter capacity, and backup runtime needed to keep your refrigerator running during a power outage. Prevent food spoilage with properly sized emergency backup power."
+  faqItems={faqItems}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+  relatedCalculators={relatedCalculators}
+>
+  <PowerOutageForm
+    presetAppliances={presetAppliances}
+    defaultBackupHours={12}
+    defaultVoltage="24"
+    defaultLoadsDescription="A refrigerator has been pre-loaded above. Adjust the backup duration and settings to match your needs."
+    defaultLoads={[{ name: "Refrigerator", quantity: 1 }]}
+  />
+
+  <section class="mb-16 border-t border-hairline pt-12">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+      <FormulaBox title="Mathematical Formulas">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Total Running W = Σ (Appliance Running W × Quantity)</div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Surge W = Highest Single Appliance Surge + Other Running W</div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Energy Required (Wh) = (Running W × Hours) / Inverter Efficiency × (1 + Safety Margin)</div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Battery Ah = Required Wh / (Battery Voltage × Depth of Discharge)</div>
+      </FormulaBox>
+      <div>
+        <h2 class="text-title-lg text-primary uppercase mb-6 tracking-wider">Worked Example</h2>
+        <div class="text-body-sm text-muted flex flex-col gap-4">
+          <p><strong>Scenario:</strong> Keep a refrigerator cold during a 12-hour hurricane power outage.</p>
+          <div class="border-l-2 border-m-blue-light pl-4">
+            <p class="font-bold text-primary mb-2">Step 1: Running load</p>
+            <div class="font-mono text-primary">Refrigerator: 150W × 1 = 150W</div>
+          </div>
+          <div class="border-l-2 border-m-blue-light pl-4">
+            <p class="font-bold text-primary mb-2">Step 2: Surge</p>
+            <div class="font-mono text-primary">Compressor startup: 600W (no other loads)</div>
+          </div>
+          <div class="border-l-2 border-m-blue-light pl-4">
+            <p class="font-bold text-primary mb-2">Step 3: Energy required</p>
+            <div class="font-mono text-primary">Raw: 150W × 12h = 1,800 Wh</div>
+            <div class="font-mono text-primary">After efficiency: 1,800 / 0.90 = 2,000 Wh</div>
+            <div class="font-mono text-primary">With 20% margin: 2,000 × 1.20 = 2,400 Wh</div>
+          </div>
+          <div class="border-l-2 border-m-blue-light pl-4">
+            <p class="font-bold text-primary mb-2">Step 4: Battery (24V LFP, 80% DoD)</p>
+            <div class="font-mono text-primary">Ah = 2,400 / (24 × 0.80) = 125 Ah</div>
+            <div class="font-mono text-primary font-bold mt-1">Result: 24V 130Ah LFP battery bank (≈3.1 kWh)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <FAQSection items={faqItems} />
+</CalculatorLayout>

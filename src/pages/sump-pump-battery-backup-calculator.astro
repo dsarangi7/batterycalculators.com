@@ -1,0 +1,126 @@
+---
+import CalculatorLayout from '../layouts/CalculatorLayout.astro';
+import FormulaBox from '../components/FormulaBox.astro';
+import FAQSection from '../components/FAQSection.astro';
+import PowerOutageForm from '../components/PowerOutageForm.astro';
+
+const whatIs = `A sump pump battery backup calculator determines the battery capacity, inverter size, and backup runtime you need to keep your sump pump running during a power outage. Sump pumps are critical flood prevention devices — when the grid fails during a storm, water levels rise fast. This calculator sizes your battery based on your sump pump's running wattage and motor startup surge, accounting for inverter efficiency, depth-of-discharge limits, and a configurable safety margin.`;
+
+const whyItMatters = [
+  "Sump pumps draw 800–1,200W running and 2,000–3,000W surge during motor startup — one of the highest-draw residential appliances to back up.",
+  "Power outages during storms are exactly when you need your sump pump most — without backup power, basements flood within hours.",
+  "A 1/3 HP sump pump moves 7–10 gallons per minute. A flooded basement causes $5,000–$15,000 in average damage.",
+  "Battery backup sump pump systems are a separate product, but a whole-home battery provides more flexibility and higher surge capacity.",
+  "Sump pump motors have very high startup surge (3–5× running wattage) — most cheap inverters cannot handle the load."
+];
+
+const practicalApplications = [
+  { title: "Storm Flood Prevention", description: "Keep your sump pump running when power goes out during heavy rain — the exact time flooding risk is highest." },
+  { title: "Basement Protection", description: "Prevent thousands in water damage by ensuring your primary sump pump has power during grid outages." },
+  { title: "Whole-Home Battery Sizing", description: "Factor your sump pump's high surge into your whole-home battery backup system sizing." },
+  { title: "Construction & Renovation Sites", description: "Temporary dewatering during construction projects often requires battery-powered pump operation." },
+];
+
+const expertNotes: { title: string; variant: 'engineering' | 'tip' | 'warning'; content: string }[] = [
+  { title: "Sump Pump Surge is the Real Challenge", variant: "engineering", content: "A 1/3 HP sump pump draws ~800W running but surges to 2,000–3,000W during motor startup (1–3 seconds). Your inverter must handle this peak. A 2,000W continuous inverter with 4,000W surge is a minimum." },
+  { title: "Duty Cycle Is Low", variant: "tip", content: "Sump pumps cycle on and off based on water level — typically running 30 seconds to 2 minutes per cycle, with minutes between cycles. Actual power consumption is much lower than continuous running suggests." },
+  { title: "Consider a Battery Backup Sump Pump", variant: "warning", content: "Dedicated battery backup sump pump systems exist as a secondary pump. They use a 12V marine battery and run independently. However, they have limited capacity — a whole-home battery provides more runtime and power." }
+];
+
+const trustSection = {
+  text: "This calculator uses standard electrical engineering formulas for battery system sizing. Sump pump surge varies significantly by model — always verify with your specific device.",
+  link: { label: "View our methodology", href: "/methodology" }
+};
+
+const references = [
+  { title: "FEMA — Flood Insurance & Protection", url: "https://www.fema.gov/flood-insurance", source: "Federal Emergency Management Agency" },
+  { title: "InterNACHI — Sump Pump Inspection", url: "https://www.nachi.org/sump-pumps.htm", source: "International Association of Certified Home Inspectors" },
+];
+
+const faqItems = [
+  { question: "What size battery for a sump pump?", answer: "A 1/3 HP sump pump (~800W running) needs a 24V 100Ah LiFePO4 battery (2,560 Wh) for 4–6 hours of intermittent pumping. The high motor surge (2,000–3,000W) requires a high-surge inverter — at least 2,000W continuous with 4,000W+ peak." },
+  { question: "How long can a battery run a sump pump?", answer: "Runtime depends on how often the pump cycles. During steady rain, a sump pump may run 30 seconds every 5–10 minutes. A 24V 100Ah battery can support this cycling pattern for 6–12 hours. Continuous running depletes it in 1–2 hours." },
+  { question: "Can a portable power station run a sump pump?", answer: "Only high-capacity units (2,000W+ output, 2,000+ Wh capacity) can handle a sump pump's motor surge. Most 1,000W stations cannot handle the 2,000–3,000W startup spike. Always check the surge rating, not just continuous output." },
+  { question: "Why does a sump pump need so much power?", answer: "Sump pumps use induction motors that draw 3–5× their running wattage during startup (1–3 seconds). A 1/3 HP pump draws ~800W running but 2,500W+ during startup. This surge is the limiting factor for battery backup sizing." },
+];
+
+const relatedCalculators = [
+  { href: "/home-power-outage-battery-backup-calculator", title: "Home Power Outage Battery Backup Calculator", description: "Full backup power calculator for all household appliances." },
+  { href: "/tools/runtime-calculator", title: "Battery Runtime Calculator", description: "Estimate discharge time from capacity and load." },
+  { href: "/tools/battery-sizing-calculator", title: "Battery Sizing Calculator", description: "Full battery bank sizing with temperature derating." },
+  { href: "/tools/solar-battery-sizing-calculator", title: "Solar Battery Sizing Calculator", description: "Size batteries paired with solar panel arrays." },
+  { href: "/tools/energy-conversion-calculator", title: "Energy Conversion Calculator", description: "Convert between Ah, Wh, and kWh at any voltage." },
+  { href: "/tools/charging-time-calculator", title: "Charging Time Calculator", description: "Estimate charge time from solar or grid." },
+  { href: "/tools/voltage-drop-calculator", title: "Voltage Drop Calculator", description: "Size wire runs to minimize voltage drop." },
+  { href: "/tools/dc-cable-loss-calculator", title: "DC Cable Loss Calculator", description: "Calculate wiring losses in DC connections." },
+];
+
+const presetAppliances = [
+  { name: "Sump Pump", runningW: 800, surgeW: 2000 }, { name: "Refrigerator", runningW: 150, surgeW: 600 },
+  { name: "Wi-Fi Router", runningW: 12, surgeW: 12 }, { name: "LED Light", runningW: 10, surgeW: 10 },
+  { name: "Laptop", runningW: 60, surgeW: 90 }, { name: "TV", runningW: 100, surgeW: 150 },
+  { name: "Fan", runningW: 50, surgeW: 75 }, { name: "Microwave", runningW: 1000, surgeW: 1500 },
+  { name: "Freezer", runningW: 120, surgeW: 500 }, { name: "CPAP Machine", runningW: 40, surgeW: 80 },
+];
+---
+
+<CalculatorLayout
+  title="Sump Pump Battery Backup Calculator | Battery Calculators"
+  description="Calculate the battery size, inverter capacity, and backup runtime needed to keep your sump pump running during a power outage. Prevent basement flooding with properly sized emergency backup power."
+  faqItems={faqItems}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+  relatedCalculators={relatedCalculators}
+>
+  <PowerOutageForm
+    presetAppliances={presetAppliances}
+    defaultBackupHours={4}
+    defaultVoltage="24"
+    defaultLoadsDescription="A sump pump has been pre-loaded above. Add other critical loads and adjust backup duration."
+    defaultLoads={[{ name: "Sump Pump", quantity: 1 }]}
+  />
+
+  <section class="mb-16 border-t border-hairline pt-12">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+      <FormulaBox title="Mathematical Formulas">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Total Running W = Σ (Appliance Running W × Quantity)</div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Surge W = Highest Single Appliance Surge + Other Running W</div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Energy Required (Wh) = (Running W × Hours) / Inverter Efficiency × (1 + Safety Margin)</div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Battery Ah = Required Wh / (Battery Voltage × Depth of Discharge)</div>
+        <p class="text-xs text-muted mt-4">Note: Sump pumps cycle intermittently — actual runtime may be 2–4× longer than continuous running estimates suggest.</p>
+      </FormulaBox>
+      <div>
+        <h2 class="text-title-lg text-primary uppercase mb-6 tracking-wider">Worked Example</h2>
+        <div class="text-body-sm text-muted flex flex-col gap-4">
+          <p><strong>Scenario:</strong> Keep a sump pump operational during a 4-hour power outage from a severe storm.</p>
+          <div class="border-l-2 border-m-blue-light pl-4">
+            <p class="font-bold text-primary mb-2">Step 1: Running load</p>
+            <div class="font-mono text-primary">Sump pump: 800W × 1 = 800W</div>
+          </div>
+          <div class="border-l-2 border-m-blue-light pl-4">
+            <p class="font-bold text-primary mb-2">Step 2: Surge</p>
+            <div class="font-mono text-primary">Motor startup: 2,000W (no other loads)</div>
+          </div>
+          <div class="border-l-2 border-m-blue-light pl-4">
+            <p class="font-bold text-primary mb-2">Step 3: Energy required</p>
+            <div class="font-mono text-primary">Raw: 800W × 4h = 3,200 Wh</div>
+            <div class="font-mono text-primary">After efficiency: 3,200 / 0.90 = 3,556 Wh</div>
+            <div class="font-mono text-primary">With 20% margin: 3,556 × 1.20 = 4,267 Wh</div>
+          </div>
+          <div class="border-l-2 border-m-blue-light pl-4">
+            <p class="font-bold text-primary mb-2">Step 4: Battery (24V LFP, 80% DoD)</p>
+            <div class="font-mono text-primary">Ah = 4,267 / (24 × 0.80) = 222 Ah</div>
+            <div class="font-mono text-primary font-bold mt-1">Result: 24V 230Ah LFP battery (≈5.5 kWh)</div>
+          </div>
+          <p class="text-xs text-muted mt-2">Note: Sump pumps cycle intermittently. If the pump runs 30 sec every 10 min, actual runtime extends to 8+ hours on this bank.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <FAQSection items={faqItems} />
+</CalculatorLayout>

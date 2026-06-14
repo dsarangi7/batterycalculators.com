@@ -1,0 +1,235 @@
+---
+import CalculatorCard from './CalculatorCard.astro';
+import InputField from './InputField.astro';
+import ResultBox from './ResultBox.astro';
+
+export interface AppliancePreset {
+  name: string;
+  runningW: number;
+  surgeW: number;
+}
+
+export interface DefaultLoad {
+  name: string;
+  quantity?: number;
+}
+
+export interface Props {
+  presetAppliances: AppliancePreset[];
+  defaultBackupHours: number;
+  defaultVoltage: string;
+  defaultLoadsDescription: string;
+  defaultLoads?: DefaultLoad[];
+  componentId?: string;
+}
+
+const { presetAppliances, defaultBackupHours, defaultVoltage = '24', defaultLoadsDescription, defaultLoads = [], componentId = 'calc' } = Astro.props as Props;
+---
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+  <CalculatorCard>
+    <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Appliance Loads</h3>
+    <div class="flex flex-col gap-5" id="appliance-list">
+      <div class="flex flex-col gap-2">
+        <label class="text-label-uppercase text-xs text-primary">Add Appliances</label>
+        <div class="relative flex items-center">
+          <select id="appliance-select" class="select-input w-full">
+            <option value="">Select an appliance...</option>
+            {presetAppliances.map((a) => (
+              <option value={a.name} class="bg-surface-card">{a.name} ({a.runningW}W / {a.surgeW}W surge)</option>
+            ))}
+            <option value="custom" class="bg-surface-card">Custom Load...</option>
+          </select>
+        </div>
+      </div>
+      <div id="custom-load-fields" class="hidden flex-col gap-4 p-4 bg-surface-soft border border-hairline">
+        <div class="flex flex-col gap-2">
+          <label for="custom-name" class="text-label-uppercase text-xs text-primary">Custom Appliance Name</label>
+          <input id="custom-name" type="text" class="text-input w-full" placeholder="e.g., Well Pump" />
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div class="flex flex-col gap-2">
+            <label for="custom-running" class="text-label-uppercase text-xs text-primary">Running Watts</label>
+            <input id="custom-running" type="number" class="text-input w-full" value={100} min={1} />
+          </div>
+          <div class="flex flex-col gap-2">
+            <label for="custom-surge" class="text-label-uppercase text-xs text-primary">Surge Watts</label>
+            <input id="custom-surge" type="number" class="text-input w-full" value={200} min={1} />
+          </div>
+        </div>
+        <button id="add-custom-btn" type="button" class="btn-primary w-full">Add Custom Load</button>
+      </div>
+      <div id="selected-appliances" class="flex flex-col gap-2"></div>
+    </div>
+    <div class="border-t border-hairline mt-6 pt-6 flex flex-col gap-5">
+      <h3 class="text-title-lg text-primary uppercase tracking-wider">Backup Settings</h3>
+      <InputField id="backup-hours" label="Backup Duration" value={defaultBackupHours} min={0.5} max={72} step={0.5} unit="hours" helperText="How long you need backup power during the outage." />
+      <InputField id="battery-voltage" label="Battery System Voltage" type="select" value={defaultVoltage} helperText="12V for small portable setups, 24V for mid-size, 48V for whole-home." options={[{ label: "12 V", value: "12" }, { label: "24 V", value: "24" }, { label: "48 V", value: "48" }]} />
+      <InputField id="battery-chemistry" label="Battery Chemistry" type="select" value="lifepo4" helperText="LiFePO4 recommended: safest, longest life, deepest discharge." options={[{ label: "LiFePO4", value: "lifepo4" }, { label: "AGM / Sealed Lead-Acid", value: "agm" }, { label: "Flooded Lead-Acid", value: "flooded" }]} />
+      <InputField id="dod-percent" label="Depth of Discharge" value={80} min={10} max={100} step={1} unit="%" helperText="Auto-set by chemistry. LiFePO4: 80%, Lead-Acid: 50%." />
+      <InputField id="inverter-efficiency" label="Inverter Efficiency" value={90} min={80} max={98} step={1} unit="%" helperText="Modern pure sine wave inverters: 90–95%. Use 90% for conservative sizing." />
+      <InputField id="safety-margin" label="Safety Margin" value={20} min={0} max={50} step={1} unit="%" helperText="Extra capacity buffer for temperature, aging, and unexpected loads." />
+    </div>
+    <div class="border-t border-hairline mt-6 pt-6 flex flex-col gap-5">
+      <div class="flex items-center gap-3">
+        <input type="checkbox" id="solar-enabled" class="w-4 h-4 accent-m-blue-light" />
+        <label for="solar-enabled" class="text-label-uppercase text-xs text-primary cursor-pointer">Enable Solar Recharge</label>
+      </div>
+      <div id="solar-fields" class="hidden flex-col gap-5">
+        <InputField id="solar-watts" label="Solar Panel Wattage" value={400} min={50} max={10000} step={50} unit="W" helperText="Total wattage of solar panels connected to charge controller." />
+        <InputField id="peak-sun-hours" label="Peak Sun Hours" value={5} min={1} max={10} step={0.5} unit="hours" helperText="Average daily peak sun hours for your location." />
+        <InputField id="charge-controller-efficiency" label="Charge Controller Efficiency" value={95} min={80} max={99} step={1} unit="%" helperText="MPPT controllers: 95–98%. PWM controllers: 80–90%." />
+      </div>
+    </div>
+  </CalculatorCard>
+
+  <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+    <div>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Backup System Results</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <ResultBox label="Required Battery Energy" value="0 Wh" suffix="0 kWh total battery bank" variant="primary" id="result-battery-wh" />
+        <ResultBox label="Battery Capacity" value="0 Ah" suffix={`At ${defaultVoltage}V nominal`} id="result-battery-ah" />
+        <ResultBox label="Total Running Load" value="0 W" suffix="Continuous draw" id="result-running-w" />
+        <ResultBox label="Estimated Surge" value="0 W" suffix="Startup peak" id="result-surge-w" />
+        <ResultBox label="Inverter Continuous" value="0 W" suffix="Recommended minimum" id="result-inverter-cont" />
+        <ResultBox label="Inverter Surge Rating" value="0 W" suffix="Recommended minimum" id="result-inverter-surge" />
+      </div>
+      <div class="bg-surface-soft border border-hairline p-4 mb-6">
+        <h4 class="text-label-uppercase text-primary text-[10px] mb-3">Suggested Battery Configurations</h4>
+        <div class="grid grid-cols-2 gap-3 text-body-sm text-muted">
+          <div class="flex justify-between"><span>12V 100Ah batteries:</span> <span class="text-primary font-bold" id="result-bat-12v100">0</span></div>
+          <div class="flex justify-between"><span>12V 200Ah batteries:</span> <span class="text-primary font-bold" id="result-bat-12v200">0</span></div>
+          <div class="flex justify-between"><span>24V 100Ah batteries:</span> <span class="text-primary font-bold" id="result-bat-24v100">0</span></div>
+          <div class="flex justify-between"><span>48V 100Ah batteries:</span> <span class="text-primary font-bold" id="result-bat-48v100">0</span></div>
+        </div>
+      </div>
+      <div id="solar-results" class="hidden bg-surface-soft border border-hairline p-4 mb-6">
+        <h4 class="text-label-uppercase text-primary text-[10px] mb-3">Solar Recharge Estimate</h4>
+        <div class="flex flex-col gap-2 text-body-sm text-muted">
+          <div class="flex justify-between"><span>Daily solar energy:</span> <span class="text-primary font-bold" id="result-solar-daily">0 Wh</span></div>
+          <div class="flex justify-between"><span>Full recharge time:</span> <span class="text-primary font-bold" id="result-solar-recharge">0 hours</span></div>
+          <div class="flex justify-between"><span>Solar sufficient for daily use:</span> <span class="text-primary font-bold" id="result-solar-sufficient">—</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="border-t border-hairline pt-6">
+      <h4 class="text-label-uppercase text-primary text-xs mb-2">Planning Notes</h4>
+      <p class="text-body-sm text-muted" id="planning-notes">{defaultLoadsDescription}</p>
+    </div>
+  </CalculatorCard>
+</div>
+
+<script define:vars={{ defaultVoltage, defaultLoads: JSON.stringify(defaultLoads) }}>
+  import { calculatePowerOutageBackup } from '../utils/calculators';
+
+  const presetData = [
+    ["Refrigerator", 150, 600], ["Freezer", 120, 500], ["Wi-Fi Router", 12, 12],
+    ["LED Light", 10, 10], ["Laptop", 60, 90], ["TV", 100, 150],
+    ["CPAP Machine", 40, 80], ["Fan", 50, 75], ["Sump Pump", 800, 2000],
+    ["Microwave", 1000, 1500], ["CPAP (no humidifier)", 20, 40], ["Phone Charger", 15, 15],
+  ];
+  const appliancePresets = {};
+  presetData.forEach(([name, runningW, surgeW]) => { appliancePresets[name] = { runningW, surgeW }; });
+
+  const defaults = JSON.parse(defaultLoads || '[]');
+
+  let appliances = [];
+  let nextId = 1;
+  const el = (id) => document.getElementById(id);
+  const applianceSelect = el('appliance-select');
+  const customLoadFields = el('custom-load-fields');
+  const selectedAppliancesDiv = el('selected-appliances');
+  const chemistryDodMap = { lifepo4: 80, agm: 50, flooded: 50 };
+
+  function addAppliance(name, runningW, surgeW) {
+    const existing = appliances.find(a => a.name === name);
+    if (existing) { existing.quantity++; renderAppliances(); updateCalculations(); return; }
+    appliances.push({ id: `appliance-${nextId++}`, name, runningW, surgeW, quantity: 1 });
+    renderAppliances(); updateCalculations();
+  }
+  function removeAppliance(id) { appliances = appliances.filter(a => a.id !== id); renderAppliances(); updateCalculations(); }
+  function updateQuantity(id, qty) { const a = appliances.find(a => a.id === id); if (a) { a.quantity = Math.max(1, Math.min(20, qty)); updateCalculations(); } }
+
+  function renderAppliances() {
+    if (!selectedAppliancesDiv) return;
+    selectedAppliancesDiv.innerHTML = '';
+    if (appliances.length === 0) return;
+    const header = document.createElement('div');
+    header.className = 'flex items-center justify-between mb-1';
+    header.innerHTML = `<span class="text-label-uppercase text-muted text-[10px]">SELECTED APPLIANCES</span><span class="text-caption text-muted">${appliances.length} item${appliances.length !== 1 ? 's' : ''}</span>`;
+    selectedAppliancesDiv.appendChild(header);
+    for (const appliance of appliances) {
+      const row = document.createElement('div');
+      row.className = 'flex items-center gap-3 bg-surface-soft border border-hairline p-3';
+      row.innerHTML = `<div class="flex-1 min-w-0"><span class="text-primary font-bold text-sm block truncate">${appliance.name}</span><span class="text-caption text-muted">${appliance.runningW}W running / ${appliance.surgeW}W surge</span></div><div class="flex items-center gap-2 shrink-0"><label class="text-caption text-muted">Qty:</label><input type="number" class="text-input w-16 h-8 text-center text-sm" value="${appliance.quantity}" min="1" max="20" data-id="${appliance.id}" /></div><button type="button" class="text-m-red hover:text-primary text-lg font-bold px-2 h-8 flex items-center justify-center border border-hairline hover:border-primary transition-colors shrink-0" data-remove="${appliance.id}">✕</button>`;
+      (row.querySelector('input')).addEventListener('input', (e) => { updateQuantity(appliance.id, parseInt(e.target.value) || 1); });
+      (row.querySelector('[data-remove]')).addEventListener('click', () => { removeAppliance(appliance.id); });
+      selectedAppliancesDiv.appendChild(row);
+    }
+  }
+
+  applianceSelect?.addEventListener('change', () => {
+    const val = applianceSelect.value; if (!val) return;
+    if (val === 'custom') { customLoadFields?.classList.remove('hidden'); customLoadFields?.classList.add('flex'); }
+    else { customLoadFields?.classList.add('hidden'); customLoadFields?.classList.remove('flex'); const preset = appliancePresets[val]; if (preset) addAppliance(val, preset.runningW, preset.surgeW); }
+    applianceSelect.value = '';
+  });
+
+  el('add-custom-btn')?.addEventListener('click', () => {
+    const n = el('custom-name'); const r = el('custom-running'); const s = el('custom-surge');
+    addAppliance(n?.value.trim() || 'Custom Load', Math.max(1, parseInt(r?.value) || 100), Math.max(1, parseInt(s?.value) || 200));
+    if (n) n.value = '';
+  });
+
+  el('solar-enabled')?.addEventListener('change', () => {
+    const checked = el('solar-enabled').checked;
+    if (checked) { el('solar-fields')?.classList.remove('hidden'); el('solar-fields')?.classList.add('flex'); el('solar-results')?.classList.remove('hidden'); }
+    else { el('solar-fields')?.classList.add('hidden'); el('solar-fields')?.classList.remove('flex'); el('solar-results')?.classList.add('hidden'); }
+    updateCalculations();
+  });
+
+  el('battery-chemistry')?.addEventListener('change', () => { const dod = chemistryDodMap[el('battery-chemistry').value]; if (dod && el('dod-percent')) el('dod-percent').value = String(dod); updateCalculations(); });
+
+  function set(id, sel, text) { const e = el(id)?.querySelector(sel); if (e) e.textContent = text; }
+
+  function updateCalculations() {
+    const backupHours = parseFloat(el('backup-hours')?.value) || 8;
+    const batteryVoltage = parseFloat(el('battery-voltage')?.value) || 24;
+    const dodPercent = parseFloat(el('dod-percent')?.value) || 80;
+    const inverterEfficiency = parseFloat(el('inverter-efficiency')?.value) || 90;
+    const safetyMargin = parseFloat(el('safety-margin')?.value) || 20;
+    const solarEnabled = el('solar-enabled')?.checked || false;
+    const solarWatts = parseFloat(el('solar-watts')?.value) || 400;
+    const peakSunHours = parseFloat(el('peak-sun-hours')?.value) || 5;
+    const chargeControllerEff = parseFloat(el('charge-controller-efficiency')?.value) || 95;
+    const applianceLoads = appliances.map(a => ({ name: a.name, runningW: a.runningW, surgeW: a.surgeW, quantity: a.quantity }));
+    const results = calculatePowerOutageBackup(applianceLoads, backupHours, batteryVoltage, dodPercent, inverterEfficiency, safetyMargin, solarEnabled, solarWatts, peakSunHours, chargeControllerEff);
+
+    set('result-battery-wh', '.text-display-md', `${Math.round(results.energyRequiredWh).toLocaleString()} Wh`);
+    set('result-battery-wh', '.text-caption', `${results.energyRequiredKwh.toFixed(1)} kWh total battery bank`);
+    set('result-battery-ah', '.text-title-lg', `${Math.round(results.batteryCapacityAh).toLocaleString()} Ah`);
+    set('result-battery-ah', '.text-caption', `At ${batteryVoltage}V nominal`);
+    set('result-running-w', '.text-title-lg', `${Math.round(results.totalRunningW).toLocaleString()} W`);
+    set('result-surge-w', '.text-title-lg', `${Math.round(results.surgeW).toLocaleString()} W`);
+    set('result-inverter-cont', '.text-title-lg', `${results.inverterContinuousW.toLocaleString()} W`);
+    set('result-inverter-surge', '.text-title-lg', `${results.inverterSurgeW.toLocaleString()} W`);
+
+    const bat = (id, val) => { const e = el(id); if (e) e.textContent = String(val); };
+    bat('result-bat-12v100', results.batteries12v100ah); bat('result-bat-12v200', results.batteries12v200ah);
+    bat('result-bat-24v100', results.batteries24v100ah); bat('result-bat-48v100', results.batteries48v100ah);
+
+    if (solarEnabled) { set('result-solar-daily', '.text-primary', `${Math.round(results.solarDailyWh).toLocaleString()} Wh`); set('result-solar-recharge', '.text-primary', `${results.solarRechargeHours.toFixed(1)} hours`); set('result-solar-sufficient', '.text-primary', results.solarSufficient ? 'Yes' : 'No — need more panels'); }
+
+    const pn = el('planning-notes');
+    if (pn) { if (appliances.length === 0) { /* keep default text */ } else { const cn = el('battery-chemistry')?.value === 'lifepo4' ? 'LiFePO4' : el('battery-chemistry')?.value === 'agm' ? 'AGM Lead-Acid' : 'Flooded Lead-Acid'; pn.textContent = `For ${Math.round(results.totalRunningW)}W of loads over ${backupHours} hours at ${batteryVoltage}V ${cn}, you need approximately ${results.energyRequiredKwh.toFixed(1)} kWh of battery capacity (${Math.round(results.batteryCapacityAh)} Ah). Recommended inverter: ${results.inverterContinuousW}W continuous with ${results.inverterSurgeW}W surge rating.`; } }
+  }
+
+  [el('backup-hours'), el('dod-percent'), el('inverter-efficiency'), el('safety-margin'), el('solar-watts'), el('peak-sun-hours'), el('charge-controller-efficiency')].forEach(e => { e?.addEventListener('input', updateCalculations); });
+  [el('battery-voltage'), el('battery-chemistry')].forEach(e => { e?.addEventListener('change', updateCalculations); });
+
+  // Pre-load default appliances
+  defaults.forEach((d) => { for (let i = 0; i < (d.quantity || 1); i++) addAppliance(d.name, appliancePresets[d.name]?.runningW || 0, appliancePresets[d.name]?.surgeW || 0); });
+
+  // Run initial calculation
+  updateCalculations();
+</script>
