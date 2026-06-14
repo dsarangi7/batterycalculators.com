@@ -1,0 +1,809 @@
+---
+import CalculatorLayout from '../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../components/CalculatorCard.astro';
+import InputField from '../components/InputField.astro';
+import ResultBox from '../components/ResultBox.astro';
+import FormulaBox from '../components/FormulaBox.astro';
+import FAQSection from '../components/FAQSection.astro';
+
+const whatIs = `A home power outage battery backup calculator helps you estimate the battery capacity, inverter size, and overall backup power system you need to keep essential appliances running during a grid outage. Whether you're preparing for hurricane season, wildfire shutoffs, winter storms, or unexpected blackouts, this tool sizes your battery bank based on the specific devices you want powered—refrigerator, CPAP machine, sump pump, Wi-Fi router, lights, and more. It accounts for inverter conversion losses, battery chemistry depth-of-discharge limits, and a configurable safety margin to give you a realistic, engineering-grade estimate.`;
+
+const whyItMatters = [
+  "U.S. power outages have increased 67% over the past decade—storms, wildfires, and grid strain make backup power a practical necessity in many regions.",
+  "Undersized battery systems leave you without refrigeration or medical device power during multi-day outages. A full fridge costs $300–$600 to restock if food spoils.",
+  "Oversized systems waste money—every unnecessary 5 kWh of LFP capacity adds $2,000–$4,000 in cost. Right-sizing saves thousands.",
+  "Ignoring surge loads from appliances like sump pumps and refrigerators can trip your inverter at the worst possible moment—proper surge sizing prevents mid-outage failures.",
+  "Not planning for temperature extremes means battery capacity drops 10–30% in cold weather, leaving you short when you need backup most during winter storms."
+];
+
+const practicalApplications = [
+  { title: "Hurricane & Storm Preparedness", description: "Size a battery system to maintain critical loads through 24–72 hour outages common during hurricanes, nor'easters, and severe thunderstorms." },
+  { title: "Wildfire Public Safety Power Shutoffs", description: "Prepare for planned grid shutoffs during high fire danger. California and western U.S. utilities regularly de-energize lines to prevent ignition." },
+  { title: "Medical Equipment Backup Power", description: "Ensure sufficient battery runtime for CPAP machines, oxygen concentrators, nebulizers, and other life-sustaining medical devices." },
+  { title: "Winter Storm & Ice Storm Backup", description: "Keep heating controls, sump pumps, refrigeration, and communication equipment running during ice storms and blizzards that knock out power for days." },
+  { title: "Portable Power Station Sizing", description: "Use this calculator to match a portable power station or solar generator to your specific emergency load requirements before purchasing." },
+  { title: "Fridge & Freezer Protection", description: "Calculate exactly how long a battery can keep your refrigerator and freezer running to prevent food spoilage during extended outages." }
+];
+
+const expertNotes: { title: string; variant: 'engineering' | 'tip' | 'warning'; content: string }[] = [
+  {
+    title: "Appliance Duty Cycles Matter",
+    variant: "engineering",
+    content: "A refrigerator draws 150W when the compressor runs, but it cycles on and off—typically running 30–50% of the time. This calculator uses continuous running wattage for conservative sizing. Real-world runtime may be 40–60% longer than calculated for cycling loads like refrigerators and freezers."
+  },
+  {
+    title: "LiFePO4 vs Lead-Acid for Emergency Backup",
+    variant: "tip",
+    content: "LiFePO4 (LFP) batteries deliver 80–100% usable capacity, weigh 60% less, last 10× more cycles, and require zero maintenance. Lead-acid batteries are limited to 50% depth of discharge and lose capacity rapidly in cold weather. For emergency backup where reliability matters, LFP is the clear recommendation."
+  },
+  {
+    title: "Surge Loads Can Trip Your Inverter",
+    variant: "warning",
+    content: "Sump pumps, refrigerators, and microwaves draw 2–3× their running wattage during startup. If your inverter surge rating is too low, it will shut down precisely when you need it most. Always size your inverter surge capacity for the worst-case startup scenario."
+  }
+];
+
+const trustSection = {
+  text: "This calculator uses standard electrical engineering formulas for battery system sizing, aligned with UL 1741 inverter standards and IEEE 1547 interconnection guidelines. All calculations are transparent, derived from publicly available appliance wattage data and manufacturer specifications. The math is fully verifiable.",
+  link: { label: "View our methodology and formula derivations", href: "/methodology" }
+};
+
+const references = [
+  { title: "U.S. EIA — Residential Electricity Consumption Data", url: "https://www.eia.gov/electricity/monthly/", source: "U.S. Energy Information Administration" },
+  { title: "UL 1741 — Standard for Inverters for Distributed Energy Resources", url: "https://www.ul.com/resources/ul-1741-edition-3", source: "Underwriters Laboratories" },
+  { title: "FEMA — Emergency Backup Power Guidance", url: "https://www.fema.gov/emergency-managers/risk-management/power/guidance", source: "Federal Emergency Management Agency" },
+  { title: "NREL — Battery Storage Sizing for Residential Applications", url: "https://www.nrel.gov/docs/fy23osti/85472.pdf", source: "National Renewable Energy Laboratory" }
+];
+
+const faqItems = [
+  {
+    question: "What size battery do I need for a power outage?",
+    answer: "For basic internet and phone backup (Wi-Fi router + laptop + lights for 8 hours), you need approximately 300–500 Wh. For food protection (refrigerator + freezer for 12 hours), plan for 2,000–4,000 Wh. For comprehensive emergency backup with medical devices, 3,000–8,000 Wh covers most critical household loads for 24 hours.",
+  },
+  {
+    question: "How long will a 100Ah battery run a refrigerator?",
+    answer: "A 12V 100Ah LiFePO4 battery (1,280 Wh) can run a standard refrigerator for approximately 8–12 hours. The refrigerator compressor cycles on and off, so actual runtime depends on ambient temperature, fridge efficiency, and how often the door is opened. In warm conditions with frequent door openings, expect closer to 6–8 hours.",
+  },
+  {
+    question: "Is LiFePO4 better than lead-acid for home backup?",
+    answer: "Yes, for emergency backup power. LiFePO4 provides 80–100% usable depth of discharge vs 50% for lead-acid, lasts 3,000–6,000 cycles vs 300–500 for lead-acid, charges faster, weighs 60% less, and requires zero maintenance. The upfront cost is higher but the lifetime cost per cycle is significantly lower.",
+  },
+  {
+    question: "What size inverter do I need for a refrigerator?",
+    answer: "A standard refrigerator needs a 1,500–2,000W continuous inverter with at least 3,000W surge capacity. The running load is typically 150W, but the compressor startup surge can reach 600W or more. If you're running additional appliances, add their running watts and the largest single surge load to size your inverter.",
+  },
+  {
+    question: "Can a portable power station run a fridge?",
+    answer: "Yes, a portable power station rated at 1,500W+ continuous with 3,000W+ surge can run a standard refrigerator. You'll need a unit with at least 1,000–1,500 Wh capacity for 8–12 hours of backup. Popular options include the EcoFlow Delta 2 (1,024 Wh), Bluetti AC200MAX (2,048 Wh), and Goal Zero Yeti 1500X (1,516 Wh).",
+  },
+  {
+    question: "How much battery backup do I need for a CPAP machine?",
+    answer: "A typical CPAP machine draws 30–60W with humidifier (10–30W without). For 8 hours of sleep, you need 240–480 Wh. A 12V 50Ah LiFePO4 battery (640 Wh) provides a full night's CPAP power. Without the humidifier, a 12V 20Ah battery (256 Wh) can last one night.",
+  },
+  {
+    question: "Should I use 12V, 24V, or 48V for home backup?",
+    answer: "For home backup systems over 1,000W, use 24V or 48V. Higher voltage reduces current, allowing thinner wires and lower losses. 48V is ideal for systems over 3,000W and is the standard for modern home battery systems. 12V is practical only for small portable setups under 1,000W.",
+  },
+  {
+    question: "Can solar panels recharge my battery during an outage?",
+    answer: "Yes, if you have a hybrid inverter with battery input. A 400W solar panel array in 4–5 peak sun hours can generate 1,600–2,000 Wh daily—enough to partially recharge a home battery or extend backup runtime significantly. This is the most effective strategy for multi-day outage survival.",
+  },
+  {
+    question: "Why does my battery not last as long as the calculator says?",
+    answer: "Common reasons: battery age and degradation (capacity drops 20–30% over years), cold weather reducing capacity 10–30%, higher actual surge draws than rated, wiring losses, inverter standby power draw, and appliance cycling patterns that differ from assumptions. This calculator provides conservative estimates—actual results vary.",
+  },
+  {
+    question: "What appliances should I avoid running on battery backup?",
+    answer: "Avoid high-draw resistive loads: air conditioners (1,500–5,000W), electric stoves (2,000–5,000W), electric water heaters (4,500W), clothes dryers (2,500–5,000W), and space heaters (1,500W). These drain batteries rapidly and require impractically large systems. Focus on critical loads: refrigeration, lighting, medical devices, communication, and small electronics."
+  },
+];
+
+const relatedCalculators = [
+  { href: "/tools/runtime-calculator", title: "Battery Runtime Calculator", description: "Estimate discharge time from capacity and load." },
+  { href: "/tools/battery-sizing-calculator", title: "Battery Sizing Calculator", description: "Full battery bank sizing with temperature derating." },
+  { href: "/tools/solar-battery-sizing-calculator", title: "Solar Battery Sizing Calculator", description: "Size batteries paired with solar panel arrays." },
+  { href: "/tools/energy-conversion-calculator", title: "Energy Conversion Calculator", description: "Convert between Ah, Wh, and kWh at any voltage." },
+  { href: "/tools/c-rate-calculator", title: "C-Rate Calculator", description: "Calculate charge and discharge rates." },
+  { href: "/tools/charging-time-calculator", title: "Charging Time Calculator", description: "Estimate charge time from solar or grid." },
+  { href: "/tools/dc-cable-loss-calculator", title: "DC Cable Loss Calculator", description: "Calculate wiring losses in DC connections." },
+  { href: "/tools/voltage-drop-calculator", title: "Voltage Drop Calculator", description: "Size wire runs to minimize voltage drop." },
+];
+
+const appliancePresets = [
+  { name: "Refrigerator", runningW: 150, surgeW: 600 },
+  { name: "Freezer", runningW: 120, surgeW: 500 },
+  { name: "Wi-Fi Router", runningW: 12, surgeW: 12 },
+  { name: "LED Light", runningW: 10, surgeW: 10 },
+  { name: "Laptop", runningW: 60, surgeW: 90 },
+  { name: "TV", runningW: 100, surgeW: 150 },
+  { name: "CPAP Machine", runningW: 40, surgeW: 80 },
+  { name: "Fan", runningW: 50, surgeW: 75 },
+  { name: "Sump Pump", runningW: 800, surgeW: 2000 },
+  { name: "Microwave", runningW: 1000, surgeW: 1500 },
+];
+---
+
+<CalculatorLayout
+  title="Home Power Outage Battery Backup Calculator | Battery Calculators"
+  description="Calculate what battery size, inverter size, and backup power system you need to run essential appliances during a power outage, storm, hurricane, wildfire outage, or emergency grid failure."
+  faqItems={faqItems}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+  relatedCalculators={relatedCalculators}
+>
+
+  <!-- Calculator Grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+
+    <!-- Input Form -->
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Appliance Loads</h3>
+      <div class="flex flex-col gap-5" id="appliance-list">
+        <div class="flex flex-col gap-2">
+          <label class="text-label-uppercase text-xs text-primary">Add Appliances</label>
+          <div class="relative flex items-center">
+            <select id="appliance-select" class="select-input w-full">
+              <option value="">Select an appliance...</option>
+              {appliancePresets.map((a) => (
+                <option value={a.name} class="bg-surface-card">{a.name} ({a.runningW}W / {a.surgeW}W surge)</option>
+              ))}
+              <option value="custom" class="bg-surface-card">Custom Load...</option>
+            </select>
+          </div>
+          <p class="text-caption text-muted">Select appliances to add them to your backup plan.</p>
+        </div>
+
+        <div id="custom-load-fields" class="hidden flex-col gap-4 p-4 bg-surface-soft border border-hairline">
+          <div class="flex flex-col gap-2">
+            <label for="custom-name" class="text-label-uppercase text-xs text-primary">Custom Appliance Name</label>
+            <input id="custom-name" type="text" class="text-input w-full" placeholder="e.g., Well Pump" />
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div class="flex flex-col gap-2">
+              <label for="custom-running" class="text-label-uppercase text-xs text-primary">Running Watts</label>
+              <input id="custom-running" type="number" class="text-input w-full" value={500} min={1} />
+            </div>
+            <div class="flex flex-col gap-2">
+              <label for="custom-surge" class="text-label-uppercase text-xs text-primary">Surge Watts</label>
+              <input id="custom-surge" type="number" class="text-input w-full" value={750} min={1} />
+            </div>
+          </div>
+          <button id="add-custom-btn" type="button" class="btn-primary w-full">Add Custom Load</button>
+        </div>
+
+        <div id="selected-appliances" class="flex flex-col gap-2"></div>
+      </div>
+
+      <div class="border-t border-hairline mt-6 pt-6 flex flex-col gap-5">
+        <h3 class="text-title-lg text-primary uppercase tracking-wider">Backup Settings</h3>
+
+        <InputField id="backup-hours" label="Backup Duration" value={8} min={0.5} max={72} step={0.5} unit="hours" helperText="How long you need backup power during the outage." />
+
+        <InputField
+          id="battery-voltage"
+          label="Battery System Voltage"
+          type="select"
+          value="24"
+          helperText="12V for small portable setups, 24V for mid-size, 48V for whole-home."
+          options={[
+            { label: "12 V", value: "12" },
+            { label: "24 V", value: "24" },
+            { label: "48 V", value: "48" },
+          ]}
+        />
+
+        <InputField
+          id="battery-chemistry"
+          label="Battery Chemistry"
+          type="select"
+          value="lifepo4"
+          helperText="LiFePO4 recommended: safest, longest life, deepest discharge."
+          options={[
+            { label: "LiFePO4", value: "lifepo4" },
+            { label: "AGM / Sealed Lead-Acid", value: "agm" },
+            { label: "Flooded Lead-Acid", value: "flooded" },
+          ]}
+        />
+
+        <InputField id="dod-percent" label="Depth of Discharge" value={80} min={10} max={100} step={1} unit="%" helperText="Auto-set by chemistry. LiFePO4: 80%, Lead-Acid: 50%. You can override." />
+
+        <InputField id="inverter-efficiency" label="Inverter Efficiency" value={90} min={80} max={98} step={1} unit="%" helperText="Modern pure sine wave inverters: 90–95%. Use 90% for conservative sizing." />
+
+        <InputField id="safety-margin" label="Safety Margin" value={20} min={0} max={50} step={1} unit="%" helperText="Extra capacity buffer for temperature, aging, and unexpected loads." />
+      </div>
+
+      <div class="border-t border-hairline mt-6 pt-6 flex flex-col gap-5">
+        <div class="flex items-center gap-3">
+          <input type="checkbox" id="solar-enabled" class="w-4 h-4 accent-m-blue-light" />
+          <label for="solar-enabled" class="text-label-uppercase text-xs text-primary cursor-pointer">Enable Solar Recharge</label>
+        </div>
+
+        <div id="solar-fields" class="hidden flex-col gap-5">
+          <InputField id="solar-watts" label="Solar Panel Wattage" value={400} min={50} max={10000} step={50} unit="W" helperText="Total wattage of solar panels connected to charge controller." />
+
+          <InputField id="peak-sun-hours" label="Peak Sun Hours" value={5} min={1} max={10} step={0.5} unit="hours" helperText="Average daily peak sun hours for your location. U.S. average: 4–6 hours." />
+
+          <InputField id="charge-controller-efficiency" label="Charge Controller Efficiency" value={95} min={80} max={99} step={1} unit="%" helperText="MPPT controllers: 95–98%. PWM controllers: 80–90%." />
+        </div>
+      </div>
+    </CalculatorCard>
+
+    <!-- Results -->
+    <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Backup System Results</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <ResultBox
+            label="Required Battery Energy"
+            value="0 Wh"
+            suffix="0 kWh total battery bank"
+            variant="primary"
+            id="result-battery-wh"
+          />
+          <ResultBox
+            label="Battery Capacity"
+            value="0 Ah"
+            suffix="At 24V nominal"
+            id="result-battery-ah"
+          />
+          <ResultBox
+            label="Total Running Load"
+            value="0 W"
+            suffix="Continuous draw"
+            id="result-running-w"
+          />
+          <ResultBox
+            label="Estimated Surge"
+            value="0 W"
+            suffix="Startup peak"
+            id="result-surge-w"
+          />
+          <ResultBox
+            label="Inverter Continuous"
+            value="0 W"
+            suffix="Recommended minimum"
+            id="result-inverter-cont"
+          />
+          <ResultBox
+            label="Inverter Surge Rating"
+            value="0 W"
+            suffix="Recommended minimum"
+            id="result-inverter-surge"
+          />
+        </div>
+
+        <div class="bg-surface-soft border border-hairline p-4 mb-6">
+          <h4 class="text-label-uppercase text-primary text-[10px] mb-3">Suggested Battery Configurations</h4>
+          <div class="grid grid-cols-2 gap-3 text-body-sm text-muted">
+            <div class="flex justify-between"><span>12V 100Ah batteries:</span> <span class="text-primary font-bold" id="result-bat-12v100">0</span></div>
+            <div class="flex justify-between"><span>12V 200Ah batteries:</span> <span class="text-primary font-bold" id="result-bat-12v200">0</span></div>
+            <div class="flex justify-between"><span>24V 100Ah batteries:</span> <span class="text-primary font-bold" id="result-bat-24v100">0</span></div>
+            <div class="flex justify-between"><span>48V 100Ah batteries:</span> <span class="text-primary font-bold" id="result-bat-48v100">0</span></div>
+          </div>
+        </div>
+
+        <div id="solar-results" class="hidden bg-surface-soft border border-hairline p-4 mb-6">
+          <h4 class="text-label-uppercase text-primary text-[10px] mb-3">Solar Recharge Estimate</h4>
+          <div class="flex flex-col gap-2 text-body-sm text-muted">
+            <div class="flex justify-between"><span>Daily solar energy:</span> <span class="text-primary font-bold" id="result-solar-daily">0 Wh</span></div>
+            <div class="flex justify-between"><span>Full recharge time:</span> <span class="text-primary font-bold" id="result-solar-recharge">0 hours</span></div>
+            <div class="flex justify-between"><span>Solar sufficient for daily use:</span> <span class="text-primary font-bold" id="result-solar-sufficient">—</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="border-t border-hairline pt-6">
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">Planning Notes</h4>
+        <p class="text-body-sm text-muted" id="planning-notes">
+          Add appliances above to calculate your backup power requirements. Results update instantly as you adjust inputs.
+        </p>
+      </div>
+    </CalculatorCard>
+  </div>
+
+  <!-- Formulas + Worked Example -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+
+      <FormulaBox title="Mathematical Formulas">
+        <p>The calculation follows a standard energy-chain approach from load to battery bank:</p>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Total Running W = Σ (Appliance Running W × Quantity)
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Surge W = Highest Single Appliance Surge + Other Running W
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Energy Required (Wh) = (Running W × Hours) / Inverter Efficiency × (1 + Safety Margin)
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Battery Ah = Required Wh / (Battery Voltage × Depth of Discharge)
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Inverter Continuous = Running W × 1.25
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Inverter Surge = Surge W × 1.10
+        </div>
+        <p>Surge is calculated as the highest single appliance startup surge plus the running load of all other appliances—not all surges stacked simultaneously.</p>
+      </FormulaBox>
+
+      <div>
+        <h2 class="text-title-lg text-primary uppercase mb-6 tracking-wider">Worked Example</h2>
+        <div class="text-body-sm text-muted flex flex-col gap-4">
+          <p><strong>Scenario:</strong> Food protection backup during a hurricane — refrigerator, freezer, Wi-Fi router, and 2 LED lights for 12 hours.</p>
+
+          <div class="border-l-2 border-m-blue-light pl-4">
+            <p class="font-bold text-primary mb-2">Step 1: Calculate running load</p>
+            <div class="font-mono text-primary">Fridge: 150W × 1 = 150W</div>
+            <div class="font-mono text-primary">Freezer: 120W × 1 = 120W</div>
+            <div class="font-mono text-primary">Router: 12W × 1 = 12W</div>
+            <div class="font-mono text-primary">LED Lights: 10W × 2 = 20W</div>
+            <div class="font-mono text-primary font-bold mt-1">Total = 302W</div>
+          </div>
+
+          <div class="border-l-2 border-m-blue-light pl-4">
+            <p class="font-bold text-primary mb-2">Step 2: Calculate surge</p>
+            <div class="font-mono text-primary">Highest surge: Fridge 600W + others 152W = 752W</div>
+          </div>
+
+          <div class="border-l-2 border-m-blue-light pl-4">
+            <p class="font-bold text-primary mb-2">Step 3: Energy required</p>
+            <div class="font-mono text-primary">Raw: 302W × 12h = 3,624 Wh</div>
+            <div class="font-mono text-primary">After efficiency: 3,624 / 0.90 = 4,027 Wh</div>
+            <div class="font-mono text-primary">With 20% margin: 4,027 × 1.20 = 4,832 Wh</div>
+          </div>
+
+          <div class="border-l-2 border-m-blue-light pl-4">
+            <p class="font-bold text-primary mb-2">Step 4: Battery capacity (24V LFP, 80% DoD)</p>
+            <div class="font-mono text-primary">Ah = 4,832 / (24 × 0.80) = 251.7 Ah</div>
+            <div class="font-mono text-primary font-bold mt-1">Result: 24V 260Ah LFP battery bank (≈6.2 kWh)</div>
+          </div>
+
+          <div class="border-l-2 border-m-blue-light pl-4">
+            <p class="font-bold text-primary mb-2">Inverter sizing</p>
+            <div class="font-mono text-primary">Continuous: 302W × 1.25 = 377.5W → round to 500W</div>
+            <div class="font-mono text-primary">Surge: 752W × 1.10 = 827.2W → need 1,000W+ surge</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- U.S. Power Outage Planning Examples -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">U.S. Power Outage Planning Examples</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+      <CalculatorCard>
+        <h4 class="text-primary font-bold text-sm mb-3">Basic Internet Backup</h4>
+        <p class="text-body-sm text-muted mb-3">Keep your home connected during an outage.</p>
+        <ul class="text-body-sm text-muted flex flex-col gap-1 mb-3">
+          <li>• Wi-Fi Router: 12W</li>
+          <li>• Laptop: 60W</li>
+          <li>• LED Lights ×2: 20W</li>
+        </ul>
+        <div class="bg-surface-soft p-3 border border-hairline">
+          <p class="text-caption text-muted">Total: 92W for 8 hours = <span class="text-primary font-bold">736 Wh → 12V 80Ah LFP battery</span></p>
+        </div>
+      </CalculatorCard>
+
+      <CalculatorCard>
+        <h4 class="text-primary font-bold text-sm mb-3">Food Protection Backup</h4>
+        <p class="text-body-sm text-muted mb-3">Keep refrigerator and freezer cold during extended outages.</p>
+        <ul class="text-body-sm text-muted flex flex-col gap-1 mb-3">
+          <li>• Refrigerator: 150W</li>
+          <li>• Freezer: 120W</li>
+          <li>• Wi-Fi Router: 12W</li>
+        </ul>
+        <div class="bg-surface-soft p-3 border border-hairline">
+          <p class="text-caption text-muted">Total: 282W for 12 hours = <span class="text-primary font-bold">3,760 Wh → 24V 200Ah LFP battery</span></p>
+        </div>
+      </CalculatorCard>
+
+      <CalculatorCard>
+        <h4 class="text-primary font-bold text-sm mb-3">Medical Device Backup</h4>
+        <p class="text-body-sm text-muted mb-3">Power CPAP and essential communication overnight.</p>
+        <ul class="text-body-sm text-muted flex flex-col gap-1 mb-3">
+          <li>• CPAP Machine: 40W</li>
+          <li>• Wi-Fi Router: 12W</li>
+          <li>• Phone Charger: 15W</li>
+          <li>• LED Light: 10W</li>
+        </ul>
+        <div class="bg-surface-soft p-3 border border-hairline">
+          <p class="text-caption text-muted">Total: 77W for 10 hours = <span class="text-primary font-bold">963 Wh → 12V 100Ah LFP battery</span></p>
+        </div>
+      </CalculatorCard>
+
+      <CalculatorCard>
+        <h4 class="text-primary font-bold text-sm mb-3">Storm Emergency Backup</h4>
+        <p class="text-body-sm text-muted mb-3">Comprehensive backup for severe weather events.</p>
+        <ul class="text-body-sm text-muted flex flex-col gap-1 mb-3">
+          <li>• Refrigerator: 150W</li>
+          <li>• Freezer: 120W</li>
+          <li>• Sump Pump: 800W</li>
+          <li>• LED Lights ×3: 30W</li>
+          <li>• Wi-Fi Router: 12W</li>
+        </ul>
+        <div class="bg-surface-soft p-3 border border-hairline">
+          <p class="text-caption text-muted">Total: 1,112W for 12 hours = <span class="text-primary font-bold">16,680 Wh → 48V 440Ah LFP system</span></p>
+        </div>
+      </CalculatorCard>
+
+    </div>
+  </section>
+
+  <!-- Appliance Wattage Reference Table -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Appliance Wattage Reference Table</h2>
+    <div class="overflow-x-auto">
+      <table class="w-full text-body-sm text-muted border border-hairline">
+        <thead>
+          <tr class="border-b border-hairline">
+            <th class="text-left p-3 text-label-uppercase text-primary text-[10px]">Appliance</th>
+            <th class="text-right p-3 text-label-uppercase text-primary text-[10px]">Running Watts</th>
+            <th class="text-right p-3 text-label-uppercase text-primary text-[10px]">Surge Watts</th>
+            <th class="text-right p-3 text-label-uppercase text-primary text-[10px]">Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="border-b border-hairline"><td class="p-3">Refrigerator</td><td class="p-3 text-right">150 W</td><td class="p-3 text-right">600 W</td><td class="p-3 text-right text-muted">Cycles 30–50% of time</td></tr>
+          <tr class="border-b border-hairline"><td class="p-3">Freezer</td><td class="p-3 text-right">120 W</td><td class="p-3 text-right">500 W</td><td class="p-3 text-right text-muted">Cycles 30–40% of time</td></tr>
+          <tr class="border-b border-hairline"><td class="p-3">Wi-Fi Router</td><td class="p-3 text-right">12 W</td><td class="p-3 text-right">12 W</td><td class="p-3 text-right text-muted">Continuous draw</td></tr>
+          <tr class="border-b border-hairline"><td class="p-3">LED Bulb</td><td class="p-3 text-right">10 W</td><td class="p-3 text-right">10 W</td><td class="p-3 text-right text-muted">Per bulb</td></tr>
+          <tr class="border-b border-hairline"><td class="p-3">Laptop</td><td class="p-3 text-right">60 W</td><td class="p-3 text-right">90 W</td><td class="p-3 text-right text-muted">Charging + running</td></tr>
+          <tr class="border-b border-hairline"><td class="p-3">TV (LED/LCD)</td><td class="p-3 text-right">100 W</td><td class="p-3 text-right">150 W</td><td class="p-3 text-right text-muted">55" class typical</td></tr>
+          <tr class="border-b border-hairline"><td class="p-3">CPAP Machine</td><td class="p-3 text-right">40 W</td><td class="p-3 text-right">80 W</td><td class="p-3 text-right text-muted">With humidifier</td></tr>
+          <tr class="border-b border-hairline"><td class="p-3">Box Fan</td><td class="p-3 text-right">50 W</td><td class="p-3 text-right">75 W</td><td class="p-3 text-right text-muted">20" box fan</td></tr>
+          <tr class="border-b border-hairline"><td class="p-3">Sump Pump</td><td class="p-3 text-right">800 W</td><td class="p-3 text-right">2,000 W</td><td class="p-3 text-right text-muted">½ HP typical</td></tr>
+          <tr class="border-b border-hairline"><td class="p-3">Microwave</td><td class="p-3 text-right">1,000 W</td><td class="p-3 text-right">1,500 W</td><td class="p-3 text-right text-muted">1,000W model</td></tr>
+          <tr class="border-b border-hairline"><td class="p-3">Phone Charger</td><td class="p-3 text-right">15 W</td><td class="p-3 text-right">15 W</td><td class="p-3 text-right text-muted">USB-C fast charge</td></tr>
+          <tr class="p-3"><td class="p-3">Coffee Maker</td><td class="p-3 text-right">900 W</td><td class="p-3 text-right">1,200 W</td><td class="p-3 text-right text-muted">Drip 12-cup</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- LiFePO4 vs Lead-Acid Comparison -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">LiFePO4 vs Lead-Acid for Backup Power</h2>
+    <div class="overflow-x-auto">
+      <table class="w-full text-body-sm text-muted border border-hairline">
+        <thead>
+          <tr class="border-b border-hairline">
+            <th class="text-left p-3 text-label-uppercase text-primary text-[10px]">Feature</th>
+            <th class="text-center p-3 text-label-uppercase text-primary text-[10px]">LiFePO4</th>
+            <th class="text-center p-3 text-label-uppercase text-primary text-[10px]">AGM / Sealed</th>
+            <th class="text-center p-3 text-label-uppercase text-primary text-[10px]">Flooded Lead-Acid</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="border-b border-hairline"><td class="p-3">Usable Depth of Discharge</td><td class="p-3 text-center font-bold text-primary">80–100%</td><td class="p-3 text-center">50%</td><td class="p-3 text-center">50%</td></tr>
+          <tr class="border-b border-hairline"><td class="p-3">Cycle Life</td><td class="p-3 text-center font-bold text-primary">3,000–6,000</td><td class="p-3 text-center">300–500</td><td class="p-3 text-center">200–400</td></tr>
+          <tr class="border-b border-hairline"><td class="p-3">Weight</td><td class="p-3 text-center font-bold text-primary">Lightest</td><td class="p-3 text-center">Heavy</td><td class="p-3 text-center">Heaviest</td></tr>
+          <tr class="border-b border-hairline"><td class="p-3">Maintenance</td><td class="p-3 text-center font-bold text-primary">None</td><td class="p-3 text-center">None</td><td class="p-3 text-center">Water refill</td></tr>
+          <tr class="border-b border-hairline"><td class="p-3">Cold Weather Performance</td><td class="p-3 text-center font-bold text-primary">Good</td><td class="p-3 text-center">Poor</td><td class="p-3 text-center">Poor</td></tr>
+          <tr class="border-b border-hairline"><td class="p-3">Indoor Installation</td><td class="p-3 text-center font-bold text-primary">Safe</td><td class="p-3 text-center">Ventilation needed</td><td class="p-3 text-center">Ventilation required</td></tr>
+          <tr class="border-b border-hairline"><td class="p-3">Upfront Cost</td><td class="p-3 text-center">Higher</td><td class="p-3 text-center">Lower</td><td class="p-3 text-center">Lowest</td></tr>
+          <tr class="p-3"><td class="p-3">Lifetime Cost per Cycle</td><td class="p-3 text-center font-bold text-primary">Lowest</td><td class="p-3 text-center">Higher</td><td class="p-3 text-center">Highest</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Safety Notes -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Safety Notes</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <CalculatorCard>
+        <p class="text-body-sm text-muted flex gap-3">
+          <span class="text-m-red shrink-0 mt-0.5">⚠</span>
+          <span>Never connect a portable generator or battery system to your home wiring without a proper transfer switch. Backfeed can electrocute utility workers restoring power.</span>
+        </p>
+      </CalculatorCard>
+      <CalculatorCard>
+        <p class="text-body-sm text-muted flex gap-3">
+          <span class="text-m-red shrink-0 mt-0.5">⚠</span>
+          <span>Lithium batteries should be installed away from living spaces per local fire codes. LiFePO4 is the safest lithium chemistry but always follow manufacturer installation guidelines.</span>
+        </p>
+      </CalculatorCard>
+      <CalculatorCard>
+        <p class="text-body-sm text-muted flex gap-3">
+          <span class="text-m-red shrink-0 mt-0.5">⚠</span>
+          <span>Do not exceed the continuous or surge rating of your inverter. Overloaded inverters can overheat, shut down, or cause fire. Add 25% headroom to your continuous load estimate.</span>
+        </p>
+      </CalculatorCard>
+      <CalculatorCard>
+        <p class="text-body-sm text-muted flex gap-3">
+          <span class="text-m-red shrink-0 mt-0.5">⚠</span>
+          <span>Lead-acid batteries emit hydrogen gas during charging. Install in well-ventilated areas away from ignition sources. Never charge a frozen lead-acid battery.</span>
+        </p>
+      </CalculatorCard>
+    </div>
+  </section>
+
+  <FAQSection items={faqItems} />
+
+  <!-- Calculation Script -->
+  <script>
+    import { calculatePowerOutageBackup } from '../utils/calculators';
+
+    interface ApplianceEntry {
+      id: string;
+      name: string;
+      runningW: number;
+      surgeW: number;
+      quantity: number;
+    }
+
+    const appliancePresets: Record<string, { runningW: number; surgeW: number }> = {
+      "Refrigerator": { runningW: 150, surgeW: 600 },
+      "Freezer": { runningW: 120, surgeW: 500 },
+      "Wi-Fi Router": { runningW: 12, surgeW: 12 },
+      "LED Light": { runningW: 10, surgeW: 10 },
+      "Laptop": { runningW: 60, surgeW: 90 },
+      "TV": { runningW: 100, surgeW: 150 },
+      "CPAP Machine": { runningW: 40, surgeW: 80 },
+      "Fan": { runningW: 50, surgeW: 75 },
+      "Sump Pump": { runningW: 800, surgeW: 2000 },
+      "Microwave": { runningW: 1000, surgeW: 1500 },
+    };
+
+    let appliances: ApplianceEntry[] = [];
+    let nextId = 1;
+
+    const applianceSelect = document.getElementById('appliance-select') as HTMLSelectElement;
+    const customLoadFields = document.getElementById('custom-load-fields') as HTMLDivElement;
+    const addCustomBtn = document.getElementById('add-custom-btn') as HTMLButtonElement;
+    const selectedAppliancesDiv = document.getElementById('selected-appliances') as HTMLDivElement;
+
+    const backupHoursInput = document.getElementById('backup-hours') as HTMLInputElement;
+    const batteryVoltageSelect = document.getElementById('battery-voltage') as HTMLSelectElement;
+    const batteryChemistrySelect = document.getElementById('battery-chemistry') as HTMLSelectElement;
+    const dodInput = document.getElementById('dod-percent') as HTMLInputElement;
+    const inverterEfficiencyInput = document.getElementById('inverter-efficiency') as HTMLInputElement;
+    const safetyMarginInput = document.getElementById('safety-margin') as HTMLInputElement;
+
+    const solarEnabledCheckbox = document.getElementById('solar-enabled') as HTMLInputElement;
+    const solarFields = document.getElementById('solar-fields') as HTMLDivElement;
+    const solarWattsInput = document.getElementById('solar-watts') as HTMLInputElement;
+    const peakSunHoursInput = document.getElementById('peak-sun-hours') as HTMLInputElement;
+    const chargeControllerEffInput = document.getElementById('charge-controller-efficiency') as HTMLInputElement;
+
+    const solarResultsDiv = document.getElementById('solar-results') as HTMLDivElement;
+
+    const chemistryDodMap: Record<string, number> = {
+      lifepo4: 80,
+      agm: 50,
+      flooded: 50,
+    };
+
+    function addAppliance(name: string, runningW: number, surgeW: number) {
+      const id = `appliance-${nextId++}`;
+      appliances.push({ id, name, runningW, surgeW, quantity: 1 });
+      renderAppliances();
+      updateCalculations();
+    }
+
+    function removeAppliance(id: string) {
+      appliances = appliances.filter(a => a.id !== id);
+      renderAppliances();
+      updateCalculations();
+    }
+
+    function updateQuantity(id: string, qty: number) {
+      const appliance = appliances.find(a => a.id === id);
+      if (appliance) {
+        appliance.quantity = Math.max(1, Math.min(20, qty));
+        updateCalculations();
+      }
+    }
+
+    function renderAppliances() {
+      if (!selectedAppliancesDiv) return;
+      selectedAppliancesDiv.innerHTML = '';
+
+      if (appliances.length === 0) return;
+
+      const header = document.createElement('div');
+      header.className = 'flex items-center justify-between mb-1';
+      header.innerHTML = `<span class="text-label-uppercase text-muted text-[10px]">SELECTED APPLIANCES</span><span class="text-caption text-muted">${appliances.length} item${appliances.length !== 1 ? 's' : ''}</span>`;
+      selectedAppliancesDiv.appendChild(header);
+
+      for (const appliance of appliances) {
+        const row = document.createElement('div');
+        row.className = 'flex items-center gap-3 bg-surface-soft border border-hairline p-3';
+
+        row.innerHTML = `
+          <div class="flex-1 min-w-0">
+            <span class="text-primary font-bold text-sm block truncate">${appliance.name}</span>
+            <span class="text-caption text-muted">${appliance.runningW}W running / ${appliance.surgeW}W surge</span>
+          </div>
+          <div class="flex items-center gap-2 shrink-0">
+            <label class="text-caption text-muted">Qty:</label>
+            <input type="number" class="text-input w-16 h-8 text-center text-sm" value="${appliance.quantity}" min="1" max="20" data-id="${appliance.id}" />
+          </div>
+          <button type="button" class="text-m-red hover:text-primary text-lg font-bold px-2 h-8 flex items-center justify-center border border-hairline hover:border-primary transition-colors shrink-0" data-remove="${appliance.id}">✕</button>
+        `;
+
+        const qtyInput = row.querySelector('input') as HTMLInputElement;
+        qtyInput.addEventListener('input', () => {
+          updateQuantity(appliance.id, parseInt(qtyInput.value) || 1);
+        });
+
+        const removeBtn = row.querySelector('[data-remove]') as HTMLButtonElement;
+        removeBtn.addEventListener('click', () => {
+          removeAppliance(appliance.id);
+        });
+
+        selectedAppliancesDiv.appendChild(row);
+      }
+    }
+
+    applianceSelect?.addEventListener('change', () => {
+      const val = applianceSelect.value;
+      if (!val) return;
+
+      if (val === 'custom') {
+        customLoadFields?.classList.remove('hidden');
+        customLoadFields?.classList.add('flex');
+      } else {
+        customLoadFields?.classList.add('hidden');
+        customLoadFields?.classList.remove('flex');
+        const preset = appliancePresets[val];
+        if (preset) {
+          addAppliance(val, preset.runningW, preset.surgeW);
+        }
+      }
+      applianceSelect.value = '';
+    });
+
+    addCustomBtn?.addEventListener('click', () => {
+      const nameInput = document.getElementById('custom-name') as HTMLInputElement;
+      const runningInput = document.getElementById('custom-running') as HTMLInputElement;
+      const surgeInput = document.getElementById('custom-surge') as HTMLInputElement;
+
+      const name = nameInput?.value.trim() || 'Custom Load';
+      const runningW = Math.max(1, parseInt(runningInput?.value) || 500);
+      const surgeW = Math.max(runningW, parseInt(surgeInput?.value) || Math.ceil(runningW * 1.5));
+
+      addAppliance(name, runningW, surgeW);
+
+      if (nameInput) nameInput.value = '';
+    });
+
+    solarEnabledCheckbox?.addEventListener('change', () => {
+      if (solarEnabledCheckbox.checked) {
+        solarFields?.classList.remove('hidden');
+        solarFields?.classList.add('flex');
+        solarResultsDiv?.classList.remove('hidden');
+      } else {
+        solarFields?.classList.add('hidden');
+        solarFields?.classList.remove('flex');
+        solarResultsDiv?.classList.add('hidden');
+      }
+      updateCalculations();
+    });
+
+    batteryChemistrySelect?.addEventListener('change', () => {
+      const chem = batteryChemistrySelect.value;
+      const dod = chemistryDodMap[chem];
+      if (dod && dodInput) {
+        dodInput.value = String(dod);
+      }
+      updateCalculations();
+    });
+
+    function updateCalculations() {
+      const backupHours = parseFloat(backupHoursInput?.value) || 8;
+      const batteryVoltage = parseFloat(batteryVoltageSelect?.value) || 24;
+      const dodPercent = parseFloat(dodInput?.value) || 80;
+      const inverterEfficiency = parseFloat(inverterEfficiencyInput?.value) || 90;
+      const safetyMargin = parseFloat(safetyMarginInput?.value) || 20;
+
+      const solarEnabled = solarEnabledCheckbox?.checked || false;
+      const solarWatts = parseFloat(solarWattsInput?.value) || 400;
+      const peakSunHours = parseFloat(peakSunHoursInput?.value) || 5;
+      const chargeControllerEff = parseFloat(chargeControllerEffInput?.value) || 95;
+
+      const applianceLoads = appliances.map(a => ({
+        name: a.name,
+        runningW: a.runningW,
+        surgeW: a.surgeW,
+        quantity: a.quantity,
+      }));
+
+      const results = calculatePowerOutageBackup(
+        applianceLoads,
+        backupHours,
+        batteryVoltage,
+        dodPercent,
+        inverterEfficiency,
+        safetyMargin,
+        solarEnabled,
+        solarWatts,
+        peakSunHours,
+        chargeControllerEff
+      );
+
+      // Update result displays
+      const batteryWhBox = document.getElementById('result-battery-wh');
+      const batteryWhValue = batteryWhBox?.querySelector('.text-display-md') as HTMLElement;
+      const batteryWhSuffix = batteryWhBox?.querySelector('.text-caption') as HTMLElement;
+      if (batteryWhValue) batteryWhValue.textContent = `${Math.round(results.energyRequiredWh).toLocaleString()} Wh`;
+      if (batteryWhSuffix) batteryWhSuffix.textContent = `${results.energyRequiredKwh.toFixed(1)} kWh total battery bank`;
+
+      const batteryAhBox = document.getElementById('result-battery-ah');
+      const batteryAhValue = batteryAhBox?.querySelector('.text-title-lg') as HTMLElement;
+      const batteryAhSuffix = batteryAhBox?.querySelector('.text-caption') as HTMLElement;
+      if (batteryAhValue) batteryAhValue.textContent = `${Math.round(results.batteryCapacityAh).toLocaleString()} Ah`;
+      if (batteryAhSuffix) batteryAhSuffix.textContent = `At ${batteryVoltage}V nominal`;
+
+      const runningBox = document.getElementById('result-running-w');
+      const runningValue = runningBox?.querySelector('.text-title-lg') as HTMLElement;
+      if (runningValue) runningValue.textContent = `${Math.round(results.totalRunningW).toLocaleString()} W`;
+
+      const surgeBox = document.getElementById('result-surge-w');
+      const surgeValue = surgeBox?.querySelector('.text-title-lg') as HTMLElement;
+      if (surgeValue) surgeValue.textContent = `${Math.round(results.surgeW).toLocaleString()} W`;
+
+      const inverterContBox = document.getElementById('result-inverter-cont');
+      const inverterContValue = inverterContBox?.querySelector('.text-title-lg') as HTMLElement;
+      if (inverterContValue) inverterContValue.textContent = `${results.inverterContinuousW.toLocaleString()} W`;
+
+      const inverterSurgeBox = document.getElementById('result-inverter-surge');
+      const inverterSurgeValue = inverterSurgeBox?.querySelector('.text-title-lg') as HTMLElement;
+      if (inverterSurgeValue) inverterSurgeValue.textContent = `${results.inverterSurgeW.toLocaleString()} W`;
+
+      // Battery configurations
+      const bat12v100 = document.getElementById('result-bat-12v100');
+      const bat12v200 = document.getElementById('result-bat-12v200');
+      const bat24v100 = document.getElementById('result-bat-24v100');
+      const bat48v100 = document.getElementById('result-bat-48v100');
+      if (bat12v100) bat12v100.textContent = String(results.batteries12v100ah);
+      if (bat12v200) bat12v200.textContent = String(results.batteries12v200ah);
+      if (bat24v100) bat24v100.textContent = String(results.batteries24v100ah);
+      if (bat48v100) bat48v100.textContent = String(results.batteries48v100ah);
+
+      // Solar results
+      if (solarEnabled) {
+        const solarDaily = document.getElementById('result-solar-daily');
+        const solarRecharge = document.getElementById('result-solar-recharge');
+        const solarSufficient = document.getElementById('result-solar-sufficient');
+        if (solarDaily) solarDaily.textContent = `${Math.round(results.solarDailyWh).toLocaleString()} Wh`;
+        if (solarRecharge) solarRecharge.textContent = `${results.solarRechargeHours.toFixed(1)} hours`;
+        if (solarSufficient) solarSufficient.textContent = results.solarSufficient ? 'Yes' : 'No — need more panels';
+      }
+
+      // Planning notes
+      const planningNotes = document.getElementById('planning-notes');
+      if (planningNotes) {
+        if (appliances.length === 0) {
+          planningNotes.textContent = 'Add appliances above to calculate your backup power requirements. Results update instantly as you adjust inputs.';
+        } else {
+          const chemistryName = batteryChemistrySelect?.value === 'lifepo4' ? 'LiFePO4' : batteryChemistrySelect?.value === 'agm' ? 'AGM Lead-Acid' : 'Flooded Lead-Acid';
+          planningNotes.textContent = `For ${Math.round(results.totalRunningW)}W of loads over ${backupHours} hours at ${batteryVoltage}V ${chemistryName}, you need approximately ${results.energyRequiredKwh.toFixed(1)} kWh of battery capacity (${Math.round(results.batteryCapacityAh)} Ah). Recommended inverter: ${results.inverterContinuousW}W continuous with ${results.inverterSurgeW}W surge rating.`;
+        }
+      }
+    }
+
+    // Attach event listeners
+    [backupHoursInput, dodInput, inverterEfficiencyInput, safetyMarginInput, solarWattsInput, peakSunHoursInput, chargeControllerEffInput].forEach(el => {
+      el?.addEventListener('input', updateCalculations);
+    });
+
+    [batteryVoltageSelect, batteryChemistrySelect].forEach(el => {
+      el?.addEventListener('change', updateCalculations);
+    });
+
+    // Initial render
+    updateCalculations();
+  </script>
+
+</CalculatorLayout>

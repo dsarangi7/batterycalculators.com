@@ -302,6 +302,31 @@ export const searchData: SearchItem[] = [
     ],
   },
   {
+    title: "Home Power Outage Battery Backup Calculator",
+    description:
+      "Calculate what battery size, inverter size, and backup power system you need for essential appliances during a power outage, storm, hurricane, wildfire outage, or emergency grid failure.",
+    url: "/home-power-outage-battery-backup-calculator",
+    type: "calculator",
+    category: "Calculator",
+    keywords: [
+      "power outage",
+      "battery backup",
+      "home battery backup",
+      "emergency backup power",
+      "portable power station",
+      "solar generator",
+      "storm outage",
+      "hurricane backup",
+      "wildfire outage",
+      "winter storm backup",
+      "fridge backup",
+      "CPAP backup",
+      "sump pump backup",
+      "inverter sizing",
+      "battery sizing",
+    ],
+  },
+  {
     title: "RV Battery Calculator",
     description:
       "Calculate the battery bank size you need for your RV or camper. Estimate daily consumption and required capacity.",

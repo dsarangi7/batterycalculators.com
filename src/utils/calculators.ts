@@ -765,3 +765,136 @@ export function calculateInverterBattery(
     requiredCapacityAh,
   };
 }
+
+// 18. Power Outage Battery Backup Calculator
+export interface ApplianceLoad {
+  name: string;
+  runningW: number;
+  surgeW: number;
+  quantity: number;
+}
+
+export interface PowerOutageBackupResult {
+  totalRunningW: number;
+  surgeW: number;
+  energyRequiredWh: number;
+  energyRequiredKwh: number;
+  batteryCapacityWh: number;
+  batteryCapacityAh: number;
+  inverterContinuousW: number;
+  inverterSurgeW: number;
+  batteries12v100ah: number;
+  batteries12v200ah: number;
+  batteries24v100ah: number;
+  batteries48v100ah: number;
+  solarDailyWh: number;
+  solarRechargeHours: number;
+  solarSufficient: boolean;
+}
+
+export function calculatePowerOutageBackup(
+  appliances: ApplianceLoad[],
+  backupHours: number,
+  batteryVoltage: number,
+  dodPercent: number,
+  inverterEfficiencyPercent: number,
+  safetyMarginPercent: number,
+  solarEnabled: boolean,
+  solarWatts: number,
+  peakSunHours: number,
+  chargeControllerEfficiencyPercent: number
+): PowerOutageBackupResult {
+  // Input validation
+  const safeBackupHours = Math.max(0.1, backupHours);
+  const safeDod = Math.max(1, Math.min(100, dodPercent)) / 100;
+  const safeEfficiency = Math.max(50, Math.min(99, inverterEfficiencyPercent)) / 100;
+  const safeMargin = Math.max(0, Math.min(50, safetyMarginPercent)) / 100;
+  const safeVoltage = Math.max(1, batteryVoltage);
+
+  // Calculate total running load and find the highest-surge appliance
+  let totalRunningW = 0;
+  let maxSingleSurgeW = 0;
+  let maxSurgeApplianceRunningW = 0;
+
+  for (const appliance of appliances) {
+    if (appliance.runningW <= 0 || appliance.quantity <= 0) continue;
+    const applianceTotalRunning = appliance.runningW * appliance.quantity;
+    totalRunningW += applianceTotalRunning;
+
+    const applianceTotalSurge = appliance.surgeW * appliance.quantity;
+    if (applianceTotalSurge > maxSingleSurgeW) {
+      maxSingleSurgeW = applianceTotalSurge;
+      maxSurgeApplianceRunningW = applianceTotalRunning;
+    }
+  }
+
+  // Surge = highest single appliance startup + all other appliances running
+  const surgeW = maxSingleSurgeW + (totalRunningW - maxSurgeApplianceRunningW);
+
+  // Energy required (before losses)
+  const energyBeforeLosses = totalRunningW * safeBackupHours;
+
+  // After inverter losses
+  const energyAfterInverter = safeEfficiency > 0 ? energyBeforeLosses / safeEfficiency : 0;
+
+  // After safety margin
+  const energyRequiredWh = energyAfterInverter * (1 + safeMargin);
+
+  // Battery capacity in Ah
+  const batteryCapacityAh = safeDod > 0 && safeVoltage > 0
+    ? energyRequiredWh / (safeVoltage * safeDod)
+    : 0;
+
+  // Battery capacity in Wh
+  const batteryCapacityWh = safeDod > 0
+    ? energyRequiredWh / safeDod
+    : 0;
+
+  // Inverter sizing
+  const inverterContinuousW = Math.ceil(totalRunningW * 1.25 / 100) * 100;
+  const inverterSurgeW = Math.ceil(surgeW * 1.10 / 100) * 100;
+
+  // Battery suggestions
+  const batteries12v100ah = safeVoltage > 0 && safeDod > 0
+    ? Math.ceil(energyRequiredWh / (12 * 100 * safeDod))
+    : 0;
+  const batteries12v200ah = safeVoltage > 0 && safeDod > 0
+    ? Math.ceil(energyRequiredWh / (12 * 200 * safeDod))
+    : 0;
+  const batteries24v100ah = safeVoltage > 0 && safeDod > 0
+    ? Math.ceil(energyRequiredWh / (24 * 100 * safeDod))
+    : 0;
+  const batteries48v100ah = safeVoltage > 0 && safeDod > 0
+    ? Math.ceil(energyRequiredWh / (48 * 100 * safeDod))
+    : 0;
+
+  // Solar recharge
+  const safeSolarEff = Math.max(50, Math.min(100, chargeControllerEfficiencyPercent)) / 100;
+  const solarDailyWh = solarEnabled
+    ? solarWatts * Math.max(0, peakSunHours) * safeSolarEff
+    : 0;
+  const solarRechargeHours = solarEnabled && solarDailyWh > 0
+    ? energyRequiredWh / (solarWatts * safeSolarEff)
+    : 0;
+  const solarSufficient = solarEnabled && solarDailyWh > 0
+    ? solarDailyWh >= (totalRunningW * safeBackupHours > 0 ? totalRunningW * safeBackupHours / safeBackupHours * 24 : 0)
+    : false;
+
+  return {
+    totalRunningW,
+    surgeW,
+    energyRequiredWh,
+    energyRequiredKwh: energyRequiredWh / 1000,
+    batteryCapacityWh,
+    batteryCapacityAh,
+    inverterContinuousW,
+    inverterSurgeW,
+    batteries12v100ah,
+    batteries12v200ah,
+    batteries24v100ah,
+    batteries48v100ah,
+    solarDailyWh,
+    solarRechargeHours,
+    solarSufficient,
+  };
+}
