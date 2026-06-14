@@ -1,0 +1,269 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import CalculatorCard from '../../components/CalculatorCard.astro';
+import FormulaBox from '../../components/FormulaBox.astro';
+import FAQSection from '../../components/FAQSection.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "How long will a solar battery last at night?",
+    answer: "A solar battery's nighttime runtime depends on its usable capacity and the loads it powers. A 10 kWh usable LFP bank powering 500W of overnight loads (fridge, lights, router) runs for approximately 16 hours — from sunset to sunrise with margin.",
+  },
+  {
+    question: "How many days can a solar battery power a house?",
+    answer: "It depends on battery capacity and daily consumption. A 13.5 kWh usable battery (typical Powerwall size) powering a home consuming 30 kWh/day provides roughly 0.45 days of autonomy. Most homes need 2–3 days of autonomy, requiring 60–90 kWh of usable capacity.",
+  },
+  {
+    question: "Does solar recharge the battery during the day?",
+    answer: "Yes, if the solar array is sized correctly. A properly sized array generates enough energy during peak sun hours to both power daytime loads and recharge the battery. If the array is undersized, the battery will never fully recover, reducing nighttime runtime.",
+  },
+  {
+    question: "What happens when the solar battery is empty?",
+    answer: "If the battery reaches its minimum SOC (typically 10–20% for LFP), the system either switches to grid power (hybrid systems) or disconnects loads (off-grid). The battery remains in standby until solar production resumes and recharges it above the minimum threshold.",
+  },
+];
+---
+
+<Layout
+  title="How Long Will My Solar Battery Last? | Battery Calculators"
+  description="Learn how to estimate solar battery runtime at night and during cloudy periods. Includes worked examples for off-grid and hybrid solar systems."
+  canonical="https://batterycalculators.com/learn/how-long-will-my-solar-battery-last"
+  schema="faqPage"
+  schemaName="How Long Will My Solar Battery Last"
+  schemaDescription="Guide to estimating solar battery runtime at night and during cloudy periods."
+  schemaUrl="https://batterycalculators.com/learn/how-long-will-my-solar-battery-last"
+  faqItems={faqItems}
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/learn" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Back to Guides</a>
+      <Breadcrumb items={[
+        { label: "Learning Center", href: "/learn" },
+        { label: "How Long Will My Solar Battery Last" }
+      ]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">SOLAR</span>
+      <h1 class="text-display-md text-primary mb-6">How Long Will My Solar Battery Last?</h1>
+      <p class="text-body-md text-body font-light">
+        Solar batteries face a unique challenge: they must store enough energy during the day to power loads through the night, and survive extended periods without sun. The answer depends on your battery capacity, daily consumption, and how well the solar array replenishes what you use.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Daytime vs. Nighttime Operation</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          During the day, solar panels directly power your loads and any excess energy charges the battery. At night, the battery alone must supply all loads until sunrise. The critical runtime question is: how long does the stored energy last from sunset to sunrise?
+        </p>
+        <p class="text-body-md text-body font-light">
+          This is fundamentally different from a simple battery backup scenario because the solar system is designed to cycle daily — charge during the day, discharge at night. The battery does not need to power your home for days on end (unless you are sizing for cloudy-day autonomy). It needs to bridge the overnight gap.
+        </p>
+      </section>
+
+      <FormulaBox title="Solar Battery Runtime Formulas">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Nighttime Energy = Nighttime Load (W) × Hours of Darkness (h)
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Usable Battery Energy = Capacity (Ah) × Voltage (V) × DoD%
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Night Runtime (h) = Usable Battery Energy / (Nighttime Load / Efficiency)
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Autonomy (days) = Usable Battery Energy / (Daily Consumption / Efficiency)
+        </div>
+        <p>
+          Efficiency accounts for inverter losses during the night and charge controller losses during the day. Use 0.90–0.92 for modern equipment.
+        </p>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Worked Example: Overnight Runtime</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Given:</strong></p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li>Solar battery: 200 Ah at 48V LFP (10,240 Wh total)</li>
+              <li>DoD limit: 80%</li>
+              <li>System efficiency: 92%</li>
+              <li>Overnight loads: fridge (60W) + router (10W) + 4 LED lights (24W) + phone charging (15W) = 109W</li>
+              <li>Hours of darkness: 12 hours</li>
+            </ul>
+            <p><strong>Step 1:</strong> Usable battery energy:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              200 Ah × 48V × 0.80 = 7,680 Wh
+            </div>
+            <p><strong>Step 2:</strong> Effective overnight load:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              109 W / 0.92 = 118.5 W
+            </div>
+            <p><strong>Step 3:</strong> Night runtime:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              7,680 Wh / 118.5 W = 64.8 hours
+            </div>
+            <p class="text-muted mt-2">This battery can power these overnight loads for over 5 consecutive nights without any solar input — more than enough to survive extended cloudy periods.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Autonomy During Cloudy Periods</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Cloudy-day autonomy is the number of days your battery can power your loads without meaningful solar production. This is the most critical sizing parameter for off-grid systems in regions with variable weather.
+        </p>
+        <p class="text-body-md text-body font-light mb-4">
+          The formula for autonomy is straightforward:
+        </p>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-4">
+          Autonomy (days) = Usable Battery Energy (Wh) / (Daily Consumption (Wh) / Efficiency)
+        </div>
+        <p class="text-body-md text-body font-light">
+          A larger battery bank provides more autonomy days but costs more. The optimal balance depends on your local climate, how critical the loads are, and whether you have a backup generator.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Autonomy Reference by Battery Size</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          The table below shows autonomy days for common 48V LFP battery banks at 80% DoD and 92% efficiency, for different daily consumption levels.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Battery Size</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">5 kWh/day</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">10 kWh/day</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">20 kWh/day</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">30 kWh/day</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">5 kWh (50Ah 48V)</td>
+                <td class="p-4 text-muted">0.7 days</td>
+                <td class="p-4 text-muted">0.4 days</td>
+                <td class="p-4 text-muted">0.2 days</td>
+                <td class="p-4 text-muted">0.1 days</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">10 kWh (100Ah 48V)</td>
+                <td class="p-4 text-muted">1.5 days</td>
+                <td class="p-4 text-muted">0.7 days</td>
+                <td class="p-4 text-muted">0.4 days</td>
+                <td class="p-4 text-muted">0.2 days</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">20 kWh (200Ah 48V)</td>
+                <td class="p-4 text-muted">2.9 days</td>
+                <td class="p-4 text-muted">1.5 days</td>
+                <td class="p-4 text-muted">0.7 days</td>
+                <td class="p-4 text-muted">0.5 days</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">40 kWh (400Ah 48V)</td>
+                <td class="p-4 text-muted">5.9 days</td>
+                <td class="p-4 text-muted">2.9 days</td>
+                <td class="p-4 text-muted">1.5 days</td>
+                <td class="p-4 text-muted">1.0 days</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">80 kWh (800Ah 48V)</td>
+                <td class="p-4 text-muted">11.8 days</td>
+                <td class="p-4 text-muted">5.9 days</td>
+                <td class="p-4 text-muted">2.9 days</td>
+                <td class="p-4 text-muted">2.0 days</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">The Role of Solar Recharge</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Your solar array must generate enough energy during peak sun hours to both power daytime loads and recharge the battery for nighttime use. The minimum array size is:
+        </p>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-4">
+          Minimum Array (W) ≥ Daily Consumption (Wh) / Peak Sun Hours
+        </div>
+        <p class="text-body-md text-body font-light mb-4">
+          For a home consuming 15 kWh/day with 5 peak sun hours, the minimum array is 3,000W (3 kW). Oversizing by 20–30% accounts for cloudy days and system losses, making a 4 kW array a practical choice.
+        </p>
+        <p class="text-body-md text-body font-light">
+          If the array is undersized, the battery will not fully recharge each day. Over time, the SOC will trend downward until the battery is empty. This is the most common cause of solar system underperformance.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Factors That Reduce Solar Battery Runtime</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Seasonal Variation</h4>
+            <p class="text-body-sm text-muted">
+              Winter has shorter days, lower sun angle, and more cloud cover. A system that runs comfortably in summer may struggle in winter. Size for your worst-case season if reliability is critical.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Panel Degradation</h4>
+            <p class="text-body-sm text-muted">
+              Solar panels lose 0.5–0.7% efficiency per year. After 10 years, output is roughly 93–95% of rated. This reduces daily recharge energy and extends the time needed to replenish the battery.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Load Growth</h4>
+            <p class="text-body-sm text-muted">
+              Adding appliances without upgrading the battery bank reduces autonomy. A new space heater or EV charger can dramatically increase daily consumption beyond what the system was sized for.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Temperature Derating</h4>
+            <p class="text-body-sm text-muted">
+              Cold batteries accept less charge from solar and deliver less energy at night. In cold climates, oversized batteries by 15–20% to compensate for reduced winter capacity.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Try It</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use the Solar Battery Sizing Calculator to determine the right bank size for your daily consumption and autonomy requirements.
+          </p>
+          <a href="/tools/solar-battery-sizing-calculator" class="btn-primary text-xs py-3 px-6 inline-block">Open Solar Battery Sizing Calculator</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Related</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Estimate how long your battery powers specific loads with the Runtime Calculator.
+          </p>
+          <a href="/tools/runtime-calculator" class="btn-primary-outline text-xs py-3 px-6 inline-block">Open Runtime Calculator</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Related Articles</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">How to Size a Solar Battery Bank</h4>
+            <p class="text-body-sm text-muted mb-3">
+              The complete method for sizing solar storage from consumption, autonomy, and DoD.
+            </p>
+            <a href="/learn/how-to-size-solar-battery-bank" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Read Guide →</a>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">How Long Will a Battery Last?</h4>
+            <p class="text-body-sm text-muted mb-3">
+              The general method for calculating battery runtime from capacity and load.
+            </p>
+            <a href="/learn/how-long-will-a-battery-last" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Read Guide →</a>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

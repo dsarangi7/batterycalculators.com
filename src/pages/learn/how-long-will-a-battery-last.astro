@@ -1,0 +1,272 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import CalculatorCard from '../../components/CalculatorCard.astro';
+import FormulaBox from '../../components/FormulaBox.astro';
+import FAQSection from '../../components/FAQSection.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "How do I calculate how long my battery will last?",
+    answer: "Divide the usable energy (capacity × voltage × DoD) by the effective load (load watts ÷ efficiency). For example, a 100 Ah 12.8V LFP battery at 80% DoD with 90% system efficiency powering a 200W load lasts approximately 4.6 hours.",
+  },
+  {
+    question: "Does battery chemistry affect how long a battery lasts?",
+    answer: "Yes. Lead-acid batteries suffer the Peukert effect, delivering less energy at high discharge rates. Lithium batteries maintain more consistent capacity across discharge rates. LFP chemistry also tolerates deeper discharge, giving more usable energy per cycle.",
+  },
+  {
+    question: "Why does my battery drain faster in cold weather?",
+    answer: "Cold temperatures increase internal resistance and slow the electrochemical reaction. At 0°C, lithium batteries lose roughly 10% of rated capacity. At -20°C, usable capacity can drop 30% or more, directly reducing runtime proportionally.",
+  },
+  {
+    question: "What reduces battery runtime the most?",
+    answer: "The biggest factors are high load power, low system efficiency (poor inverter or long cable runs), deep discharge limits on lead-acid batteries, and cold temperatures. Addressing efficiency losses often yields the largest runtime improvement.",
+  },
+];
+---
+
+<Layout
+  title="How Long Will a Battery Last? | Battery Calculators"
+  description="Learn how to calculate battery runtime from capacity, load, efficiency, and depth of discharge. Includes worked examples, formulas, and practical tips."
+  canonical="https://batterycalculators.com/learn/how-long-will-a-battery-last"
+  schema="faqPage"
+  schemaName="How Long Will a Battery Last"
+  schemaDescription="Guide to calculating battery runtime from capacity, load power, efficiency, and depth of discharge."
+  schemaUrl="https://batterycalculators.com/learn/how-long-will-a-battery-last"
+  faqItems={faqItems}
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/learn" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Back to Guides</a>
+      <Breadcrumb items={[
+        { label: "Learning Center", href: "/learn" },
+        { label: "How Long Will a Battery Last" }
+      ]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">SYSTEM DESIGN</span>
+      <h1 class="text-display-md text-primary mb-6">How Long Will a Battery Last?</h1>
+      <p class="text-body-md text-body font-light">
+        Whether you are sizing a backup system, planning an RV trip, or designing a solar installation, estimating battery runtime is one of the most practical engineering questions you can ask. The answer depends on four variables: capacity, voltage, load, and efficiency.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Why Simple Division Is Not Enough</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          The most common mistake is dividing capacity (Ah) directly by load current (A) to get runtime. This works only if your system is 100% efficient, you discharge the battery to 0%, and the battery delivers its full rated capacity at that discharge rate. In practice, none of these conditions hold.
+        </p>
+        <p class="text-body-md text-body font-light">
+          Real-world runtime is always shorter than the ideal calculation because energy is lost in the inverter, wiring, and battery management system. The battery chemistry also determines how much of the rated capacity is actually available, especially at higher discharge rates.
+        </p>
+      </section>
+
+      <FormulaBox title="Runtime Formulas">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Usable Energy (Wh) = Capacity (Ah) × Voltage (V) × (DoD% / 100)
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Effective Load (W) = Load (W) / (Efficiency% / 100)
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Runtime (hours) = Usable Energy (Wh) / Effective Load (W)
+        </div>
+        <p>
+          DoD (Depth of Discharge) represents the percentage of total capacity you are willing to use. Efficiency accounts for inverter conversion losses, cable resistance, and BMS overhead.
+        </p>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Step 1: Determine Usable Energy</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Usable energy is the amount of energy your battery can actually deliver before hitting its low-voltage cutoff or DoD limit. Multiply the rated capacity (Ah) by the nominal voltage to get total energy in watt-hours, then multiply by the DoD percentage.
+        </p>
+        <p class="text-body-md text-body font-light">
+          For example, a 200 Ah LFP battery at 12.8V has a total energy of 2,560 Wh. At 80% DoD, the usable energy is 2,048 Wh. A lead-acid battery of the same rating at 50% DoD would only provide 1,280 Wh of usable energy.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Step 2: Account for System Efficiency</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          The load does not draw power directly from the battery. Energy passes through an inverter (for AC loads), wiring, and potentially a DC-DC converter. Each stage consumes a percentage of the energy as heat.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Component</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Typical Efficiency</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">Pure sine wave inverter</td>
+                <td class="p-4 font-mono text-primary">85–92%</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">DC wiring (short run)</td>
+                <td class="p-4 font-mono text-primary">97–99%</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">DC wiring (long run)</td>
+                <td class="p-4 font-mono text-primary">90–96%</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">MPPT charge controller</td>
+                <td class="p-4 font-mono text-primary">95–98%</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Total system (typical)</td>
+                <td class="p-4 font-mono text-primary">85–92%</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-body-md text-body font-light mt-4">
+          A system with 90% efficiency means the battery must supply 11% more energy than the load actually consumes. Ignoring this leads to a significant overestimate of runtime.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Worked Example</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Given:</strong></p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li>Battery: 100 Ah at 12.8V (LFP 4S pack)</li>
+              <li>DoD limit: 80%</li>
+              <li>System efficiency: 90%</li>
+              <li>Continuous load: 200 W (through an inverter)</li>
+            </ul>
+            <p><strong>Step 1:</strong> Usable energy:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              100 Ah × 12.8V × 0.80 = 1,024 Wh
+            </div>
+            <p><strong>Step 2:</strong> Effective load seen by battery:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              200 W / 0.90 = 222.2 W
+            </div>
+            <p><strong>Step 3:</strong> Runtime:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              1,024 Wh / 222.2 W = 4.61 hours ≈ 4 hours 36 minutes
+            </div>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Quick Reference: Common Battery Runtimes</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          The table below shows approximate runtimes for common 12V LFP batteries powering typical loads at 90% system efficiency and 80% DoD.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Battery</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">100W Load</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">250W Load</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">500W Load</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">50 Ah 12.8V</td>
+                <td class="p-4 text-muted">2.3 hrs</td>
+                <td class="p-4 text-muted">54 min</td>
+                <td class="p-4 text-muted">27 min</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">100 Ah 12.8V</td>
+                <td class="p-4 text-muted">4.6 hrs</td>
+                <td class="p-4 text-muted">1.8 hrs</td>
+                <td class="p-4 text-muted">54 min</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">200 Ah 12.8V</td>
+                <td class="p-4 text-muted">9.1 hrs</td>
+                <td class="p-4 text-muted">3.6 hrs</td>
+                <td class="p-4 text-muted">1.8 hrs</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">300 Ah 12.8V</td>
+                <td class="p-4 text-muted">13.7 hrs</td>
+                <td class="p-4 text-muted">5.5 hrs</td>
+                <td class="p-4 text-muted">2.7 hrs</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Factors That Reduce Runtime</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Temperature</h4>
+            <p class="text-body-sm text-muted">
+              Cold environments reduce available capacity. LFP loses roughly 10% at 0°C and up to 30% at -20°C. Lead-acid is even more sensitive, losing up to 50% capacity at -20°C.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Peukert Effect</h4>
+            <p class="text-body-sm text-muted">
+              Lead-acid batteries deliver less total energy at high discharge rates. A 100 Ah lead-acid battery at 1C may only deliver 60–70 Ah of usable capacity. Lithium batteries are far less affected.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Battery Age</h4>
+            <p class="text-body-sm text-muted">
+              As batteries age, capacity fades. A battery at 80% State of Health (SOH) delivers only 80% of its original capacity. After 2,000 cycles, most LFP batteries are at 80% SOH.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Voltage Sag Under Load</h4>
+            <p class="text-body-sm text-muted">
+              Heavy discharge causes terminal voltage to drop. If the inverter's low-voltage cutoff triggers early, the battery is disconnected before it is fully depleted, wasting remaining capacity.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Try It</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use the Runtime Calculator to estimate discharge duration for your specific system configuration.
+          </p>
+          <a href="/tools/runtime-calculator" class="btn-primary text-xs py-3 px-6 inline-block">Open Runtime Calculator</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Related</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Need to size the battery first? Use the Battery Sizing Calculator to determine required capacity.
+          </p>
+          <a href="/tools/battery-sizing-calculator" class="btn-primary-outline text-xs py-3 px-6 inline-block">Open Sizing Calculator</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Related Articles</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">How to Calculate Battery Runtime</h4>
+            <p class="text-body-sm text-muted mb-3">
+              The detailed engineering method for calculating discharge runtime step by step.
+            </p>
+            <a href="/learn/how-to-calculate-battery-runtime" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Read Guide →</a>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">How Long Will a 200Ah Battery Last?</h4>
+            <p class="text-body-sm text-muted mb-3">
+              Specific runtime examples for 200Ah batteries across common load scenarios.
+            </p>
+            <a href="/learn/how-long-will-a-200ah-battery-last" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Read Guide →</a>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

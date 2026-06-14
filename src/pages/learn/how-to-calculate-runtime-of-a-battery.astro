@@ -1,0 +1,225 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import CalculatorCard from '../../components/CalculatorCard.astro';
+import FormulaBox from '../../components/FormulaBox.astro';
+import FAQSection from '../../components/FAQSection.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "What is the simplest way to calculate battery runtime?",
+    answer: "Multiply capacity (Ah) by voltage (V) to get total watt-hours, apply your DoD limit, then divide by the effective load (load watts ÷ efficiency). For a 100Ah 12.8V LFP at 80% DoD with a 100W load and 90% efficiency, runtime is (100 × 12.8 × 0.80) ÷ (100 ÷ 0.90) = 9.2 hours.",
+  },
+  {
+    question: "Why can't I just divide Ah by amps to get runtime?",
+    answer: "Simple division ignores efficiency losses, DoD limits, and the Peukert effect. Real systems lose 8–15% through the inverter and wiring, and you typically discharge only to 80% DoD to preserve battery life. This makes actual runtime 30–40% shorter than the naive calculation.",
+  },
+  {
+    question: "Does runtime change with different battery voltages?",
+    answer: "For the same load power, a higher-voltage battery draws less current, reducing cable losses and improving efficiency. A 48V system loses less energy in wiring than a 12V system for the same wattage, so runtime is slightly longer at higher voltages.",
+  },
+  {
+    question: "How accurate are battery runtime calculations?",
+    answer: "Well-executed calculations are typically within 10–15% of measured values. The main sources of error are temperature variations, battery age (SOH), and the Peukert effect in lead-acid batteries. Lithium batteries are more predictable because they maintain voltage more consistently during discharge.",
+  },
+];
+---
+
+<Layout
+  title="How to Calculate Runtime of a Battery | Battery Calculators"
+  description="Step-by-step method for calculating battery runtime from capacity, voltage, load, efficiency, and depth of discharge. Includes formulas, worked examples, and common mistakes."
+  canonical="https://batterycalculators.com/learn/how-to-calculate-runtime-of-a-battery"
+  schema="faqPage"
+  schemaName="How to Calculate Runtime of a Battery"
+  schemaDescription="Engineering method for calculating battery runtime with accuracy."
+  schemaUrl="https://batterycalculators.com/learn/how-to-calculate-runtime-of-a-battery"
+  faqItems={faqItems}
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/learn" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Back to Guides</a>
+      <Breadcrumb items={[
+        { label: "Learning Center", href: "/learn" },
+        { label: "How to Calculate Runtime of a Battery" }
+      ]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">SYSTEM DESIGN</span>
+      <h1 class="text-display-md text-primary mb-6">How to Calculate Runtime of a Battery</h1>
+      <p class="text-body-md text-body font-light">
+        Calculating battery runtime requires understanding how energy flows from the battery through the system to the load. This guide walks through the complete engineering method, from capacity rating to final runtime estimate, accounting for the real-world factors that naive calculations miss.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Why Naive Calculations Fail</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          The most common approach — dividing Ah by load current — produces wildly optimistic results. A 100Ah battery powering a 10A load appears to last 10 hours. In reality, the system loses energy through the inverter, wiring, and battery management system, and you do not discharge to 0%.
+        </p>
+        <p class="text-body-md text-body font-light">
+          The accurate method accounts for five factors: total energy storage, usable capacity (DoD), system efficiency, load power, and voltage considerations. Each factor reduces the theoretical maximum by a measurable amount.
+        </p>
+      </section>
+
+      <FormulaBox title="Complete Runtime Formula">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Total Energy (Wh) = Capacity (Ah) × Nominal Voltage (V)
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Usable Energy (Wh) = Total Energy × (DoD% / 100)
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Effective Load (W) = Actual Load (W) / (System Efficiency% / 100)
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Runtime (hours) = Usable Energy (Wh) / Effective Load (W)
+        </div>
+        <p>
+          System efficiency includes inverter conversion losses, DC wiring losses, BMS consumption, and any DC-DC converter overhead. A typical value is 85–92%.
+        </p>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Worked Example</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Given:</strong></p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li>Battery: 200 Ah at 12.8V (LFP 4S pack)</li>
+              <li>DoD limit: 80%</li>
+              <li>Load: 300W AC (through pure sine inverter)</li>
+              <li>System efficiency: 90%</li>
+            </ul>
+            <p><strong>Step 1:</strong> Total energy:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              200 Ah × 12.8V = 2,560 Wh
+            </div>
+            <p><strong>Step 2:</strong> Usable energy at 80% DoD:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              2,560 Wh × 0.80 = 2,048 Wh
+            </div>
+            <p><strong>Step 3:</strong> Effective load:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              300 W / 0.90 = 333.3 W
+            </div>
+            <p><strong>Step 4:</strong> Runtime:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              2,048 Wh / 333.3 W = 6.14 hours ≈ 6 hours 9 minutes
+            </div>
+            <p class="mt-2 text-muted">The naive calculation (200Ah ÷ 25A = 8 hours) overestimates by 30%.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Step-by-Step Method</h2>
+        <div class="flex flex-col gap-6">
+          <CalculatorCard>
+            <div class="flex items-start gap-4">
+              <span class="text-display-sm text-m-blue-light font-bold shrink-0">1</span>
+              <div>
+                <h4 class="text-primary font-bold mb-1">Identify Battery Specifications</h4>
+                <p class="text-body-sm text-muted">Record the rated capacity (Ah), nominal voltage (V), and chemistry. LFP nominal voltage is 3.2V per cell (12.8V for 4S). NMC is 3.6–3.7V per cell.</p>
+              </div>
+            </div>
+          </CalculatorCard>
+          <CalculatorCard>
+            <div class="flex items-start gap-4">
+              <span class="text-display-sm text-m-blue-light font-bold shrink-0">2</span>
+              <div>
+                <h4 class="text-primary font-bold mb-1">Determine Usable DoD</h4>
+                <p class="text-body-sm text-muted">LFP batteries can safely discharge to 80–90% DoD. Lead-acid should be limited to 50% for cycle life. Set your DoD based on chemistry and cycle life requirements.</p>
+              </div>
+            </div>
+          </CalculatorCard>
+          <CalculatorCard>
+            <div class="flex items-start gap-4">
+              <span class="text-display-sm text-m-blue-light font-bold shrink-0">3</span>
+              <div>
+                <h4 class="text-primary font-bold mb-1">Calculate Effective Load</h4>
+                <p class="text-body-sm text-muted">Divide the actual load wattage by system efficiency. For AC loads through an inverter, account for inverter losses (8–15%). For DC loads, account for wiring losses (1–5%).</p>
+              </div>
+            </div>
+          </CalculatorCard>
+          <CalculatorCard>
+            <div class="flex items-start gap-4">
+              <span class="text-display-sm text-m-blue-light font-bold shrink-0">4</span>
+              <div>
+                <h4 class="text-primary font-bold mb-1">Divide Usable Energy by Effective Load</h4>
+                <p class="text-body-sm text-muted">The result is your runtime in hours. For loads that cycle on and off (like a fridge), use the average power draw over a 24-hour period rather than the compressor's peak wattage.</p>
+              </div>
+            </div>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Common Mistakes</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Ignoring Efficiency</h4>
+            <p class="text-body-sm text-muted">
+              Skipping the efficiency step overestimates runtime by 10–15%. An inverter alone consumes 8–12% of the power, and this is the single largest source of error.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Using Full Capacity</h4>
+            <p class="text-body-sm text-muted">
+              Discharging lead-acid below 50% DoD causes permanent damage. Even lithium batteries degrade faster at 100% DoD. Always apply the chemistry's recommended DoD limit.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Ignoring Temperature</h4>
+            <p class="text-body-sm text-muted">
+              Cold batteries lose 10–30% of rated capacity. If your battery is in an unheated compartment, apply a temperature derating factor of 0.85–0.90 for winter conditions.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Peak vs. Average Power</h4>
+            <p class="text-body-sm text-muted">
+              Motors and compressors draw 3–5× their rated power during startup. Using peak power instead of average power gives a pessimistic runtime estimate. Use average consumption over time.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Try It</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use the Runtime Calculator to estimate discharge duration for your specific system.
+          </p>
+          <a href="/tools/runtime-calculator" class="btn-primary text-xs py-3 px-6 inline-block">Open Runtime Calculator</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Related</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Browse Solar, RV, and Home Backup calculators for application-specific sizing.
+          </p>
+          <a href="/solar" class="btn-primary-outline text-xs py-3 px-6 inline-block">Solar Calculators</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Related Articles</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Battery Runtime Formula</h4>
+            <p class="text-body-sm text-muted mb-3">
+              Reference sheet for all runtime formulas including voltage, efficiency, and temperature corrections.
+            </p>
+            <a href="/learn/battery-runtime-formula" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Read Guide →</a>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">12V vs 24V vs 48V Runtime</h4>
+            <p class="text-body-sm text-muted mb-3">
+              How system voltage affects runtime, efficiency, and cable sizing decisions.
+            </p>
+            <a href="/learn/12v-vs-24v-vs-48v-runtime" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Read Guide →</a>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

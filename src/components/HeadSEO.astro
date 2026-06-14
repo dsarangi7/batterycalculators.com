@@ -1,0 +1,137 @@
+---
+export interface FAQItem {
+  question: string;
+  answer: string;
+}
+
+export interface BreadcrumbItem {
+  label: string;
+  href?: string;
+}
+
+export interface Props {
+  title: string;
+  description: string;
+  canonical?: string;
+  ogType?: string;
+  ogImage?: string;
+  schema?: 'website' | 'webApplication' | 'faqPage';
+  schemaName?: string;
+  schemaDescription?: string;
+  schemaUrl?: string;
+  faqItems?: FAQItem[];
+  breadcrumbs?: BreadcrumbItem[];
+}
+
+const {
+  title,
+  description,
+  canonical,
+  ogType = 'website',
+  ogImage = '/og-default.png',
+  schema = 'website',
+  schemaName,
+  schemaDescription,
+  schemaUrl,
+  faqItems = [],
+  breadcrumbs = [],
+} = Astro.props;
+
+const siteUrl = 'https://batterycalculators.com';
+const currentUrl = canonical || `${siteUrl}${Astro.url.pathname}`;
+const imageUrl = ogImage.startsWith('http') ? ogImage : `${siteUrl}${ogImage}`;
+
+let schemaData: Record<string, unknown> = {};
+let faqSchemaData: Record<string, unknown> | null = null;
+let breadcrumbSchemaData: Record<string, unknown> | null = null;
+
+if (schema === 'website') {
+  schemaData = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: schemaName || 'Battery Calculators',
+    description: schemaDescription || description,
+    url: siteUrl,
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: `${siteUrl}/tools?q={search_term_string}`,
+      'query-input': 'required name=search_term_string',
+    },
+  };
+} else if (schema === 'webApplication') {
+  schemaData = {
+    '@context': 'https://schema.org',
+    '@type': 'WebApplication',
+    name: schemaName || title.split('|')[0].trim(),
+    description: schemaDescription || description,
+    url: schemaUrl || currentUrl,
+    applicationCategory: 'EngineeringApplication',
+    operatingSystem: 'Web Browser',
+    offers: {
+      '@type': 'Offer',
+      price: '0',
+      priceCurrency: 'USD',
+    },
+  };
+}
+
+if (breadcrumbs.length > 0) {
+  const itemListElement = [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: siteUrl },
+    ...breadcrumbs.map((b, i) => ({
+      '@type': 'ListItem',
+      position: i + 2,
+      name: b.label,
+      ...(b.href ? { item: `${siteUrl}${b.href}` } : {}),
+    })),
+  ];
+  breadcrumbSchemaData = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement,
+  };
+}
+
+if (faqItems.length > 0) {
+  faqSchemaData = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqItems.map((item) => ({
+      '@type': 'Question',
+      name: item.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: item.answer,
+      },
+    })),
+  };
+}
+---
+
+<!-- Canonical URL -->
+<link rel="canonical" href={currentUrl} />
+
+<!-- Open Graph -->
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:type" content={ogType} />
+<meta property="og:url" content={currentUrl} />
+<meta property="og:image" content={imageUrl} />
+<meta property="og:site_name" content="Battery Calculators" />
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={imageUrl} />
+
+<!-- Structured Data -->
+{schemaData['@type'] && (
+  <script is:inline type="application/ld+json" set:html={JSON.stringify(schemaData)} />
+)}
+{breadcrumbSchemaData && (
+  <script is:inline type="application/ld+json" set:html={JSON.stringify(breadcrumbSchemaData)} />
+)}
+{faqSchemaData && (
+  <script is:inline type="application/ld+json" set:html={JSON.stringify(faqSchemaData)} />
+)}

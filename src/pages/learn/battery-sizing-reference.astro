@@ -1,0 +1,475 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import CalculatorCard from "../../components/CalculatorCard.astro";
+import FAQSection from "../../components/FAQSection.astro";
+import ReferenceChart from "../../components/ReferenceChart.astro";
+
+const faqItems = [
+  {
+    question: "What is the difference between Wh and Ah?",
+    answer:
+      "Amp-hours (Ah) measure charge capacity — how much current a battery can deliver over time. Watt-hours (Wh) measure energy capacity — how much total work the battery can do. Wh = Ah × Voltage. A 100Ah 12V battery stores 1,280Wh. A 100Ah 48V battery stores 5,120Wh. Wh is the more meaningful metric for comparing energy storage.",
+  },
+  {
+    question: "What is the difference between nominal and usable capacity?",
+    answer:
+      "Nominal capacity is the manufacturer's rated capacity under ideal conditions. Usable capacity is the energy you can actually draw, accounting for depth of discharge limits, efficiency losses, and temperature derating. A 100Ah LiFePO4 battery at 80% DoD provides 80Ah usable. A 100Ah lead-acid at 50% DoD provides only 50Ah usable.",
+  },
+  {
+    question: "How do autonomy days affect battery sizing?",
+    answer:
+      "Autonomy days determine how many days the battery must power the load without recharging. More autonomy days require a proportionally larger battery. A system needing 1,000Wh/day with 3 days of autonomy requires a 3,000Wh usable battery (before DoD and efficiency derating). Off-grid systems typically need 2–5 days; grid-tied backup needs 1–2 days.",
+  },
+  {
+    question: "Why does inverter efficiency matter for battery sizing?",
+    answer:
+      "Inverters convert DC battery power to AC for household loads. This conversion is not 100% efficient — typically 85–95%. A 1,000W AC load requires 1,050–1,175W from the battery. Inverter efficiency must be factored into battery sizing, or the battery will drain faster than expected.",
+  },
+];
+
+const tableOfContents = [
+  { id: "wh-vs-ah", label: "Wh vs Ah" },
+  { id: "nominal-vs-usable", label: "Nominal vs Usable Capacity" },
+  { id: "sizing-table", label: "Application Sizing Table" },
+  { id: "sizing-factors", label: "Key Sizing Factors" },
+  { id: "common-mistakes", label: "Common Mistakes" },
+];
+
+const relatedCalculators = [
+  {
+    title: "Battery Sizing Calculator",
+    href: "/tools/battery-sizing-calculator",
+  },
+  {
+    title: "Solar Battery Sizing Calculator",
+    href: "/tools/solar-battery-sizing-calculator",
+  },
+  {
+    title: "Home Backup Battery Calculator",
+    href: "/tools/home-backup-battery-calculator",
+  },
+  {
+    title: "Marine Battery Sizing Calculator",
+    href: "/tools/marine-battery-sizing-calculator",
+  },
+];
+
+const references = [
+  {
+    title: "Battery University — Sizing Batteries",
+    url: "https://batteryuniversity.com/article/bu-403-lead-acid",
+  },
+  {
+    title: "NREL — Battery Storage Sizing Guide",
+    url: "https://www.nrel.gov/docs/fy24osti/87655.pdf",
+  },
+];
+---
+
+<Layout
+  title="Battery Sizing Reference — How to Size a Battery Bank | Battery Calculators"
+  description="Battery sizing reference with practical tables for RV, solar, marine, home backup, and commercial applications. Wh vs Ah, usable capacity, and key sizing factors."
+  faqItems={faqItems}
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a
+        href="/learn"
+        class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block"
+        >&larr; Back to Guides</a
+      >
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4"
+        >REFERENCE</span
+      >
+      <h1 class="text-display-md text-primary mb-6">
+        Battery Sizing Reference
+      </h1>
+      <p class="text-body-md text-body font-light">
+        How to size a battery bank for any application. Understand Wh vs Ah,
+        nominal vs usable capacity, and the key factors that determine how large
+        your battery needs to be.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section id="wh-vs-ah">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          Wh vs Ah
+        </h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Amp-hours (Ah) describe how much charge a battery can deliver at its
+          rated voltage. Watt-hours (Wh) describe how much total energy it
+          stores. The relationship is straightforward: Wh = Ah × Voltage. A
+          100Ah battery at 12V stores 1,280Wh. The same 100Ah capacity at 48V
+          stores 5,120Wh.
+        </p>
+        <p class="text-body-md text-body font-light mb-4">
+          Wh is the more useful metric for comparing batteries across different
+          voltage systems. A 100Ah 12V battery and a 50Ah 24V battery store the
+          same energy (1,280Wh), but the Ah ratings are very different. When
+          sizing battery banks, always work in Wh to avoid confusion between
+          voltage levels.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-body-sm min-w-[480px]">
+              <thead>
+                <tr class="border-b border-hairline bg-surface-card">
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >Capacity</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >12V</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >24V</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >48V</th
+                  >
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-hairline">
+                <tr>
+                  <td class="p-4 font-mono text-primary">50 Ah</td>
+                  <td class="p-4 text-muted">640 Wh</td>
+                  <td class="p-4 text-muted">1,280 Wh</td>
+                  <td class="p-4 text-muted">2,560 Wh</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">100 Ah</td>
+                  <td class="p-4 text-muted">1,280 Wh</td>
+                  <td class="p-4 text-muted">2,560 Wh</td>
+                  <td class="p-4 text-muted">5,120 Wh</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">200 Ah</td>
+                  <td class="p-4 text-muted">2,560 Wh</td>
+                  <td class="p-4 text-muted">5,120 Wh</td>
+                  <td class="p-4 text-muted">10,240 Wh</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">300 Ah</td>
+                  <td class="p-4 text-muted">3,840 Wh</td>
+                  <td class="p-4 text-muted">7,680 Wh</td>
+                  <td class="p-4 text-muted">15,360 Wh</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <p class="text-caption text-muted mt-3">
+          Wh = Ah × nominal voltage. LiFePO4 nominal cell voltage is 3.2V;
+          lead-acid is 2.0V per cell.
+        </p>
+      </section>
+
+      <section id="nominal-vs-usable">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          Nominal vs Usable Capacity
+        </h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Nominal capacity is what the manufacturer prints on the label. Usable
+          capacity is what you can actually extract, accounting for depth of
+          discharge limits, inverter efficiency, and temperature derating. The
+          gap between nominal and usable can be 20–50% depending on chemistry
+          and conditions.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-body-sm min-w-[480px]">
+              <thead>
+                <tr class="border-b border-hairline bg-surface-card">
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >Factor</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >Typical Value</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >Effect on Usable Capacity</th
+                  >
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-hairline">
+                <tr>
+                  <td class="p-4 font-mono text-primary">DoD Limit</td>
+                  <td class="p-4 text-muted">50–80%</td>
+                  <td class="p-4 text-muted">Reduces usable by 20–50%</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">Inverter Efficiency</td
+                  >
+                  <td class="p-4 text-muted">85–95%</td>
+                  <td class="p-4 text-muted"
+                    >AC load requires 5–15% more DC energy</td
+                  >
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary"
+                    >Temperature Derating</td
+                  >
+                  <td class="p-4 text-muted">0–30%</td>
+                  <td class="p-4 text-muted"
+                    >Reduces capacity in cold environments</td
+                  >
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">Battery Aging</td>
+                  <td class="p-4 text-muted">10–20%</td>
+                  <td class="p-4 text-muted"
+                    >Capacity decreases over lifetime</td
+                  >
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <p class="text-body-md text-body font-light mt-4">
+          A 100Ah LiFePO4 battery at 25°C with 80% DoD and 90% inverter
+          efficiency provides roughly 72Ah usable AC capacity (100 × 0.80 × 0.90
+          = 72Ah). Plan for end-of-life capacity, not just Day 1 performance.
+        </p>
+      </section>
+
+      <section id="sizing-table">
+        <ReferenceChart
+          type="bar"
+          title="Typical Battery Energy Range by Application"
+          description="Typical planning ranges only. Actual system sizing depends on load, autonomy, DoD, efficiency, and safety margin."
+          xLabel="Application"
+          yLabel="Energy (kWh)"
+          data={[
+            { x: 1, y: 0.1, label: "Small ELEC" },
+            { x: 2, y: 2, label: "RV" },
+            { x: 3, y: 10, label: "Solar" },
+            { x: 4, y: 15, label: "Marine" },
+            { x: 5, y: 20, label: "Home" },
+            { x: 6, y: 100, label: "BESS" },
+          ]}
+          yMin={0}
+          yMax={110}
+          caption="Typical planning ranges only. Actual system sizing depends on load, autonomy, DoD, efficiency, and safety margin."
+        />
+
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          Application Sizing Table
+        </h2>
+        <p class="text-body-md text-body font-light mb-4">
+          The table below shows typical battery configurations for common
+          applications. These are starting points — actual requirements depend
+          on specific loads, autonomy needs, and environmental conditions.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-body-sm min-w-[700px]">
+              <thead>
+                <tr class="border-b border-hairline bg-surface-card">
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >Application</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >Typical Voltage</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >Typical Energy Range</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >Notes</th
+                  >
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-hairline">
+                <tr>
+                  <td class="p-4 font-mono text-primary">Small Electronics</td>
+                  <td class="p-4 text-muted">12V</td>
+                  <td class="p-4 text-muted">50–200 Wh</td>
+                  <td class="p-4 text-muted">Phones, routers, LED lights</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">RV / Camper</td>
+                  <td class="p-4 text-muted">12V</td>
+                  <td class="p-4 text-muted">1–5 kWh</td>
+                  <td class="p-4 text-muted"
+                    >Weekend camping to full-time boondocking</td
+                  >
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">Solar Backup</td>
+                  <td class="p-4 text-muted">48V</td>
+                  <td class="p-4 text-muted">5–30 kWh</td>
+                  <td class="p-4 text-muted"
+                    >1–3 days autonomy for household loads</td
+                  >
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">Marine House Load</td>
+                  <td class="p-4 text-muted">12V / 24V</td>
+                  <td class="p-4 text-muted">2–10 kWh</td>
+                  <td class="p-4 text-muted"
+                    >Navigation, lighting, refrigeration, electronics</td
+                  >
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">Home Backup</td>
+                  <td class="p-4 text-muted">48V</td>
+                  <td class="p-4 text-muted">10–40 kWh</td>
+                  <td class="p-4 text-muted">Essential loads for 1–3 days</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">Commercial BESS</td>
+                  <td class="p-4 text-muted">48V–800V</td>
+                  <td class="p-4 text-muted">100–10,000+ kWh</td>
+                  <td class="p-4 text-muted"
+                    >Peak shaving, demand response, backup</td
+                  >
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section id="sizing-factors">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          Key Sizing Factors
+        </h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Battery sizing is not just about total energy storage. Several factors
+          must be considered together to determine the right bank size:
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">
+              Daily Energy Consumption
+            </h4>
+            <p class="text-body-sm text-muted">
+              Total Wh consumed per day from all loads. This is the foundation
+              of sizing. Measure or estimate every load that will run from the
+              battery, multiplied by its daily run time.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Autonomy Days</h4>
+            <p class="text-body-sm text-muted">
+              Number of days the battery must power loads without recharging.
+              Grid-tied backup: 1–2 days. Off-grid solar: 2–5 days. Remote
+              sites: 3–7 days. More autonomy = larger battery.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Depth of Discharge</h4>
+            <p class="text-body-sm text-muted">
+              DoD limits reduce usable capacity. LiFePO4: 80% DoD. Lead-acid:
+              50% DoD. Size the bank so that the DoD-limited usable capacity
+              meets your energy needs.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Safety Margin</h4>
+            <p class="text-body-sm text-muted">
+              Add 10–20% margin for load estimation errors, capacity degradation
+              over time, temperature effects, and unexpected demand. Undersized
+              banks fail when you need them most.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <section id="common-mistakes">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          Common Mistakes
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">
+              Sizing from Nominal Capacity
+            </h4>
+            <p class="text-body-sm text-muted">
+              A 200Ah lead-acid battery at 50% DoD provides only 100Ah usable.
+              If you need 100Ah of usable capacity, you need 200Ah of lead-acid,
+              not 100Ah. Always size from usable, not nominal.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">
+              Forgetting Inverter Efficiency
+            </h4>
+            <p class="text-body-sm text-muted">
+              A 1,000W AC load requires 1,050–1,175W from the battery due to
+              inverter losses. Ignoring this 5–15% overhead means the battery
+              drains faster than calculated.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">
+              Not Accounting for Temperature
+            </h4>
+            <p class="text-body-sm text-muted">
+              A battery in a cold environment delivers less capacity. If your
+              battery will be in an unheated space, apply temperature derating
+              or oversize the bank to compensate.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Ignoring Load Growth</h4>
+            <p class="text-body-sm text-muted">
+              If you plan to add loads (new appliances, EV charging, expanded
+              system), size the battery bank for future capacity, not just
+              current needs. Replacing undersized banks is expensive.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <CalculatorCard class="border-m-blue-light">
+        <h4 class="text-label-uppercase text-primary text-xs mb-3">Try It</h4>
+        <p class="text-body-sm text-muted mb-4">
+          Use the Battery Sizing Calculator to size a battery bank from your
+          specific loads, autonomy requirements, and battery chemistry.
+        </p>
+        <a
+          href="/tools/battery-sizing-calculator"
+          class="btn-primary text-xs py-3 px-6 inline-block"
+          >Open Battery Sizing Calculator</a
+        >
+      </CalculatorCard>
+
+      <FAQSection items={faqItems} />
+
+      <section class="border-t border-hairline pt-12">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          References
+        </h2>
+        <ul class="flex flex-col gap-2 text-body-sm text-muted">
+          {
+            references.map((ref) => (
+              <li class="flex gap-2">
+                <span class="text-m-blue-light shrink-0">—</span>
+                <a
+                  href={ref.url}
+                  class="hover:text-primary transition-colors underline underline-offset-2"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {ref.title}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+    </div>
+  </div>
+</Layout>

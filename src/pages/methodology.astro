@@ -1,0 +1,193 @@
+---
+import Layout from '../layouts/Layout.astro';
+import CalculatorCard from '../components/CalculatorCard.astro';
+import Breadcrumb from '../components/Breadcrumb.astro';
+import FormulaBox from '../components/FormulaBox.astro';
+import FAQSection from '../components/FAQSection.astro';
+import MStripe from '../components/MStripe.astro';
+
+const faqItems = [
+  {
+    question: 'Are these calculators certified engineering tools?',
+    answer: 'No. All calculators provide educational estimates and should not replace certified engineering analysis. They are designed as preliminary sizing aids for battery system planning.',
+  },
+  {
+    question: 'Can I use these results for production battery designs?',
+    answer: 'You may use the results as starting points, but all production designs must be validated by qualified battery engineers using manufacturer-specific datasheets, thermal modeling, and safety testing.',
+  },
+  {
+    question: 'Why are formulas shown openly?',
+    answer: 'Transparency is a core principle. Every formula is displayed so engineers can verify, audit, and adapt the calculations to their specific requirements. Hidden logic builds no trust.',
+  },
+  {
+    question: 'How often are the calculators updated?',
+    answer: 'Formulas follow established electrical engineering principles that do not change. Reference data (wire gauges, chemistry specs) is reviewed periodically. Any updates are logged in the repository.',
+  },
+];
+---
+
+<Layout
+  title="Methodology & Engineering Transparency | Battery Calculators"
+  description="Learn about the formulas, assumptions, and engineering principles behind BatteryCalculators.com calculators. Full transparency for educational and professional use."
+  schema="website"
+  schemaName="Methodology & Engineering Transparency"
+  schemaDescription="Explains the public formulas, engineering assumptions, and limitations of BatteryCalculators.com calculators."
+  faqItems={faqItems}
+>
+  <Breadcrumb items={[{ label: 'Methodology' }]} />
+
+  <div class="mb-12 border-b border-hairline pb-12">
+    <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">TRANSPARENCY</span>
+    <h1 class="text-display-md text-primary mb-4">Methodology & Engineering Transparency</h1>
+    <p class="text-body-md text-muted max-w-2xl font-light">
+      Every calculator on this site is built on public, auditable formulas. This page explains what we calculate,
+      what assumptions we make, and where the limits of online estimation tools lie.
+    </p>
+  </div>
+
+  <div class="flex flex-col gap-16">
+
+    <!-- Core Principle -->
+    <section>
+      <h2 class="text-title-lg text-primary mb-4 uppercase tracking-wider">Core Principle</h2>
+      <p class="text-body-md text-muted mb-6">
+        Battery Calculators exists to make standard electrical engineering formulas accessible to designers,
+        installers, and engineers. We do not use proprietary models, hidden correction factors, or
+        black-box algorithms. Every calculation can be traced to a published engineering source.
+      </p>
+    </section>
+
+    <MStripe />
+
+    <!-- Formulas Are Public -->
+    <section>
+      <h2 class="text-title-lg text-primary mb-4 uppercase tracking-wider">Formulas Are Public</h2>
+      <p class="text-body-md text-muted mb-6">
+        Every calculator page displays its underlying formulas in a dedicated section. These are
+        standard electrical engineering equations — not approximations or trade secrets.
+      </p>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <CalculatorCard>
+          <h3 class="text-primary font-bold mb-2">Runtime Calculation</h3>
+          <p class="text-body-sm text-muted mb-3">Divides usable energy by efficiency-adjusted load power.</p>
+          <FormulaBox title="Runtime Formula">
+            <div class="bg-surface-soft p-3 font-mono text-primary border border-hairline">
+              T = (Ah × V × DoD) / (Load / η)
+            </div>
+          </FormulaBox>
+        </CalculatorCard>
+
+        <CalculatorCard>
+          <h3 class="text-primary font-bold mb-2">C-Rate Calculation</h3>
+          <p class="text-body-sm text-muted mb-3">Expresses current relative to cell capacity.</p>
+          <FormulaBox title="C-Rate Formula">
+            <div class="bg-surface-soft p-3 font-mono text-primary border border-hairline">
+              C-rate = I / Capacity(Ah)
+            </div>
+          </FormulaBox>
+        </CalculatorCard>
+
+        <CalculatorCard>
+          <h3 class="text-primary font-bold mb-2">Voltage Drop</h3>
+          <p class="text-body-sm text-muted mb-3">Standard resistive loss calculation using conductor properties.</p>
+          <FormulaBox title="Voltage Drop Formula">
+            <div class="bg-surface-soft p-3 font-mono text-primary border border-hairline">
+              V_drop = I × R × 2L
+            </div>
+          </FormulaBox>
+        </CalculatorCard>
+
+        <CalculatorCard>
+          <h3 class="text-primary font-bold mb-2">BESS ROI</h3>
+          <p class="text-body-sm text-muted mb-3">Net present value and payback analysis using standard DCF methods.</p>
+          <FormulaBox title="NPV Formula">
+            <div class="bg-surface-soft p-3 font-mono text-primary border border-hairline">
+              NPV = Σ [CF_t / (1+r)^t] − C₀
+            </div>
+          </FormulaBox>
+        </CalculatorCard>
+      </div>
+    </section>
+
+    <MStripe />
+
+    <!-- Engineering Assumptions -->
+    <section>
+      <h2 class="text-title-lg text-primary mb-4 uppercase tracking-wider">Engineering Assumptions</h2>
+      <p class="text-body-md text-muted mb-6">
+        Where calculators require default values, we use conservative, industry-standard assumptions.
+        Users can override all defaults.
+      </p>
+
+      <div class="flex flex-col gap-4">
+        <CalculatorCard>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <h3 class="text-primary font-bold mb-1">Temperature</h3>
+              <p class="text-body-sm text-muted">Standard ambient assumed at 25°C unless specified. Capacity derating applied for cold conditions.</p>
+            </div>
+            <div>
+              <h3 class="text-primary font-bold mb-1">Inverter Efficiency</h3>
+              <p class="text-body-sm text-muted">Default 90% represents a typical mid-range inverter. High-end units may reach 96%; low-end may be 85%.</p>
+            </div>
+            <div>
+              <h3 class="text-primary font-bold mb-1">DoD Limits</h3>
+              <p class="text-body-sm text-muted">Default limits reflect manufacturer cycle-life recommendations: LFP 80%, NMC 80%, Lead-Acid 50%.</p>
+            </div>
+          </div>
+        </CalculatorCard>
+      </div>
+    </section>
+
+    <MStripe />
+
+    <!-- Limitations -->
+    <section>
+      <h2 class="text-title-lg text-primary mb-4 uppercase tracking-wider">Limitations</h2>
+      <div class="flex flex-col gap-4 text-body-sm text-muted">
+        <CalculatorCard>
+          <h3 class="text-primary font-bold mb-2">No Real-Time Data</h3>
+          <p>Calculators use static formulas and do not account for real-time battery state, temperature sensors, or dynamic load profiles.</p>
+        </CalculatorCard>
+        <CalculatorCard>
+          <h3 class="text-primary font-bold mb-2">Chemistry Simplification</h3>
+          <p>Lithium and lead-acid chemistries are modeled with simplified curves. Real cell behavior varies by manufacturer, batch, age, and thermal history.</p>
+        </CalculatorCard>
+        <CalculatorCard>
+          <h3 class="text-primary font-bold mb-2">No Safety Certification</h3>
+          <p>Results are engineering estimates, not certified safety analyses. Critical applications require professional validation per UL, IEC, or local standards.</p>
+        </CalculatorCard>
+        <CalculatorCard>
+          <h3 class="text-primary font-bold mb-2">No Account for Manufacturing Tolerance</h3>
+          <p>Cell-to-cell variation, capacity fade, and production tolerances are not modeled. Use manufacturer datasheets for production specifications.</p>
+        </CalculatorCard>
+      </div>
+    </section>
+
+    <MStripe />
+
+    <!-- Educational Use Statement -->
+    <section>
+      <h2 class="text-title-lg text-primary mb-4 uppercase tracking-wider">Educational Use</h2>
+      <p class="text-body-md text-muted mb-4">
+        These tools are provided for educational and preliminary design purposes. They are useful for:
+      </p>
+      <ul class="text-body-sm text-muted flex flex-col gap-2 mb-6">
+        <li class="flex gap-2"><span class="text-m-blue-light">—</span> Learning fundamental battery engineering concepts</li>
+        <li class="flex gap-2"><span class="text-m-blue-light">—</span> Quick preliminary sizing before detailed design</li>
+        <li class="flex gap-2"><span class="text-m-blue-light">—</span> Comparing configuration options and trade-offs</li>
+        <li class="flex gap-2"><span class="text-m-blue-light">—</span> Validating hand calculations and spreadsheet models</li>
+        <li class="flex gap-2"><span class="text-m-blue-light">—</span> Teaching and training in battery system design</li>
+      </ul>
+      <p class="text-body-sm text-muted">
+        They are not a substitute for professional engineering judgment, manufacturer datasheets, or certified testing.
+      </p>
+    </section>
+
+    <MStripe />
+
+    <FAQSection items={faqItems} />
+
+  </div>
+</Layout>

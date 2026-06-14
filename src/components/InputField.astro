@@ -1,0 +1,71 @@
+<!-- src/components/InputField.astro -->
+---
+export interface SelectOption {
+  label: string;
+  value: string | number;
+}
+
+export interface Props {
+  id: string;
+  label: string;
+  type?: 'text' | 'number' | 'email' | 'select';
+  value?: string | number;
+  min?: number;
+  max?: number;
+  step?: number | string;
+  unit?: string;
+  helperText?: string;
+  required?: boolean;
+  options?: SelectOption[];
+  class?: string;
+  wrapperId?: string;
+}
+
+const {
+  id,
+  label,
+  type = 'number',
+  value = '',
+  min,
+  max,
+  step,
+  unit,
+  helperText,
+  required = false,
+  options = [],
+  class: customClass = '',
+  wrapperId,
+} = Astro.props as Props;
+---
+
+<div class={`flex flex-col gap-2 w-full ${customClass}`} id={wrapperId}>
+  <label for={id} class="text-label-uppercase text-xs text-primary">
+    {label}{required ? ' *' : ''}
+  </label>
+  <div class="relative flex items-center">
+    {type === 'select' ? (
+      <select id={id} class="select-input w-full">
+        {options.map((opt) => (
+          <option value={opt.value} selected={String(opt.value) === String(value)} class="bg-surface-card">{opt.label}</option>
+        ))}
+      </select>
+    ) : (
+      <input
+        id={id}
+        type={type}
+        class="text-input w-full"
+        value={value}
+        min={min}
+        max={max}
+        step={step}
+        required={required}
+      />
+    )}
+    {unit && type !== 'select' && (
+      <span class="absolute right-3 text-caption text-muted">{unit}</span>
+    )}
+  </div>
+  {helperText && (
+    <p class="text-caption text-muted">{helperText}</p>
+  )}
+</div>

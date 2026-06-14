@@ -1,0 +1,332 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import CalculatorCard from '../../components/CalculatorCard.astro';
+import FormulaBox from '../../components/FormulaBox.astro';
+import FAQSection from '../../components/FAQSection.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "How many batteries do I need for a 10 kW solar system?",
+    answer: "A 10 kW solar array does not directly determine battery count — your daily consumption does. A home consuming 30 kWh/day with 2 days autonomy needs roughly 75 kWh of usable LFP capacity. That translates to approximately 7–8 48V 100Ah (5.12 kWh) batteries wired in parallel.",
+  },
+  {
+    question: "Can I start with fewer batteries and add more later?",
+    answer: "Yes, if you use modular batteries designed for parallel expansion. Add modules of the same chemistry, capacity, and age. Mixing old and new cells creates imbalance. A battery management system (BMS) with parallel support is essential for safe expansion.",
+  },
+  {
+    question: "Does battery voltage affect how many I need?",
+    answer: "Higher system voltage (48V vs 12V) reduces the number of batteries wired in series for a given capacity. A 48V 200Ah bank stores the same energy as a 12V 800Ah bank, but the 48V configuration uses fewer modules, thinner cables, and less copper.",
+  },
+  {
+    question: "What happens if I undersize my battery bank?",
+    answer: "An undersized bank will frequently hit its minimum state of charge, triggering load shedding or grid fallback. Chronic deep cycling accelerates capacity fade and reduces cycle life. It is better to oversize by 20–30% than to undersize and degrade the cells early.",
+  },
+];
+---
+
+<Layout
+  title="How Many Batteries for Solar? | Battery Calculators"
+  description="Learn how to calculate the exact number of batteries needed for your solar system. Step-by-step method covering consumption, autonomy, depth of discharge, and worked example."
+  canonical="https://batterycalculators.com/learn/how-many-batteries-for-solar"
+  schema="faqPage"
+  schemaName="How Many Batteries for Solar"
+  schemaDescription="Step-by-step guide to calculating the number of batteries needed for a solar energy system."
+  schemaUrl="https://batterycalculators.com/learn/how-many-batteries-for-solar"
+  faqItems={faqItems}
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/learn" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Back to Guides</a>
+      <Breadcrumb items={[
+        { label: "Learning Center", href: "/learn" },
+        { label: "How Many Batteries for Solar" }
+      ]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">SOLAR</span>
+      <h1 class="text-display-md text-primary mb-6">How Many Batteries for Solar?</h1>
+      <p class="text-body-md text-body font-light">
+        Determining the right number of batteries for a solar installation is not about matching your inverter size or solar array wattage — it is about matching your daily energy consumption and autonomy requirements. This guide walks through the engineering method to calculate the exact count of battery modules your system needs.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Why Battery Count Is Not About Solar Array Size</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          A common misconception is that the number of batteries scales with the size of the solar array. In reality, battery sizing is driven by how much energy you consume and how many days of backup you require. A 5 kW array and a 20 kW array may both feed into a battery bank sized for the same household if the daily consumption is identical.
+        </p>
+        <p class="text-body-md text-body font-light mb-4">
+          The solar array determines how quickly the battery recharges each day. The battery bank determines how much energy you can store and for how long. These are two separate design decisions, and conflating them leads to overspending on panels while undersizing storage, or vice versa.
+        </p>
+        <p class="text-body-md text-body font-light">
+          The correct starting point is always a load audit: enumerate every appliance that runs off the battery, multiply power by daily runtime, and sum the total watt-hours per day.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Step 1: Calculate Daily Energy Consumption</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          List every load that the battery bank must power. For each appliance, record the power draw in watts and the estimated daily runtime in hours. Multiply watts by hours to get watt-hours per day, then sum all devices.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden mb-4">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Appliance</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Power (W)</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Hours/Day</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Wh/Day</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">Refrigerator</td>
+                <td class="p-4 font-mono text-primary">150</td>
+                <td class="p-4 font-mono text-primary">8</td>
+                <td class="p-4 font-mono text-primary">1,200</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">LED Lighting (8 fixtures)</td>
+                <td class="p-4 font-mono text-primary">80</td>
+                <td class="p-4 font-mono text-primary">5</td>
+                <td class="p-4 font-mono text-primary">400</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Well Pump</td>
+                <td class="p-4 font-mono text-primary">750</td>
+                <td class="p-4 font-mono text-primary">1</td>
+                <td class="p-4 font-mono text-primary">750</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">TV + Streaming Box</td>
+                <td class="p-4 font-mono text-primary">120</td>
+                <td class="p-4 font-mono text-primary">4</td>
+                <td class="p-4 font-mono text-primary">480</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Internet Router</td>
+                <td class="p-4 font-mono text-primary">12</td>
+                <td class="p-4 font-mono text-primary">24</td>
+                <td class="p-4 font-mono text-primary">288</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Laptop Charging</td>
+                <td class="p-4 font-mono text-primary">65</td>
+                <td class="p-4 font-mono text-primary">4</td>
+                <td class="p-4 font-mono text-primary">260</td>
+              </tr>
+              <tr class="bg-surface-card">
+                <td class="p-4 font-bold text-primary" colspan="3">Total Daily Consumption</td>
+                <td class="p-4 font-mono font-bold text-primary">3,378 Wh</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-body-md text-body font-light">
+          Round up to 3,400 Wh for planning purposes. This is your daily energy budget — the foundation for every subsequent calculation.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Step 2: Determine Autonomy Days</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Autonomy is the number of consecutive days the battery must power your loads without any solar recharge. In sunny climates with reliable sunshine, one day may suffice. In cloudy or storm-prone regions, two or three days provides a meaningful safety margin.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Scenario</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Recommended Autonomy</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">Sunny desert climate, backup generator available</td>
+                <td class="p-4 font-mono text-primary">1 day</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Standard residential, moderate climate</td>
+                <td class="p-4 font-mono text-primary">2 days</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Cloudy region, critical loads, no generator</td>
+                <td class="p-4 font-mono text-primary">3 days</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Remote medical or telecom site</td>
+                <td class="p-4 font-mono text-primary">5+ days</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <FormulaBox title="Battery Count Formula">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Total Required Capacity (Wh) = Daily Consumption (Wh) × Autonomy Days / (DoD × Efficiency)
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Number of Batteries = Total Required Capacity (Wh) / Single Battery Usable Capacity (Wh)
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Single Battery Usable Capacity = Rated Capacity (Ah) × Voltage (V) × DoD
+        </div>
+        <p>
+          Efficiency accounts for inverter losses, wiring resistance, and BMS overhead. Use 0.90–0.95 for modern equipment. Always round up to the nearest whole battery.
+        </p>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Worked Example: 10 kWh/day System, 2 Days Autonomy</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Given:</strong></p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li>Daily consumption: 10,000 Wh (10 kWh)</li>
+              <li>Autonomy: 2 days</li>
+              <li>Battery chemistry: LFP (LiFePO4)</li>
+              <li>Depth of discharge limit: 85%</li>
+              <li>System efficiency: 92%</li>
+              <li>System voltage: 48V</li>
+              <li>Single battery: 48V 100Ah LFP = 5,120 Wh total capacity</li>
+            </ul>
+            <p><strong>Step 1:</strong> Calculate total required capacity:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              10,000 Wh × 2 / (0.85 × 0.92) = 20,000 / 0.782 = 25,575 Wh
+            </div>
+            <p><strong>Step 2:</strong> Calculate single battery usable capacity:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              100 Ah × 48V × 0.85 = 4,096 Wh usable per battery
+            </div>
+            <p><strong>Step 3:</strong> Calculate number of batteries:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              25,575 Wh / 4,096 Wh = 6.24 → round up to 7 batteries
+            </div>
+            <p class="text-muted mt-2">This system requires <strong>7 × 48V 100Ah LFP batteries</strong> (approximately 35.8 kWh total nameplate capacity, 30.5 kWh usable). The seven modules would be wired in a combination of series and parallel depending on the chosen system architecture — four in series for 48V, with two additional parallel strings of three and four modules, or a single 48V rack system accepting up to 16 modules.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Quick Reference: Battery Count by Consumption</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          The table below shows the number of 48V 100Ah (5.12 kWh) LFP batteries needed for common daily consumption levels at 85% DoD, 92% efficiency, and 2 days autonomy.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Daily Consumption</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Required Capacity</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Batteries Needed</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Total Usable</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">5 kWh/day</td>
+                <td class="p-4 text-muted">12,788 Wh</td>
+                <td class="p-4 font-mono text-primary">4</td>
+                <td class="p-4 text-muted">16.4 kWh</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">10 kWh/day</td>
+                <td class="p-4 text-muted">25,575 Wh</td>
+                <td class="p-4 font-mono text-primary">7</td>
+                <td class="p-4 text-muted">28.7 kWh</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">15 kWh/day</td>
+                <td class="p-4 text-muted">38,363 Wh</td>
+                <td class="p-4 font-mono text-primary">10</td>
+                <td class="p-4 text-muted">41.0 kWh</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">20 kWh/day</td>
+                <td class="p-4 text-muted">51,151 Wh</td>
+                <td class="p-4 font-mono text-primary">13</td>
+                <td class="p-4 text-muted">53.2 kWh</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">30 kWh/day</td>
+                <td class="p-4 text-muted">76,726 Wh</td>
+                <td class="p-4 font-mono text-primary">19</td>
+                <td class="p-4 text-muted">77.9 kWh</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Factors That Change the Count</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Temperature Derating</h4>
+            <p class="text-body-sm text-muted">
+              Cold batteries deliver less usable capacity. Below 0°C, LFP cells lose roughly 10% of rated capacity. At -20°C, the loss can reach 30%. In cold-climate installations, increase your battery count by 15–25% to compensate for winter derating.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Parallel String Limits</h4>
+            <p class="text-body-sm text-muted">
+              Most BMS units support a maximum of 4–8 parallel strings. If your count exceeds this, consider higher-capacity modules or a higher system voltage. More parallel strings increase imbalance risk and reduce overall reliability.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Future Load Growth</h4>
+            <p class="text-body-sm text-muted">
+              If you plan to add EV charging, a heat pump, or additional appliances, oversize the bank now. Retrofitting a battery system is more expensive than installing extra capacity upfront. A 30% growth margin is common.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Voltage Architecture</h4>
+            <p class="text-body-sm text-muted">
+              A 48V system requires fewer parallel strings than a 12V system for the same capacity. For banks over 20 kWh, 48V is strongly preferred — it reduces copper losses, simplifies wiring, and is compatible with most modern inverters and charge controllers.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Try It</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use the Solar Battery Sizing Calculator to compute the exact number of batteries for your consumption and autonomy requirements.
+          </p>
+          <a href="/tools/solar-battery-sizing-calculator" class="btn-primary text-xs py-3 px-6 inline-block">Open Solar Battery Sizing Calculator</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Next Step</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Once your bank is sized, estimate how long it will power specific loads with the Runtime Calculator.
+          </p>
+          <a href="/tools/runtime-calculator" class="btn-primary-outline text-xs py-3 px-6 inline-block">Open Runtime Calculator</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Related Articles</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">How to Size a Solar Battery Bank</h4>
+            <p class="text-body-sm text-muted mb-3">
+              The complete four-step engineering method for sizing solar battery banks from consumption data.
+            </p>
+            <a href="/learn/how-to-size-solar-battery-bank" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Read Guide →</a>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">How Much Battery Storage Do I Need?</h4>
+            <p class="text-body-sm text-muted mb-3">
+              Calculate total storage capacity from your daily consumption and desired autonomy period.
+            </p>
+            <a href="/learn/how-much-battery-storage-do-i-need" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Read Guide →</a>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

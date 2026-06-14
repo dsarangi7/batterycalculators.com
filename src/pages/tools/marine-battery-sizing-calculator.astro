@@ -1,0 +1,339 @@
+---
+import CalculatorLayout from '../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../components/CalculatorCard.astro';
+import InputField from '../../components/InputField.astro';
+import ResultBox from '../../components/ResultBox.astro';
+import FormulaBox from '../../components/FormulaBox.astro';
+import FAQSection from '../../components/FAQSection.astro';
+
+const whatIs = `A marine battery sizing calculator determines the correct battery bank capacity for powering a vessel's hotel loads—navigation electronics, cabin lighting, refrigeration, freshwater pumps, and auxiliary systems—while at anchor or underway. Proper sizing ensures reliable power during extended cruises without shore power, preventing dead batteries mid-voyage. Marine electrical systems face unique constraints: vibration, moisture exposure, alternator charging limits, and the need to reserve cranking power for engine starts. This calculator applies depth-of-discharge limits and system efficiency factors specific to the marine environment, aligning with ISO 13297 yacht electrical installation standards.`;
+
+const whyItMatters = [
+  "Undersized marine battery banks leave you without navigation lights or autopilot power during overnight passages—a serious safety hazard at sea.",
+  "Oversized banks add unnecessary weight and cost; on a 35ft sailboat, every 100Ah of LFP capacity adds roughly 12 kg to a weight-sensitive hull.",
+  "Incorrect DoD assumptions accelerate battery degradation—discharging lead-acid below 50% DoD can halve its cycle life from 500 to under 250 cycles.",
+  "Ignoring alternator charging limits means your engine cannot replenish the bank fast enough, leaving you progressively drained on multi-day cruises.",
+  "Failing to account for hotel load profiles during anchoring versus cruising leads to runtime shortages exactly when you need power most."
+];
+
+const practicalApplications = [
+  { title: "Overnight Anchoring", description: "Size your house bank for 12–16 hours of hotel loads while at anchor without engine charging or shore power." },
+  { title: "Extended Bluewater Cruising", description: "Design for 24–72 hour autonomy when sailing remote passages with limited alternator runtime each day." },
+  { title: "Liveaboard Houseboat Systems", description: "Calculate continuous daily power needs for full-time living aboard with refrigeration, watermakers, and entertainment loads." },
+  { title: "Trawler & Motor Yacht Auxiliaries", description: "Separate house bank from starting battery to ensure hotel loads never compromise engine cranking capacity." }
+];
+
+const expertNotes: { title: string; variant: 'warning' | 'engineering'; content: string }[] = [
+  {
+    title: "Marine Depth of Discharge Limits",
+    variant: "warning",
+    content: "LFP batteries in marine applications should target 80% DoD maximum to account for high-vibration environment cell stress. Lead-acid banks should not exceed 50% DoD—consider 40% for rough-water anchoring where wave-induced load spikes occur. Always reserve 20% capacity as a safety margin for emergency electronics (EPIRB, VHF-DSC)."
+  },
+  {
+    title: "12V vs 24V for Marine Systems",
+    variant: "engineering",
+    content: "For boats under 40ft with loads under 500W, 12V systems are simpler and compatible with standard marine electronics. For vessels above 40ft or loads exceeding 500W, 24V or 48V systems halve the current draw, reducing cable gauge requirements and voltage drop. A 48V system charging a 12V house bank via DC-DC converter is an efficient modern approach for larger yachts."
+  }
+];
+
+const trustSection = {
+  text: "This calculator uses transparent formulas aligned with ISO 13297 marine electrical standards and ABYC E-11 guidelines. All sizing factors—DoD limits, efficiency derating, and voltage drop assumptions—are documented so you can verify the math independently.",
+  link: { label: "View our methodology and formula derivations", href: "/methodology" }
+};
+
+const references = [
+  { title: "ISO 13297:2014 — Electrical installations in small craft", url: "https://www.iso.org/standard/65870.html", source: "International Organization for Standardization" },
+  { title: "ABYC E-11 — AC and DC Electrical Systems on Boats", url: "https://abycinc.org/standards", source: "American Boat and Yacht Council" },
+  { title: "Cruisers Forum — Marine Battery Bank Sizing Guide", url: "https://www.cruisersforum.com/forums/f48/marine-battery-bank-sizing.html", source: "Cruisers Forum Community" },
+  { title: "Victron Energy — Marine Battery Systems Design", url: "https://www.victronenergy.com/learn/battery-bank-design", source: "Victron Energy Technical Library" }
+];
+
+const faqItems = [
+  {
+    question: "What are typical hotel loads on a cruising yacht?",
+    answer: "Hotel loads vary by boat size and equipment. A 40ft cruiser typically draws 150–250W for navigation and electronics, 50–100W for lighting, 80–150W for refrigeration, and 20–60W for pumps and other auxiliaries. Total hotel loads often range from 300–600W.",
+  },
+  {
+    question: "How many hours of usage should I design for?",
+    answer: "For overnight anchoring without engine charging, design for 12–16 hours of usage. For extended cruising without shore power, 24 hours provides comfortable margin. For emergency backup, 48–72 hours ensures resilience in bad weather.",
+  },
+  {
+    question: "What depth of discharge is safe for marine batteries?",
+    answer: "LFP (LiFePO4) batteries can safely discharge to 80–90% DoD. Lead-acid (AGM/Gel) should not exceed 50% DoD for acceptable cycle life. Deep-cycle lead-acid rated at 200 cycles at 50% DoD; LFP can deliver 3000+ cycles at 80% DoD.",
+  },
+  {
+    question: "Should I use 12V or 24V for my marine battery bank?",
+    answer: "12V is standard for most recreational boats under 50ft due to widespread 12V equipment compatibility. 24V or 48V systems reduce wiring current for larger vessels with higher loads, reducing cable costs and voltage drop. Converters are available for either configuration.",
+  },
+  {
+    question: "How do alternator charging limits affect my bank size?",
+    answer: "Most marine alternators produce 50–100A. A 200Ah LFP bank at 50% state of charge needs 100Ah to recharge—which takes 1–2 hours at full alternator output. If your daily hotel load exceeds what your alternator can replenish during engine runs, you need a larger bank or solar support.",
+  },
+  {
+    question: "Can I mix lead-acid and lithium batteries in a marine system?",
+    answer: "<span class=\"text-primary font-bold\">Never mix chemistries in parallel.</span> Lead-acid and lithium batteries have different charge curves, internal resistances, and safe DoD limits. Charging them together causes one chemistry to overcharge or the other to undercharge, creating safety risks and reducing lifespan.",
+  },
+  {
+    question: "What is the difference between anchor load and cruising load?",
+    answer: "Anchor load is the power drawn while stationary—typically navigation lights, instruments, refrigeration, and cabin lighting (300–500W). Cruising load adds autopilot, radar overlay, fishfinder, and wind instrument loads (500–900W). Size your bank for the higher cruising load if you plan underway usage without alternator support.",
+  },
+  {
+    question: "How does vibration affect marine battery selection?",
+    answer: "Marine environments produce constant vibration from engine, waves, and hull flex. LFP batteries with sealed prismatic cells are vibration-resistant. Flooded lead-acid batteries can spill electrolyte under heavy vibration. AGM and Gel are sealed but still subject to internal plate damage. Mount all marine batteries with vibration-dampening brackets.",
+  },
+  {
+    question: "Should I install a battery monitor for my marine bank?",
+    answer: "Yes—highly recommended. A battery monitor with a shunt measures actual current flow, tracks state of charge, estimates remaining runtime, and logs historical usage. Victron BMV or similar units give real-time visibility that simple voltage readings cannot provide, especially under load.",
+  },
+  {
+    question: "Do I need separate banks for engine starting and house loads?",
+    answer: "Best practice is to use a dedicated starting battery and a separate house bank, connected via an isolator or dual-battery switch. This prevents hotel loads from draining your engine start reserve. For sailboats with electric winches, consider a third dedicated thruster/winch bank.",
+  },
+  {
+    question: "How does cold weather affect marine battery sizing?",
+    answer: "Below 0°C (32°F), LFP capacity drops 5–10% and charging must be limited to prevent lithium plating. Lead-acid capacity drops 20–30% at -10°C. If you cruise in cold climates, oversize the bank by 15–25% and consider battery heaters or insulated battery boxes.",
+  },
+  {
+    question: "What role does solar play in marine battery systems?",
+    answer: "Solar panels on a bimini or hardtop can supplement alternator charging, providing 100–400W during daylight hours. This extends anchor time without engine running. Solar is best viewed as a maintenance charger rather than primary source—it offsets hotel loads but rarely fully recharges a large bank in one day.",
+  },
+];
+
+const relatedCalculators = [
+  { href: "/tools/runtime-calculator", title: "Runtime Calculator", description: "Estimate how long your battery powers specific loads." },
+  { href: "/tools/voltage-drop-calculator", title: "Voltage Drop Calculator", description: "Ensure cable runs meet marine voltage drop requirements." },
+  { href: "/tools/battery-sizing-calculator", title: "Battery Sizing Calculator", description: "General-purpose battery bank sizing with temperature derating." },
+  { href: "/tools/c-rate-calculator", title: "C-Rate Calculator", description: "Verify charging current limits for your marine bank." },
+  { href: "/tools/energy-conversion-calculator", title: "Energy Conversion", description: "Convert between Ah and Wh at your system voltage." },
+  { href: "/tools/home-backup-battery-calculator", title: "Home Backup Calculator", description: "Compare marine sizing to residential backup approaches." },
+];
+---
+
+<CalculatorLayout
+  title="Marine Battery Sizing Calculator | Battery Calculators"
+  description="Size your marine house battery bank based on hotel loads, usage hours, battery voltage, and depth of discharge for reliable cruising power."
+  faqItems={faqItems}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+  relatedCalculators={relatedCalculators}
+>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+
+    <!-- Input Form -->
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Hotel Load Profile</h3>
+      <div class="flex flex-col gap-6">
+
+        <InputField id="nav-load" label="Navigation / Electronics Load" value={180} min={0} step={10} unit="W" helperText="Chartplotter, radar, AIS, VHF, instruments." />
+
+        <InputField id="lighting-load" label="Lighting Load" value={80} min={0} step={10} unit="W" helperText="Interior lights, anchor light, navigation lights." />
+
+        <InputField id="refrigeration-load" label="Refrigeration Load" value={100} min={0} step={10} unit="W" helperText="Marine fridge and freezer (compressor cycling average)." />
+
+        <InputField id="pumps-load" label="Pumps / Auxiliary Load" value={40} min={0} step={10} unit="W" helperText="Bilge pump, freshwater pump, anchor windlass (average)." />
+
+        <InputField id="other-load" label="Other Hotel Load" value={30} min={0} step={10} unit="W" helperText="Entertainment, USB charging, cabin fans, instruments." />
+
+        <InputField id="usage-hours" label="Daily Usage Hours" value={14} min={1} max={24} step={1} unit="hours" helperText="Hours the battery bank must supply loads per day." />
+
+        <InputField id="battery-voltage" label="Battery System Voltage" value={12} min={12} step={1} unit="V" helperText="12V standard for small boats, 24V for larger yachts." />
+
+        <InputField id="usable-dod" label="Usable Depth of Discharge" value={80} min={20} max={100} step={1} unit="%" helperText="LFP: 80–90%, Lead-Acid: 50% recommended." />
+
+        <InputField id="system-efficiency" label="System Efficiency" value={90} min={70} max={100} step={1} unit="%" helperText="Accounts for wiring losses and BMS overhead." />
+
+      </div>
+    </CalculatorCard>
+
+    <!-- Results -->
+    <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Sizing Results</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <ResultBox
+            label="Total Hotel Load"
+            value="430 W"
+            suffix="Combined daily average"
+            variant="primary"
+            id="result-total-load"
+          />
+          <ResultBox
+            label="Daily Energy Demand"
+            value="6,020 Wh"
+            suffix="6.02 kWh per day"
+            id="result-daily-energy"
+          />
+          <ResultBox
+            label="Total Battery Energy"
+            value="8,361 Wh"
+            suffix="Total battery bank energy required"
+            id="result-usable-energy"
+          />
+          <ResultBox
+            label="Recommended Capacity"
+            value="696.8 Ah"
+            suffix="At 12V nominal"
+            id="result-capacity"
+          />
+          <ResultBox
+            label="Recommended Bank Size"
+            value="10.03 kWh"
+            suffix="Total battery energy"
+            id="result-bank-energy"
+          />
+        </div>
+      </div>
+
+      <div class="border-t border-hairline pt-6">
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">Bank Recommendation</h4>
+        <p class="text-body-sm text-muted" id="bank-recommendation">
+          For a 430W hotel load over 14 hours at 12V, a 12V 700Ah LFP bank (8.4 kWh) provides approximately 14 hours of runtime.
+        </p>
+      </div>
+    </CalculatorCard>
+
+  </div>
+
+  <!-- Formulas -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+
+      <FormulaBox title="Mathematical Formulas">
+        <p>
+          Marine battery sizing sums all hotel loads, multiplies by usage time, and adjusts for depth of discharge and system losses:
+        </p>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Total Load = Nav + Lighting + Refrigeration + Pumps + Other
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Daily Energy = Total Load × Usage Hours
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Required Energy = Daily Energy / (DoD% × Efficiency%)
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Required Ah = Required Energy / Battery Voltage
+        </div>
+        <p>
+          The DoD and efficiency factors ensure the battery bank is sized conservatively for real-world conditions.
+        </p>
+      </FormulaBox>
+
+      <div>
+        <h2 class="text-title-lg text-primary uppercase mb-6 tracking-wider">Worked Engineering Example</h2>
+        <div class="text-body-sm text-muted flex flex-col gap-4">
+          <p>Given hotel load profile:</p>
+          <ul class="list-disc pl-6 flex flex-col gap-1">
+            <li><strong>Navigation:</strong> 180W | <strong>Lighting:</strong> 80W | <strong>Refrigeration:</strong> 100W</li>
+            <li><strong>Pumps:</strong> 40W | <strong>Other:</strong> 30W | <strong>Usage:</strong> 14 hours</li>
+            <li><strong>Battery voltage:</strong> 12V | <strong>DoD:</strong> 80% | <strong>Efficiency:</strong> 90%</li>
+          </ul>
+
+          <p><strong>Step 1:</strong> Sum all hotel loads:</p>
+          <div class="font-mono text-primary">Total = 180 + 80 + 100 + 40 + 30 = 430W</div>
+
+          <p><strong>Step 2:</strong> Calculate daily energy demand:</p>
+          <div class="font-mono text-primary">Daily = 430W × 14h = 6,020 Wh</div>
+
+          <p><strong>Step 3:</strong> Adjust for DoD and efficiency:</p>
+          <div class="font-mono text-primary">Required = 6,020 / (0.80 × 0.90) = 8,361 Wh</div>
+
+          <p><strong>Step 4:</strong> Convert to Amp-hours:</p>
+          <div class="font-mono text-primary">Ah = 8,361 Wh / 12V = 696.8 Ah</div>
+
+          <p><strong>Result:</strong> A 12V 700Ah LFP battery bank provides 8.4 kWh, delivering approximately 14 hours of reliable hotel load power for your vessel.</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <FAQSection items={faqItems} />
+
+  <!-- Calculation Script -->
+  <script>
+    import { calculateMarineBatterySizing } from '../../utils/calculators';
+
+    const navLoadInput = document.getElementById('nav-load') as HTMLInputElement;
+    const lightingLoadInput = document.getElementById('lighting-load') as HTMLInputElement;
+    const refrigerationLoadInput = document.getElementById('refrigeration-load') as HTMLInputElement;
+    const pumpsLoadInput = document.getElementById('pumps-load') as HTMLInputElement;
+    const otherLoadInput = document.getElementById('other-load') as HTMLInputElement;
+    const usageHoursInput = document.getElementById('usage-hours') as HTMLInputElement;
+    const batteryVoltageInput = document.getElementById('battery-voltage') as HTMLInputElement;
+    const usableDodInput = document.getElementById('usable-dod') as HTMLInputElement;
+    const systemEfficiencyInput = document.getElementById('system-efficiency') as HTMLInputElement;
+
+    const resultTotalLoadBox = document.getElementById('result-total-load');
+    const resultTotalLoadValue = resultTotalLoadBox?.querySelector('.text-display-md') as HTMLElement;
+    const resultTotalLoadSuffix = resultTotalLoadBox?.querySelector('.text-caption') as HTMLElement;
+
+    const resultDailyEnergyBox = document.getElementById('result-daily-energy');
+    const resultDailyEnergyValue = resultDailyEnergyBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultDailyEnergySuffix = resultDailyEnergyBox?.querySelector('.text-caption') as HTMLElement;
+
+    const resultUsableEnergyBox = document.getElementById('result-usable-energy');
+    const resultUsableEnergyValue = resultUsableEnergyBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultUsableEnergySuffix = resultUsableEnergyBox?.querySelector('.text-caption') as HTMLElement;
+
+    const resultCapacityBox = document.getElementById('result-capacity');
+    const resultCapacityValue = resultCapacityBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultCapacitySuffix = resultCapacityBox?.querySelector('.text-caption') as HTMLElement;
+
+    const resultBankEnergyBox = document.getElementById('result-bank-energy');
+    const resultBankEnergyValue = resultBankEnergyBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultBankEnergySuffix = resultBankEnergyBox?.querySelector('.text-caption') as HTMLElement;
+
+    const bankRecommendationEl = document.getElementById('bank-recommendation');
+
+    function updateCalculations() {
+      const navLoad = parseFloat(navLoadInput.value) || 0;
+      const lightingLoad = parseFloat(lightingLoadInput.value) || 0;
+      const refrigerationLoad = parseFloat(refrigerationLoadInput.value) || 0;
+      const pumpsLoad = parseFloat(pumpsLoadInput.value) || 0;
+      const otherLoad = parseFloat(otherLoadInput.value) || 0;
+      const usageHours = parseFloat(usageHoursInput.value) || 14;
+      const batteryVoltage = parseFloat(batteryVoltageInput.value) || 12;
+      const usableDod = parseFloat(usableDodInput.value) || 80;
+      const systemEfficiency = parseFloat(systemEfficiencyInput.value) || 90;
+
+      const results = calculateMarineBatterySizing(
+        navLoad, lightingLoad, refrigerationLoad, pumpsLoad, otherLoad,
+        usageHours, batteryVoltage, usableDod, systemEfficiency
+      );
+
+      if (resultTotalLoadValue) resultTotalLoadValue.textContent = `${Math.round(results.totalLoadW)} W`;
+      if (resultTotalLoadSuffix) resultTotalLoadSuffix.textContent = 'Combined daily average';
+
+      if (resultDailyEnergyValue) resultDailyEnergyValue.textContent = `${Math.round(results.dailyEnergyWh).toLocaleString()} Wh`;
+      if (resultDailyEnergySuffix) resultDailyEnergySuffix.textContent = `${results.dailyEnergyKwh.toFixed(2)} kWh per day`;
+
+      if (resultUsableEnergyValue) resultUsableEnergyValue.textContent = `${Math.round(results.totalBatteryEnergyWh).toLocaleString()} Wh`;
+      if (resultUsableEnergySuffix) resultUsableEnergySuffix.textContent = 'Total battery bank energy required';
+
+      if (resultCapacityValue) resultCapacityValue.textContent = `${results.requiredCapacityAh.toFixed(1)} Ah`;
+      if (resultCapacitySuffix) resultCapacitySuffix.textContent = `At ${batteryVoltage}V nominal`;
+
+      if (resultBankEnergyValue) resultBankEnergyValue.textContent = `${results.requiredEnergyKwh.toFixed(2)} kWh`;
+      if (resultBankEnergySuffix) resultBankEnergySuffix.textContent = 'Total battery energy';
+
+      if (bankRecommendationEl) {
+        const recommendedAh = Math.ceil(results.requiredCapacityAh / 10) * 10;
+        bankRecommendationEl.textContent = `For a ${Math.round(results.totalLoadW)}W hotel load over ${usageHours} hours at ${batteryVoltage}V, a ${batteryVoltage}V ${recommendedAh}Ah LFP bank (${(recommendedAh * batteryVoltage / 1000).toFixed(1)} kWh) provides approximately ${usageHours} hours of runtime.`;
+      }
+    }
+
+    [navLoadInput, lightingLoadInput, refrigerationLoadInput, pumpsLoadInput, otherLoadInput, usageHoursInput, batteryVoltageInput, usableDodInput, systemEfficiencyInput].forEach(el => {
+      el.addEventListener('input', updateCalculations);
+    });
+
+    updateCalculations();
+  </script>
+
+</CalculatorLayout>

@@ -1,0 +1,300 @@
+---
+import CalculatorLayout from '../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../components/CalculatorCard.astro';
+import InputField from '../../components/InputField.astro';
+import ResultBox from '../../components/ResultBox.astro';
+import FormulaBox from '../../components/FormulaBox.astro';
+import FAQSection from '../../components/FAQSection.astro';
+import RelatedTools from '../../components/RelatedTools.astro';
+
+const modeOptions = [
+  { label: "Solve for C-Rate (Given Current)", value: "solve-c" },
+  { label: "Solve for Current (Given C-Rate)", value: "solve-current" },
+];
+
+const whatIs = `C-rate is a normalized measure of charge or discharge current relative to a battery's total capacity. A C-rate of 1C means the current will fully charge or discharge the battery in exactly one hour. A 0.5C rate takes two hours; a 2C rate takes 30 minutes. C-rate is the universal language for specifying battery performance — it allows engineers to compare cells of different capacities on equal footing. Understanding C-rate is essential for sizing chargers, selecting appropriate discharge currents, predicting runtime, and avoiding conditions that accelerate degradation or cause thermal runaway.`;
+
+const whyItMatters = [
+  "Charging above the recommended C-rate causes lithium plating on the anode, permanently reducing capacity and creating safety risks.",
+  "Discharging at high C-rates reduces usable capacity due to voltage sag and internal resistance losses — a 100Ah battery may deliver only 80Ah at 2C.",
+  "Lead-acid batteries suffer severe Peukert losses above 0.2C, making C-rate understanding critical for accurate runtime predictions.",
+  "Mismatched C-rates between charger and battery lead to either dangerously fast charging or unnecessarily slow charge times.",
+  "C-rate directly correlates with heat generation (I²R losses) — exceeding thermal limits triggers BMS protection and shutdowns.",
+];
+
+const practicalApplications = [
+  { title: "Charger Sizing", description: "Select charger current to match battery chemistry limits — 0.5C for LFP longevity, 1C for NMC fast charging." },
+  { title: "Load Analysis", description: "Determine if your load current exceeds safe continuous discharge limits for your battery configuration." },
+  { title: "Runtime Estimation", description: "Convert load power to C-rate to quickly assess whether a battery can sustain a given load profile." },
+  { title: "EV Powertrain Sizing", description: "Match motor current draw to battery pack C-rate capability for peak acceleration and regenerative braking." },
+  { title: "Telecom Backup Design", description: "Size battery banks so backup loads draw at safe C-rates during extended grid outages." },
+];
+
+const expertNotes = [
+  { title: 'LFP vs NMC C-Rates', variant: 'engineering', content: 'LiFePO4 cells are generally optimized for 0.5C–1C continuous rates, with bursts up to 3C. NMC cells can support higher continuous rates (1–2C) but with shorter cycle life at elevated rates. Always check manufacturer datasheets for specific C-rate limits.' },
+  { title: 'Lead-Acid Peukert', variant: 'warning', content: 'Heavy lead-acid deep-cycle systems should be limited to 0.1C–0.2C to avoid severe capacity reduction. At 1C, a lead-acid battery may deliver only 50–60% of its rated capacity due to Peukert effect.' },
+] as const;;
+
+const trustSection = {
+  text: "C-rate is a universally defined concept in battery engineering (IEC 62660). The formulas used here — C = I/Capacity, Time = 1/C — are industry-standard definitions. All calculations are transparent and displayed step-by-step.",
+  link: { label: "View our full methodology", href: "/methodology" },
+};
+
+const references = [
+  { title: "Battery University — What is C-Rate?", url: "https://batteryuniversity.com/article/bu-402-what-is-the-peukert-effect", source: "Battery University / Cadex Electronics" },
+  { title: "IEC 62660-1 — Secondary lithium-ion cells for EVs", url: "https://webstore.iec.ch/en/publication/26272", source: "International Electrotechnical Commission" },
+  { title: "Victron Energy — Battery Charge and Discharge Rates", url: "https://www.victronenergy.com/help-center", source: "Victron Energy" },
+];
+
+const faqItems = [
+  {
+    question: "What does \"1C\" mean in practical terms?",
+    answer: "A C-rate of 1C means the charge or discharge current will deplete or fill the battery completely in exactly 1 hour. For a 100 Ah pack, a 1C rate is a 100 A current. A 2C rate (200 A) would deplete it in 30 minutes, whereas a 0.5C rate (50 A) would deplete it in 2 hours.",
+  },
+  {
+    question: "Why do lead-acid batteries lose capacity at high C-rates?",
+    answer: "Lead-acid batteries rely on chemical diffusion of acid into the active plate material. At high currents (e.g., >0.2C), the acid near the plates is depleted faster than it can diffuse from the bulk electrolyte, causing terminal voltage to drop quickly and trigger low-voltage disconnects prematurely.",
+  },
+  {
+    question: "How does C-rate correlate with degradation?",
+    answer: "Operating at high C-rates (especially charging above 1C) generates significant thermal stress (I²R heat) and accelerates lithium plating in lithium-ion chemistries. Both factors lead to accelerated capacity fading and can shorten lifetime cycles by half.",
+  },
+  {
+    question: "Is the charging C-rate the same as the discharging C-rate?",
+    answer: "No. In most battery specs, the maximum continuous discharge C-rate is significantly higher than the charge C-rate. For example, a quality LFP cell might support 1C continuous discharge, but only 0.5C charging limits.",
+  },
+  {
+    question: "What is a safe C-rate for LiFePO4 batteries?",
+    answer: "Standard LFP cells support 0.5C–1C continuous discharge and 0.2C–0.5C charging for optimal cycle life. Some high-power LFP cells support up to 3C burst discharge. Always check the manufacturer's datasheet for specific limits.",
+  },
+  {
+    question: "How does C-rate affect battery runtime?",
+    answer: "Higher C-rates reduce usable capacity due to internal resistance losses. A 100Ah battery at 0.1C delivers close to 100Ah, but at 2C may only deliver 80–85Ah. This is especially pronounced in lead-acid batteries due to Peukert effect.",
+  },
+  {
+    question: "Can I charge a battery at a higher C-rate than specified?",
+    answer: "Exceeding the manufacturer's recommended charge C-rate risks lithium plating, thermal runaway, and voided warranties. While some cells tolerate brief high-rate charges, sustained charging above spec accelerates degradation significantly.",
+  },
+  {
+    question: "What C-rate should I use for solar battery charging?",
+    answer: "Solar charge controllers typically charge at 0.2C–0.5C depending on solar array size and battery capacity. A 200Ah LFP bank paired with a 100A charger charges at 0.5C, which is acceptable for most LFP chemistries.",
+  },
+  {
+    question: "How do I convert watts to C-rate?",
+    answer: "Divide the load power (watts) by the battery voltage to get current (amps), then divide by capacity (Ah). Formula: C-rate = Power (W) / (Voltage (V) × Capacity (Ah)). For example, 250W on a 12.8V 100Ah battery = 250/(12.8×100) = 0.195C.",
+  },
+  {
+    question: "What happens if I discharge at too high a C-rate?",
+    answer: "Excessive discharge C-rates cause voltage sag, reduced usable capacity, overheating, and potential BMS shutdown. In extreme cases, it can cause permanent cell damage through copper dissolution or internal short circuits.",
+  },
+  {
+    question: "Is 0.5C considered fast or slow charging?",
+    answer: "0.5C is moderate — it fully charges a battery in about 2 hours (accounting for CV phase). For LFP, this is considered the upper end of optimal charging. For NMC, it is standard. Fast charging is generally considered 1C or above.",
+  },
+];
+
+const relatedTools = [
+  { href: "/tools/runtime-calculator", title: "Runtime Calculator", description: "Compute runtime from Watts load directly." },
+  { href: "/tools/charging-time-calculator", title: "Charging Time", description: "Estimate CC-CV charge durations." },
+  { href: "/tools/battery-degradation-estimator", title: "Degradation Estimator", description: "Model state of health decay over time." },
+  { href: "/tools/battery-sizing-calculator", title: "Battery Sizing Tool", description: "Determine daily consumption sizing requirements." },
+  { href: "/tools/soc-estimator", title: "SOC Estimator", description: "Interpolate battery State of Charge from voltage." },
+  { href: "/tools/energy-conversion-calculator", title: "Energy Conversion", description: "Convert between capacity Ah and energy Wh." },
+  { href: "/tools/battery-pack-calculator", title: "Battery Pack Calculator", description: "Design series/parallel cell configurations." },
+  { href: "/tools/c-rate-calculator", title: "C-Rate Calculator", description: "Calculate charge and discharge current rates." },
+];
+---
+
+<CalculatorLayout
+  title="Battery C-Rate Calculator | Battery Calculators"
+  description="Convert between discharge current, battery capacity, and C-rate. Estimate charge/discharge times with transparent formulas."
+  faqItems={faqItems}
+  relatedCalculators={relatedTools}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+>
+
+  <!-- Main Calculator Grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+
+    <!-- Input Form -->
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Parameters</h3>
+      <div class="flex flex-col gap-6">
+        <InputField id="mode" label="Calculation Goal" type="select" options={modeOptions} value="solve-c" />
+        <InputField id="capacity" label="Battery Capacity (Ah)" value={100} min={0.1} step="any" />
+
+        <!-- Dynamic Input (Current or C-rate) -->
+        <div class="flex flex-col gap-2" id="input-current-wrapper">
+          <label for="input-val" class="text-label-uppercase text-xs text-primary" id="dynamic-label">Continuous Current (Amperes)</label>
+          <input type="number" id="input-val" value="50" class="text-input" min="0.01" step="any" />
+        </div>
+
+      </div>
+    </CalculatorCard>
+
+    <!-- Calculation Results -->
+    <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Estimated Outputs</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <!-- Main Output 1 -->
+          <ResultBox
+            id="result-val-1-box"
+            label=""
+            value="0.50 C"
+            variant="primary"
+          >
+            <span class="text-label-uppercase text-muted text-[10px] block mb-1" id="out-label-1">Calculated C-Rate</span>
+            <span class="text-caption text-muted block mt-1" id="out-desc-1">Current/Capacity ratio</span>
+          </ResultBox>
+
+          <!-- Main Output 2 -->
+          <ResultBox
+            id="result-val-2-box"
+            label="Discharge Duration"
+            value="2h 00m"
+          >
+            <span class="text-caption text-muted block mt-1" id="result-hours-decimal">2.00 hours</span>
+          </ResultBox>
+        </div>
+      </div>
+
+      <!-- Action Area -->
+      <div class="border-t border-hairline pt-6">
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">C-Rate Guidelines (Lithium vs Lead-Acid)</h4>
+        <p class="text-body-sm text-muted">
+          LiFePO4 cells are generally optimized for 0.5C–1C continuous rates, with bursts up to 3C. Heavy lead-acid deep-cycle systems should be limited to 0.1C–0.2C to avoid severe capacity reduction.
+        </p>
+      </div>
+    </CalculatorCard>
+
+  </div>
+
+  <!-- Technical Explanation and Equations -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+      <FormulaBox title="Mathematical Formulas">
+        <p>
+          The C-Rate represents the speed at which a battery is charged or discharged relative to its maximum capacity.
+        </p>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          C-Rate (h⁻¹) = Current (A) / Capacity (Ah)
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Discharge Current (A) = Capacity (Ah) × C-Rate (h⁻¹)
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Theoretical Time (Hours) = 1 / C-Rate
+        </div>
+      </FormulaBox>
+
+      <!-- Worked Example -->
+      <div>
+        <h2 class="text-title-lg text-primary uppercase mb-6 tracking-wider">Worked Engineering Example</h2>
+        <div class="text-body-sm text-muted flex flex-col gap-4">
+          <p>Given system parameters:</p>
+          <ul class="list-disc pl-6 flex flex-col gap-1">
+            <li><strong>Capacity:</strong> 200 Ah</li>
+            <li><strong>Continuous load current:</strong> 100 Amperes</li>
+          </ul>
+          <p><strong>Step 1:</strong> Calculate C-rate:</p>
+          <div class="font-mono text-primary">C = 100 A / 200 Ah = 0.50 C</div>
+
+          <p><strong>Step 2:</strong> Solve the theoretical discharge duration:</p>
+          <div class="font-mono text-primary">T = 1 / 0.50 = 2.00 hours</div>
+
+          <p><strong>Notice:</strong> This is a 100% Depth of Discharge value. If you restrict the discharge to an 80% DoD safety margin, the actual run time is: 2 hours x 0.80 = 1.6 hours (1 hour and 36 minutes).</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <FAQSection items={faqItems} />
+
+  <!-- Calculation Script -->
+  <script>
+    import { calculateCRate } from '../../utils/calculators';
+
+    const modeSelect = document.getElementById('mode') as HTMLSelectElement;
+    const capacityInput = document.getElementById('capacity') as HTMLInputElement;
+    const dynamicLabel = document.getElementById('dynamic-label');
+    const inputVal = document.getElementById('input-val') as HTMLInputElement;
+
+    // Outputs
+    const outLabel1 = document.getElementById('out-label-1');
+    const outDesc1 = document.getElementById('out-desc-1');
+    const resultVal1Box = document.getElementById('result-val-1-box');
+    const resultVal1 = resultVal1Box?.querySelector('.text-display-md') as HTMLElement;
+    const resultVal2Box = document.getElementById('result-val-2-box');
+    const resultVal2 = resultVal2Box?.querySelector('.text-title-lg') as HTMLElement;
+    const resultHoursDecimal = document.getElementById('result-hours-decimal');
+
+    function updateLabels() {
+      const mode = modeSelect.value;
+      if (mode === 'solve-c') {
+        if (dynamicLabel) dynamicLabel.textContent = 'Continuous Current (Amperes)';
+        if (outLabel1) outLabel1.textContent = 'Calculated C-Rate';
+        if (outDesc1) outDesc1.textContent = 'Current/Capacity ratio';
+      } else {
+        if (dynamicLabel) dynamicLabel.textContent = 'Target C-Rate (h⁻¹)';
+        if (outLabel1) outLabel1.textContent = 'Calculated Current';
+        if (outDesc1) outDesc1.textContent = 'Required Amperes flow';
+      }
+      updateCalculations();
+    }
+
+    function updateCalculations() {
+      const mode = modeSelect.value;
+      const capacity = parseFloat(capacityInput.value) || 100;
+      const val = parseFloat(inputVal.value) || 0;
+
+      const calcTarget = mode === 'solve-c' ? 'current' : 'time';
+      const calcVal = calcTarget === 'current' ? val : (val > 0 ? 1 / val : 0);
+
+      const results = calculateCRate(capacity, calcTarget, calcVal);
+
+      if (mode === 'solve-c') {
+        if (resultVal1) resultVal1.textContent = `${results.cRate.toFixed(2)} C`;
+
+        if (results.timeHours <= 0) {
+          if (resultVal2) resultVal2.textContent = '0h 00m';
+          if (resultHoursDecimal) resultHoursDecimal.textContent = '0.00 hours';
+        } else {
+          const totalMins = Math.round(results.timeHours * 60);
+          const hours = Math.floor(totalMins / 60);
+          const mins = totalMins % 60;
+          if (resultVal2) resultVal2.textContent = `${hours}h ${mins < 10 ? '0' : ''}${mins}m`;
+          if (resultHoursDecimal) resultHoursDecimal.textContent = `${results.timeHours.toFixed(2)} hours`;
+        }
+      } else {
+        if (resultVal1) resultVal1.textContent = `${results.currentA.toFixed(1)} A`;
+
+        const timeHours = val > 0 ? 1 / val : 0;
+        if (timeHours <= 0) {
+          if (resultVal2) resultVal2.textContent = '0h 00m';
+          if (resultHoursDecimal) resultHoursDecimal.textContent = '0.00 hours';
+        } else {
+          const totalMins = Math.round(timeHours * 60);
+          const hours = Math.floor(totalMins / 60);
+          const mins = totalMins % 60;
+          if (resultVal2) resultVal2.textContent = `${hours}h ${mins < 10 ? '0' : ''}${mins}m`;
+          if (resultHoursDecimal) resultHoursDecimal.textContent = `${timeHours.toFixed(2)} hours`;
+        }
+      }
+    }
+
+    modeSelect.addEventListener('change', updateLabels);
+    [capacityInput, inputVal].forEach(el => {
+      el.addEventListener('input', updateCalculations);
+    });
+
+    // Run on boot
+    updateLabels();
+  </script>
+</CalculatorLayout>

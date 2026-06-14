@@ -1,0 +1,237 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import CalculatorCard from '../../components/CalculatorCard.astro';
+import FAQSection from '../../components/FAQSection.astro';
+
+const faqItems = [
+  {
+    question: "What is the typical charge voltage for LiFePO4 cells?",
+    answer: "A single LiFePO4 cell has a nominal voltage of 3.2V and a maximum charge voltage of 3.65V. For a 12V pack (4 cells in series), the charge voltage range is 14.4–14.6V. For a 24V pack, it is 28.8–29.2V. For a 48V pack, it is 57.6–58.4V.",
+  },
+  {
+    question: "What is the float voltage for LiFePO4?",
+    answer: "LiFePO4 does not require a traditional float charge like lead-acid. Once the battery reaches its maximum charge voltage (3.65V per cell), the BMS typically disconnects the charger. Some systems use a reduced voltage of 3.38–3.42V per cell for maintenance, but this is not standard practice.",
+  },
+  {
+    question: "How does charge voltage affect battery life?",
+    answer: "Charging to a higher voltage (e.g., 3.65V vs 3.55V per cell) provides slightly more capacity but accelerates calendar aging. Charging to a lower voltage (e.g., 3.50V per cell) reduces capacity by 5–10% but can significantly extend cycle life. Many BMS units allow configurable charge voltage limits.",
+  },
+  {
+    question: "Can I charge LiFePO4 with a lead-acid charger?",
+    answer: "Not reliably. Lead-acid chargers use a different voltage profile (bulk, absorb, float) that does not match LiFePO4 requirements. The float voltage of a lead-acid charger (13.5–13.8V) is too low to fully charge LiFePO4, and the absorb voltage may be too high. Use a charger specifically designed for LiFePO4.",
+  },
+];
+
+const tableOfContents = [
+  { id: "cell-voltage", label: "Cell Voltage Reference" },
+  { id: "pack-voltage", label: "Pack Voltage Table" },
+  { id: "charge-profile", label: "Charge Profile" },
+  { id: "common-mistakes", label: "Common Mistakes" },
+];
+
+const relatedCalculators = [
+  { title: "SOC Estimator", href: "/tools/soc-estimator" },
+  { title: "Battery Pack Calculator", href: "/tools/battery-pack-calculator" },
+  { title: "Charging Time Calculator", href: "/tools/charging-time-calculator" },
+];
+
+const references = [
+  { title: "Battery University — Charging LiFePO4", url: "https://batteryuniversity.com/article/bu-409-charging-lithium-iron-phosphate" },
+  { title: "Wikipedia — LiFePO4 Voltage Characteristics", url: "https://en.wikipedia.org/wiki/Lithium_iron_phosphate_battery" },
+];
+---
+
+<Layout
+  title="LiFePO4 Charge Voltage Table — Cell and Pack Voltages | Battery Calculators"
+  description="Complete charge voltage reference for LiFePO4 batteries. Cell-level and pack-level voltages for 12V, 24V, and 48V systems with charge profile guidance."
+  faqItems={faqItems}
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/learn" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">&larr; Back to Guides</a>
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">REFERENCE</span>
+      <h1 class="text-display-md text-primary mb-6">LiFePO4 Charge Voltage Table</h1>
+      <p class="text-body-md text-body font-light">
+        Complete voltage reference for charging LiFePO4 batteries at the cell and pack level. Use this table to configure charge controllers, BMS units, and solar charge regulators.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section id="cell-voltage">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Cell-Level Voltage Reference</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Each LiFePO4 cell has a nominal voltage of 3.2V. The charge voltage range is 2.5V (minimum) to 3.65V (maximum). The table below shows voltage at each stage of the charge cycle.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-body-sm min-w-[480px]">
+              <thead>
+                <tr class="border-b border-hairline bg-surface-card">
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Stage</th>
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Cell Voltage</th>
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Approx. SOC</th>
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Notes</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-hairline">
+                <tr>
+                  <td class="p-4 font-mono text-primary">Minimum (empty)</td>
+                  <td class="p-4 text-muted">2.50V</td>
+                  <td class="p-4 text-muted">0%</td>
+                  <td class="p-4 text-muted">BMS cutoff — do not discharge below this</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">Nominal</td>
+                  <td class="p-4 text-muted">3.20V</td>
+                  <td class="p-4 text-muted">~50%</td>
+                  <td class="p-4 text-muted">Flat plateau region</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">Full (resting)</td>
+                  <td class="p-4 text-muted">3.40V</td>
+                  <td class="p-4 text-muted">100%</td>
+                  <td class="p-4 text-muted">Typical resting voltage after full charge</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">Charge limit (CC)</td>
+                  <td class="p-4 text-muted">3.65V</td>
+                  <td class="p-4 text-muted">100%</td>
+                  <td class="p-4 text-muted">Maximum charge voltage — do not exceed</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section id="pack-voltage">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Pack Voltage Table</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Pack voltage is the cell voltage multiplied by the number of cells in series (S count). The table below shows charge voltages for common pack configurations.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-body-sm min-w-[640px]">
+              <thead>
+                <tr class="border-b border-hairline bg-surface-card">
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Pack Configuration</th>
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Nominal Voltage</th>
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Min Voltage</th>
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Max Charge Voltage</th>
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Typical Float</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-hairline">
+                <tr>
+                  <td class="p-4 font-mono text-primary">4S (12V)</td>
+                  <td class="p-4 text-muted">12.8V</td>
+                  <td class="p-4 text-muted">10.0V</td>
+                  <td class="p-4 text-muted">14.6V</td>
+                  <td class="p-4 text-muted">13.6V</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">8S (24V)</td>
+                  <td class="p-4 text-muted">25.6V</td>
+                  <td class="p-4 text-muted">20.0V</td>
+                  <td class="p-4 text-muted">29.2V</td>
+                  <td class="p-4 text-muted">27.2V</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">16S (48V)</td>
+                  <td class="p-4 text-muted">51.2V</td>
+                  <td class="p-4 text-muted">40.0V</td>
+                  <td class="p-4 text-muted">58.4V</td>
+                  <td class="p-4 text-muted">54.4V</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">7S (24V alt)</td>
+                  <td class="p-4 text-muted">22.4V</td>
+                  <td class="p-4 text-muted">17.5V</td>
+                  <td class="p-4 text-muted">25.55V</td>
+                  <td class="p-4 text-muted">23.8V</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <p class="text-caption text-muted mt-3">Voltage values are per string. Parallel strings share the same voltage. Always use a BMS for cell balancing.</p>
+      </section>
+
+      <section id="charge-profile">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">LiFePO4 Charge Profile</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          LiFePO4 uses a CC-CV (Constant Current, Constant Voltage) charge profile. During the CC phase, the charger supplies a constant current while voltage rises. When voltage reaches 3.65V per cell, the charger switches to CV mode and holds voltage constant while current tapers.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">CC Phase (Bulk)</h4>
+            <p class="text-body-sm text-muted">
+              Charger delivers constant current (e.g., 0.5C). Voltage rises from ~3.0V to 3.65V per cell. This phase charges the battery from ~0% to ~90% SOC. Duration depends on charge rate and capacity.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">CV Phase (Absorb)</h4>
+            <p class="text-body-sm text-muted">
+              Charger holds 3.65V per cell. Current tapers as the battery approaches full. When current drops to ~0.05C, the battery is considered fully charged. This phase takes 30–60 minutes at typical charge rates.
+            </p>
+          </CalculatorCard>
+        </div>
+        <p class="text-body-md text-body font-light mt-4">
+          Unlike lead-acid, LiFePO4 does not require a float charge. Once fully charged, the BMS typically disconnects the charger. Some systems use a reduced maintenance voltage (3.38–3.42V per cell) to compensate for self-discharge during storage.
+        </p>
+      </section>
+
+      <section id="common-mistakes">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Common Mistakes</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Using Lead-Acid Charge Voltages</h4>
+            <p class="text-body-sm text-muted">
+              Lead-acid chargers use 14.4V absorb and 13.5V float for 12V systems. LiFePO4 needs 14.4–14.6V max charge and does not use float. Using lead-acid settings undercharges LiFePO4.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Exceeding 3.65V Per Cell</h4>
+            <p class="text-body-sm text-muted">
+              Charging above 3.65V per cell causes lithium plating on the anode, which permanently damages the cell and can create safety hazards. Always set the BMS charge limit to 3.65V or below.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Skipping the BMS</h4>
+            <p class="text-body-sm text-muted">
+              Without a BMS, individual cells can be overcharged or overdischarged. Cell imbalance grows over time, leading to premature capacity loss and potential safety risks. Always use a BMS.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Charging at Too High a Rate</h4>
+            <p class="text-body-sm text-muted |
+              Exceeding the manufacturer's recommended charge C-rate causes excessive heating and can trigger lithium plating. Stay within the datasheet limits for safe, long-life charging.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <CalculatorCard class="border-m-blue-light">
+        <h4 class="text-label-uppercase text-primary text-xs mb-3">Try It</h4>
+        <p class="text-body-sm text-muted mb-4">
+          Use the Charging Time Calculator to estimate charge time based on your charger current and battery capacity.
+        </p>
+        <a href="/tools/charging-time-calculator" class="btn-primary text-xs py-3 px-6 inline-block">Open Charging Time Calculator</a>
+      </CalculatorCard>
+
+      <FAQSection items={faqItems} />
+
+      <section class="border-t border-hairline pt-12">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">References</h2>
+        <ul class="flex flex-col gap-2 text-body-sm text-muted">
+          {references.map((ref) => (
+            <li class="flex gap-2">
+              <span class="text-m-blue-light shrink-0">—</span>
+              <a href={ref.url} class="hover:text-primary transition-colors underline underline-offset-2" target="_blank" rel="noopener noreferrer">{ref.title}</a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    </div>
+  </div>
+</Layout>

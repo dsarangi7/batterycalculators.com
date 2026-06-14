@@ -1,0 +1,417 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import CalculatorCard from "../../components/CalculatorCard.astro";
+import FAQSection from "../../components/FAQSection.astro";
+import ReferenceChart from "../../components/ReferenceChart.astro";
+
+const faqItems = [
+  {
+    question: "What does 0.2C mean for a 100Ah battery?",
+    answer:
+      "0.2C means the charge or discharge current is 20% of the battery capacity. For a 100Ah battery, 0.2C = 20A. At this rate, the battery will theoretically charge or discharge in 5 hours (1 / 0.2 = 5). This is considered a slow, gentle rate that maximizes battery lifespan.",
+  },
+  {
+    question:
+      "What is the difference between charge C-rate and discharge C-rate?",
+    answer:
+      "Charge C-rate is the current used to charge the battery, while discharge C-rate is the current drawn during use. Many batteries can handle higher discharge C-rates than charge C-rates. For example, a LiFePO4 battery might support 1C discharge but only 0.5C charge. Always check the manufacturer's specifications for both.",
+  },
+  {
+    question: "Which C-rate is best for battery longevity?",
+    answer:
+      "Lower C-rates produce less heat and stress, extending cycle life. For LiFePO4, 0.2–0.5C is ideal for daily cycling. For lead-acid, keeping discharge below 0.2C (5-hour rate) minimizes sulfation. Higher C-rates (1C+) are acceptable for occasional fast charging or high-power discharge but reduce overall lifespan.",
+  },
+  {
+    question: "How do I calculate the current from C-rate?",
+    answer:
+      "Multiply the C-rate by the battery capacity in Ah. Formula: Current (A) = C-Rate × Capacity (Ah). For example, 0.5C on a 200Ah battery = 0.5 × 200 = 100A. Reverse the formula to find C-rate from current: C-Rate = Current (A) / Capacity (Ah).",
+  },
+];
+
+const tableOfContents = [
+  { id: "c-rate-explained", label: "C-Rate Explained" },
+  { id: "current-reference-table", label: "Current Reference Table" },
+  { id: "charging-vs-discharging", label: "Charging vs Discharging" },
+  { id: "chemistry-considerations", label: "Chemistry Considerations" },
+  { id: "common-mistakes", label: "Common Mistakes" },
+];
+
+const relatedCalculators = [
+  { title: "C-Rate Calculator", href: "/tools/c-rate-calculator" },
+  {
+    title: "Charging Time Calculator",
+    href: "/tools/charging-time-calculator",
+  },
+  {
+    title: "Battery Degradation Estimator",
+    href: "/tools/battery-degradation-estimator",
+  },
+];
+
+const references = [
+  {
+    title: "Battery University — C-Rate Explained",
+    url: "https://batteryuniversity.com/article/bu-406-stress-and-strain",
+  },
+  {
+    title: "IEC 60086 — Primary Batteries Standard",
+    url: "https://webstore.iec.ch/en/publication/26863",
+  },
+];
+---
+
+<Layout
+  title="Battery C-Rate Reference — Charge and Discharge Current Table | Battery Calculators"
+  description="C-rate reference table showing charge and discharge currents for 50Ah, 100Ah, 200Ah, and 300Ah batteries. Practical current values for 0.2C, 0.5C, 1C, and 2C rates."
+  faqItems={faqItems}
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a
+        href="/learn"
+        class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block"
+        >&larr; Back to Guides</a
+      >
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4"
+        >REFERENCE</span
+      >
+      <h1 class="text-display-md text-primary mb-6">
+        Battery C-Rate Reference
+      </h1>
+      <p class="text-body-md text-body font-light">
+        Quick-reference table for converting between C-rate and actual current.
+        Know exactly how many amps your battery can charge or discharge at each
+        rate.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section id="c-rate-explained">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          C-Rate Explained
+        </h2>
+        <p class="text-body-md text-body font-light mb-4">
+          C-rate is the standard way to express charge or discharge current
+          relative to a battery's capacity. It normalizes current across
+          different battery sizes. A 1C rate on a 100Ah battery is 100A; on a
+          50Ah battery, 1C is 50A. Both batteries are being charged or
+          discharged at the same relative stress level.
+        </p>
+        <p class="text-body-md text-body font-light mb-4">
+          Common C-rates range from 0.05C (trickle charging) to 3C (high-power
+          discharge). The "C" in C-rate stands for capacity. The number before C
+          indicates the multiplier. 0.5C means half the capacity in amps. 2C
+          means twice the capacity in amps.
+        </p>
+        <p class="text-body-md text-body font-light">
+          Time to charge or discharge is inversely proportional to C-rate. At
+          0.2C, it takes 5 hours. At 0.5C, it takes 2 hours. At 1C, it takes 1
+          hour. At 2C, it takes 30 minutes. This relationship holds regardless
+          of battery size.
+        </p>
+      </section>
+
+      <section id="current-reference-table">
+        <ReferenceChart
+          type="bar"
+          title="Current Demand by C-Rate for a 100Ah Battery"
+          description="C-rate current equals battery capacity multiplied by C-rate."
+          xLabel="C-Rate"
+          yLabel="Current (A)"
+          data={[
+            { x: 1, y: 20, label: "0.2C" },
+            { x: 2, y: 50, label: "0.5C" },
+            { x: 3, y: 100, label: "1C" },
+            { x: 4, y: 200, label: "2C" },
+          ]}
+          yMin={0}
+          yMax={220}
+          caption="C-rate current equals battery capacity multiplied by C-rate."
+        />
+
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          Current Reference Table
+        </h2>
+        <p class="text-body-md text-body font-light mb-4">
+          The table below shows the actual current in amps for common battery
+          capacities at each C-rate. Use this to quickly determine what current
+          your battery should charge or discharge at.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-body-sm min-w-[640px]">
+              <thead>
+                <tr class="border-b border-hairline bg-surface-card">
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >C-Rate</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >50 Ah</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >100 Ah</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >200 Ah</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >300 Ah</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >Approx. Time</th
+                  >
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-hairline">
+                <tr>
+                  <td class="p-4 font-mono text-primary">0.1C</td>
+                  <td class="p-4 text-muted">5 A</td>
+                  <td class="p-4 text-muted">10 A</td>
+                  <td class="p-4 text-muted">20 A</td>
+                  <td class="p-4 text-muted">30 A</td>
+                  <td class="p-4 text-muted">~10 hours</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">0.2C</td>
+                  <td class="p-4 text-muted">10 A</td>
+                  <td class="p-4 text-muted">20 A</td>
+                  <td class="p-4 text-muted">40 A</td>
+                  <td class="p-4 text-muted">60 A</td>
+                  <td class="p-4 text-muted">~5 hours</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">0.5C</td>
+                  <td class="p-4 text-muted">25 A</td>
+                  <td class="p-4 text-muted">50 A</td>
+                  <td class="p-4 text-muted">100 A</td>
+                  <td class="p-4 text-muted">150 A</td>
+                  <td class="p-4 text-muted">~2 hours</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">1C</td>
+                  <td class="p-4 text-muted">50 A</td>
+                  <td class="p-4 text-muted">100 A</td>
+                  <td class="p-4 text-muted">200 A</td>
+                  <td class="p-4 text-muted">300 A</td>
+                  <td class="p-4 text-muted">~1 hour</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">2C</td>
+                  <td class="p-4 text-muted">100 A</td>
+                  <td class="p-4 text-muted">200 A</td>
+                  <td class="p-4 text-muted">400 A</td>
+                  <td class="p-4 text-muted">600 A</td>
+                  <td class="p-4 text-muted">~30 minutes</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <p class="text-caption text-muted mt-3">
+          Approximate times assume constant current (CC phase only). Actual
+          charge time includes CV phase and is longer.
+        </p>
+      </section>
+
+      <section id="charging-vs-discharging">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          Charging vs Discharging C-Rates
+        </h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Batteries often have different maximum C-rates for charging and
+          discharging. A battery that can discharge at 2C may only safely charge
+          at 0.5C. This asymmetry exists because charging causes different
+          chemical stresses than discharging — particularly lithium plating risk
+          during high-rate charging.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Typical Charge C-Rates</h4>
+            <p class="text-body-sm text-muted">
+              LiFePO4: 0.5–1C (fast), 0.2C (gentle)<br />
+              NMC: 0.5–1C (fast), 0.3C (gentle)<br />
+              Lead-acid: 0.1–0.3C (limited by chemistry)<br />
+              AGM: 0.2–0.4C (better than flooded)
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">
+              Typical Discharge C-Rates
+            </h4>
+            <p class="text-body-sm text-muted">
+              LiFePO4: 1–3C (continuous), 5–10C (peak)<br />
+              NMC: 1–2C (continuous), 3–5C (peak)<br />
+              Lead-acid: 0.1–0.3C (Peukert effect above this)<br />
+              AGM: 0.2–0.5C (better high-rate than flooded)
+            </p>
+          </CalculatorCard>
+        </div>
+        <p class="text-body-md text-body font-light mt-4">
+          Always check the manufacturer's datasheet for the specific C-rate
+          limits of your battery. Exceeding the recommended C-rate voids
+          warranties, reduces cycle life, and can create safety hazards.
+        </p>
+      </section>
+
+      <section id="chemistry-considerations">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          Chemistry Considerations
+        </h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Different battery chemistries respond differently to high C-rates.
+          LiFePO4 handles high C-rates well with minimal degradation. Lead-acid
+          suffers the Peukert effect — effective capacity drops significantly at
+          high discharge rates. NMC falls between the two.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-body-sm min-w-[640px]">
+              <thead>
+                <tr class="border-b border-hairline bg-surface-card">
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >Chemistry</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >Recommended Charge</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >Recommended Discharge</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >High C-Rate Tolerance</th
+                  >
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-hairline">
+                <tr>
+                  <td class="p-4 font-mono text-primary">LiFePO4</td>
+                  <td class="p-4 text-muted">0.2–0.5C</td>
+                  <td class="p-4 text-muted">0.5–1C</td>
+                  <td class="p-4 text-muted">Excellent</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">NMC</td>
+                  <td class="p-4 text-muted">0.3–0.5C</td>
+                  <td class="p-4 text-muted">0.5–1C</td>
+                  <td class="p-4 text-muted">Good</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">Lead-Acid</td>
+                  <td class="p-4 text-muted">0.1–0.3C</td>
+                  <td class="p-4 text-muted">0.1–0.2C</td>
+                  <td class="p-4 text-muted">Poor (Peukert effect)</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">AGM</td>
+                  <td class="p-4 text-muted">0.2–0.4C</td>
+                  <td class="p-4 text-muted">0.2–0.3C</td>
+                  <td class="p-4 text-muted">Moderate</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section id="common-mistakes">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          Common Mistakes
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">
+              Confusing C-Rate with Absolute Current
+            </h4>
+            <p class="text-body-sm text-muted">
+              1C means different currents for different batteries. 1C on a 50Ah
+              battery is 50A; on a 200Ah battery, it is 200A. Always calculate
+              the actual current from the C-rate and capacity before sizing
+              wires, fuses, or BMS components.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">
+              Exceeding Manufacturer Limits
+            </h4>
+            <p class="text-body-sm text-muted">
+              Just because a battery can physically deliver 2C does not mean it
+              should. Exceeding the recommended C-rate accelerates degradation,
+              voids warranties, and may create safety risks. Stay within the
+              datasheet limits.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">
+              Ignoring Peukert Effect in Lead-Acid
+            </h4>
+            <p class="text-body-sm text-muted">
+              Lead-acid batteries deliver less total energy at high discharge
+              rates. A 100Ah lead-acid battery at 1C may only deliver 60–70Ah.
+              LiFePO4 does not suffer this effect — it delivers close to rated
+              capacity regardless of C-rate within limits.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">
+              Using Same C-Rate for Charge and Discharge
+            </h4>
+            <p class="text-body-sm text-muted">
+              Charge and discharge C-rate limits are different. A battery rated
+              for 1C discharge may only support 0.5C charge. Using the discharge
+              rating for charging leads to overcharging stress and potential
+              damage.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <CalculatorCard class="border-m-blue-light">
+        <h4 class="text-label-uppercase text-primary text-xs mb-3">Try It</h4>
+        <p class="text-body-sm text-muted mb-4">
+          Use the C-Rate Calculator to convert between current, capacity, and
+          C-rate for your specific battery configuration.
+        </p>
+        <a
+          href="/tools/c-rate-calculator"
+          class="btn-primary text-xs py-3 px-6 inline-block"
+          >Open C-Rate Calculator</a
+        >
+      </CalculatorCard>
+
+      <FAQSection items={faqItems} />
+
+      <section class="border-t border-hairline pt-12">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          References
+        </h2>
+        <ul class="flex flex-col gap-2 text-body-sm text-muted">
+          {
+            references.map((ref) => (
+              <li class="flex gap-2">
+                <span class="text-m-blue-light shrink-0">—</span>
+                <a
+                  href={ref.url}
+                  class="hover:text-primary transition-colors underline underline-offset-2"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {ref.title}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+    </div>
+  </div>
+</Layout>

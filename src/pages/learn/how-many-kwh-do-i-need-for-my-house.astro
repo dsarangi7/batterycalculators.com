@@ -1,0 +1,321 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import CalculatorCard from '../../components/CalculatorCard.astro';
+import FormulaBox from '../../components/FormulaBox.astro';
+import FAQSection from '../../components/FAQSection.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "How many kWh does the average house use per day?",
+    answer: "The average U.S. household consumes approximately 29–30 kWh per day, which translates to roughly 900 kWh per month. However, this varies dramatically by home size, climate, and occupancy. A small apartment may use 5–10 kWh/day while a large home in a hot climate can exceed 50 kWh/day.",
+  },
+  {
+    question: "How do I calculate my actual household kWh consumption?",
+    answer: "Check your utility bill for monthly kWh usage and divide by 30 to get a daily average. For a more precise figure, walk through each major appliance and multiply its wattage by estimated daily runtime. Sum all devices to get your total daily consumption in watt-hours, then divide by 1,000 to convert to kWh.",
+  },
+  {
+    question: "Does home size directly correlate with energy consumption?",
+    answer: "Home size correlates with consumption but not linearly. Larger homes have more square footage to heat and cool, more lighting, and typically more appliances. However, insulation quality, window efficiency, HVAC system age, and occupant behavior are equally important variables. A well-insulated 2,500 sq ft home may use less energy than a poorly insulated 1,500 sq ft home.",
+  },
+  {
+    question: "What is the difference between kWh and Ah for battery sizing?",
+    answer: "Kilowatt-hours (kWh) measure total energy capacity — how much work a battery can do. Amp-hours (Ah) measure charge capacity at a given voltage. To convert, multiply Ah by voltage: a 48V 100Ah battery stores 4,800 Wh or 4.8 kWh. Both units describe the same energy but from different perspectives. kWh is more intuitive for comparing household consumption, while Ah is useful for battery system configuration.",
+  },
+];
+---
+
+<Layout
+  title="How Many kWh Do I Need for My House? | Battery Calculators"
+  description="Learn how to calculate your household's daily kWh consumption for battery backup sizing. Includes average consumption tables by home size, step-by-step formulas, and worked examples."
+  canonical="https://batterycalculators.com/learn/how-many-kwh-do-i-need-for-my-house"
+  schema="faqPage"
+  schemaName="How Many kWh Do I Need for My House?"
+  schemaDescription="Learn how to calculate your household's daily kWh consumption for battery backup sizing."
+  schemaUrl="https://batterycalculators.com/learn/how-many-kwh-do-i-need-for-my-house"
+  faqItems={faqItems}
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/learn" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Back to Guides</a>
+      <Breadcrumb items={[
+        { label: "Learning Center", href: "/learn" },
+        { label: "How Many kWh Do I Need for My House?" },
+      ]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">HOME BACKUP</span>
+      <h1 class="text-display-md text-primary mb-6">How Many kWh Do I Need for My House?</h1>
+      <p class="text-body-md text-body font-light">
+        Before you can size a home battery backup system, you need to know how much energy your house actually consumes. This guide walks through the engineering process of calculating household kWh requirements — from utility bill analysis to appliance-level audits — so you can size a battery system with confidence.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Why kWh Consumption Matters for Battery Sizing</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Battery capacity is measured in kilowatt-hours (kWh). If your house consumes 25 kWh per day and you want one full day of backup, you need at least 25 kWh of usable battery storage — before accounting for inverter losses and depth of discharge limits. Underestimating consumption leads to a system that runs dry before the outage ends. Overestimating means you pay for capacity you never use.
+        </p>
+        <p class="text-body-md text-body font-light mb-6">
+          The calculation is straightforward once you have accurate consumption data. The challenge is gathering that data. Your utility bill gives you a monthly total, but battery sizing requires a daily — or even hourly — breakdown of which loads run and when. This guide covers both approaches: the quick estimate from your bill and the precise audit from an appliance inventory.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Step 1: Quick Estimate from Your Utility Bill</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          The fastest way to estimate household consumption is to read your most recent utility bill. Look for the line that states total kWh consumed during the billing period. Divide that number by the number of days in the billing cycle to get your average daily consumption. Most bills cover 28–32 days, so adjust accordingly.
+        </p>
+        <p class="text-body-md text-body font-light mb-6">
+          This method gives you a reliable average, but it smooths out seasonal peaks. Summer months with air conditioning or winter months with electric heating will show significantly higher consumption than spring or fall. For battery sizing, you should design for your worst-case month, not the annual average.
+        </p>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Worked Example:</strong> Utility bill estimate.</p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li>Monthly usage on June bill: 930 kWh</li>
+              <li>Billing period: 30 days</li>
+            </ul>
+            <p><strong>Calculation:</strong></p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              930 kWh / 30 days = 31 kWh/day
+            </div>
+            <p>This household averages 31 kWh/day. For battery sizing, check the hottest or coldest month — that peak drives your worst-case requirement.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Average Household Consumption by Home Size</h2>
+        <p class="text-body-md text-body font-light mb-6">
+          The table below shows typical daily energy consumption ranges for U.S. households segmented by floor area. These figures assume electric heating and cooling, standard appliances, and 2–4 occupants. Homes with electric water heaters, pool pumps, or EV charging will consume significantly more.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Home Size</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Avg Daily kWh</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Monthly kWh</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Typical Loads</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-primary font-bold">Small (under 1,000 sq ft)</td>
+                <td class="p-4 font-mono text-primary">5 – 12 kWh</td>
+                <td class="p-4 font-mono text-primary">150 – 360</td>
+                <td class="p-4 text-muted">1BR apartment, minimal appliances, no central HVAC</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-primary font-bold">Medium (1,000 – 2,000 sq ft)</td>
+                <td class="p-4 font-mono text-primary">12 – 25 kWh</td>
+                <td class="p-4 font-mono text-primary">360 – 750</td>
+                <td class="p-4 text-muted">2-3BR home, standard appliances, central AC</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-primary font-bold">Large (2,000 – 3,000 sq ft)</td>
+                <td class="p-4 font-mono text-primary">25 – 40 kWh</td>
+                <td class="p-4 font-mono text-primary">750 – 1,200</td>
+                <td class="p-4 text-muted">3-4BR home, full appliance suite, HVAC, lighting</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-primary font-bold">Very Large (3,000+ sq ft)</td>
+                <td class="p-4 font-mono text-primary">40 – 60+ kWh</td>
+                <td class="p-4 font-mono text-primary">1,200 – 1,800+</td>
+                <td class="p-4 text-muted">5+BR home, multiple HVAC zones, pool, EV</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-body-sm text-muted mt-4">
+          These ranges are national averages. Your actual consumption depends on climate zone, insulation quality, occupant count, appliance efficiency, and lifestyle. Use these as a sanity check after performing your own calculation.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Step 2: Appliance-Level Audit</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          For precise battery sizing, walk through your home and catalog every electrical device. Record its wattage (found on the nameplate or in the manual) and estimate how many hours per day it operates. Multiply wattage by hours to get watt-hours per day. Sum all devices for your total.
+        </p>
+        <p class="text-body-md text-body font-light mb-6">
+          Pay special attention to appliances that cycle on and off automatically. A refrigerator compressor runs roughly 8–12 hours per day even though it is plugged in 24 hours. An air conditioner might run 8–16 hours in summer but zero hours in spring. Estimate runtime based on typical usage patterns, not just the number of hours the device is plugged in.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Appliance</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Power (W)</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Daily Runtime (hrs)</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Energy (Wh/day)</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">Refrigerator</td>
+                <td class="p-4 font-mono text-primary">150 – 400</td>
+                <td class="p-4 font-mono text-primary">8 – 12</td>
+                <td class="p-4 font-mono text-primary">1,200 – 4,800</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">LED Lighting (whole house)</td>
+                <td class="p-4 font-mono text-primary">200 – 500</td>
+                <td class="p-4 font-mono text-primary">5 – 8</td>
+                <td class="p-4 font-mono text-primary">1,000 – 4,000</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Internet / modem</td>
+                <td class="p-4 font-mono text-primary">15 – 30</td>
+                <td class="p-4 font-mono text-primary">24</td>
+                <td class="p-4 font-mono text-primary">360 – 720</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">TV / entertainment</td>
+                <td class="p-4 font-mono text-primary">80 – 200</td>
+                <td class="p-4 font-mono text-primary">3 – 6</td>
+                <td class="p-4 font-mono text-primary">240 – 1,200</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Washing machine</td>
+                <td class="p-4 font-mono text-primary">300 – 500</td>
+                <td class="p-4 font-mono text-primary">1</td>
+                <td class="p-4 font-mono text-primary">300 – 500</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Central AC (2-ton)</td>
+                <td class="p-4 font-mono text-primary">2,000 – 3,500</td>
+                <td class="p-4 font-mono text-primary">6 – 12</td>
+                <td class="p-4 font-mono text-primary">12,000 – 42,000</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Electric oven</td>
+                <td class="p-4 font-mono text-primary">2,000 – 5,000</td>
+                <td class="p-4 font-mono text-primary">0.5 – 1</td>
+                <td class="p-4 font-mono text-primary">1,000 – 5,000</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <FormulaBox title="Household kWh Formulas">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Daily kWh = Σ (Appliance Wattage × Daily Runtime in hours) / 1,000
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Battery Required (kWh) = Daily kWh / (DoD × Inverter Efficiency)
+        </div>
+        <p>
+          Divide the raw consumption by depth of discharge and inverter efficiency to get the total battery capacity you need. For LFP batteries at 85% DoD with a 92% efficient inverter, your multiplier is approximately 1.28× your raw consumption.
+        </p>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Worked Example: Full Calculation</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Scenario:</strong> Medium-sized home, 2,200 sq ft, 3 occupants, mixed climate.</p>
+            <p><strong>Appliance inventory summary:</strong></p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li>Refrigerator: 200W × 10h = 2,000 Wh</li>
+              <li>LED lights: 300W × 6h = 1,800 Wh</li>
+              <li>Internet: 20W × 24h = 480 Wh</li>
+              <li>TV: 120W × 4h = 480 Wh</li>
+              <li>Coffee maker: 900W × 0.5h = 450 Wh</li>
+              <li>Phone/laptop charging: 60W × 4h = 240 Wh</li>
+              <li>Miscellaneous: 200W × 3h = 600 Wh</li>
+            </ul>
+            <p class="pt-2 border-t border-hairline"><strong>Total daily consumption:</strong> <span class="font-mono text-primary">6,050 Wh (6.05 kWh/day)</span></p>
+            <p class="text-xs text-muted">Note: This is a critical-only load list. HVAC and electric heating excluded — see the Whole-House Backup guide for full-home scenarios.</p>
+            <p class="pt-2 border-t border-hairline"><strong>Battery sizing for 24-hour critical backup:</strong></p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              6,050 / (0.85 × 0.92) = 7,756 Wh ≈ 7.8 kWh
+            </div>
+            <p>A single 8 kWh LFP battery or two 4 kWh units would cover critical loads for 24 hours. For a 48V system, that is approximately 161 Ah at 48V.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Critical Loads vs. Whole-House Consumption</h2>
+        <p class="text-body-md text-body font-light mb-6">
+          A common mistake is sizing a backup battery to your entire household consumption. During an outage, you do not need to power everything — you need to power what matters. Critical loads (refrigeration, medical devices, lighting, communication) typically represent 20–40% of total household consumption. By excluding HVAC, electric heating, water heating, and laundry, you dramatically reduce the required battery size and cost.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Load Category</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">% of Total</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Typical kWh/day</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Battery Needed (24h)</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-primary font-bold">Critical loads only</td>
+                <td class="p-4 font-mono text-primary">20 – 40%</td>
+                <td class="p-4 font-mono text-primary">5 – 12 kWh</td>
+                <td class="p-4 font-mono text-primary">6 – 15 kWh</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-primary font-bold">Critical + important</td>
+                <td class="p-4 font-mono text-primary">40 – 60%</td>
+                <td class="p-4 font-mono text-primary">10 – 25 kWh</td>
+                <td class="p-4 font-mono text-primary">13 – 32 kWh</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-primary font-bold">Whole-house (all loads)</td>
+                <td class="p-4 font-mono text-primary">100%</td>
+                <td class="p-4 font-mono text-primary">25 – 50+ kWh</td>
+                <td class="p-4 font-mono text-primary">32 – 64+ kWh</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Try It</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use the Home Backup Calculator to size a battery system based on your actual critical load inventory and desired backup duration.
+          </p>
+          <a href="/tools/home-backup-battery-calculator" class="btn-primary text-xs py-3 px-6 inline-block">Open Home Backup Calculator</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Related Tool</h4>
+          <p class="text-body-sm text-muted mb-4">
+            After sizing your battery, use the Battery Sizing Calculator to determine the exact bank configuration for your system voltage and chemistry.
+          </p>
+          <a href="/tools/battery-sizing-calculator" class="btn-primary text-xs py-3 px-6 inline-block">Open Battery Sizing Calculator</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Related Articles</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <a href="/learn/home-battery-sizing-guide" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors mb-2 block">
+              Home Battery Sizing Guide
+            </a>
+            <p class="text-body-sm text-muted">
+              Walks through the complete process of sizing a home battery system, from load identification to final configuration recommendations.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <a href="/learn/power-outage-battery-guide" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors mb-2 block">
+              Power Outage Battery Guide
+            </a>
+            <p class="text-body-sm text-muted">
+              Explains how to prepare a battery backup system specifically for power outages, including critical load triage and runtime planning.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

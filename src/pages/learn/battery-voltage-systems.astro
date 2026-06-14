@@ -1,0 +1,300 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import CalculatorCard from '../../components/CalculatorCard.astro';
+import FormulaBox from '../../components/FormulaBox.astro';
+import FAQSection from '../../components/FAQSection.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "What are the common battery voltage systems?",
+    answer: "The most common systems are 12V (automotive, marine, small RV), 24V (larger marine, commercial vehicles), 36V (electric bikes, trolling motors), and 48V (home energy, electric vehicles, large solar). Higher voltages reduce current draw, allowing thinner cables and more efficient power delivery.",
+  },
+  {
+    question: "How many LFP cells make a 12V battery?",
+    answer: "A 12V LFP battery uses 4 cells in series (4S). Each cell has a nominal voltage of 3.2V, so 4 × 3.2V = 12.8V nominal. The charge voltage is 14.4–14.6V and the cutoff voltage is approximately 10.0V (2.5V per cell).",
+  },
+  {
+    question: "How many NMC cells make a 12V battery?",
+    answer: "A 12V NMC battery uses 3 cells in series (3S). Each NMC cell has a nominal voltage of 3.6V, so 3 × 3.6V = 10.8V nominal (often marketed as 12V). The charge voltage is 12.6V. NMC packs typically use 4S for a true 14.4V nominal that matches 12V systems.",
+  },
+  {
+    question: "Why use 48V instead of 12V for home battery systems?",
+    answer: "48V systems draw 1/4 the current of 12V for the same power. A 5kW load at 48V draws 104A; at 12V it draws 417A. Lower current means thinner cables, smaller bus bars, lower voltage drop, and higher efficiency. 48V is the standard for home energy storage and solar systems above 3kW.",
+  },
+];
+---
+
+<Layout
+  title="Battery Voltage Systems Guide | Battery Calculators"
+  description="Common battery voltage systems: 12V, 24V, 36V, 48V explained. Cell configurations for LFP and NMC chemistries and how to build each voltage system."
+  canonical="https://batterycalculators.com/learn/battery-voltage-systems"
+  schema="faqPage"
+  schemaName="Battery Voltage Systems Guide"
+  schemaDescription="Engineering guide to common battery voltage systems and cell configurations."
+  schemaUrl="https://batterycalculators.com/learn/battery-voltage-systems"
+  faqItems={faqItems}
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/learn" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Back to Guides</a>
+      <Breadcrumb items={[
+        { label: "Learning Center", href: "/learn" },
+        { label: "Battery Voltage Systems Guide" }
+      ]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">ELECTRICAL</span>
+      <h1 class="text-display-md text-primary mb-6">Battery Voltage Systems</h1>
+      <p class="text-body-md text-body font-light">
+        Battery systems are classified by their nominal voltage — 12V, 24V, 36V, or 48V. The voltage determines cable sizing, current draw, efficiency, and compatibility with loads and chargers. Understanding how voltage systems are built from individual cells is essential for designing packs, selecting components, and troubleshooting voltage mismatches.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Common Voltage Systems</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Each voltage system serves a specific application range. The choice depends on load power, cable run length, available components, and industry standards. Higher voltage systems are more efficient for high-power applications but require rated components and careful safety practices.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">System</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Nominal Voltage</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Typical Applications</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Max Practical Load</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">12V</td>
+                <td class="p-4 font-mono text-primary">12.8V (LFP) / 12.6V (NMC)</td>
+                <td class="p-4 text-muted">Cars, small boats, RVs, portable power</td>
+                <td class="p-4 font-mono text-primary">~2 kW</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">24V</td>
+                <td class="p-4 font-mono text-primary">25.6V (LFP) / 25.2V (NMC)</td>
+                <td class="p-4 text-muted">Larger boats, trucks, commercial vehicles</td>
+                <td class="p-4 font-mono text-primary">~5 kW</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">36V</td>
+                <td class="p-4 font-mono text-primary">38.4V (LFP) / 36.0V (NMC)</td>
+                <td class="p-4 text-muted">Electric bikes, trolling motors, golf carts</td>
+                <td class="p-4 font-mono text-primary">~3 kW</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">48V</td>
+                <td class="p-4 font-mono text-primary">51.2V (LFP) / 48.0V (NMC)</td>
+                <td class="p-4 text-muted">Home energy, solar, EVs, telecom</td>
+                <td class="p-4 font-mono text-primary">~20 kW</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <FormulaBox title="Cell Count Formula">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Series Cells (Ns) = Target Voltage / Cell Nominal Voltage
+        </div>
+        <p>
+          LFP nominal: 3.2V/cell. NMC nominal: 3.6V/cell. Round up to the nearest integer.
+        </p>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Parallel Strings (Np) = Target Ah / Cell Ah
+        </div>
+        <p>
+          To build a 48V 200Ah LFP pack from 3.2V 100Ah cells: Ns = 51.2/3.2 = 16S, Np = 200/100 = 2P → 16S2P configuration.
+        </p>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">LFP Cell Configurations</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          LFP cells at 3.2V nominal are the most common chemistry for energy storage. The 4S configuration (12.8V) is the building block for all standard voltage systems. Higher voltage systems stack 4S modules in series.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">System</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">LFP Cells</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Charge Voltage</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Cutoff Voltage</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">12V</td>
+                <td class="p-4 font-mono text-primary">4S</td>
+                <td class="p-4 font-mono text-primary">14.4–14.6V</td>
+                <td class="p-4 font-mono text-primary">10.0V (2.5V/cell)</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">24V</td>
+                <td class="p-4 font-mono text-primary">8S</td>
+                <td class="p-4 font-mono text-primary">28.8–29.2V</td>
+                <td class="p-4 font-mono text-primary">20.0V (2.5V/cell)</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">36V</td>
+                <td class="p-4 font-mono text-primary">12S</td>
+                <td class="p-4 font-mono text-primary">43.2–43.8V</td>
+                <td class="p-4 font-mono text-primary">30.0V (2.5V/cell)</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">48V</td>
+                <td class="p-4 font-mono text-primary">16S</td>
+                <td class="p-4 font-mono text-primary">57.6–58.4V</td>
+                <td class="p-4 font-mono text-primary">40.0V (2.5V/cell)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">NMC Cell Configurations</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          NMC cells at 3.6V nominal are common in EV and consumer electronics applications. Fewer cells are needed per voltage level compared to LFP. The 3S configuration (10.8V) approximates 12V, while 4S (14.4V) provides a better match for 12V systems.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">System</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">NMC Cells</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Charge Voltage</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Cutoff Voltage</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">12V (nominal)</td>
+                <td class="p-4 font-mono text-primary">3S</td>
+                <td class="p-4 font-mono text-primary">12.6V</td>
+                <td class="p-4 font-mono text-primary">7.5V (2.5V/cell)</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">12V (true)</td>
+                <td class="p-4 font-mono text-primary">4S</td>
+                <td class="p-4 font-mono text-primary">16.8V</td>
+                <td class="p-4 font-mono text-primary">12.0V (3.0V/cell)</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">24V</td>
+                <td class="p-4 font-mono text-primary">7S</td>
+                <td class="p-4 font-mono text-primary">29.4V</td>
+                <td class="p-4 font-mono text-primary">21.0V (3.0V/cell)</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">48V</td>
+                <td class="p-4 font-mono text-primary">13S</td>
+                <td class="p-4 font-mono text-primary">54.6V</td>
+                <td class="p-4 font-mono text-primary">39.0V (3.0V/cell)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Worked Example: Building a 48V System</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Goal:</strong> Build a 48V 200Ah LFP battery pack from individual 3.2V 100Ah cells</p>
+            <p><strong>Step 1:</strong> Determine series count:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              Ns = 51.2V / 3.2V = 16 cells in series (16S)
+            </div>
+            <p><strong>Step 2:</strong> Determine parallel count:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              Np = 200Ah / 100Ah = 2 strings in parallel (2P)
+            </div>
+            <p><strong>Step 3:</strong> Total cells required:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              16S × 2P = 32 cells total
+            </div>
+            <p><strong>Step 4:</strong> Pack specifications:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              Voltage: 16 × 3.2V = 51.2V nominal
+              Capacity: 2 × 100Ah = 200Ah
+              Energy: 51.2V × 200Ah = 10,240 Wh (10.24 kWh)
+              Weight: 32 × 3.5 kg = 112 kg (~247 lbs)
+            </div>
+            <p><strong>Step 5:</strong> BMS requirement. A 16S BMS with cell balancing is required. Active balancing is recommended for packs above 5kWh to maintain cell-to-cell voltage balance during cycling.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Voltage Selection Guide</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">12V Systems</h4>
+            <p class="text-body-sm text-muted">
+              Best for loads under 2kW with short cable runs. Universal compatibility with automotive and marine accessories. Simple wiring. Limited by high current draw at higher power levels.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">24V Systems</h4>
+            <p class="text-body-sm text-muted">
+              Ideal for boats, trucks, and medium-power applications. Half the current of 12V for the same load. Good balance between efficiency and component availability. Common in commercial marine and RV installations.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">36V Systems</h4>
+            <p class="text-body-sm text-muted">
+              Standard for electric bikes, golf carts, and trolling motors. Provides adequate voltage for motor efficiency while staying below hazardous voltage thresholds. Limited ecosystem compared to 12V/24V/48V.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">48V Systems</h4>
+            <p class="text-body-sm text-muted">
+              Preferred for home energy storage, solar, and high-power EVs. Lowest current for the same power — enabling thinner cables and higher efficiency. Requires LV-rated components and safety practices.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Try It</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use the Battery Pack Calculator to model cell configurations for any target voltage and capacity.
+          </p>
+          <a href="/tools/battery-pack-calculator" class="btn-primary text-xs py-3 px-6 inline-block">Open Battery Pack Calculator</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Next Step</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Compare runtime across 12V, 24V, and 48V systems for your load profile.
+          </p>
+          <a href="/learn/12v-vs-24v-vs-48v-runtime" class="btn-primary text-xs py-3 px-6 inline-block">Read 12V vs 24V vs 48V Runtime</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Related Articles</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <a href="/learn/series-vs-parallel-batteries" class="text-primary hover:underline font-bold block mb-2">Series vs Parallel Batteries</a>
+            <p class="text-body-sm text-muted">
+              Detailed explanation of series and parallel connection rules for building battery packs from individual cells.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <a href="/learn/12v-vs-24v-vs-48v-runtime" class="text-primary hover:underline font-bold block mb-2">12V vs 24V vs 48V Runtime</a>
+            <p class="text-body-sm text-muted">
+              How system voltage affects runtime, cable sizing, and efficiency for the same load profile.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

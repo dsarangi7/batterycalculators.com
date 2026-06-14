@@ -1,0 +1,79 @@
+---
+/**
+ * FeedbackWidget.astro
+ *
+ * "Was this calculator helpful?" — Yes / No
+ * Stores response in localStorage (no backend).
+ * Self-contained; drop into any calculator page.
+ */
+
+export interface Props {
+  calculatorName: string;
+}
+
+const { calculatorName } = Astro.props as Props;
+---
+
+<div id="feedback-widget" class="bg-surface-soft border border-hairline p-6 mb-16">
+  <p class="text-body-sm text-primary font-bold mb-3">Was this calculator helpful?</p>
+  <div class="flex gap-3" id="feedback-buttons">
+    <button
+      id="feedback-yes"
+      class="btn-primary-outline text-xs h-10 px-5"
+      data-calc={calculatorName}
+    >
+      Yes
+    </button>
+    <button
+      id="feedback-no"
+      class="btn-primary-outline text-xs h-10 px-5"
+      data-calc={calculatorName}
+    >
+      No
+    </button>
+  </div>
+  <p id="feedback-thanks" class="text-caption text-muted hidden mt-3">Thanks for your feedback.</p>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const widget = document.getElementById('feedback-widget');
+    const buttons = document.getElementById('feedback-buttons');
+    const thanks = document.getElementById('feedback-thanks');
+    const yesBtn = document.getElementById('feedback-yes');
+    const noBtn = document.getElementById('feedback-no');
+
+    if (!widget || !buttons || !thanks) return;
+
+    const calcName = (yesBtn || noBtn)?.getAttribute('data-calc') || 'unknown';
+    const storageKey = `feedback_${calcName}`;
+
+    // Already submitted?
+    if (localStorage.getItem(storageKey)) {
+      widget.classList.add('hidden');
+      return;
+    }
+
+    function handleResponse(value: 'yes' | 'no') {
+      localStorage.setItem(storageKey, JSON.stringify({
+        value,
+        timestamp: new Date().toISOString(),
+      }));
+      buttons?.classList.add('hidden');
+      thanks?.classList.remove('hidden');
+
+      // Emit analytics event
+      try {
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({
+          event: 'feedback_given',
+          calculator_name: calcName,
+          feedback_value: value,
+        });
+      } catch (_) { /* noop */ }
+    }
+
+    yesBtn?.addEventListener('click', () => handleResponse('yes'));
+    noBtn?.addEventListener('click', () => handleResponse('no'));
+  });
+</script>

@@ -1,0 +1,261 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import CalculatorCard from '../../components/CalculatorCard.astro';
+import FormulaBox from '../../components/FormulaBox.astro';
+import FAQSection from '../../components/FAQSection.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "What is battery sizing?",
+    answer: "Battery sizing is the process of calculating the total energy capacity (in Wh or Ah) a battery bank must store to meet a defined load over a specified duration. It accounts for daily energy consumption, autonomy requirements, depth of discharge limits, system efficiency, and environmental factors like temperature.",
+  },
+  {
+    question: "Why does battery sizing matter?",
+    answer: "An undersized battery bank will fail to power loads during outages or periods without recharge, leading to downtime or equipment damage. An oversized bank wastes capital, adds unnecessary weight and space, and may cycle too shallowly to maintain battery health. Proper sizing balances cost, performance, and longevity.",
+  },
+  {
+    question: "What is the difference between battery capacity and battery sizing?",
+    answer: "Battery capacity is a fixed specification — the total energy a battery can store when fully charged (e.g., 200 Ah at 48V). Battery sizing is the engineering process of determining what capacity you actually need for your specific application. Sizing takes your loads, runtime, and constraints as inputs and outputs a required capacity.",
+  },
+  {
+    question: "How long does the battery sizing process take?",
+    answer: "With a load inventory and basic system parameters (voltage, autonomy days, DoD limit), a sizing calculation can be completed in minutes using a spreadsheet or calculator. The more time-consuming step is gathering accurate load data, especially for systems with many intermittent devices.",
+  },
+];
+---
+
+<Layout
+  title="What Is Battery Sizing? | Battery Calculators"
+  description="Learn what battery sizing means, why it matters for system reliability, and how the sizing process works. A complete overview for engineers and system designers."
+  canonical="https://batterycalculators.com/learn/what-is-battery-sizing"
+  schema="faqPage"
+  schemaName="What Is Battery Sizing?"
+  schemaDescription="Engineering overview of battery sizing: definition, importance, and the standard process for calculating required battery capacity."
+  schemaUrl="https://batterycalculators.com/learn/what-is-battery-sizing"
+  faqItems={faqItems}
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/learn" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Back to Guides</a>
+      <Breadcrumb items={[
+        { label: "Learning Center", href: "/learn" },
+        { label: "What Is Battery Sizing?" }
+      ]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">SYSTEM DESIGN</span>
+      <h1 class="text-display-md text-primary mb-6">What Is Battery Sizing?</h1>
+      <p class="text-body-md text-body font-light">
+        Battery sizing is the engineering process of determining how much energy capacity a battery bank must store to reliably power a set of loads over a defined period. It is the single most important step in designing any battery-based energy system — get it wrong and the system either fails to meet demand or wastes money on unnecessary capacity.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Why Battery Sizing Matters</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Every battery system exists to bridge a gap between energy supply and energy demand. A solar installation produces energy during the day but must supply loads at night. A UPS must keep servers running until grid power returns. An off-grid cabin needs power through cloudy stretches with no sun. In each case, the battery bank is sized to cover that gap.
+        </p>
+        <p class="text-body-md text-body font-light mb-4">
+          Undersizing is the most common and most damaging mistake. A battery bank that is too small will hit its depth-of-discharge limit before the recharge source comes back online, causing a complete system shutdown. For critical applications — medical equipment, telecommunications, data centers — this can have serious consequences. For residential systems, it means the homeowner loses power during the exact moments they need it most.
+        </p>
+        <p class="text-body-md text-body font-light">
+          Oversizing carries its own costs. Batteries are among the most expensive components in an energy system. Every unused amp-hour of capacity represents capital that could have been allocated elsewhere. Excessively large banks also cycle too shallowly, which can accelerate certain degradation mechanisms in lithium cells and reduce the return on investment over the system lifetime.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">The Sizing Process Overview</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Battery sizing follows a systematic, repeatable process. The steps below apply universally — whether you are sizing a residential solar battery, a marine house bank, a UPS for server equipment, or an off-grid telecom site. The inputs change, but the method does not.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Step 1: Load Inventory</h4>
+            <p class="text-body-sm text-muted">
+              List every electrical device that will draw from the battery. Record the power rating in watts and estimate daily usage hours. Multiply power by hours to get watt-hours per device. Sum all devices for total daily energy consumption. For intermittent loads like pumps or compressors, use average duty cycle rather than continuous power.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Step 2: Autonomy Requirement</h4>
+            <p class="text-body-sm text-muted">
+              Define how many days the system must operate without any recharge input. For grid-tied solar with net metering, autonomy may be 0–1 days. For off-grid solar, 2–3 days is typical to handle consecutive cloudy days. For critical backup systems, 3–7 days may be required.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Step 3: Depth of Discharge Limit</h4>
+            <p class="text-body-sm text-muted">
+              Decide how deeply you will discharge the battery bank on a regular basis. LFP batteries can safely handle 80–90% DoD. Lead-acid batteries should be limited to 50% DoD for reasonable cycle life. NMC lithium typically uses 80% DoD. The DoD limit directly determines how much of the installed capacity is usable.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Step 4: Efficiency and Temperature</h4>
+            <p class="text-body-sm text-muted">
+              Account for energy losses in the inverter (85–95%), charge controller (95–98%), battery round-trip efficiency (85–98% depending on chemistry), and wiring losses. Apply a temperature derating factor if the battery will operate below 25°C — cold reduces available capacity significantly.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FormulaBox title="The Core Sizing Formula">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Required Capacity (Wh) = Daily Load (Wh) × Autonomy Days / DoD / System Efficiency / Temp Factor
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Required Capacity (Ah) = Required Capacity (Wh) / System Voltage (V)
+        </div>
+        <p>
+          This formula is the foundation of all battery sizing. Every specialized sizing tool — whether for solar, UPS, marine, or telecom — is a variation of this equation with application-specific inputs.
+        </p>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Key Parameters Explained</h2>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Parameter</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Typical Range</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Impact</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">Daily Load</td>
+                <td class="p-4 font-mono text-primary">500–10,000 Wh</td>
+                <td class="p-4 text-muted">Directly scales required capacity</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Autonomy Days</td>
+                <td class="p-4 font-mono text-primary">0.5–7 days</td>
+                <td class="p-4 text-muted">Linear multiplier — double autonomy doubles capacity</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">DoD Limit</td>
+                <td class="p-4 font-mono text-primary">50–90%</td>
+                <td class="p-4 text-muted">Lower DoD requires larger installed capacity</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">System Efficiency</td>
+                <td class="p-4 font-mono text-primary">70–92%</td>
+                <td class="p-4 text-muted">Inverter, wiring, and battery losses combined</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Temp Factor</td>
+                <td class="p-4 font-mono text-primary">0.70–1.00</td>
+                <td class="p-4 text-muted">Cold climates derate capacity by 10–30%</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Sizing Across Applications</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          The sizing method is universal, but the dominant constraints vary by application. Understanding which parameters matter most in your scenario helps prioritize data collection and design decisions.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Application</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Key Constraint</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Typical Autonomy</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">Home Solar Backup</td>
+                <td class="p-4 text-muted">Overnight loads + cloudy day buffer</td>
+                <td class="p-4 font-mono text-primary">1–3 days</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">UPS / IT Infrastructure</td>
+                <td class="p-4 text-muted">Runtime until generator start or graceful shutdown</td>
+                <td class="p-4 font-mono text-primary">5–30 min</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Off-Grid Solar</td>
+                <td class="p-4 text-muted">Extended cloudy periods</td>
+                <td class="p-4 font-mono text-primary">2–5 days</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Telecom / Critical</td>
+                <td class="p-4 text-muted">Reliability under all conditions</td>
+                <td class="p-4 font-mono text-primary">3–7 days</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Marine / RV</td>
+                <td class="p-4 text-muted">Space and weight constraints</td>
+                <td class="p-4 font-mono text-primary">1–2 days</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Worked Example</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Scenario:</strong> Size a battery for a small off-grid cabin.</p>
+            <p><strong>Given:</strong></p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li>Daily load: 2,400 Wh (2.4 kWh)</li>
+              <li>Autonomy: 2 days</li>
+              <li>DoD limit: 80% (LFP chemistry)</li>
+              <li>System efficiency: 85% (inverter + wiring)</li>
+              <li>Temperature factor: 0.95 (mild climate)</li>
+              <li>System voltage: 48V</li>
+            </ul>
+            <p><strong>Step 1:</strong> Required capacity in Wh:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              2,400 Wh × 2 / 0.80 / 0.85 / 0.95 = 7,431 Wh
+            </div>
+            <p><strong>Step 2:</strong> Convert to Ah:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              7,431 Wh / 48V = 154.8 Ah
+            </div>
+            <p><strong>Step 3:</strong> Round to a practical configuration. A 48V 200Ah LFP bank (9,600 Wh) provides the required 7,431 Wh with 23% margin for capacity fade over time and load growth.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Try It</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use the Battery Sizing Calculator to input your specific loads and get a bank recommendation in seconds.
+          </p>
+          <a href="/tools/battery-sizing-calculator" class="btn-primary text-xs py-3 px-6 inline-block">Open Battery Sizing Calculator</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">For Solar</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Sizing a solar-integrated battery? Use the Solar Battery Sizing Calculator to factor in charge rates and solar production.
+          </p>
+          <a href="/tools/solar-battery-sizing-calculator" class="btn-primary-outline text-xs py-3 px-6 inline-block">Open Solar Battery Sizing Calculator</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Related Articles</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Battery Sizing Formula</h4>
+            <p class="text-body-sm text-muted mb-3">Complete formula reference with all parameters, temperature derating, and efficiency factors.</p>
+            <a href="/learn/battery-sizing-formula" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Read Guide →</a>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Home Battery Sizing Guide</h4>
+            <p class="text-body-sm text-muted mb-3">How to size a residential battery backup system for essential household loads.</p>
+            <a href="/learn/home-battery-sizing-guide" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Read Guide →</a>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

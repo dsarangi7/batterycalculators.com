@@ -1,0 +1,277 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import CalculatorCard from '../../components/CalculatorCard.astro';
+import FormulaBox from '../../components/FormulaBox.astro';
+import FAQSection from '../../components/FAQSection.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "How many cells do I need for a 48V battery?",
+    answer: "For LFP cells (3.2V nominal), you need 16 cells in series for a 51.2V nominal pack. For NMC cells (3.6V-3.7V nominal), you need 14 cells in series for approximately 50.4V-51.8V. The exact count depends on your target voltage range and the BMS cutoff voltages.",
+  },
+  {
+    question: "What is cell balancing and why does it matter?",
+    answer: "Cell balancing ensures all cells in a series string charge and discharge equally. Without balancing, weaker cells reach voltage limits first, reducing usable capacity and potentially causing damage. Passive balancing dissipates excess energy as heat; active balancing transfers energy between cells.",
+  },
+  {
+    question: "Can I mix cells from different manufacturers?",
+    answer: "Mixing cells from different manufacturers is strongly discouraged. Cells from different manufacturers may have different internal resistance, capacity, and aging characteristics. This creates imbalances that reduce pack performance and lifespan. Always use matched cells from the same production batch.",
+  },
+  {
+    question: "What gauge wire do I need for battery pack connections?",
+    answer: "Wire gauge depends on the maximum current and cable length. For a pack delivering 100A, use at minimum 2 AWG (33.6 mm²) copper cable. For shorter runs under 1 meter, 4 AWG (21.2 mm²) may suffice. Always calculate voltage drop for your specific cable length and current.",
+  },
+];
+---
+
+<Layout
+  title="Battery Pack Design Basics | Battery Calculators"
+  description="Learn the fundamentals of battery pack design: series and parallel connections, voltage and capacity calculations, cell configurations, and practical design guidelines for building battery packs."
+  faqItems={faqItems}
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/learn" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Back to Guides</a>
+      <Breadcrumb items={[{ label: "Learning Center", href: "/learn" }, { label: "Battery Pack Design Basics" }]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">EV & BATTERY PACKS</span>
+      <h1 class="text-display-md text-primary mb-6">Battery Pack Design Basics</h1>
+      <p class="text-body-md text-body font-light">
+        Building a battery pack from individual cells is the foundation of electric vehicle powertrains, home energy storage, and portable power systems. The arrangement of cells in series and parallel determines the pack's voltage, capacity, and current capability — the three parameters that define its performance.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Series Connection: Increasing Voltage</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          A series connection links cells end-to-end, connecting the positive terminal of one cell to the negative terminal of the next. In a series string, voltages add up while the capacity remains that of a single cell. This is the primary method for reaching the higher voltages required by motors, inverters, and grid-tied systems.
+        </p>
+        <p class="text-body-md text-body font-light">
+          Consider four LFP cells rated at 3.2V and 100 Ah connected in series. The resulting pack delivers 12.8V (4 × 3.2V) at 100 Ah. The energy stored is 12.8V × 100 Ah = 1,280 Wh. No matter how many cells you stack in series, the pack capacity never exceeds that of a single cell — only voltage increases.
+        </p>
+      </section>
+
+      <FormulaBox title="Series Connection Formulas">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          V_pack = N_series × V_cell
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Capacity_pack = Capacity_cell (unchanged)
+        </div>
+        <p>
+          Example: 4 cells at 3.2V, 100 Ah in series → Pack = 12.8V, 100 Ah. Voltage quadruples; capacity stays at 100 Ah.
+        </p>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Parallel Connection: Increasing Capacity</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          A parallel connection links cells side-by-side, connecting all positive terminals together and all negative terminals together. In a parallel bank, capacities add up while the voltage remains that of a single cell. This is how you increase the total energy stored without changing the system voltage.
+        </p>
+        <p class="text-body-md text-body font-light">
+          Take the same four 3.2V, 100 Ah LFP cells and connect them in parallel. The resulting bank delivers 3.2V at 400 Ah (4 × 100 Ah). The total energy is 3.2V × 400 Ah = 1,280 Wh — the same energy as the series example, but delivered at a much lower voltage and higher current capability. Parallel cells share the load, reducing stress on each individual cell and extending cycle life.
+        </p>
+      </section>
+
+      <FormulaBox title="Parallel Connection Formulas">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Capacity_pack = N_parallel × Capacity_cell
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          V_pack = V_cell (unchanged)
+        </div>
+        <p>
+          Example: 4 cells at 3.2V, 100 Ah in parallel → Pack = 3.2V, 400 Ah. Capacity quadruples; voltage stays at 3.2V.
+        </p>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Series-Parallel Configuration</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Real battery packs almost always combine series and parallel connections. Cells are first grouped into parallel strings, and then those strings are connected in series. This arrangement lets you reach both your target voltage and target capacity simultaneously.
+        </p>
+        <p class="text-body-md text-body font-light mb-6">
+          The notation used in industry follows the format xSyP, where x is the number of cells in series and y is the number of parallel strings. For example, a 4S2P pack has 4 cells in series and 2 parallel strings, for a total of 8 cells.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Configuration</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Cell Chemistry</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Nominal Voltage</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Typical Parallel Count</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Common Applications</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">4S</td>
+                <td class="p-4 text-muted">LFP (3.2V)</td>
+                <td class="p-4 font-mono text-primary">12.8V</td>
+                <td class="p-4 text-muted">4P – 16P</td>
+                <td class="p-4 text-muted">12V systems, RVs, marine</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">7S</td>
+                <td class="p-4 text-muted">LFP (3.2V)</td>
+                <td class="p-4 font-mono text-primary">25.9V</td>
+                <td class="p-4 text-muted">4P – 8P</td>
+                <td class="p-4 text-muted">24V off-grid solar, telecom</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">16S</td>
+                <td class="p-4 text-muted">LFP (3.2V)</td>
+                <td class="p-4 font-mono text-primary">51.2V</td>
+                <td class="p-4 text-muted">2P – 8P</td>
+                <td class="p-4 text-muted">48V home storage, EV</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">10S</td>
+                <td class="p-4 text-muted">NMC (3.6V)</td>
+                <td class="p-4 font-mono text-primary">36V</td>
+                <td class="p-4 text-muted">4P – 12P</td>
+                <td class="p-4 text-muted">E-bikes, power tools</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">14S</td>
+                <td class="p-4 text-muted">NMC (3.7V)</td>
+                <td class="p-4 font-mono text-primary">51.8V</td>
+                <td class="p-4 text-muted">2P – 6P</td>
+                <td class="p-4 text-muted">EVs, high-power storage</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Design Example</h2>
+        <CalculatorCard>
+          <h4 class="text-primary font-bold mb-4">Build a 48V 200Ah LFP Pack from 3.2V 100Ah Cells</h4>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Target specifications:</strong></p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li>Target voltage: 48V (nominal 51.2V for LFP)</li>
+              <li>Target capacity: 200 Ah</li>
+              <li>Available cell: 3.2V, 100 Ah LFP prismatic</li>
+            </ul>
+            <p class="mt-2"><strong>Step 1: Calculate series count</strong></p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              N_series = 51.2V / 3.2V = 16 cells in series
+            </div>
+            <p><strong>Step 2: Calculate parallel count</strong></p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              N_parallel = 200Ah / 100Ah = 2 parallel strings
+            </div>
+            <p><strong>Step 3: Calculate total cells</strong></p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              Total cells = 16 × 2 = 32 cells
+            </div>
+            <p class="mt-2"><strong>Pack specifications:</strong></p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li>Pack voltage = 16 × 3.2V = <strong>51.2V</strong></li>
+              <li>Pack capacity = 2 × 100Ah = <strong>200Ah</strong></li>
+              <li>Pack energy = 51.2V × 200Ah = <strong>10,240 Wh (10.24 kWh)</strong></li>
+            </ul>
+            <p class="mt-2">The configuration is <strong>16S2P</strong>. Each parallel string has 16 cells in series, and two such strings are connected in parallel to double the capacity.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Key Design Considerations</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Cell Matching</h4>
+            <p class="text-body-sm text-muted">
+              All cells in a pack should share the same chemistry, capacity, internal resistance, and manufacturing batch. Mismatched cells create imbalances where weaker cells hit voltage limits first, reducing the usable capacity of the entire pack and accelerating degradation of the weakest cells.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">BMS Requirements</h4>
+            <p class="text-body-sm text-muted">
+              A Battery Management System monitors every cell's voltage, current, and temperature. It performs cell balancing during charge, enforces over-charge and over-discharge cutoffs, and disconnects the pack during fault conditions. Without a BMS, series-connected lithium cells are a safety hazard.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Thermal Management</h4>
+            <p class="text-body-sm text-muted">
+              Cells generate heat during charge and discharge through I²R losses. At high currents, this heat can push cells beyond safe operating temperatures. Pack design must account for cooling — whether passive (heat sinks, airflow) or active (liquid cooling loops, forced air) — to maintain uniform temperature across all cells.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Busbar Sizing</h4>
+            <p class="text-body-sm text-muted">
+              Busbars and interconnects must carry the full pack current with minimal resistance. Undersized busbars create hot spots, voltage drops, and potential fire hazards. Calculate the required cross-section based on maximum continuous current, allowable temperature rise, and connection resistance at each joint.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">C-Rate and Pack Performance</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          The C-rate of a battery pack is determined by the C-rate of its individual cells. If each cell in the pack is rated for 1C continuous discharge, the pack as a whole can only deliver 1C at the pack level — no more. The series and parallel arrangement does not increase the C-rate; it only changes the absolute voltage and current values.
+        </p>
+        <p class="text-body-md text-body font-light">
+          A critical rule of thumb: the pack's maximum current is limited by the weakest cell in the series string. If one cell in a 16S pack has slightly higher internal resistance, it will heat up more under load and may trigger the BMS to derate the entire pack. This is why cell matching and quality control are essential during pack assembly.
+        </p>
+      </section>
+
+      <FormulaBox title="Pack C-Rate Formula">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          I_max_pack = N_series × I_max_cell (limited by weakest cell)
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Pack C-Rate = Cell C-Rate (unchanged)
+        </div>
+        <p>
+          A 16S2P pack using 1C, 100 Ah cells: I_max = 16 × 100A = 1,600V equivalent current path, but pack-level max current = 2 × 100A = 200A at 1C. The pack delivers 200A at 51.2V = 10.24 kW at 1C.
+        </p>
+      </FormulaBox>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Try It</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use the Battery Pack Calculator to design a custom pack configuration for your voltage and capacity requirements.
+          </p>
+          <a href="/tools/battery-pack-calculator" class="btn-primary text-xs py-3 px-6 inline-block">Open Battery Pack Calculator</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Try It</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use the Parallel String Calculator to determine optimal parallel configurations for your target capacity.
+          </p>
+          <a href="/tools/parallel-string-calculator" class="btn-primary text-xs py-3 px-6 inline-block">Open Parallel String Calculator</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Related Articles</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">
+              <a href="/learn/what-is-battery-c-rate" class="hover:text-m-blue-light transition-colors">What Is Battery C-Rate?</a>
+            </h4>
+            <p class="text-body-sm text-muted">
+              C-rate determines how fast a battery charges and discharges. Understanding C-rate is essential for sizing pack current capability and thermal management systems.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">
+              <a href="/learn/voltage-drop-explained" class="hover:text-m-blue-light transition-colors">Voltage Drop Explained</a>
+            </h4>
+            <p class="text-body-sm text-muted">
+              Voltage drop in busbars and cables reduces the usable voltage at the load. Minimizing connection resistance is critical in high-current battery pack designs.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

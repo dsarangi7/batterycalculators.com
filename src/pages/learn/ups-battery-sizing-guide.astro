@@ -1,0 +1,349 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import CalculatorCard from '../../components/CalculatorCard.astro';
+import FormulaBox from '../../components/FormulaBox.astro';
+import FAQSection from '../../components/FAQSection.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "How do I size a UPS battery for my computer?",
+    answer: "Start by measuring your computer and monitor power draw with a plug-in wattmeter. A typical desktop with monitor draws 150–350W. For 15 minutes of runtime, you need roughly 75–175 Wh of usable battery energy. A 600–1000VA UPS with internal batteries typically provides this. Use the Runtime Calculator to verify.",
+  },
+  {
+    question: "What runtime do medical equipment need from a UPS?",
+    answer: "Medical equipment typically requires 15–30 minutes of backup to allow for orderly shutdown or transfer to a generator. Life-critical devices like ventilators may require 60+ minutes or continuous backup with redundant battery banks. Always size medical UPS systems with at least 25% capacity margin above the calculated requirement.",
+  },
+  {
+    question: "How many batteries does a server UPS need?",
+    answer: "A standard 2U rack-mount UPS typically contains 2–4 internal batteries. For extended runtime, external battery modules (EBMs) add capacity in parallel. A data center UPS may have 16–32 batteries in a battery cabinet, providing 15–60 minutes of runtime at full load depending on the configuration.",
+  },
+  {
+    question: "Can I replace UPS lead-acid batteries with lithium?",
+    answer: "Some newer UPS models support lithium-ion batteries, but most legacy UPS units are designed for lead-acid voltage curves and charging profiles. Replacing lead-acid with lithium requires a compatible UPS or a battery management system that adapts the charging profile. Check your UPS manufacturer's specifications before attempting a chemistry swap.",
+  },
+];
+---
+
+<Layout
+  title="UPS Battery Sizing Guide | Battery Calculators"
+  description="How to size UPS batteries for computers, servers, and medical equipment. Covers runtime requirements by application, battery capacity formulas, and sizing examples."
+  canonical="https://batterycalculators.com/learn/ups-battery-sizing-guide"
+  schema="faqPage"
+  schemaName="UPS Battery Sizing Guide"
+  schemaDescription="Engineering guide to sizing UPS batteries for computers, servers, medical equipment, and critical infrastructure."
+  schemaUrl="https://batterycalculators.com/learn/ups-battery-sizing-guide"
+  faqItems={faqItems}
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/learn" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Back to Guides</a>
+      <Breadcrumb items={[
+        { label: "Learning Center", href: "/learn" },
+        { label: "UPS Battery Sizing Guide" }
+      ]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">APPLICATIONS</span>
+      <h1 class="text-display-md text-primary mb-6">UPS Battery Sizing Guide</h1>
+      <p class="text-body-md text-body font-light">
+        Sizing a UPS battery is fundamentally different from sizing a solar or off-grid battery. UPS batteries are designed for short-duration, high-reliability backup — they must deliver full power instantly when grid voltage drops, with zero transfer time. This guide covers how to calculate the battery capacity required for computers, servers, medical equipment, and other critical loads.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">How UPS Battery Sizing Works</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          A UPS contains a battery bank, an inverter, and a transfer switch. When grid power is present, the UPS passes power through to the load while keeping the battery charged. When grid power fails, the inverter draws from the battery and supplies AC power to the load with zero interruption. The battery must provide enough energy to sustain the load until either grid power returns or a generator starts.
+        </p>
+        <p class="text-body-md text-body font-light mb-4">
+          UPS battery sizing is driven by two parameters: the load power (in watts) and the required runtime (in minutes). The relationship is linear — doubling the runtime requires doubling the battery capacity, assuming the same load. Most consumer UPS units are optimized for 10–30 minutes of runtime at full load, which is sufficient for graceful shutdown but not for extended outages.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Application</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Typical Load</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Required Runtime</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Sizing Priority</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">Home desktop PC</td>
+                <td class="p-4 font-mono text-primary">150–350W</td>
+                <td class="p-4 font-mono text-primary">10–20 min</td>
+                <td class="p-4 text-muted">Save work, graceful shutdown</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Office workstation</td>
+                <td class="p-4 font-mono text-primary">200–500W</td>
+                <td class="p-4 font-mono text-primary">15–30 min</td>
+                <td class="p-4 text-muted">Save work, network cleanup</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Network server (1U–2U)</td>
+                <td class="p-4 font-mono text-primary">300–800W</td>
+                <td class="p-4 font-mono text-primary">15–45 min</td>
+                <td class="p-4 text-muted">Generator start or orderly shutdown</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Server rack (full)</td>
+                <td class="p-4 font-mono text-primary">2–10 kW</td>
+                <td class="p-4 font-mono text-primary">15–60 min</td>
+                <td class="p-4 text-muted">Generator start, failover</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Medical monitor / ventilator</td>
+                <td class="p-4 font-mono text-primary">100–500W</td>
+                <td class="p-4 font-mono text-primary">30–60+ min</td>
+                <td class="p-4 text-muted">Life safety, no interruption</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Medical imaging (MRI/CT)</td>
+                <td class="p-4 font-mono text-primary">10–50 kW</td>
+                <td class="p-4 font-mono text-primary">15–30 min</td>
+                <td class="p-4 text-muted">Protect equipment, orderly shutdown</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <FormulaBox title="UPS Battery Sizing Formulas">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Battery Energy (Wh) = Load (W) × Runtime (min) / 60
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Usable Energy (Wh) = Battery Energy × DoD × η_battery × η_inverter
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Required Battery (Wh) = Load (W) × Runtime (min) / 60 / DoD / η_battery / η_inverter
+        </div>
+        <p>
+          For lead-acid SLA batteries: DoD = 0.50, η_battery = 0.80, η_inverter = 0.88–0.92. Combined, this means only about 35–36% of the nominal battery capacity is usable energy at the load.
+        </p>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Required Ah = Required Battery (Wh) / Battery Voltage (V)
+        </div>
+        <p>
+          Most consumer UPS units use 12V batteries. For a 12V system: Ah = Wh / 12. For a 48V system (larger UPS): Ah = Wh / 48.
+        </p>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Worked Example: Desktop UPS</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Given:</strong></p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li>Desktop PC + monitor: 280W</li>
+              <li>Required runtime: 20 minutes</li>
+              <li>Battery voltage: 12V (internal SLA batteries)</li>
+              <li>DoD limit: 50% (lead-acid SLA)</li>
+              <li>Battery efficiency: 80%</li>
+              <li>Inverter efficiency: 90%</li>
+            </ul>
+            <p><strong>Step 1:</strong> Total energy needed at the load:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              280W × 20 min / 60 = 93.3 Wh
+            </div>
+            <p><strong>Step 2:</strong> Required battery capacity accounting for losses:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              93.3 / 0.50 / 0.80 / 0.90 = 259.2 Wh
+            </div>
+            <p><strong>Step 3:</strong> Convert to Ah at 12V:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              259.2 / 12 = 21.6 Ah
+            </div>
+            <p><strong>Step 4:</strong> Select battery configuration. Two 12V 12Ah SLA batteries in series (for 24V internal bus) or a single 12V 24Ah battery would meet the requirement. A typical 1000VA/600W UPS ships with 2× 12V 9Ah batteries (18 Ah total), which provides about 10 minutes at 280W — sufficient for many users but short of the 20-minute target. An extended runtime model with 2× 12V 18Ah batteries would be needed.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Runtime by UPS Size and Load</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          The following table shows approximate runtime for common UPS sizes at various load levels. Actual values depend on battery age, temperature, and manufacturer. Use these as planning estimates.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">UPS Rating</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Full Load</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">50% Load</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">25% Load</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Internal Batteries</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">350VA / 200W</td>
+                <td class="p-4 text-muted">~5 min</td>
+                <td class="p-4 text-muted">~12 min</td>
+                <td class="p-4 text-muted">~28 min</td>
+                <td class="p-4 font-mono text-primary">1× 12V 7Ah</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">600VA / 360W</td>
+                <td class="p-4 text-muted">~7 min</td>
+                <td class="p-4 text-muted">~18 min</td>
+                <td class="p-4 text-muted">~42 min</td>
+                <td class="p-4 font-mono text-primary">2× 12V 7Ah</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">1000VA / 600W</td>
+                <td class="p-4 text-muted">~10 min</td>
+                <td class="p-4 text-muted">~25 min</td>
+                <td class="p-4 text-muted">~55 min</td>
+                <td class="p-4 font-mono text-primary">2× 12V 9Ah</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">1500VA / 900W</td>
+                <td class="p-4 text-muted">~12 min</td>
+                <td class="p-4 text-muted">~30 min</td>
+                <td class="p-4 text-muted">~70 min</td>
+                <td class="p-4 font-mono text-primary">2× 12V 12Ah</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">3000VA / 2400W</td>
+                <td class="p-4 text-muted">~15 min</td>
+                <td class="p-4 text-muted">~40 min</td>
+                <td class="p-4 text-muted">~90 min</td>
+                <td class="p-4 font-mono text-primary">4× 12V 17Ah</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">5000VA / 4000W</td>
+                <td class="p-4 text-muted">~12 min</td>
+                <td class="p-4 text-muted">~35 min</td>
+                <td class="p-4 text-muted">~85 min</td>
+                <td class="p-4 font-mono text-primary">4× 12V 26Ah</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-body-sm text-muted mt-2">Runtime increases roughly proportionally as load decreases. Halving the load approximately doubles the runtime.</p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Extending UPS Runtime</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          When internal batteries do not provide sufficient runtime, there are several approaches to extend backup duration. The right choice depends on your runtime requirement, budget, and available space.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">External Battery Modules</h4>
+            <p class="text-body-sm text-muted">
+              EBMs connect to the UPS in parallel, adding battery capacity without replacing the UPS. A single EBM can double or triple runtime. Multiple EBMs can be daisy-chained for extended runtime. This is the most common approach for server and data center applications.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Larger Internal Batteries</h4>
+            <p class="text-body-sm text-muted">
+              Some UPS models accept higher Ah batteries in the same compartment. Upgrading from 9Ah to 12Ah or 18Ah cells can increase runtime by 30–100%. Verify physical dimensions and terminal compatibility before substituting.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Load Shedding</h4>
+            <p class="text-body-sm text-muted">
+              Reducing the load during an outage extends runtime proportionally. Disconnect non-essential devices (monitors, printers, peripherals) and keep only critical equipment on the UPS. Cutting load from 300W to 150W doubles runtime.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Generator Integration</h4>
+            <p class="text-body-sm text-muted">
+              For extended outages, a generator provides continuous power while the UPS bridges the gap during generator startup (typically 10–30 seconds). Size the UPS for generator start time, not full outage duration.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Medical Equipment Sizing Considerations</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Medical UPS systems have stricter requirements than standard IT UPS. The IEC 60601-1 standard specifies that medical electrical equipment must maintain power during patient care. Life-critical devices like ventilators, infusion pumps, and patient monitors require runtime measured in hours, not minutes.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Equipment</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Power Draw</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Minimum Runtime</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Notes</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">Patient monitor</td>
+                <td class="p-4 font-mono text-primary">50–150W</td>
+                <td class="p-4 font-mono text-primary">60 min</td>
+                <td class="p-4 text-muted">Continuous monitoring during transfer</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Ventilator</td>
+                <td class="p-4 font-mono text-primary">100–300W</td>
+                <td class="p-4 font-mono text-primary">60+ min</td>
+                <td class="p-4 text-muted">Life-critical, zero downtime</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Infusion pump</td>
+                <td class="p-4 font-mono text-primary">30–80W</td>
+                <td class="p-4 font-mono text-primary">60+ min</td>
+                <td class="p-4 text-muted">Medication delivery must not stop</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Surgical lighting</td>
+                <td class="p-4 font-mono text-primary">200–500W</td>
+                <td class="p-4 font-mono text-primary">15–30 min</td>
+                <td class="p-4 text-muted">Transition to backup lighting</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">MRI / CT scanner</td>
+                <td class="p-4 font-mono text-primary">10–50 kW</td>
+                <td class="p-4 font-mono text-primary">15–30 min</td>
+                <td class="p-4 text-muted">Protect imaging data, orderly shutdown</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Try It</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use the Runtime Calculator to estimate how long your UPS will sustain a given load.
+          </p>
+          <a href="/tools/runtime-calculator" class="btn-primary text-xs py-3 px-6 inline-block">Open Runtime Calculator</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Size a Battery</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Need a larger battery bank beyond standard UPS? Use the Battery Sizing Calculator.
+          </p>
+          <a href="/tools/battery-sizing-calculator" class="btn-primary-outline text-xs py-3 px-6 inline-block">Open Battery Sizing Calculator</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Related Articles</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">UPS Battery Runtime Guide</h4>
+            <p class="text-body-sm text-muted mb-3">How to estimate and extend UPS battery runtime with practical formulas.</p>
+            <a href="/learn/ups-battery-runtime-guide" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Read Guide →</a>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Home Battery Sizing Guide</h4>
+            <p class="text-body-sm text-muted mb-3">Sizing a residential battery backup for essential household loads during outages.</p>
+            <a href="/learn/home-battery-sizing-guide" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Read Guide →</a>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

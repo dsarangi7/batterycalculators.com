@@ -1,0 +1,292 @@
+---
+import CalculatorLayout from '../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../components/CalculatorCard.astro';
+import InputField from '../../components/InputField.astro';
+import ResultBox from '../../components/ResultBox.astro';
+import FormulaBox from '../../components/FormulaBox.astro';
+import FAQSection from '../../components/FAQSection.astro';
+import RelatedTools from '../../components/RelatedTools.astro';
+
+const whatIs = `A battery pack calculator designs series-parallel configurations from individual cells to achieve target voltage, capacity, and current specifications. <strong>Series connections</strong> increase voltage (cells stacked end-to-end), while <strong>parallel connections</strong> increase capacity (cells side-by-side). The SxP notation (e.g., 8S4P) describes the configuration: S = series count (sets voltage), P = parallel count (sets capacity). This tool calculates pack voltage, total capacity (Ah), energy (Wh/kWh), and maximum continuous current from cell-level specifications. Battery pack design is fundamental to EV battery modules, home energy storage systems, DIY powerwalls, marine propulsion banks, and custom portable power solutions.`;
+
+const whyItMatters = [
+  "Incorrect series count produces the wrong voltage — too few cells means the inverter won't operate; too many risks overvoltage damage.",
+  "Insufficient parallel count means the pack cannot deliver the required continuous current, causing BMS shutdowns under load.",
+  "Mixing cells from different batches or manufacturers causes imbalance, accelerated degradation, and potential safety hazards.",
+  "Undersized packs lead to deep discharge cycles that reduce battery lifespan, while oversized packs waste capital.",
+  "Understanding pack configuration is essential for BMS selection, as BMS units are rated for specific series counts and chemistry.",
+];
+
+const practicalApplications = [
+  { title: "EV Battery Modules", description: "Design battery modules for electric vehicles with specific voltage and capacity requirements." },
+  { title: "DIY Powerwall Builds", description: "Configure lithium battery packs for home energy storage from individual prismatic or cylindrical cells." },
+  { title: "Marine Propulsion Banks", description: "Design high-capacity, high-current battery banks for electric boat propulsion systems." },
+  { title: "Portable Power Stations", description: "Size compact battery packs for camping, emergency, and mobile power applications." },
+  { title: "Telecom Backup Systems", description: "Configure 48V battery banks from individual cells for telecom tower backup power." },
+  { title: "Robotics & UAV", description: "Design lightweight, high-discharge battery packs for robotic and drone applications." },
+];
+
+const expertNotes = [
+  { title: 'Cell Matching', variant: 'warning', content: 'Never mix different cell chemistries, capacities, or age conditions in a single pack. Mismatched cells cause uneven charge distribution, reduced performance, safety hazards, and accelerated degradation. Always use identical cells from the same manufacturer and production batch.' },
+  { title: 'BMS Compatibility', variant: 'engineering', content: 'Ensure your BMS supports the series count and chemistry of your configuration. A 4S BMS cannot protect an 8S pack. BMS units are chemistry-specific — an LFP BMS has different voltage thresholds than an NMC BMS.' },
+];
+
+const trustSection = {
+  text: "Pack configuration formulas (V_pack = V_cell × S, Ah_pack = Ah_cell × P, Wh = V × Ah) are fundamental electrical engineering relationships. All calculations are transparent and follow standard industry conventions for battery pack design.",
+  link: { label: "View our full methodology", href: "/methodology" },
+};
+
+const references = [
+  { title: "Battery University — Building Battery Packs", url: "https://batteryuniversity.com/article/bu-104-1a-electrical-connections-in-packs", source: "Battery University / Cadex Electronics" },
+  { title: "JBD BMS — Series/Parallel Configuration Guide", url: "https://www.jbdbms.com/", source: "JBD BMS Manufacturer" },
+  { title: "EVE Energy — Cell Specifications and Pack Design", url: "https://www.evebattery.com/", source: "EVE Energy Co., Ltd" },
+];
+
+const faqItems = [
+  {
+    question: "What is the difference between series and parallel cell connections?",
+    answer: "In series, cells are connected end-to-end to increase voltage (e.g., 8 × 3.2V cells = 25.6V). In parallel, cells are connected side-by-side to increase capacity (e.g., 4 × 100Ah cells = 400Ah). A battery pack typically uses both: series for voltage, parallel for capacity.",
+  },
+  {
+    question: "How do I choose the right cell for my battery pack?",
+    answer: "Select a cell whose nominal voltage matches your target pack voltage when arranged in series. Common choices: LFP (3.2V nominal) for safety and cycle life, NMC (3.7V nominal) for higher energy density. Ensure the cell's maximum continuous discharge current meets your load requirements.",
+  },
+  {
+    question: "What does the SxP notation mean?",
+    answer: "SxP notation describes a battery pack's configuration. 'S' = number of cells in series (sets voltage), 'P' = number of cells in parallel (sets capacity). For example, 8S4P means 8 cells in series and 4 parallel strings, totaling 32 cells.",
+  },
+  {
+    question: "Can I mix different cell types in a pack?",
+    answer: "No. Never mix different cell chemistries, capacities, or age conditions in a single pack. Mismatched cells cause uneven charge distribution, reduced performance, safety hazards, and accelerated degradation. Always use identical cells from the same manufacturer and batch.",
+  },
+  {
+    question: "How many cells do I need for a 48V battery?",
+    answer: "For LFP (3.2V nominal): 16S = 51.2V nominal (common for 48V systems). For NMC (3.7V nominal): 13S = 48.1V or 14S = 51.8V. The exact count depends on your chemistry and the voltage range of your inverter.",
+  },
+  {
+    question: "What is the total cell count formula?",
+    answer: "Total cells = Series count × Parallel count. For example, an 8S4P configuration uses 32 cells. An 16S2P configuration uses 32 cells but produces double the voltage at half the parallel capacity.",
+  },
+  {
+    question: "How does parallel count affect max current?",
+    answer: "Maximum pack current = Cell max current × Parallel count. If each cell supports 50A continuous, a 4P configuration supports 200A total. This is the safe continuous discharge limit for the entire pack.",
+  },
+  {
+    question: "Should I design series-first or parallel-first?",
+    answer: "Series-first (S then P) is standard for most applications — it creates a high-voltage string that is then paralleled for capacity. Parallel-first (P then S) can be safer for high-current applications but requires careful busbar sizing.",
+  },
+  {
+    question: "What voltage should I target for my application?",
+    answer: "12V: Small portable systems. 24V: Medium off-grid, RV. 48V: Residential solar, telecom, most modern inverters. Higher voltage reduces current for the same power, enabling thinner cables and lower losses.",
+  },
+  {
+    question: "How do I account for BMS overhead?",
+    answer: "BMS units consume 10–50mA continuously for monitoring and balancing. Over a month, this can drain 7–36 Ah. Factor BMS standby consumption into very low-load or long-autonomy applications.",
+  },
+  {
+    question: "Can I add cells to an existing pack?",
+    answer: "Only add identical cells (same chemistry, capacity, manufacturer, batch) to an existing pack. Adding different cells creates imbalance. New cells should be pre-balanced to match the existing pack voltage before connection.",
+  },
+];
+---
+
+<CalculatorLayout
+  title="Battery Pack Calculator | Battery Calculators"
+  description="Design battery packs from individual cells. Calculate pack voltage, capacity, energy, and maximum current for any series-parallel cell configuration."
+  faqItems={faqItems}
+  relatedCalculators={[
+    { href: "/tools/parallel-string-calculator", title: "Parallel String Calculator", description: "Design series/parallel configurations for target voltage and capacity." },
+    { href: "/tools/c-rate-calculator", title: "C-Rate Calculator", description: "Calculate charge and discharge rates for your cells." },
+    { href: "/tools/battery-sizing-calculator", title: "Battery Sizing Calculator", description: "Determine overall bank size for your application." },
+    { href: "/tools/runtime-calculator", title: "Runtime Calculator", description: "Compute runtime from load wattage profiles." },
+    { href: "/tools/battery-degradation-estimator", title: "Degradation Estimator", description: "Estimate capacity fading over time." },
+    { href: "/tools/soc-estimator", title: "SOC Estimator", description: "Interpolate State of Charge from voltage." },
+  ]}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+
+    <!-- Input Form -->
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Cell Parameters</h3>
+      <div class="flex flex-col gap-6">
+
+        <InputField id="cell-voltage" label="Cell Nominal Voltage" value={3.2} min={1} max={5} step={0.1} unit="V" helperText="LFP: 3.2V, NMC: 3.7V, NCA: 3.6V, Lead-Acid: 2.0V" />
+
+        <InputField id="cell-capacity" label="Cell Capacity" value={100} min={1} step={1} unit="Ah" helperText="Amp-hour capacity of a single cell." />
+
+        <InputField id="series-count" label="Cells in Series" value={8} min={1} max={200} step={1} helperText="Sets pack voltage. 8 × 3.2V = 25.6V for a 24V nominal system." />
+
+        <InputField id="parallel-count" label="Cells in Parallel" value={4} min={1} max={200} step={1} helperText="Sets pack capacity. 4 × 100Ah = 400Ah pack capacity." />
+
+        <InputField id="cell-max-current" label="Max Continuous Current per Cell" value={50} min={1} step={1} unit="A" helperText="Maximum safe continuous discharge current per cell." />
+
+      </div>
+    </CalculatorCard>
+
+    <!-- Results -->
+    <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Pack Specifications</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <ResultBox
+            label="Pack Nominal Voltage"
+            value="25.6 V"
+            suffix="8S configuration"
+            variant="primary"
+            id="result-voltage"
+          />
+          <ResultBox
+            label="Pack Capacity"
+            value="400 Ah"
+            suffix="4P configuration"
+            id="result-capacity"
+          />
+          <ResultBox
+            label="Pack Energy"
+            value="10,240 Wh"
+            suffix="10.24 kWh"
+            id="result-energy"
+          />
+          <ResultBox
+            label="Max Continuous Current"
+            value="200 A"
+            suffix="Pack discharge limit"
+            id="result-max-current"
+          />
+        </div>
+      </div>
+
+      <div class="border-t border-hairline pt-6">
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">Configuration Summary</h4>
+        <p class="text-body-sm text-muted" id="config-summary">
+          8S4P — 32 total cells (8 series × 4 parallel)
+        </p>
+      </div>
+    </CalculatorCard>
+
+  </div>
+
+  <!-- Formulas -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+
+      <FormulaBox title="Mathematical Formulas">
+        <p>
+          A battery pack's electrical characteristics are determined by the number of cells in series and parallel:
+        </p>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Pack Voltage = Cell Voltage × Series Count
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Pack Capacity = Cell Capacity × Parallel Count
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Pack Energy = Pack Voltage × Pack Capacity
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Max Pack Current = Cell Max Current × Parallel Count
+        </div>
+        <p>
+          Total cells = Series Count × Parallel Count. All cells must be identical in chemistry, capacity, and age.
+        </p>
+      </FormulaBox>
+
+      <div>
+        <h2 class="text-title-lg text-primary uppercase mb-6 tracking-wider">Worked Engineering Example</h2>
+        <div class="text-body-sm text-muted flex flex-col gap-4">
+          <p>Given cell parameters:</p>
+          <ul class="list-disc pl-6 flex flex-col gap-1">
+            <li><strong>Cell voltage:</strong> 3.2V (LFP) | <strong>Cell capacity:</strong> 100Ah</li>
+            <li><strong>Series count:</strong> 8 | <strong>Parallel count:</strong> 4</li>
+            <li><strong>Max current per cell:</strong> 50A</li>
+          </ul>
+
+          <p><strong>Step 1:</strong> Calculate pack voltage:</p>
+          <div class="font-mono text-primary">Pack Voltage = 3.2V × 8 = 25.6V</div>
+
+          <p><strong>Step 2:</strong> Calculate pack capacity:</p>
+          <div class="font-mono text-primary">Pack Capacity = 100Ah × 4 = 400Ah</div>
+
+          <p><strong>Step 3:</strong> Calculate pack energy:</p>
+          <div class="font-mono text-primary">Pack Energy = 25.6V × 400Ah = 10,240 Wh = 10.24 kWh</div>
+
+          <p><strong>Step 4:</strong> Calculate max continuous current:</p>
+          <div class="font-mono text-primary">Max Current = 50A × 4 = 200A</div>
+
+          <p><strong>Result:</strong> An 8S4P pack of 32 × 100Ah LFP cells delivers 25.6V, 400Ah, 10.24 kWh, with a 200A continuous discharge limit.</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <FAQSection items={faqItems} />
+
+  <!-- Calculation Script -->
+  <script>
+    import { calculateBatteryPack } from '../../utils/calculators';
+
+    const cellVoltageInput = document.getElementById('cell-voltage') as HTMLInputElement;
+    const cellCapacityInput = document.getElementById('cell-capacity') as HTMLInputElement;
+    const seriesCountInput = document.getElementById('series-count') as HTMLInputElement;
+    const parallelCountInput = document.getElementById('parallel-count') as HTMLInputElement;
+    const cellMaxCurrentInput = document.getElementById('cell-max-current') as HTMLInputElement;
+
+    const resultVoltageBox = document.getElementById('result-voltage');
+    const resultVoltageValue = resultVoltageBox?.querySelector('.text-display-md') as HTMLElement;
+    const resultVoltageSuffix = resultVoltageBox?.querySelector('.text-caption') as HTMLElement;
+
+    const resultCapacityBox = document.getElementById('result-capacity');
+    const resultCapacityValue = resultCapacityBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultCapacitySuffix = resultCapacityBox?.querySelector('.text-caption') as HTMLElement;
+
+    const resultEnergyBox = document.getElementById('result-energy');
+    const resultEnergyValue = resultEnergyBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultEnergySuffix = resultEnergyBox?.querySelector('.text-caption') as HTMLElement;
+
+    const resultMaxCurrentBox = document.getElementById('result-max-current');
+    const resultMaxCurrentValue = resultMaxCurrentBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultMaxCurrentSuffix = resultMaxCurrentBox?.querySelector('.text-caption') as HTMLElement;
+
+    const configSummaryEl = document.getElementById('config-summary');
+
+    function updateCalculations() {
+      const cellVoltage = parseFloat(cellVoltageInput.value) || 3.2;
+      const cellCapacity = parseFloat(cellCapacityInput.value) || 100;
+      const seriesCount = parseInt(seriesCountInput.value) || 8;
+      const parallelCount = parseInt(parallelCountInput.value) || 4;
+      const cellMaxCurrent = parseFloat(cellMaxCurrentInput.value) || 50;
+
+      const results = calculateBatteryPack(cellVoltage, cellCapacity, seriesCount, parallelCount, cellMaxCurrent);
+
+      if (resultVoltageValue) resultVoltageValue.textContent = `${results.packVoltageV.toFixed(1)} V`;
+      if (resultVoltageSuffix) resultVoltageSuffix.textContent = `${seriesCount}S configuration`;
+
+      if (resultCapacityValue) resultCapacityValue.textContent = `${results.packCapacityAh.toFixed(0)} Ah`;
+      if (resultCapacitySuffix) resultCapacitySuffix.textContent = `${parallelCount}P configuration`;
+
+      if (resultEnergyValue) resultEnergyValue.textContent = `${Math.round(results.packEnergyWh).toLocaleString()} Wh`;
+      if (resultEnergySuffix) resultEnergySuffix.textContent = `${results.packEnergyKwh.toFixed(2)} kWh`;
+
+      if (resultMaxCurrentValue) resultMaxCurrentValue.textContent = `${results.maxContinuousCurrentA.toFixed(0)} A`;
+      if (resultMaxCurrentSuffix) resultMaxCurrentSuffix.textContent = 'Pack discharge limit';
+
+      if (configSummaryEl) configSummaryEl.textContent = results.configSummary;
+    }
+
+    [cellVoltageInput, cellCapacityInput, seriesCountInput, parallelCountInput, cellMaxCurrentInput].forEach(el => {
+      el.addEventListener('input', updateCalculations);
+    });
+
+    updateCalculations();
+  </script>
+
+</CalculatorLayout>

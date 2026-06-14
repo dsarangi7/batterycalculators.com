@@ -1,0 +1,206 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import CalculatorCard from '../../components/CalculatorCard.astro';
+import FormulaBox from '../../components/FormulaBox.astro';
+import FAQSection from '../../components/FAQSection.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "What is the basic battery runtime formula?",
+    answer: "Runtime (hours) = (Capacity Ah × Voltage V × DoD%) ÷ (Load W ÷ Efficiency%). For example: (100Ah × 12.8V × 0.80) ÷ (200W ÷ 0.90) = 4.6 hours.",
+  },
+  {
+    question: "How do I convert Ah to Wh for runtime calculations?",
+    answer: "Multiply Ah by the nominal voltage: Wh = Ah × V. A 100Ah 12.8V battery stores 1,280 Wh. Apply DoD to get usable Wh: 1,280 × 0.80 = 1,024 Wh usable.",
+  },
+  {
+    question: "What efficiency value should I use?",
+    answer: "For AC loads through an inverter, use 85–92% depending on inverter quality and load level. For DC loads, use 95–99% (wiring losses only). For solar systems, include charge controller efficiency (95–98%).",
+  },
+  {
+    question: "How do I account for temperature in runtime formulas?",
+    answer: "Apply a temperature derating factor: 0.95 at 10°C, 0.90 at 0°C, 0.80 at -10°C, 0.70 at -20°C. Multiply the usable energy by this factor before dividing by load.",
+  },
+];
+---
+
+<Layout
+  title="Battery Runtime Formula | Battery Calculators"
+  description="Complete reference for battery runtime formulas: Ah to Wh conversion, efficiency corrections, temperature derating, and voltage calculations for all battery types."
+  canonical="https://batterycalculators.com/learn/battery-runtime-formula"
+  schema="faqPage"
+  schemaName="Battery Runtime Formula"
+  schemaDescription="Reference sheet for all battery runtime calculation formulas."
+  schemaUrl="https://batterycalculators.com/learn/battery-runtime-formula"
+  faqItems={faqItems}
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/learn" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Back to Guides</a>
+      <Breadcrumb items={[
+        { label: "Learning Center", href: "/learn" },
+        { label: "Battery Runtime Formula" }
+      ]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">REFERENCE</span>
+      <h1 class="text-display-md text-primary mb-6">Battery Runtime Formula</h1>
+      <p class="text-body-md text-body font-light">
+        A quick-reference formula sheet for calculating battery runtime across all common scenarios. Bookmark this page for fast access to the exact formulas you need.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Core Formulas</h2>
+        <FormulaBox title="Fundamental Runtime">
+          <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+            Total Energy (Wh) = Capacity (Ah) × Nominal Voltage (V)
+          </div>
+          <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+            Usable Energy (Wh) = Total Energy × (DoD% / 100)
+          </div>
+          <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+            Effective Load (W) = Actual Load (W) / (System Efficiency / 100)
+          </div>
+          <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+            Runtime (hours) = Usable Energy (Wh) / Effective Load (W)
+          </div>
+        </FormulaBox>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Ah to Wh Conversion</h2>
+        <FormulaBox title="Capacity Conversion">
+          <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+            Energy (Wh) = Capacity (Ah) × Voltage (V)
+          </div>
+          <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+            Capacity (Ah) = Energy (Wh) / Voltage (V)
+          </div>
+          <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+            Current (A) = Power (W) / Voltage (V)
+          </div>
+          <p>Common pack voltages: 12V (3S/4S), 24V (7S/8S), 36V (10S/11S), 48V (14S/16S).</p>
+        </FormulaBox>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Inverter Efficiency</h2>
+        <FormulaBox title="AC Load Runtime">
+          <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+            Effective Load (W) = AC Load (W) / Inverter Efficiency
+          </div>
+          <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+            Runtime (h) = Usable Energy (Wh) / Effective Load (W)
+          </div>
+          <p>Typical inverter efficiency: 85–92% at 50–80% load. Drops to 75–80% at 10% load.</p>
+        </FormulaBox>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Temperature Derating</h2>
+        <FormulaBox title="Cold Weather Correction">
+          <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+            Derated Energy = Usable Energy × Temperature Factor
+          </div>
+          <div class="bg-surface-soft border border-hairline overflow-hidden my-4">
+            <table class="w-full text-left text-body-sm">
+              <thead>
+                <tr class="border-b border-hairline bg-surface-card">
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Temperature</th>
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">LFP Factor</th>
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Lead-Acid Factor</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-hairline">
+                <tr><td class="p-4 text-muted">25°C</td><td class="p-4 font-mono text-primary">1.00</td><td class="p-4 font-mono text-primary">1.00</td></tr>
+                <tr><td class="p-4 text-muted">10°C</td><td class="p-4 font-mono text-primary">0.95</td><td class="p-4 text-muted">0.90</td></tr>
+                <tr><td class="p-4 text-muted">0°C</td><td class="p-4 font-mono text-primary">0.90</td><td class="p-4 text-muted">0.80</td></tr>
+                <tr><td class="p-4 text-muted">-10°C</td><td class="p-4 font-mono text-primary">0.80</td><td class="p-4 text-muted">0.65</td></tr>
+                <tr><td class="p-4 text-muted">-20°C</td><td class="p-4 font-mono text-primary">0.70</td><td class="p-4 text-muted">0.50</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </FormulaBox>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Peukert Effect (Lead-Acid Only)</h2>
+        <FormulaBox title="Lead-Acid Derating">
+          <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+            Effective Ah = Rated Ah × (C-rate / 0.05C)^(n-1)
+          </div>
+          <p>
+            Where n is the Peukert exponent (1.1–1.3 for AGM, 1.3–1.6 for flooded). At 0.05C (20-hour rate), the battery delivers its full rated capacity. At higher rates, effective capacity decreases.
+          </p>
+          <p class="mt-2">
+            Lithium batteries have a Peukert exponent near 1.0, meaning they deliver nearly full capacity at any reasonable discharge rate.
+          </p>
+        </FormulaBox>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Quick Reference Table</h2>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Scenario</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Formula</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">DC load, no inverter</td>
+                <td class="p-4 font-mono text-primary text-[11px]">Ah × V × DoD / Load</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">AC load through inverter</td>
+                <td class="p-4 font-mono text-primary text-[11px]">Ah × V × DoD / (Load / η_inv)</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">With temperature derating</td>
+                <td class="p-4 font-mono text-primary text-[11px]">Ah × V × DoD × TempFactor / Load</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Solar + battery system</td>
+                <td class="p-4 font-mono text-primary text-[11px]">Ah × V × DoD / (Load / (η_inv × η_wiring))</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Try It</h4>
+          <p class="text-body-sm text-muted mb-4">Use the Runtime Calculator to apply these formulas to your system.</p>
+          <a href="/tools/runtime-calculator" class="btn-primary text-xs py-3 px-6 inline-block">Open Runtime Calculator</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Related</h4>
+          <p class="text-body-sm text-muted mb-4">Use the Inverter Battery Calculator for AC system sizing.</p>
+          <a href="/tools/inverter-battery-calculator" class="btn-primary-outline text-xs py-3 px-6 inline-block">Inverter Battery Calculator</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Related Articles</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">How to Calculate Battery Runtime</h4>
+            <p class="text-body-sm text-muted mb-3">The step-by-step engineering method explained in detail.</p>
+            <a href="/learn/how-to-calculate-battery-runtime" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Read Guide →</a>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">12V vs 24V vs 48V Runtime</h4>
+            <p class="text-body-sm text-muted mb-3">How voltage choice affects system efficiency and runtime.</p>
+            <a href="/learn/12v-vs-24v-vs-48v-runtime" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Read Guide →</a>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

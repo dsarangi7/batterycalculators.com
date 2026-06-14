@@ -1,0 +1,431 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import CalculatorCard from "../../components/CalculatorCard.astro";
+import FAQSection from "../../components/FAQSection.astro";
+import ReferenceChart from "../../components/ReferenceChart.astro";
+
+const faqItems = [
+  {
+    question: "Why is LiFePO4 SOC hard to determine from voltage?",
+    answer:
+      "LiFePO4 has an extremely flat voltage plateau between 20% and 80% SOC. The voltage difference across this entire range is only about 0.2V per cell (0.8V for a 12V pack). A typical multimeter cannot resolve this difference reliably, making voltage-based SOC estimation impractical for the middle 60% of the charge curve.",
+  },
+  {
+    question: "What is coulomb counting?",
+    answer:
+      "Coulomb counting measures the total charge entering and leaving a battery by integrating current over time. The BMS tracks amp-hours in and out to maintain a running SOC estimate. It is more accurate than voltage-based methods in the flat plateau region, but can drift over time and needs periodic recalibration.",
+  },
+  {
+    question:
+      "What is the difference between resting voltage and loaded voltage?",
+    answer:
+      "Resting voltage (OCV) is measured after the battery has been idle for 30+ minutes with no current flow. Loaded voltage is measured while the battery is supplying current and is always lower due to internal resistance (V = OCV − I × R). The difference can be 0.5V or more under heavy load.",
+  },
+  {
+    question: "How do I recalibrate my BMS SOC?",
+    answer:
+      "Perform a full charge to 100% (absorb for 30+ minutes), then a full discharge to the BMS cutoff, then recharge to 100%. This calibration cycle aligns the coulomb counter with the actual cell voltage endpoints. Some BMS units also allow a manual SOC reset via Bluetooth or a configuration tool.",
+  },
+];
+
+const tableOfContents = [
+  { id: "the-flat-curve-problem", label: "The Flat Curve Problem" },
+  { id: "coulomb-counting", label: "Coulomb Counting" },
+  { id: "resting-vs-loaded", label: "Resting vs Loaded Voltage" },
+  { id: "soc-table", label: "SOC Reference Table" },
+  { id: "best-practices", label: "Best Practices" },
+  { id: "common-mistakes", label: "Common Mistakes" },
+];
+
+const relatedCalculators = [
+  { title: "SOC Estimator", href: "/tools/soc-estimator" },
+  { title: "Battery Runtime Calculator", href: "/tools/runtime-calculator" },
+];
+
+const references = [
+  {
+    title: "Battery University — State-of-Charge Determination",
+    url: "https://batteryuniversity.com/article/bu-902-how-to-measure-state-of-charge",
+  },
+  {
+    title: "Texas Instruments — Coulomb Counting for Li-ion",
+    url: "https://www.ti.com/lit/an/slua863a/slua863a.pdf",
+  },
+];
+---
+
+<Layout
+  title="LiFePO4 SOC Chart — State of Charge vs Voltage | Battery Calculators"
+  description="Why LiFePO4 voltage is flat in the middle SOC range, how coulomb counting works, and the difference between resting and loaded voltage for LFP batteries."
+  faqItems={faqItems}
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a
+        href="/learn"
+        class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block"
+        >&larr; Back to Guides</a
+      >
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4"
+        >REFERENCE</span
+      >
+      <h1 class="text-display-md text-primary mb-6">LiFePO4 SOC Chart</h1>
+      <p class="text-body-md text-body font-light">
+        Understanding why LiFePO4 voltage is a poor SOC indicator in the middle
+        range, and why coulomb counting is often the better method.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section id="the-flat-curve-problem">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          The Flat Curve Problem
+        </h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Most battery chemistries have a relatively linear relationship between
+          voltage and state of charge. Lead-acid batteries, for example, show a
+          clear voltage drop as SOC decreases. LiFePO4 does not. The discharge
+          curve of a LiFePO4 cell is nearly flat between 20% and 80% SOC,
+          hovering around 3.2V per cell.
+        </p>
+        <p class="text-body-md text-body font-light mb-4">
+          This flat plateau is actually an advantage for power delivery — the
+          voltage stays stable across a wide SOC range, which means the device
+          being powered sees consistent voltage. But it creates a significant
+          challenge for SOC estimation. When the voltage at 30% SOC is
+          essentially identical to the voltage at 70% SOC, you cannot
+          meaningfully estimate SOC from voltage alone.
+        </p>
+        <p class="text-body-md text-body font-light">
+          The voltage only becomes a useful SOC indicator at the extremes: above
+          80% SOC where the curve steepens toward the charge endpoint, and below
+          20% SOC where it drops toward the discharge cutoff. For the middle 60%
+          of the charge curve, a different approach is needed.
+        </p>
+      </section>
+
+      <section id="coulomb-counting">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          Coulomb Counting
+        </h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Coulomb counting is the method most BMS units use to track SOC. It
+          works by measuring the current flowing in and out of the battery and
+          integrating it over time. If you start at 100% SOC and draw 10A for 5
+          hours, the BMS calculates that 50Ah have been removed, reducing SOC by
+          50% on a 100Ah battery.
+        </p>
+        <p class="text-body-md text-body font-light mb-4">
+          Coulomb counting is accurate within the flat plateau region where
+          voltage provides no information. However, it has its own limitations.
+          Small measurement errors accumulate over time, causing SOC drift.
+          Temperature affects actual capacity, and the BMS may not track this
+          perfectly. Periodic full charge-discharge cycles recalibrate the
+          coulomb counter against the known voltage endpoints.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Advantages</h4>
+            <p class="text-body-sm text-muted">
+              Accurate in the flat plateau region. Works under load. Provides
+              continuous SOC updates. No need for the battery to rest. Used by
+              virtually all modern BMS units.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Limitations</h4>
+            <p class="text-body-sm text-muted">
+              Drifts over time without recalibration. Initial SOC must be set
+              correctly (usually by charging to 100%). Temperature affects
+              actual capacity. Current sensor accuracy matters.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <section id="resting-vs-loaded">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          Resting vs Loaded Voltage
+        </h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Resting voltage (open-circuit voltage, or OCV) is measured when no
+          current is flowing. This is the truest representation of the cell's
+          electrochemical state. Loaded voltage is measured while the battery is
+          supplying current and is always lower due to internal resistance. The
+          difference follows Ohm's law: V_loaded = V_OCV − (I × R_internal).
+        </p>
+        <p class="text-body-md text-body font-light mb-4">
+          For a LiFePO4 cell with 20mΩ internal resistance under 50A load, the
+          voltage drop is 1.0V — a significant deviation from the resting value.
+          This means a battery reading 13.2V at rest might read 12.2V under a
+          50A load on a 12V pack. If you are trying to estimate SOC from a
+          voltage reading taken under load, the result will be misleadingly low.
+        </p>
+        <p class="text-body-md text-body font-light">
+          For reliable SOC estimation from voltage, always measure after the
+          battery has been idle for at least 30 minutes. For systems that need
+          SOC under load, rely on the BMS coulomb counter rather than a voltage
+          reading.
+        </p>
+      </section>
+
+      <section id="soc-table">
+        <ReferenceChart
+          type="line"
+          title="LiFePO4 Resting Voltage vs SOC"
+          description="Approximate relationship for a 12V pack; voltage is less informative in the middle SOC plateau."
+          xLabel="SOC %"
+          yLabel="Voltage (V)"
+          data={[
+            { x: 0, y: 12.0, label: "0%" },
+            { x: 10, y: 12.6, label: "10%" },
+            { x: 20, y: 12.9, label: "20%" },
+            { x: 30, y: 13.0, label: "30%" },
+            { x: 40, y: 13.1, label: "40%" },
+            { x: 50, y: 13.1, label: "50%" },
+            { x: 60, y: 13.2, label: "60%" },
+            { x: 70, y: 13.2, label: "70%" },
+            { x: 80, y: 13.3, label: "80%" },
+            { x: 90, y: 13.4, label: "90%" },
+            { x: 100, y: 13.6, label: "100%" },
+          ]}
+          yMin={11.5}
+          yMax={14.0}
+          caption="Values are approximate resting voltages at 25°C. Actual values vary by manufacturer, cell age, temperature, and measurement conditions."
+        />
+
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          SOC Reference Table
+        </h2>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-body-sm min-w-[640px]">
+              <thead>
+                <tr class="border-b border-hairline bg-surface-card">
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >SOC %</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >Cell Voltage (OCV)</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >12V Pack</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >24V Pack</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >Voltage Resolution Needed</th
+                  >
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-hairline">
+                <tr>
+                  <td class="p-4 font-mono text-primary">100%</td>
+                  <td class="p-4 text-muted">3.40V</td>
+                  <td class="p-4 text-muted">13.6V</td>
+                  <td class="p-4 text-muted">27.2V</td>
+                  <td class="p-4 text-muted">Easy — clear signal</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">90%</td>
+                  <td class="p-4 text-muted">3.35V</td>
+                  <td class="p-4 text-muted">13.4V</td>
+                  <td class="p-4 text-muted">26.8V</td>
+                  <td class="p-4 text-muted">Detectable</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">80%</td>
+                  <td class="p-4 text-muted">3.32V</td>
+                  <td class="p-4 text-muted">13.3V</td>
+                  <td class="p-4 text-muted">26.6V</td>
+                  <td class="p-4 text-muted">Still distinguishable</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">70%</td>
+                  <td class="p-4 text-muted">3.30V</td>
+                  <td class="p-4 text-muted">13.2V</td>
+                  <td class="p-4 text-muted">26.4V</td>
+                  <td class="p-4 text-muted">Difficult</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">60%</td>
+                  <td class="p-4 text-muted">3.29V</td>
+                  <td class="p-4 text-muted">13.2V</td>
+                  <td class="p-4 text-muted">26.4V</td>
+                  <td class="p-4 text-muted">Indistinguishable from 70%</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">50%</td>
+                  <td class="p-4 text-muted">3.28V</td>
+                  <td class="p-4 text-muted">13.1V</td>
+                  <td class="p-4 text-muted">26.2V</td>
+                  <td class="p-4 text-muted">Indistinguishable from 40–60%</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">40%</td>
+                  <td class="p-4 text-muted">3.27V</td>
+                  <td class="p-4 text-muted">13.1V</td>
+                  <td class="p-4 text-muted">26.2V</td>
+                  <td class="p-4 text-muted">Indistinguishable from 30–50%</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">30%</td>
+                  <td class="p-4 text-muted">3.26V</td>
+                  <td class="p-4 text-muted">13.0V</td>
+                  <td class="p-4 text-muted">26.0V</td>
+                  <td class="p-4 text-muted">Difficult</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">20%</td>
+                  <td class="p-4 text-muted">3.22V</td>
+                  <td class="p-4 text-muted">12.9V</td>
+                  <td class="p-4 text-muted">25.8V</td>
+                  <td class="p-4 text-muted">Detectable</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">10%</td>
+                  <td class="p-4 text-muted">3.15V</td>
+                  <td class="p-4 text-muted">12.6V</td>
+                  <td class="p-4 text-muted">25.2V</td>
+                  <td class="p-4 text-muted">Easy — clear drop</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">0%</td>
+                  <td class="p-4 text-muted">3.00V</td>
+                  <td class="p-4 text-muted">12.0V</td>
+                  <td class="p-4 text-muted">24.0V</td>
+                  <td class="p-4 text-muted">Clear — cutoff voltage</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <p class="text-caption text-muted mt-3">
+          Values are approximate resting voltages at 25°C. Actual values vary by
+          manufacturer and cell age.
+        </p>
+      </section>
+
+      <section id="best-practices">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          Best Practices
+        </h2>
+        <p class="text-body-md text-body font-light mb-4">
+          For most applications, use a BMS with coulomb counting as the primary
+          SOC method, and voltage as a cross-check at the charge endpoints.
+          Calibrate the BMS periodically by fully charging to 100% (the BMS
+          resets SOC to 100% when it detects the charge endpoint voltage).
+        </p>
+        <p class="text-body-md text-body font-light mb-4">
+          If you are building a custom system without a sophisticated BMS, you
+          can estimate SOC from voltage — but only at the extremes. Above 80% or
+          below 20% SOC, voltage provides a reasonable estimate. In the middle
+          range, you must track amp-hours manually or accept that SOC is
+          unknown.
+        </p>
+        <p class="text-body-md text-body font-light">
+          For critical applications (medical, telecom, BESS), use both methods
+          in parallel. The BMS coulomb counter provides continuous SOC, while
+          periodic voltage checks at rest confirm the coulomb counter has not
+          drifted.
+        </p>
+      </section>
+
+      <section id="common-mistakes">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          Common Mistakes
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">
+              Using a Voltmeter for Mid-Range SOC
+            </h4>
+            <p class="text-body-sm text-muted">
+              A standard multimeter with 0.1V resolution cannot distinguish
+              between 30% and 70% SOC on a LiFePO4 pack. The voltage difference
+              is smaller than the meter's resolution. Do not rely on voltage
+              alone for SOC in the flat plateau.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">
+              Ignoring Calibration Drift
+            </h4>
+            <p class="text-body-sm text-muted">
+              Coulomb counters drift over time. If you never fully charge and
+              discharge the battery, the BMS SOC reading becomes increasingly
+              inaccurate. Perform a full calibration cycle every 1–3 months for
+              best accuracy.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">
+              Measuring Voltage Under Load
+            </h4>
+            <p class="text-body-sm text-muted">
+              Voltage measured while the battery is discharging is lower than
+              the resting voltage due to internal resistance. This gives a
+              falsely low SOC estimate. Always disconnect loads and wait 30+
+              minutes before taking a voltage-based SOC reading.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">
+              Expecting Voltage to Track SOC Linearly
+            </h4>
+            <p class="text-body-sm text-muted">
+              Unlike lead-acid, LiFePO4 voltage does not decrease linearly with
+              SOC. It stays flat then drops steeply at the endpoints. Assume
+              voltage is only useful above 80% or below 20% SOC unless you have
+              high-precision measurement equipment.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <CalculatorCard class="border-m-blue-light">
+        <h4 class="text-label-uppercase text-primary text-xs mb-3">Try It</h4>
+        <p class="text-body-sm text-muted mb-4">
+          Use the SOC Estimator to calculate state of charge from open-circuit
+          voltage or simulate coulomb counting for your LiFePO4 battery.
+        </p>
+        <a
+          href="/tools/soc-estimator"
+          class="btn-primary text-xs py-3 px-6 inline-block"
+          >Open SOC Estimator</a
+        >
+      </CalculatorCard>
+
+      <FAQSection items={faqItems} />
+
+      <section class="border-t border-hairline pt-12">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          References
+        </h2>
+        <ul class="flex flex-col gap-2 text-body-sm text-muted">
+          {
+            references.map((ref) => (
+              <li class="flex gap-2">
+                <span class="text-m-blue-light shrink-0">—</span>
+                <a
+                  href={ref.url}
+                  class="hover:text-primary transition-colors underline underline-offset-2"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {ref.title}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+    </div>
+  </div>
+</Layout>

@@ -1,0 +1,182 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import CalculatorCard from '../../components/CalculatorCard.astro';
+import FormulaBox from '../../components/FormulaBox.astro';
+import FAQSection from '../../components/FAQSection.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "What is the difference between lithium-ion and LiFePO4 runtime?",
+    answer: "For the same capacity and voltage, runtime is similar. The key difference is cycle life and DoD tolerance. LFP supports 80–90% DoD for 3,000–5,000 cycles, while NMC supports 80% DoD for 2,000–3,000 cycles. LFP also has a flatter voltage curve, providing more consistent power delivery.",
+  },
+  {
+    question: "How does the Peukert effect affect lithium batteries?",
+    answer: "Lithium batteries have minimal Peukert effect — they maintain nearly full capacity even at high discharge rates. This is a major advantage over lead-acid, which loses 20–40% of usable capacity at high C-rates. Lithium runtime is more predictable across different load levels.",
+  },
+  {
+    question: "Can lithium batteries deliver their full rated capacity?",
+    answer: "Yes, under normal conditions. Lithium batteries maintain 95–100% of rated capacity down to 20% SOC. Below 10% SOC, voltage drops rapidly and the BMS disconnects to prevent damage. Usable capacity is typically 80–90% of the rated Ah rating.",
+  },
+  {
+    question: "How does lithium battery age affect runtime?",
+    answer: "Lithium batteries degrade gradually — typically reaching 80% SOH after 2,000–5,000 cycles depending on chemistry and conditions. At 80% SOH, runtime is 20% shorter than when new. Calendar aging also contributes roughly 2–3% capacity loss per year.",
+  },
+];
+---
+
+<Layout
+  title="Lithium Battery Runtime Guide | Battery Calculators"
+  description="Understand lithium battery runtime characteristics: discharge curves, capacity utilization, cycle life effects, and practical runtime calculations for all applications."
+  canonical="https://batterycalculators.com/learn/lithium-battery-runtime-guide"
+  schema="faqPage"
+  schemaName="Lithium Battery Runtime Guide"
+  schemaDescription="Engineering guide to lithium battery runtime and discharge behavior."
+  schemaUrl="https://batterycalculators.com/learn/lithium-battery-runtime-guide"
+  faqItems={faqItems}
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/learn" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Back to Guides</a>
+      <Breadcrumb items={[
+        { label: "Learning Center", href: "/learn" },
+        { label: "Lithium Battery Runtime Guide" }
+      ]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">CHEMISTRY</span>
+      <h1 class="text-display-md text-primary mb-6">Lithium Battery Runtime Guide</h1>
+      <p class="text-body-md text-body font-light">
+        Lithium batteries — including LFP, NMC, and NCA chemistries — offer superior runtime characteristics compared to lead-acid. Their flat discharge curves, minimal Peukert effect, and deep DoD tolerance make them the preferred choice for applications requiring predictable, sustained power delivery.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Discharge Curve Characteristics</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Unlike lead-acid batteries where voltage drops progressively throughout discharge, lithium batteries maintain a relatively flat voltage until the last 10–15% of capacity. This flat curve means the power delivered to your load remains consistent throughout most of the discharge cycle.
+        </p>
+        <p class="text-body-md text-body font-light">
+          For LFP, the cell voltage stays between 3.2V and 3.3V from 90% down to 10% SOC. For NMC, the curve has a moderate slope from 4.2V to 3.5V. Both are significantly flatter than lead-acid, which drops from 2.1V to 1.75V per cell over the discharge cycle.
+        </p>
+      </section>
+
+      <FormulaBox title="Lithium Runtime Formula">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Usable Energy (Wh) = Capacity (Ah) × Nominal Voltage (V) × DoD%
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Runtime (h) = Usable Energy / (Load (W) / Efficiency)
+        </div>
+        <p>
+          LFP nominal: 3.2V/cell. NMC nominal: 3.6V/cell. Multiply by series cell count for pack voltage.
+        </p>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Worked Example</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Given:</strong> 100Ah 12.8V NMC battery, 200W load, 90% efficiency, 80% DoD</p>
+            <p><strong>Step 1:</strong> Usable energy:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              100 × 12.8 × 0.80 = 1,024 Wh
+            </div>
+            <p><strong>Step 2:</strong> Effective load:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              200 / 0.90 = 222 W
+            </div>
+            <p><strong>Step 3:</strong> Runtime:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              1,024 / 222 = 4.61 hours
+            </div>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Lithium Sub-Chemistry Comparison</h2>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Feature</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">LFP</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">NMC</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">NCA</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">Nominal Voltage</td>
+                <td class="p-4 font-mono text-primary">3.2V</td>
+                <td class="p-4 font-mono text-primary">3.6V</td>
+                <td class="p-4 font-mono text-primary">3.6V</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Usable DoD</td>
+                <td class="p-4 font-mono text-primary">80–90%</td>
+                <td class="p-4 text-muted">80%</td>
+                <td class="p-4 text-muted">80%</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Cycle Life</td>
+                <td class="p-4 font-mono text-primary">3,000–5,000</td>
+                <td class="p-4 text-muted">2,000–3,000</td>
+                <td class="p-4 text-muted">1,000–2,000</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Energy Density</td>
+                <td class="p-4 text-muted">Moderate</td>
+                <td class="p-4 font-mono text-primary">High</td>
+                <td class="p-4 font-mono text-primary">Highest</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Thermal Stability</td>
+                <td class="p-4 font-mono text-primary">Excellent</td>
+                <td class="p-4 text-muted">Good</td>
+                <td class="p-4 text-muted">Moderate</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Best For</td>
+                <td class="p-4 text-muted">Stationary, RV, Marine</td>
+                <td class="p-4 text-muted">EV, Portable</td>
+                <td class="p-4 text-muted">Power tools, EV</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Try It</h4>
+          <p class="text-body-sm text-muted mb-4">Use the Runtime Calculator for your lithium battery configuration.</p>
+          <a href="/tools/runtime-calculator" class="btn-primary text-xs py-3 px-6 inline-block">Open Runtime Calculator</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Related</h4>
+          <p class="text-body-sm text-muted mb-4">Understand degradation effects on runtime over the battery's life.</p>
+          <a href="/tools/battery-degradation-estimator" class="btn-primary-outline text-xs py-3 px-6 inline-block">Degradation Estimator</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Related Articles</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">LiFePO4 Runtime Guide</h4>
+            <p class="text-body-sm text-muted mb-3">Deep dive into LFP-specific runtime characteristics.</p>
+            <a href="/learn/lifepo4-battery-runtime-guide" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Read Guide →</a>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Battery Runtime Formula</h4>
+            <p class="text-body-sm text-muted mb-3">Reference for all runtime calculation formulas.</p>
+            <a href="/learn/battery-runtime-formula" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Read Guide →</a>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

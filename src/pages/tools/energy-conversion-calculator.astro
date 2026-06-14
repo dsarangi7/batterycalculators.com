@@ -1,0 +1,273 @@
+---
+import CalculatorLayout from '../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../components/CalculatorCard.astro';
+import InputField from '../../components/InputField.astro';
+import FormulaBox from '../../components/FormulaBox.astro';
+import FAQSection from '../../components/FAQSection.astro';
+import RelatedTools from '../../components/RelatedTools.astro';
+
+const directionOptions = [
+  { label: "Amp-hours (Ah) to Watt-hours (Wh)", value: "ahToWh" },
+  { label: "Watt-hours (Wh) to Amp-hours (Ah)", value: "whToAh" },
+];
+
+const whatIs = `Energy conversion between Amp-hours (Ah) and Watt-hours (Wh) is the most fundamental calculation in battery engineering. <strong>Amp-hours measure charge capacity</strong> — the total electrical charge a battery can deliver at a given voltage. <strong>Watt-hours measure total energy</strong> — the actual work a battery can perform. The conversion requires one additional variable: <strong>nominal voltage</strong>. A 100Ah battery at 12V stores 1,200 Wh, while the same 100Ah at 48V stores 4,800 Wh — four times the energy despite identical charge capacity. Understanding this distinction is critical for comparing batteries across different voltage systems, sizing backup power, and designing energy storage systems.`;
+
+const whyItMatters = [
+  "Comparing batteries by Ah alone is misleading — a 100Ah 12V battery holds 3× less energy than a 100Ah 48V battery.",
+  "Load calculations require Wh, not Ah — a 500W load runs for 2.4 hours on 1,200 Wh but you need the correct unit.",
+  "Batteries at different voltages cannot be compared by Ah — only Wh provides a fair energy comparison.",
+  "Solar and backup systems are designed in Wh/kWh — converting Ah to Wh is the first step in any sizing calculation.",
+  "Charger specifications often mix Ah and Wh ratings — confusion leads to undersized or oversized charging systems.",
+];
+
+const practicalApplications = [
+  { title: "Battery Comparison Shopping", description: "Compare batteries of different voltages and chemistries on equal footing by converting to Wh." },
+  { title: "System Sizing", description: "Convert Ah ratings to Wh for load-based energy storage sizing calculations." },
+  { title: "Solar Design", description: "Convert battery Ah ratings to Wh to match against daily solar production and consumption." },
+  { title: "Runtime Estimation", description: "Convert Ah to Wh to calculate how long a battery can sustain a given wattage load." },
+  { title: "EV Range Calculation", description: "Convert pack capacity from Ah to Wh for range estimation and energy consumption analysis." },
+];
+
+const expertNotes = [
+  { title: 'Nominal Voltage Selection', variant: 'engineering', content: 'Always use the average nominal voltage of the pack rather than peak charge or low discharge cut-off voltages. For example, a single LiFePO4 cell is nominal 3.2V (peak 3.65V, cut-off 2.5V). For a 4S system, nominal is 12.8V.' },
+  { title: 'Temperature Effects', variant: 'warning', content: 'Lower temperatures reduce chemical kinetics inside cells, which increases internal resistance and drops the cell output voltage curve during discharge. Since Wh = Ah × V, this lower voltage directly translates to fewer total Watt-hours delivered.' },
+];
+
+const trustSection = {
+  text: "The conversion formulas (Wh = Ah × V, Ah = Wh / V) are fundamental electrical relationships. All calculations are transparent and use standard SI units.",
+  link: { label: "View our full methodology", href: "/methodology" },
+};
+
+const references = [
+  { title: "Battery University — How to Measure Capacity", url: "https://batteryuniversity.com/article/bu-901-how-to-measure-capacity", source: "Battery University / Cadex Electronics" },
+  { title: "IEC 61960 — Secondary Lithium Cells for Portable Applications", url: "https://webstore.iec.ch/en/publication/25543", source: "International Electrotechnical Commission" },
+];
+
+const faqItems = [
+  {
+    question: "What is the difference between Ah and Wh?",
+    answer: "Amp-hours (Ah) measure electric charge capacity (the volume of electrons moving past a point). Watt-hours (Wh) measure total electric energy capacity (the volume of electrons multiplied by the electrical force, or voltage). Wh is the actual measurement of energy potential.",
+  },
+  {
+    question: "What voltage value should I use for nominal voltage?",
+    answer: "Always use the average nominal voltage of the pack rather than peak charge or low discharge cut-off voltages. For example, a single LiFePO4 cell is nominal 3.2V (peak 3.65V, cut-off 2.5V). For a 4S system, nominal is 12.8V.",
+  },
+  {
+    question: "Why is capacity sometimes measured in Ah instead of Wh?",
+    answer: "Historically, lead-acid batteries were standardized around 6V or 12V outputs, making Amp-hours a convenient shortcut comparison. However, with modern multi-voltage lithium architectures (12V, 24V, 48V, 400V, 800V), Watt-hours are required for safe comparison.",
+  },
+  {
+    question: "How do temperature effects impact Wh capacity?",
+    answer: "Lower temperatures reduce chemical kinetics inside cells, which increases internal resistance and drops the cell's output voltage curve during discharge. Since Wh = Ah × V, this lower voltage drop directly translates to fewer total Watt-hours delivered.",
+  },
+  {
+    question: "How do I compare a 12V 200Ah battery with a 48V 100Ah battery?",
+    answer: "Convert both to Wh: 12V × 200Ah = 2,400 Wh. 48V × 100Ah = 4,800 Wh. The 48V battery stores twice the energy despite having half the Ah rating. Always compare in Wh for fair comparison.",
+  },
+  {
+    question: "Can I use Ah to calculate runtime?",
+    answer: "Only if the load is specified in amps. If the load is in watts (the more common case), convert to Wh first, then divide by load watts. Formula: Runtime (hours) = (Ah × V × DoD) / (Load W / Efficiency).",
+  },
+  {
+    question: "What is the relationship between Ah, Wh, and kWh?",
+    answer: "Ah × Voltage = Wh. Wh / 1000 = kWh. For example, a 200Ah battery at 51.2V = 10,240 Wh = 10.24 kWh. kWh is simply Wh expressed in thousands for large systems.",
+  },
+  {
+    question: "Why do some batteries list only Ah and others only Wh?",
+    answer: "Ah is traditional for lead-acid and some lithium manufacturers. Wh is increasingly preferred because it directly represents energy content. Always check if the stated Ah is at the pack's nominal voltage before comparing.",
+  },
+  {
+    question: "Does Ah capacity change with discharge rate?",
+    answer: "Yes. Higher discharge rates reduce usable Ah due to internal resistance losses. This is especially pronounced in lead-acid (Peukert effect). A 100Ah lead-acid battery may deliver only 60Ah at 1C rate. LFP is less affected but still shows some capacity reduction at high C-rates.",
+  },
+  {
+    question: "How does DoD affect the Ah vs Wh comparison?",
+    answer: "DoD limits reduce usable capacity in both Ah and Wh equally. A 100Ah battery at 80% DoD provides 80Ah usable, or (80Ah × V) Wh usable. The conversion between Ah and Wh remains valid regardless of DoD — DoD simply scales both proportionally.",
+  },
+  {
+    question: "Is Wh the best metric for comparing all batteries?",
+    answer: "Wh is the best metric for comparing total energy content. However, for applications requiring high current, also consider max continuous discharge (A) and C-rate. Two batteries with the same Wh may have very different current delivery capabilities.",
+  },
+];
+---
+
+<CalculatorLayout
+  title="Battery Capacity Ah to Wh Converter | Battery Calculators"
+  description="Convert battery capacity metrics between Amp-hours (Ah) and Watt-hours (Wh) using nominal pack voltage. Fast, transparent calculator."
+  faqItems={faqItems}
+  relatedCalculators={[
+    { href: "/tools/runtime-calculator", title: "Runtime Calculator", description: "Estimate backup hours given a W load profile." },
+    { href: "/tools/c-rate-calculator", title: "C-Rate Calculator", description: "Analyze battery load speed parameters." },
+    { href: "/tools/battery-sizing-calculator", title: "Battery Sizing Tool", description: "Size packs from daily electrical draw." },
+    { href: "/tools/solar-battery-sizing-calculator", title: "Solar Battery Sizing", description: "Size solar battery banks from daily consumption." },
+    { href: "/tools/battery-pack-calculator", title: "Battery Pack Calculator", description: "Design series/parallel cell configurations." },
+  ]}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+>
+
+  <!-- Main Calculator Grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+
+    <!-- Input Form -->
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Parameters</h3>
+      <div class="flex flex-col gap-6">
+
+        <!-- Direction -->
+        <InputField id="direction" label="Conversion Type" type="select" options={directionOptions} value="ahToWh" />
+
+        <!-- Input Capacity (raw HTML for dynamic label) -->
+        <div class="flex flex-col gap-2">
+          <label for="input-val" class="text-label-uppercase text-xs text-primary" id="value-label">Capacity (Ah)</label>
+          <input type="number" id="input-val" value="100" class="text-input" min="0.1" step="any" />
+        </div>
+
+        <!-- Voltage -->
+        <InputField id="voltage" label="Nominal Voltage (V)" value={12.8} min={0.1} step="any" helperText="Nominal voltage of cell stack or module" />
+
+      </div>
+    </CalculatorCard>
+
+    <!-- Calculation Results -->
+    <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Estimated Outputs</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <!-- Main Output -->
+          <div class="bg-surface-soft p-6 border border-hairline col-span-1 md:col-span-2">
+            <span class="text-label-uppercase text-muted text-[10px] block mb-1" id="out-label">Equivalent Energy</span>
+            <div class="text-display-md text-primary font-bold animate-pulse-once" id="result-converted">1,280 Wh</div>
+            <span class="text-caption text-muted block mt-1" id="result-kwh">1.28 kWh</span>
+          </div>
+
+          <!-- Secondary Context -->
+          <div class="bg-surface-soft p-6 border border-hairline col-span-1 md:col-span-2">
+            <span class="text-label-uppercase text-muted text-[10px] block mb-1">Standard Reference comparison</span>
+            <p class="text-body-sm text-body mt-2 font-light" id="result-ref">
+              A 1.28 kWh pack can power a 100W load for approximately 11.5 hours at 90% system efficiency.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Area -->
+      <div class="border-t border-hairline pt-6">
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">Why nominal voltage matters</h4>
+        <p class="text-body-sm text-muted">
+          Two batteries with identical 100 Ah capacities can hold very different amounts of total energy. A 100 Ah 12V pack holds 1.2 kWh, whereas a 100 Ah 48V pack holds 4.8 kWh. Total energy capacity is the correct index for comparisons.
+        </p>
+      </div>
+    </CalculatorCard>
+
+  </div>
+
+  <!-- Technical Explanation and Equations -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+
+      <!-- Formulas -->
+      <FormulaBox title="Mathematical Formulas">
+        <p>
+          The conversion between electric charge capacity (Ah) and total energy capacity (Wh) is direct, based on Ohm's law:
+        </p>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Watt-Hours (Wh) = Amp-Hours (Ah) × Nominal Voltage (V)
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Amp-Hours (Ah) = Watt-Hours (Wh) / Nominal Voltage (V)
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Kilowatt-Hours (kWh) = Watt-Hours (Wh) / 1000
+        </div>
+      </FormulaBox>
+
+      <!-- Worked Example -->
+      <div>
+        <h2 class="text-title-lg text-primary uppercase mb-6 tracking-wider">Worked Engineering Example</h2>
+        <div class="text-body-sm text-muted flex flex-col gap-4">
+          <p>Consider converting a deep-cycle marine battery rated at 100 Ah with 12.8V nominal voltage:</p>
+          <p><strong>Step 1:</strong> Apply the Ah-to-Wh formula:</p>
+          <div class="font-mono text-primary">Wh = 100 Ah x 12.8 V = 1280 Wh</div>
+
+          <p><strong>Step 2:</strong> Convert Wh to kWh:</p>
+          <div class="font-mono text-primary">kWh = 1280 Wh / 1000 = 1.28 kWh</div>
+
+          <p>This means a 12.8V 100 Ah battery stores 1,280 Wh of total chemical energy.</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <FAQSection items={faqItems} />
+
+  <!-- Calculation Script -->
+  <script>
+    import { calculateEnergyConversion } from '../../utils/calculators';
+
+    const directionSelect = document.getElementById('direction') as HTMLSelectElement;
+    const inputValElement = document.getElementById('input-val') as HTMLInputElement;
+    const valueLabel = document.getElementById('value-label');
+    const voltageInput = document.getElementById('voltage') as HTMLInputElement;
+
+    // Outputs
+    const outLabel = document.getElementById('out-label');
+    const resultConverted = document.getElementById('result-converted');
+    const resultKwh = document.getElementById('result-kwh');
+    const resultRef = document.getElementById('result-ref');
+
+    function updateLabels() {
+      const dir = directionSelect.value;
+      if (dir === 'ahToWh') {
+        if (valueLabel) valueLabel.textContent = 'Capacity (Amp-hours, Ah)';
+        if (outLabel) outLabel.textContent = 'Equivalent Energy (Watt-hours)';
+      } else {
+        if (valueLabel) valueLabel.textContent = 'Energy (Watt-hours, Wh)';
+        if (outLabel) outLabel.textContent = 'Equivalent Capacity (Amp-hours)';
+      }
+      updateCalculations();
+    }
+
+    function updateCalculations() {
+      const dir = directionSelect.value as "ahToWh" | "whToAh";
+      const val = parseFloat(inputValElement.value) || 0;
+      const voltage = parseFloat(voltageInput.value) || 12.8;
+
+      const converted = calculateEnergyConversion(val, dir, voltage);
+
+      if (dir === 'ahToWh') {
+        if (resultConverted) resultConverted.textContent = `${Math.round(converted).toLocaleString()} Wh`;
+        const kwh = converted / 1000;
+        if (resultKwh) resultKwh.textContent = `${kwh.toFixed(2)} kWh`;
+
+        // Runtime simulation for 100W load at 90% efficiency
+        const runtimeHours = (converted * 0.90) / 100;
+        if (resultRef) {
+          resultRef.textContent = `A ${kwh.toFixed(2)} kWh pack can power a 100W load for approximately ${runtimeHours.toFixed(1)} hours at 90% system efficiency.`;
+        }
+      } else {
+        if (resultConverted) resultConverted.textContent = `${converted.toFixed(2)} Ah`;
+        if (resultKwh) resultKwh.textContent = `${(val / 1000).toFixed(2)} kWh energy source`;
+
+        if (resultRef) {
+          resultRef.textContent = `At ${voltage.toFixed(1)}V nominal, a capacity of ${converted.toFixed(1)} Ah is equivalent to a ${val.toLocaleString()} Wh battery storage system.`;
+        }
+      }
+    }
+
+    directionSelect.addEventListener('change', updateLabels);
+    [inputValElement, voltageInput].forEach(el => {
+      el.addEventListener('input', updateCalculations);
+    });
+
+    // Run on boot
+    updateLabels();
+  </script>
+</CalculatorLayout>

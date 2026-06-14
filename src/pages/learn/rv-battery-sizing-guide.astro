@@ -1,0 +1,303 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import CalculatorCard from '../../components/CalculatorCard.astro';
+import FormulaBox from '../../components/FormulaBox.astro';
+import FAQSection from '../../components/FAQSection.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "How long will my RV battery last while camping?",
+    answer: "A typical RV with LED lights, 12V fridge, and phone charging uses 1,500-2,500 Wh per day. A 12V 200Ah LFP battery (2,400 Wh) provides approximately 1-2 days of boondocking. Adding a second battery or solar panels extends this significantly.",
+  },
+  {
+    question: "Should I use lithium or lead-acid in my RV?",
+    answer: "Lithium LFP batteries cost more upfront but offer 80-90% usable capacity (vs 50% for lead-acid), weigh 50-70% less, charge faster, and last 5-10x more cycles. For serious boondocking, lithium typically has a lower total cost of ownership.",
+  },
+  {
+    question: "Do I need a battery monitor for my RV?",
+    answer: "A battery monitor is highly recommended, especially for lithium batteries. It tracks real-time SOC, current draw, and remaining capacity. Without one, you risk over-discharging and damaging expensive lithium batteries.",
+  },
+  {
+    question: "Can I mix old and new batteries in my RV?",
+    answer: "Never mix batteries of different ages, chemistries, or capacities in a parallel bank. The weaker battery limits the entire bank and degrades faster. Always replace all batteries in a bank at the same time.",
+  },
+];
+---
+
+<Layout
+  title="RV Battery Sizing Guide | Battery Calculators"
+  description="Complete guide to sizing RV house batteries: inventory your loads, calculate daily consumption, choose system voltage, select battery chemistry, and size for your boondocking needs."
+  faqItems={faqItems}
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <Breadcrumb items={[
+        { label: "Learning Center", href: "/learn" },
+        { label: "RV Battery Sizing Guide" },
+      ]} />
+      <a href="/learn" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Back to Guides</a>
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">RV & CAMPER</span>
+      <h1 class="text-display-md text-primary mb-6">RV Battery Sizing Guide</h1>
+      <p class="text-body-md text-body font-light">
+        Sizing a battery system for an RV means balancing energy storage capacity against weight, space, and cost constraints. This guide walks through a structured process to determine exactly how much battery capacity your rig needs for comfortable boondocking.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Step 1: Inventory Your Loads</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          The first step in any RV battery project is cataloging every electrical device you plan to run. RV loads fall into two categories: DC loads that run directly off the house battery (12V systems) and AC loads that require an inverter to convert battery power to 120V. Each device must be rated in watts and estimated for how many hours per day it will operate.
+        </p>
+        <p class="text-body-md text-body font-light mb-6">
+          Walk through your RV from front to back and write down every appliance, light, fan, and charger. Pay special attention to high-draw items like microwave, coffee maker, or space heater — these are often the dominant load and heavily influence battery sizing decisions.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Load</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Power (W)</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Daily Use (hrs)</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Energy (Wh)</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">LED lights (4 fixtures)</td>
+                <td class="p-4 font-mono text-primary">5 – 10 each</td>
+                <td class="p-4 font-mono text-primary">4 – 8</td>
+                <td class="p-4 font-mono text-primary">80 – 320</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">12V fridge</td>
+                <td class="p-4 font-mono text-primary">40 – 60</td>
+                <td class="p-4 font-mono text-primary">24</td>
+                <td class="p-4 font-mono text-primary">960 – 1,440</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Water pump</td>
+                <td class="p-4 font-mono text-primary">5 – 8</td>
+                <td class="p-4 font-mono text-primary">0.5</td>
+                <td class="p-4 font-mono text-primary">2.5 – 4</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Phone / laptop charging</td>
+                <td class="p-4 font-mono text-primary">30 – 65</td>
+                <td class="p-4 font-mono text-primary">2 – 4</td>
+                <td class="p-4 font-mono text-primary">60 – 260</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">TV</td>
+                <td class="p-4 font-mono text-primary">30 – 80</td>
+                <td class="p-4 font-mono text-primary">2 – 4</td>
+                <td class="p-4 font-mono text-primary">60 – 320</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Roof vent fan</td>
+                <td class="p-4 font-mono text-primary">5 – 15</td>
+                <td class="p-4 font-mono text-primary">4 – 8</td>
+                <td class="p-4 font-mono text-primary">20 – 120</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Inverter loads (AC)</td>
+                <td class="p-4 font-mono text-primary">Varies</td>
+                <td class="p-4 font-mono text-primary">Varies</td>
+                <td class="p-4 font-mono text-primary">Varies</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Step 2: Calculate Daily Consumption</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Multiply each device's wattage by its estimated daily runtime to get energy consumption in watt-hours. Then sum all devices to find your total daily consumption. This number is the foundation of your entire battery sizing calculation.
+        </p>
+        <p class="text-body-md text-body font-light mb-6">
+          For AC loads that pass through an inverter, you must also account for inverter conversion losses. A typical inverter operates at 85-92% efficiency, meaning 8-15% of the energy is lost as heat. Add roughly 20% to your total AC load consumption to get the actual battery draw.
+        </p>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Worked Example:</strong> Typical weekend camper loads.</p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li>4 LED lights × 8W × 6h = <strong class="text-primary">192 Wh</strong></li>
+              <li>12V fridge: 50W × 24h = <strong class="text-primary">1,200 Wh</strong></li>
+              <li>Water pump: 6W × 0.5h = <strong class="text-primary">3 Wh</strong></li>
+              <li>Phones: 40W × 3h = <strong class="text-primary">120 Wh</strong></li>
+              <li>TV: 50W × 3h = <strong class="text-primary">150 Wh</strong></li>
+            </ul>
+            <p class="pt-2 border-t border-hairline"><strong>Daily total:</strong> <span class="font-mono text-primary">1,665 Wh/day</span></p>
+            <p class="text-xs text-muted">Add ~20% for inverter losses on AC loads if using an inverter for any devices.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <FormulaBox title="Battery Sizing Formulas">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Battery Capacity (Wh) = Total Daily Consumption (Wh) / DoD
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Battery Capacity (Ah) = Battery Capacity (Wh) / System Voltage
+        </div>
+        <p>
+          Depth of discharge (DoD) is the fraction of total capacity you can safely use without damaging the battery. Lithium LFP batteries are typically rated at 80-90% DoD, while lead-acid batteries should not be regularly discharged beyond 50%.
+        </p>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Step 3: Choose Your System Voltage</h2>
+        <p class="text-body-md text-body font-light mb-6">
+          RV house battery systems typically operate at 12V because most appliances and accessories are designed for 12V DC. However, as power requirements grow — especially for larger rigs with multiple inverters — higher system voltages reduce current draw, allowing thinner wiring and smaller fuses. The choice of voltage directly affects cost, complexity, and efficiency.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Voltage</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Best For</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Load Range</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Notes</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">12V</td>
+                <td class="p-4 text-muted">Most RVs, campers, vans</td>
+                <td class="p-4 font-mono text-primary">Under 2 kW</td>
+                <td class="p-4 text-muted">Simple, standard, widest accessory compatibility</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">24V</td>
+                <td class="p-4 text-muted">Larger motorhomes, expedition vehicles</td>
+                <td class="p-4 font-mono text-primary">Under 3 kW</td>
+                <td class="p-4 text-muted">Lower current, thinner wire, fewer parallel batteries</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">48V</td>
+                <td class="p-4 text-muted">Commercial RVs, tour buses</td>
+                <td class="p-4 font-mono text-primary">Over 3 kW</td>
+                <td class="p-4 text-muted">Rare in RVs, used in extreme high-power setups</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Step 4: Select Battery Chemistry</h2>
+        <p class="text-body-md text-body font-light mb-6">
+          The battery chemistry you choose determines usable capacity, weight, cycle life, and total cost of ownership. For RV applications, the trade-off between upfront cost and long-term value is significant. The table below compares the most common options used in mobile power systems.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Lead-Acid AGM</h4>
+            <p class="text-body-sm text-muted mb-3">
+              Lowest upfront cost. Heavy and bulky. Maximum 50% depth of discharge to preserve cycle life. Suitable for weekend campers who stay near shore power and do not cycle deeply.
+            </p>
+            <div class="font-mono text-m-blue-light text-xs">50% DoD · 300 – 500 cycles · Heaviest</div>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Gel Cell</h4>
+            <p class="text-body-sm text-muted mb-3">
+              Better deep-cycle performance than flooded lead-acid. Moderate cost. Handles partial-state-of-charge operation better than AGM. Good middle ground for boondockers on a budget who cycle moderately.
+            </p>
+            <div class="font-mono text-m-blue-light text-xs">50% DoD · 400 – 600 cycles · Moderate weight</div>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Lithium LFP</h4>
+            <p class="text-body-sm text-muted mb-3">
+              Best overall value for serious boondocking. Lightweight, 80-90% usable capacity, charges fast, and lasts 3,000+ cycles. Higher upfront cost pays for itself over 5-10 years of regular use.
+            </p>
+            <div class="font-mono text-m-blue-light text-xs">80 – 90% DoD · 3,000+ cycles · Lightest</div>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Lithium NMC</h4>
+            <p class="text-body-sm text-muted mb-3">
+              Highest energy density — stores the most energy per kilogram. Moderate cycle life compared to LFP. More sensitive to high temperatures. Used in some premium mobile applications where weight is critical.
+            </p>
+            <div class="font-mono text-m-blue-light text-xs">80% DoD · 1,500 – 2,000 cycles · Lightest per Wh</div>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Worked Example</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Scenario:</strong> Weekend camper, 1,665 Wh/day consumption, 2-day autonomy target.</p>
+            <p><strong>Given:</strong></p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li>Daily consumption: 1,665 Wh/day</li>
+              <li>Autonomy: 2 days without charging</li>
+              <li>Battery chemistry: Lithium LFP (85% DoD)</li>
+              <li>System voltage: 12V</li>
+            </ul>
+            <p><strong>Step 1:</strong> Multiply daily consumption by autonomy days:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              1,665 Wh × 2 = 3,330 Wh
+            </div>
+            <p><strong>Step 2:</strong> Divide by depth of discharge to get total required capacity:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              3,330 Wh / 0.85 = 3,918 Wh
+            </div>
+            <p><strong>Step 3:</strong> Convert to amp-hours at 12V system voltage:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              3,918 Wh / 12V = 327 Ah
+            </div>
+            <p><strong>Step 4:</strong> Select a practical battery configuration:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              Option A: 3 × 12V 100Ah LFP in parallel (300 Ah total — slightly undersized, acceptable for occasional use)<br/>
+              Option B: 2 × 12V 200Ah LFP in parallel (400 Ah total — recommended, provides margin for aging and temperature)
+            </div>
+            <p class="pt-2 border-t border-hairline"><strong>Recommendation:</strong> Choose the 400 Ah bank. Battery capacity degrades over time, and cold weather reduces usable capacity. The extra margin ensures reliable performance across seasons.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Try It</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use the RV Battery Calculator to size a complete house battery system for your rig based on your actual appliance inventory.
+          </p>
+          <a href="/tools/rv-battery-calculator" class="btn-primary text-xs py-3 px-6 inline-block">Open RV Battery Calculator</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Related Tool</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Calculate how long your battery will power inverter-based AC appliances with the Inverter Battery Calculator.
+          </p>
+          <a href="/tools/inverter-battery-calculator" class="btn-primary-outline text-xs py-3 px-6 inline-block">Open Inverter Battery Calculator</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Related Articles</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <a href="/learn/how-to-size-a-battery-bank" class="text-primary font-bold mb-2 block hover:text-m-blue-light transition-colors">
+              How to Size a Battery Bank
+            </a>
+            <p class="text-body-sm text-muted">
+              Covers the standard engineering method for sizing battery banks from daily energy consumption, autonomy days, temperature derating, and depth of discharge limits.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <a href="/learn/how-to-calculate-battery-runtime" class="text-primary font-bold mb-2 block hover:text-m-blue-light transition-colors">
+              How to Calculate Battery Runtime
+            </a>
+            <p class="text-body-sm text-muted">
+              Explains how to determine how long a battery will last under a given load, covering amp-hour ratings, Peukert exponent, and efficiency losses.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

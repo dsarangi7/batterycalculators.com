@@ -1,0 +1,253 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import CalculatorCard from '../../components/CalculatorCard.astro';
+import FormulaBox from '../../components/FormulaBox.astro';
+import FAQSection from '../../components/FAQSection.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "What do I need to build a battery pack?",
+    answer: "You need: matched cells (same chemistry, capacity, age), a BMS (Battery Management System) rated for your series count, bus bars or cables for connections, a battery enclosure, terminal hardware, and a fuse or breaker. Optional: thermal management, monitoring display, and charge controller.",
+  },
+  {
+    question: "How do I select cells for a battery pack?",
+    answer: "Select cells from the same manufacturer and batch with matched capacity and internal resistance. Test each cell's capacity (full charge-discharge cycle) and internal resistance before assembly. Reject cells that deviate more than 2–3% from the mean. LFP prismatic cells are most common for DIY packs.",
+  },
+  {
+    question: "Is it safe to build a battery pack at home?",
+    answer: "LFP cells are relatively safe for home assembly — they do not undergo thermal runaway. However, short circuits from bus bar contact or wiring errors can cause high-current arcs, burns, and fire. Always work with one cell at a time, use insulated tools, and install a fuse on the main positive terminal before connecting cells.",
+  },
+  {
+    question: "How do I connect cells together?",
+    answer: "Use copper or brass bus bars rated for your maximum current. Torque terminal bolts to the manufacturer's specification (typically 4–6 Nm for LFP prismatic cells). Apply anti-oxidation compound to terminals. Use a torque wrench to ensure consistent connections — loose connections cause heating and fire risk.",
+  },
+];
+---
+
+<Layout
+  title="How to Build a Battery Pack | Battery Calculators"
+  description="Step-by-step guide to building a battery pack from cells: cell selection, BMS selection, wiring, safety considerations, and testing procedures."
+  canonical="https://batterycalculators.com/learn/how-to-build-a-battery-pack"
+  schema="faqPage"
+  schemaName="How to Build a Battery Pack"
+  schemaDescription="Step-by-step engineering guide to building battery packs from individual cells."
+  schemaUrl="https://batterycalculators.com/learn/how-to-build-a-battery-pack"
+  faqItems={faqItems}
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/learn" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Back to Guides</a>
+      <Breadcrumb items={[
+        { label: "Learning Center", href: "/learn" },
+        { label: "How to Build a Battery Pack" }
+      ]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">ELECTRICAL</span>
+      <h1 class="text-display-md text-primary mb-6">How to Build a Battery Pack</h1>
+      <p class="text-body-md text-body font-light">
+        Building a battery pack from individual cells gives you control over capacity, voltage, and configuration — but it requires careful cell selection, proper BMS integration, and strict safety practices. This guide walks through the complete process from cell procurement to final testing, with emphasis on safety and reliability.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Step 1: Cell Selection</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Cell selection is the most critical step. Mismatched cells limit the entire pack's performance to the weakest cell. All cells in a pack should be from the same manufacturer, same production batch, and tested to verify matching capacity and internal resistance.
+        </p>
+        <p class="text-body-md text-body font-light mb-4">
+          For DIY battery packs, LFP prismatic cells (e.g., EVE LF280, CATL 280Ah) are the recommended choice. They are mechanically robust, thermally stable, and available in standardized form factors. Avoid cylindrical cells for large packs — they require spot-welded nickel strips and are more difficult to service.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Parameter</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Acceptable Range</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Notes</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">Capacity match</td>
+                <td class="p-4 font-mono text-primary">±2%</td>
+                <td class="p-4 text-muted">Test each cell with full charge-discharge cycle</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Internal resistance match</td>
+                <td class="p-4 font-mono text-primary">±5%</td>
+                <td class="p-4 text-muted">Measure with AC impedance meter or dedicated tester</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Initial voltage match</td>
+                <td class="p-4 font-mono text-primary">±0.05V</td>
+                <td class="p-4 text-muted">Cells should rest at similar voltage before assembly</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Manufacturing date</td>
+                <td class="p-4 font-mono text-primary">Same batch</td>
+                <td class="p-4 text-muted">Cells from different batches may have different chemistry</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Step 2: BMS Selection</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          The Battery Management System (BMS) is the safety brain of the pack. It monitors individual cell voltages, pack current, and temperature, and disconnects the pack if any parameter exceeds safe limits. For series packs, the BMS also performs cell balancing to keep all cells at equal state of charge.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Passive Balancing</h4>
+            <p class="text-body-sm text-muted">
+              Bleeds excess energy from higher cells through resistors. Simple, low-cost, but slow. Suitable for packs under 5kWh where cells are well-matched. Balancing current typically 50–100mA.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Active Balancing</h4>
+            <p class="text-body-sm text-muted">
+              Transfers energy from higher cells to lower cells using capacitors or inductors. Faster and more efficient. Recommended for packs above 5kWh or where cell aging is expected. Balancing current 1–5A.
+            </p>
+          </CalculatorCard>
+        </div>
+        <p class="text-body-md text-body font-light mt-4">
+          BMS selection criteria: series count matching your pack (e.g., 16S for 48V LFP), continuous current rating above your maximum load, and protection features (over-charge, over-discharge, over-current, short-circuit, temperature).
+        </p>
+      </section>
+
+      <FormulaBox title="Pack Design Formulas">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Series Count (Ns) = Target Voltage / Cell Voltage
+          Parallel Count (Np) = Target Capacity / Cell Capacity
+          Total Cells = Ns × Np
+        </div>
+        <p>
+          Example: 48V 200Ah pack from 3.2V 100Ah cells → Ns = 16, Np = 2, Total = 32 cells.
+        </p>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Bus Bar Current Rating ≥ Max Load Current × 1.5 Safety Factor
+        </div>
+        <p>
+          For a 5kW load at 48V: I = 5000/51.2 = 97.7A. Bus bars rated for ≥147A (with 1.5× safety factor). Use 1/0 AWG cable minimum for the main terminals.
+        </p>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Step 3: Assembly</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Assembly requires insulated tools, a clean workspace, and a methodical approach. Work with one cell at a time to prevent accidental short circuits. Install the main fuse on the positive terminal before connecting any cells together.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Bus Bar Installation</h4>
+            <p class="text-body-sm text-muted">
+              Use copper or brass bus bars sized for your current. Apply anti-oxidation compound to terminals. Torque bolts to manufacturer specification (typically 4–6 Nm for LFP prismatic cells). Use a torque wrench for consistency.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Wiring</h4>
+            <p class="text-body-sm text-muted">
+              Run BMS sense wires to each cell terminal. Use appropriate gauge wire for current (14 AWG for sense wires, 4/0 AWG for main terminals on high-current packs). Label all wires. Route wires away from sharp edges and heat sources.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Enclosure</h4>
+            <p class="text-body-sm text-muted">
+              Use a non-conductive enclosure (fiberglass, plastic, or wood). Ensure ventilation for heat dissipation. Mount the BMS in a protected location. Provide cable entry points with strain relief and grommets.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Safety Devices</h4>
+            <p class="text-body-sm text-muted">
+              Install a main fuse or breaker rated for 1.5× maximum continuous current. Add a manual disconnect switch. Include a temperature sensor on the bus bar or cell body. Consider a smoke detector inside the enclosure.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Step 4: Testing</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Before connecting loads, perform a systematic test sequence to verify all connections, BMS function, and cell balance. Never skip testing — a wiring error that goes undetected can cause fire or explosion under load.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Test</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Method</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Pass Criteria</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">Cell voltage check</td>
+                <td class="p-4 text-muted">DMM on each cell terminal</td>
+                <td class="p-4 font-mono text-primary">All cells within ±0.05V</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Polarity check</td>
+                <td class="p-4 text-muted">DMM on pack output</td>
+                <td class="p-4 font-mono text-primary">Correct polarity, expected voltage</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">BMS protection test</td>
+                <td class="p-4 text-muted">Simulate over-voltage on one cell</td>
+                <td class="p-4 font-mono text-primary">BMS disconnects within 1 second</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Short-circuit test</td>
+                <td class="p-4 text-muted">Brief controlled short via fuse</td>
+                <td class="p-4 font-mono text-primary">BMS disconnects, fuse intact</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Load test</td>
+                <td class="p-4 text-muted">Apply 50% load for 30 minutes</td>
+                <td class="p-4 font-mono text-primary">Stable voltage, no heat at connections</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Try It</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use the Battery Pack Calculator to model your pack configuration before purchasing cells.
+          </p>
+          <a href="/tools/battery-pack-calculator" class="btn-primary text-xs py-3 px-6 inline-block">Open Battery Pack Calculator</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Next Step</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Calculate parallel string current sharing and balance requirements for your pack.
+          </p>
+          <a href="/tools/parallel-string-calculator" class="btn-primary text-xs py-3 px-6 inline-block">Open Parallel String Calculator</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Related Articles</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <a href="/learn/battery-pack-design-basics" class="text-primary hover:underline font-bold block mb-2">Battery Pack Design Basics</a>
+            <p class="text-body-sm text-muted">
+              Introduction to battery pack design covering fundamental concepts, cell types, and system architecture.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <a href="/learn/lifepo4-pack-design" class="text-primary hover:underline font-bold block mb-2">LFP Pack Design</a>
+            <p class="text-body-sm text-muted">
+              LFP-specific pack design guidance: cell matching, balancing strategies, and thermal management.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

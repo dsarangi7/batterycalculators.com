@@ -1,0 +1,243 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import CalculatorCard from '../../components/CalculatorCard.astro';
+import FormulaBox from '../../components/FormulaBox.astro';
+import FAQSection from '../../components/FAQSection.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "What is the formula for battery charge time?",
+    answer: "Basic charge time = Ah to Charge / Charge Current (A). For LFP, total time includes a CV taper phase of approximately 0.3–0.5 hours. For lead-acid, the absorption phase can add 2–4 hours. Total energy consumed = Ah × Voltage ÷ Efficiency (typically 0.95 for lithium, 0.80 for lead-acid).",
+  },
+  {
+    question: "What is the CC phase in battery charging?",
+    answer: "The Constant Current (CC) phase is the bulk charging stage where the charger delivers a fixed maximum current while battery voltage rises. For LFP, this phase delivers approximately 70–80% of total capacity. The CC phase ends when the battery reaches its maximum voltage, at which point the charger switches to CV mode.",
+  },
+  {
+    question: "What is the CV phase in battery charging?",
+    answer: "The Constant Voltage (CV) phase follows the CC phase. The charger holds voltage at the battery's maximum while current tapers. This phase tops off the remaining 20–30% of capacity. For LFP, the CV phase adds 20–60 minutes. For lead-acid, the absorption (CV) phase can last 2–4 hours.",
+  },
+  {
+    question: "How does charger efficiency affect charge time?",
+    answer: "Charger efficiency determines how much energy is lost as heat during conversion. A 95% efficient charger means 5% of input energy is lost. For a 1,024 Wh charge, the charger draws 1,078 Wh from the source. Lower efficiency chargers draw more power and take slightly longer to deliver the same charge.",
+  },
+];
+---
+
+<Layout
+  title="Battery Charging Formula Reference | Battery Calculators"
+  description="Complete formula reference for battery charging calculations: CC phase time, CV phase estimation, total charge time, and energy consumption for all battery chemistries."
+  canonical="https://batterycalculators.com/learn/battery-charging-formula"
+  schema="faqPage"
+  schemaName="Battery Charging Formula Reference"
+  schemaDescription="Complete formula reference for battery charging time and energy calculations."
+  schemaUrl="https://batterycalculators.com/learn/battery-charging-formula"
+  faqItems={faqItems}
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/learn" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Back to Guides</a>
+      <Breadcrumb items={[
+        { label: "Learning Center", href: "/learn" },
+        { label: "Battery Charging Formula Reference" }
+      ]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">REFERENCE</span>
+      <h1 class="text-display-md text-primary mb-6">Battery Charging Formula Reference</h1>
+      <p class="text-body-md text-body font-light">
+        This reference consolidates all formulas needed for battery charging calculations — from basic CC phase time estimation to total energy consumption accounting for charger efficiency. Use these formulas to size chargers, estimate charge times, and plan energy budgets for any battery chemistry.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Fundamental Formulas</h2>
+        <FormulaBox title="Charge Time (CC Phase)">
+          <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+            CC Time (hours) = Ah to Charge / Charge Current (A)
+          </div>
+          <p>
+            This is the primary formula for estimating bulk charge time. The Ah to Charge is the difference between starting and ending state of charge multiplied by rated capacity.
+          </p>
+          <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+            Ah to Charge = Capacity (Ah) × (End SOC% - Start SOC%)
+          </div>
+          <p>
+            Example: 100Ah battery, 20% to 100% → Ah to Charge = 100 × 0.80 = 80 Ah. At 50A charge current: 80/50 = 1.6 hours.
+          </p>
+        </FormulaBox>
+      </section>
+
+      <FormulaBox title="Charge Current from C-Rate">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Charge Current (A) = Battery Capacity (Ah) × C-Rate
+        </div>
+        <p>
+          The C-rate defines charge speed relative to capacity. A 0.5C rate on a 100Ah battery = 50A. A 0.2C rate = 20A. Higher C-rates charge faster but increase heat and may reduce cycle life.
+        </p>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          C-Rate = Charge Current (A) / Battery Capacity (Ah)
+        </div>
+        <p>
+          To find the C-rate of your charger: divide charger current by battery capacity. A 30A charger on a 100Ah battery = 0.3C.
+        </p>
+      </FormulaBox>
+
+      <FormulaBox title="CV Phase Time Estimation">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          CV Time (hours) ≈ 0.3–0.5 h (LFP)
+          CV Time (hours) ≈ 2–4 h (Lead-Acid)
+        </div>
+        <p>
+          The CV phase time depends on battery design and termination current. For LFP, the CV phase is relatively short because the voltage curve is flat and current tapers quickly. For lead-acid, the absorption phase is much longer as the charger must push current into increasingly resistant plates.
+        </p>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Total Charge Time = CC Time + CV Time
+        </div>
+        <p>
+          For practical purposes, charging from 20% to 80% skips most of the CV phase, making it significantly faster than a full 0–100% charge.
+        </p>
+      </FormulaBox>
+
+      <FormulaBox title="Energy Consumption">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Energy to Battery (Wh) = Ah to Charge × Nominal Voltage (V)
+        </div>
+        <p>
+          LFP nominal voltage: 3.2V/cell (12.8V for 4S, 25.6V for 8S, 51.2V for 16S). NMC nominal voltage: 3.6V/cell.
+        </p>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Energy from Source (Wh) = Energy to Battery / Charger Efficiency
+        </div>
+        <p>
+          Charger efficiency is typically 90–98% for modern switching chargers. A 95% efficient charger means 5% of input energy is lost as heat.
+        </p>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Charger Power Draw (W) = Charge Voltage × Charge Current / Efficiency
+        </div>
+        <p>
+          Example: 50A at 14.6V with 95% efficiency → 50 × 14.6 / 0.95 = 768W from the power source.
+        </p>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Chemistry-Specific Parameters</h2>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Parameter</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">LFP</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">NMC</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Lead-Acid</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">Cell nominal voltage</td>
+                <td class="p-4 font-mono text-primary">3.2V</td>
+                <td class="p-4 font-mono text-primary">3.6V</td>
+                <td class="p-4 font-mono text-primary">2.0V</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Charge voltage (12V pack)</td>
+                <td class="p-4 font-mono text-primary">14.4–14.6V</td>
+                <td class="p-4 font-mono text-primary">16.8V</td>
+                <td class="p-4 font-mono text-primary">14.4–14.8V</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Recommended C-rate</td>
+                <td class="p-4 font-mono text-primary">0.5C</td>
+                <td class="p-4 font-mono text-primary">0.5C</td>
+                <td class="p-4 font-mono text-primary">0.2C</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Charge efficiency</td>
+                <td class="p-4 font-mono text-primary">95–98%</td>
+                <td class="p-4 font-mono text-primary">95–98%</td>
+                <td class="p-4 font-mono text-primary">80–85%</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">CV phase duration</td>
+                <td class="p-4 font-mono text-primary">0.3–0.5 h</td>
+                <td class="p-4 font-mono text-primary">0.3–0.5 h</td>
+                <td class="p-4 font-mono text-primary">2–4 h</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Worked Example: Full Charge Calculation</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Given:</strong> 200Ah 48V LFP battery, 100A charger (0.5C), 20% to 100% SOC, 96% charger efficiency</p>
+            <p><strong>Step 1:</strong> Ah to charge:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              200 Ah × 0.80 = 160 Ah
+            </div>
+            <p><strong>Step 2:</strong> CC phase time:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              160 Ah / 100A = 1.6 hours
+            </div>
+            <p><strong>Step 3:</strong> Total time with CV taper:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              1.6 h + 0.4 h = 2.0 hours
+            </div>
+            <p><strong>Step 4:</strong> Energy to battery:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              160 Ah × 51.2V = 8,192 Wh
+            </div>
+            <p><strong>Step 5:</strong> Energy from source:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              8,192 Wh / 0.96 = 8,533 Wh
+            </div>
+            <p><strong>Step 6:</strong> Average charger power draw:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              8,533 Wh / 2.0 h = 4,267W (~4.3 kW)
+            </div>
+            <p>This is a substantial charger — typical for large RV, marine, or home battery systems. Ensure your AC input or generator can sustain this power draw for the full charge duration.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Try It</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use the Charging Time Calculator to compute exact charge times using these formulas with your specific battery and charger.
+          </p>
+          <a href="/tools/charging-time-calculator" class="btn-primary text-xs py-3 px-6 inline-block">Open Charging Time Calculator</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Next Step</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Calculate the C-rate for any charger and battery combination with the C-Rate Calculator.
+          </p>
+          <a href="/tools/c-rate-calculator" class="btn-primary text-xs py-3 px-6 inline-block">Open C-Rate Calculator</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Related Articles</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <a href="/learn/how-long-to-charge-a-battery" class="text-primary hover:underline font-bold block mb-2">How Long to Charge a Battery</a>
+            <p class="text-body-sm text-muted">
+              Practical guide to battery charging times across common capacities and charger sizes.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <a href="/learn/charger-sizing-guide" class="text-primary hover:underline font-bold block mb-2">Charger Sizing Guide</a>
+            <p class="text-body-sm text-muted">
+              How to select the right charger size for your battery based on chemistry, capacity, and use case.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

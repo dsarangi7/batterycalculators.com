@@ -1,0 +1,401 @@
+---
+import CalculatorLayout from '../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../components/CalculatorCard.astro';
+import InputField from '../../components/InputField.astro';
+import ResultBox from '../../components/ResultBox.astro';
+import FormulaBox from '../../components/FormulaBox.astro';
+import FAQSection from '../../components/FAQSection.astro';
+import RelatedTools from '../../components/RelatedTools.astro';
+
+const modeOptions = [
+  { label: "Open Circuit Voltage (OCV) Lookup", value: "ocv" },
+  { label: "Coulomb Counting (Current Integration)", value: "coulomb" },
+];
+
+const chemistryOptions = [
+  { label: "Lithium Iron Phosphate (LiFePO4 / LFP)", value: "lfp" },
+  { label: "Lithium Nickel Manganese Cobalt (NMC)", value: "nmc" },
+  { label: "Deep-Cycle Lead-Acid (12V pack)", value: "lead-acid" },
+];
+
+const durationUnitOptions = [
+  { label: "Minutes", value: "minutes" },
+  { label: "Seconds", value: "seconds" },
+  { label: "Hours", value: "hours" },
+];
+
+const whatIs = `State of Charge (SOC) estimation is the process of determining how much energy remains in a battery relative to its current maximum capacity. Two primary methods are used in practice: <strong>Open Circuit Voltage (OCV) lookup</strong>, which correlates the battery's resting voltage to a chemistry-specific reference curve, and <strong>Coulomb counting</strong>, which integrates current flow over time to track charge entering and leaving the cell. Accurate SOC estimation is critical for battery management systems (BMS), electric vehicle range prediction, solar storage dispatch, and preventing over-discharge or over-charge events that damage cells.`;
+
+const whyItMatters = [
+  "Incorrect SOC readings can cause over-discharge, permanently damaging lithium cells and reducing battery lifespan.",
+  "Overestimating SOC leads to unexpected shutdowns when the battery is depleted earlier than the BMS predicted.",
+  "LFP batteries have extremely flat voltage curves between 20–80% SOC, making voltage-based estimation unreliable without precise measurement.",
+  "Coulomb counting drift accumulates over time — without periodic recalibration, SOC error grows to 5–15% within days.",
+  "Marine and RV systems relying on inaccurate SOC may leave users stranded without power during critical operations.",
+];
+
+const practicalApplications = [
+  { title: "Battery Management Systems", description: "BMS units use SOC estimation to prevent over-charge and over-discharge, protecting cell chemistry and extending cycle life." },
+  { title: "Electric Vehicles", description: "Accurate SOC is the basis for range estimation and driver-facing battery gauges in EVs and hybrid vehicles." },
+  { title: "Solar Storage Dispatch", description: "Home and commercial solar systems use SOC to decide when to discharge batteries vs. when to preserve charge for evening loads." },
+  { title: "Marine & RV Power Management", description: "Off-grid travelers use SOC to plan power usage, knowing exactly how much energy remains before recharging." },
+  { title: "Telecom Backup Monitoring", description: "Telecom operators monitor SOC to verify backup batteries are charged and ready for grid outage events." },
+  { title: "Grid-Scale Storage", description: "Utility-scale BESS operators use SOC to manage charge/discharge scheduling and grid services dispatch." },
+];
+
+const expertNotes = [
+  { title: 'LFP Challenges', variant: 'warning', content: 'LFP (LiFePO4) has an extremely flat voltage curve between 20% and 80% SOC. The cell voltage sits steadily between 3.25V and 3.30V. Under load, noise or contact voltage drop easily mimics capacity changes, making pure OCV lookups unreliable. Most LFP BMS units use Coulomb counting, correcting to OCV values when resting at full charge.' },
+  { title: 'Coulomb Counting Drift', variant: 'engineering', content: 'Coulomb counting integrates current over time, but sensor offsets or measurement errors accumulate. A small 0.1A current sensor drift will compile to 2.4 Ah of error over 24 hours. The SOC drift will grow progressively until reset by hitting 100% or 0% voltage limits.' },
+  { title: 'Rest Requirement', variant: 'info', content: 'For accurate OCV measurement, the battery must rest for at least 1–2 hours after charge or discharge. Chemical concentration gradients near cell plates take time to equilibrate to the true open-circuit voltage.' },
+];
+
+const trustSection = {
+  text: "This estimator uses publicly documented OCV-SOC reference curves for LFP, NMC, and lead-acid chemistries. The Coulomb counting model integrates current over time using standard SI units. Both methods are industry-standard approaches used in battery management systems worldwide. All intermediate values are displayed for independent verification.",
+  link: { label: "View our full methodology", href: "/methodology" },
+};
+
+const references = [
+  { title: "Battery University — How to Measure State of Charge", url: "https://batteryuniversity.com/article/bu-902-how-to-measure-state-of-charge", source: "Battery University / Cadex Electronics" },
+  { title: "IEEE Std 1188-1996 — Battery Monitoring and Diagnostics", url: "https://standards.ieee.org/ieee/1188/1076/", source: "IEEE Standards Association" },
+  { title: "Texas Instruments — Coulomb Counting for SOC Estimation", url: "https://www.ti.com/lit/an/slua517/slua517.pdf", source: "Texas Instruments Application Notes" },
+  { title: "NREL — State of Charge Estimation Methods", url: "https://www.nrel.gov/analysis/state-of-charge-estimation.html", source: "National Renewable Energy Laboratory" },
+];
+
+const faqItems = [
+  {
+    question: "Why is OCV lookup difficult for LFP (LiFePO4) chemistries?",
+    answer: "LFP has an extremely flat voltage curve between 20% and 80% SOC. The cell voltage sits steadily between 3.25V and 3.30V. Under load, noise or contact voltage drop easily mimics capacity changes, making pure OCV lookups unreliable. Most LFP BMS units use Coulomb counting, correcting to OCV values when resting at full charge.",
+  },
+  {
+    question: "What is Coulomb counting drift?",
+    answer: "Coulomb counting integrates current over time. However, sensor offsets or measurement errors compile over duration. A small 0.1A current sensor drift will compile to 2.4 Ah of error over 24 hours. The SOC drift will grow progressively until reset by hitting 100% or 0% voltage limits.",
+  },
+  {
+    question: "Why must the battery rest for OCV measurements?",
+    answer: "Discharging or charging triggers chemical concentration gradients near cell plates. Voltage rises during charge and sags under load. Once currents stop, the cell chemistry slowly equilibriates to its steady chemical potential (the true OCV), which takes 1 to 2 hours.",
+  },
+  {
+    question: "How do Lead-Acid OCV curves differ?",
+    answer: "Lead-acid has a relatively linear voltage-to-SOC relationship (12.72V = 100%, 11.63V = 0%), making voltage-based estimation more reliable than in lithium systems. However, lead-acid voltage sag under heavy loads is severe, requiring load-correction factors.",
+  },
+  {
+    question: "What is the best method for SOC estimation?",
+    answer: "The most accurate approach combines Coulomb counting with periodic OCV recalibration. Coulomb counting provides real-time SOC tracking, while OCV measurements at rest points (full charge, empty) correct accumulated drift. This hybrid approach is standard in commercial BMS implementations.",
+  },
+  {
+    question: "How accurate is Coulomb counting?",
+    answer: "In the short term (hours), Coulomb counting is accurate to within 1–3%. Over days without recalibration, sensor drift can accumulate to 5–15% error. High-quality current sensors (hall-effect or shunt-based) with calibration reduce drift, but periodic voltage-based correction remains necessary.",
+  },
+  {
+    question: "Can I use SOC estimation while the battery is under load?",
+    answer: "OCV-based SOC is only accurate when the battery is at rest (no current flow). Under load, terminal voltage sags due to internal resistance, producing misleading SOC readings. Coulomb counting works under load but requires accurate current measurement.",
+  },
+  {
+    question: "How does temperature affect SOC estimation?",
+    answer: "Temperature affects both OCV curves and Coulomb counting accuracy. Cold temperatures increase internal resistance, causing greater voltage sag under load (distorting OCV). Coulomb counting efficiency also decreases at low temperatures. Temperature compensation is essential for accurate SOC.",
+  },
+  {
+    question: "What is the difference between SOC and SOH?",
+    answer: "SOC measures current charge relative to current capacity (like a fuel gauge). SOH measures maximum capacity remaining relative to original design capacity (like engine wear). A battery at 50% SOC with 80% SOH has 40% of its original design capacity remaining.",
+  },
+  {
+    question: "How do I calibrate my battery's SOC gauge?",
+    answer: "Charge the battery to 100% and let it rest for 2+ hours — this sets the upper calibration point. Then discharge to empty (or the BMS cutoff) to set the lower point. Most BMS units automatically calibrate during full charge cycles.",
+  },
+  {
+    question: "Why does my SOC jump suddenly?",
+    answer: "Sudden SOC jumps usually indicate the BMS has recalibrated. After a rest period, the BMS corrects Coulomb counting drift by comparing actual OCV to the reference curve. This is normal behavior and indicates the system is self-correcting.",
+  },
+];
+
+const relatedTools = [
+  { href: "/tools/battery-degradation-estimator", title: "Degradation Estimator", description: "Estimate battery capacity fading and degradation state." },
+  { href: "/tools/runtime-calculator", title: "Runtime Calculator", description: "Compute runtime from load wattage profiles." },
+  { href: "/tools/charging-time-calculator", title: "Charging Time", description: "Estimate CC-CV charge durations." },
+  { href: "/tools/c-rate-calculator", title: "C-Rate Calculator", description: "Calculate charge and discharge current rates." },
+  { href: "/tools/battery-sizing-calculator", title: "Battery Sizing Tool", description: "Size battery storage from electrical draw profiles." },
+  { href: "/tools/solar-battery-sizing-calculator", title: "Solar Battery Sizing", description: "Size solar battery banks from daily consumption." },
+];
+
+const commonMistakes = [
+  "Assuming voltage alone determines SOC — for LFP, voltage is nearly constant between 20–80% SOC. A 10mV measurement error can represent a 30% SOC swing in the flat region.",
+  "Ignoring rest time for OCV measurements — measuring voltage immediately after charge or discharge produces misleading SOC readings. Wait 1–2 hours for chemical equilibrium.",
+  "Not recalibrating Coulomb counting — sensor drift accumulates daily. Without periodic OCV-based recalibration, SOC error grows to 10–15% within a week.",
+  "Using the wrong chemistry profile — LFP, NMC, and lead-acid have completely different OCV-SOC curves. Using an NMC curve for an LFP battery produces wildly inaccurate results.",
+  "Ignoring temperature effects — cold temperatures increase internal resistance, distorting voltage measurements. Coulomb counting also becomes less efficient at low temperatures.",
+  "Measuring SOC under load — terminal voltage under load includes IR drop, making OCV-based SOC unreliable. Always measure OCV at rest.",
+];
+
+const relatedArticles = [
+  { href: "/learn/what-is-state-of-charge", title: "What Is State of Charge?" },
+  { href: "/learn/soc-estimation-methods", title: "SOC Estimation Methods Compared" },
+  { href: "/learn/lfp-voltage-curve-explained", title: "LFP Voltage Curve Explained" },
+];
+---
+
+<CalculatorLayout
+  title="Battery State of Charge (SOC) Estimator | Battery Calculators"
+  description="Estimate battery remaining capacity using Open Circuit Voltage (OCV) interpolation curves or Coulomb Counting simulators."
+  faqItems={faqItems}
+  commonMistakes={commonMistakes}
+  relatedCalculators={relatedTools}
+  relatedArticles={relatedArticles}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+>
+
+  <!-- Main Calculator Grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+
+    <!-- Input Form -->
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Parameters</h3>
+      <div class="flex flex-col gap-6">
+
+        <!-- Mode selection -->
+        <InputField id="mode" label="Estimation Mode" type="select" options={modeOptions} value="ocv" />
+
+        <!-- Chemistry -->
+        <InputField id="chemistry" label="Chemistry Profile" type="select" options={chemistryOptions} value="lfp" />
+
+        <!-- OCV Specific Inputs -->
+        <div id="ocv-inputs" class="flex flex-col gap-6">
+          <InputField id="voltage" label="Measured Open Circuit Voltage (V)" value={13.16} min={0.1} step="any" />
+          <InputField id="nominal" label="Pack Nominal Voltage (V)" value={12.8} min={0.1} step="any" helperText="Used to infer series cell counts (e.g. 12.8V nominal is a 4S system)" />
+        </div>
+
+        <!-- Coulomb Counting Specific Inputs -->
+        <div id="coulomb-inputs" class="flex flex-col gap-6 hidden">
+          <InputField id="initial-soc" label="Initial SOC (%)" value={50} min={0} max={100} />
+          <InputField id="current" label="Net Current (Amperes)" value={-10} step="any" helperText="Use negative (-) for discharging loads, positive (+) for charger current input." />
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <InputField id="duration" label="Duration" value={60} min={1} step="any" />
+            <InputField id="duration-unit" label="Unit" type="select" options={durationUnitOptions} value="minutes" />
+          </div>
+          <InputField id="capacity" label="Total SOH Capacity (Ah)" value={100} min={0.1} step="any" helperText="Actual capacity of battery pack adjusted for degradation." />
+        </div>
+
+      </div>
+    </CalculatorCard>
+
+    <!-- Calculation Results -->
+    <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">State of Charge Output</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <!-- Main Output -->
+          <ResultBox
+            label="State of Charge (SOC)"
+            value="70.0%"
+            suffix="Battery is partially depleted"
+            variant="primary"
+            id="result-soc"
+          />
+
+          <!-- Secondary Outputs -->
+          <ResultBox
+            label="Estimated Energy Remaining"
+            value="896 Wh"
+            suffix="Calculated at nominal voltage"
+            id="result-energy-remaining"
+          />
+        </div>
+      </div>
+
+      <!-- Action Area -->
+      <div class="border-t border-hairline pt-6">
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">SOC Estimation Constraints</h4>
+        <p class="text-body-sm text-muted mb-4">
+          OCV estimation is only accurate when the battery has been at rest (no charge or discharge) for at least <span class="text-primary font-bold">1 to 2 hours</span>. Active loads depress voltage, resulting in massive SOC error.
+        </p>
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">Educational Disclaimer</h4>
+        <p class="text-body-sm text-muted">
+          This tool provides <span class="text-primary font-bold">educational approximations only</span>. Results are not diagnostic, not certified battery health predictions, and must not be used as the sole basis for safety-critical decisions. Always validate with a qualified BMS or certified professional instrumentation.
+        </p>
+      </div>
+    </CalculatorCard>
+
+  </div>
+
+  <!-- Technical Explanation and Equations -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+
+      <FormulaBox title="Mathematical Formulas">
+        <p>
+          <strong>OCV Lookup:</strong> Measured voltage is normalized to cell level (V_cell = V / S) and interpolated against a standard chemistry reference curve:
+        </p>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2 text-xs">
+          LFP cell: 3.40V (100%), 3.31V (90%), 3.29V (70%), 3.27V (40%), 3.23V (20%), 2.50V (0%)
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2 text-xs">
+          NMC cell: 4.20V (100%), 4.05V (80%), 3.80V (50%), 3.60V (20%), 3.00V (0%)
+        </div>
+        <p>
+          <strong>Coulomb Counting (Current Integration):</strong> The changes in charge capacity are calculated by summing continuous Ampere flows over duration:
+        </p>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2 text-xs font-light">
+          SOC_final (%) = SOC_start + [ (Current (A) x (Duration (sec) / 3600)) / Capacity (Ah) ] x 100
+        </div>
+        <p class="text-xs text-muted mt-4">
+          <strong>Variables:</strong> Voltage in V, Current in A (negative = discharge), Duration in seconds, Capacity in Ah (SOH-adjusted). Assumptions: battery at rest for OCV, constant current for Coulomb counting, standard temperature (25°C).
+        </p>
+      </FormulaBox>
+
+      <!-- Worked Examples -->
+      <div>
+        <h2 class="text-title-lg text-primary uppercase mb-6 tracking-wider">Worked Examples</h2>
+        <div class="text-body-sm text-muted flex flex-col gap-6">
+
+          <div class="border-l-2 border-m-blue-light pl-4">
+            <p class="font-bold text-primary mb-2">Example 1: LFP OCV Lookup</p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li><strong>Voltage:</strong> 13.16 V | <strong>Nominal Voltage:</strong> 12.8 V</li>
+              <li><strong>Step 1:</strong> Identify series cells: 12.8 / 3.2 = 4 Cells</li>
+              <li><strong>Step 2:</strong> Solve cell voltage: 13.16 / 4 = 3.29 V</li>
+              <li><strong>Step 3:</strong> Interpolate curve: 3.29V cell corresponds to exactly <strong>70% SOC</strong>.</li>
+            </ul>
+          </div>
+
+          <div class="border-l-2 border-m-blue-dark pl-4">
+            <p class="font-bold text-primary mb-2">Example 2: Coulomb Counting — Discharge</p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li><strong>Initial SOC:</strong> 50% | <strong>Capacity:</strong> 100 Ah</li>
+              <li><strong>Current:</strong> -10 A (discharge) | <strong>Duration:</strong> 60 minutes (3600s)</li>
+              <li><strong>Step 1:</strong> Calculate charge change: -10 A x 1 hour = -10 Ah</li>
+              <li><strong>Step 2:</strong> Solve SOC change: (-10 Ah / 100 Ah) x 100% = -10%</li>
+              <li><strong>Step 3:</strong> Solve final SOC: 50% - 10% = <strong>40%</strong></li>
+            </ul>
+          </div>
+
+          <div class="border-l-2 border-m-red pl-4">
+            <p class="font-bold text-primary mb-2">Example 3: NMC OCV Lookup — High Voltage</p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li><strong>Voltage:</strong> 38.5 V | <strong>Nominal Voltage:</strong> 37 V (10S NMC)</li>
+              <li><strong>Step 1:</strong> Identify series cells: 37 / 3.7 = 10 Cells</li>
+              <li><strong>Step 2:</strong> Solve cell voltage: 38.5 / 10 = 3.85 V</li>
+              <li><strong>Step 3:</strong> Interpolate NMC curve: 3.85V corresponds to approximately <strong>53% SOC</strong>.</li>
+            </ul>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <FAQSection items={faqItems} />
+  <RelatedTools tools={relatedTools} />
+
+  <!-- Calculation Script -->
+  <script>
+    import { estimateSocFromOcv, simulateCoulombCounting } from '../../utils/calculators';
+
+    const modeSelect = document.getElementById('mode') as HTMLSelectElement;
+    const chemistrySelect = document.getElementById('chemistry') as HTMLSelectElement;
+
+    // Inputs sections
+    const ocvInputs = document.getElementById('ocv-inputs');
+    const coulombInputs = document.getElementById('coulomb-inputs');
+
+    // Inputs elements
+    const voltageInput = document.getElementById('voltage') as HTMLInputElement;
+    const nominalInput = document.getElementById('nominal') as HTMLInputElement;
+    const initialSocInput = document.getElementById('initial-soc') as HTMLInputElement;
+    const currentInput = document.getElementById('current') as HTMLInputElement;
+    const durationInput = document.getElementById('duration') as HTMLInputElement;
+    const durationUnit = document.getElementById('duration-unit') as HTMLSelectElement;
+    const capacityInput = document.getElementById('capacity') as HTMLInputElement;
+
+    // Outputs elements - query inside ResultBox wrappers
+    const resultSocBox = document.getElementById('result-soc');
+    const resultSoc = resultSocBox?.querySelector('.text-display-md') as HTMLElement;
+    const resultStatusDesc = resultSocBox?.querySelector('.text-caption') as HTMLElement;
+    const resultEnergyBox = document.getElementById('result-energy-remaining');
+    const resultEnergyRemaining = resultEnergyBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultEnergyDesc = resultEnergyBox?.querySelector('.text-caption') as HTMLElement;
+
+    function toggleMode() {
+      const mode = modeSelect.value;
+      if (mode === 'ocv') {
+        ocvInputs?.classList.remove('hidden');
+        coulombInputs?.classList.add('hidden');
+      } else {
+        ocvInputs?.classList.add('hidden');
+        coulombInputs?.classList.remove('hidden');
+      }
+      updateCalculations();
+    }
+
+    function updateCalculations() {
+      const mode = modeSelect.value;
+      const chemistry = chemistrySelect.value as "lfp" | "nmc" | "lead-acid";
+
+      let finalSoc = 0;
+      let nominalV = 12.8;
+
+      if (mode === 'ocv') {
+        const voltage = parseFloat(voltageInput.value) || 0;
+        nominalV = parseFloat(nominalInput.value) || 12.8;
+        finalSoc = estimateSocFromOcv(chemistry, voltage, nominalV);
+      } else {
+        const initialSoc = parseFloat(initialSocInput.value) || 50;
+        const current = parseFloat(currentInput.value) || 0;
+        const duration = parseFloat(durationInput.value) || 0;
+        const unit = durationUnit.value;
+        const capacity = parseFloat(capacityInput.value) || 100;
+
+        let durationSec = duration;
+        if (unit === 'minutes') {
+          durationSec = duration * 60;
+        } else if (unit === 'hours') {
+          durationSec = duration * 3600;
+        }
+
+        finalSoc = simulateCoulombCounting(initialSoc, current, durationSec, capacity);
+
+        // Infer nominal voltage for remaining energy output based on chemistry
+        if (chemistry === 'lfp') nominalV = 12.8;
+        else if (chemistry === 'nmc') nominalV = 11.1;
+        else nominalV = 12.0;
+      }
+
+      // Render Outputs
+      if (resultSoc) resultSoc.textContent = `${finalSoc.toFixed(1)}%`;
+
+      let statusStr = "Battery is partially depleted";
+      if (finalSoc >= 95) statusStr = "Battery is fully charged";
+      else if (finalSoc <= 15) statusStr = "Critical: Battery is nearly depleted";
+      if (resultStatusDesc) resultStatusDesc.textContent = statusStr;
+
+      // Estimate Energy Remaining
+      const capacityAh = mode === 'ocv' ? 100 : (parseFloat(capacityInput.value) || 100);
+      const remainingWh = capacityAh * nominalV * (finalSoc / 100);
+
+      if (resultEnergyRemaining) {
+        resultEnergyRemaining.textContent = `${Math.round(remainingWh).toLocaleString()} Wh`;
+      }
+      if (resultEnergyDesc) {
+        resultEnergyDesc.textContent = `Calculated at ${nominalV.toFixed(1)}V nominal and a reference ${capacityAh.toFixed(0)} Ah capacity.`;
+      }
+    }
+
+    modeSelect.addEventListener('change', toggleMode);
+    chemistrySelect.addEventListener('change', updateCalculations);
+
+    [
+      voltageInput, nominalInput, initialSocInput, currentInput,
+      durationInput, durationUnit, capacityInput
+    ].forEach(el => {
+      el.addEventListener('input', updateCalculations);
+    });
+
+    // Run on boot
+    toggleMode();
+  </script>
+</CalculatorLayout>

@@ -1,0 +1,475 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import CalculatorCard from '../../components/CalculatorCard.astro';
+import FormulaBox from '../../components/FormulaBox.astro';
+import FAQSection from '../../components/FAQSection.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "How long will a 100Ah battery run a 12V fridge?",
+    answer: "A 100Ah 12.8V LFP battery at 80% DoD provides 1,024 Wh. A typical 12V compressor fridge draws 40–60W average (accounting for compressor cycling). At 50W average, runtime is approximately 16–18 hours. A lead-acid battery at 50% DoD would provide roughly 9–10 hours under the same conditions.",
+  },
+  {
+    question: "What size battery do I need for a 12V camping fridge?",
+    answer: "For a weekend trip (2–3 days) with a 12V compressor fridge, a 100Ah LiFePO4 battery is the minimum recommended size. For extended trips or hot climates, a 200Ah battery provides comfortable margin. Lead-acid batteries require roughly double the capacity due to lower usable depth of discharge.",
+  },
+  {
+    question: "How much power does a 12V fridge use per day?",
+    answer: "A 12V compressor fridge typically consumes 300–600 Wh per day depending on ambient temperature, fridge size, and how often the door is opened. In hot conditions (35°C+), consumption can increase by 30–50%. Absorption fridges use significantly more power — typically 1,500–2,500 Wh per day when running on electricity.",
+  },
+  {
+    question: "Can a solar panel keep a 12V fridge running indefinitely?",
+    answer: "Yes, in most conditions. A 100W solar panel in 4–5 peak sun hours generates 350–450 Wh per day, which matches the consumption of an efficient 12V compressor fridge. In winter or cloudy conditions, you may need 200W of solar or a larger battery bank to bridge low-production days.",
+  },
+  {
+    question: "Does a 12V fridge drain the car battery?",
+    answer: "If connected directly to your vehicle starter battery, yes — a 12V fridge will drain it within hours. Always run camping fridges from a dedicated deep house battery, not the starter battery. Use an isolator or voltage-sensing relay to protect the starter battery if charging from the alternator.",
+  },
+  {
+    question: "How long will a 200Ah battery run a 12V fridge?",
+    answer: "A 200Ah 12.8V LFP battery at 80% DoD provides 2,048 Wh. At 50W average fridge consumption, runtime is approximately 33–36 hours — roughly two full days without any solar input or charging.",
+  },
+  {
+    question: "What is the difference between compressor and absorption 12V fridges?",
+    answer: "Compressor fridges use a small compressor (like a household fridge) and are highly efficient, drawing 30–60W average. Absorption fridges use a heating element and are far less efficient, drawing 150–250W average when on electric power. For battery-powered applications, compressor fridges are strongly recommended.",
+  },
+  {
+    question: "How do I calculate the runtime for my specific fridge?",
+    answer: "Check your fridge's power consumption rating (usually on a label or in the manual). If listed in amps, multiply by 12V to get watts. If listed as daily energy consumption (kWh or Wh), use that directly. Divide your battery's usable capacity (Wh) by the fridge's power draw (W) to get runtime in hours.",
+  },
+];
+---
+
+<Layout
+  title="How Long Will a Battery Run a 12V Fridge? | Battery Calculators"
+  description="Calculate exact battery runtime for 12V camping fridges. Covers LFP, AGM, and lead-acid with worked examples for RV, camping, and off-grid setups."
+  canonical="https://batterycalculators.com/learn/how-long-will-a-battery-run-a-12v-fridge"
+  schema="faqPage"
+  schemaName="How Long Will a Battery Run a 12V Fridge"
+  schemaDescription="Battery runtime calculations for 12V fridges across common battery sizes and chemistries."
+  schemaUrl="https://batterycalculators.com/learn/how-long-will-a-battery-run-a-12v-fridge"
+  faqItems={faqItems}
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/learn" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Back to Guides</a>
+      <Breadcrumb items={[
+        { label: "Learning Center", href: "/learn" },
+        { label: "How Long Will a Battery Run a 12V Fridge?" }
+      ]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">RV & CAMPER</span>
+      <h1 class="text-display-md text-primary mb-6">How Long Will a Battery Run a 12V Fridge?</h1>
+      <p class="text-body-md text-body font-light">
+        A 12V fridge is one of the most common and essential loads in any camping, RV, or off-grid setup. Unlike lights or phone chargers, a fridge runs continuously — cycling its compressor throughout the day and night. Understanding how long your battery will keep it running is critical for trip planning and system design.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Quick Answer</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          A 100Ah LiFePO4 (LFP) battery at 12.8V will run a typical 12V compressor fridge for approximately <strong class="text-primary">16–18 hours</strong>. A 200Ah LFP battery extends this to <strong class="text-primary">33–36 hours</strong> — roughly two full days without solar or charging. Lead-acid batteries provide roughly half these runtimes due to lower usable depth of discharge.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Battery</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Usable Energy</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Fridge Runtime</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">100Ah LFP (12.8V)</td>
+                <td class="p-4 font-mono text-primary">1,024 Wh</td>
+                <td class="p-4 font-mono text-primary">~17 hours</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">200Ah LFP (12.8V)</td>
+                <td class="p-4 font-mono text-primary">2,048 Wh</td>
+                <td class="p-4 font-mono text-primary">~34 hours</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">100Ah AGM (12V)</td>
+                <td class="p-4 font-mono text-primary">640 Wh</td>
+                <td class="p-4 font-mono text-primary">~10.5 hours</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">200Ah AGM (12V)</td>
+                <td class="p-4 font-mono text-primary">1,280 Wh</td>
+                <td class="p-4 font-mono text-primary">~21 hours</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-caption text-muted mt-2">Assumes 50W average fridge draw (compressor cycling), 90% system efficiency, and 80% DoD for LFP / 50% DoD for AGM.</p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Factors That Affect Fridge Battery Runtime</h2>
+        <p class="text-body-md text-body font-light mb-6">
+          Several variables determine how long your battery will actually power a 12V fridge. Understanding these helps you size your system accurately and avoid surprises in the field.
+        </p>
+
+        <div class="flex flex-col gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Fridge Power Consumption</h4>
+            <p class="text-body-sm text-muted">
+              Not all 12V fridges draw the same power. A small 20L portable fridge might average 25–35W, while a large 60L+ fridge can average 50–70W. The compressor cycles on and off — the average draw over 24 hours is what matters, not the peak draw. Check your fridge's spec label or manual for daily energy consumption in Wh or kWh.
+            </p>
+          </CalculatorCard>
+
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Ambient Temperature</h4>
+            <p class="text-body-sm text-muted">
+              Hotter environments force the compressor to run longer. At 35°C (95°F) ambient, a fridge that averages 40W at 25°C might average 55–65W. In extreme heat, consumption can increase by 40–60%. Conversely, in cool conditions (15–20°C), the compressor cycles less frequently and power draw drops significantly.
+            </p>
+          </CalculatorCard>
+
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Battery Chemistry and DoD</h4>
+            <p class="text-body-sm text-muted">
+              LiFePO4 batteries provide 80–90% usable depth of discharge, meaning a 100Ah LFP battery delivers 80–90Ah of usable capacity. Lead-acid batteries (AGM, flooded, gel) should only be discharged to 50% for acceptable cycle life, cutting usable capacity in half. This is the single largest factor in runtime differences between battery types.
+            </p>
+          </CalculatorCard>
+
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">System Efficiency</h4>
+            <p class="text-body-sm text-muted">
+              Every component between the battery and the fridge consumes some energy. Battery internal resistance, wiring losses, connectors, and any DC-DC converter or voltage regulator all reduce effective capacity. A typical 12V DC system operates at 90–95% efficiency. If using an inverter to power a 120V fridge from a 12V battery, inverter efficiency (85–92%) becomes a significant factor.
+            </p>
+          </CalculatorCard>
+
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Door Openings and Food Load</h4>
+            <p class="text-body-sm text-muted">
+              Every time you open the fridge door, cold air escapes and the compressor must work harder to recover. Frequent openings during a hot day can increase consumption by 15–25%. A fully loaded fridge also behaves differently than an empty one — thermal mass from food and drinks helps maintain temperature during compressor off-cycles.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FormulaBox title="Runtime Formula">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Runtime (h) = (Battery Ah × Voltage × DoD × Efficiency) / Average Fridge Power (W)
+        </div>
+        <p class="text-body-sm text-muted mt-2">
+          For a DC fridge running directly off the battery (no inverter), efficiency is typically 90–95%. For an AC fridge on an inverter, use the inverter efficiency rating (typically 85–90%).
+        </p>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Worked Example 1: Weekend Camping Trip</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Scenario:</strong> 3-day camping trip, 12V compressor fridge (50W average), no solar.</p>
+            <p><strong>Given:</strong></p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li>Battery: 100Ah 12.8V LiFePO4</li>
+              <li>DoD: 80%</li>
+              <li>System efficiency: 90%</li>
+              <li>Fridge average draw: 50W</li>
+            </ul>
+            <p><strong>Step 1:</strong> Calculate usable energy:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              100 Ah × 12.8V × 0.80 = 1,024 Wh
+            </div>
+            <p><strong>Step 2:</strong> Account for system losses:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              1,024 Wh × 0.90 = 921.6 Wh usable
+            </div>
+            <p><strong>Step 3:</strong> Calculate runtime:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              921.6 Wh / 50W = 18.4 hours
+            </div>
+            <p class="pt-2 border-t border-hairline"><strong>Result:</strong> The 100Ah LFP battery runs the fridge for approximately 18 hours. For a 3-day trip (72 hours), you need solar panels or a generator to recharge. A 200W solar panel in 4 peak sun hours generates ~720 Wh, which covers most of the daily fridge consumption.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Worked Example 2: Extended Off-Grid Trip</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Scenario:</strong> 5-day off-grid trip, 12V compressor fridge (45W average), with 200W solar.</p>
+            <p><strong>Given:</strong></p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li>Battery: 200Ah 12.8V LiFePO4</li>
+              <li>DoD: 80%</li>
+              <li>Solar: 200W panel, 4.5 peak sun hours</li>
+              <li>Solar system efficiency: 85%</li>
+              <li>Fridge average draw: 45W</li>
+            </ul>
+            <p><strong>Step 1:</strong> Daily fridge consumption:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              45W × 24h = 1,080 Wh/day
+            </div>
+            <p><strong>Step 2:</strong> Daily solar generation:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              200W × 4.5h × 0.85 = 765 Wh/day
+            </div>
+            <p><strong>Step 3:</strong> Daily deficit (battery must supply):</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              1,080 - 765 = 315 Wh/day from battery
+            </div>
+            <p><strong>Step 4:</strong> Battery runtime on its own:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              (200 × 12.8 × 0.80 × 0.90) / 45 = 41 hours
+            </div>
+            <p class="pt-2 border-t border-hairline"><strong>Result:</strong> The 200Ah battery alone runs the fridge for 41 hours. With solar replenishing 765 Wh daily, the system can sustain the fridge indefinitely in sunny conditions. On cloudy days with 50% solar output, the battery provides approximately 3 days of buffer.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Worked Example 3: Lead-Acid Comparison</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Scenario:</strong> Same 50W fridge, but with a 100Ah AGM lead-acid battery.</p>
+            <p><strong>Given:</strong></p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li>Battery: 100Ah 12V AGM</li>
+              <li>DoD: 50% (recommended maximum for cycle life)</li>
+              <li>System efficiency: 90%</li>
+              <li>Fridge average draw: 50W</li>
+            </ul>
+            <p><strong>Step 1:</strong> Usable energy:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              100 Ah × 12V × 0.50 = 600 Wh
+            </div>
+            <p><strong>Step 2:</strong> After efficiency losses:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              600 Wh × 0.90 = 540 Wh usable
+            </div>
+            <p><strong>Step 3:</strong> Runtime:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              540 Wh / 50W = 10.8 hours
+            </div>
+            <p class="pt-2 border-t border-hairline"><strong>Result:</strong> The same 100Ah lead-acid battery provides only 10.8 hours versus 18.4 hours from a 100Ah LFP battery — a 41% reduction in runtime. This is why lithium batteries are strongly recommended for fridge applications where weight and runtime matter.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Runtime by Battery Size and Chemistry</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          The table below shows estimated runtime for a 50W average 12V fridge across common battery sizes and chemistries. All values assume 90% DC system efficiency.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Battery</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Total Energy</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Usable Energy</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Runtime (50W)</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">50Ah LFP</td>
+                <td class="p-4 text-muted">640 Wh</td>
+                <td class="p-4 font-mono text-primary">461 Wh</td>
+                <td class="p-4 font-mono text-primary">~9.2 hrs</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">100Ah LFP</td>
+                <td class="p-4 text-muted">1,280 Wh</td>
+                <td class="p-4 font-mono text-primary">922 Wh</td>
+                <td class="p-4 font-mono text-primary">~18.4 hrs</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">200Ah LFP</td>
+                <td class="p-4 text-muted">2,560 Wh</td>
+                <td class="p-4 font-mono text-primary">1,843 Wh</td>
+                <td class="p-4 font-mono text-primary">~36.9 hrs</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">300Ah LFP</td>
+                <td class="p-4 text-muted">3,840 Wh</td>
+                <td class="p-4 font-mono text-primary">2,765 Wh</td>
+                <td class="p-4 font-mono text-primary">~55.3 hrs</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">100Ah AGM</td>
+                <td class="p-4 text-muted">1,200 Wh</td>
+                <td class="p-4 font-mono text-primary">540 Wh</td>
+                <td class="p-4 font-mono text-primary">~10.8 hrs</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">200Ah AGM</td>
+                <td class="p-4 text-muted">2,400 Wh</td>
+                <td class="p-4 font-mono text-primary">1,080 Wh</td>
+                <td class="p-4 font-mono text-primary">~21.6 hrs</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">220Ah Flooded</td>
+                <td class="p-4 text-muted">2,640 Wh</td>
+                <td class="p-4 font-mono text-primary">1,069 Wh</td>
+                <td class="p-4 font-mono text-primary">~21.4 hrs*</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-caption text-muted mt-2">* Flooded lead-acid runtime reduced by Peukert effect at moderate discharge rates. DoD: 80% LFP, 50% AGM/flooded.</p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Real-World Scenarios</h2>
+
+        <div class="flex flex-col gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Scenario 1: Weekend Car Camping</h4>
+            <p class="text-body-sm text-muted mb-3">
+              Two people, 2-night trip, small 30L 12V fridge (35W average). Using a single 100Ah LFP battery with no solar. The battery provides approximately 24 hours of fridge runtime — enough to reach camp Friday evening and last until Saturday evening. A 100W portable solar panel placed in the sun during the day can extend this indefinitely.
+            </p>
+            <div class="font-mono text-m-blue-light text-xs">100Ah LFP · 35W fridge · ~24 hrs runtime</div>
+          </CalculatorCard>
+
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Scenario 2: Week-Long RV Trip</h4>
+            <p class="text-body-sm text-muted mb-3">
+              Family of four, 7-day RV trip with a large 60L 12V fridge (55W average). Using two 200Ah LFP batteries (400Ah total) and 400W of roof-mounted solar. Daily fridge consumption is 1,320 Wh. Solar generates approximately 1,500 Wh per day in good conditions, covering the fridge load with margin. The 400Ah battery bank provides 5+ days of cloud cover buffer.
+            </p>
+            <div class="font-mono text-m-blue-light text-xs">400Ah LFP · 55W fridge · 400W solar · indefinite runtime</div>
+          </CalculatorCard>
+
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Scenario 3: Hot Climate Expedition</h4>
+            <p class="text-body-sm text-muted mb-3">
+              Desert camping at 40°C+ ambient. A 12V fridge that normally averages 40W now draws 65W due to extreme heat. A 200Ah LFP battery provides approximately 20 hours of runtime. In this scenario, solar output is also affected by heat — panel efficiency drops ~0.4% per °C above 25°C. You need at least 300W of solar to keep pace with the increased consumption.
+            </p>
+            <div class="font-mono text-m-blue-light text-xs">200Ah LFP · 65W fridge (hot) · ~20 hrs · 300W+ solar needed</div>
+          </CalculatorCard>
+
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Scenario 4: Overland Vehicle with Alternator Charging</h4>
+            <p class="text-body-sm text-muted mb-3">
+              Overland truck with a 200Ah LFP battery, 12V fridge (45W average), and DC-DC charger connected to the alternator. During driving (4 hours/day), the DC-DC charger replenishes approximately 500 Wh. Daily fridge consumption is 1,080 Wh. The battery covers the remaining 580 Wh overnight. With alternator charging, the system runs indefinitely as long as the vehicle is driven daily.
+            </p>
+            <div class="font-mono text-m-blue-light text-xs">200Ah LFP · 45W fridge · DC-DC alternator charging · indefinite</div>
+          </CalculatorCard>
+
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Scenario 5: Emergency Backup (Power Outage)</h4>
+            <p class="text-body-sm text-muted mb-3">
+              Using a 12V fridge during a power outage with a 100Ah LFP battery as backup. The fridge is well-stocked (high thermal mass) and opened minimally. Average draw drops to 35W. Runtime on a full battery is approximately 26 hours. Adding a 200W portable solar panel on a sunny day extends this to cover the full outage.
+            </p>
+            <div class="font-mono text-m-blue-light text-xs">100Ah LFP · 35W fridge (minimal openings) · ~26 hrs</div>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Common Mistakes</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Using Peak Power Instead of Average</h4>
+            <p class="text-body-sm text-muted">
+              A fridge compressor might draw 60–80W when running but only runs 30–40% of the time. Using the peak draw instead of the 24-hour average overestimates consumption and leads to oversizing. Always use the average power draw over a full day.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Ignoring Temperature Effects</h4>
+            <p class="text-body-sm text-muted">
+              Hot ambient temperatures significantly increase fridge runtime. If your system is sized for mild spring conditions, it may fall short during summer camping. Add 30–50% margin for hot-weather use.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Connecting to the Starter Battery</h4>
+            <p class="text-body-sm text-muted">
+              Running a fridge from your vehicle's starter battery is a common mistake that leaves you stranded. A 100Ah starter battery at 50% DoD provides roughly 200 Wh — enough to drain it completely in 3–4 hours of fridge operation. Always use a dedicated deep-cycle house battery.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Forgetting Inverter Losses</h4>
+            <p class="text-body-sm text-muted">
+              If you run a 12V fridge through an inverter (converting DC to AC), the inverter consumes 8–15% of the energy. This reduces runtime by roughly one hour per 10 hours of operation. Use a DC fridge whenever possible to avoid this loss.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Recommended Battery Sizes for 12V Fridges</h2>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Trip Duration</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Without Solar</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">With 100–200W Solar</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">Day trip (12 hrs)</td>
+                <td class="p-4 font-mono text-primary">50Ah LFP</td>
+                <td class="p-4 font-mono text-primary">N/A — solar not needed</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Weekend (2 days)</td>
+                <td class="p-4 font-mono text-primary">100Ah LFP</td>
+                <td class="p-4 font-mono text-primary">50Ah LFP</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Long weekend (3–4 days)</td>
+                <td class="p-4 font-mono text-primary">200Ah LFP</td>
+                <td class="p-4 font-mono text-primary">100Ah LFP</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Extended trip (5–7 days)</td>
+                <td class="p-4 font-mono text-primary">300–400Ah LFP</td>
+                <td class="p-4 font-mono text-primary">100–200Ah LFP</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Full-time / indefinite</td>
+                <td class="p-4 font-mono text-primary">Not practical</td>
+                <td class="p-4 font-mono text-primary">200Ah+ LFP + 200W+ solar</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-caption text-muted mt-2">Recommendations based on a 50W average fridge. Adjust proportionally for your fridge's actual consumption.</p>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Calculate Your Exact Battery Requirement</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use the Runtime Calculator to determine exact battery runtime for your specific fridge model, battery capacity, and usage patterns.
+          </p>
+          <a href="/tools/runtime-calculator" class="btn-primary text-xs py-3 px-6 inline-block">Open Runtime Calculator</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Related Tool</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Planning a larger RV or camper system? Size your complete house battery bank with the RV Battery Calculator.
+          </p>
+          <a href="/tools/rv-battery-calculator" class="btn-primary-outline text-xs py-3 px-6 inline-block">Open RV Battery Calculator</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Related Articles</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">How Long Will a 100Ah Battery Last?</h4>
+            <p class="text-body-sm text-muted mb-3">Detailed runtime examples for 100Ah batteries across common load scenarios including fridges, lights, and electronics.</p>
+            <a href="/learn/how-long-will-a-100ah-battery-last" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Read Guide →</a>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">RV Battery Sizing Guide</h4>
+            <p class="text-body-sm text-muted mb-3">Complete guide to sizing RV house batteries for boondocking with load inventory and consumption calculations.</p>
+            <a href="/learn/rv-battery-sizing-guide" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Read Guide →</a>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

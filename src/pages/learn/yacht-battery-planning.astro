@@ -1,0 +1,227 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import CalculatorCard from '../../components/CalculatorCard.astro';
+import FormulaBox from '../../components/FormulaBox.astro';
+import FAQSection from '../../components/FAQSection.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "How much battery capacity does a weekend yacht trip need?",
+    answer: "A typical weekend yacht trip (2 days, 2 people) consumes 2–4 kWh per day for hotel loads. With a 2-day autonomy buffer and 50% DoD, you need approximately 8–16 kWh of stored energy. At 12V, this translates to 667–1,333 Ah. A 24V or 48V system reduces the Ah requirement proportionally.",
+  },
+  {
+    question: "What is the difference between yacht hotel loads and cruising loads?",
+    answer: "Hotel loads are the baseline electrical demand when the engines are off — lights, refrigeration, water pumps, electronics. Cruising loads include additional instruments, navigation displays, and engine-related pumps, but are offset by alternator charging. Hotel loads are the critical design scenario for battery sizing.",
+  },
+  {
+    question: "Should yachts use 12V or 24V battery systems?",
+    answer: "For boats under 45 feet, 12V systems are common due to compatibility with standard marine electronics. For larger yachts with higher power demands, 24V or 48V systems reduce current draw, allowing thinner cables and smaller bus bars. Many modern yachts use 48V for hotel loads with DC-DC converters for 12V sub-systems.",
+  },
+  {
+    question: "Can solar panels fully power a yacht's hotel loads?",
+    answer: "In tropical latitudes, 400–800W of solar can offset 3–6 kWh/day. In temperate regions with cloud cover, solar typically provides 30–50% of hotel load needs. Solar is an excellent supplement but should not be the sole power source for critical hotel loads without battery backup.",
+  },
+];
+---
+
+<Layout
+  title="Yacht Battery Planning Guide | Battery Calculators"
+  description="Complete battery planning guide for yachts: hotel loads, navigation, anchoring vs cruising modes, and worked examples for weekend trips with 3kWh/day consumption."
+  canonical="https://batterycalculators.com/learn/yacht-battery-planning"
+  schema="faqPage"
+  schemaName="Yacht Battery Planning Guide"
+  schemaDescription="Engineering guide to yacht battery system planning and hotel load management."
+  schemaUrl="https://batterycalculators.com/learn/yacht-battery-planning"
+  faqItems={faqItems}
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/learn" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Back to Guides</a>
+      <Breadcrumb items={[
+        { label: "Learning Center", href: "/learn" },
+        { label: "Yacht Battery Planning Guide" }
+      ]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">MARINE</span>
+      <h1 class="text-display-md text-primary mb-6">Yacht Battery Planning Guide</h1>
+      <p class="text-body-md text-body font-light">
+        Yachts operate in a unique electrical environment. Unlike smaller boats, yachts have substantial hotel loads — galley equipment, climate control, entertainment systems, and watermakers — that must be sustained over multi-day passages and extended anchoring periods. This guide walks through the engineering method for planning a yacht battery system that handles both hotel and navigation loads reliably.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Understanding Yacht Electrical Loads</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Yacht electrical planning revolves around two distinct operating modes: anchored (hotel loads only) and cruising (hotel loads plus navigation and engine-related systems). The anchored scenario is the critical design case because there is no alternator input — the battery bank must carry all loads unaided for 12–18 hours overnight or longer during extended stays.
+        </p>
+        <p class="text-body-md text-body font-light mb-4">
+          A weekend yacht trip with moderate loads typically consumes 2–4 kWh per day. Larger yachts with watermakers, air conditioning, or extensive entertainment systems can easily consume 8–15 kWh per day. The key is to inventory every load, estimate daily consumption, and size the battery bank for the required autonomy period.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Load Category</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Typical Daily Consumption</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Notes</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">Refrigeration</td>
+                <td class="p-4 font-mono text-primary">0.8–1.5 kWh</td>
+                <td class="p-4 text-muted">Runs 24h, cycles on/off</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Cabin lighting</td>
+                <td class="p-4 font-mono text-primary">0.2–0.5 kWh</td>
+                <td class="p-4 text-muted">LED preferred, 4–6h evening use</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Navigation electronics</td>
+                <td class="p-4 font-mono text-primary">0.5–1.0 kWh</td>
+                <td class="p-4 text-muted">Chartplotter, radar, AIS when underway</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Water pump</td>
+                <td class="p-4 font-mono text-primary">0.1–0.3 kWh</td>
+                <td class="p-4 text-muted">Intermittent duty, pressure switch</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Communication</td>
+                <td class="p-4 font-mono text-primary">0.1–0.3 kWh</td>
+                <td class="p-4 text-muted">VHF, SSB, satellite phone</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Watermaker</td>
+                <td class="p-4 font-mono text-primary">1.5–3.0 kWh</td>
+                <td class="p-4 text-muted">Only when running, high draw</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Entertainment</td>
+                <td class="p-4 font-mono text-primary">0.3–0.8 kWh</td>
+                <td class="p-4 text-muted">TV, audio, charging devices</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <FormulaBox title="Yacht Battery Sizing Formula">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Required Energy (Wh) = Daily Load (Wh) × Autonomy Days × Safety Factor
+        </div>
+        <p>
+          The safety factor accounts for battery aging, temperature derating, and parasitic loads. For marine applications, use 1.20–1.30 depending on conditions.
+        </p>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Required Capacity (Ah) = Required Energy / (System Voltage × DoD)
+        </div>
+        <p>
+          Use 50% DoD for lead-acid AGM, 80% for lithium LFP. Always round up to the nearest standard battery size.
+        </p>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Anchoring vs Cruising</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          The critical difference between anchoring and cruising is charge input. When cruising, the alternator (or generators) continuously recharge the battery bank, so the battery only needs to bridge brief engine-off periods. When anchored, there is no charge input and the battery bank is the sole energy source for all hotel loads — typically 12–18 hours overnight.
+        </p>
+        <p class="text-body-md text-body font-light mb-4">
+          Design your battery bank around the anchored scenario. The alternator handles cruising loads. If you plan extended stays at anchor (multi-day), consider adding solar or a dedicated generator to reduce battery cycling depth and extend battery life.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Worked Example: Weekend Yacht Trip</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Scenario:</strong> Weekend cruise (2 days), 2 people, 3 kWh/day consumption, anchored overnight for 14 hours each night. 24V lithium LFP system.</p>
+            <p><strong>Step 1:</strong> Calculate total energy requirement:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              3,000 Wh/day × 1.25 safety factor = 3,750 Wh
+            </div>
+            <p><strong>Step 2:</strong> Convert to Ah at 24V with 80% DoD (LFP):</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              3,750 Wh / (0.80 × 24V) = 195 Ah
+            </div>
+            <p><strong>Step 3:</strong> Size for 2-day autonomy:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              195 Ah × 2 = 390 Ah
+            </div>
+            <p><strong>Step 4:</strong> Select battery configuration. Two 24V 200Ah LFP batteries in parallel provide 400 Ah at 24V — 9,600 Wh total. At 80% DoD, usable energy is 7,680 Wh, supporting 2.56 days at 3,000 Wh/day with margin for load growth.</p>
+            <p><strong>Step 5:</strong> Verify overnight discharge. Anchored 14 hours with 125W average hotel load = 1,750 Wh. Bank provides 7,680 Wh usable — sufficient for 4.4 overnight cycles before needing recharge.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Power Source Options</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Alternator Charging</h4>
+            <p class="text-body-sm text-muted">
+              Primary charging source while cruising. A 120A alternator on a 24V system can replenish 2,880 Wh/hour. Effective for daytime running but unavailable at anchor without engine idle or a dedicated generator.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Solar Panels</h4>
+            <p class="text-body-sm text-muted">
+              400–800W of solar can generate 2–6 kWh/day depending on latitude and season. Excellent for extending anchor stays without engine use. Requires MPPT charge controller and sufficient deck/roof mounting area.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Shore Power</h4>
+            <p class="text-body-sm text-muted">
+              When docked, shore power via a battery charger keeps the bank topped up and eliminates cycling. Use a multi-stage marine charger matched to your battery chemistry to avoid overcharging and maximize battery life.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Generator</h4>
+            <p class="text-body-sm text-muted">
+              A dedicated diesel or propane generator provides charge input independent of the main engine. Sized at 5–15 kW for yacht hotel loads. Most effective for multi-day anchoring where solar is insufficient and engine idle is impractical.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Try It</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use the Marine Battery Sizing Calculator to input your specific yacht loads and get a bank recommendation.
+          </p>
+          <a href="/tools/marine-battery-sizing-calculator" class="btn-primary text-xs py-3 px-6 inline-block">Open Marine Battery Sizing Calculator</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Next Step</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Calculate how long your yacht battery bank will power your hotel loads during overnight anchoring.
+          </p>
+          <a href="/tools/runtime-calculator" class="btn-primary text-xs py-3 px-6 inline-block">Open Runtime Calculator</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Related Articles</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <a href="/learn/marine-battery-sizing-guide" class="text-primary hover:underline font-bold block mb-2">Marine Battery Sizing Guide</a>
+            <p class="text-body-sm text-muted">
+              The standard method for sizing marine house battery banks — covers hotel loads, environment factors, and battery chemistry selection.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <a href="/learn/lithium-marine-batteries" class="text-primary hover:underline font-bold block mb-2">Lithium Marine Batteries</a>
+            <p class="text-body-sm text-muted">
+              Why LFP is replacing lead-acid in marine applications — weight savings, cycle life, and vibration resistance compared.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

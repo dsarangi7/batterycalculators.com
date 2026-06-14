@@ -1,0 +1,384 @@
+---
+---
+<div class="bg-surface-card border border-hairline p-6 md:p-8" id="calculator-finder">
+  <!-- Step 1: Category Selection -->
+  <div id="cf-step1">
+    <h2 class="text-title-lg text-primary mb-1">Find the Right Calculator</h2>
+    <p class="text-body-sm text-muted mb-6">Answer two quick questions to get a recommendation.</p>
+
+    <p class="text-label-uppercase text-m-blue-light text-[10px] block mb-3">WHAT ARE YOU WORKING ON?</p>
+    <div class="flex flex-wrap gap-2" role="radiogroup" aria-label="Application category">
+      <button
+        type="button"
+        class="cf-option bg-surface-elevated border border-hairline text-body-strong text-body-sm px-4 py-2 hover:border-primary hover:text-primary transition-colors cursor-pointer"
+        data-category="solar"
+        role="radio"
+        aria-checked="false"
+      >Solar / Off-grid</button>
+      <button
+        type="button"
+        class="cf-option bg-surface-elevated border border-hairline text-body-strong text-body-sm px-4 py-2 hover:border-primary hover:text-primary transition-colors cursor-pointer"
+        data-category="home-backup"
+        role="radio"
+        aria-checked="false"
+      >Home Backup</button>
+      <button
+        type="button"
+        class="cf-option bg-surface-elevated border border-hairline text-body-strong text-body-sm px-4 py-2 hover:border-primary hover:text-primary transition-colors cursor-pointer"
+        data-category="rv"
+        role="radio"
+        aria-checked="false"
+      >RV / Camper</button>
+      <button
+        type="button"
+        class="cf-option bg-surface-elevated border border-hairline text-body-strong text-body-sm px-4 py-2 hover:border-primary hover:text-primary transition-colors cursor-pointer"
+        data-category="marine"
+        role="radio"
+        aria-checked="false"
+      >Marine / Boat</button>
+      <button
+        type="button"
+        class="cf-option bg-surface-elevated border border-hairline text-body-strong text-body-sm px-4 py-2 hover:border-primary hover:text-primary transition-colors cursor-pointer"
+        data-category="ev"
+        role="radio"
+        aria-checked="false"
+      >EV / Battery Pack</button>
+      <button
+        type="button"
+        class="cf-option bg-surface-elevated border border-hairline text-body-strong text-body-sm px-4 py-2 hover:border-primary hover:text-primary transition-colors cursor-pointer"
+        data-category="bess"
+        role="radio"
+        aria-checked="false"
+      >BESS / Commercial</button>
+      <button
+        type="button"
+        class="cf-option bg-surface-elevated border border-hairline text-body-strong text-body-sm px-4 py-2 hover:border-primary hover:text-primary transition-colors cursor-pointer"
+        data-category="general"
+        role="radio"
+        aria-checked="false"
+      >General Calculation</button>
+    </div>
+  </div>
+
+  <!-- Step 2: Goal Selection (hidden until step 1 completes) -->
+  <div id="cf-step2" class="hidden mt-6 pt-6 border-t border-hairline">
+    <div class="flex items-center justify-between mb-3">
+      <p class="text-label-uppercase text-m-blue-light text-[10px]" id="cf-step2-label">WHAT DO YOU WANT TO CALCULATE?</p>
+      <button
+        type="button"
+        id="cf-back-btn"
+        class="text-label-uppercase text-muted text-[10px] hover:text-primary transition-colors cursor-pointer"
+        aria-label="Go back to category selection"
+      >← BACK</button>
+    </div>
+    <div class="flex flex-wrap gap-2" id="cf-goals" role="radiogroup" aria-label="Calculation goal">
+    </div>
+  </div>
+
+  <!-- Results -->
+  <div id="cf-results" class="hidden mt-6 pt-6 border-t border-hairline">
+    <p class="text-label-uppercase text-m-blue-light text-[10px] block mb-4">RECOMMENDED CALCULATORS</p>
+    <ul class="space-y-2" id="cf-results-list" role="list">
+    </ul>
+  </div>
+</div>
+
+<script>
+(function() {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const rules: Record<string, { goals: { id: string; label: string }[]; recommendations: Record<string, { name: string; href: string }[]> }> = {
+    'solar': {
+      goals: [
+        { id: 'sizing', label: 'Size a battery bank for solar storage' },
+        { id: 'runtime', label: 'Estimate runtime from solar loads' },
+        { id: 'charging', label: 'Calculate solar charging time' },
+        { id: 'degradation', label: 'Estimate battery degradation over time' },
+      ],
+      recommendations: {
+        sizing: [
+          { name: 'Solar Battery Sizing Calculator', href: '/tools/solar-battery-sizing-calculator' },
+          { name: 'Battery Sizing Calculator', href: '/tools/battery-sizing-calculator' },
+        ],
+        runtime: [
+          { name: 'Runtime Calculator', href: '/tools/runtime-calculator' },
+          { name: 'Energy Conversion Calculator', href: '/tools/energy-conversion-calculator' },
+        ],
+        charging: [
+          { name: 'Charging Time Calculator', href: '/tools/charging-time-calculator' },
+          { name: 'C-Rate Calculator', href: '/tools/c-rate-calculator' },
+        ],
+        degradation: [
+          { name: 'Battery Degradation Estimator', href: '/tools/battery-degradation-estimator' },
+          { name: 'SOC Estimator', href: '/tools/soc-estimator' },
+        ],
+      },
+    },
+    'home-backup': {
+      goals: [
+        { id: 'sizing', label: 'Size a backup battery system' },
+        { id: 'inverter', label: 'Match battery to inverter / AC load' },
+        { id: 'runtime', label: 'Estimate backup runtime for essentials' },
+        { id: 'degradation', label: 'Estimate battery degradation over time' },
+      ],
+      recommendations: {
+        sizing: [
+          { name: 'Home Backup Battery Calculator', href: '/tools/home-backup-battery-calculator' },
+          { name: 'Battery Sizing Calculator', href: '/tools/battery-sizing-calculator' },
+        ],
+        inverter: [
+          { name: 'Inverter Battery Calculator', href: '/tools/inverter-battery-calculator' },
+          { name: 'Energy Conversion Calculator', href: '/tools/energy-conversion-calculator' },
+        ],
+        runtime: [
+          { name: 'Runtime Calculator', href: '/tools/runtime-calculator' },
+          { name: 'C-Rate Calculator', href: '/tools/c-rate-calculator' },
+        ],
+        degradation: [
+          { name: 'Battery Degradation Estimator', href: '/tools/battery-degradation-estimator' },
+          { name: 'SOC Estimator', href: '/tools/soc-estimator' },
+        ],
+      },
+    },
+    'rv': {
+      goals: [
+        { id: 'sizing', label: 'Size batteries for van / camper life' },
+        { id: 'inverter', label: 'Match battery to inverter / AC appliances' },
+        { id: 'runtime', label: 'Estimate off-grid runtime' },
+        { id: 'charging', label: 'Calculate alternator / solar charging time' },
+      ],
+      recommendations: {
+        sizing: [
+          { name: 'RV Battery Calculator', href: '/tools/rv-battery-calculator' },
+          { name: 'Battery Sizing Calculator', href: '/tools/battery-sizing-calculator' },
+        ],
+        inverter: [
+          { name: 'Inverter Battery Calculator', href: '/tools/inverter-battery-calculator' },
+          { name: 'Parallel String Calculator', href: '/tools/parallel-string-calculator' },
+        ],
+        runtime: [
+          { name: 'Runtime Calculator', href: '/tools/runtime-calculator' },
+          { name: 'Energy Conversion Calculator', href: '/tools/energy-conversion-calculator' },
+        ],
+        charging: [
+          { name: 'Charging Time Calculator', href: '/tools/charging-time-calculator' },
+          { name: 'C-Rate Calculator', href: '/tools/c-rate-calculator' },
+        ],
+      },
+    },
+    'marine': {
+      goals: [
+        { id: 'sizing', label: 'Size a marine battery bank' },
+        { id: 'cable', label: 'Calculate cable loss or voltage drop' },
+        { id: 'runtime', label: 'Estimate hotel-load runtime' },
+        { id: 'charging', label: 'Calculate shore / alternator charge time' },
+      ],
+      recommendations: {
+        sizing: [
+          { name: 'Marine Battery Sizing Calculator', href: '/tools/marine-battery-sizing-calculator' },
+          { name: 'Battery Sizing Calculator', href: '/tools/battery-sizing-calculator' },
+        ],
+        cable: [
+          { name: 'DC Cable Loss Calculator', href: '/tools/dc-cable-loss-calculator' },
+          { name: 'Voltage Drop Calculator', href: '/tools/voltage-drop-calculator' },
+        ],
+        runtime: [
+          { name: 'Runtime Calculator', href: '/tools/runtime-calculator' },
+          { name: 'Inverter Battery Calculator', href: '/tools/inverter-battery-calculator' },
+        ],
+        charging: [
+          { name: 'Charging Time Calculator', href: '/tools/charging-time-calculator' },
+          { name: 'C-Rate Calculator', href: '/tools/c-rate-calculator' },
+        ],
+      },
+    },
+    'ev': {
+      goals: [
+        { id: 'pack', label: 'Design a battery pack (series / parallel)' },
+        { id: 'cable', label: 'Calculate wiring losses or voltage drop' },
+        { id: 'crate', label: 'Determine safe C-rate / current limits' },
+        { id: 'conversion', label: 'Convert between Ah, Wh, and energy units' },
+      ],
+      recommendations: {
+        pack: [
+          { name: 'Battery Pack Calculator', href: '/tools/battery-pack-calculator' },
+          { name: 'Parallel String Calculator', href: '/tools/parallel-string-calculator' },
+        ],
+        cable: [
+          { name: 'DC Cable Loss Calculator', href: '/tools/dc-cable-loss-calculator' },
+          { name: 'Voltage Drop Calculator', href: '/tools/voltage-drop-calculator' },
+        ],
+        crate: [
+          { name: 'C-Rate Calculator', href: '/tools/c-rate-calculator' },
+          { name: 'Battery Pack Calculator', href: '/tools/battery-pack-calculator' },
+        ],
+        conversion: [
+          { name: 'Energy Conversion Calculator', href: '/tools/energy-conversion-calculator' },
+          { name: 'SOC Estimator', href: '/tools/soc-estimator' },
+        ],
+      },
+    },
+    'bess': {
+      goals: [
+        { id: 'roi', label: 'Evaluate ROI and payback period' },
+        { id: 'sizing', label: 'Size a BESS for peak shaving or TOU' },
+        { id: 'conversion', label: 'Convert energy units or capacity' },
+        { id: 'degradation', label: 'Estimate battery life and degradation' },
+      ],
+      recommendations: {
+        roi: [
+          { name: 'BESS ROI Calculator', href: '/tools/bess-roi-calculator' },
+          { name: 'Energy Conversion Calculator', href: '/tools/energy-conversion-calculator' },
+        ],
+        sizing: [
+          { name: 'Battery Sizing Calculator', href: '/tools/battery-sizing-calculator' },
+          { name: 'Inverter Battery Calculator', href: '/tools/inverter-battery-calculator' },
+        ],
+        conversion: [
+          { name: 'Energy Conversion Calculator', href: '/tools/energy-conversion-calculator' },
+          { name: 'SOC Estimator', href: '/tools/soc-estimator' },
+        ],
+        degradation: [
+          { name: 'Battery Degradation Estimator', href: '/tools/battery-degradation-estimator' },
+          { name: 'BESS ROI Calculator', href: '/tools/bess-roi-calculator' },
+        ],
+      },
+    },
+    'general': {
+      goals: [
+        { id: 'sizing', label: 'Size a battery bank' },
+        { id: 'runtime', label: 'Estimate runtime from load' },
+        { id: 'conversion', label: 'Convert between Ah, Wh, and units' },
+        { id: 'crate', label: 'Calculate C-rate or safe current' },
+      ],
+      recommendations: {
+        sizing: [
+          { name: 'Battery Sizing Calculator', href: '/tools/battery-sizing-calculator' },
+          { name: 'Parallel String Calculator', href: '/tools/parallel-string-calculator' },
+        ],
+        runtime: [
+          { name: 'Runtime Calculator', href: '/tools/runtime-calculator' },
+          { name: 'Charging Time Calculator', href: '/tools/charging-time-calculator' },
+        ],
+        conversion: [
+          { name: 'Energy Conversion Calculator', href: '/tools/energy-conversion-calculator' },
+          { name: 'SOC Estimator', href: '/tools/soc-estimator' },
+        ],
+        crate: [
+          { name: 'C-Rate Calculator', href: '/tools/c-rate-calculator' },
+          { name: 'Battery Pack Calculator', href: '/tools/battery-pack-calculator' },
+        ],
+      },
+    },
+  };
+
+  let selectedCategory: string | null = null;
+  let selectedGoal: string | null = null;
+
+  const step1 = document.getElementById('cf-step1') as HTMLElement | null;
+  const step2 = document.getElementById('cf-step2') as HTMLElement | null;
+  const goalsContainer = document.getElementById('cf-goals') as HTMLElement | null;
+  const resultsContainer = document.getElementById('cf-results') as HTMLElement | null;
+  const resultsList = document.getElementById('cf-results-list') as HTMLElement | null;
+  const backBtn = document.getElementById('cf-back-btn') as HTMLElement | null;
+
+  function emitFinderEvent(category: string, goal: string) {
+    if (typeof window !== 'undefined' && window.dataLayer) {
+      window.dataLayer.push({
+        event: 'calculator_finder_used',
+        selected_category: category,
+        selected_goal: goal,
+      });
+    }
+  }
+
+  function showResults(category: string, goal: string) {
+    const data = rules[category];
+    const recs = data?.recommendations[goal];
+    if (!recs || recs.length === 0) return;
+
+    if (resultsList) resultsList.innerHTML = '';
+    recs.forEach(function(rec: { name: string; href: string }) {
+      const li = document.createElement('li');
+      const a = document.createElement('a');
+      a.href = rec.href;
+      a.className = 'flex items-center justify-between bg-surface-elevated border border-hairline p-4 text-primary hover:border-primary transition-colors group';
+      a.innerHTML = '<span class="text-title-sm text-primary group-hover:text-m-blue-light transition-colors">' + rec.name + '</span><span class="text-label-uppercase text-muted text-[10px] group-hover:text-primary transition-colors">OPEN →</span>';
+      li.appendChild(a);
+      if (resultsList) resultsList.appendChild(li);
+    });
+
+    if (resultsContainer) resultsContainer.classList.remove('hidden');
+    emitFinderEvent(category, goal);
+  }
+
+  function showStep2(category: string) {
+    selectedCategory = category;
+    const data = rules[category];
+    if (!data || !goalsContainer) return;
+
+    goalsContainer.innerHTML = '';
+    data.goals.forEach(function(goal: { id: string; label: string }) {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'cf-option bg-surface-elevated border border-hairline text-body-strong text-body-sm px-4 py-2 hover:border-primary hover:text-primary transition-colors cursor-pointer';
+      btn.textContent = goal.label;
+      btn.setAttribute('role', 'radio');
+      btn.setAttribute('aria-checked', 'false');
+      btn.setAttribute('data-goal', goal.id);
+      btn.addEventListener('click', function() {
+        selectedGoal = goal.id;
+        goalsContainer.querySelectorAll('.cf-option').forEach(function(b) {
+          b.classList.remove('border-primary', 'text-primary', 'bg-canvas');
+          b.classList.add('border-hairline', 'text-body-strong');
+          b.setAttribute('aria-checked', 'false');
+        });
+        btn.classList.add('border-primary', 'text-primary', 'bg-canvas');
+        btn.classList.remove('border-hairline', 'text-body-strong');
+        btn.setAttribute('aria-checked', 'true');
+        if (selectedCategory && selectedGoal) showResults(selectedCategory, selectedGoal);
+      });
+      goalsContainer.appendChild(btn);
+    });
+
+    if (step1) step1.classList.add('hidden');
+    if (resultsContainer) resultsContainer.classList.add('hidden');
+    if (step2) step2.classList.remove('hidden');
+  }
+
+  function showStep1() {
+    selectedCategory = null;
+    selectedGoal = null;
+    if (step2) step2.classList.add('hidden');
+    if (resultsContainer) resultsContainer.classList.add('hidden');
+    if (step1) step1.classList.remove('hidden');
+
+    if (step1) {
+      step1.querySelectorAll('.cf-option').forEach(function(b) {
+        b.classList.remove('border-primary', 'text-primary', 'bg-canvas');
+        b.classList.add('border-hairline', 'text-body-strong');
+        b.setAttribute('aria-checked', 'false');
+      });
+    }
+  }
+
+  if (step1) {
+    step1.querySelectorAll('.cf-option').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        step1.querySelectorAll('.cf-option').forEach(function(b) {
+          b.classList.remove('border-primary', 'text-primary', 'bg-canvas');
+          b.classList.add('border-hairline', 'text-body-strong');
+          b.setAttribute('aria-checked', 'false');
+        });
+        btn.classList.add('border-primary', 'text-primary', 'bg-canvas');
+        btn.classList.remove('border-hairline', 'text-body-strong');
+        btn.setAttribute('aria-checked', 'true');
+        showStep2(btn.getAttribute('data-category') || '');
+      });
+    });
+  }
+
+  if (backBtn) {
+    backBtn.addEventListener('click', showStep1);
+  }
+})();
+</script>

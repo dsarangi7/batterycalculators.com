@@ -1,11 +1,380 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
+import Layout from "../layouts/Layout.astro";
+import CalculatorCard from "../components/CalculatorCard.astro";
+import CategoryCard from "../components/CategoryCard.astro";
+import CalculatorFinder from "../components/CalculatorFinder.astro";
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+const categories = [
+  {
+    href: "/solar",
+    title: "Solar",
+    description: "Sizing, off-grid planning, and home backup with PV + storage",
+    calculatorCount: 3,
+  },
+  {
+    href: "/home-backup",
+    title: "Home Backup",
+    description: "Essential loads, runtime planning, and outage preparedness",
+    calculatorCount: 3,
+  },
+  {
+    href: "/rv",
+    title: "RV",
+    description:
+      "Van/camper energy planning, runtime estimates, inverter matching",
+    calculatorCount: 3,
+  },
+  {
+    href: "/marine",
+    title: "Marine",
+    description:
+      "Boat electrical planning, load estimation, and battery sizing",
+    calculatorCount: 3,
+  },
+  {
+    href: "/ev",
+    title: "EV",
+    description: "Pack design, series/parallel configuration, voltage planning",
+    calculatorCount: 4,
+  },
+  {
+    href: "/bess",
+    title: "BESS",
+    description: "Commercial ROI, peak shaving, and demand charge planning",
+    calculatorCount: 3,
+  },
+  {
+    href: "/engineering",
+    title: "Engineering",
+    description: "C-rate, SOC/SOH, voltage drop, and cable loss analysis",
+    calculatorCount: 6,
+  },
+];
+
+const featuredCalculators = [
+  {
+    name: "Runtime Calculator",
+    href: "/tools/runtime-calculator",
+    category: "Cell & Pack",
+    description:
+      "Estimate discharge runtime from capacity, load, and efficiency.",
+  },
+  {
+    name: "Battery Sizing Calculator",
+    href: "/tools/battery-sizing-calculator",
+    category: "Electrical",
+    description:
+      "Size battery banks from daily loads, autonomy, and temperature.",
+  },
+  {
+    name: "C-Rate Calculator",
+    href: "/tools/c-rate-calculator",
+    category: "Cell & Pack",
+    description: "Calculate charge/discharge current and C-rate speed.",
+  },
+  {
+    name: "DC Voltage Drop Calculator",
+    href: "/tools/voltage-drop-calculator",
+    category: "Electrical",
+    description: "Calculate voltage drop across DC conductors.",
+  },
+  {
+    name: "DC Cable Loss Calculator",
+    href: "/tools/dc-cable-loss-calculator",
+    category: "Electrical",
+    description: "Determine resistive power losses in DC lines.",
+  },
+  {
+    name: "BESS ROI Calculator",
+    href: "/tools/bess-roi-calculator",
+    category: "ROI & Life",
+    description: "Evaluate NPV and payback for commercial battery storage.",
+  },
+];
+
+const learnArticles = [
+  {
+    title: "What Is Battery C-Rate?",
+    href: "/learn/what-is-battery-c-rate",
+    category: "Cell Fundamentals",
+  },
+  {
+    title: "How to Calculate Battery Runtime",
+    href: "/learn/how-to-calculate-battery-runtime",
+    category: "System Design",
+  },
+  {
+    title: "How to Size a Battery Bank",
+    href: "/learn/how-to-size-a-battery-bank",
+    category: "System Design",
+  },
+];
 ---
 
-<Layout>
-	<Welcome />
+<Layout
+  title="Battery Calculators for Solar, Home Backup, RV, Marine, EV | Battery Calculators"
+  description="Free engineering-grade battery calculators and sizing tools for homeowners, solar users, RV owners, marine systems, DIY battery builders, and battery professionals."
+  schema="website"
+  schemaName="Battery Calculators"
+  schemaDescription="Engineering-grade battery calculators for solar, home backup, RV, marine, EV, and energy storage systems."
+>
+  <!-- Hero Section -->
+  <section class="border-b border-hairline pb-6 md:pb-8">
+    <div class="grid grid-cols-1 md:grid-cols-[1.1fr_0.9fr] gap-8 md:gap-10 min-h-[28vh] md:min-h-[34vh] items-center">
+      <!-- Left column: copy + CTAs + pills -->
+      <div class="max-w-[700px]">
+        <div class="mb-3">
+          <span
+            class="text-label-uppercase text-m-blue-light text-[11px] block mb-2"
+            >ENGINEERING UTILITY PLATFORM</span
+          >
+          <h1 class="text-display-md text-primary leading-tight mb-3">
+            Battery Calculators &amp; Engineering Tools
+          </h1>
+          <p class="text-body-md text-body font-light max-w-[650px]">
+            Free calculators for solar, home backup, RV, marine, EV, battery
+            packs, and energy storage systems.
+          </p>
+        </div>
+
+        <!-- CTA row -->
+        <div class="mt-5 flex flex-col sm:flex-row gap-3">
+          <a
+            href="/tools"
+            class="btn-primary-outline text-xs text-center sm:text-sm inline-flex flex-1 h-11 items-center justify-center"
+          >
+            Browse Calculators
+          </a>
+          <a
+            href="/learn"
+            class="btn-secondary text-xs text-center sm:text-sm inline-flex flex-1 h-11 items-center justify-center"
+          >
+            Learning Center
+          </a>
+        </div>
+
+        <!-- Quick category pills -->
+        <div class="mt-5 flex flex-wrap gap-2">
+          {
+            [
+              { label: "Solar", href: "/solar" },
+              { label: "Home Backup", href: "/home-backup" },
+              { label: "RV", href: "/rv" },
+              { label: "Marine", href: "/marine" },
+              { label: "EV", href: "/ev" },
+              { label: "BESS", href: "/bess" },
+              { label: "Engineering", href: "/engineering" },
+            ].map((pill) => (
+              <a
+                href={pill.href}
+                class="text-label-uppercase text-muted text-[10px] border border-hairline px-3 py-2 hover:border-primary transition-colors bg-transparent"
+              >
+                {pill.label}
+              </a>
+            ))
+          }
+        </div>
+      </div>
+
+      <!-- Right column: Popular Battery Tools panel -->
+      <div class="bg-surface-card border border-hairline">
+        <div class="border-b border-hairline px-6 py-4">
+          <h2 class="text-title-sm text-primary font-bold">Popular Battery Tools</h2>
+        </div>
+        <div class="divide-y divide-hairline">
+          {
+            [
+              {
+                name: "Solar Battery Sizing",
+                desc: "Solar + storage sizing",
+                href: "/tools/solar-battery-sizing-calculator",
+              },
+              {
+                name: "Home Backup Battery",
+                desc: "Outage runtime planning",
+                href: "/tools/home-backup-battery-calculator",
+              },
+              {
+                name: "RV Battery Calculator",
+                desc: "Camper energy planning",
+                href: "/tools/rv-battery-calculator",
+              },
+              {
+                name: "Battery Pack Calculator",
+                desc: "Series-parallel design",
+                href: "/tools/battery-pack-calculator",
+              },
+              {
+                name: "BESS ROI Calculator",
+                desc: "Payback and savings",
+                href: "/tools/bess-roi-calculator",
+              },
+            ].map((tool) => (
+              <a
+                href={tool.href}
+                class="block px-6 py-4 hover:bg-surface-elevated transition-colors group"
+              >
+                <span class="text-title-sm text-primary group-hover:text-m-blue-light transition-colors block">
+                  {tool.name}
+                </span>
+                <span class="text-body-sm text-muted text-[13px]">
+                  {tool.desc}
+                </span>
+              </a>
+            ))
+          }
+        </div>
+        <div class="border-t border-hairline px-6 py-3">
+          <a
+            href="/tools"
+            class="text-label-uppercase text-m-blue-light text-[10px] hover:text-primary transition-colors"
+          >
+            VIEW ALL TOOLS
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Category Cards Section (must be visible within first viewport) -->
+  <section class="pt-6 md:pt-8 pb-12">
+    <div class="flex items-center justify-between mb-5">
+      <h2 class="text-title-lg text-primary">Tools by Category</h2>
+      <a
+        href="/tools"
+        class="text-label-uppercase text-muted text-[10px] hover:text-primary transition-colors"
+        >VIEW ALL TOOLS →</a
+      >
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      {categories.map((cat) => <CategoryCard {...cat} />)}
+    </div>
+
+    <!-- Calculator Finder -->
+    <div class="mt-8">
+      <CalculatorFinder />
+    </div>
+  </section>
+
+  <!-- Featured Calculators Section -->
+  <section class="mb-16">
+    <div class="flex items-center justify-between mb-8">
+      <h2 class="text-title-lg text-primary">Featured Calculators</h2>
+      <a
+        href="/tools"
+        class="text-label-uppercase text-muted text-[10px] hover:text-primary transition-colors"
+        >VIEW ALL →</a
+      >
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {
+        featuredCalculators.map((calc) => (
+          <a href={calc.href} class="block group">
+            <CalculatorCard class="h-full flex flex-col justify-between">
+              <div>
+                <span class="text-label-uppercase text-m-blue-light text-[10px] block mb-2">
+                  {calc.category}
+                </span>
+                <h3 class="text-title-lg text-primary mb-2 group-hover:text-m-blue-light transition-colors">
+                  {calc.name}
+                </h3>
+                <p class="text-body-sm text-muted mb-6">{calc.description}</p>
+              </div>
+              <span class="btn-primary-outline text-xs text-center py-3 w-full">
+                Open Calculator
+              </span>
+            </CalculatorCard>
+          </a>
+        ))
+      }
+    </div>
+  </section>
+
+  <!-- Learning Center Preview -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <div class="flex items-center justify-between mb-8">
+      <h2 class="text-title-lg text-primary">Learning Center</h2>
+      <a
+        href="/learn"
+        class="text-label-uppercase text-muted text-[10px] hover:text-primary transition-colors"
+        >VIEW ALL GUIDES →</a
+      >
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {
+        learnArticles.map((article) => (
+          <a href={article.href} class="block group">
+            <CalculatorCard class="h-full flex flex-col justify-between">
+              <div>
+                <span class="text-label-uppercase text-m-blue-light text-[10px] block mb-2">
+                  {article.category}
+                </span>
+                <h3 class="text-title-lg text-primary mb-3 group-hover:text-m-blue-light transition-colors">
+                  {article.title}
+                </h3>
+              </div>
+              <span class="text-label-uppercase text-muted text-[10px] group-hover:text-primary transition-colors">
+                READ GUIDE →
+              </span>
+            </CalculatorCard>
+          </a>
+        ))
+      }
+    </div>
+  </section>
+
+  <!-- Trust Section (technical; no emojis) -->
+  <section class="bg-surface-card border border-hairline p-8 md:p-12 mb-16">
+    <h2 class="text-title-lg text-primary mb-8 text-center">
+      Trustworthy Calculations, Built for Engineering Work
+    </h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+      <div class="text-center">
+        <!-- Sigma / function icon -->
+        <svg class="mx-auto mb-4 opacity-90" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--color-body-strong)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 4h12l-4 4 4 4H4" />
+          <path d="M12 12h8" />
+        </svg>
+        <h3 class="text-title-sm text-primary mb-2">Transparent Formulas</h3>
+        <p class="text-body-sm text-muted">
+          All equations and assumptions are visible.
+        </p>
+      </div>
+      <div class="text-center">
+        <!-- Lightning / instant icon -->
+        <svg class="mx-auto mb-4 opacity-90" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--color-body-strong)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8" />
+        </svg>
+        <h3 class="text-title-sm text-primary mb-2">Instant Calculations</h3>
+        <p class="text-body-sm text-muted">
+          Results update immediately in your browser.
+        </p>
+      </div>
+      <div class="text-center">
+        <!-- Open lock icon -->
+        <svg class="mx-auto mb-4 opacity-90" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--color-body-strong)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="5" y="11" width="14" height="10" rx="0" />
+          <path d="M7 11V7a5 5 0 0 1 9.9-1" />
+        </svg>
+        <h3 class="text-title-sm text-primary mb-2">No Registration</h3>
+        <p class="text-body-sm text-muted">
+          Use every tool without creating an account.
+        </p>
+      </div>
+      <div class="text-center">
+        <!-- Technical document icon -->
+        <svg class="mx-auto mb-4 opacity-90" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--color-body-strong)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+          <polyline points="14 2 14 8 20 8" />
+          <line x1="9" y1="13" x2="15" y2="13" />
+          <line x1="9" y1="17" x2="13" y2="17" />
+        </svg>
+        <h3 class="text-title-sm text-primary mb-2">Engineering References</h3>
+        <p class="text-body-sm text-muted">
+          Based on established electrical engineering principles.
+        </p>
+      </div>
+    </div>
+  </section>
 </Layout>

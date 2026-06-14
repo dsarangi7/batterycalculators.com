@@ -1,0 +1,285 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import CalculatorCard from '../../components/CalculatorCard.astro';
+import FormulaBox from '../../components/FormulaBox.astro';
+import FAQSection from '../../components/FAQSection.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "How long will a 10kWh battery power my home?",
+    answer: "It depends on your load. A 10kWh battery at 85% DoD provides 8.5kWh usable. Running a 1kW critical load (fridge, lights, internet) would last approximately 8.5 hours. A 500W load would last approximately 17 hours. Higher loads deplete the battery faster.",
+  },
+  {
+    question: "Do I need a generator if I have batteries?",
+    answer: "Batteries alone provide limited runtime. A generator extends backup duration during multi-day outages. Many systems pair batteries with generators: the battery handles short outages silently, and the generator recharges the battery during extended outages. This is the most resilient configuration.",
+  },
+  {
+    question: "What inverter size do I need for home backup?",
+    answer: "Size your inverter to handle the peak load of all critical appliances running simultaneously. For typical essential loads (fridge, lights, internet, medical devices), a 3,000-5,000W inverter is sufficient. If you want to back up HVAC or well pumps, you may need 7,500-10,000W.",
+  },
+  {
+    question: "Can I add batteries to an existing solar system?",
+    answer: "Yes, most grid-tied solar systems can be retrofitted with battery backup using a hybrid inverter or AC-coupled battery system. The complexity depends on your existing inverter and local electrical codes. Consult a certified installer for retrofit assessments.",
+  },
+];
+---
+
+<Layout
+  title="Home Battery Backup Planning Guide | Battery Calculators"
+  description="Step-by-step guide to sizing a home battery backup system: identify critical loads, determine backup duration, size the battery, and choose the right backup strategy."
+  faqItems={faqItems}
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <Breadcrumb items={[
+        { label: "Learning Center", href: "/learn" },
+        { label: "Home Battery Backup Planning Guide" },
+      ]} />
+      <a href="/learn" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Back to Guides</a>
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">HOME BACKUP</span>
+      <h1 class="text-display-md text-primary mb-6">Home Battery Backup Planning</h1>
+      <p class="text-body-md text-body font-light">
+        Planning a home battery backup system means deciding what to power, for how long, and then sizing the battery to deliver that energy reliably. This guide walks through the three-step engineering process that produces a defensible backup design for residential properties.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Step 1: Identify Critical Loads</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Not every circuit in your home needs backup power. The first step is to categorize your electrical loads into three tiers based on necessity during an outage. This triage directly controls system size and cost — backing up every circuit dramatically increases the required battery capacity.
+        </p>
+        <p class="text-body-md text-body font-light mb-6">
+          Critical loads are those you cannot live without: refrigeration, medical equipment, communication, and security. Important loads improve comfort and functionality. Non-essential loads like HVAC and heavy appliances are typically excluded from backup systems because their energy consumption would require an impractically large battery.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Priority</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Typical Loads</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Est. Daily Energy</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-primary font-bold">Critical</td>
+                <td class="p-4 text-muted">Refrigerator, medical devices, security system, phone charging</td>
+                <td class="p-4 font-mono text-primary">2 – 5 kWh/day</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-primary font-bold">Important</td>
+                <td class="p-4 text-muted">Interior lighting, internet router, sump pump, garage door</td>
+                <td class="p-4 font-mono text-primary">1 – 3 kWh/day</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-primary font-bold">Non-essential</td>
+                <td class="p-4 text-muted">HVAC, electric oven, clothes dryer, water heater</td>
+                <td class="p-4 font-mono text-primary">10 – 30 kWh/day</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-body-sm text-muted mt-4">
+          Walk through your home and list every circuit you would want operational during an outage. Add up the wattage of each device and estimate how many hours per day each would run. The sum is your critical load power requirement — the input for the sizing formula.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Step 2: Determine Backup Duration</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Backup duration defines how many hours or days your battery bank must sustain the critical loads without any recharge input. Short outages (a few hours) require far less capacity than multi-day grid failures. Your local utility's historical outage data and weather patterns should drive this decision.
+        </p>
+        <p class="text-body-md text-body font-light mb-6">
+          For most residential backup systems, 24 hours of coverage is the standard design target. This covers overnight outages and extends well into the next day. Critical medical or security applications may demand 48-72 hours of autonomous operation.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Duration</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Use Case</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Typical Battery Size</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">8 hours</td>
+                <td class="p-4 text-muted">Overnight coverage, short grid flickers</td>
+                <td class="p-4 font-mono text-primary">5 – 10 kWh</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">24 hours</td>
+                <td class="p-4 text-muted">Single-day outage, most common target</td>
+                <td class="p-4 font-mono text-primary">10 – 20 kWh</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">48 – 72 hours</td>
+                <td class="p-4 text-muted">Extended outage, critical systems</td>
+                <td class="p-4 font-mono text-primary">20 – 40+ kWh</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <FormulaBox title="Backup Sizing Formulas">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Battery Capacity (Wh) = Critical Load Power (W) × Backup Hours / (DoD × Inverter Efficiency)
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Battery Capacity (Ah) = Battery Capacity (Wh) / System Voltage
+        </div>
+        <p>
+          Depth of discharge (DoD) is the fraction of total capacity you can safely use. LFP batteries are typically rated at 80-90% DoD. Inverter efficiency accounts for energy lost during DC-to-AC conversion, usually 90-95%.
+        </p>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Step 3: Size the Battery</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Worked Example:</strong> A household wants 24-hour backup for critical loads on a 48V LFP system.</p>
+            <p><strong>Given:</strong></p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li>Critical loads total: 2,500W</li>
+              <li>Backup duration: 24 hours</li>
+              <li>System voltage: 48V LFP</li>
+              <li>Depth of discharge (DoD): 85%</li>
+              <li>Inverter efficiency: 92%</li>
+            </ul>
+            <p><strong>Step 1:</strong> Calculate total energy needed in watt-hours:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              2,500W × 24h = 60,000 Wh
+            </div>
+            <p><strong>Step 2:</strong> Account for DoD and inverter efficiency:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              60,000 / (0.85 × 0.92) = 76,830 Wh
+            </div>
+            <p><strong>Step 3:</strong> Convert to amp-hours at 48V:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              76,830 Wh / 48V = 1,601 Ah
+            </div>
+            <p><strong>Step 4:</strong> Determine battery count. This equals approximately 16 × 48V 100Ah LFP batteries, or a single 48V 15kWh unit with adequate capacity. A practical system might use two 48V 8kWh units for redundancy and modularity.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Backup Strategy Comparison</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Whole-Home Backup</h4>
+            <p class="text-body-sm text-muted mb-3">
+              Covers all household loads including HVAC, appliances, and lighting. Provides seamless automatic switchover on grid failure. Most expensive option — requires 20-40+ kWh of storage depending on home size and climate.
+            </p>
+            <span class="font-mono text-m-blue-light text-sm">20 – 40+ kWh</span>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Essential-Loads-Only</h4>
+            <p class="text-body-sm text-muted mb-3">
+              Powers only critical circuits: refrigerator, medical devices, lighting, internet, and phone charging. Most cost-effective approach with 5-15 kWh of storage. Ideal for typical residential backup on a moderate budget.
+            </p>
+            <span class="font-mono text-m-blue-light text-sm">5 – 15 kWh</span>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Hybrid Approach</h4>
+            <p class="text-body-sm text-muted mb-3">
+              Combines critical loads with selected important loads like the sump pump, garage door, or a few additional circuits. Moderate cost with 10-25 kWh of storage. Balances resilience with practical budget constraints.
+            </p>
+            <span class="font-mono text-m-blue-light text-sm">10 – 25 kWh</span>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Solar-Charged Backup</h4>
+            <p class="text-body-sm text-muted mb-3">
+              Pairs a battery bank with rooftop solar panels to recharge during daylight hours. Provides the highest resilience — the system can sustain loads indefinitely as long as the sun shines. Requires larger battery and solar array sizing.
+            </p>
+            <span class="font-mono text-m-blue-light text-sm">Highest resilience</span>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">System Components</h2>
+        <p class="text-body-md text-body font-light mb-6">
+          A complete home backup system requires more than just batteries. Each component plays a specific role in converting, controlling, and delivering stored energy to your home's electrical panel. Understanding each piece helps you plan the full installation and budget accurately.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Battery Bank</h4>
+            <p class="text-body-sm text-muted">
+              Stores electrical energy as chemical energy. LFP (LiFePO4) is the standard for home backup due to long cycle life, thermal stability, and 80-90% depth of discharge. Sizing is determined by the formulas above.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Inverter</h4>
+            <p class="text-body-sm text-muted">
+              Converts DC battery power to AC household power (120/240V). Must be sized to handle peak simultaneous load of all backed-up circuits. Hybrid inverters integrate charge control and grid-tie functions in one unit.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Charge Controller</h4>
+            <p class="text-body-sm text-muted">
+              Required if solar panels charge the battery. MPPT controllers maximize energy harvest from the array and regulate charging voltage to protect battery health. Not needed for grid-only charging systems.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Transfer Switch</h4>
+            <p class="text-body-sm text-muted">
+              Automatically disconnects from the grid and switches to battery power during an outage. Essential for safety — prevents backfeeding into utility lines. Manual transfer switches are a lower-cost alternative.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard class="md:col-span-2">
+            <h4 class="text-primary font-bold mb-2">Monitoring System</h4>
+            <p class="text-body-sm text-muted">
+              Tracks battery state of charge, power flow, and system health in real time. Most modern systems include a mobile app or web dashboard. Monitoring is critical for detecting issues early and optimizing charge/discharge cycles to extend battery life.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Try It</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use the Home Backup Battery Calculator to size a complete backup system for your critical loads.
+          </p>
+          <a href="/tools/home-backup-battery-calculator" class="btn-primary text-xs py-3 px-6 inline-block">Open Home Backup Calculator</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Related Tool</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Calculate how long your battery will take to recharge from solar or grid power with the Charging Time Calculator.
+          </p>
+          <a href="/tools/charging-time-calculator" class="btn-primary text-xs py-3 px-6 inline-block">Open Charging Time Calculator</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Related Articles</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <a href="/learn/how-to-size-a-battery-bank" class="text-primary font-bold mb-2 block hover:text-m-blue-light transition-colors">
+              How to Size a Battery Bank
+            </a>
+            <p class="text-body-sm text-muted">
+              Covers the standard engineering method for sizing battery banks from daily energy consumption, autonomy days, temperature derating, and depth of discharge limits.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <a href="/learn/how-to-calculate-battery-runtime" class="text-primary font-bold mb-2 block hover:text-m-blue-light transition-colors">
+              How to Calculate Battery Runtime
+            </a>
+            <p class="text-body-sm text-muted">
+              Explains how to determine how long a battery will last under a given load, covering amp-hour ratings, Peukert exponent, and efficiency losses.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

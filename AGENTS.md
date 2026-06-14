@@ -6,7 +6,7 @@ Always Use:
 - all project skills
 
 Project rule:
-This project is Battery Engineering Hub, a public SEO microtool website. Never include confidential company data, customer data, internal battery datasets, proprietary SOH algorithms, AYK-specific workflows, or private formulas.
+This project is Battery Calculators, a public SEO microtool website. Never include confidential company data, customer data, internal battery datasets, proprietary SOH algorithms, AYK-specific workflows, or private formulas.
 
 Build rules:
 - Use Astro for static SEO pages.

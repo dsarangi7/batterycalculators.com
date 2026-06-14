@@ -1,0 +1,301 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import CalculatorCard from '../../components/CalculatorCard.astro';
+import FAQSection from '../../components/FAQSection.astro';
+import ReferenceChart from '../../components/ReferenceChart.astro';
+
+const faqItems = [
+  {
+    question: "What is the resting voltage of a fully charged LiFePO4 battery?",
+    answer: "A fully charged LiFePO4 cell rests at approximately 3.35–3.40V. For a 12V nominal pack (4 cells in series), that is roughly 13.4–13.6V. A 24V pack (8 cells) rests at 26.8–27.2V, and a 48V pack (16 cells) at 53.6–54.4V.",
+  },
+  {
+    question: "Why is LiFePO4 voltage flat in the middle SOC range?",
+    answer: "LiFePO4 has an extremely flat discharge plateau between roughly 20% and 90% SOC. Voltage stays near 3.2V per cell across most of this range, making voltage-based SOC estimation unreliable in the middle. This is why coulomb counting or a BMS with cell balancing is preferred.",
+  },
+  {
+    question: "Does temperature affect LiFePO4 resting voltage?",
+    answer: "Yes. Cold temperatures lower the open-circuit voltage slightly and increase internal resistance, which causes voltage sag under load. At room temperature (25°C), the values in the chart are most accurate. At 0°C, expect roughly 0.05–0.1V lower per cell under load.",
+  },
+  {
+    question: "Can I use a multimeter to check LiFePO4 SOC?",
+    answer: "A multimeter can give you a rough estimate, but only if the battery has been resting (no charge or discharge) for at least 30 minutes to several hours. Surface charge from recent charging inflates the reading. For accurate SOC, use a BMS with coulomb counting.",
+  },
+];
+
+const tableOfContents = [
+  { id: "why-voltage-matters", label: "Why Voltage Matters" },
+  { id: "voltage-chart", label: "LiFePO4 Voltage Chart" },
+  { id: "reading-the-table", label: "Reading the Table" },
+  { id: "accuracy-notes", label: "Accuracy Notes" },
+  { id: "practical-tips", label: "Practical Tips" },
+  { id: "common-mistakes", label: "Common Mistakes" },
+];
+
+const relatedCalculators = [
+  { title: "SOC Estimator", href: "/tools/soc-estimator" },
+  { title: "Battery Runtime Calculator", href: "/tools/runtime-calculator" },
+  { title: "Battery Sizing Calculator", href: "/tools/battery-sizing-calculator" },
+];
+
+const references = [
+  { title: "Battery University — LiFePO4 Voltage Characteristics", url: "https://batteryuniversity.com/article/bu-402-types-of-lithium-ion" },
+  { title: "Wikipedia — Lithium Iron Phosphate Battery", url: "https://en.wikipedia.org/wiki/Lithium_iron_phosphate_battery" },
+];
+---
+
+<Layout
+  title="LiFePO4 Voltage Chart — Resting Voltage by SOC | Battery Calculators"
+  description="Approximate resting voltage table for LiFePO4 batteries at 12V, 24V, and 48V. Reference chart showing voltage at each SOC level with accuracy caveats."
+  faqItems={faqItems}
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/learn" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">&larr; Back to Guides</a>
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">REFERENCE</span>
+      <h1 class="text-display-md text-primary mb-6">LiFePO4 Voltage Chart</h1>
+      <p class="text-body-md text-body font-light">
+        Approximate resting voltage values for LiFePO4 (LFP) batteries across common pack voltages. Use this chart as a quick reference for estimating state of charge from open-circuit voltage.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section id="why-voltage-matters">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Why Voltage Matters</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Battery voltage is the most accessible indicator of state of charge. A multimeter connected to battery terminals can reveal roughly how charged the battery is — if you know the chemistry and pack configuration. For LiFePO4 cells, the relationship between open-circuit voltage and SOC follows a well-characterized curve, though it is notably flat in the middle range.
+        </p>
+        <p class="text-body-md text-body font-light">
+          Understanding resting voltage helps you verify BMS readings, diagnose charging issues, and estimate remaining capacity without specialized equipment. However, voltage-based SOC estimation has real limitations for LiFePO4, which is why many systems use coulomb counting as the primary method.
+        </p>
+      </section>
+
+      <section id="voltage-chart">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">LiFePO4 Voltage Chart</h2>
+        <ReferenceChart
+          type="line"
+          title="LiFePO4 Resting Voltage vs SOC"
+          description="12V nominal pack (4S) — note the flat plateau between 30–70% SOC"
+          xLabel="SOC %"
+          yLabel="Voltage (V)"
+          data={[
+            { x: 0, y: 12.0, label: '0%' },
+            { x: 10, y: 12.6, label: '10%' },
+            { x: 20, y: 12.9, label: '20%' },
+            { x: 30, y: 13.0, label: '30%' },
+            { x: 40, y: 13.1, label: '40%' },
+            { x: 50, y: 13.1, label: '50%' },
+            { x: 60, y: 13.2, label: '60%' },
+            { x: 70, y: 13.2, label: '70%' },
+            { x: 80, y: 13.3, label: '80%' },
+            { x: 90, y: 13.4, label: '90%' },
+            { x: 100, y: 13.6, label: '100%' },
+          ]}
+          yMin={11.5}
+          yMax={14.0}
+          caption="Values are approximate resting voltages at 25°C. Actual values vary by manufacturer."
+        />
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-body-sm min-w-[640px]">
+              <thead>
+                <tr class="border-b border-hairline bg-surface-card">
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">SOC %</th>
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">12V Pack (4S)</th>
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">24V Pack (8S)</th>
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">48V Pack (16S)</th>
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Notes</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-hairline">
+                <tr>
+                  <td class="p-4 font-mono text-primary">100%</td>
+                  <td class="p-4 text-muted">13.6V</td>
+                  <td class="p-4 text-muted">27.2V</td>
+                  <td class="p-4 text-muted">54.4V</td>
+                  <td class="p-4 text-muted">Fully charged, resting</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">90%</td>
+                  <td class="p-4 text-muted">13.4V</td>
+                  <td class="p-4 text-muted">26.8V</td>
+                  <td class="p-4 text-muted">53.6V</td>
+                  <td class="p-4 text-muted">Near top of curve</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">80%</td>
+                  <td class="p-4 text-muted">13.3V</td>
+                  <td class="p-4 text-muted">26.6V</td>
+                  <td class="p-4 text-muted">53.2V</td>
+                  <td class="p-4 text-muted">Entering flat plateau</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">70%</td>
+                  <td class="p-4 text-muted">13.2V</td>
+                  <td class="p-4 text-muted">26.4V</td>
+                  <td class="p-4 text-muted">52.8V</td>
+                  <td class="p-4 text-muted">Flat region begins</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">60%</td>
+                  <td class="p-4 text-muted">13.2V</td>
+                  <td class="p-4 text-muted">26.4V</td>
+                  <td class="p-4 text-muted">52.8V</td>
+                  <td class="p-4 text-muted">Voltage nearly constant</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">50%</td>
+                  <td class="p-4 text-muted">13.1V</td>
+                  <td class="p-4 text-muted">26.2V</td>
+                  <td class="p-4 text-muted">52.4V</td>
+                  <td class="p-4 text-muted">Midpoint of flat plateau</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">40%</td>
+                  <td class="p-4 text-muted">13.1V</td>
+                  <td class="p-4 text-muted">26.2V</td>
+                  <td class="p-4 text-muted">52.4V</td>
+                  <td class="p-4 text-muted">Voltage indistinguishable from 50–60%</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">30%</td>
+                  <td class="p-4 text-muted">13.0V</td>
+                  <td class="p-4 text-muted">26.0V</td>
+                  <td class="p-4 text-muted">52.0V</td>
+                  <td class="p-4 text-muted">Still in flat region</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">20%</td>
+                  <td class="p-4 text-muted">12.9V</td>
+                  <td class="p-4 text-muted">25.8V</td>
+                  <td class="p-4 text-muted">51.6V</td>
+                  <td class="p-4 text-muted">Beginning to drop</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">10%</td>
+                  <td class="p-4 text-muted">12.6V</td>
+                  <td class="p-4 text-muted">25.2V</td>
+                  <td class="p-4 text-muted">50.4V</td>
+                  <td class="p-4 text-muted">Steep voltage drop</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">0%</td>
+                  <td class="p-4 text-muted">12.0V</td>
+                  <td class="p-4 text-muted">24.0V</td>
+                  <td class="p-4 text-muted">48.0V</td>
+                  <td class="p-4 text-muted">Fully discharged (cutoff)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <p class="text-caption text-muted mt-3">Values are approximate. Actual voltage varies by manufacturer, cell age, temperature, and load history.</p>
+      </section>
+
+      <section id="reading-the-table">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Reading the Table</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          The table shows open-circuit voltage (OCV) — the voltage measured after the battery has been resting with no load for at least 30 minutes. A 12V LiFePO4 pack uses 4 cells in series (4S), a 24V pack uses 8 cells (8S), and a 48V pack uses 16 cells (16S).
+        </p>
+        <p class="text-body-md text-body font-light">
+          Notice the extremely flat voltage plateau between 30% and 70% SOC. In this range, voltage differs by only 0.1–0.2V across the entire pack. This is the defining characteristic of LiFePO4 chemistry and makes voltage-based SOC estimation unreliable in the middle range. The voltage only becomes a useful SOC indicator near the top (above 80%) and bottom (below 20%) of the charge curve.
+        </p>
+      </section>
+
+      <section id="accuracy-notes">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Accuracy Notes</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Manufacturer Variation</h4>
+            <p class="text-body-sm text-muted">
+              Different LiFePO4 cell manufacturers produce cells with slightly different OCV curves. A Grade A cell from one manufacturer may rest 0.02–0.05V differently from another. Always cross-reference with your specific manufacturer's datasheet.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Temperature Effects</h4>
+            <p class="text-body-sm text-muted">
+              Cold temperatures reduce open-circuit voltage. At 0°C, expect readings 0.05–0.1V lower per cell than at 25°C. Temperature compensation in the BMS or a temperature-corrected lookup table improves accuracy.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Resting Requirement</h4>
+            <p class="text-body-sm text-muted">
+              Surface charge from recent charging inflates voltage readings. For accurate OCV measurement, the battery must rest for at least 30 minutes after charge or discharge. Some manufacturers recommend 2–4 hours for best accuracy.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">BMS Calibration</h4>
+            <p class="text-body-sm text-muted">
+              Many BMS units use voltage-based SOC estimation combined with coulomb counting. If the BMS SOC reading disagrees with the voltage reading, it may need recalibration. Perform a full charge-discharge-charge cycle to reset.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <section id="practical-tips">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Practical Tips</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Use voltage readings to confirm the battery is within a reasonable SOC range. For example, if your 12V LiFePO4 pack reads 12.8V after resting, you can estimate approximately 20–25% SOC. If it reads 13.4V, the battery is near full.
+        </p>
+        <p class="text-body-md text-body font-light mb-4">
+          For applications requiring accurate SOC (such as solar storage or RV boondocking), combine voltage monitoring with a coulomb-counting BMS. Voltage alone is insufficient for precise SOC determination in the flat plateau region.
+        </p>
+        <p class="text-body-md text-body font-light">
+          When comparing voltage readings, always measure after the battery has been idle. Load conditions change voltage significantly. A 100Ah LiFePO4 battery under 50A load will show lower voltage than the same battery at rest, even at the same SOC.
+        </p>
+      </section>
+
+      <section id="common-mistakes">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Common Mistakes</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Measuring Under Load</h4>
+            <p class="text-body-sm text-muted">
+              Voltage under load is always lower than resting voltage due to internal resistance (V = OCV − I × R). Measuring while discharging gives a falsely low SOC estimate. Always disconnect the load and wait before measuring.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Ignoring Temperature</h4>
+            <p class="text-body-sm text-muted">
+              A cold battery reads lower than the chart values. Applying room-temperature voltage tables to a battery stored in a cold garage leads to underestimating SOC. Use temperature-corrected values in cold environments.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Trusting SOC from Voltage Alone</h4>
+            <p class="text-body-sm text-muted">
+              The flat plateau between 30% and 70% SOC means voltage differences of less than 0.1V. A cheap voltmeter cannot reliably distinguish 40% from 60% SOC on a 12V LiFePO4 pack. Rely on coulomb counting for the middle range.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Mixing Up Pack and Cell Voltages</h4>
+            <p class="text-body-sm text-muted">
+              Always know whether you are reading cell voltage (3.0–3.65V) or pack voltage (12–54V). Confusing the two leads to completely wrong SOC estimates. The chart values are for nominal pack voltages, not individual cells.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <CalculatorCard class="border-m-blue-light">
+        <h4 class="text-label-uppercase text-primary text-xs mb-3">Try It</h4>
+        <p class="text-body-sm text-muted mb-4">
+          Use the SOC Estimator to interpolate state of charge from open-circuit voltage measurements for your specific LiFePO4 pack.
+        </p>
+        <a href="/tools/soc-estimator" class="btn-primary text-xs py-3 px-6 inline-block">Open SOC Estimator</a>
+      </CalculatorCard>
+
+      <FAQSection items={faqItems} />
+
+      <section class="border-t border-hairline pt-12">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">References</h2>
+        <ul class="flex flex-col gap-2 text-body-sm text-muted">
+          {references.map((ref) => (
+            <li class="flex gap-2">
+              <span class="text-m-blue-light shrink-0">—</span>
+              <a href={ref.url} class="hover:text-primary transition-colors underline underline-offset-2" target="_blank" rel="noopener noreferrer">{ref.title}</a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    </div>
+  </div>
+</Layout>

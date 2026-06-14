@@ -1,0 +1,162 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Breadcrumb from '../components/Breadcrumb.astro';
+import CategoryToolGrid from '../components/CategoryToolGrid.astro';
+import FAQSection from '../components/FAQSection.astro';
+
+const tools = [
+  {
+    name: "Battery Pack Calculator",
+    href: "/tools/battery-pack-calculator",
+    description: "Design battery packs from individual cells. Calculate pack voltage, capacity, energy, and max current for any series-parallel configuration.",
+    available: true,
+  },
+  {
+    name: "Parallel String Calculator",
+    href: "/tools/parallel-string-calculator",
+    description: "Configure series and parallel strings of cells to build battery packs with target voltage and capacity.",
+    available: true,
+  },
+  {
+    name: "Battery Voltage Calculator",
+    href: "/tools/energy-conversion-calculator",
+    description: "Convert between Ah and Wh at any nominal voltage to understand your pack's energy density.",
+    available: true,
+  },
+  {
+    name: "C-Rate Calculator",
+    href: "/tools/c-rate-calculator",
+    description: "Calculate charge and discharge C-rates for EV battery cells and packs.",
+    available: true,
+  },
+];
+
+const learnArticles = [
+  { title: "Battery Pack Design Basics", href: "/learn/battery-pack-design-basics" },
+  { title: "Series vs Parallel Batteries", href: "/learn/series-vs-parallel-batteries" },
+  { title: "Battery Voltage Systems", href: "/learn/battery-voltage-systems" },
+  { title: "How to Build a Battery Pack", href: "/learn/how-to-build-a-battery-pack" },
+  { title: "LiFePO4 Pack Design", href: "/learn/lifepo4-pack-design" },
+  { title: "What Is Battery C-Rate?", href: "/learn/what-is-battery-c-rate" },
+  { title: "LiFePO4 Voltage Chart", href: "/learn/lifepo4-voltage-chart" },
+  { title: "Battery C-Rate Reference", href: "/learn/battery-c-rate-reference" },
+  { title: "LiFePO4 vs NMC", href: "/learn/lifepo4-vs-nmc" },
+  { title: "Battery Energy Density Chart", href: "/learn/battery-energy-density-chart" },
+];
+
+const faqItems = [
+  {
+    question: "What is the difference between series and parallel battery connections?",
+    answer: "Series connections increase voltage while keeping capacity constant. Connecting two 3.2V 100Ah cells in series produces a 6.4V 100Ah pack. Parallel connections increase capacity while keeping voltage constant. Connecting two 3.2V 100Ah cells in parallel produces a 3.2V 200Ah pack. Series-parallel combinations achieve both target voltage and capacity.",
+  },
+  {
+    question: "How do I determine the number of cells for a battery pack?",
+    answer: "Divide your target pack voltage by the individual cell voltage to get the number of cells in series (S count). Divide your target capacity by the individual cell capacity to get the number of parallel strings (P count). For example, to build a 48V 200Ah pack from 3.2V 100Ah cells, you need 16S (48V ÷ 3.2V) and 2P (200Ah ÷ 100Ah), totaling 32 cells.",
+  },
+  {
+    question: "What is a C-rate and why does it matter for pack design?",
+    answer: "C-rate expresses charge or discharge current relative to battery capacity. A 1C rate on a 100Ah battery means 100A current. Pack design must ensure the cells can handle your maximum expected current. Exceeding the rated C-rate causes overheating, accelerated degradation, and potential safety hazards. Match cell C-rate ratings to your application's peak current demands.",
+  },
+  {
+    question: "Do I need a BMS for my battery pack?",
+    answer: "Yes. A Battery Management System (BMS) is essential for lithium battery packs. It monitors individual cell voltages, prevents overcharge and overdischarge, balances cell capacities, monitors temperature, and provides short-circuit protection. Operating lithium cells without a BMS risks cell damage, fire, or explosion from overcharge or deep discharge events.",
+  },
+  {
+    question: "What voltage system should I choose for my EV project?",
+    answer: "Common EV voltages are 48V (light EVs, golf carts, e-bikes), 72V–96V (motorcycles, small cars), and 300V–400V+ (full-size EVs). Higher voltage reduces current for the same power, allowing thinner wiring and smaller components. However, high-voltage systems require specialized safety equipment and knowledge. Start with 48V for learning, move to 72V–96V for medium projects.",
+  },
+];
+
+const relatedCategories = [
+  { href: "/engineering", title: "Engineering", description: "C-rate, SOC, voltage drop, and cable loss tools" },
+  { href: "/bess", title: "BESS & Commercial", description: "Commercial battery storage ROI analysis" },
+  { href: "/solar", title: "Solar", description: "Solar battery sizing and off-grid planning" },
+];
+
+const breadcrumbItems = [
+  { label: "EV & Battery Packs" },
+];
+---
+
+<Layout
+  title="EV & Battery Pack Calculators | Battery Calculators"
+  description="Free EV battery calculators for pack design, series-parallel configuration, voltage calculation, and C-rate analysis."
+  schema="website"
+  schemaName="EV & Battery Pack Calculators"
+  schemaDescription="Engineering-grade battery calculators for EV pack design, cell configuration, and voltage planning."
+  breadcrumbs={[{ label: 'EV & Battery Packs' }]}
+>
+  <Breadcrumb items={breadcrumbItems} />
+
+  <section class="mb-12 md:mb-16 border-b border-hairline pb-12">
+    <div class="max-w-4xl">
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">EV & BATTERY PACKS</span>
+      <h1 class="text-display-md text-primary mb-6">EV & Battery Pack Calculators</h1>
+      <p class="text-body-md text-body max-w-2xl font-light">
+        Design EV battery packs with engineering-grade calculators. Configure series and parallel cell arrangements, calculate pack voltage, and analyze C-rates for charge and discharge.
+      </p>
+    </div>
+  </section>
+
+  <section class="mb-16">
+    <div class="max-w-4xl text-body-md text-body font-light flex flex-col gap-6">
+      <p>
+        Battery pack design is the process of combining individual cells into a configured assembly that meets specific voltage, capacity, and current requirements. Whether you are building a battery for an electric vehicle, a solar storage system, a power tool, or a custom energy project, the fundamental principles of series and parallel configuration apply.
+      </p>
+      <p>
+        Series connections increase pack voltage. When cells are connected positive-to-negative in series, their voltages add while capacity remains that of a single string. Connecting 16 LiFePO4 cells (3.2V each) in series produces a 51.2V nominal pack. This is the standard configuration for 48V systems used in solar storage, light EVs, and marine applications.
+      </p>
+      <p>
+        Parallel connections increase pack capacity. When identical cells are connected positive-to-positive and negative-to-negative, their capacities add while voltage stays the same. Two 100Ah cells in parallel produce a 200Ah pack at the same voltage. The parallel count (P count) determines how much energy the pack can store and deliver.
+      </p>
+      <p>
+        The P count also determines maximum discharge current. If each cell is rated for 1C continuous discharge, a 2P configuration of 100Ah cells can deliver 200A continuously. A 4P configuration can deliver 400A. Matching the pack's current capability to your application's peak demands is critical for safety and longevity.
+      </p>
+      <p>
+        Cell selection is the most important decision in pack design. LiFePO4 cells offer the best balance of safety, cycle life, and cost for most applications. NMC cells provide higher energy density for weight-sensitive applications like EVs. LTO cells offer extreme fast charging and cold-weather performance but at higher cost. Our calculators help you evaluate configurations for any cell chemistry.
+      </p>
+    </div>
+  </section>
+
+  <section class="mb-16">
+    <h2 class="text-title-lg text-primary mb-6">Available Calculators</h2>
+    <CategoryToolGrid tools={tools} />
+  </section>
+
+  {learnArticles.length > 0 && (
+    <section class="mb-16 border-t border-hairline pt-12">
+      <h2 class="text-title-lg text-primary mb-6">Battery Pack Guides</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {learnArticles.map((article) => (
+          <a href={article.href} class="bg-surface-card border border-hairline p-4 hover:border-primary transition-colors">
+            <span class="text-label-uppercase text-muted text-[10px] block mb-2">LEARNING CENTER</span>
+            <h3 class="text-title-sm text-primary">{article.title}</h3>
+          </a>
+        ))}
+      </div>
+    </section>
+  )}
+
+  <FAQSection items={faqItems} />
+
+  {relatedCategories.length > 0 && (
+    <section class="mb-16 border-t border-hairline pt-12">
+      <h2 class="text-title-lg text-primary mb-6">Related Categories</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {relatedCategories.map((cat) => (
+          <a href={cat.href} class="bg-surface-card border border-hairline p-6 hover:border-primary transition-colors block">
+            <h3 class="text-title-md text-primary mb-2">{cat.title}</h3>
+            <p class="text-body-sm text-muted">{cat.description}</p>
+          </a>
+        ))}
+      </div>
+    </section>
+  )}
+
+  <section class="bg-surface-soft border border-hairline p-6 text-caption text-muted mb-8">
+    <span class="text-primary font-bold text-[10px] tracking-wider uppercase border border-hairline px-1.5 py-0.5 mr-2 inline-block mb-3">
+      Engineering Disclaimer
+    </span>
+    All calculators provide design estimates only. EV battery pack design requires consideration of BMS requirements, thermal management, and safety certifications. Consult qualified engineers for production designs.
+  </section>
+</Layout>

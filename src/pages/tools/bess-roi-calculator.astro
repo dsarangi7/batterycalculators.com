@@ -1,0 +1,439 @@
+---
+import CalculatorLayout from '../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../components/CalculatorCard.astro';
+import InputField from '../../components/InputField.astro';
+import ResultBox from '../../components/ResultBox.astro';
+import FormulaBox from '../../components/FormulaBox.astro';
+import FAQSection from '../../components/FAQSection.astro';
+import RelatedTools from '../../components/RelatedTools.astro';
+import MiniSimulationChart from '../../components/MiniSimulationChart.astro';
+
+const whatIs = `A Battery Energy Storage System (BESS) ROI calculator evaluates the financial viability of commercial and industrial battery storage investments. It models <strong>energy arbitrage</strong> (buying electricity cheaply during off-peak hours and selling or using it during expensive peak hours), <strong>demand charge reduction</strong> (shaving peak power spikes to lower utility demand fees), and <strong>long-term financial metrics</strong> including simple payback period, net present value (NPV), and internal rate of return. The calculation accounts for round-trip efficiency losses, annual battery degradation reducing available capacity, operating expenses, and the time value of money through discounted cash flow analysis. BESS ROI analysis is essential for commercial facilities, industrial plants, microgrids, and utility-scale storage projects.`;
+
+const whyItMatters = [
+  "A BESS project with a positive NPV can generate $10,000–$100,000+ in annual savings, but only if the financial model accurately reflects real-world degradation and efficiency losses.",
+  "Ignoring battery degradation overstates later-year cash flows by 20–40%, leading to unrealistic payback projections and poor investment decisions.",
+  "Round-trip efficiency losses of 10–15% directly reduce arbitrage margins — a spread that looks profitable on paper can become marginal after accounting for RTE.",
+  "Demand charge reduction can represent 30–50% of total BESS savings in commercial applications, but is often overlooked in basic analyses.",
+  "Discount rate selection dramatically affects NPV — a 2% difference in WACC can swing NPV from positive to negative.",
+];
+
+const practicalApplications = [
+  { title: "Peak Shaving", description: "Reduce facility demand charges by discharging batteries during peak load periods to flatten the load profile." },
+  { title: "Energy Arbitrage", description: "Charge batteries during low-tariff off-peak hours and discharge during high-tariff peak hours for energy cost savings." },
+  { title: "Demand Response", description: "Participate in utility demand response programs by reducing grid draw during grid stress events for additional revenue." },
+  { title: "Renewable Integration", description: "Store excess solar or wind generation for later use, reducing curtailment and maximizing renewable asset value." },
+  { title: "Microgrid Economics", description: "Evaluate battery storage ROI for islanded microgrids in remote or military applications." },
+  { title: "Utility-Scale Storage", description: "Assess financial viability of grid-scale battery projects providing frequency regulation and capacity services." },
+];
+
+const expertNotes = [
+  { title: 'Degradation Modeling', variant: 'warning', content: 'Battery degradation diminishes BESS discharge capabilities by a compounding rate yearly. A system with 2% annual degradation retains only ~82% capacity by year 10. Failing to model SOH decay results in highly overestimated cash flows in later project years.' },
+  { title: 'Demand Charges', variant: 'engineering', content: 'In many commercial utility tariffs, demand charges (based on peak 15-minute power draw) can represent 30–50% of the total electricity bill. BESS peak shaving targeting demand charges often delivers faster payback than energy arbitrage alone.' },
+  { title: 'RTE Impact', variant: 'info', content: 'Round-trip efficiency (RTE) of 88% means 12% of energy is lost in each charge-discharge cycle. For arbitrage, the effective off-peak cost is tariff_offpeak / RTE, which can significantly narrow the profit margin on small price spreads.' },
+];
+
+const trustSection = {
+  text: "This calculator uses standard discounted cash flow (DCF) analysis methodology. Annual savings are modeled with compounding degradation, OPEX is deducted from gross savings, and cash flows are discounted at the specified WACC. All intermediate values are displayed for independent verification. Our financial model follows standard project finance practices used in energy storage industry analysis.",
+  link: { label: "View our full methodology", href: "/methodology" },
+};
+
+const references = [
+  { title: "NREL — BESS Economic Analysis Methods", url: "https://www.nrel.gov/analysis/bess-economic-analysis.html", source: "National Renewable Energy Laboratory" },
+  { title: "US DOE — Energy Storage Valuation Framework", url: "https://www.energy.gov/eere/storage/energy-storage-valuation", source: "U.S. Department of Energy" },
+  { title: "IEEE 2800-2022 — Standard for Interconnection of Energy Storage", url: "https://standards.ieee.org/ieee/2800/11000/", source: "IEEE Standards Association" },
+  { title: "Lazard — Levelized Cost of Storage Analysis", url: "https://www.lazard.com/research-insights/levelized-cost-of-storage/", source: "Lazard Financial Advisory" },
+  { title: "BloombergNEF — Energy Storage Market Outlook", url: "https://about.bnef.com/energy-storage/", source: "BloombergNEF" },
+];
+
+const faqItems = [
+  {
+    question: "What is peak shaving vs energy arbitrage?",
+    answer: "Energy arbitrage is charging the battery during cheap off-peak hours and discharging it during expensive peak hours. Peak shaving is discharging the battery to flatten a building's overall power consumption spikes, reducing the \"demand charges\" that utilities assess based on the highest 15-minute load spike of the month.",
+  },
+  {
+    question: "Why is Round-Trip Efficiency (RTE) important for BESS ROI?",
+    answer: "Charging a BESS consumes more electricity than it releases. A 100 kWh discharge requires pulling 114 kWh of grid energy if the system RTE is 88%. This means the off-peak power cost must be divided by 0.88 in arbitrage calculations, which squeezes the price spread.",
+  },
+  {
+    question: "How does capacity degradation affect financial returns?",
+    answer: "Lithium battery capacities diminish each year due to chemical decay. A system with a 2% annual degradation rate retains only ~82% capacity by year 10. Consequently, the energy available for daily arbitrage shifts decreases by 2% yearly, reducing annual cash flows progressively.",
+  },
+  {
+    question: "What is a good target discount rate for commercial storage?",
+    answer: "Most commercial operations use a discount rate (weighted average cost of capital, WACC) of 6% to 10% to analyze storage projects. A higher discount rate penalizes future cash flows, requiring faster payback periods to achieve a positive Net Present Value (NPV > 0).",
+  },
+  {
+    question: "What is the typical payback period for BESS?",
+    answer: "Payback periods vary widely by application. Commercial peak shaving systems with high demand charges may achieve 5–7 year payback. Energy arbitrage alone typically yields 8–12 years. Systems combining multiple value streams (arbitrage + demand response + capacity) can achieve 5–8 years.",
+  },
+  {
+    question: "How does BESS sizing affect ROI?",
+    answer: "Oversized BESS wastes CAPEX on unused capacity. Undersized BESS cannot capture full savings potential. Optimal sizing matches the daily load profile — the BESS should be large enough to shift the maximum practical load but no larger than the daily arbitrage opportunity supports.",
+  },
+  {
+    question: "What are demand charges?",
+    answer: "Demand charges are utility fees based on the highest 15-minute average power draw (kW) during a billing period, separate from energy consumption (kWh). They can represent 30–50% of commercial electricity bills. BESS peak shaving reduces demand charges by discharging during high-load periods.",
+  },
+  {
+    question: "Should I include incentives in ROI calculations?",
+    answer: "Yes. Federal Investment Tax Credits (ITC), state-level incentives, and utility rebates can reduce effective CAPEX by 30–50%. Include all applicable incentives to get an accurate picture of net investment cost and payback timeline.",
+  },
+  {
+    question: "How does degradation rate affect NPV?",
+    answer: "Higher degradation rates reduce later-year cash flows, extending payback and reducing NPV. A system with 1% annual degradation will have significantly higher NPV than the same system at 3% degradation, because more energy is available for arbitrage in years 5–15.",
+  },
+  {
+    question: "What is the difference between simple payback and discounted payback?",
+    answer: "Simple payback divides CAPEX by annual savings without considering the time value of money. Discounted payback accounts for the fact that future savings are worth less today. Discounted payback is always longer than simple payback and is the more financially rigorous metric.",
+  },
+  {
+    question: "Can BESS ROI be negative?",
+    answer: "Yes. If the tariff spread is too narrow, degradation is high, CAPEX is excessive, or discount rate is aggressive, the project may never achieve positive NPV. Always run sensitivity analysis on key variables before investing.",
+  },
+  {
+    question: "What OPEX should I include?",
+    answer: "Typical BESS OPEX includes maintenance inspections ($500–$2,000/yr), insurance (0.5–1% of CAPEX/yr), replacement of auxiliary components, and monitoring system costs. OPEX typically ranges from 1–3% of CAPEX annually.",
+  },
+];
+
+const relatedTools = [
+  { href: "/tools/battery-degradation-estimator", title: "Degradation Estimator", description: "Estimate calendar and cycle lifetime degradation (SOH)." },
+  { href: "/tools/battery-sizing-calculator", title: "Battery Sizing Tool", description: "Sizing storage capacity from electrical draw profiles." },
+  { href: "/tools/runtime-calculator", title: "Runtime Calculator", description: "Verify run hours under a specific continuous Watt load." },
+  { href: "/tools/solar-battery-sizing-calculator", title: "Solar Battery Sizing", description: "Size solar battery banks from daily consumption data." },
+  { href: "/tools/c-rate-calculator", title: "C-Rate Calculator", description: "Calculate charge and discharge current rates." },
+  { href: "/tools/soc-estimator", title: "SOC Estimator", description: "Interpolate battery State of Charge from voltages." },
+];
+
+const commonMistakes = [
+  "Ignoring battery degradation — a 2% annual degradation rate means 18% less capacity by year 10. Always model SOH decline in multi-year cash flow projections.",
+  "Overestimating arbitrage spread — real-world tariff spreads vary seasonally and may narrow due to market changes. Use conservative average spreads, not peak-day values.",
+  "Forgetting OPEX — maintenance, insurance, and monitoring costs are real expenses that reduce net annual savings. Include 1–3% of CAPEX as annual OPEX.",
+  "Using wrong discount rate — a rate that is too low makes projects look better than they are. Use your actual WACC or a minimum of 8% for commercial projects.",
+  "Ignoring demand charge variability — demand charges depend on the single highest 15-minute peak each month. If your peak is seasonal, savings will vary month to month.",
+  "Oversizing the BESS — a system larger than the daily load profile can utilize wastes CAPEX. Size BESS to match the actual daily arbitrage opportunity.",
+  "Not including incentives — federal ITC (30%+), state incentives, and utility rebates can dramatically improve ROI. Always model net CAPEX after incentives.",
+];
+
+const relatedArticles = [
+  { href: "/learn/what-is-bess-roi", title: "What Is BESS ROI?" },
+  { href: "/learn/bess-peak-shaving-explained", title: "BESS Peak Shaving Explained" },
+  { href: "/learn/battery-degradation-financial-impact", title: "Battery Degradation Financial Impact" },
+];
+---
+
+<CalculatorLayout
+  title="BESS ROI Calculator | Battery Calculators"
+  description="Evaluate payback period, net present value (NPV), and peak shaving savings of commercial Battery Energy Storage Systems (BESS)."
+  faqItems={faqItems}
+  commonMistakes={commonMistakes}
+  relatedCalculators={relatedTools}
+  relatedArticles={relatedArticles}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+>
+
+  <!-- Main Calculator Grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+
+    <!-- Input Form -->
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Financial & Sizing Inputs</h3>
+      <div class="flex flex-col gap-6">
+
+        <!-- Capex / Opex -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <InputField id="capex" label="System CAPEX ($)" value={150000} min={0} step="any" />
+          <InputField id="opex" label="Annual OPEX ($/yr)" value={3000} min={0} step="any" />
+        </div>
+
+        <!-- System Sizing -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <InputField id="capacity" label="BESS Capacity (kWh)" value={200} min={1} step="any" />
+          <InputField id="daily-shift" label="Daily Arbitrage Shift (kWh)" value={180} min={0} step="any" />
+        </div>
+
+        <!-- TOU Tariffs -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <InputField id="peak-tariff" label="Peak Tariff ($/kWh)" value={0.35} min={0} step={0.01} />
+          <InputField id="offpeak-tariff" label="Off-Peak Tariff ($/kWh)" value={0.10} min={0} step={0.01} />
+        </div>
+
+        <!-- Demand Charges -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <InputField id="demand-reduction" label="Demand Reduction (kW)" value={50} min={0} step="any" />
+          <InputField id="demand-price" label="Demand Charge ($/kW/mo)" value={15} min={0} step="any" />
+        </div>
+
+        <!-- Lifetime parameters -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <InputField id="rte" label="Round-Trip Efficiency (%)" value={88} min={50} max={100} />
+          <InputField id="degradation" label="Annual Degradation (%)" value={2.0} min={0} max={10} step={0.1} />
+        </div>
+
+        <!-- Discount & Lifetime -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <InputField id="lifetime" label="System Lifetime (Years)" value={10} min={1} max={25} />
+          <InputField id="discount" label="Discount Rate (%)" value={8.0} min={0} max={25} step={0.1} />
+        </div>
+
+      </div>
+    </CalculatorCard>
+
+    <!-- Calculation Results -->
+    <CalculatorCard class="border-m-red flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Financial Outputs</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <!-- Main Output 1 -->
+          <ResultBox
+            label="Simple Payback Period"
+            value="7.8 Years"
+            suffix="Time to recover standard $150k CAPEX"
+            variant="primary"
+            id="result-payback"
+          />
+
+          <!-- Main Output 2 (NPV) -->
+          <ResultBox
+            label="Net Present Value (NPV)"
+            value="$12,453"
+            suffix="Discounted lifetime net return"
+            variant="primary"
+            id="result-npv-card"
+          />
+
+          <!-- Secondary Savings -->
+          <ResultBox
+            label="Year 1 Arbitrage Savings"
+            value="$15,531 / yr"
+            id="result-arbitrage"
+          />
+
+          <ResultBox
+            label="Year 1 Demand Savings"
+            value="$9,000 / yr"
+            id="result-demand"
+          />
+        </div>
+
+        <MiniSimulationChart
+          title="Cumulative Net Savings"
+          description="Projected savings trajectory over project lifetime"
+          xLabel="Year"
+          yLabel="Cumulative ($)"
+          chartId="chart-bess-roi"
+        />
+      </div>
+
+      <!-- Action Area -->
+      <div class="border-t border-hairline pt-6">
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">BESS ROI Risk Warning</h4>
+        <p class="text-body-sm text-muted">
+          Degradation diminishes BESS discharge capabilities by a compounding rate yearly. Failing to model SOH decay results in highly over-estimated cash flows in later project years.
+        </p>
+      </div>
+    </CalculatorCard>
+
+  </div>
+
+  <!-- Technical Explanation and Equations -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+
+      <!-- Formulas -->
+      <FormulaBox title="Mathematical Formulas">
+        <p>
+          Annual energy arbitrage savings account for charger round-trip efficiency (RTE) conversion losses:
+        </p>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Daily Arbitrage ($) = EnergyShifted × [Tariff_peak - (Tariff_offpeak / (RTE% / 100))]
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Annual Arbitrage ($) = Daily Arbitrage × 365
+        </div>
+        <p>
+          Peak demand savings represent monthly demand tariff reductions:
+        </p>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Annual Demand Savings ($) = kW Reduction × Demand Tariff ($/kW) × 12
+        </div>
+        <p>
+          Net Present Value (NPV) discounts yearly cash flows (S_t - OPEX) relative to CAPEX:
+        </p>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          CashFlow_t = (Year 1 Savings × (1 - Degradation%)^(t-1)) - OPEX
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          NPV ($) = Σ [ CashFlow_t / (1 + DiscountRate%)^t ] - CAPEX
+        </div>
+        <p class="text-xs text-muted mt-4">
+          <strong>Variables:</strong> Tariffs in $/kWh, RTE as percentage, Degradation as annual %, Discount Rate as WACC percentage, CAPEX/OPEX in $. Assumptions: constant daily arbitrage, linear degradation model, end-of-life at project horizon.
+        </p>
+      </FormulaBox>
+
+      <!-- Worked Examples -->
+      <div>
+        <h2 class="text-title-lg text-primary uppercase mb-6 tracking-wider">Worked Examples</h2>
+        <div class="text-body-sm text-muted flex flex-col gap-6">
+
+          <div class="border-l-2 border-m-blue-light pl-4">
+            <p class="font-bold text-primary mb-2">Example 1: Small Commercial — 100 kWh BESS</p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li><strong>CAPEX:</strong> $80,000 | <strong>OPEX:</strong> $1,500/yr | <strong>Capacity:</strong> 100 kWh</li>
+              <li><strong>Daily Shift:</strong> 90 kWh | <strong>RTE:</strong> 88% | <strong>Lifetime:</strong> 10 yrs</li>
+              <li><strong>Tariffs:</strong> Peak $0.30/kWh, Off-Peak $0.08/kWh</li>
+            </ul>
+            <p class="mt-2"><strong>Daily arbitrage:</strong> 90 × (0.30 - 0.08/0.88) = 90 × 0.209 = <span class="font-mono text-primary">$18.82</span></p>
+            <p><strong>Annual arbitrage:</strong> $18.82 × 365 = <span class="font-mono text-primary">$6,869</span></p>
+            <p><strong>Simple payback:</strong> $80,000 / $6,869 ≈ <span class="font-mono text-primary">11.6 years</span></p>
+          </div>
+
+          <div class="border-l-2 border-m-blue-dark pl-4">
+            <p class="font-bold text-primary mb-2">Example 2: Large Commercial — 500 kWh BESS with Demand Shaving</p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li><strong>CAPEX:</strong> $350,000 | <strong>OPEX:</strong> $5,000/yr | <strong>Capacity:</strong> 500 kWh</li>
+              <li><strong>Daily Shift:</strong> 450 kWh | <strong>RTE:</strong> 90%</li>
+              <li><strong>Tariffs:</strong> Peak $0.35/kWh, Off-Peak $0.10/kWh</li>
+              <li><strong>Demand reduction:</strong> 120 kW at $18/kW/month</li>
+            </ul>
+            <p class="mt-2"><strong>Arbitrage:</strong> 450 × (0.35 - 0.10/0.90) × 365 = <span class="font-mono text-primary">$39,525/yr</span></p>
+            <p><strong>Demand savings:</strong> 120 × $18 × 12 = <span class="font-mono text-primary">$25,920/yr</span></p>
+            <p><strong>Total Year 1:</strong> $39,525 + $25,920 - $5,000 = <span class="font-mono text-primary">$60,445</span></p>
+            <p><strong>Simple payback:</strong> $350,000 / $60,445 ≈ <span class="font-mono text-primary">5.8 years</span></p>
+          </div>
+
+          <div class="border-l-2 border-m-red pl-4">
+            <p class="font-bold text-primary mb-2">Example 3: Marginal Project — Narrow Tariff Spread</p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li><strong>CAPEX:</strong> $200,000 | <strong>OPEX:</strong> $4,000/yr | <strong>Capacity:</strong> 250 kWh</li>
+              <li><strong>Daily Shift:</strong> 200 kWh | <strong>RTE:</strong> 85%</li>
+              <li><strong>Tariffs:</strong> Peak $0.20/kWh, Off-Peak $0.12/kWh</li>
+            </ul>
+            <p class="mt-2"><strong>Arbitrage:</strong> 200 × (0.20 - 0.12/0.85) × 365 = 200 × 0.0588 × 365 = <span class="font-mono text-primary">$4,293/yr</span></p>
+            <p><strong>Simple payback:</strong> $200,000 / $4,293 ≈ <span class="font-mono text-primary">46.6 years</span></p>
+            <p><strong>Result:</strong> <span class="text-m-red font-bold">Negative NPV — project is not financially viable with narrow spread.</span></p>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <FAQSection items={faqItems} />
+  <RelatedTools tools={relatedTools} />
+
+  <!-- Calculation Script -->
+  <script>
+    import { calculateBessRoi } from '../../utils/calculators';
+    import { renderLineChart, clearChart } from '../../utils/charting';
+
+    const capexInput = document.getElementById('capex') as HTMLInputElement;
+    const opexInput = document.getElementById('opex') as HTMLInputElement;
+    const capacityInput = document.getElementById('capacity') as HTMLInputElement;
+    const dailyShiftInput = document.getElementById('daily-shift') as HTMLInputElement;
+    const peakTariffInput = document.getElementById('peak-tariff') as HTMLInputElement;
+    const offpeakTariffInput = document.getElementById('offpeak-tariff') as HTMLInputElement;
+    const demandReductionInput = document.getElementById('demand-reduction') as HTMLInputElement;
+    const demandPriceInput = document.getElementById('demand-price') as HTMLInputElement;
+    const rteInput = document.getElementById('rte') as HTMLInputElement;
+    const degradationInput = document.getElementById('degradation') as HTMLInputElement;
+    const lifetimeInput = document.getElementById('lifetime') as HTMLInputElement;
+    const discountInput = document.getElementById('discount') as HTMLInputElement;
+
+    // Outputs - query inner value elements from ResultBox wrappers
+    const resultPaybackCard = document.getElementById('result-payback');
+    const resultPayback = resultPaybackCard?.querySelector('.text-display-md') as HTMLElement;
+    const resultPaybackDesc = resultPaybackCard?.querySelector('.text-caption') as HTMLElement;
+    const resultNpvCard = document.getElementById('result-npv-card');
+    const resultNpv = resultNpvCard?.querySelector('.text-display-md') as HTMLElement;
+    const resultArbitrageCard = document.getElementById('result-arbitrage');
+    const resultArbitrage = resultArbitrageCard?.querySelector('.text-title-lg') as HTMLElement;
+    const resultDemandCard = document.getElementById('result-demand');
+    const resultDemand = resultDemandCard?.querySelector('.text-title-lg') as HTMLElement;
+
+    const chartSvg = document.getElementById('chart-bess-roi') as unknown as SVGElement;
+
+    function updateCalculations() {
+      const capex = parseFloat(capexInput.value) || 0;
+      const opex = parseFloat(opexInput.value) || 0;
+      const capacity = parseFloat(capacityInput.value) || 0;
+      const dailyShift = parseFloat(dailyShiftInput.value) || 0;
+      const peakTariff = parseFloat(peakTariffInput.value) || 0;
+      const offpeakTariff = parseFloat(offpeakTariffInput.value) || 0;
+      const demandReduction = parseFloat(demandReductionInput.value) || 0;
+      const demandPrice = parseFloat(demandPriceInput.value) || 0;
+      const rte = parseFloat(rteInput.value) || 90;
+      const degradation = parseFloat(degradationInput.value) || 0;
+      const lifetime = parseFloat(lifetimeInput.value) || 10;
+      const discount = parseFloat(discountInput.value) || 0;
+
+      const results = calculateBessRoi(
+        capex, opex, capacity, dailyShift, peakTariff, offpeakTariff,
+        demandReduction, demandPrice, rte, degradation, lifetime, discount
+      );
+
+      // Render Payback
+      if (results.paybackYears < 0) {
+        if (resultPayback) resultPayback.textContent = '> Lifetime';
+        if (resultPaybackDesc) resultPaybackDesc.textContent = `Payback is not reached within ${lifetime} years.`;
+      } else {
+        if (resultPayback) resultPayback.textContent = `${results.paybackYears.toFixed(1)} Years`;
+        if (resultPaybackDesc) resultPaybackDesc.textContent = `Time to recover $${Math.round(capex).toLocaleString()} CAPEX`;
+      }
+
+      // Render NPV
+      if (resultNpv) {
+        const sign = results.npv < 0 ? "-" : "";
+        resultNpv.textContent = `${sign}$${Math.abs(Math.round(results.npv)).toLocaleString()}`;
+      }
+
+      if (resultNpvCard) {
+        resultNpvCard.className = "bg-surface-soft p-6 border col-span-1 md:col-span-2 " +
+          (results.npv >= 0 ? "border-green-600" : "border-red-800");
+      }
+
+      // Secondary
+      if (resultArbitrage) resultArbitrage.textContent = `$${Math.round(results.annualSavingsArbitrage).toLocaleString()} / yr`;
+      if (resultDemand) resultDemand.textContent = `$${Math.round(results.annualSavingsDemand).toLocaleString()} / yr`;
+
+      if (chartSvg && capex > 0 && lifetime > 0) {
+        const totalSavingsYr1 = results.annualSavingsArbitrage + results.annualSavingsDemand;
+        const cumPts: { x: number; y: number }[] = [];
+        let cumulative = -capex;
+        cumPts.push({ x: 0, y: -capex });
+
+        for (let year = 1; year <= lifetime; year++) {
+          const degMult = Math.pow(1 - degradation / 100, year - 1);
+          cumulative += totalSavingsYr1 * degMult - opex;
+          cumPts.push({ x: year, y: cumulative });
+        }
+
+        renderLineChart(chartSvg, cumPts, {
+          width: 320, height: 160,
+          xLabel: 'Year', yLabel: 'Cumulative ($)',
+          xMin: 0, xMax: lifetime,
+        });
+      } else if (chartSvg) {
+        clearChart(chartSvg);
+      }
+    }
+
+    [
+      capexInput, opexInput, capacityInput, dailyShiftInput, peakTariffInput, offpeakTariffInput,
+      demandReductionInput, demandPriceInput, rteInput, degradationInput, lifetimeInput, discountInput
+    ].forEach(el => {
+      el.addEventListener('input', updateCalculations);
+    });
+
+    // Run on boot
+    updateCalculations();
+  </script>
+</CalculatorLayout>

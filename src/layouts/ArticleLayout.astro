@@ -1,0 +1,150 @@
+---
+import Layout from './Layout.astro';
+import Breadcrumb from '../components/Breadcrumb.astro';
+import FAQSection from '../components/FAQSection.astro';
+
+export interface FAQItem {
+  question: string;
+  answer: string;
+}
+
+export interface RelatedLink {
+  title: string;
+  href: string;
+  type?: 'calculator' | 'guide';
+}
+
+export interface Props {
+  title: string;
+  description: string;
+  canonical?: string;
+  ogImage?: string;
+  category: string;
+  categoryHref?: string;
+  breadcrumbItems?: Array<{ label: string; href?: string }>;
+  faqItems?: FAQItem[];
+  relatedCalculators?: RelatedLink[];
+  relatedGuides?: RelatedLink[];
+  tableOfContents?: Array<{ id: string; label: string }>;
+  references?: Array<{ title: string; url?: string }>;
+}
+
+const {
+  title,
+  description,
+  canonical,
+  ogImage,
+  category,
+  categoryHref,
+  breadcrumbItems = [],
+  faqItems = [],
+  relatedCalculators = [],
+  relatedGuides = [],
+  tableOfContents = [],
+  references = [],
+} = Astro.props as Props;
+
+const allBreadcrumbItems = categoryHref
+  ? [{ label: category, href: categoryHref }, ...breadcrumbItems]
+  : [{ label: category }, ...breadcrumbItems];
+---
+
+<Layout
+  title={title}
+  description={description}
+  canonical={canonical}
+  ogType="article"
+  ogImage={ogImage}
+  schema="webApplication"
+  schemaName={title.split('|')[0].trim()}
+  schemaDescription={description}
+  faqItems={faqItems}
+>
+  <article class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/learn" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">&larr; Back to Guides</a>
+      <Breadcrumb items={allBreadcrumbItems} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">{category.toUpperCase()}</span>
+      <h1 class="text-display-md text-primary mb-6">{title.split('|')[0].trim()}</h1>
+      <p class="text-body-md text-body font-light">
+        {description}
+      </p>
+    </div>
+
+    <div class="flex flex-col lg:flex-row gap-8 lg:gap-12">
+      <!-- Main Content -->
+      <div class="flex-1 min-w-0">
+        <slot />
+        <FAQSection items={faqItems} />
+      </div>
+
+      <!-- Sidebar -->
+      <aside class="w-full lg:w-64 shrink-0">
+        <div class="lg:sticky lg:top-24 flex flex-col gap-8">
+          {tableOfContents.length > 0 && (
+            <nav class="bg-surface-card border border-hairline p-4">
+              <h3 class="text-label-uppercase text-primary text-xs mb-3">On This Page</h3>
+              <ul class="flex flex-col gap-2">
+                {tableOfContents.map((item) => (
+                  <li>
+                    <a href={`#${item.id}`} class="text-body-sm text-muted hover:text-primary transition-colors">
+                      {item.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          )}
+
+          {relatedCalculators.length > 0 && (
+            <div class="bg-surface-card border border-hairline p-4">
+              <h3 class="text-label-uppercase text-primary text-xs mb-3">Related Calculators</h3>
+              <ul class="flex flex-col gap-2">
+                {relatedCalculators.map((calc) => (
+                  <li>
+                    <a href={calc.href} class="text-body-sm text-muted hover:text-primary transition-colors flex items-center gap-1">
+                      <span class="text-m-blue-light">&rarr;</span> {calc.title}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {relatedGuides.length > 0 && (
+            <div class="bg-surface-card border border-hairline p-4">
+              <h3 class="text-label-uppercase text-primary text-xs mb-3">Related Guides</h3>
+              <ul class="flex flex-col gap-2">
+                {relatedGuides.map((guide) => (
+                  <li>
+                    <a href={guide.href} class="text-body-sm text-muted hover:text-primary transition-colors flex items-center gap-1">
+                      <span class="text-m-blue-light">&rarr;</span> {guide.title}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      </aside>
+    </div>
+
+    {references.length > 0 && (
+      <section class="mt-16 border-t border-hairline pt-12">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">References</h2>
+        <ul class="flex flex-col gap-2 text-body-sm text-muted">
+          {references.map((ref) => (
+            <li class="flex gap-2">
+              <span class="text-m-blue-light shrink-0">—</span>
+              {ref.url ? (
+                <a href={ref.url} class="hover:text-primary transition-colors underline underline-offset-2" target="_blank" rel="noopener noreferrer">{ref.title}</a>
+              ) : (
+                <span>{ref.title}</span>
+              )}
+            </li>
+          ))}
+        </ul>
+      </section>
+    )}
+  </article>
+</Layout>

@@ -1,0 +1,307 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import CalculatorCard from '../../components/CalculatorCard.astro';
+import FormulaBox from '../../components/FormulaBox.astro';
+import FAQSection from '../../components/FAQSection.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "How long will a 100Ah marine battery last?",
+    answer: "At a moderate 50W hotel load, a 100Ah 12V battery provides approximately 12 hours of runtime (1,200Wh ÷ 50W). Real-world runtime depends on load profile, battery chemistry, temperature, and age. Always derate by 15–20% for marine conditions.",
+  },
+  {
+    question: "What is the biggest marine battery drain?",
+    answer: "Refrigeration is typically the largest single load, drawing 40–80W continuously. Trolling motors can spike to 1,000W+ under load but run intermittently. Navigation electronics, cabin lighting, and water pumps also contribute significantly to daily consumption.",
+  },
+  {
+    question: "Should I size my battery bank for 2 days or 3 days?",
+    answer: "For weekend fishing trips, 1–2 days of autonomy is typical. For cruising yachts or liveaboards, 2–3 days provides a safety margin for weather delays or extended anchoring. A 2-day autonomy at 50% DoD gives a practical buffer without oversized banks.",
+  },
+  {
+    question: "Can I use car batteries on my boat?",
+    answer: "No. Car (starter) batteries are designed for short high-current bursts, not sustained deep cycling. Using them for marine house loads will cause rapid capacity loss and premature failure. Always use deep-cycle marine batteries rated for the discharge profile.",
+  },
+];
+---
+
+<Layout
+  title="Boat Battery Runtime Guide | Battery Calculators"
+  description="Calculate how long your marine battery bank will power trolling motors, fish finders, navigation, lights, and other boat loads. Includes runtime tables and worked examples."
+  canonical="https://batterycalculators.com/learn/boat-battery-runtime-guide"
+  schema="faqPage"
+  schemaName="Boat Battery Runtime Guide"
+  schemaDescription="Engineering guide to calculating marine battery runtime for boats and yachts."
+  schemaUrl="https://batterycalculators.com/learn/boat-battery-runtime-guide"
+  faqItems={faqItems}
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/learn" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Back to Guides</a>
+      <Breadcrumb items={[
+        { label: "Learning Center", href: "/learn" },
+        { label: "Boat Battery Runtime Guide" }
+      ]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">MARINE</span>
+      <h1 class="text-display-md text-primary mb-6">Boat Battery Runtime Guide</h1>
+      <p class="text-body-md text-body font-light">
+        Runtime on a boat is a critical engineering constraint. Unlike grid-tied systems, a marine battery bank must carry all loads unaided for hours — from overnight anchoring to extended trolling sessions. This guide covers the method for estimating runtime across common marine load categories and explains the factors that reduce real-world performance below rated specifications.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Understanding Marine Runtime</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Marine runtime depends on three variables: total available energy (Wh), average load (W), and system efficiency. The fundamental calculation is straightforward — divide usable energy by load power — but marine applications introduce complications. Vibration, temperature extremes, salt air corrosion, and intermittent high-current loads (pumps, windlass) all degrade usable capacity below the manufacturer's rated specification.
+        </p>
+        <p class="text-body-md text-body font-light mb-4">
+          The most common mistake is using nameplate Ah rating directly. Lead-acid batteries lose 20–40% of usable capacity at higher discharge rates due to the Peukert effect. Lithium batteries perform better but still lose capacity at low temperatures and when aged. Always derate your calculations by 15–25% for marine conditions.
+        </p>
+      </section>
+
+      <FormulaBox title="Runtime Formula">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Runtime (h) = Usable Energy (Wh) / Total Load (W)
+        </div>
+        <p>
+          Usable Energy = Battery Capacity (Ah) × System Voltage (V) × DoD × Efficiency Factor
+        </p>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Marine Derating: Multiply result × 0.80 to 0.85
+        </div>
+        <p>
+          This accounts for Peukert losses (lead-acid), temperature derating, and parasitic draws not captured in your load inventory.
+        </p>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Common Marine Loads and Runtime Estimates</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          The following table provides typical power consumption for common marine electrical loads. Values assume LED lighting and modern electronics. Older incandescent fixtures or analog instruments will draw significantly more power.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Load</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Typical Power (W)</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Runtime on 100Ah 12V</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">Trolling motor (medium speed)</td>
+                <td class="p-4 font-mono text-primary">150–300 W</td>
+                <td class="p-4 font-mono text-primary">3–6 h</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Fish finder / chartplotter</td>
+                <td class="p-4 font-mono text-primary">15–30 W</td>
+                <td class="p-4 font-mono text-primary">25–50 h</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Navigation lights (LED)</td>
+                <td class="p-4 font-mono text-primary">5–15 W</td>
+                <td class="p-4 font-mono text-primary">50–150 h</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Cabin lights (LED)</td>
+                <td class="p-4 font-mono text-primary">20–40 W</td>
+                <td class="p-4 font-mono text-primary">20–40 h</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Refrigerator</td>
+                <td class="p-4 font-mono text-primary">40–80 W</td>
+                <td class="p-4 font-mono text-primary">10–20 h</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">VHF radio</td>
+                <td class="p-4 font-mono text-primary">5–25 W</td>
+                <td class="p-4 font-mono text-primary">30–150 h</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Water pump</td>
+                <td class="p-4 font-mono text-primary">5–10 W</td>
+                <td class="p-4 font-mono text-primary">70–140 h</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Anchor light (LED)</td>
+                <td class="p-4 font-mono text-primary">5–10 W</td>
+                <td class="p-4 font-mono text-primary">70–140 h</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Bilge pump</td>
+                <td class="p-4 font-mono text-primary">20–40 W</td>
+                <td class="p-4 font-mono text-primary">20–40 h</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-body-sm text-muted mt-4">
+          Runtime estimates assume a 100Ah 12V battery at 80% DoD with 85% system efficiency. Actual runtime will vary based on load duty cycles and battery age.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Load Profile Method</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          A single load does not tell the full story. Boats run multiple loads simultaneously — a fish finder and trolling motor during the day, navigation lights and cabin lighting at night. To estimate real-world runtime, build a load profile for each operating mode and sum the watt-hours consumed during each period.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Mode</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Active Loads</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Combined Draw</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">Day fishing</td>
+                <td class="p-4 text-muted">Trolling motor + fish finder + nav lights</td>
+                <td class="p-4 font-mono text-primary">180–350 W</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Overnight at anchor</td>
+                <td class="p-4 text-muted">Anchor light + cabin lights + fridge + VHF</td>
+                <td class="p-4 font-mono text-primary">80–160 W</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Cruising</td>
+                <td class="p-4 text-muted">Electronics + instruments + pumps</td>
+                <td class="p-4 font-mono text-primary">100–250 W</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Worked Example: Overnight Anchor Runtime</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Scenario:</strong> 12V 200Ah AGM battery bank, anchored overnight with the following loads:</p>
+            <table class="w-full text-left text-body-sm my-2">
+              <thead>
+                <tr class="border-b border-hairline">
+                  <th class="p-2 text-label-uppercase text-primary text-xs tracking-wider">Load</th>
+                  <th class="p-2 text-label-uppercase text-primary text-xs tracking-wider">Power</th>
+                  <th class="p-2 text-label-uppercase text-primary text-xs tracking-wider">Hours</th>
+                  <th class="p-2 text-label-uppercase text-primary text-xs tracking-wider">Wh</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-hairline">
+                <tr>
+                  <td class="p-2 text-muted">Anchor light</td>
+                  <td class="p-2 font-mono text-primary">8 W</td>
+                  <td class="p-2 font-mono text-primary">12 h</td>
+                  <td class="p-2 font-mono text-primary">96 Wh</td>
+                </tr>
+                <tr>
+                  <td class="p-2 text-muted">Cabin lights</td>
+                  <td class="p-2 font-mono text-primary">30 W</td>
+                  <td class="p-2 font-mono text-primary">4 h</td>
+                  <td class="p-2 font-mono text-primary">120 Wh</td>
+                </tr>
+                <tr>
+                  <td class="p-2 text-muted">Refrigerator</td>
+                  <td class="p-2 font-mono text-primary">50 W</td>
+                  <td class="p-2 font-mono text-primary">12 h</td>
+                  <td class="p-2 font-mono text-primary">600 Wh</td>
+                </tr>
+                <tr>
+                  <td class="p-2 text-muted">VHF radio</td>
+                  <td class="p-2 font-mono text-primary">8 W</td>
+                  <td class="p-2 font-mono text-primary">2 h</td>
+                  <td class="p-2 font-mono text-primary">16 Wh</td>
+                </tr>
+              </tbody>
+            </table>
+            <p><strong>Step 1:</strong> Total overnight energy:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              96 + 120 + 600 + 16 = 832 Wh
+            </div>
+            <p><strong>Step 2:</strong> Apply marine derating (0.85):</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              832 Wh / 0.85 = 979 Wh required from bank
+            </div>
+            <p><strong>Step 3:</strong> Convert to Ah at 12V with 50% DoD (AGM):</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              979 Wh / (0.50 × 12V) = 163 Ah
+            </div>
+            <p><strong>Step 4:</strong> A 200Ah AGM bank provides 100 Ah usable at 50% DoD — sufficient with margin. A 300Ah bank would be recommended if daytime trolling loads are also expected.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Factors That Reduce Runtime</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Temperature</h4>
+            <p class="text-body-sm text-muted">
+              Battery capacity drops 10–20% in cold conditions (below 10°C / 50°F). Cold anchors in early morning can significantly reduce overnight runtime compared to warm-weather calculations.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Battery Age</h4>
+            <p class="text-body-sm text-muted">
+              Lead-acid batteries lose 20–30% capacity after 300–500 cycles. A 2-year-old AGM bank may deliver only 70–80% of its rated capacity. Factor in expected aging when sizing for multi-season use.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Peukert Effect</h4>
+            <p class="text-body-sm text-muted">
+              Lead-acid batteries lose usable capacity at higher discharge rates. A 100Ah battery discharging at 10A (1C) may only deliver 60–70Ah. Discharging at 2A (0.02C) yields closer to the full 100Ah rating.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Parasitic Loads</h4>
+            <p class="text-body-sm text-muted">
+              Battery monitors, bilge pump controllers, clock circuits, and alarm systems draw small but continuous loads (5–20W total). Over 12–24 hours, these parasitic draws add 60–480 Wh to your consumption.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Try It</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use the Marine Battery Sizing Calculator to input your specific loads and get a bank recommendation.
+          </p>
+          <a href="/tools/marine-battery-sizing-calculator" class="btn-primary text-xs py-3 px-6 inline-block">Open Marine Battery Sizing Calculator</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Next Step</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Calculate how long your sized battery bank will run your specific load profile with the Runtime Calculator.
+          </p>
+          <a href="/tools/runtime-calculator" class="btn-primary text-xs py-3 px-6 inline-block">Open Runtime Calculator</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Related Articles</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <a href="/learn/marine-battery-sizing-guide" class="text-primary hover:underline font-bold block mb-2">Marine Battery Sizing Guide</a>
+            <p class="text-body-sm text-muted">
+              The complete method for sizing a marine house battery bank, including hotel loads, cruising vs anchored modes, and battery chemistry selection.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <a href="/learn/marine-hotel-load-guide" class="text-primary hover:underline font-bold block mb-2">Marine Hotel Load Guide</a>
+            <p class="text-body-sm text-muted">
+              How to inventory and calculate marine hotel loads — the foundation of accurate runtime and bank sizing calculations.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

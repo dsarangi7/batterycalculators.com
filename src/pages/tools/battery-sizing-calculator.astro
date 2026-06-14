@@ -1,0 +1,351 @@
+---
+import CalculatorLayout from '../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../components/CalculatorCard.astro';
+import InputField from '../../components/InputField.astro';
+import ResultBox from '../../components/ResultBox.astro';
+import FormulaBox from '../../components/FormulaBox.astro';
+import FAQSection from '../../components/FAQSection.astro';
+import RelatedTools from '../../components/RelatedTools.astro';
+
+const whatIs = `Battery sizing is the process of determining the total energy capacity (in watt-hours or amp-hours) a battery bank must store to meet defined electrical loads over a specified period without external recharge. The calculation integrates <strong>daily energy consumption</strong>, <strong>days of autonomy</strong> (how long the system must operate without grid or solar input), <strong>depth of discharge limits</strong> (to preserve cycle life), <strong>system round-trip efficiency</strong> (inverter, wiring, and BMS losses), and <strong>temperature derating</strong> (cold reduces available capacity). Proper battery sizing is the foundation of every off-grid solar installation, residential energy storage system, telecom backup, marine power system, and EV range extension project.`;
+
+const whyItMatters = [
+  "Oversized battery banks waste capital — a 30% oversized bank can cost thousands in unnecessary lithium cells that sit unused.",
+  "Undersized banks cause unexpected power loss, forcing loads to shut down before the intended autonomy period ends.",
+  "Ignoring temperature derating can leave systems short 10–30% of expected capacity in cold climates.",
+  "Confusing nominal and usable capacity leads to banks that appear sufficient on paper but fail under real DoD constraints.",
+  "Neglecting round-trip efficiency means the battery must supply more energy than the loads consume, creating a hidden deficit.",
+];
+
+const practicalApplications = [
+  { title: "Residential Energy Storage", description: "Size home battery systems for solar self-consumption, backup power, and time-of-use optimization." },
+  { title: "Off-Grid Solar", description: "Determine battery bank capacity for homes and cabins entirely disconnected from the utility grid." },
+  { title: "Telecom Backup", description: "Ensure telecom tower batteries meet minimum autonomy requirements during extended grid outages." },
+  { title: "Marine Power Systems", description: "Size house banks for vessels with significant hotel loads during extended cruising." },
+  { title: "RV & Mobile Living", description: "Calculate battery capacity for full-time RV living with solar charging infrastructure." },
+  { title: "Industrial UPS", description: "Size battery banks for critical industrial processes requiring guaranteed backup duration." },
+];
+
+const expertNotes = [
+  { title: 'Cold Climate Design', variant: 'warning', content: 'Lithium batteries cannot be charged below 0°C without causing permanent cell degradation due to lithium plating. If your design temperature falls below freezing, include a battery heating system in your sizing or apply significant capacity margin.' },
+  { title: 'Autonomy Planning', variant: 'engineering', content: 'For off-grid solar systems, 2–3 days of autonomy is standard. In regions with frequent multi-day cloud cover (Pacific Northwest, Northern Europe), 4 days may be necessary. More autonomy means larger, more expensive battery banks.' },
+];
+
+const trustSection = {
+  text: "This calculator uses publicly documented battery engineering formulas. The sizing model accounts for energy scaling by autonomy, derating by depth of discharge, round-trip efficiency losses, and temperature-dependent capacity reduction. All intermediate values are displayed for independent verification. Our methodology follows IEEE 1188 and manufacturer application notes.",
+  link: { label: "View our full methodology", href: "/methodology" },
+};
+
+const references = [
+  { title: "Battery University — Sizing Batteries", url: "https://batteryuniversity.com/article/bu-403-positive-kinetics", source: "Battery University / Cadex Electronics" },
+  { title: "IEEE Std 1188-1996 — Battery Maintenance for Stationary Applications", url: "https://standards.ieoe.org/ieee/1188/1076/", source: "IEEE Standards Association" },
+  { title: "NREL — Battery Storage Sizing Methods", url: "https://www.nrel.gov/storage-battery-sizing.html", source: "National Renewable Energy Laboratory" },
+  { title: "US DOE — Battery Storage Technology Overview", url: "https://www.energy.gov/eere/storage/battery-storage-technology", source: "U.S. Department of Energy" },
+  { title: "Victron Energy — Battery Bank Sizing Guide", url: "https://www.victronenergy.com/help-center", source: "Victron Energy" },
+];
+
+const faqItems = [
+  {
+    question: 'What does "Days of Autonomy" mean?',
+    answer: "Autonomy is the number of days a battery storage bank can support system loads without receiving any input charge (e.g., during cloudy days for solar, or windless periods for turbines). Solar off-grid systems typically use 2 to 3 days of autonomy to prevent total blackouts.",
+  },
+  {
+    question: "How do Lead-Acid and Lithium temperature characteristics differ?",
+    answer: "Lithium chemistries perform slightly better than lead-acid at cold temperatures down to -10°C. However, lithium batteries suffer a critical constraint: they cannot be charged below 0°C without causing permanent cell degradation due to lithium plating, unless they incorporate pre-heating circuits.",
+  },
+  {
+    question: "How do I estimate my daily energy consumption?",
+    answer: "Multiply the wattage rating of every electrical load by the number of hours it runs per day. Add all load results together. Example: A 100W TV running for 3 hours = 300 Wh. A 50W fridge cycling on for 10 hours = 500 Wh. Total daily energy is 800 Wh.",
+  },
+  {
+    question: "Why is system round-trip efficiency lower than cell efficiency?",
+    answer: "While lithium cells are 98% efficient, the system includes wiring resistive losses, battery management system (BMS) standby power, fuse contacts, and DC-to-AC inverter losses. The overall system efficiency represents the net thermal loss from battery terminal to end-load.",
+  },
+  {
+    question: "How many batteries do I need for a 5kW load?",
+    answer: "It depends on autonomy and voltage. For a 5kW load running 8 hours/day at 48V with 2 days autonomy and 80% DoD: Required energy = (5,000W × 8h × 2) / (0.80 × 0.90) = 111,111 Wh = 111.1 kWh. At 48V, that is 2,314 Ah — equivalent to about 8 large 280Ah LFP batteries in a 48V configuration.",
+  },
+  {
+    question: "What is the difference between battery capacity and usable capacity?",
+    answer: "Rated capacity is the total energy stored at 100% charge. Usable capacity is what you can safely extract before hitting DoD limits. A 100Ah LFP battery at 80% DoD provides 80Ah usable. A 100Ah lead-acid at 50% DoD provides only 50Ah usable. Always size based on usable capacity.",
+  },
+  {
+    question: "How does battery chemistry affect sizing?",
+    answer: "LFP allows 80–90% DoD with 5,000+ cycles, NMC allows 70–80% DoD with 2,000 cycles, and lead-acid is limited to 50% DoD with 500–1,000 cycles. LFP requires less total capacity for the same usable energy but costs more upfront per kWh.",
+  },
+  {
+    question: "Should I oversize my battery bank?",
+    answer: "Moderate oversizing (10–20%) provides safety margin for temperature derating, aging, and load growth. Excessive oversizing (50%+) wastes capital and may cause undercharging issues. A 15–20% margin above calculated minimum is generally appropriate.",
+  },
+  {
+    question: "What voltage should I choose for my battery bank?",
+    answer: "Higher voltage reduces current for the same power, meaning thinner cables and lower losses. 12V suits small systems (<1kW), 24V suits medium systems (1–5kW), and 48V is standard for residential and commercial systems (>5kW). Most modern inverters are designed for 48V.",
+  },
+  {
+    question: "How do I account for future load growth?",
+    answer: "Add 15–25% capacity margin to account for additional appliances, increased usage, or family growth. Alternatively, design for modular expansion — use a battery system that allows adding parallel strings later without replacing the entire bank.",
+  },
+  {
+    question: "Can I mix old and new batteries?",
+    answer: "Never mix batteries of different ages, chemistries, or capacities in the same bank. Older batteries have higher internal resistance and lower capacity, forcing newer batteries to work harder and degrade faster. Always replace entire strings or banks at once.",
+  },
+  {
+    question: "What happens if I undersize my battery bank?",
+    answer: "Undersized banks cause deep discharge cycles that accelerate degradation, voltage sag under load triggering premature low-voltage disconnects, and insufficient autonomy during extended cloudy periods. The cost of premature battery replacement often exceeds the savings from undersizing.",
+  },
+];
+
+const relatedTools = [
+  { href: "/tools/parallel-string-calculator", title: "Parallel String Tool", description: "Arrange series/parallel packs to match this output capacity." },
+  { href: "/tools/runtime-calculator", title: "Runtime Calculator", description: "Verify run hours under a specific continuous Watt load." },
+  { href: "/tools/energy-conversion-calculator", title: "Energy Conversion", description: "Convert battery capacities between Ah and Wh." },
+  { href: "/tools/solar-battery-sizing-calculator", title: "Solar Battery Sizing", description: "Size solar battery banks from daily consumption data." },
+  { href: "/tools/home-backup-battery-calculator", title: "Home Backup Calculator", description: "Size home battery backup for critical loads." },
+  { href: "/tools/battery-pack-calculator", title: "Battery Pack Calculator", description: "Design series/parallel cell configurations for target specs." },
+  { href: "/tools/marine-battery-sizing-calculator", title: "Marine Battery Sizing", description: "Size marine house banks for hotel loads." },
+  { href: "/tools/rv-battery-calculator", title: "RV Battery Calculator", description: "Plan RV power budgets for off-grid trips." },
+];
+
+const commonMistakes = [
+  "Forgetting temperature derating — lithium batteries cannot be charged below 0°C without permanent damage. Lead-acid capacity drops significantly in cold conditions. Always apply temperature correction factors.",
+  "Confusing rated and usable capacity — a 100Ah lead-acid battery at 50% DoD only provides 50Ah usable. A 100Ah LFP battery at 80% DoD provides 80Ah. Size based on usable capacity.",
+  "Ignoring system round-trip efficiency — battery charging and discharging loses 5–15% of energy. Your load requirement must be divided by system efficiency to get the true battery capacity needed.",
+  "Using average instead of peak load — your battery must handle peak loads, not just averages. A well pump may draw 1,000W for 5 minutes even if average consumption is 50W.",
+  "Mixing battery ages or chemistries — never combine old and new batteries, or different chemistries, in the same bank. Mismatched internal resistance causes uneven loading and accelerated degradation.",
+  "Ignoring self-discharge losses — over multi-day autonomy periods, self-discharge (1–5%/month lithium, higher lead-acid) reduces available energy. Factor this into long-autonomy calculations.",
+  "Sizing only for today's loads — future load growth from new appliances, family changes, or increased usage can quickly outpace an undersized bank. Include 15–20% growth margin.",
+  "Choosing wrong system voltage — a 12V system for a 5kW load requires 400+ amps, demanding extremely thick cables. Use 48V for loads above 2kW to keep current manageable.",
+];
+
+const relatedArticles = [
+  { href: "/learn/how-to-size-a-battery-bank", title: "How to Size a Battery Bank" },
+  { href: "/learn/what-is-battery-sizing", title: "What Is Battery Sizing?" },
+  { href: "/learn/battery-sizing-formula", title: "Battery Sizing Formula" },
+  { href: "/learn/battery-sizing-chart-guide", title: "Battery Sizing Chart Guide" },
+];
+---
+
+<CalculatorLayout
+  title="Battery Sizing Calculator | Battery Calculators"
+  description="Size battery storage packs based on daily consumption Wh, autonomy days, nominal voltage, and low temperature capacity derating."
+  faqItems={faqItems}
+  commonMistakes={commonMistakes}
+  relatedCalculators={relatedTools}
+  relatedArticles={relatedArticles}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+>
+
+  <!-- Main Calculator Grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+
+    <!-- Input Form -->
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Sizing Criteria</h3>
+      <div class="flex flex-col gap-6">
+
+        <!-- Daily load (paired input + select) -->
+        <div class="flex flex-col gap-2 w-full">
+          <label for="daily-energy" class="text-label-uppercase text-xs text-primary">Daily Energy Consumption</label>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            <input type="number" id="daily-energy" value="1200" class="text-input col-span-2" min="1" step="any" />
+            <select id="energy-unit" class="select-input">
+              <option value="wh">Wh</option>
+              <option value="kwh">kWh</option>
+            </select>
+          </div>
+        </div>
+
+        <InputField id="autonomy" label="Days of Autonomy" value={2} min={1} step={1} helperText="Number of days the battery system must support the load without recharging." />
+        <InputField id="dod" label="Max Depth of Discharge (DoD %)" value={80} min={10} max={100} helperText="Safe continuous limit. Recommend: 80% for Lithium, 50% for Lead-Acid." />
+        <InputField id="voltage" label="Nominal System Voltage (V)" value={25.6} min={1} step="any" helperText="Nominal voltage of pack (e.g. 12.8V, 25.6V, 51.2V)" />
+        <InputField id="efficiency" label="System Round-Trip Efficiency (%)" value={90} min={50} max={100} helperText="Inverter loss, cabling voltage drops, and battery charge acceptance efficiency." />
+        <InputField id="temperature" label="Design Minimum Temperature (°C)" value={10} min={-40} max={50} helperText="Cold temperatures reduce chemical energy storage capability." />
+
+      </div>
+    </CalculatorCard>
+
+    <!-- Calculation Results -->
+    <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Estimated Outputs</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <ResultBox
+            label="Required Battery Bank Energy"
+            value="3,546 Wh"
+            suffix="3.55 kWh storage recommended"
+            variant="primary"
+            id="result-energy"
+          />
+          <ResultBox
+            label="Charge Capacity Needed"
+            value="138.5 Ah"
+            suffix="At 25.6V nominal"
+            id="result-capacity-box"
+          />
+          <ResultBox
+            label="Temp Derating Multiplier"
+            value="0.94"
+            suffix="6.00% capacity loss in cold"
+            id="result-temp-box"
+          />
+        </div>
+      </div>
+
+      <!-- Action Area -->
+      <div class="border-t border-hairline pt-6">
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">Design Layout Suggestion</h4>
+        <p class="text-body-sm text-muted" id="sizing-layout-suggestion">
+          To achieve 138.5 Ah capacity at 25.6V, you could use a series/parallel string configuration of 8 series cells with multiple parallel strings.
+        </p>
+      </div>
+    </CalculatorCard>
+
+  </div>
+
+  <!-- Technical Explanation and Equations -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+
+      <FormulaBox title="Mathematical Formulas">
+        <p>
+          The required battery energy capacity E_req is calculated by scaling the daily energy demand by autonomy and dividing by losses:
+        </p>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          E_req (Wh) = (Daily Energy x Autonomy Days) / (DoD% x Efficiency% x TempMultiplier)
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Capacity_req (Ah) = E_req (Wh) / Nominal Voltage (V)
+        </div>
+        <p>
+          The temperature multiplier derates battery capability at low temperatures:
+        </p>
+        <ul class="list-disc pl-6 flex flex-col gap-1 text-xs">
+          <li>T >= 25°C: Multiplier = 1.00</li>
+          <li>0°C &lt;= T &lt; 25°C: Multiplier = 0.90 + 0.10 x (T/25)</li>
+          <li>-20°C &lt;= T &lt; 0°C: Multiplier = 0.70 + 0.20 x ((T+20)/20)</li>
+        </ul>
+        <p class="text-xs text-muted mt-4">
+          <strong>Variables:</strong> Daily Energy in Wh, Autonomy in days, DoD as percentage, Efficiency as percentage, Temperature in °C. Assumptions: constant daily load, standard discharge curves, 25°C reference temperature.
+        </p>
+      </FormulaBox>
+
+      <!-- Worked Examples -->
+      <div>
+        <h2 class="text-title-lg text-primary uppercase mb-6 tracking-wider">Worked Examples</h2>
+        <div class="text-body-sm text-muted flex flex-col gap-6">
+
+          <div class="border-l-2 border-m-blue-light pl-4">
+            <p class="font-bold text-primary mb-2">Example 1: Small Cabin — 1.5 kWh/day, 25.6V</p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li><strong>Daily load:</strong> 1,500 Wh | <strong>Autonomy:</strong> 2 days | <strong>DoD:</strong> 80%</li>
+              <li><strong>Efficiency:</strong> 90% | <strong>Temperature:</strong> 10°C</li>
+            </ul>
+            <p class="mt-2"><strong>Temp multiplier:</strong> 0.90 + 0.10 × (10/25) = <span class="font-mono text-primary">0.94</span></p>
+            <p><strong>Required energy:</strong> (1,500 × 2) / (0.80 × 0.90 × 0.94) = <span class="font-mono text-primary">4,433 Wh (4.43 kWh)</span></p>
+            <p><strong>Capacity:</strong> 4,433 / 25.6 = <span class="font-mono text-primary">173.2 Ah</span></p>
+          </div>
+
+          <div class="border-l-2 border-m-blue-dark pl-4">
+            <p class="font-bold text-primary mb-2">Example 2: Off-Grid Home — 8 kWh/day, 48V</p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li><strong>Daily load:</strong> 8,000 Wh | <strong>Autonomy:</strong> 3 days | <strong>DoD:</strong> 85%</li>
+              <li><strong>Efficiency:</strong> 92% | <strong>Temperature:</strong> 20°C</li>
+            </ul>
+            <p class="mt-2"><strong>Temp multiplier:</strong> 0.90 + 0.10 × (20/25) = <span class="font-mono text-primary">0.98</span></p>
+            <p><strong>Required energy:</strong> (8,000 × 3) / (0.85 × 0.92 × 0.98) = <span class="font-mono text-primary">31,358 Wh (31.36 kWh)</span></p>
+            <p><strong>Capacity:</strong> 31,358 / 48 = <span class="font-mono text-primary">653.3 Ah</span></p>
+          </div>
+
+          <div class="border-l-2 border-m-red pl-4">
+            <p class="font-bold text-primary mb-2">Example 3: Telecom Tower — 5 kWh/day, 48V, Cold Climate</p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li><strong>Daily load:</strong> 5,000 Wh | <strong>Autonomy:</strong> 4 days | <strong>DoD:</strong> 80%</li>
+              <li><strong>Efficiency:</strong> 90% | <strong>Temperature:</strong> -10°C</li>
+            </ul>
+            <p class="mt-2"><strong>Temp multiplier:</strong> 0.70 + 0.20 × ((-10+20)/20) = <span class="font-mono text-primary">0.80</span></p>
+            <p><strong>Required energy:</strong> (5,000 × 4) / (0.80 × 0.90 × 0.80) = <span class="font-mono text-primary">34,722 Wh (34.72 kWh)</span></p>
+            <p><strong>Capacity:</strong> 34,722 / 48 = <span class="font-mono text-primary">723.4 Ah</span></p>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <FAQSection items={faqItems} />
+  <RelatedTools tools={relatedTools} />
+
+  <!-- Calculation Script -->
+  <script>
+    import { calculateBatterySizing } from '../../utils/calculators';
+
+    const dailyEnergyInput = document.getElementById('daily-energy') as HTMLInputElement;
+    const energyUnitSelect = document.getElementById('energy-unit') as HTMLSelectElement;
+    const autonomyInput = document.getElementById('autonomy') as HTMLInputElement;
+    const dodInput = document.getElementById('dod') as HTMLInputElement;
+    const voltageInput = document.getElementById('voltage') as HTMLInputElement;
+    const efficiencyInput = document.getElementById('efficiency') as HTMLInputElement;
+    const temperatureInput = document.getElementById('temperature') as HTMLInputElement;
+
+    // Outputs — adapted for ResultBox DOM structure
+    const resultEnergyContainer = document.getElementById('result-energy');
+    const resultEnergyValue = resultEnergyContainer?.querySelector('.text-display-md') as HTMLElement;
+    const resultKwh = resultEnergyContainer?.querySelector('.text-caption') as HTMLElement;
+
+    const resultCapacityContainer = document.getElementById('result-capacity-box');
+    const resultCapacity = resultCapacityContainer?.querySelector('.text-title-lg') as HTMLElement;
+    const resultVoltageRef = resultCapacityContainer?.querySelector('.text-caption') as HTMLElement;
+
+    const resultTempContainer = document.getElementById('result-temp-box');
+    const resultTempMultiplier = resultTempContainer?.querySelector('.text-title-lg') as HTMLElement;
+    const resultTempDesc = resultTempContainer?.querySelector('.text-caption') as HTMLElement;
+
+    const sizingLayoutSuggestion = document.getElementById('sizing-layout-suggestion');
+
+    function updateCalculations() {
+      const dailyVal = parseFloat(dailyEnergyInput.value) || 0;
+      const isKwh = energyUnitSelect.value === 'kwh';
+      const dailyEnergyWh = isKwh ? dailyVal * 1000 : dailyVal;
+      const autonomy = parseFloat(autonomyInput.value) || 1;
+      const dod = parseFloat(dodInput.value) || 80;
+      const voltage = parseFloat(voltageInput.value) || 25.6;
+      const efficiency = parseFloat(efficiencyInput.value) || 90;
+      const temperature = parseFloat(temperatureInput.value) || 25;
+
+      const results = calculateBatterySizing(dailyEnergyWh, autonomy, dod, voltage, efficiency, temperature);
+
+      // Render Outputs
+      if (resultEnergyValue) resultEnergyValue.textContent = `${Math.round(results.requiredEnergyWh).toLocaleString()} Wh`;
+      if (resultKwh) resultKwh.textContent = `${(results.requiredEnergyWh / 1000).toFixed(2)} kWh storage recommended`;
+      if (resultCapacity) resultCapacity.textContent = `${results.requiredCapacityAh.toFixed(1)} Ah`;
+      if (resultVoltageRef) resultVoltageRef.textContent = `At ${voltage.toFixed(1)}V nominal`;
+      if (resultTempMultiplier) resultTempMultiplier.textContent = results.temperatureMultiplier.toFixed(2);
+
+      const percentLoss = (1 - results.temperatureMultiplier) * 100;
+      if (resultTempDesc) resultTempDesc.textContent = `${percentLoss.toFixed(1)}% capacity loss in cold`;
+
+      // Suggest Series cell layout
+      // A typical lithium cell is 3.2V nominal.
+      const cellV = 3.2;
+      const seriesCells = Math.round(voltage / cellV);
+      if (sizingLayoutSuggestion) {
+        sizingLayoutSuggestion.textContent = `To achieve ${results.requiredCapacityAh.toFixed(1)} Ah capacity at ${voltage.toFixed(1)}V nominal, you could configure a pack with ${seriesCells} series cells (approx. ${cellV}V per cell) and parallel strings to match the targeted capacity.`;
+      }
+    }
+
+    [dailyEnergyInput, energyUnitSelect, autonomyInput, dodInput, voltageInput, efficiencyInput, temperatureInput].forEach(el => {
+      el.addEventListener('input', updateCalculations);
+    });
+
+    // Run on load
+    updateCalculations();
+  </script>
+
+</CalculatorLayout>

@@ -1,0 +1,305 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import CalculatorCard from '../../components/CalculatorCard.astro';
+import FormulaBox from '../../components/FormulaBox.astro';
+import FAQSection from '../../components/FAQSection.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "How many batteries do I need for van life?",
+    answer: "It depends on your daily consumption and how long you want to stay off-grid. A typical van life setup with a fridge, lighting, water pump, device charging, and a laptop uses 1,500-3,000 Wh per day. For 2-day autonomy without solar, you need 200-400Ah of LFP capacity. With 200W of solar, you can often use a smaller battery bank.",
+  },
+  {
+    question: "Do I need solar panels for van life?",
+    answer: "Solar panels are not strictly required but are highly recommended. They recharge your battery during the day, extending your off-grid capability indefinitely. A 200W panel generates 800-1,000 Wh per day in good conditions. Without solar, you rely solely on alternator charging and shore power.",
+  },
+  {
+    question: "What is the best battery chemistry for van life?",
+    answer: "Lithium LFP (LiFePO4) is the best choice for van life. It offers 80-90% usable capacity (vs 50% for lead-acid), weighs 50-70% less, charges faster, and lasts 3,000+ cycles. The higher upfront cost pays for itself within 2-3 years of regular use compared to replacing lead-acid batteries repeatedly.",
+  },
+  {
+    question: "How do I charge my van life batteries?",
+    answer: "Three primary methods: solar panels (MPPT charge controller), alternator charging while driving (DC-DC charger), and shore power at campsites or homes (AC charger). A complete van life system typically includes all three charging sources for maximum flexibility.",
+  },
+];
+---
+
+<Layout
+  title="Van Life Battery Planning | Battery Calculators"
+  description="Complete battery planning guide for van life: load inventory, daily consumption calculation, solar charging strategy, battery sizing, and system architecture for off-grid living."
+  canonical="https://batterycalculators.com/learn/van-life-battery-planning"
+  schema="faqPage"
+  schemaName="Van Life Battery Planning"
+  schemaDescription="Complete battery planning guide for van life."
+  schemaUrl="https://batterycalculators.com/learn/van-life-battery-planning"
+  faqItems={faqItems}
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/learn" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Back to Guides</a>
+      <Breadcrumb items={[
+        { label: "Learning Center", href: "/learn" },
+        { label: "Van Life Battery Planning" },
+      ]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">RV & CAMPER</span>
+      <h1 class="text-display-md text-primary mb-6">Van Life Battery Planning</h1>
+      <p class="text-body-md text-body font-light">
+        Battery planning is the foundation of a functional van life build. Without reliable power, you cannot run a fridge, charge devices, pump water, or use lighting after dark. This guide walks through the complete engineering process — from load inventory through solar charging to final system architecture — so your van life electrical system works reliably for years on the road.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Step 1: Build a Load Inventory</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Every van life electrical system starts with a complete inventory of every device that will draw power. Walk through your van from the driver's seat to the rear doors and write down every electrical device: lights, fan, fridge, pump, outlets, USB ports, inverters, and any specialty items like a diesel heater controller or maxxfan. Record each device's power draw in watts and estimate daily runtime in hours.
+        </p>
+        <p class="text-body-md text-body font-light mb-6">
+          The most common mistake is underestimating runtime. The fridge runs 24 hours per day though the compressor cycles on and off. Lights are used more than you think — typically 4-6 hours per evening. Phone and device charging happens daily. Be conservative in your estimates; it is better to oversize the system slightly than to run short on a rainy day with no solar.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Device</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Power (W)</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Daily Use (hrs)</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Energy (Wh)</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">12V fridge</td>
+                <td class="p-4 font-mono text-primary">45</td>
+                <td class="p-4 font-mono text-primary">24 (cycling)</td>
+                <td class="p-4 font-mono text-primary">1,080</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">LED lights (x6)</td>
+                <td class="p-4 font-mono text-primary">3 each</td>
+                <td class="p-4 font-mono text-primary">5</td>
+                <td class="p-4 font-mono text-primary">90</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Maxxfan / roof vent</td>
+                <td class="p-4 font-mono text-primary">10</td>
+                <td class="p-4 font-mono text-primary">8</td>
+                <td class="p-4 font-mono text-primary">80</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Water pump</td>
+                <td class="p-4 font-mono text-primary">6</td>
+                <td class="p-4 font-mono text-primary">0.3</td>
+                <td class="p-4 font-mono text-primary">1.8</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">USB device charging</td>
+                <td class="p-4 font-mono text-primary">20</td>
+                <td class="p-4 font-mono text-primary">3</td>
+                <td class="p-4 font-mono text-primary">60</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Laptop</td>
+                <td class="p-4 font-mono text-primary">45</td>
+                <td class="p-4 font-mono text-primary">4</td>
+                <td class="p-4 font-mono text-primary">180</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Diesel heater controller</td>
+                <td class="p-4 font-mono text-primary">1</td>
+                <td class="p-4 font-mono text-primary">12</td>
+                <td class="p-4 font-mono text-primary">12</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">CO / propane detector</td>
+                <td class="p-4 font-mono text-primary">0.5</td>
+                <td class="p-4 font-mono text-primary">24</td>
+                <td class="p-4 font-mono text-primary">12</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Step 2: Calculate Daily Consumption</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Sum all device energy values from your load inventory to get total daily consumption in watt-hours. For AC loads that pass through an inverter, add 10-15% to account for conversion losses. The result is the amount of energy your battery system must store or your solar system must generate each day.
+        </p>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Worked Example:</strong> Using the load inventory above.</p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li>DC loads (fridge, lights, fan, pump, USB): 1,252 Wh</li>
+              <li>AC loads (laptop): 180 Wh x 1.12 (inverter loss) = 202 Wh</li>
+              <li>Always-on (heater controller, detector): 24 Wh</li>
+            </ul>
+            <p class="pt-2 border-t border-hairline"><strong>Total daily consumption:</strong> <span class="font-mono text-primary">1,478 Wh/day</span></p>
+            <p class="text-xs text-muted">This is a moderate van life load profile. Adding high-draw items like an induction cooktop, coffee maker, or space heater would increase consumption significantly.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <FormulaBox title="Van Life Sizing Formulas">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Battery Required (Wh) = Daily Consumption (Wh) x Autonomy Days / DoD
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Battery Ah = Battery Required (Wh) / System Voltage
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Solar Needed (W) = (Daily Consumption - Alternator Input) / Peak Sun Hours
+        </div>
+        <p>
+          Autonomy days is the number of days you want to stay off-grid without any charging input. For weekend trips, 1-2 days is typical. For full-time van life, 0.5-1 day combined with daily solar or alternator charging is the standard approach.
+        </p>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Step 3: Solar Charging Strategy</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Solar panels convert sunlight into electrical energy that recharges your battery during the day. The amount of energy generated depends on panel wattage, sun exposure, angle, and weather. In ideal conditions, a 200W panel generates 800-1,000 Wh per day — enough to offset most van life consumption. In practice, expect 500-800 Wh per day from a roof-mounted 200W array.
+        </p>
+        <p class="text-body-md text-body font-light mb-6">
+          The key design principle is to match your solar array to your daily consumption. If you consume 1,500 Wh per day and your solar generates 800 Wh, you have a 700 Wh daily deficit that must come from the battery. With a 200Ah battery (2,040 Wh usable), you can sustain this deficit for approximately 3 days before the battery is depleted. This is your off-grid autonomy.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Solar Array</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Daily Output</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Covers</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">100W</td>
+                <td class="p-4 font-mono text-primary">400 - 500 Wh</td>
+                <td class="p-4 text-muted">Lights, fans, device charging</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">200W</td>
+                <td class="p-4 font-mono text-primary">800 - 1,000 Wh</td>
+                <td class="p-4 text-muted">Fridge + most daily loads</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">300W</td>
+                <td class="p-4 font-mono text-primary">1,200 - 1,500 Wh</td>
+                <td class="p-4 text-muted">Full van life load profile</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">400W+</td>
+                <td class="p-4 font-mono text-primary">1,600 - 2,000 Wh</td>
+                <td class="p-4 text-muted">High-draw setups with cooktop</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Step 4: Battery Sizing</h2>
+        <p class="text-body-md text-body font-light mb-6">
+          Battery capacity must cover your daily consumption for the desired number of autonomy days. For full-time van life with solar and alternator charging, a 200-400Ah LFP bank at 12V is the standard range. For weekend warriors without solar, 300-500Ah provides comfortable margin.
+        </p>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Worked Example:</strong> Full-time van life, 1,478 Wh/day, 1-day autonomy.</p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li>Daily consumption: 1,478 Wh</li>
+              <li>Autonomy: 1 day</li>
+              <li>Battery: LFP (85% DoD)</li>
+              <li>System voltage: 12V</li>
+            </ul>
+            <p><strong>Step 1:</strong> Calculate total battery needed:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              1,478 x 1 / 0.85 = 1,739 Wh
+            </div>
+            <p><strong>Step 2:</strong> Convert to amp-hours:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              1,739 / 12 = 145 Ah
+            </div>
+            <p><strong>Recommendation:</strong> A 200Ah LFP battery provides 2,040 Wh usable — enough for 1.4 days of this load profile. For 2-day autonomy, upgrade to 300Ah. With 200W of solar generating ~800 Wh/day, a 200Ah bank sustains the 678 Wh daily deficit for approximately 3 days.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Step 5: System Architecture</h2>
+        <p class="text-body-md text-body font-light mb-6">
+          A complete van life electrical system includes the battery, charge sources, loads, and monitoring. The system architecture determines how these components connect and interact. The most common configuration for a 12V van build uses a single busbar-based system with parallel charging inputs.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Battery Bank</h4>
+            <p class="text-body-sm text-muted">
+              LFP 12V batteries connected in parallel for capacity. A 200Ah bank (two 100Ah units) provides redundancy — if one battery fails, the other still powers essential loads. Use a battery monitor to track state of charge.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Solar + MPPT</h4>
+            <p class="text-body-sm text-muted">
+              Roof-mounted solar panels connected to an MPPT charge controller. The controller regulates voltage and maximizes energy harvest. Size the controller for 1.25x your solar array wattage.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">DC-DC Charger</h4>
+            <p class="text-body-sm text-muted">
+              Charges the house battery from the alternator while driving. Essential for van life — a 30-minute drive can add 200-400 Wh. Use a DC-DC charger (not a simple relay) to regulate alternator input and protect both batteries.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Inverter + Distribution</h4>
+            <p class="text-body-sm text-muted">
+              A pure sine wave inverter for AC loads (laptop, small appliances). DC distribution panel with fuses for all 12V loads. Label every circuit for easy troubleshooting on the road.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Try It</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use the RV Battery Calculator to size a complete van life battery system based on your specific load inventory.
+          </p>
+          <a href="/tools/rv-battery-calculator" class="btn-primary text-xs py-3 px-6 inline-block">Open RV Battery Calculator</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Related Tool</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use the Solar Battery Sizing Calculator to match your solar array and battery bank for optimal off-grid performance.
+          </p>
+          <a href="/tools/solar-battery-sizing-calculator" class="btn-primary text-xs py-3 px-6 inline-block">Open Solar Battery Sizing Calculator</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Related Articles</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <a href="/learn/camper-battery-runtime-guide" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors mb-2 block">
+              Camper Battery Runtime Guide
+            </a>
+            <p class="text-body-sm text-muted">
+              Detailed breakdown of camper load consumption and runtime estimates for common camping scenarios.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <a href="/learn/how-many-batteries-for-rv" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors mb-2 block">
+              How Many Batteries for RV
+            </a>
+            <p class="text-body-sm text-muted">
+              Explains how to determine the exact number of batteries for your RV based on usage patterns and consumption.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

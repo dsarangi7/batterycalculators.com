@@ -1,0 +1,306 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import CalculatorCard from '../../components/CalculatorCard.astro';
+import FormulaBox from '../../components/FormulaBox.astro';
+import FAQSection from '../../components/FAQSection.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "What is the formula for sizing a battery bank?",
+    answer: "The standard formula is: Required Capacity (Wh) = Daily Load (Wh) × Autonomy Days / (DoD% / 100) / (Efficiency% / 100) / Temperature Factor. Convert to Ah by dividing by system voltage. This accounts for all major variables: energy demand, backup duration, discharge limits, system losses, and environmental conditions.",
+  },
+  {
+    question: "How does temperature affect the sizing formula?",
+    answer: "Temperature derating factors reduce the effective capacity available from a battery. At 0°C, LFP batteries deliver about 90% of rated capacity and lead-acid about 80%. At -20°C, the numbers drop to 70% and 50% respectively. The temperature factor is a divisor in the sizing formula — a lower factor means you need more installed capacity to compensate.",
+  },
+  {
+    question: "What depth of discharge should I use in the formula?",
+    answer: "It depends on your battery chemistry and cycle life requirements. LFP can use 80–90% DoD for 4,000+ cycles. NMC lithium typically uses 80% DoD. Lead-acid should be limited to 50% DoD to avoid rapid degradation. Using a lower DoD extends battery life but requires a larger bank — the formula captures this tradeoff directly.",
+  },
+  {
+    question: "How do I account for inverter efficiency in the formula?",
+    answer: "Inverter efficiency is typically 85–95% and is included in the system efficiency divisor. If your inverter is 90% efficient, use 0.90 in the formula. For systems with multiple conversion stages (DC-DC converter + inverter), multiply the efficiencies of each stage for the total system efficiency figure.",
+  },
+];
+---
+
+<Layout
+  title="Battery Sizing Formula | Battery Calculators"
+  description="Complete formula reference for battery sizing. Covers capacity calculation, voltage, depth of discharge, autonomy, temperature derating, and system efficiency with worked examples."
+  canonical="https://batterycalculators.com/learn/battery-sizing-formula"
+  schema="faqPage"
+  schemaName="Battery Sizing Formula"
+  schemaDescription="Complete engineering formula reference for calculating battery bank capacity across all system types."
+  schemaUrl="https://batterycalculators.com/learn/battery-sizing-formula"
+  faqItems={faqItems}
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/learn" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Back to Guides</a>
+      <Breadcrumb items={[
+        { label: "Learning Center", href: "/learn" },
+        { label: "Battery Sizing Formula" }
+      ]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">REFERENCE</span>
+      <h1 class="text-display-md text-primary mb-6">Battery Sizing Formula</h1>
+      <p class="text-body-md text-body font-light">
+        This is the complete formula reference for battery bank sizing. Every variable is defined, every factor is explained, and a fully worked example demonstrates how the formulas apply to a real-world 48V LFP system.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Primary Sizing Formula</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          The primary formula calculates the total energy capacity required in watt-hours. All other sizing parameters — autonomy, discharge limits, efficiency, and temperature — are divisors that increase the required capacity to account for real-world losses and constraints.
+        </p>
+        <FormulaBox title="Capacity in Watt-Hours">
+          <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+            C_Wh = (E_daily × N_autonomy) / (D_DoD × η_system × K_temp)
+          </div>
+          <div class="flex flex-col gap-2 mt-2">
+            <p><strong>C_Wh</strong> — Required battery capacity in watt-hours</p>
+            <p><strong>E_daily</strong> — Total daily energy consumption in watt-hours</p>
+            <p><strong>N_autonomy</strong> — Number of days of autonomy (backup duration)</p>
+            <p><strong>D_DoD</strong> — Maximum depth of discharge as a decimal (e.g., 0.80 for 80%)</p>
+            <p><strong>η_system</strong> — Overall system efficiency as a decimal (inverter × charge controller × wiring)</p>
+            <p><strong>K_temp</strong> — Temperature derating factor (1.0 at 25°C, lower at colder temperatures)</p>
+          </div>
+        </FormulaBox>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Capacity in Amp-Hours</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Once you have the required capacity in watt-hours, convert to amp-hours by dividing by the system voltage. This is the figure you use when selecting batteries, since most batteries are rated in Ah at a specific voltage.
+        </p>
+        <FormulaBox title="Capacity in Amp-Hours">
+          <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+            C_Ah = C_Wh / V_system
+          </div>
+          <p>
+            For a 48V system requiring 9,600 Wh: 9,600 / 48 = 200 Ah. For a 12V system requiring 2,400 Wh: 2,400 / 12 = 200 Ah. Same energy, different Ah ratings due to voltage.
+          </p>
+        </FormulaBox>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">System Efficiency Breakdown</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          System efficiency is the product of all conversion and transmission losses between the battery and the load. Each stage multiplies together to give the total η_system value used in the sizing formula.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Loss Stage</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Typical Efficiency</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Notes</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">Inverter (DC→AC)</td>
+                <td class="p-4 font-mono text-primary">88–95%</td>
+                <td class="p-4 text-muted">Pure sine wave inverters at the higher end</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Charge Controller</td>
+                <td class="p-4 font-mono text-primary">95–98%</td>
+                <td class="p-4 text-muted">MPPT controllers are more efficient than PWM</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Battery Round-Trip</td>
+                <td class="p-4 font-mono text-primary">90–98%</td>
+                <td class="p-4 text-muted">LFP at 96–98%, lead-acid at 80–85%</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Wiring / Connections</td>
+                <td class="p-4 font-mono text-primary">97–99%</td>
+                <td class="p-4 text-muted">Depends on cable gauge and length</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted"><strong>Combined η_system</strong></td>
+                <td class="p-4 font-mono text-primary"><strong>78–90%</strong></td>
+                <td class="p-4 text-muted">Multiply all stages together</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Temperature Derating Factors</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Batteries are rated at 25°C. Cold temperatures slow the chemical reactions inside the cells, reducing the energy that can be extracted. The temperature factor K_temp is applied as a divisor — a lower K_temp means you need more installed capacity.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Temperature</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">LFP (K_temp)</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Lead-Acid (K_temp)</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">NMC (K_temp)</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">30°C (86°F)</td>
+                <td class="p-4 font-mono text-primary">1.02</td>
+                <td class="p-4 font-mono text-primary">1.00</td>
+                <td class="p-4 font-mono text-primary">1.01</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">25°C (77°F)</td>
+                <td class="p-4 font-mono text-primary">1.00</td>
+                <td class="p-4 font-mono text-primary">1.00</td>
+                <td class="p-4 font-mono text-primary">1.00</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">10°C (50°F)</td>
+                <td class="p-4 font-mono text-primary">0.95</td>
+                <td class="p-4 font-mono text-primary">0.90</td>
+                <td class="p-4 font-mono text-primary">0.93</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">0°C (32°F)</td>
+                <td class="p-4 font-mono text-primary">0.90</td>
+                <td class="p-4 font-mono text-primary">0.80</td>
+                <td class="p-4 font-mono text-primary">0.85</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">-10°C (14°F)</td>
+                <td class="p-4 font-mono text-primary">0.80</td>
+                <td class="p-4 font-mono text-primary">0.65</td>
+                <td class="p-4 font-mono text-primary">0.75</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">-20°C (-4°F)</td>
+                <td class="p-4 font-mono text-primary">0.70</td>
+                <td class="p-4 font-mono text-primary">0.50</td>
+                <td class="p-4 font-mono text-primary">0.60</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-body-sm text-muted mt-2">Values are approximate and vary by manufacturer. Always consult the specific battery datasheet for precise derating curves.</p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Worked Example: 48V LFP Bank</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Scenario:</strong> Size a 48V LFP battery bank for a home with 10 kWh/day consumption and 2 days of autonomy.</p>
+            <p><strong>Given:</strong></p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li>Daily energy consumption: 10,000 Wh (10 kWh)</li>
+              <li>Autonomy required: 2 days</li>
+              <li>DoD limit: 80% (LFP chemistry)</li>
+              <li>Inverter efficiency: 92%</li>
+              <li>Charge controller efficiency: 97%</li>
+              <li>Battery round-trip efficiency: 96%</li>
+              <li>Wiring losses: 98%</li>
+              <li>Temperature factor: 0.95 (mild climate, 10°C average)</li>
+              <li>System voltage: 48V</li>
+            </ul>
+
+            <p><strong>Step 1:</strong> Calculate combined system efficiency:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              η_system = 0.92 × 0.97 × 0.96 × 0.98 = 0.839
+            </div>
+
+            <p><strong>Step 2:</strong> Calculate required capacity in Wh:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              C_Wh = (10,000 × 2) / 0.80 / 0.839 / 0.95
+              C_Wh = 20,000 / 0.638
+              C_Wh = 31,348 Wh (31.3 kWh)
+            </div>
+
+            <p><strong>Step 3:</strong> Convert to Ah at 48V:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              C_Ah = 31,348 / 48 = 653 Ah
+            </div>
+
+            <p><strong>Step 4:</strong> Select practical configuration. A 48V LFP system with 16 cells in series (48V nominal) and a 280 Ah cell configuration yields approximately 13.4 kWh. For 31.3 kWh, use 4 parallel strings of 280 Ah cells: 4 × 280 Ah = 1,120 Ah at 48V = 53.8 kWh. This provides substantial margin for 10+ years of capacity fade and potential load growth.</p>
+            <p class="mt-2"><strong>Alternatively,</strong> a commercially available 48V 200Ah LFP battery module (9.6 kWh) can be paralleled: 4 modules = 38.4 kWh, providing 22% margin above the 31.3 kWh requirement.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Quick Reference: Ah per kWh by Voltage</h2>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">System Voltage</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Ah per 1 kWh</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Typical Use</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">12V</td>
+                <td class="p-4 font-mono text-primary">83.3 Ah</td>
+                <td class="p-4 text-muted">RV, marine, small off-grid</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">24V</td>
+                <td class="p-4 font-mono text-primary">41.7 Ah</td>
+                <td class="p-4 text-muted">Medium off-grid, small home</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">48V</td>
+                <td class="p-4 font-mono text-primary">20.8 Ah</td>
+                <td class="p-4 text-muted">Home solar, commercial, telecom</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">400V</td>
+                <td class="p-4 font-mono text-primary">2.5 Ah</td>
+                <td class="p-4 text-muted">Utility-scale BESS</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-body-sm text-muted mt-2">Higher voltage systems require fewer Ah for the same energy, reducing cable size and conduction losses.</p>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Try It</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use the Battery Sizing Calculator to apply these formulas with your own numbers.
+          </p>
+          <a href="/tools/battery-sizing-calculator" class="btn-primary text-xs py-3 px-6 inline-block">Open Battery Sizing Calculator</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Verify Runtime</h4>
+          <p class="text-body-sm text-muted mb-4">
+            After sizing, verify your runtime estimate with the Runtime Calculator.
+          </p>
+          <a href="/tools/runtime-calculator" class="btn-primary-outline text-xs py-3 px-6 inline-block">Open Runtime Calculator</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Related Articles</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">What Is Battery Sizing?</h4>
+            <p class="text-body-sm text-muted mb-3">Overview of the sizing process, why it matters, and key design considerations.</p>
+            <a href="/learn/what-is-battery-sizing" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Read Guide →</a>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Battery Sizing Chart Guide</h4>
+            <p class="text-body-sm text-muted mb-3">Visual chart showing which Ah rating fits which application and load profile.</p>
+            <a href="/learn/battery-sizing-chart-guide" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Read Guide →</a>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

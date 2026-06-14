@@ -1,0 +1,354 @@
+---
+import CalculatorLayout from '../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../components/CalculatorCard.astro';
+import InputField from '../../components/InputField.astro';
+import ResultBox from '../../components/ResultBox.astro';
+import FormulaBox from '../../components/FormulaBox.astro';
+import FAQSection from '../../components/FAQSection.astro';
+import MiniSimulationChart from '../../components/MiniSimulationChart.astro';
+
+const whatIs = `A home backup battery calculator determines the battery bank capacity needed to power critical household loads during grid outages. It separates essential loads—refrigerator, lighting, medical devices, communication equipment—from non-essential loads like air conditioning and electric stoves. The calculator accounts for inverter efficiency losses, chemistry-specific depth-of-discharge limits, and runtime targets. Whether you're preparing for storm season or building a whole-home solar+storage system, this tool sizes the battery bank to maintain comfort and safety during extended outages.`;
+
+const whyItMatters = [
+  "Undersized home battery systems leave you without power for refrigeration during multi-day outages—spoilage of a full refrigerator costs $300–$600 in lost food.",
+  "Oversized systems unnecessarily increase cost—every 5 kWh of excess LFP capacity adds $2,000–$4,000 to the installation without extending critical load runtime.",
+  "Ignoring inverter standby power consumption (5–20W continuous) means your battery drains faster than calculated, especially during extended low-load overnight periods.",
+  "Failing to distinguish critical from non-critical loads leads to either insufficient backup for essentials or a system sized to power the entire house—which requires 3–5× more capacity.",
+  "Not accounting for battery degradation over time means your system may not meet its runtime target after 3–5 years as capacity fades 15–20% from initial rating."
+];
+
+const practicalApplications = [
+  { title: "Storm & Hurricane Preparedness", description: "Size a battery system to maintain critical loads through 24–72 hour outages common during severe weather events in coastal and rural areas." },
+  { title: "Solar + Storage Backup", description: "Calculate the battery capacity needed to store solar energy for overnight and cloudy-day use in grid-tied or off-grid homes." },
+  { title: "Critical Medical Equipment Backup", description: "Ensure sufficient battery runtime for oxygen concentrators, CPAP machines, dialysis equipment, and other life-sustaining medical devices." },
+  { title: "Time-of-Use Rate Optimization", description: "Size batteries to store cheap off-peak grid energy for use during expensive peak-rate hours, reducing monthly electricity costs." }
+];
+
+const expertNotes: { title: string; variant: 'engineering' | 'tip'; content: string }[] = [
+  {
+    title: "Chemistry Selection for Indoor Installation",
+    variant: "engineering",
+    content: "LFP (LiFePO4) is the only lithium chemistry recommended for indoor residential installation due to its thermal stability and absence of thermal runaway risk. NMC lithium requires ventilation and fire-rated enclosures. Lead-acid emits hydrogen gas during charging and demands dedicated ventilated battery rooms. For garage or living space installations, LFP is the clear choice—most jurisdictions require UL 9540 listing for indoor battery installations."
+  },
+  {
+    title: "Modular Expansion Strategy",
+    variant: "tip",
+    content: "Start with a battery capacity that covers your critical loads for 8–12 hours, then plan for modular expansion. Most modern LFP home batteries (Tesla Powerwall, Enphase, Sol-Ark) support parallel expansion—add modules later as your needs grow or when electricity rates change. This avoids over-investing upfront while preserving upgrade flexibility."
+  }
+];
+
+const trustSection = {
+  text: "This calculator uses standard home energy sizing methodology aligned with UL 9540 battery energy storage guidelines and IEEE 2800 interconnection standards. All formulas are derived from manufacturer performance data and residential load profiling studies. The math is fully transparent and independently verifiable.",
+  link: { label: "View our methodology and formula derivations", href: "/methodology" }
+};
+
+const references = [
+  { title: "UL 9540 — Energy Storage Systems and Equipment", url: "https://www.ul.com/resources/ul-9540-energy-storage-systems-and-equipment", source: "Underwriters Laboratories" },
+  { title: "IEEE 2800 — Standard for Interconnection of DER", url: "https://standards.ieee.org/ieee/2800/11054/", source: "IEEE Standards Association" },
+  { title: "NREL — Residential Battery Storage Sizing Analysis", url: "https://www.nrel.gov/docs/fy23osti/85472.pdf", source: "National Renewable Energy Laboratory" },
+  { title: "Energy Sage — Home Battery Backup Sizing Guide", url: "https://www.energysage.com/home-batteries/", source: "Energy Sage Marketplace" }
+];
+
+const faqItems = [
+  {
+    question: "What qualifies as a critical load during a power outage?",
+    answer: "Critical loads include essential items you need during an outage: refrigerator/freezer, lighting, phone charging, medical devices, sump pump, and internet router. Non-essential loads like air conditioning, electric stove, and washing machine are typically excluded from backup sizing.",
+  },
+  {
+    question: "How long should my home backup battery last?",
+    answer: "Most home backup systems are designed for 8–24 hours of runtime. For overnight outages, 8–12 hours is typical. For storm-prone areas, 24–48 hours provides more resilience. Longer backup requires more battery capacity and higher cost.",
+  },
+  {
+    question: "What inverter efficiency should I assume?",
+    answer: "Modern hybrid inverters typically operate at 90–95% efficiency. A conservative estimate of 90% accounts for conversion losses, standby power consumption, and real-world operating conditions. Pure sine wave inverters are more efficient than modified sine wave.",
+  },
+  {
+    question: "Can I use solar panels to extend backup runtime?",
+    answer: "Yes, with a hybrid inverter system. Solar panels can recharge the battery during daylight hours, extending backup indefinitely as long as there is sun. This is the most common setup for residential backup power.",
+  },
+  {
+    question: "How do I list my household loads for accurate sizing?",
+    answer: "Walk through your home and identify every appliance you want powered during an outage. Check the wattage label or nameplate on each device—multiply amps × volts for wattage. Account for duty cycle: a refrigerator compressor runs only 30–50% of the time even though it's 'on' 24 hours.",
+  },
+  {
+    question: "Should I size for the entire house or just critical loads?",
+    answer: "Most homeowners size for critical loads only (refrigerator, lights, router, medical devices, phone charging). This typically requires 3–8 kWh for 24 hours. Sizing for the whole house (including HVAC, dryer, range) requires 30–60+ kWh—feasible but significantly more expensive.",
+  },
+  {
+    question: "What is time-of-use (TOU) optimization with batteries?",
+    answer: "TOU optimization means charging batteries during off-peak hours (when electricity is cheap, e.g., overnight) and discharging during peak hours (when rates are highest, e.g., 4–9 PM). This can save $200–$600/year depending on your utility's rate structure and battery capacity.",
+  },
+  {
+    question: "How does battery degradation affect my backup plan?",
+    answer: "LFP batteries retain approximately 80% capacity after 6,000 cycles or ~15 years. NMC lithium retains 80% after ~3,000 cycles. Plan for 15–20% capacity reduction over the system's life—if you need 10 kWh today, the battery will provide ~8 kWh in 10 years.",
+  },
+  {
+    question: "Do I need a transfer switch for battery backup?",
+    answer: "Yes—a manual or automatic transfer switch is required to safely disconnect from the grid during outages (preventing backfeed that can endanger utility workers). Most modern battery systems include a built-in hybrid inverter with automatic transfer switch capability.",
+  },
+  {
+    question: "Can I add more batteries later?",
+    answer: "Most modern home battery systems support modular expansion. Tesla Powerwall, Enphase, and Sol-Ark systems allow additional modules in parallel. Plan your initial system with expansion capacity in mind—ensure your inverter and electrical panel can accommodate future battery additions.",
+  },
+  {
+    question: "What happens during a prolonged multi-day outage?",
+    answer: "Without solar recharging, your battery will deplete according to the runtime calculation. With solar panels, a 5 kW array can provide 15–25 kWh per day in good conditions—enough to recharge a typical home battery and run critical loads indefinitely, weather permitting.",
+  },
+  {
+    question: "Are there tax incentives for home battery systems?",
+    answer: "Yes—the US federal Investment Tax Credit (ITC) covers 30% of battery storage system cost when installed with solar. Many states and utilities offer additional rebates (e.g., California SGIP, New York NY-Sun). Check dsireusa.org for incentives in your area.",
+  },
+];
+
+const relatedCalculators = [
+  { href: "/tools/battery-sizing-calculator", title: "Battery Sizing Calculator", description: "Full battery bank sizing with temperature derating." },
+  { href: "/tools/runtime-calculator", title: "Runtime Calculator", description: "Estimate discharge time from capacity and load." },
+  { href: "/tools/charging-time-calculator", title: "Charging Time Calculator", description: "Calculate charge time from solar or grid." },
+  { href: "/tools/inverter-battery-calculator", title: "Inverter Battery Calculator", description: "Size battery banks for AC inverter loads." },
+  { href: "/tools/energy-conversion-calculator", title: "Energy Conversion", description: "Convert between Ah and Wh at any voltage." },
+  { href: "/tools/marine-battery-sizing-calculator", title: "Marine Battery Calculator", description: "Compare marine and home backup sizing approaches." },
+];
+---
+
+<CalculatorLayout
+  title="Home Backup Battery Calculator | Battery Calculators"
+  description="Calculate the battery size you need for home backup power during outages. Size critical load coverage for 8–48 hours."
+  faqItems={faqItems}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+  relatedCalculators={relatedCalculators}
+>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+
+    <!-- Input Form -->
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Backup Requirements</h3>
+      <div class="flex flex-col gap-6">
+
+        <InputField id="critical-load" label="Critical Load Power" value={2000} min={100} step={100} unit="W" helperText="Total wattage of essential loads (refrigerator, lights, fans, medical devices, networking equipment, etc.)" />
+
+        <InputField id="backup-duration" label="Backup Duration" value={12} min={1} max={72} step={1} unit="hours" helperText="How long you need power during an outage." />
+
+        <InputField id="voltage" label="Battery System Voltage" value={48} min={12} step={1} unit="V" helperText="Common: 12V small systems, 24V mid-size, 48V whole-home." />
+
+        <InputField
+          id="chemistry"
+          label="Battery Chemistry"
+          type="select"
+          value="lfp"
+          helperText="LFP recommended: longest cycle life and safest for indoor installation."
+          options={[
+            { label: "LFP (LiFePO4)", value: "lfp" },
+            { label: "NMC (Lithium Nickel Manganese Cobalt)", value: "nmc" },
+            { label: "Lead-Acid (AGM/Gel)", value: "lead-acid" },
+          ]}
+        />
+
+        <InputField id="inverter-efficiency" label="Inverter Efficiency" value={90} min={70} max={100} step={1} unit="%" helperText="Modern hybrid inverters: 90–95%. Use 90% for conservative sizing." />
+
+      </div>
+    </CalculatorCard>
+
+    <!-- Results -->
+    <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Sizing Results</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <ResultBox
+            label="Total Battery Energy"
+            value="26,667 Wh"
+            suffix="26.67 kWh — what you need to buy"
+            variant="primary"
+            id="result-energy"
+          />
+          <ResultBox
+            label="Battery Usable Energy"
+            value="24,000 Wh"
+            suffix="After depth-of-discharge limits"
+            id="result-usable"
+          />
+          <ResultBox
+            label="Delivered System Energy"
+            value="21,600 Wh"
+            suffix="Available to load after inverter losses"
+            id="result-delivered"
+          />
+          <ResultBox
+            label="Recommended Size"
+            value="555.6 Ah"
+            suffix="At 48V nominal"
+            id="result-capacity"
+          />
+          <ResultBox
+            label="Runtime Estimate"
+            value="12.0 hours"
+            suffix="At 2,000W critical load"
+            id="result-runtime"
+          />
+          <p class="text-[11px] text-muted col-span-1 md:col-span-2 -mt-4">
+            Runtime = Delivered System Energy / Load. Total Battery Energy includes DoD and efficiency overhead.
+          </p>
+        </div>
+
+        <MiniSimulationChart
+          title="Runtime Sensitivity"
+          description="How backup runtime changes with load level"
+          xLabel="Load (W)"
+          yLabel="Runtime (hours)"
+          chartId="chart-home-backup"
+        />
+      </div>
+
+      <div class="border-t border-hairline pt-6">
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">System Notes</h4>
+        <p class="text-body-sm text-muted" id="system-notes">
+          For 2,000W critical loads over 12 hours at 48V LFP, you need approximately 26.67 kWh of battery capacity (555.6 Ah at 48V).
+        </p>
+      </div>
+    </CalculatorCard>
+
+  </div>
+
+  <!-- Formulas -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+
+      <FormulaBox title="Mathematical Formulas">
+        <p>
+          The required battery energy accounts for inverter losses and safe DoD limits:
+        </p>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Required Energy (Wh) = (Load Power × Duration) / (DoD% × Inverter Efficiency%)
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Capacity (Ah) = Required Energy (Wh) / System Voltage (V)
+        </div>
+        <p>
+          DoD limits by chemistry: LFP 90%, NMC 80%, Lead-Acid 50%.
+        </p>
+      </FormulaBox>
+
+      <div>
+        <h2 class="text-title-lg text-primary uppercase mb-6 tracking-wider">Worked Example</h2>
+        <div class="text-body-sm text-muted flex flex-col gap-4">
+          <p>Given: 2,000W critical load, 12-hour backup, 48V LFP battery, 90% inverter efficiency</p>
+
+          <p><strong>Step 1:</strong> Calculate raw energy needed:</p>
+          <div class="font-mono text-primary">Raw = 2,000W × 12h = 24,000 Wh</div>
+
+          <p><strong>Step 2:</strong> Adjust for DoD and inverter losses:</p>
+          <div class="font-mono text-primary">Required = 24,000 / (0.90 × 0.90) = 29,630 Wh</div>
+
+          <p><strong>Step 3:</strong> Convert to Amp-hours:</p>
+          <div class="font-mono text-primary">Ah = 29,630 Wh / 48V = 617.3 Ah</div>
+
+          <p><strong>Result:</strong> A 48V 620 Ah LFP battery bank provides 29.76 kWh, delivering 12+ hours of backup for your 2,000W critical loads.</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <FAQSection items={faqItems} />
+
+  <!-- Calculation Script -->
+  <script>
+    import { calculateHomeBackupBattery } from '../../utils/calculators';
+    import { renderLineChart, clearChart } from '../../utils/charting';
+
+    const loadInput = document.getElementById('critical-load') as HTMLInputElement;
+    const durationInput = document.getElementById('backup-duration') as HTMLInputElement;
+    const voltageInput = document.getElementById('voltage') as HTMLInputElement;
+    const chemistrySelect = document.getElementById('chemistry') as HTMLSelectElement;
+    const efficiencyInput = document.getElementById('inverter-efficiency') as HTMLInputElement;
+
+    const resultEnergyBox = document.getElementById('result-energy');
+    const resultEnergyValue = resultEnergyBox?.querySelector('.text-display-md') as HTMLElement;
+    const resultEnergyKwh = resultEnergyBox?.querySelector('.text-caption') as HTMLElement;
+
+    const resultUsableBox = document.getElementById('result-usable');
+    const resultUsableValue = resultUsableBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultUsableRef = resultUsableBox?.querySelector('.text-caption') as HTMLElement;
+
+    const resultDeliveredBox = document.getElementById('result-delivered');
+    const resultDeliveredValue = resultDeliveredBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultDeliveredRef = resultDeliveredBox?.querySelector('.text-caption') as HTMLElement;
+
+    const resultCapacityBox = document.getElementById('result-capacity');
+    const resultCapacityValue = resultCapacityBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultCapacityRef = resultCapacityBox?.querySelector('.text-caption') as HTMLElement;
+
+    const resultRuntimeBox = document.getElementById('result-runtime');
+    const resultRuntimeValue = resultRuntimeBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultRuntimeRef = resultRuntimeBox?.querySelector('.text-caption') as HTMLElement;
+
+    const systemNotes = document.getElementById('system-notes');
+
+    const chartSvg = document.getElementById('chart-home-backup') as unknown as SVGElement;
+
+    function updateCalculations() {
+      const load = parseFloat(loadInput.value) || 2000;
+      const duration = parseFloat(durationInput.value) || 12;
+      const voltage = parseFloat(voltageInput.value) || 48;
+      const chemistry = chemistrySelect.value as "lfp" | "nmc" | "lead-acid";
+      const efficiency = parseFloat(efficiencyInput.value) || 90;
+
+      const results = calculateHomeBackupBattery(load, duration, voltage, chemistry, efficiency);
+
+      if (resultEnergyValue) resultEnergyValue.textContent = `${Math.round(results.totalEnergyWh).toLocaleString()} Wh`;
+      if (resultEnergyKwh) resultEnergyKwh.textContent = `${(results.totalEnergyWh / 1000).toFixed(2)} kWh — what you need to buy`;
+
+      if (resultUsableValue) resultUsableValue.textContent = `${Math.round(results.usableEnergyWh).toLocaleString()} Wh`;
+      if (resultUsableRef) resultUsableRef.textContent = `After depth-of-discharge limits`;
+
+      if (resultDeliveredValue) resultDeliveredValue.textContent = `${Math.round(results.deliveredEnergyWh).toLocaleString()} Wh`;
+      if (resultDeliveredRef) resultDeliveredRef.textContent = `Available to load after inverter losses`;
+
+      if (resultCapacityValue) resultCapacityValue.textContent = `${results.recommendedCapacityAh.toFixed(1)} Ah`;
+      if (resultCapacityRef) resultCapacityRef.textContent = `At ${voltage}V nominal`;
+
+      if (resultRuntimeValue) resultRuntimeValue.textContent = `${results.runtimeHours.toFixed(1)} hours`;
+      if (resultRuntimeRef) resultRuntimeRef.textContent = `At ${load.toLocaleString()}W critical load`;
+
+      if (systemNotes) {
+        const chemistryName = chemistry === "lfp" ? "LFP" : chemistry === "nmc" ? "NMC" : "Lead-Acid";
+        systemNotes.textContent = `For ${load.toLocaleString()}W critical loads over ${duration} hours at ${voltage}V ${chemistryName}, you need approximately ${(results.totalEnergyWh / 1000).toFixed(1)} kWh of battery capacity (${results.recommendedCapacityAh.toFixed(0)} Ah at ${voltage}V).`;
+      }
+
+      if (chartSvg && results.totalEnergyWh > 0 && load > 0) {
+        const dodLimits: Record<string, number> = { lfp: 90, nmc: 80, 'lead-acid': 50 };
+        const dodFrac = (dodLimits[chemistry] || 80) / 100;
+        const effFrac = efficiency / 100;
+        const batteryWh = results.totalEnergyWh;
+
+        const pts: { x: number; y: number }[] = [];
+        const percents = [50, 64, 79, 93, 107, 121, 136, 150];
+        for (const pct of percents) {
+          const testLoad = load * pct / 100;
+          const runtime = testLoad > 0 ? (batteryWh * dodFrac * effFrac) / testLoad : 0;
+          pts.push({ x: testLoad, y: runtime });
+        }
+        renderLineChart(chartSvg, pts, {
+          width: 320, height: 160,
+          xLabel: 'Load (W)', yLabel: 'Runtime (hours)',
+          yMin: 0,
+        });
+      } else if (chartSvg) {
+        clearChart(chartSvg);
+      }
+    }
+
+    [loadInput, durationInput, voltageInput, chemistrySelect, efficiencyInput].forEach(el => {
+      el.addEventListener('input', updateCalculations);
+    });
+
+    updateCalculations();
+  </script>
+
+</CalculatorLayout>

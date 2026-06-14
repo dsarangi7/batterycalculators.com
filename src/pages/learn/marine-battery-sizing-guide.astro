@@ -1,0 +1,321 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import CalculatorCard from '../../components/CalculatorCard.astro';
+import FormulaBox from '../../components/FormulaBox.astro';
+import FAQSection from '../../components/FAQSection.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "What is a marine hotel load?",
+    answer: "Hotel loads are all electrical loads on a boat when the engines are off, typically at anchor or in port. This includes navigation lights, cabin lighting, refrigeration, communication equipment, pumps, and electronics. Calculating hotel loads is essential for sizing house battery banks.",
+  },
+  {
+    question: "Should I use AGM or flooded batteries on my boat?",
+    answer: "AGM (Absorbed Glass Mat) batteries are generally preferred for marine use because they are sealed (no spill risk), maintenance-free, vibration-resistant, and can be mounted in various orientations. Flooded batteries are cheaper but require regular maintenance and proper ventilation.",
+  },
+  {
+    question: "How do I prevent battery corrosion in a marine environment?",
+    answer: "Marine batteries corrode faster due to salt air and moisture. Use marine-grade tinned copper cable, apply dielectric grease to terminals, install battery boxes for protection, and ensure proper ventilation. Regular cleaning with a baking soda solution helps prevent buildup.",
+  },
+  {
+    question: "Can I use car batteries for my boat?",
+    answer: "Car (starter) batteries are designed for short, high-current bursts and are not suitable for deep cycling. Marine deep-cycle batteries are built for sustained discharge over hours. Using starter batteries for hotel loads will result in premature failure.",
+  },
+];
+---
+
+<Layout
+  title="Marine Battery Sizing Guide | Battery Calculators"
+  description="Learn how to size a marine battery bank by calculating hotel loads, accounting for anchored vs cruising loads, and selecting the right battery chemistry for the marine environment."
+  faqItems={faqItems}
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/learn" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Back to Guides</a>
+      <Breadcrumb items={[{ label: "Learning Center", href: "/learn" }, { label: "Marine Battery Sizing Guide" }]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">MARINE</span>
+      <h1 class="text-display-md text-primary mb-6">Marine Battery Sizing Guide</h1>
+      <p class="text-body-md text-body font-light">
+        Sizing a battery bank for a boat is fundamentally different from sizing a home or EV system. Boats operate in a harsh marine environment with vibration, moisture, and salt air. Loads shift between anchored and cruising modes, and you have limited space and weight budgets. This guide walks through the standard engineering method for sizing a marine house battery bank.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Step 1: Calculate Hotel Loads</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Hotel loads are all the electrical loads on your vessel when the engines are off. These are the baseline loads your battery bank must support while you are anchored, in port, or at the dock without shore power. Every circuit that draws power from the house bank contributes to the hotel load.
+        </p>
+        <p class="text-body-md text-body font-light mb-4">
+          The first step is to inventory every device and estimate its average power draw in watts. Some loads run continuously (refrigeration, anchor light), while others are intermittent (bilge pump, water pump). For intermittent loads, estimate the duty cycle or average hours of use per day.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Load</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Typical Power (W)</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Notes</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">Navigation electronics</td>
+                <td class="p-4 font-mono text-primary">50–150 W</td>
+                <td class="p-4 text-muted">Chartplotter, radar, AIS</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Cabin lights</td>
+                <td class="p-4 font-mono text-primary">20–60 W</td>
+                <td class="p-4 text-muted">LED preferred for low draw</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Bilge pump</td>
+                <td class="p-4 font-mono text-primary">20–40 W</td>
+                <td class="p-4 text-muted">Intermittent duty cycle</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">VHF radio</td>
+                <td class="p-4 font-mono text-primary">5–25 W</td>
+                <td class="p-4 text-muted">Receive ≈ 5 W, transmit ≈ 25 W</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Anchor light</td>
+                <td class="p-4 font-mono text-primary">5–15 W</td>
+                <td class="p-4 text-muted">LED anchor light, runs all night</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Refrigeration</td>
+                <td class="p-4 font-mono text-primary">40–80 W</td>
+                <td class="p-4 text-muted">Compressor cycles on and off</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Water pump</td>
+                <td class="p-4 font-mono text-primary">5–8 W</td>
+                <td class="p-4 text-muted">Intermittent, pressure switch</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Instrument panel</td>
+                <td class="p-4 font-mono text-primary">10–30 W</td>
+                <td class="p-4 text-muted">Engine instruments, displays</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Step 2: Determine Cruising vs Anchored Loads</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Your electrical loads change significantly depending on whether you are underway or at anchor. When cruising, the alternator charges the house bank, so you have a continuous energy supply. Navigation electronics, instruments, and engine-related pumps run at higher duty cycles. When anchored, the alternator is off and the battery bank must carry all loads unaided for extended periods — often 12 to 18 hours overnight.
+        </p>
+        <p class="text-body-md text-body font-light mb-4">
+          For sizing purposes, design the battery bank around the anchored scenario. This is the worst case: maximum discharge time with no charge input. Cruising loads are less critical because the alternator keeps the batteries topped up.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Mode</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Typical Loads</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Duration</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">Anchored</td>
+                <td class="p-4 text-muted">Lights, fridge, VHF, anchor light, electronics</td>
+                <td class="p-4 text-muted">12–18 hours overnight</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Cruising</td>
+                <td class="p-4 text-muted">Navigation, instruments, pumps, electronics</td>
+                <td class="p-4 text-muted">4–8 hours (alternator charges)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <FormulaBox title="Marine Battery Sizing Formula">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Required Capacity (Ah) = Σ(Power × Hours) / (DoD × System Voltage)
+        </div>
+        <p>
+          Sum the watt-hours for all loads during the longest discharge period (typically overnight at anchor), then divide by depth of discharge and system voltage to get amp-hours.
+        </p>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Marine Safety Margin: Multiply total Wh × 1.20
+        </div>
+        <p>
+          For marine applications, include a 20% safety margin to account for bilge pump surges, unknown parasitic loads, and capacity loss from vibration and temperature extremes. This margin is more generous than typical residential calculations.
+        </p>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Step 3: Account for Marine Environment</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          A boat is one of the harshest environments for batteries. Salt air accelerates terminal corrosion. Engine vibration and wave impact shake battery connections loose and stress internal plates. Temperature swings from cold overnight anchors to hot engine rooms affect capacity and charge acceptance. Moisture and condensation can cause shorts and accelerate degradation. These factors must be addressed in battery selection and installation.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Sealed / AGM Preferred</h4>
+            <p class="text-body-sm text-muted">
+              Sealed batteries eliminate spill risk in rough seas. AGM (Absorbed Glass Mat) batteries are spill-proof, maintenance-free, and can be mounted on their side — ideal for tight boat compartments where upright mounting is not possible.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Vibration Resistance</h4>
+            <p class="text-body-sm text-muted">
+              Marine batteries endure constant vibration from engines and waves. AGM and gel batteries handle vibration better than flooded types. Secure batteries with proper brackets and use rubber isolation mounts to dampen engine vibration.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Temperature Compensation</h4>
+            <p class="text-body-sm text-muted">
+              Marine batteries face wide temperature ranges — from cold overnight anchors to hot engine rooms. Charge controllers should have temperature sensors. Lead-acid batteries need voltage compensation of approximately -3 mV per cell per degree below 25°C.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Corrosion Protection</h4>
+            <p class="text-body-sm text-muted">
+              Use marine-grade tinned copper cable and terminals. Apply dielectric grease or corrosion inhibitor to all connections. Install batteries in ventilated boxes to limit salt air exposure. Inspect and clean terminals every 30 days in saltwater environments.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Worked Example</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Scenario:</strong> Anchored for 14 hours overnight with the following loads:</p>
+            <table class="w-full text-left text-body-sm my-2">
+              <thead>
+                <tr class="border-b border-hairline">
+                  <th class="p-2 text-label-uppercase text-primary text-xs tracking-wider">Load</th>
+                  <th class="p-2 text-label-uppercase text-primary text-xs tracking-wider">Power</th>
+                  <th class="p-2 text-label-uppercase text-primary text-xs tracking-wider">Hours</th>
+                  <th class="p-2 text-label-uppercase text-primary text-xs tracking-wider">Wh</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-hairline">
+                <tr>
+                  <td class="p-2 text-muted">Navigation light</td>
+                  <td class="p-2 font-mono text-primary">10 W</td>
+                  <td class="p-2 font-mono text-primary">14 h</td>
+                  <td class="p-2 font-mono text-primary">140 Wh</td>
+                </tr>
+                <tr>
+                  <td class="p-2 text-muted">Cabin lights</td>
+                  <td class="p-2 font-mono text-primary">40 W</td>
+                  <td class="p-2 font-mono text-primary">5 h</td>
+                  <td class="p-2 font-mono text-primary">200 Wh</td>
+                </tr>
+                <tr>
+                  <td class="p-2 text-muted">Refrigerator</td>
+                  <td class="p-2 font-mono text-primary">60 W</td>
+                  <td class="p-2 font-mono text-primary">14 h</td>
+                  <td class="p-2 font-mono text-primary">840 Wh</td>
+                </tr>
+                <tr>
+                  <td class="p-2 text-muted">VHF radio</td>
+                  <td class="p-2 font-mono text-primary">10 W</td>
+                  <td class="p-2 font-mono text-primary">2 h</td>
+                  <td class="p-2 font-mono text-primary">20 Wh</td>
+                </tr>
+                <tr>
+                  <td class="p-2 text-muted">Anchor light</td>
+                  <td class="p-2 font-mono text-primary">10 W</td>
+                  <td class="p-2 font-mono text-primary">12 h</td>
+                  <td class="p-2 font-mono text-primary">120 Wh</td>
+                </tr>
+              </tbody>
+            </table>
+            <p><strong>Step 1:</strong> Total energy consumption:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              140 + 200 + 840 + 20 + 120 = 1,320 Wh
+            </div>
+            <p><strong>Step 2:</strong> Apply 20% marine safety margin:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              1,320 Wh × 1.20 = 1,584 Wh
+            </div>
+            <p><strong>Step 3:</strong> Convert to Ah at 12V with 85% DoD:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              1,584 Wh / (0.85 × 12V) = 155 Ah
+            </div>
+            <p><strong>Step 4:</strong> Round up to nearest standard bank size. A 12V 200Ah AGM bank provides 155 Ah usable capacity (200 × 0.85 = 170 Ah), giving comfortable margin for load growth and capacity fade over the battery's service life.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Battery Chemistry for Marine</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Flooded Lead-Acid</h4>
+            <p class="text-body-sm text-muted">
+              Lowest upfront cost. Requires regular maintenance (water topping, terminal cleaning). Must be mounted upright and ventilated due to hydrogen gas venting. Not recommended for boats where maintenance access is limited or motion is constant.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">AGM (Absorbed Glass Mat)</h4>
+            <p class="text-body-sm text-muted">
+              Sealed and maintenance-free. Excellent vibration resistance — the electrolyte is absorbed in fiberglass mats. Can be mounted in any orientation. Spill-proof, making it the standard choice for recreational and commercial boats. Higher cost than flooded but justified by durability.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Gel</h4>
+            <p class="text-body-sm text-muted">
+              Deep-cycle gel batteries handle repeated discharge well. Sensitive to charging voltage — overcharging causes irreversible gelling and capacity loss. Requires a gel-specific charger profile. Good for applications with slow, deep discharge cycles.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Lithium LFP</h4>
+            <p class="text-body-sm text-muted">
+              Lightest option at roughly half the weight of lead-acid for the same usable capacity. Longest cycle life (4,000–6,000 cycles) and highest upfront cost. Growing in marine use as prices drop. Excellent performance in high-demand cruising and liveaboard applications.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Try It</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use the Marine Battery Sizing Calculator to input your specific loads and get a bank recommendation.
+          </p>
+          <a href="/tools/marine-battery-sizing-calculator" class="btn-primary text-xs py-3 px-6 inline-block">Open Marine Battery Sizing Calculator</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Next Step</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Calculate how long your sized battery bank will run your anchored loads with the Runtime Calculator.
+          </p>
+          <a href="/tools/runtime-calculator" class="btn-primary text-xs py-3 px-6 inline-block">Open Runtime Calculator</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Related Articles</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <a href="/learn/voltage-drop-explained" class="text-primary hover:underline font-bold block mb-2">Voltage Drop Explained</a>
+            <p class="text-body-sm text-muted">
+              Understand how cable length and gauge affect voltage delivery in DC battery systems — critical for long wire runs on larger boats.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <a href="/learn/how-to-size-a-battery-bank" class="text-primary hover:underline font-bold block mb-2">How to Size a Battery Bank</a>
+            <p class="text-body-sm text-muted">
+              The general battery sizing method covering autonomy, temperature derating, and depth of discharge — applicable to marine systems.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

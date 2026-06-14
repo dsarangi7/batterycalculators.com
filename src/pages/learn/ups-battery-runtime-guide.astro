@@ -1,0 +1,175 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import CalculatorCard from '../../components/CalculatorCard.astro';
+import FormulaBox from '../../components/FormulaBox.astro';
+import FAQSection from '../../components/FAQSection.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "How long will a UPS battery last during a power outage?",
+    answer: "It depends on the load. A 1500VA/900W UPS with two 12V 7Ah batteries (168 Wh total) at 50% DoD provides about 84 Wh usable. At 300W load, runtime is approximately 15 minutes. At 100W, it extends to about 45 minutes.",
+  },
+  {
+    question: "Can I extend UPS battery runtime?",
+    answer: "Yes. External battery packs (EBMs) add capacity in parallel. You can also replace stock lead-acid batteries with larger Ah batteries if the compartment fits. For extended runtime, consider a rack-mount UPS with external battery modules.",
+  },
+  {
+    question: "What size UPS do I need for my computer?",
+    answer: "A typical desktop computer with monitor draws 200–400W. A 1000VA/600W UPS provides 15–30 minutes of runtime at 300W. For longer runtime, choose a 1500VA/900W model or add an external battery pack.",
+  },
+  {
+    question: "Why do UPS batteries degrade so fast?",
+    answer: "UPS batteries are typically lead-acid, which degrades faster than lithium. High ambient temperatures (above 25°C) accelerate degradation. The BMS float charging also contributes to calendar aging. Most UPS batteries need replacement every 3–5 years.",
+  },
+];
+---
+
+<Layout
+  title="UPS Battery Runtime Guide | Battery Calculators"
+  description="How to estimate and extend UPS battery runtime. Covers load calculations, battery sizing, runtime formulas, and practical examples for home and office UPS systems."
+  canonical="https://batterycalculators.com/learn/ups-battery-runtime-guide"
+  schema="faqPage"
+  schemaName="UPS Battery Runtime Guide"
+  schemaDescription="Engineering guide to estimating and extending UPS battery runtime."
+  schemaUrl="https://batterycalculators.com/learn/ups-battery-runtime-guide"
+  faqItems={faqItems}
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/learn" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Back to Guides</a>
+      <Breadcrumb items={[
+        { label: "Learning Center", href: "/learn" },
+        { label: "UPS Battery Runtime Guide" }
+      ]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">APPLICATIONS</span>
+      <h1 class="text-display-md text-primary mb-6">UPS Battery Runtime Guide</h1>
+      <p class="text-body-md text-body font-light">
+        Uninterruptible Power Supplies protect critical equipment during outages, but their runtime is often misunderstood. A typical consumer UPS provides only 10–30 minutes of backup — enough to save work and shut down gracefully, not to power equipment indefinitely.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">How UPS Runtime Works</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          A UPS contains sealed lead-acid (SLA) or lithium batteries that power an inverter during grid failure. The runtime depends on the battery capacity (measured in Ah or Wh) and the load power (measured in VA or watts). The VA rating represents apparent power; the watt rating represents real power.
+        </p>
+        <p class="text-body-md text-body font-light">
+          Most consumer UPS units are designed for short-duration backup — 10–30 minutes at full load. Extended runtime requires external battery packs or industrial UPS systems with larger battery banks.
+        </p>
+      </section>
+
+      <FormulaBox title="UPS Runtime Formulas">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Battery Energy (Wh) = Voltage (V) × Capacity (Ah)
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Usable Energy (Wh) = Battery Energy × DoD × Efficiency
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Runtime (min) = Usable Energy (Wh) / Load (W) × 60
+        </div>
+        <p>
+          Lead-acid DoD is typically 50%. SLA efficiency is about 80%. Inverter efficiency is about 85–90%. Combined system efficiency is roughly 65–70%.
+        </p>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Worked Example</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Given:</strong> UPS with 2× 12V 7Ah SLA batteries, 300W load</p>
+            <p><strong>Step 1:</strong> Total battery energy:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              2 × (12V × 7Ah) = 168 Wh
+            </div>
+            <p><strong>Step 2:</strong> Usable energy (50% DoD × 80% battery efficiency × 90% inverter):</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              168 × 0.50 × 0.80 × 0.90 = 60.5 Wh
+            </div>
+            <p><strong>Step 3:</strong> Runtime:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              60.5 / 300 × 60 = 12.1 minutes
+            </div>
+            <p class="mt-2 text-muted">At half load (150W), runtime doubles to approximately 24 minutes.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Runtime by Load Level</h2>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">UPS Size</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Full Load</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Half Load</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Quarter Load</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">600VA / 360W</td>
+                <td class="p-4 text-muted">~6 min</td>
+                <td class="p-4 text-muted">~15 min</td>
+                <td class="p-4 text-muted">~35 min</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">1000VA / 600W</td>
+                <td class="p-4 text-muted">~10 min</td>
+                <td class="p-4 text-muted">~25 min</td>
+                <td class="p-4 text-muted">~55 min</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">1500VA / 900W</td>
+                <td class="p-4 text-muted">~12 min</td>
+                <td class="p-4 text-muted">~30 min</td>
+                <td class="p-4 text-muted">~70 min</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">3000VA / 2400W</td>
+                <td class="p-4 text-muted">~15 min</td>
+                <td class="p-4 text-muted">~40 min</td>
+                <td class="p-4 text-muted">~90 min</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-caption text-muted mt-2">Approximate values for typical SLA-based UPS units at 50% battery DoD.</p>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Try It</h4>
+          <p class="text-body-sm text-muted mb-4">Use the Runtime Calculator to estimate battery backup duration.</p>
+          <a href="/tools/runtime-calculator" class="btn-primary text-xs py-3 px-6 inline-block">Open Runtime Calculator</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Related</h4>
+          <p class="text-body-sm text-muted mb-4">Size your home battery backup system for extended outages.</p>
+          <a href="/tools/home-backup-battery-calculator" class="btn-primary-outline text-xs py-3 px-6 inline-block">Home Backup Calculator</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Related Articles</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Battery Runtime Formula</h4>
+            <p class="text-body-sm text-muted mb-3">Reference for all runtime calculation formulas.</p>
+            <a href="/learn/battery-runtime-formula" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Read Guide →</a>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">12V vs 24V vs 48V Runtime</h4>
+            <p class="text-body-sm text-muted mb-3">How system voltage affects runtime and efficiency.</p>
+            <a href="/learn/12v-vs-24v-vs-48v-runtime" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Read Guide →</a>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

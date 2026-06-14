@@ -1,0 +1,542 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import CalculatorCard from "../../components/CalculatorCard.astro";
+import FAQSection from "../../components/FAQSection.astro";
+import ReferenceChart from "../../components/ReferenceChart.astro";
+
+const faqItems = [
+  {
+    question:
+      "What is the resting voltage of a fully charged 12V lead-acid battery?",
+    answer:
+      "A fully charged flooded lead-acid battery rests at approximately 12.6–12.8V. AGM and gel batteries typically rest slightly higher at 12.8–13.0V. After charging, surface charge can inflate the reading to 13.0–13.4V, so wait at least 30 minutes before measuring resting voltage.",
+  },
+  {
+    question: "How does temperature affect lead-acid voltage readings?",
+    answer:
+      "Temperature affects the chemical equilibrium of the cells. Cold temperatures increase internal resistance and lower voltage readings. At 0°C, a fully charged battery may read 0.2–0.3V lower than at 25°C. At high temperatures (above 40°C), voltage readings may be slightly elevated. Always compensate for temperature when estimating SOC from voltage.",
+  },
+  {
+    question: "What is surface charge?",
+    answer:
+      "Surface charge is a temporary voltage elevation that occurs after charging. It is caused by uneven acid concentration near the plate surfaces. It dissipates within 30–60 minutes of rest. Measuring voltage immediately after charging gives a falsely high SOC reading. Always let the battery rest before taking a voltage measurement.",
+  },
+  {
+    question:
+      "Do flooded, AGM, and gel batteries have different voltage curves?",
+    answer:
+      "Yes. AGM and gel batteries have slightly higher resting voltages than flooded batteries at the same SOC. AGM typically rests 0.1–0.2V higher than flooded. Gel batteries are similar to AGM. The differences are small but meaningful when estimating SOC from voltage. Use the correct voltage curve for your battery type.",
+  },
+];
+
+const tableOfContents = [
+  { id: "flooded-lead-acid", label: "Flooded Lead-Acid" },
+  { id: "agm-gel", label: "AGM and Gel" },
+  { id: "surface-charge", label: "Surface Charge" },
+  { id: "temperature-effects", label: "Temperature Effects" },
+  { id: "common-mistakes", label: "Common Mistakes" },
+];
+
+const relatedCalculators = [
+  {
+    title: "Battery Sizing Calculator",
+    href: "/tools/battery-sizing-calculator",
+  },
+  { title: "Battery Runtime Calculator", href: "/tools/runtime-calculator" },
+];
+
+const references = [
+  {
+    title: "Battery University — Lead-Acid Voltage",
+    url: "https://batteryuniversity.com/article/bu-403-lead-acid",
+  },
+  {
+    title: "Concorde Battery — AGM Specifications",
+    url: "https://www.concordebattery.com/products/sealed-lead-acid/",
+  },
+];
+---
+
+<Layout
+  title="Lead-Acid Battery Voltage Chart — SOC Reference | Battery Calculators"
+  description="Voltage reference tables for flooded, AGM, and gel lead-acid batteries at 12V, 24V, and 48V. Approximate resting voltage by state of charge."
+  faqItems={faqItems}
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a
+        href="/learn"
+        class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block"
+        >&larr; Back to Guides</a
+      >
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4"
+        >REFERENCE</span
+      >
+      <h1 class="text-display-md text-primary mb-6">
+        Lead-Acid Battery Voltage Chart
+      </h1>
+      <p class="text-body-md text-body font-light">
+        Approximate resting voltage values for flooded, AGM, and gel lead-acid
+        batteries across common bank voltages. Use this chart to estimate state
+        of charge from voltage readings.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section id="flooded-lead-acid">
+        <ReferenceChart
+          type="line"
+          title="Flooded Lead-Acid Resting Voltage vs SOC"
+          description="Approximate relationship for a 12V pack; lead-acid voltage is generally more linear than LiFePO4."
+          xLabel="SOC %"
+          yLabel="Voltage (V)"
+          data={[
+            { x: 0, y: 11.5, label: "0%" },
+            { x: 10, y: 11.64, label: "10%" },
+            { x: 20, y: 11.76, label: "20%" },
+            { x: 30, y: 11.88, label: "30%" },
+            { x: 40, y: 12.0, label: "40%" },
+            { x: 50, y: 12.12, label: "50%" },
+            { x: 60, y: 12.24, label: "60%" },
+            { x: 70, y: 12.34, label: "70%" },
+            { x: 80, y: 12.46, label: "80%" },
+            { x: 90, y: 12.58, label: "90%" },
+            { x: 100, y: 12.7, label: "100%" },
+          ]}
+          yMin={11.0}
+          yMax={13.2}
+          caption="Flooded lead-acid values at 25°C. Actual voltage varies by manufacturer, age, temperature, and measurement conditions."
+        />
+
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          Flooded Lead-Acid Voltage Chart
+        </h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Flooded lead-acid batteries have a well-characterized relationship
+          between resting voltage and SOC. Unlike LiFePO4, the voltage drops
+          relatively linearly across the SOC range, making voltage a practical
+          SOC indicator — provided the battery has been resting and temperature
+          is accounted for.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-body-sm min-w-[640px]">
+              <thead>
+                <tr class="border-b border-hairline bg-surface-card">
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >SOC %</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >12V Pack</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >24V Pack</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >48V Pack</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >Notes</th
+                  >
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-hairline">
+                <tr>
+                  <td class="p-4 font-mono text-primary">100%</td>
+                  <td class="p-4 text-muted">12.70V</td>
+                  <td class="p-4 text-muted">25.40V</td>
+                  <td class="p-4 text-muted">50.80V</td>
+                  <td class="p-4 text-muted">Fully charged, resting</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">90%</td>
+                  <td class="p-4 text-muted">12.58V</td>
+                  <td class="p-4 text-muted">25.16V</td>
+                  <td class="p-4 text-muted">50.32V</td>
+                  <td class="p-4 text-muted">Slight surface charge possible</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">80%</td>
+                  <td class="p-4 text-muted">12.46V</td>
+                  <td class="p-4 text-muted">24.92V</td>
+                  <td class="p-4 text-muted">49.84V</td>
+                  <td class="p-4 text-muted">Good operating range</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">70%</td>
+                  <td class="p-4 text-muted">12.34V</td>
+                  <td class="p-4 text-muted">24.68V</td>
+                  <td class="p-4 text-muted">49.36V</td>
+                  <td class="p-4 text-muted">Acceptable for daily use</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">60%</td>
+                  <td class="p-4 text-muted">12.24V</td>
+                  <td class="p-4 text-muted">24.48V</td>
+                  <td class="p-4 text-muted">48.96V</td>
+                  <td class="p-4 text-muted">Begin recharge soon</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">50%</td>
+                  <td class="p-4 text-muted">12.12V</td>
+                  <td class="p-4 text-muted">24.24V</td>
+                  <td class="p-4 text-muted">48.48V</td>
+                  <td class="p-4 text-muted">Recharge recommended</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">40%</td>
+                  <td class="p-4 text-muted">12.00V</td>
+                  <td class="p-4 text-muted">24.00V</td>
+                  <td class="p-4 text-muted">48.00V</td>
+                  <td class="p-4 text-muted">Risk of sulfation</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">30%</td>
+                  <td class="p-4 text-muted">11.88V</td>
+                  <td class="p-4 text-muted">23.76V</td>
+                  <td class="p-4 text-muted">47.52V</td>
+                  <td class="p-4 text-muted">Deep discharge zone</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">20%</td>
+                  <td class="p-4 text-muted">11.76V</td>
+                  <td class="p-4 text-muted">23.52V</td>
+                  <td class="p-4 text-muted">47.04V</td>
+                  <td class="p-4 text-muted">Battery at risk</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">10%</td>
+                  <td class="p-4 text-muted">11.64V</td>
+                  <td class="p-4 text-muted">23.28V</td>
+                  <td class="p-4 text-muted">46.56V</td>
+                  <td class="p-4 text-muted">Severe discharge</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">0%</td>
+                  <td class="p-4 text-muted">11.50V</td>
+                  <td class="p-4 text-muted">23.00V</td>
+                  <td class="p-4 text-muted">46.00V</td>
+                  <td class="p-4 text-muted">Fully discharged</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <p class="text-caption text-muted mt-3">
+          Flooded lead-acid values at 25°C. Actual voltage varies by
+          manufacturer, age, and temperature.
+        </p>
+      </section>
+
+      <section id="agm-gel">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          AGM and Gel Voltage Chart
+        </h2>
+        <p class="text-body-md text-body font-light mb-4">
+          AGM (Absorbent Glass Mat) and gel batteries have slightly different
+          voltage characteristics from flooded cells. AGM batteries typically
+          have lower internal resistance and slightly higher resting voltages at
+          the same SOC. Gel batteries are similar to AGM but with slightly lower
+          charge acceptance.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-body-sm min-w-[640px]">
+              <thead>
+                <tr class="border-b border-hairline bg-surface-card">
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >SOC %</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >AGM 12V</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >Gel 12V</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >AGM 24V</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >Notes</th
+                  >
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-hairline">
+                <tr>
+                  <td class="p-4 font-mono text-primary">100%</td>
+                  <td class="p-4 text-muted">12.90V</td>
+                  <td class="p-4 text-muted">12.85V</td>
+                  <td class="p-4 text-muted">25.80V</td>
+                  <td class="p-4 text-muted">Fully charged, resting</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">90%</td>
+                  <td class="p-4 text-muted">12.75V</td>
+                  <td class="p-4 text-muted">12.70V</td>
+                  <td class="p-4 text-muted">25.50V</td>
+                  <td class="p-4 text-muted">Near full</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">80%</td>
+                  <td class="p-4 text-muted">12.60V</td>
+                  <td class="p-4 text-muted">12.55V</td>
+                  <td class="p-4 text-muted">25.20V</td>
+                  <td class="p-4 text-muted">Good operating range</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">70%</td>
+                  <td class="p-4 text-muted">12.48V</td>
+                  <td class="p-4 text-muted">12.43V</td>
+                  <td class="p-4 text-muted">24.96V</td>
+                  <td class="p-4 text-muted">Acceptable</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">60%</td>
+                  <td class="p-4 text-muted">12.36V</td>
+                  <td class="p-4 text-muted">12.31V</td>
+                  <td class="p-4 text-muted">24.72V</td>
+                  <td class="p-4 text-muted">Begin recharge soon</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">50%</td>
+                  <td class="p-4 text-muted">12.24V</td>
+                  <td class="p-4 text-muted">12.19V</td>
+                  <td class="p-4 text-muted">24.48V</td>
+                  <td class="p-4 text-muted">Recharge recommended</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">40%</td>
+                  <td class="p-4 text-muted">12.12V</td>
+                  <td class="p-4 text-muted">12.07V</td>
+                  <td class="p-4 text-muted">24.24V</td>
+                  <td class="p-4 text-muted">Risk of damage</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">30%</td>
+                  <td class="p-4 text-muted">12.00V</td>
+                  <td class="p-4 text-muted">11.95V</td>
+                  <td class="p-4 text-muted">24.00V</td>
+                  <td class="p-4 text-muted">Deep discharge zone</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">20%</td>
+                  <td class="p-4 text-muted">11.88V</td>
+                  <td class="p-4 text-muted">11.83V</td>
+                  <td class="p-4 text-muted">23.76V</td>
+                  <td class="p-4 text-muted">Battery at risk</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">10%</td>
+                  <td class="p-4 text-muted">11.76V</td>
+                  <td class="p-4 text-muted">11.71V</td>
+                  <td class="p-4 text-muted">23.52V</td>
+                  <td class="p-4 text-muted">Severe discharge</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">0%</td>
+                  <td class="p-4 text-muted">11.60V</td>
+                  <td class="p-4 text-muted">11.55V</td>
+                  <td class="p-4 text-muted">23.20V</td>
+                  <td class="p-4 text-muted">Fully discharged</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <p class="text-caption text-muted mt-3">
+          AGM and gel values at 25°C. AGM rests slightly higher than flooded.
+          Gel rests slightly lower than AGM.
+        </p>
+      </section>
+
+      <section id="surface-charge">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          Surface Charge
+        </h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Surface charge is a phenomenon specific to lead-acid batteries. After
+          charging, the acid concentration near the plate surfaces is
+          temporarily higher than the bulk electrolyte. This elevates the
+          terminal voltage by 0.1–0.3V above the true resting voltage.
+        </p>
+        <p class="text-body-md text-body font-light mb-4">
+          Surface charge dissipates within 30–60 minutes as the acid diffuses
+          evenly through the electrolyte. If you measure voltage immediately
+          after charging, you will get a falsely high SOC reading. For accurate
+          voltage-based SOC estimation, always allow the battery to rest for at
+          least 30 minutes after the charger disconnects.
+        </p>
+        <p class="text-body-md text-body font-light">
+          Some chargers include a surface charge removal function — a brief
+          high-current discharge that breaks down the acid concentration
+          gradient. This is common in marine and RV chargers. If your charger
+          has this feature, use it before relying on voltage for SOC estimation.
+        </p>
+      </section>
+
+      <section id="temperature-effects">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          Temperature Effects
+        </h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Lead-acid battery voltage is affected by temperature. At cold
+          temperatures, the chemical reaction slows and internal resistance
+          increases, causing lower voltage readings. At high temperatures, the
+          reaction accelerates and voltage readings may be slightly elevated.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-body-sm min-w-[480px]">
+              <thead>
+                <tr class="border-b border-hairline bg-surface-card">
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >Temperature</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >Voltage Adjustment</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >Capacity Effect</th
+                  >
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-hairline">
+                <tr>
+                  <td class="p-4 font-mono text-primary">−20°C (−4°F)</td>
+                  <td class="p-4 text-muted">−0.4V per 12V pack</td>
+                  <td class="p-4 text-muted">~50% capacity available</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">0°C (32°F)</td>
+                  <td class="p-4 text-muted">−0.2V per 12V pack</td>
+                  <td class="p-4 text-muted">~75% capacity available</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">10°C (50°F)</td>
+                  <td class="p-4 text-muted">−0.1V per 12V pack</td>
+                  <td class="p-4 text-muted">~85% capacity available</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">25°C (77°F)</td>
+                  <td class="p-4 text-muted">No adjustment</td>
+                  <td class="p-4 text-muted">100% capacity</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">40°C (104°F)</td>
+                  <td class="p-4 text-muted">+0.1V per 12V pack</td>
+                  <td class="p-4 text-muted">Slightly elevated, faster aging</td
+                  >
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <p class="text-caption text-muted mt-3">
+          Temperature compensation is critical for accurate SOC estimation in
+          extreme conditions.
+        </p>
+      </section>
+
+      <section id="common-mistakes">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          Common Mistakes
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">
+              Measuring Immediately After Charge
+            </h4>
+            <p class="text-body-sm text-muted">
+              Surface charge inflates voltage by 0.1–0.3V. A battery that
+              appears at 100% SOC may actually be at 70–80% once surface charge
+              dissipates. Always wait 30+ minutes after charging before
+              measuring.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">
+              Using the Wrong Chemistry Curve
+            </h4>
+            <p class="text-body-sm text-muted">
+              Flooded, AGM, and gel batteries have different voltage profiles.
+              Applying flooded voltage values to an AGM battery (or vice versa)
+              leads to incorrect SOC estimates. Identify your battery type
+              first.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Ignoring Temperature</h4>
+            <p class="text-body-sm text-muted">
+              A battery in a cold engine bay or unheated storage unit reads
+              lower than the chart values. A 12V battery at 0°C may read 12.4V
+              at full charge, which appears to be 50% SOC on the chart. Always
+              compensate for temperature.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">
+              Discharging Below 50% Regularly
+            </h4>
+            <p class="text-body-sm text-muted">
+              Lead-acid batteries suffer significant capacity loss when
+              regularly discharged below 50% SOC. Flooded batteries may lose 50%
+              of their cycle life at 50% DoD. Use the voltage chart to ensure
+              you recharge before reaching this threshold.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <CalculatorCard class="border-m-blue-light">
+        <h4 class="text-label-uppercase text-primary text-xs mb-3">Try It</h4>
+        <p class="text-body-sm text-muted mb-4">
+          Use the Battery Sizing Calculator to size a lead-acid battery bank
+          with proper DoD limits and temperature derating.
+        </p>
+        <a
+          href="/tools/battery-sizing-calculator"
+          class="btn-primary text-xs py-3 px-6 inline-block"
+          >Open Battery Sizing Calculator</a
+        >
+      </CalculatorCard>
+
+      <FAQSection items={faqItems} />
+
+      <section class="border-t border-hairline pt-12">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          References
+        </h2>
+        <ul class="flex flex-col gap-2 text-body-sm text-muted">
+          {
+            references.map((ref) => (
+              <li class="flex gap-2">
+                <span class="text-m-blue-light shrink-0">—</span>
+                <a
+                  href={ref.url}
+                  class="hover:text-primary transition-colors underline underline-offset-2"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {ref.title}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+    </div>
+  </div>
+</Layout>

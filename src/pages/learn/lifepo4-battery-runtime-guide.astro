@@ -1,0 +1,190 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import CalculatorCard from '../../components/CalculatorCard.astro';
+import FormulaBox from '../../components/FormulaBox.astro';
+import FAQSection from '../../components/FAQSection.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "How long does LiFePO4 last compared to NMC?",
+    answer: "LiFePO4 (LFP) typically delivers 3,000–5,000 cycles at 80% DoD, while NMC delivers 2,000–3,000 cycles. LFP also has better thermal stability and does not require active cooling. The trade-off is lower energy density — LFP batteries are heavier for the same capacity.",
+  },
+  {
+    question: "What is the runtime advantage of LFP over lead-acid?",
+    answer: "LFP batteries provide 80–90% usable DoD versus 50% for lead-acid. A 100Ah LFP battery delivers 1,024 Wh usable at 12.8V, while a 100Ah AGM battery delivers only 640 Wh. LFP runtime is roughly 60% longer for the same Ah rating.",
+  },
+  {
+    question: "Can I use LFP batteries in cold weather?",
+    answer: "LFP batteries should not be charged below 0°C due to lithium plating risk. Discharge is possible down to -20°C but with reduced capacity (10–30% loss). For cold-climate applications, consider battery enclosures with heating elements.",
+  },
+  {
+    question: "Why is LFP voltage so flat during discharge?",
+    answer: "LFP chemistry has a very flat discharge curve between 20% and 90% SOC, maintaining 3.2–3.3V per cell. This makes SOC estimation from voltage difficult but provides consistent power delivery throughout the discharge cycle, improving runtime predictability.",
+  },
+];
+---
+
+<Layout
+  title="LiFePO4 Battery Runtime Guide | Battery Calculators"
+  description="Complete guide to LiFePO4 battery runtime: discharge characteristics, usable capacity, temperature effects, and runtime calculations for solar, RV, and home backup."
+  canonical="https://batterycalculators.com/learn/lifepo4-battery-runtime-guide"
+  schema="faqPage"
+  schemaName="LiFePO4 Battery Runtime Guide"
+  schemaDescription="Engineering guide to LiFePO4 battery runtime and discharge characteristics."
+  schemaUrl="https://batterycalculators.com/learn/lifepo4-battery-runtime-guide"
+  faqItems={faqItems}
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/learn" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Back to Guides</a>
+      <Breadcrumb items={[
+        { label: "Learning Center", href: "/learn" },
+        { label: "LiFePO4 Battery Runtime Guide" }
+      ]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">CHEMISTRY</span>
+      <h1 class="text-display-md text-primary mb-6">LiFePO4 Battery Runtime Guide</h1>
+      <p class="text-body-md text-body font-light">
+        LiFePO4 (LFP) has become the dominant chemistry for stationary storage, RV, marine, and solar applications. Its flat discharge curve, deep DoD tolerance, and long cycle life make it the most practical choice for applications where runtime matters more than weight.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Why LFP Excels for Runtime</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          LFP cells maintain a remarkably flat voltage between 20% and 90% SOC, holding 3.2–3.3V per cell throughout most of the discharge. This means the power delivered to your load remains consistent from nearly full to nearly empty, unlike NMC or lead-acid where voltage drops progressively.
+        </p>
+        <p class="text-body-md text-body font-light">
+          The practical benefit: runtime calculations are more predictable because the battery voltage does not sag significantly until the last 10–15% of capacity. Combined with 80–90% usable DoD and minimal Peukert effect, LFP delivers the most usable energy per Ah of any common battery chemistry.
+        </p>
+      </section>
+
+      <FormulaBox title="LFP Runtime Formula">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Usable Energy (Wh) = Capacity (Ah) × 3.2V × Cells × (DoD% / 100)
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Runtime (h) = Usable Energy / (Load (W) / Efficiency)
+        </div>
+        <p>
+          For a 4S (12.8V) pack: multiply Ah × 12.8V × DoD. For 8S (25.6V): Ah × 25.6V × DoD. For 16S (51.2V): Ah × 51.2V × DoD.
+        </p>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Worked Example</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Given:</strong> 200Ah 48V LFP server rack battery, 300W continuous load, 92% efficiency</p>
+            <p><strong>Step 1:</strong> Usable energy at 80% DoD:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              200 × 51.2 × 0.80 = 8,192 Wh
+            </div>
+            <p><strong>Step 2:</strong> Effective load:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              300 / 0.92 = 326 W
+            </div>
+            <p><strong>Step 3:</strong> Runtime:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              8,192 / 326 = 25.1 hours
+            </div>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">LFP vs. Other Chemistries</h2>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Feature</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">LFP</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">NMC</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Lead-Acid</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">Usable DoD</td>
+                <td class="p-4 font-mono text-primary">80–90%</td>
+                <td class="p-4 text-muted">80%</td>
+                <td class="p-4 text-muted">50%</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Cycle Life</td>
+                <td class="p-4 font-mono text-primary">3,000–5,000</td>
+                <td class="p-4 text-muted">2,000–3,000</td>
+                <td class="p-4 text-muted">500–1,000</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Thermal Stability</td>
+                <td class="p-4 font-mono text-primary">Excellent</td>
+                <td class="p-4 text-muted">Moderate</td>
+                <td class="p-4 text-muted">Good</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Voltage Flatness</td>
+                <td class="p-4 font-mono text-primary">Very flat</td>
+                <td class="p-4 text-muted">Moderate slope</td>
+                <td class="p-4 text-muted">Steep slope</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Weight</td>
+                <td class="p-4 text-muted">Heavier</td>
+                <td class="p-4 font-mono text-primary">Lightest</td>
+                <td class="p-4 text-muted">Heaviest</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Temperature Effects</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Discharge in Cold</h4>
+            <p class="text-body-sm text-muted">At -10°C, LFP delivers roughly 85% of rated capacity. At -20°C, capacity drops to 70–75%. Discharge is safe but reduced.</p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Charging Limits</h4>
+            <p class="text-body-sm text-muted">Never charge LFP below 0°C. Lithium plating on the anode causes permanent capacity loss and safety risks. Use a BMS with temperature-gated charge cutoff.</p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Try It</h4>
+          <p class="text-body-sm text-muted mb-4">Use the Runtime Calculator to estimate LFP battery discharge time.</p>
+          <a href="/tools/runtime-calculator" class="btn-primary text-xs py-3 px-6 inline-block">Open Runtime Calculator</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Related</h4>
+          <p class="text-body-sm text-muted mb-4">Size your solar bank with the Solar Battery Sizing Calculator.</p>
+          <a href="/tools/solar-battery-sizing-calculator" class="btn-primary-outline text-xs py-3 px-6 inline-block">Solar Calculator</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Related Articles</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Battery Runtime Formula</h4>
+            <p class="text-body-sm text-muted mb-3">Reference for all runtime formulas across chemistries.</p>
+            <a href="/learn/battery-runtime-formula" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Read Guide →</a>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">How Long Will a Battery Last?</h4>
+            <p class="text-body-sm text-muted mb-3">The general method for calculating runtime.</p>
+            <a href="/learn/how-long-will-a-battery-last" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Read Guide →</a>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

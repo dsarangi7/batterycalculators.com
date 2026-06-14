@@ -1,0 +1,246 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import CalculatorCard from '../../components/CalculatorCard.astro';
+import FormulaBox from '../../components/FormulaBox.astro';
+import FAQSection from '../../components/FAQSection.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "How many batteries does my RV need?",
+    answer: "It depends on your daily consumption and trip duration. A weekend camper with basic loads (fridge, lights, charging) needs 1-2 batteries (200-400Ah LFP). Full-time RV living with higher consumption may need 3-5 batteries (400-600Ah+). The exact number depends on your appliance inventory and how many days you stay off-grid between charges.",
+  },
+  {
+    question: "Can I mix different battery types in my RV?",
+    answer: "Never mix batteries of different chemistries, ages, or capacities in a parallel bank. The weakest battery limits the entire bank and degrades faster. Always use identical batteries — same brand, model, age, and capacity. Replace all batteries in a bank simultaneously.",
+  },
+  {
+    question: "Should I wire my RV batteries in series or parallel?",
+    answer: "For 12V RV systems, wire batteries in parallel to increase capacity (amp-hours) while maintaining 12V. For 24V or 48V systems, wire in series to increase voltage. Most RVs use 12V systems, so parallel wiring is standard. Use a battery balancer or equalizer to ensure even charging across parallel batteries.",
+  },
+  {
+    question: "How often should I replace my RV batteries?",
+    answer: "LFP batteries last 3,000-5,000 cycles (8-15 years of regular use). Lead-acid batteries last 300-500 cycles (2-4 years). Monitor capacity fade over time — when a battery retains less than 80% of its original capacity, it is time to replace. A battery monitor with capacity tracking makes this easy to track.",
+  },
+];
+---
+
+<Layout
+  title="How Many Batteries for RV | Battery Calculators"
+  description="Guide to determining the number of batteries for your RV: worked examples comparing weekend camping vs. full-time RV living, parallel vs. series wiring, and battery bank configuration."
+  canonical="https://batterycalculators.com/learn/how-many-batteries-for-rv"
+  schema="faqPage"
+  schemaName="How Many Batteries for RV"
+  schemaDescription="Guide to determining the number of batteries for your RV."
+  schemaUrl="https://batterycalculators.com/learn/how-many-batteries-for-rv"
+  faqItems={faqItems}
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/learn" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Back to Guides</a>
+      <Breadcrumb items={[
+        { label: "Learning Center", href: "/learn" },
+        { label: "How Many Batteries for RV" },
+      ]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">RV & CAMPER</span>
+      <h1 class="text-display-md text-primary mb-6">How Many Batteries for RV</h1>
+      <p class="text-body-md text-body font-light">
+        Determining how many batteries your RV needs is a function of daily consumption, desired autonomy, battery chemistry, and system voltage. This guide provides worked examples for weekend camping and full-time RV living scenarios, showing exactly how to calculate the right number of batteries for your specific use case.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">The Core Calculation</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          The number of batteries is determined by dividing total required capacity by the capacity of a single battery. Total required capacity equals daily consumption multiplied by autonomy days, divided by depth of discharge. This gives you the total amp-hours needed at your system voltage.
+        </p>
+        <p class="text-body-md text-body font-light mb-6">
+          The calculation is the same regardless of whether you are planning a weekend trip or full-time van life. The difference is in the inputs: weekend campers have lower daily consumption and fewer autonomy days, while full-time RVers have higher consumption and may need more margin for variable weather and charging conditions.
+        </p>
+        <FormulaBox title="Battery Count Formula">
+          <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+            Total Ah Needed = (Daily Wh x Autonomy Days) / (Voltage x DoD)
+          </div>
+          <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+            Number of Batteries = Total Ah Needed / Single Battery Ah
+          </div>
+          <p>
+            Round up to the nearest whole number. It is better to have one extra battery than to run short. The extra capacity also extends cycle life because the battery bank cycles less deeply on average.
+          </p>
+        </FormulaBox>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Worked Example: Weekend Camper</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Scenario:</strong> Weekend camping trip, Friday evening to Sunday afternoon.</p>
+            <p><strong>Given:</strong></p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li>Daily consumption: 1,500 Wh/day</li>
+              <li>Autonomy: 2 days (no charging expected)</li>
+              <li>Battery: LFP 12V 100Ah (85% DoD)</li>
+              <li>System voltage: 12V</li>
+            </ul>
+            <p><strong>Step 1:</strong> Calculate total capacity needed:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              (1,500 x 2) / (12 x 0.85) = 294 Ah
+            </div>
+            <p><strong>Step 2:</strong> Number of 100Ah batteries:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              294 / 100 = 2.94 → 3 batteries
+            </div>
+            <p><strong>Configuration:</strong> Three 12V 100Ah LFP batteries in parallel = 300 Ah total (3,600 Wh). This provides 300 Ah at 12V with 256 Ah usable — sufficient for 2 days of 1,500 Wh/day consumption with a small margin.</p>
+            <p class="text-xs text-muted">A practical alternative: two 12V 200Ah batteries (400 Ah total) provides more margin and fewer parallel connections.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Worked Example: Full-Time RV Living</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Scenario:</strong> Full-time RV living with moderate consumption, occasional boondocking.</p>
+            <p><strong>Given:</strong></p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li>Daily consumption: 2,500 Wh/day</li>
+              <li>Autonomy: 1.5 days (daily solar/alternator charging)</li>
+              <li>Battery: LFP 12V 200Ah (85% DoD)</li>
+              <li>System voltage: 12V</li>
+            </ul>
+            <p><strong>Step 1:</strong> Calculate total capacity needed:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              (2,500 x 1.5) / (12 x 0.85) = 368 Ah
+            </div>
+            <p><strong>Step 2:</strong> Number of 200Ah batteries:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              368 / 200 = 1.84 → 2 batteries
+            </div>
+            <p><strong>Configuration:</strong> Two 12V 200Ah LFP batteries in parallel = 400 Ah total (4,800 Wh). This provides 400 Ah at 12V with 340 Ah usable — sufficient for 1.5 days of 2,500 Wh/day consumption. With 200W solar adding ~800 Wh/day, effective autonomy extends to 3+ days.</p>
+            <p class="text-xs text-muted">For higher-draw full-time setups (induction cooktop, hair dryer, microwave), upgrade to three 200Ah batteries (600 Ah) or consider a 24V system to reduce current draw and wiring requirements.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Quick Reference: Battery Count by Usage</h2>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Usage Pattern</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Daily Wh</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Autonomy</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">LFP 100Ah Batteries</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">LFP 200Ah Batteries</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-primary font-bold">Day trip / minimal</td>
+                <td class="p-4 font-mono text-primary">500 - 800</td>
+                <td class="p-4 font-mono text-primary">0.5 day</td>
+                <td class="p-4 font-mono text-primary">1</td>
+                <td class="p-4 font-mono text-primary">1</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-primary font-bold">Weekend camper</td>
+                <td class="p-4 font-mono text-primary">1,000 - 2,000</td>
+                <td class="p-4 font-mono text-primary">2 days</td>
+                <td class="p-4 font-mono text-primary">3 - 5</td>
+                <td class="p-4 font-mono text-primary">2 - 3</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-primary font-bold">Week-long trip (with solar)</td>
+                <td class="p-4 font-mono text-primary">1,500 - 2,500</td>
+                <td class="p-4 font-mono text-primary">1 day</td>
+                <td class="p-4 font-mono text-primary">2 - 4</td>
+                <td class="p-4 font-mono text-primary">1 - 2</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-primary font-bold">Full-time RV (moderate)</td>
+                <td class="p-4 font-mono text-primary">2,000 - 3,500</td>
+                <td class="p-4 font-mono text-primary">1.5 days</td>
+                <td class="p-4 font-mono text-primary">4 - 6</td>
+                <td class="p-4 font-mono text-primary">2 - 3</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-primary font-bold">Full-time (high-draw)</td>
+                <td class="p-4 font-mono text-primary">3,500 - 5,000</td>
+                <td class="p-4 font-mono text-primary">1.5 days</td>
+                <td class="p-4 font-mono text-primary">6 - 9</td>
+                <td class="p-4 font-mono text-primary">3 - 5</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Parallel vs. Series Wiring</h2>
+        <p class="text-body-md text-body font-light mb-6">
+          The way you connect batteries affects system voltage and capacity. Understanding the difference is critical for correct system design. Most RV systems use parallel wiring because the house electrical system is 12V.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Parallel Wiring</h4>
+            <p class="text-body-sm text-muted mb-3">
+              Connect positive to positive and negative to negative. Voltage stays the same; capacity (Ah) adds up. Two 12V 100Ah batteries in parallel = 12V 200Ah. This is the standard configuration for 12V RV systems.
+            </p>
+            <div class="font-mono text-m-blue-light text-xs">Same voltage, added capacity</div>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Series Wiring</h4>
+            <p class="text-body-sm text-muted mb-3">
+              Connect positive of one battery to negative of the next. Voltage adds up; capacity stays the same. Two 12V 100Ah batteries in series = 24V 100Ah. Used for 24V or 48V systems in larger RVs or expedition vehicles.
+            </p>
+            <div class="font-mono text-m-blue-light text-xs">Added voltage, same capacity</div>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Try It</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use the RV Battery Calculator to determine the exact number and configuration of batteries for your specific RV setup.
+          </p>
+          <a href="/tools/rv-battery-calculator" class="btn-primary text-xs py-3 px-6 inline-block">Open RV Battery Calculator</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Related Tool</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use the Battery Sizing Calculator to validate your battery bank configuration across different voltages and chemistries.
+          </p>
+          <a href="/tools/battery-sizing-calculator" class="btn-primary-outline text-xs py-3 px-6 inline-block">Open Battery Sizing Calculator</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Related Articles</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <a href="/learn/rv-battery-sizing-guide" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors mb-2 block">
+              RV Battery Sizing Guide
+            </a>
+            <p class="text-body-sm text-muted">
+              The complete process for sizing RV house batteries from load inventory through to final configuration.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <a href="/learn/rv-lithium-battery-guide" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors mb-2 block">
+              RV Lithium Battery Guide
+            </a>
+            <p class="text-body-sm text-muted">
+              Explains why lithium LFP is the optimal battery chemistry for RV applications and compares it to lead-acid alternatives.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

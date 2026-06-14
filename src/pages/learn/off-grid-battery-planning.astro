@@ -1,0 +1,377 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import CalculatorCard from '../../components/CalculatorCard.astro';
+import FormulaBox from '../../components/FormulaBox.astro';
+import FAQSection from '../../components/FAQSection.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "What size battery do I need for off-grid living?",
+    answer: "For a typical off-grid cabin consuming 5–10 kWh/day, you need 15–50 kWh of usable LFP battery storage (assuming 2–3 days autonomy). The exact size depends on your consumption, climate, and whether you have a backup generator. Use: Required Capacity = Daily Consumption × Autonomy Days / (DoD × Efficiency).",
+  },
+  {
+    question: "How many solar panels do I need for off-grid batteries?",
+    answer: "Your solar array must generate enough daily energy to power your loads and recharge the battery. For a 5 kWh/day system with 5 peak sun hours, you need at least a 1,200W array. Oversize by 30–50% for off-grid systems to account for cloudy days and seasonal variation.",
+  },
+  {
+    question: "Can I use a generator with off-grid solar batteries?",
+    answer: "Yes, and it is recommended. A backup generator (propane or diesel) provides recharge energy during extended cloudy periods, reducing the required battery size. Many off-grid inverters include a generator input that automatically starts the generator when battery SOC drops below a threshold.",
+  },
+  {
+    question: "What is the biggest risk in off-grid battery sizing?",
+    answer: "Undersizing the battery bank. In an off-grid system there is no grid fallback — if the battery is empty, you have no power. Undersizing leads to chronic deep cycling, accelerated degradation, and eventually system failure during extended cloudy periods. Oversize by 30–50% beyond minimum calculations.",
+  },
+];
+---
+
+<Layout
+  title="Off-Grid Battery Planning | Battery Calculators"
+  description="Complete guide to planning an off-grid battery system: load analysis, autonomy sizing, solar charging, and battery selection. Includes worked example for a 5 kWh/day cabin."
+  canonical="https://batterycalculators.com/learn/off-grid-battery-planning"
+  schema="faqPage"
+  schemaName="Off-Grid Battery Planning"
+  schemaDescription="Engineering guide to planning and sizing battery systems for off-grid solar installations."
+  schemaUrl="https://batterycalculators.com/learn/off-grid-battery-planning"
+  faqItems={faqItems}
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/learn" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Back to Guides</a>
+      <Breadcrumb items={[
+        { label: "Learning Center", href: "/learn" },
+        { label: "Off-Grid Battery Planning" }
+      ]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">SOLAR</span>
+      <h1 class="text-display-md text-primary mb-6">Off-Grid Battery Planning</h1>
+      <p class="text-body-md text-body font-light">
+        Off-grid battery systems are the backbone of self-sufficient solar installations. Without a grid connection to fall back on, your battery bank must store enough energy to power all loads through the night and survive multi-day cloudy periods. This guide covers the complete engineering process — from load analysis to battery selection and solar recharge sizing.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Why Off-Grid Sizing Is Different</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Grid-tied backup systems can be conservative because the grid provides an unlimited energy reservoir during normal operation. Off-grid systems have no such safety net. Every watt-hour must come from the solar array and pass through the battery before reaching your loads. This creates three distinct design challenges:
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">No Fallback</h4>
+            <p class="text-body-sm text-muted">
+              If the battery is empty, you have zero power. There is no utility to switch to. The battery must be sized for worst-case scenarios, not averages.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Solar Recharge Dependency</h4>
+            <p class="text-body-sm text-muted">
+              The solar array must fully recharge the battery each day. An undersized array leads to chronic undercharge, capacity fade, and eventual system failure.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Seasonal Variation</h4>
+            <p class="text-body-sm text-muted">
+              Winter sun hours are 30–50% lower than summer. Off-grid systems must be sized for the worst season, not the best. This often doubles the required array and battery capacity.
+            </p>
+          </CalculatorCard>
+        </div>
+        <p class="text-body-md text-body font-light">
+          These constraints make off-grid battery planning a more rigorous engineering exercise than grid-tied backup sizing. The margin for error is smaller, and the consequences of undersizing are more severe.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Step 1: Complete Load Audit</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Begin with an exhaustive load audit. Every device that draws power from the battery must be cataloged. For each appliance, record the power rating in watts and the estimated daily runtime in hours. Multiply to get watt-hours per day.
+        </p>
+        <p class="text-body-md text-body font-light mb-4">
+          Consider this example for a remote cabin:
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden mb-4">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Appliance</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Power (W)</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Hours/Day</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Wh/Day</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">Refrigerator (efficient)</td>
+                <td class="p-4 font-mono text-primary">100</td>
+                <td class="p-4 font-mono text-primary">8</td>
+                <td class="p-4 font-mono text-primary">800</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">LED Lighting (6 fixtures)</td>
+                <td class="p-4 font-mono text-primary">48</td>
+                <td class="p-4 font-mono text-primary">5</td>
+                <td class="p-4 font-mono text-primary">240</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Water Pump</td>
+                <td class="p-4 font-mono text-primary">200</td>
+                <td class="p-4 font-mono text-primary">1</td>
+                <td class="p-4 font-mono text-primary">200</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Internet + Router</td>
+                <td class="p-4 font-mono text-primary">15</td>
+                <td class="p-4 font-mono text-primary">24</td>
+                <td class="p-4 font-mono text-primary">360</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Laptop</td>
+                <td class="p-4 font-mono text-primary">65</td>
+                <td class="p-4 font-mono text-primary">4</td>
+                <td class="p-4 font-mono text-primary">260</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Ceiling Fan</td>
+                <td class="p-4 font-mono text-primary">75</td>
+                <td class="p-4 font-mono text-primary">8</td>
+                <td class="p-4 font-mono text-primary">600</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Small TV</td>
+                <td class="p-4 font-mono text-primary">60</td>
+                <td class="p-4 font-mono text-primary">3</td>
+                <td class="p-4 font-mono text-primary">180</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Phone Charging</td>
+                <td class="p-4 font-mono text-primary">10</td>
+                <td class="p-4 font-mono text-primary">3</td>
+                <td class="p-4 font-mono text-primary">30</td>
+              </tr>
+              <tr class="bg-surface-card">
+                <td class="p-4 font-bold text-primary" colspan="3">Total Daily Consumption</td>
+                <td class="p-4 font-mono font-bold text-primary">2,670 Wh</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-body-md text-body font-light">
+          This cabin consumes approximately 2,700 Wh (2.7 kWh) per day. Note that this is modest — most off-grid cabins fall in the 3–8 kWh/day range. Efficient appliances and LED lighting keep consumption manageable.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Step 2: Choose Autonomy Days</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Autonomy days determine how many consecutive days the battery must power the loads without any solar input. For off-grid systems, this is the most critical sizing parameter.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Autonomy</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">When to Use</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Trade-off</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">2 days</td>
+                <td class="p-4 text-muted">Sunny climates, backup generator available</td>
+                <td class="p-4 text-muted">Lower cost, generator fills gaps</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">3 days</td>
+                <td class="p-4 text-muted">Standard off-grid, moderate climate</td>
+                <td class="p-4 text-muted">Balanced cost and resilience</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">5 days</td>
+                <td class="p-4 text-muted">Cloudy regions, no generator, critical loads</td>
+                <td class="p-4 text-muted">Higher cost, maximum resilience</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-body-md text-body font-light mt-4">
+          A backup generator dramatically reduces the required autonomy. With a generator, two days of battery storage is sufficient for most locations. Without one, three to five days provides the safety margin needed to survive extended weather events.
+        </p>
+      </section>
+
+      <FormulaBox title="Off-Grid Battery Sizing Formulas">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Required Capacity (Wh) = Daily Consumption (Wh) × Autonomy Days / (DoD × Efficiency)
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Minimum Solar Array (W) = Daily Consumption (Wh) / Peak Sun Hours
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Recommended Array = Minimum Array × 1.3 to 1.5 (oversize factor)
+        </div>
+        <p>
+          The oversize factor for off-grid arrays is 30–50% (higher than grid-tied) because there is no grid to supplement during cloudy days. This ensures the battery recharges fully even during suboptimal conditions.
+        </p>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Worked Example: Off-Grid Cabin, 5 kWh/day</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Given:</strong></p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li>Daily consumption: 5,000 Wh (5 kWh)</li>
+              <li>Autonomy: 3 days (no backup generator)</li>
+              <li>Battery chemistry: LFP at 85% DoD</li>
+              <li>System efficiency: 92%</li>
+              <li>System voltage: 48V</li>
+              <li>Peak sun hours: 5 (summer average)</li>
+            </ul>
+            <p><strong>Step 1:</strong> Calculate required battery capacity:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              5,000 Wh × 3 / (0.85 × 0.92) = 15,000 / 0.782 = 19,182 Wh
+            </div>
+            <p><strong>Step 2:</strong> Convert to Ah at 48V:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              19,182 Wh / 48V = 399.6 Ah → round to 400 Ah
+            </div>
+            <p><strong>Step 3:</strong> Calculate minimum solar array:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              5,000 Wh / 5 h = 1,000 W minimum
+            </div>
+            <p><strong>Step 4:</strong> Apply oversize factor (1.4):</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              1,000 W × 1.4 = 1,400 W recommended array
+            </div>
+            <p class="text-muted mt-2">This off-grid cabin needs a <strong>48V 400Ah LFP battery bank (19.2 kWh rated)</strong> and a <strong>1,400W solar array</strong>. The battery provides 3 days of full autonomy, and the oversized array recharges it in approximately 4.3 peak sun hours — leaving margin for cloudy days.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Step 3: Size the Solar Array for Recharge</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          The solar array must generate enough energy each day to both power daytime loads and fully recharge the battery for nighttime use. For off-grid systems, the array is sized for worst-case solar conditions, not average ones.
+        </p>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-4">
+          Daily Array Output (Wh) = Array Power (W) × Peak Sun Hours × System Efficiency
+        </div>
+        <p class="text-body-md text-body font-light mb-4">
+          The array must produce at least your daily consumption plus losses. For our 5 kWh/day cabin with 5 peak sun hours and 92% charge efficiency, the minimum array is 5,000 / (5 × 0.92) = 1,087W. Oversizing to 1,400–1,500W provides the cloud-day margin essential for off-grid reliability.
+        </p>
+        <p class="text-body-md text-body font-light">
+          Winter production is typically 40–60% of summer production depending on latitude. If your system must maintain autonomy year-round, size the array for winter peak sun hours. At 40°N latitude, winter peak sun hours may be 2.5–3.0, requiring a proportionally larger array.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Battery Configuration Options</h2>
+        <div class="bg-surface-soft border border-hairline overflow-hidden mb-4">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Configuration</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Modules</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Total Capacity</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Best For</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">4S2P (48V)</td>
+                <td class="p-4 text-muted">8 × 12V 100Ah</td>
+                <td class="p-4 font-mono text-primary">9.6 kWh</td>
+                <td class="p-4 text-muted">Small cabins (2–3 kWh/day)</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">4S4P (48V)</td>
+                <td class="p-4 text-muted">16 × 12V 100Ah</td>
+                <td class="p-4 font-mono text-primary">19.2 kWh</td>
+                <td class="p-4 text-muted">Medium cabins (4–6 kWh/day)</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">Rack-mount 48V</td>
+                <td class="p-4 text-muted">4 × 48V 100Ah</td>
+                <td class="p-4 font-mono text-primary">20.5 kWh</td>
+                <td class="p-4 text-muted">Standard off-grid homes</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">Server rack system</td>
+                <td class="p-4 text-muted">1 × 48V 400Ah rack</td>
+                <td class="p-4 font-mono text-primary">20.5 kWh</td>
+                <td class="p-4 text-muted">Integrated solutions, simplicity</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Off-Grid System Design Checklist</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Charge Controller</h4>
+            <p class="text-body-sm text-muted">
+              Use MPPT charge controllers rated for your array voltage and current. For a 1,400W 48V array, a 60A MPPT controller handles up to 3,000W at 48V. Ensure the controller's maximum input voltage exceeds the array's open-circuit voltage at the lowest expected temperature.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Inverter Selection</h4>
+            <p class="text-body-sm text-muted">
+              Size the inverter for your peak continuous load plus 20% margin. A 2,000W continuous load requires a 2,500W inverter. Pure sine wave inverters are essential for sensitive electronics. Off-grid inverters should include battery charging from generator input.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Battery Management</h4>
+            <p class="text-body-sm text-muted">
+              A battery management system (BMS) protects against overcharge, over-discharge, overcurrent, and temperature extremes. For lithium batteries, a BMS is mandatory. Choose one with cell balancing and communication with the inverter via CAN bus or RS485.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Wiring and Fusing</h4>
+            <p class="text-body-sm text-muted">
+              Off-grid battery banks carry high currents. Size cables for the maximum expected current with a 25% safety margin. Use appropriately rated fuses or breakers between battery strings and at the inverter input. Consult NEC Article 480 for battery installation requirements.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Try It</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use the Solar Battery Sizing Calculator to compute the exact battery and array sizes for your off-grid installation.
+          </p>
+          <a href="/tools/solar-battery-sizing-calculator" class="btn-primary text-xs py-3 px-6 inline-block">Open Solar Battery Sizing Calculator</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Next Step</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Verify your sizing with the Runtime Calculator to check how long your battery powers specific loads.
+          </p>
+          <a href="/tools/runtime-calculator" class="btn-primary-outline text-xs py-3 px-6 inline-block">Open Runtime Calculator</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Related Articles</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">How to Size a Solar Battery Bank</h4>
+            <p class="text-body-sm text-muted mb-3">
+              The four-step engineering method for sizing solar battery banks from scratch.
+            </p>
+            <a href="/learn/how-to-size-solar-battery-bank" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Read Guide →</a>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Solar Storage Sizing Guide</h4>
+            <p class="text-body-sm text-muted mb-3">
+              Complete guide to sizing solar storage from consumption analysis to battery selection.
+            </p>
+            <a href="/learn/solar-storage-sizing-guide" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Read Guide →</a>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

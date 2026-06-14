@@ -1,0 +1,77 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import CalculatorCard from '../../components/CalculatorCard.astro';
+import CalculatorFinder from '../../components/CalculatorFinder.astro';
+
+const tools = [
+  { name: "Runtime Calculator", path: "/tools/runtime-calculator", category: "Cell & Pack", input: "Ah/Wh capacity, load W", output: "Discharge hours" },
+  { name: "C-Rate Calculator", path: "/tools/c-rate-calculator", category: "Cell & Pack", input: "Capacity Ah, current A", output: "C-rate, duration" },
+  { name: "Charging Time", path: "/tools/charging-time-calculator", category: "Cell & Pack", input: "Capacity, current, SOC range", output: "CC-CV charge duration" },
+  { name: "Battery Pack Calculator", path: "/tools/battery-pack-calculator", category: "Cell & Pack", input: "Cell voltage/Ah, series/parallel count", output: "Pack voltage, capacity, energy" },
+  { name: "Energy Conversion", path: "/tools/energy-conversion-calculator", category: "Electrical", input: "Capacity (Ah/Wh), voltage", output: "Converted Ah/Wh" },
+  { name: "DC Voltage Drop", path: "/tools/voltage-drop-calculator", category: "Electrical", input: "Voltage, current, AWG/mm², distance", output: "V-drop (V and %)" },
+  { name: "DC Cable Loss", path: "/tools/dc-cable-loss-calculator", category: "Electrical", input: "Current, wire thickness, length", output: "Resistive power loss W" },
+  { name: "Battery Sizing", path: "/tools/battery-sizing-calculator", category: "Electrical", input: "Daily energy, autonomy, DoD, temp", output: "Target pack capacity" },
+  { name: "Marine Battery Sizing", path: "/tools/marine-battery-sizing-calculator", category: "Electrical", input: "Hotel loads, usage hours, voltage", output: "Marine bank capacity Ah/kWh" },
+  { name: "Inverter Battery Calculator", path: "/tools/inverter-battery-calculator", category: "Electrical", input: "AC load, runtime, inverter eff", output: "DC battery capacity Ah/kWh" },
+  { name: "Parallel String", path: "/tools/parallel-string-calculator", category: "Electrical", input: "Target voltage/Ah, cell voltage/Ah", output: "Series/Parallel configuration" },
+  { name: "BESS ROI Calculator", path: "/tools/bess-roi-calculator", category: "ROI & Life", input: "Capex/Opex, daily shift, tariffs", output: "NPV, lifetime payback" },
+  { name: "Degradation Estimator", path: "/tools/battery-degradation-estimator", category: "ROI & Life", input: "Cycles, DoD, temp, age", output: "State of Health (SOH) %" },
+  { name: "SOC Estimator", path: "/tools/soc-estimator", category: "ROI & Life", input: "Open circuit voltage, chemistry", output: "State of Charge %" }
+];
+---
+
+<Layout 
+  title="Calculator Directory | Battery Calculators" 
+  description="Browse our suite of electrical engineering tools for battery storage design, runtime calculations, cable losses, and life estimation."
+>
+  <div class="mb-12">
+    <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">ENGINEERING HANDBOOK DIRECTORY</span>
+    <h1 class="text-display-md text-primary mb-6">Calculators Index</h1>
+    <p class="text-body-md text-body max-w-2xl font-light">
+      A tabular overview of all calculators. Click on any row to open the tool.
+    </p>
+  </div>
+
+  <div class="mb-10">
+    <CalculatorFinder />
+  </div>
+
+  <CalculatorCard class="overflow-x-auto p-0 border border-hairline bg-surface-soft">
+    <table class="w-full text-left border-collapse min-w-[580px]">
+      <thead>
+        <tr class="border-b border-hairline bg-surface-card">
+          <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Tool Name</th>
+          <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Category</th>
+          <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Primary Inputs</th>
+          <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Target Output</th>
+          <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider text-right">Action</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-hairline">
+        {tools.map(tool => (
+          <tr class="hover:bg-surface-card transition-colors group">
+            <td class="p-4 font-bold text-primary">
+              <a href={tool.path} class="block hover:underline">{tool.name}</a>
+            </td>
+            <td class="p-4 text-body-sm">
+              <span class={`inline-block px-2 py-0.5 text-[10px] uppercase font-bold tracking-wider border rounded-none ${
+                tool.category === "Cell & Pack" ? "border-m-blue-light text-m-blue-light" : 
+                tool.category === "Electrical" ? "border-m-blue-dark text-m-blue-dark" : "border-m-red text-m-red"
+              }`}>
+                {tool.category}
+              </span>
+            </td>
+            <td class="p-4 text-body-sm font-light text-body">{tool.input}</td>
+            <td class="p-4 text-body-sm font-light text-body">{tool.output}</td>
+            <td class="p-4 text-right">
+              <a href={tool.path} class="text-label-uppercase text-xs text-primary group-hover:text-m-blue-dark transition-colors inline-flex items-center gap-1">
+                OPEN TOOL <span class="group-hover:translate-x-1 transition-transform inline-block">→</span>
+              </a>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </CalculatorCard>
+</Layout>

@@ -1,0 +1,309 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import CalculatorCard from '../../components/CalculatorCard.astro';
+import FormulaBox from '../../components/FormulaBox.astro';
+import FAQSection from '../../components/FAQSection.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "How long will a battery last during a power outage?",
+    answer: "Runtime depends entirely on the load you draw. A 10 kWh LFP battery at 85% DoD provides 8.5 kWh usable. A critical load of 1,500W runs for approximately 5.7 hours. Reducing the load to 500W extends runtime to approximately 17 hours. The fewer devices you power, the longer the battery lasts.",
+  },
+  {
+    question: "What appliances should I prioritize during a power outage?",
+    answer: "Prioritize by health and safety impact: medical equipment (CPAP, oxygen concentrator) first, then refrigeration to prevent food spoilage, communication devices (phone, internet), lighting for safety, and finally comfort loads. Avoid high-draw appliances like electric ovens, dryers, and HVAC unless you have a very large battery bank.",
+  },
+  {
+    question: "Do I need a transfer switch for my battery backup?",
+    answer: "Yes. A transfer switch automatically disconnects your home from the grid before connecting battery power. This prevents dangerous backfeeding into utility lines, which can injure lineworkers and damage equipment. A manual transfer switch is a lower-cost option, while an automatic transfer switch (ATS) provides seamless switchover without user intervention.",
+  },
+  {
+    question: "Can I run my air conditioner on a battery during an outage?",
+    answer: "It is technically possible but impractical for most residential battery systems. A typical central AC unit draws 2,000–3,500W and runs 8–12 hours per day, consuming 16–42 kWh daily. That alone exceeds the capacity of most home battery systems. If cooling is essential, consider a portable 12,000 BTU unit (1,200W) or a mini-split with a dedicated smaller battery.",
+  },
+];
+---
+
+<Layout
+  title="Power Outage Battery Guide | Battery Calculators"
+  description="Complete guide to preparing a battery backup system for power outages: critical load triage, runtime estimation, sizing method, and system configuration for reliable backup power."
+  canonical="https://batterycalculators.com/learn/power-outage-battery-guide"
+  schema="faqPage"
+  schemaName="Power Outage Battery Guide"
+  schemaDescription="Complete guide to preparing a battery backup system for power outages."
+  schemaUrl="https://batterycalculators.com/learn/power-outage-battery-guide"
+  faqItems={faqItems}
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/learn" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Back to Guides</a>
+      <Breadcrumb items={[
+        { label: "Learning Center", href: "/learn" },
+        { label: "Power Outage Battery Guide" },
+      ]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">HOME BACKUP</span>
+      <h1 class="text-display-md text-primary mb-6">Power Outage Battery Guide</h1>
+      <p class="text-body-md text-body font-light">
+        A power outage battery system keeps your essential electrical loads running when the grid goes down. This guide covers the engineering approach to sizing, configuring, and operating a battery backup system specifically designed for outage resilience — from critical load identification through to runtime calculation and system deployment.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Understanding Outage Patterns</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Before sizing a backup system, study your local outage history. Contact your utility or check public outage data to understand how frequently outages occur, how long they typically last, and what causes them. Storm-related outages in rural areas can last days, while urban grid failures from equipment failure usually resolve in hours.
+        </p>
+        <p class="text-body-md text-body font-light mb-6">
+          The U.S. Department of Energy reports that the average utility customer experiences approximately 1.5 outages per year with an average duration of roughly 7 hours. However, averages are misleading — some regions experience frequent short interruptions while others face rare but extended blackouts. Your backup system should be sized for the worst-case scenario your location faces, not the national average.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Outage Type</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Typical Duration</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Recommended Backup</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-primary font-bold">Grid flicker / momentary</td>
+                <td class="p-4 font-mono text-primary">Seconds – 5 minutes</td>
+                <td class="p-4 text-muted">UPS or small battery (1–3 kWh)</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-primary font-bold">Equipment failure</td>
+                <td class="p-4 font-mono text-primary">2 – 8 hours</td>
+                <td class="p-4 text-muted">Medium battery (5–10 kWh)</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-primary font-bold">Storm / weather event</td>
+                <td class="p-4 font-mono text-primary">8 – 48 hours</td>
+                <td class="p-4 text-muted">Large battery (10–20 kWh) or hybrid</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-primary font-bold">Extended grid failure</td>
+                <td class="p-4 font-mono text-primary">2 – 7+ days</td>
+                <td class="p-4 text-muted">Generator + battery hybrid system</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Step 1: Create a Critical Loads List</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          A critical loads list is an inventory of every device you must keep powered during an outage. Categorize loads by priority: critical (life safety and food preservation), important (comfort and communication), and deferrable (convenience). This triage controls your battery size and cost — every additional load increases the required capacity.
+        </p>
+        <p class="text-body-md text-body font-light mb-6">
+          Walk through your home and physically write down every device you would want operational. Do not forget low-power items that collectively add up: smoke detectors, outdoor security lights, sump pumps, and garage door openers. A 5W smoke detector is negligible alone, but ten 5W devices across the house totals 50W running 24/7 — that is 1.2 kWh per day just for safety devices.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Priority</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Devices</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Typical Power</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Daily Energy</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-primary font-bold">Critical</td>
+                <td class="p-4 text-muted">Refrigerator, medical devices, phone charging, smoke/CO detectors</td>
+                <td class="p-4 font-mono text-primary">200 – 800W</td>
+                <td class="p-4 font-mono text-primary">3 – 6 kWh</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-primary font-bold">Important</td>
+                <td class="p-4 text-muted">LED lighting, internet, sump pump, security system</td>
+                <td class="p-4 font-mono text-primary">100 – 500W</td>
+                <td class="p-4 font-mono text-primary">1 – 4 kWh</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-primary font-bold">Deferrable</td>
+                <td class="p-4 text-muted">TV, washing machine, garage door, ceiling fans</td>
+                <td class="p-4 font-mono text-primary">200 – 1,500W</td>
+                <td class="p-4 font-mono text-primary">1 – 5 kWh</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Step 2: Estimate Runtime Requirements</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Once you have a loads list, decide how many hours of backup you need. This depends on outage frequency and duration in your area. A reasonable starting point for most homes is 24 hours of critical-load coverage — this handles overnight outages and extends well into the next day.
+        </p>
+        <p class="text-body-md text-body font-light mb-6">
+          For areas prone to multi-day outages, you have two strategies: oversize the battery for 48–72 hours of critical loads only, or pair a moderate battery with a generator. The hybrid approach is more cost-effective because a generator provides unlimited runtime as long as fuel is available, while batteries provide silent, instant power for the first 12–24 hours.
+        </p>
+      </section>
+
+      <FormulaBox title="Runtime Estimation Formulas">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Runtime (hours) = (Battery Capacity (Wh) × DoD × Inverter Efficiency) / Load Power (W)
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Required Battery (Wh) = Load Power (W) × Desired Hours / (DoD × Inverter Efficiency)
+        </div>
+        <p>
+          Depth of discharge (DoD) represents the usable fraction of total battery capacity. LFP batteries are typically rated at 85% DoD. Inverter efficiency accounts for DC-to-AC conversion losses, usually 90–95%. Together, these factors mean you need approximately 1.2–1.3× your raw energy requirement in total battery capacity.
+        </p>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Worked Example: 24-Hour Critical Backup</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Scenario:</strong> Family home, 24-hour backup for critical loads on a 48V LFP system.</p>
+            <p><strong>Critical loads list:</strong></p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li>Refrigerator: 200W × 10h runtime = 2,000 Wh</li>
+              <li>LED lights (4 rooms): 60W × 6h = 360 Wh</li>
+              <li>Internet modem: 20W × 24h = 480 Wh</li>
+              <li>Phone charging: 30W × 4h = 120 Wh</li>
+              <li>Medical device (CPAP): 40W × 8h = 320 Wh</li>
+              <li>Smoke/CO detectors: 10W × 24h = 240 Wh</li>
+            </ul>
+            <p class="pt-2 border-t border-hairline"><strong>Total critical load:</strong> <span class="font-mono text-primary">3,520 Wh/day (3.52 kWh)</span></p>
+            <p><strong>Battery sizing:</strong></p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              3,520 / (0.85 × 0.92) = 4,513 Wh ≈ 4.5 kWh
+            </div>
+            <p><strong>At 48V:</strong></p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              4,513 Wh / 48V = 94 Ah
+            </div>
+            <p><strong>Recommendation:</strong> A single 48V 100Ah LFP battery (5.12 kWh) provides sufficient capacity with a 13% margin for aging and temperature derating. For added resilience, two 48V 50Ah units in parallel provide redundancy — if one unit fails, the other still powers critical loads for roughly 14 hours.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Step 3: System Configuration</h2>
+        <p class="text-body-md text-body font-light mb-6">
+          A power outage backup system requires four core components: the battery bank, an inverter, a charge controller (if solar-charged), and a transfer switch. The battery stores energy, the inverter converts DC to AC, the charge controller manages charging, and the transfer switch isolates your home from the grid during an outage. Each component must be rated for the loads and battery voltage you select.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Battery Bank</h4>
+            <p class="text-body-sm text-muted">
+              LFP (LiFePO4) chemistry is the standard for outage backup. It offers 85% usable depth of discharge, 3,000+ cycle life, and thermal stability without active cooling. Size based on the formula above.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Inverter</h4>
+            <p class="text-body-sm text-muted">
+              Must handle the peak simultaneous load of all critical circuits. For most homes, a 3,000–5,000W pure sine wave inverter covers essential loads. Ensure the inverter supports your battery voltage (12V, 24V, or 48V).
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Transfer Switch</h4>
+            <p class="text-body-sm text-muted">
+              Essential for safety. Disconnects from the grid before connecting battery power. An automatic transfer switch (ATS) provides seamless switchover. Manual switches are cheaper but require you to be home.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Charge Controller</h4>
+            <p class="text-body-sm text-muted">
+              Required if adding solar panels to recharge the battery during extended outages. MPPT controllers maximize solar harvest. Not needed if charging exclusively from grid power.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Runtime by Battery Size</h2>
+        <p class="text-body-md text-body font-light mb-6">
+          The following table shows estimated runtime for different battery capacities at various critical load levels. All values assume LFP chemistry (85% DoD) with a 92% efficient inverter. Use this as a quick reference when deciding between battery sizes.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Battery Size</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">1,000W Load</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">2,000W Load</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">3,000W Load</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">5 kWh</td>
+                <td class="p-4 font-mono text-primary">3.9 hrs</td>
+                <td class="p-4 font-mono text-primary">1.9 hrs</td>
+                <td class="p-4 font-mono text-primary">1.3 hrs</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">10 kWh</td>
+                <td class="p-4 font-mono text-primary">7.8 hrs</td>
+                <td class="p-4 font-mono text-primary">3.9 hrs</td>
+                <td class="p-4 font-mono text-primary">2.6 hrs</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">15 kWh</td>
+                <td class="p-4 font-mono text-primary">11.7 hrs</td>
+                <td class="p-4 font-mono text-primary">5.9 hrs</td>
+                <td class="p-4 font-mono text-primary">3.9 hrs</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">20 kWh</td>
+                <td class="p-4 font-mono text-primary">15.6 hrs</td>
+                <td class="p-4 font-mono text-primary">7.8 hrs</td>
+                <td class="p-4 font-mono text-primary">5.2 hrs</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Try It</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use the Home Backup Calculator to size a complete outage backup system based on your critical loads and desired runtime.
+          </p>
+          <a href="/tools/home-backup-battery-calculator" class="btn-primary text-xs py-3 px-6 inline-block">Open Home Backup Calculator</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Related Tool</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Calculate the exact runtime of your configured battery system at different load levels with the Runtime Calculator.
+          </p>
+          <a href="/tools/battery-runtime-calculator" class="btn-primary-outline text-xs py-3 px-6 inline-block">Open Runtime Calculator</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Related Articles</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <a href="/learn/home-battery-backup-planning" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors mb-2 block">
+              Home Battery Backup Planning
+            </a>
+            <p class="text-body-sm text-muted">
+              A step-by-step framework for planning a complete home battery backup system, from load identification to final configuration.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <a href="/learn/generator-vs-battery-backup" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors mb-2 block">
+              Generator vs. Battery Backup
+            </a>
+            <p class="text-body-sm text-muted">
+              Compares the strengths and weaknesses of generators versus batteries for backup power, including hybrid system strategies.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

@@ -1,0 +1,263 @@
+---
+export interface ChartDataPoint {
+  x: number;
+  y: number;
+  label?: string;
+}
+
+export interface Props {
+  type: 'line' | 'bar';
+  title: string;
+  description?: string;
+  xLabel: string;
+  yLabel: string;
+  data: ChartDataPoint[];
+  xMin?: number;
+  xMax?: number;
+  yMin?: number;
+  yMax?: number;
+  caption?: string;
+  class?: string;
+}
+
+const {
+  type,
+  title,
+  description,
+  xLabel,
+  yLabel,
+  data,
+  xMin: propXMin,
+  xMax: propXMax,
+  yMin: propYMin,
+  yMax: propYMax,
+  caption,
+  class: className = '',
+} = Astro.props as Props;
+
+const W = 520;
+const H = 280;
+const PAD = { top: 20, right: 20, bottom: 70, left: 52 };
+const PW = W - PAD.left - PAD.right;
+const PH = H - PAD.top - PAD.bottom;
+
+const valid = data.filter((d) => isFinite(d.x) && isFinite(d.y));
+
+const xMin = propXMin ?? (valid.length > 0 ? Math.min(...valid.map((d) => d.x)) : 0);
+const xMax = propXMax ?? (valid.length > 0 ? Math.max(...valid.map((d) => d.x)) : 100);
+const yMin = propYMin ?? 0;
+const yMax = propYMax ?? (valid.length > 0 ? Math.max(...valid.map((d) => d.y)) * 1.1 : 100);
+const xRange = xMax - xMin || 1;
+const yRange = yMax - yMin || 1;
+
+function toX(v: number): number {
+  return PAD.left + ((v - xMin) / xRange) * PW;
+}
+
+function toY(v: number): number {
+  return PAD.top + PH - ((v - yMin) / yRange) * PH;
+}
+
+function fmt(v: number): string {
+  const a = Math.abs(v);
+  if (a >= 1000) return (v / 1000).toFixed(1) + 'k';
+  if (Number.isInteger(v)) return v.toString();
+  return v.toFixed(1);
+}
+
+/* Y-axis tick values */
+const yTicks: number[] = [];
+const yStep = yRange / 5;
+for (let i = 0; i <= 5; i++) {
+  yTicks.push(yMin + yStep * i);
+}
+
+/* X-axis tick values */
+const xTicks = type === 'bar'
+  ? valid.map((_, i) => PAD.left + (i + 0.5) * (PW / valid.length))
+  : valid.map((d) => d.x);
+
+/* Line chart path */
+let linePath = '';
+let areaPath = '';
+if (type === 'line' && valid.length > 1) {
+  linePath = valid.map((d, i) => `${i === 0 ? 'M' : 'L'}${toX(d.x).toFixed(2)},${toY(d.y).toFixed(2)}`).join(' ');
+  areaPath = linePath
+    + ` L${toX(valid[valid.length - 1].x).toFixed(2)},${toY(yMin).toFixed(2)}`
+    + ` L${toX(valid[0].x).toFixed(2)},${toY(yMin).toFixed(2)}Z`;
+}
+
+/* Bar dimensions */
+const barSlot = PW / (valid.length || 1);
+const barW = barSlot * 0.6;
+const barGap = barSlot - barW;
+---
+
+<figure class={`mt-6 mb-8 ${className}`} role="figure" aria-label={`${title}: ${description || `${yLabel} versus ${xLabel}`}`}>
+  <div class="bg-surface-soft border border-hairline p-4 overflow-hidden">
+    <svg
+      viewBox={`0 0 ${W} ${H}`}
+      class="w-full block"
+      preserveAspectRatio="xMidYMid meet"
+      role="img"
+      aria-label={`${title} chart`}
+    >
+      <!-- Grid lines -->
+      {yTicks.map((yv) => (
+        <line
+          x1={PAD.left}
+          y1={toY(yv)}
+          x2={W - PAD.right}
+          y2={toY(yv)}
+          stroke="var(--color-hairline, #3c3c3c)"
+          stroke-width="0.5"
+          stroke-dasharray="3,3"
+        />
+      ))}
+
+      <!-- Axes -->
+      <line
+        x1={PAD.left}
+        y1={H - PAD.bottom}
+        x2={W - PAD.right}
+        y2={H - PAD.bottom}
+        stroke="var(--color-hairline, #3c3c3c)"
+        stroke-width="1"
+      />
+      <line
+        x1={PAD.left}
+        y1={PAD.top}
+        x2={PAD.left}
+        y2={H - PAD.bottom}
+        stroke="var(--color-hairline, #3c3c3c)"
+        stroke-width="1"
+      />
+
+      <!-- Y-axis tick labels -->
+      {yTicks.map((yv) => (
+        <text
+          x={PAD.left - 6}
+          y={toY(yv) + 3}
+          fill="var(--color-muted, #7e7e7e)"
+          font-size="9"
+          text-anchor="end"
+          font-family="Inter, sans-serif"
+        >{fmt(yv)}</text>
+      ))}
+
+      <!-- LINE CHART -->
+      {type === 'line' && valid.length > 1 && (
+        <Fragment>
+          <path d={areaPath} fill="var(--color-m-blue-light, #0066b1)" fill-opacity="0.1" />
+          <path d={linePath} fill="none" stroke="var(--color-m-blue-light, #0066b1)" stroke-width="1.5" stroke-linejoin="round" />
+          {valid.map((d) => (
+            <circle
+              cx={toX(d.x)}
+              cy={toY(d.y)}
+              r="2.5"
+              fill="var(--color-m-blue-light, #0066b1)"
+              stroke="var(--color-surface-soft, #0d0d0d)"
+              stroke-width="1"
+            />
+          ))}
+          {/* X-axis labels for line chart */}
+          {valid.map((d) => (
+            <text
+              x={toX(d.x)}
+              y={H - PAD.bottom + 14}
+              fill="var(--color-muted, #7e7e7e)"
+              font-size="9"
+              text-anchor="middle"
+              font-family="Inter, sans-serif"
+            >{d.label ?? fmt(d.x)}</text>
+          ))}
+        </Fragment>
+      )}
+
+      {/* X-axis vertical grid for line chart */}
+      {type === 'line' && valid.map((d) => (
+        <line
+          x1={toX(d.x)}
+          y1={PAD.top}
+          x2={toX(d.x)}
+          y2={H - PAD.bottom}
+          stroke="var(--color-hairline, #3c3c3c)"
+          stroke-width="0.5"
+          stroke-dasharray="2,4"
+          stroke-opacity="0.4"
+        />
+      ))}
+
+      <!-- BAR CHART -->
+      {type === 'bar' && valid.map((d, i) => {
+        const barH = ((d.y - yMin) / yRange) * PH;
+        const x = PAD.left + i * barSlot + barGap / 2;
+        const y = PAD.top + PH - barH;
+        return (
+          <Fragment>
+            <rect
+              x={x}
+              y={Math.max(PAD.top, y)}
+              width={barW}
+              height={Math.max(0, barH)}
+              fill="var(--color-m-blue-light, #0066b1)"
+              fill-opacity="0.7"
+              stroke="var(--color-m-blue-light, #0066b1)"
+              stroke-width="0.5"
+            />
+            <text
+              x={x + barW / 2}
+              y={Math.max(PAD.top + 10, y - 4)}
+              fill="var(--color-primary, #ffffff)"
+              font-size="9"
+              text-anchor="middle"
+              font-family="Inter, sans-serif"
+              font-weight="bold"
+            >{fmt(d.y)}</text>
+            <text
+              x={x + barW / 2}
+              y={H - PAD.bottom + 14}
+              fill="var(--color-muted, #7e7e7e)"
+              font-size="9"
+              text-anchor="middle"
+              font-family="Inter, sans-serif"
+            >{d.label ?? fmt(d.x)}</text>
+          </Fragment>
+        );
+      })}
+
+      <!-- X-axis label -->
+      <text
+        x={PAD.left + PW / 2}
+        y={H - 4}
+        fill="var(--color-muted, #7e7e7e)"
+        font-size="8"
+        text-anchor="middle"
+        font-family="Inter, sans-serif"
+        letter-spacing="0.5"
+      >{xLabel.toUpperCase()}</text>
+
+      <!-- Y-axis label -->
+      <text
+        x={6}
+        y={PAD.top + PH / 2}
+        fill="var(--color-muted, #7e7e7e)"
+        font-size="8"
+        text-anchor="middle"
+        font-family="Inter, sans-serif"
+        letter-spacing="0.5"
+        transform={`rotate(-90, 6, ${PAD.top + PH / 2})`}
+      >{yLabel.toUpperCase()}</text>
+    </svg>
+  </div>
+
+  <figcaption class="mt-2">
+    <span class="text-label-uppercase text-primary text-[10px] block mb-0.5">{title}</span>
+    {description && (
+      <p class="text-caption text-muted">{description}</p>
+    )}
+    {caption && (
+      <p class="text-caption text-muted mt-1 italic">{caption}</p>
+    )}
+  </figcaption>
+</figure>

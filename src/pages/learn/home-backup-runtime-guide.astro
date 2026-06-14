@@ -1,0 +1,286 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import CalculatorCard from '../../components/CalculatorCard.astro';
+import FormulaBox from '../../components/FormulaBox.astro';
+import FAQSection from '../../components/FAQSection.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "How long will a 10kWh battery power my house?",
+    answer: "A 10 kWh LFP battery at 85% DoD with 92% inverter efficiency provides approximately 7.8 kWh usable. At a 1,500W critical load, it runs for about 5.2 hours. At a 500W load, it lasts roughly 15.6 hours. The runtime scales linearly with load — halving the load doubles the runtime.",
+  },
+  {
+    question: "Does battery size directly determine backup runtime?",
+    answer: "Battery size sets the upper limit, but runtime is determined by the ratio of usable energy to load. A 20 kWh battery powering a 2 kW load lasts about 7.8 hours. The same battery powering a 500W load lasts roughly 31 hours. Reducing load is often more cost-effective than adding battery capacity.",
+  },
+  {
+    question: "How do temperature and age affect battery runtime?",
+    answer: "Cold temperatures reduce usable capacity — LFP batteries lose 10–20% capacity below 0°C (32°F). Battery capacity also degrades over time: LFP batteries retain approximately 80% capacity after 3,000 cycles (roughly 8–10 years of daily cycling). A 10-year-old battery delivers roughly 80% of its original runtime.",
+  },
+  {
+    question: "Can I extend battery runtime without adding more batteries?",
+    answer: "Yes. Reduce the load by turning off non-essential devices, use higher-efficiency appliances, and ensure the inverter is properly sized for the load (inverters are more efficient at 40–80% capacity than at very light loads). Smart load management and scheduling high-draw activities during daylight hours (if solar-charged) also extends effective runtime.",
+  },
+];
+---
+
+<Layout
+  title="Home Backup Runtime Guide | Battery Calculators"
+  description="Detailed guide to home battery backup runtime: how long 5kWh, 10kWh, 15kWh, and 20kWh batteries last at different load levels, with runtime tables, formulas, and optimization strategies."
+  canonical="https://batterycalculators.com/learn/home-backup-runtime-guide"
+  schema="faqPage"
+  schemaName="Home Backup Runtime Guide"
+  schemaDescription="Detailed guide to home battery backup runtime at different load levels."
+  schemaUrl="https://batterycalculators.com/learn/home-backup-runtime-guide"
+  faqItems={faqItems}
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/learn" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Back to Guides</a>
+      <Breadcrumb items={[
+        { label: "Learning Center", href: "/learn" },
+        { label: "Home Backup Runtime Guide" },
+      ]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">HOME BACKUP</span>
+      <h1 class="text-display-md text-primary mb-6">Home Backup Runtime Guide</h1>
+      <p class="text-body-md text-body font-light">
+        Runtime is the most practical metric for home battery backup — it answers the question everyone asks: how long will this keep my lights on? This guide provides runtime tables for common battery sizes, explains the physics behind the numbers, and shows how load management can dramatically extend your backup duration without adding hardware.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">How Runtime Is Calculated</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Battery runtime is the ratio of usable energy to load power. Usable energy equals total battery capacity multiplied by depth of discharge (DoD) and inverter efficiency. Load power is the total wattage of all devices running simultaneously. Dividing usable energy by load gives runtime in hours.
+        </p>
+        <p class="text-body-md text-body font-light mb-6">
+          The calculation assumes a constant load. In practice, loads fluctuate — the refrigerator cycles on and off, lights are turned on and off, and devices are added or removed throughout the day. For a more accurate estimate, calculate runtime for average load over the full backup period rather than peak load at a single moment.
+        </p>
+        <FormulaBox title="Runtime Formula">
+          <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+            Runtime (hours) = (Battery Capacity (Wh) × DoD × Inverter Efficiency) / Load Power (W)
+          </div>
+          <p>
+            For a 10 kWh (10,000 Wh) LFP battery at 85% DoD with a 92% efficient inverter, the usable energy is 10,000 × 0.85 × 0.92 = 7,820 Wh. At a 1,000W load, runtime is 7.82 hours. At 2,000W, it drops to 3.91 hours.
+          </p>
+        </FormulaBox>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Runtime by Battery Size and Load</h2>
+        <p class="text-body-md text-body font-light mb-6">
+          The table below shows estimated runtime for four common battery sizes across five load levels. All values assume LFP chemistry (85% DoD) with a 92% efficient inverter. Use this as a quick reference when selecting a battery size for your backup needs.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Battery Size</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">500W</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">1,000W</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">2,000W</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">3,000W</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">5,000W</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">5 kWh</td>
+                <td class="p-4 font-mono text-primary">7.8 hrs</td>
+                <td class="p-4 font-mono text-primary">3.9 hrs</td>
+                <td class="p-4 font-mono text-primary">2.0 hrs</td>
+                <td class="p-4 font-mono text-primary">1.3 hrs</td>
+                <td class="p-4 font-mono text-primary">0.8 hrs</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">10 kWh</td>
+                <td class="p-4 font-mono text-primary">15.6 hrs</td>
+                <td class="p-4 font-mono text-primary">7.8 hrs</td>
+                <td class="p-4 font-mono text-primary">3.9 hrs</td>
+                <td class="p-4 font-mono text-primary">2.6 hrs</td>
+                <td class="p-4 font-mono text-primary">1.6 hrs</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">15 kWh</td>
+                <td class="p-4 font-mono text-primary">23.5 hrs</td>
+                <td class="p-4 font-mono text-primary">11.7 hrs</td>
+                <td class="p-4 font-mono text-primary">5.9 hrs</td>
+                <td class="p-4 font-mono text-primary">3.9 hrs</td>
+                <td class="p-4 font-mono text-primary">2.3 hrs</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">20 kWh</td>
+                <td class="p-4 font-mono text-primary">31.3 hrs</td>
+                <td class="p-4 font-mono text-primary">15.6 hrs</td>
+                <td class="p-4 font-mono text-primary">7.8 hrs</td>
+                <td class="p-4 font-mono text-primary">5.2 hrs</td>
+                <td class="p-4 font-mono text-primary">3.1 hrs</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-body-sm text-muted mt-4">
+          These values represent a static load scenario. Real-world runtime will be slightly higher for loads that cycle off periodically (like refrigerators) and slightly lower for loads with high inrush currents (like motor-driven appliances).
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Typical Home Load Profiles</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Understanding your actual load profile is essential for predicting runtime. A home's power draw is not constant — it peaks during morning and evening hours when multiple appliances run simultaneously and drops to a baseline overnight. The following table shows typical load levels for a household with critical loads only during different periods of the day.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Time Period</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Active Load</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Duration</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Energy (Wh)</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-primary font-bold">Morning (6am – 9am)</td>
+                <td class="p-4 font-mono text-primary">1,500 – 2,500W</td>
+                <td class="p-4 font-mono text-primary">3 hours</td>
+                <td class="p-4 font-mono text-primary">4,500 – 7,500</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-primary font-bold">Daytime (9am – 5pm)</td>
+                <td class="p-4 font-mono text-primary">500 – 1,000W</td>
+                <td class="p-4 font-mono text-primary">8 hours</td>
+                <td class="p-4 font-mono text-primary">4,000 – 8,000</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-primary font-bold">Evening (5pm – 10pm)</td>
+                <td class="p-4 font-mono text-primary">2,000 – 3,500W</td>
+                <td class="p-4 font-mono text-primary">5 hours</td>
+                <td class="p-4 font-mono text-primary">10,000 – 17,500</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-primary font-bold">Overnight (10pm – 6am)</td>
+                <td class="p-4 font-mono text-primary">200 – 500W</td>
+                <td class="p-4 font-mono text-primary">8 hours</td>
+                <td class="p-4 font-mono text-primary">1,600 – 4,000</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-body-sm text-muted mt-4">
+          The average daily consumption across all periods is the weighted mean of the energy column. A typical critical-only profile totals 20,000–37,000 Wh (20–37 kWh), though the peak-to-average ratio matters for inverter sizing even if average consumption determines battery capacity.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Worked Example: Runtime Estimation</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Scenario:</strong> 15 kWh LFP battery, typical critical-load household.</p>
+            <p><strong>Given:</strong></p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li>Battery: 15,000 Wh total</li>
+              <li>DoD: 85%</li>
+              <li>Inverter efficiency: 92%</li>
+              <li>Average critical load: 1,200W</li>
+            </ul>
+            <p><strong>Step 1:</strong> Calculate usable energy:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              15,000 × 0.85 × 0.92 = 11,730 Wh
+            </div>
+            <p><strong>Step 2:</strong> Calculate runtime at average load:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              11,730 Wh / 1,200W = 9.8 hours
+            </div>
+            <p><strong>Step 3:</strong> Apply load profile for more accuracy:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              Morning (3h @ 2,000W): 6,000 Wh<br/>
+              Daytime (8h @ 800W): 6,400 Wh<br/>
+              Evening (5h @ 2,500W): 12,500 Wh<br/>
+              Overnight (8h @ 300W): 2,400 Wh<br/>
+              Total: 27,300 Wh → exceeds 11,730 Wh
+            </div>
+            <p class="pt-2 border-t border-hairline"><strong>Conclusion:</strong> A 15 kWh battery cannot sustain 24 hours of full critical-load profile for this household. It covers approximately 10 hours of daytime and evening loads. To achieve 24-hour coverage, increase battery capacity to approximately 27 kWh or reduce evening loads.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Factors That Reduce Runtime</h2>
+        <p class="text-body-md text-body font-light mb-6">
+          Several real-world factors reduce runtime below the theoretical calculation. Understanding these factors prevents overestimating your backup duration and helps you design a more resilient system.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Temperature Derating</h4>
+            <p class="text-body-sm text-muted">
+              LFP batteries lose 10–20% of usable capacity below 0°C (32°F). If your battery is in an unheated garage or outdoor enclosure in winter, expect reduced runtime. Keep batteries above 10°C (50°F) for optimal performance.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Battery Age</h4>
+            <p class="text-body-sm text-muted">
+              LFP capacity degrades roughly 20% over 3,000 cycles. A 5-year-old battery used daily retains approximately 85–90% of original capacity. A 10-year-old battery may retain 75–80%. Factor this aging into your sizing if planning for long-term system life.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Inverter Light-Load Efficiency</h4>
+            <p class="text-body-sm text-muted">
+              Inverters are less efficient at very light loads (below 10% capacity). A 5 kW inverter running a 200W load may operate at only 80% efficiency instead of the rated 92%. This adds up over long overnight periods with low loads.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Inrush Currents</h4>
+            <p class="text-body-sm text-muted">
+              Motors in refrigerators, pumps, and compressors draw 3–6× their running wattage for 1–3 seconds during startup. These brief surges consume extra energy and must be within the inverter's surge rating, though their impact on total runtime is minimal.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Try It</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use the Home Backup Calculator to estimate runtime for your specific load profile and battery configuration.
+          </p>
+          <a href="/tools/home-backup-battery-calculator" class="btn-primary text-xs py-3 px-6 inline-block">Open Home Backup Calculator</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Related Tool</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Calculate the exact runtime of any battery configuration at a specific load with the Battery Runtime Calculator.
+          </p>
+          <a href="/tools/battery-runtime-calculator" class="btn-primary-outline text-xs py-3 px-6 inline-block">Open Runtime Calculator</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Related Articles</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <a href="/learn/how-many-kwh-do-i-need-for-my-house" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors mb-2 block">
+              How Many kWh Do I Need for My House?
+            </a>
+            <p class="text-body-sm text-muted">
+              Explains how to calculate your household's daily kWh consumption — the starting point for determining battery size and expected runtime.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <a href="/learn/whole-house-battery-backup" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors mb-2 block">
+              Whole-House Battery Backup
+            </a>
+            <p class="text-body-sm text-muted">
+              Covers sizing a battery system to back up an entire house, including the larger capacities needed for full-home runtime.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

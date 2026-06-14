@@ -1,0 +1,175 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Breadcrumb from '../components/Breadcrumb.astro';
+import CategoryToolGrid from '../components/CategoryToolGrid.astro';
+import FAQSection from '../components/FAQSection.astro';
+
+const tools = [
+  {
+    name: "C-Rate Calculator",
+    href: "/tools/c-rate-calculator",
+    description: "Calculate charge/discharge current, C-rate speed, and charging times based on capacity.",
+    available: true,
+  },
+  {
+    name: "SOC Estimator",
+    href: "/tools/soc-estimator",
+    description: "Interpolate State of Charge from Open Circuit Voltage (OCV) curves or simulate Coulomb Counting.",
+    available: true,
+  },
+  {
+    name: "Degradation Estimator",
+    href: "/tools/battery-degradation-estimator",
+    description: "Estimate calendar and cycle lifetime degradation (SOH) for LFP, NMC, LTO, and Lead-Acid chemistries.",
+    available: true,
+  },
+  {
+    name: "DC Voltage Drop Calculator",
+    href: "/tools/voltage-drop-calculator",
+    description: "Calculate voltage drop percentages across DC conductors based on gauge, run distance, and load current.",
+    available: true,
+  },
+  {
+    name: "DC Cable Loss Calculator",
+    href: "/tools/dc-cable-loss-calculator",
+    description: "Determine resistive power losses (I²R) and thermal dissipation in DC transmission lines.",
+    available: true,
+  },
+  {
+    name: "Battery Runtime Calculator",
+    href: "/tools/runtime-calculator",
+    description: "Estimate battery discharge runtime based on nominal capacity, load wattage, efficiency, and DoD limits.",
+    available: true,
+  },
+];
+
+const learnArticles = [
+  { title: "What Is Battery C-Rate?", href: "/learn/what-is-battery-c-rate" },
+  { title: "Understanding State of Charge (SOC)", href: "/learn/understanding-state-of-charge" },
+  { title: "Battery Degradation Explained", href: "/learn/battery-degradation-explained" },
+  { title: "Voltage Drop Explained", href: "/learn/voltage-drop-explained" },
+  { title: "How to Calculate Battery Runtime", href: "/learn/how-to-calculate-battery-runtime" },
+  { title: "How to Size a Battery Bank", href: "/learn/how-to-size-a-battery-bank" },
+  { title: "Battery Runtime Formula", href: "/learn/battery-runtime-formula" },
+  { title: "12V vs 24V vs 48V Runtime", href: "/learn/12v-vs-24v-vs-48v-runtime" },
+  { title: "LiFePO4 Voltage Chart", href: "/learn/lifepo4-voltage-chart" },
+  { title: "Battery C-Rate Reference", href: "/learn/battery-c-rate-reference" },
+  { title: "Battery Temperature Correction Chart", href: "/learn/battery-temperature-correction-chart" },
+];
+
+const faqItems = [
+  {
+    question: "What is C-rate and why does it matter?",
+    answer: "C-rate expresses the charge or discharge current relative to battery capacity. A 1C rate on a 100Ah battery means 100A current. Higher C-rates generate more heat, increase voltage drop, and reduce usable capacity. Understanding C-rate is essential for selecting the right battery for your application and ensuring safe operation within manufacturer limits.",
+  },
+  {
+    question: "How does temperature affect battery performance?",
+    answer: "Temperature has a significant impact on battery performance. Cold temperatures increase internal resistance, reducing available capacity and output voltage. At 0°C, lithium batteries may lose 10% capacity. At -20°C, losses can reach 30%. High temperatures accelerate calendar aging and can trigger thermal management systems. Most calculations assume 25°C standard ambient.",
+  },
+  {
+    question: "What is the difference between SOC and DoD?",
+    answer: "State of Charge (SOC) represents the percentage of capacity remaining in the battery (100% = fully charged, 0% = empty). Depth of Discharge (DoD) represents the percentage of capacity that has been used (0% = fully charged, 100% = empty). They are complements: SOC + DoD = 100%. Most battery specifications reference DoD limits for cycle life.",
+  },
+  {
+    question: "How do I calculate voltage drop in DC wiring?",
+    answer: "Voltage drop is calculated using V_drop = I × R × 2L, where I is current, R is resistance per unit length, and 2L accounts for the round-trip distance (positive and negative conductors). Use our DC Voltage Drop Calculator to determine if your wiring meets the commonly accepted 3% maximum drop for feeders and 1% for branch circuits.",
+  },
+  {
+    question: "Why do batteries degrade over time?",
+    answer: "Batteries degrade through two primary mechanisms: calendar aging (chemical degradation even when not in use) and cycle aging (degradation from charge-discharge cycles). Calendar aging is driven by temperature and state of charge. Cycle aging is driven by depth of discharge, C-rate, and temperature. Both mechanisms increase internal resistance and reduce capacity over time.",
+  },
+];
+
+const relatedCategories = [
+  { href: "/solar", title: "Solar", description: "Solar battery sizing and off-grid planning" },
+  { href: "/ev", title: "EV & Battery Packs", description: "Pack design and cell configuration" },
+  { href: "/bess", title: "BESS & Commercial", description: "Commercial battery storage ROI analysis" },
+];
+
+const breadcrumbItems = [
+  { label: "Engineering Tools" },
+];
+---
+
+<Layout
+  title="Engineering Battery Calculators | Battery Calculators"
+  description="Professional battery engineering calculators for C-rate analysis, SOC estimation, SOH degradation, voltage drop, and cable loss calculations."
+  schema="website"
+  schemaName="Engineering Battery Calculators"
+  schemaDescription="Professional electrical engineering tools for battery system design, analysis, and diagnostics."
+  breadcrumbs={[{ label: 'Engineering Tools' }]}
+>
+  <Breadcrumb items={breadcrumbItems} />
+
+  <section class="mb-12 md:mb-16 border-b border-hairline pb-12">
+    <div class="max-w-4xl">
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">ENGINEERING TOOLS</span>
+      <h1 class="text-display-md text-primary mb-6">Engineering Battery Calculators</h1>
+      <p class="text-body-md text-body max-w-2xl font-light">
+        Professional-grade battery engineering calculators for system design, analysis, and diagnostics. Transparent formulas based on standard electrical engineering principles.
+      </p>
+    </div>
+  </section>
+
+  <section class="mb-16">
+    <div class="max-w-4xl text-body-md text-body font-light flex flex-col gap-6">
+      <p>
+        Battery engineering extends far beyond simple capacity calculations. Professional battery system design requires understanding electrochemical behavior, thermal management, electrical distribution losses, and long-term degradation patterns. The engineering calculators on this page address the technical analysis that underpins reliable battery system design.
+      </p>
+      <p>
+        C-rate analysis is fundamental to every battery application. The C-rate determines how quickly a battery can charge or discharge relative to its capacity. A battery rated at 1C can theoretically charge or discharge its full capacity in one hour. Higher C-rates deliver more power but generate more heat, increase internal losses, and accelerate degradation. Our C-rate calculator helps you determine the optimal charge and discharge rates for your specific battery chemistry and application.
+      </p>
+      <p>
+        State of Charge (SOC) estimation is critical for battery management. Accurate SOC data prevents deep discharge events that damage cells and ensures you have sufficient reserve for your intended application. Our SOC estimator supports both Open Circuit Voltage (OCV) interpolation and Coulomb Counting simulation, providing two independent methods for verifying battery charge levels.
+      </p>
+      <p>
+        DC distribution losses are often overlooked in battery system design. Cable resistance causes voltage drop and power loss that reduces system efficiency. For a system carrying 100A over a 10-meter run using 2 AWG cable, the voltage drop is approximately 0.46V on a 48V system (nearly 1%), and the power loss is 46W continuous. Over a year, this represents 403 kWh of wasted energy. Our voltage drop and cable loss calculators help you size conductors to minimize these losses.
+      </p>
+      <p>
+        Battery degradation analysis enables accurate lifetime cost projections. Understanding how capacity fades over time and cycles allows you to size battery systems with appropriate margin, plan replacement schedules, and calculate true levelized cost of storage. Our degradation estimator models both calendar and cycle aging for LFP, NMC, LTO, and lead-acid chemistries.
+      </p>
+    </div>
+  </section>
+
+  <section class="mb-16">
+    <h2 class="text-title-lg text-primary mb-6">All Engineering Calculators</h2>
+    <CategoryToolGrid tools={tools} />
+  </section>
+
+  {learnArticles.length > 0 && (
+    <section class="mb-16 border-t border-hairline pt-12">
+      <h2 class="text-title-lg text-primary mb-6">Engineering Guides</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {learnArticles.map((article) => (
+          <a href={article.href} class="bg-surface-card border border-hairline p-4 hover:border-primary transition-colors">
+            <span class="text-label-uppercase text-muted text-[10px] block mb-2">LEARNING CENTER</span>
+            <h3 class="text-title-sm text-primary">{article.title}</h3>
+          </a>
+        ))}
+      </div>
+    </section>
+  )}
+
+  <FAQSection items={faqItems} />
+
+  {relatedCategories.length > 0 && (
+    <section class="mb-16 border-t border-hairline pt-12">
+      <h2 class="text-title-lg text-primary mb-6">Related Categories</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {relatedCategories.map((cat) => (
+          <a href={cat.href} class="bg-surface-card border border-hairline p-6 hover:border-primary transition-colors block">
+            <h3 class="text-title-md text-primary mb-2">{cat.title}</h3>
+            <p class="text-body-sm text-muted">{cat.description}</p>
+          </a>
+        ))}
+      </div>
+    </section>
+  )}
+
+  <section class="bg-surface-soft border border-hairline p-6 text-caption text-muted mb-8">
+    <span class="text-primary font-bold text-[10px] tracking-wider uppercase border border-hairline px-1.5 py-0.5 mr-2 inline-block mb-3">
+      Engineering Disclaimer
+    </span>
+    All calculations use standard engineering formulas and are provided for educational reference. Results must be verified by qualified engineers for production battery systems.
+  </section>
+</Layout>

@@ -1,0 +1,275 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import CalculatorCard from '../../components/CalculatorCard.astro';
+import FAQSection from '../../components/FAQSection.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "How do I read the battery sizing chart?",
+    answer: "Find your application or load profile in the left column. The corresponding row shows the recommended Ah rating range at your system voltage. For example, if you are powering a small cabin with lights, a fridge, and a laptop, the chart might suggest 200–400 Ah at 12V or 100–200 Ah at 24V.",
+  },
+  {
+    question: "What Ah rating do I need for home backup?",
+    answer: "For a typical home with essential loads (refrigerator, lights, router, medical devices) at 2–5 kWh/day, a 48V 200–400 Ah LFP bank (10–20 kWh) provides 1–2 days of autonomy. Larger homes with 10+ kWh/day consumption may need 400–800 Ah at 48V.",
+  },
+  {
+    question: "Can I use the chart for any battery chemistry?",
+    answer: "The chart shows capacity ranges based on energy requirements, not chemistry. However, usable capacity varies by chemistry. A 200 Ah lead-acid bank at 50% DoD provides only 100 Ah usable, while the same LFP bank at 80% DoD provides 160 Ah usable. The chart accounts for typical DoD limits per chemistry.",
+  },
+  {
+    question: "What if my application falls between two chart entries?",
+    answer: "Round up to the larger size. It is always better to have 20% excess capacity than to fall short. The cost of undersizing — system shutdown, load shedding, or premature battery replacement — far outweighs the marginal cost of additional capacity.",
+  },
+];
+---
+
+<Layout
+  title="Battery Sizing Chart Guide | Battery Calculators"
+  description="Visual chart and table showing battery sizes for common load profiles. Find the right Ah rating for your application from small portable to large residential systems."
+  canonical="https://batterycalculators.com/learn/battery-sizing-chart-guide"
+  schema="faqPage"
+  schemaName="Battery Sizing Chart Guide"
+  schemaDescription="Reference chart mapping load profiles and applications to recommended battery capacity ranges."
+  schemaUrl="https://batterycalculators.com/learn/battery-sizing-chart-guide"
+  faqItems={faqItems}
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/learn" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Back to Guides</a>
+      <Breadcrumb items={[
+        { label: "Learning Center", href: "/learn" },
+        { label: "Battery Sizing Chart Guide" }
+      ]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">REFERENCE</span>
+      <h1 class="text-display-md text-primary mb-6">Battery Sizing Chart Guide</h1>
+      <p class="text-body-md text-body font-light">
+        Choosing the right battery size starts with understanding your load profile. This reference chart maps common applications and energy consumption ranges to recommended battery capacities, helping you quickly identify where your system falls without running a full calculation.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">How to Use This Chart</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Identify your application type in the chart below. The daily load column gives you a rough energy consumption range for that application. The recommended battery capacity columns show what you need at 12V, 24V, and 48V system voltages. These are starting-point estimates — use the Battery Sizing Calculator for precise sizing with your actual numbers.
+        </p>
+        <p class="text-body-md text-body font-light">
+          All capacity values assume 80% DoD for LFP lithium and 50% DoD for lead-acid. The usable capacity is what matters — the installed capacity must be larger to respect these discharge limits.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Master Sizing Chart</h2>
+        <div class="bg-surface-soft border border-hairline overflow-hidden overflow-x-auto">
+          <table class="w-full text-left text-body-sm min-w-[640px]">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Application</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Daily Load</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">12V Ah</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">24V Ah</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">48V Ah</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">Phone / tablet charging only</td>
+                <td class="p-4 font-mono text-primary">30–60 Wh</td>
+                <td class="p-4 font-mono text-primary">5–10</td>
+                <td class="p-4 font-mono text-primary">—</td>
+                <td class="p-4 font-mono text-primary">—</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Laptop + lights + router</td>
+                <td class="p-4 font-mono text-primary">200–500 Wh</td>
+                <td class="p-4 font-mono text-primary">50–100</td>
+                <td class="p-4 font-mono text-primary">25–50</td>
+                <td class="p-4 font-mono text-primary">—</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Small cabin (lights, fridge, fan)</td>
+                <td class="p-4 font-mono text-primary">1–3 kWh</td>
+                <td class="p-4 font-mono text-primary">200–500</td>
+                <td class="p-4 font-mono text-primary">100–250</td>
+                <td class="p-4 font-mono text-primary">50–125</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">RV / camper (12V appliances)</td>
+                <td class="p-4 font-mono text-primary">1–4 kWh</td>
+                <td class="p-4 font-mono text-primary">200–600</td>
+                <td class="p-4 font-mono text-primary">100–300</td>
+                <td class="p-4 font-mono text-primary">—</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Essential home loads (overnight)</td>
+                <td class="p-4 font-mono text-primary">3–8 kWh</td>
+                <td class="p-4 font-mono text-primary">600–1,500</td>
+                <td class="p-4 font-mono text-primary">300–750</td>
+                <td class="p-4 font-mono text-primary">150–375</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Full home (moderate usage)</td>
+                <td class="p-4 font-mono text-primary">8–20 kWh</td>
+                <td class="p-4 font-mono text-primary">Not practical</td>
+                <td class="p-4 font-mono text-primary">1,000–2,500</td>
+                <td class="p-4 font-mono text-primary">400–1,000</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Large home / EV charging</td>
+                <td class="p-4 font-mono text-primary">20–60 kWh</td>
+                <td class="p-4 font-mono text-primary">Not practical</td>
+                <td class="p-4 font-mono text-primary">Not practical</td>
+                <td class="p-4 font-mono text-primary">1,000–3,000</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Small business / office</td>
+                <td class="p-4 font-mono text-primary">15–50 kWh</td>
+                <td class="p-4 font-mono text-primary">Not practical</td>
+                <td class="p-4 font-mono text-primary">2,000–5,000</td>
+                <td class="p-4 font-mono text-primary">800–2,500</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Telecom / cell tower</td>
+                <td class="p-4 font-mono text-primary">5–30 kWh</td>
+                <td class="p-4 font-mono text-primary">Not practical</td>
+                <td class="p-4 font-mono text-primary">1,000–3,000</td>
+                <td class="p-4 font-mono text-primary">500–1,500</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-body-sm text-muted mt-2">Values are approximate ranges for 1–2 days of autonomy at typical DoD limits. Use the Battery Sizing Calculator for precise values with your specific parameters.</p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Load Profile Categories</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Load profiles group common usage patterns into three broad categories. Understanding which category your application falls into helps narrow down the capacity range before you run exact numbers.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Light Load (300–2,000 Wh/day)</h4>
+            <p class="text-body-sm text-muted">
+              Phone charging, LED lighting, laptop, small fan, Wi-Fi router. Typical for tents, basic cabins, and emergency lighting. A single 12V 100Ah battery covers most light-load scenarios.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Medium Load (2–10 kWh/day)</h4>
+            <p class="text-body-sm text-muted">
+              Refrigerator, well pump, washer, TV, lights, small appliances. Typical for off-grid cabins, RVs, and essential home backup. A 24V 200Ah or 48V 100Ah bank is the starting point.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Heavy Load (10–60 kWh/day)</h4>
+            <p class="text-body-sm text-muted">
+              Full home with HVAC, electric range, dryer, EV charging. Typical for whole-home backup and commercial installations. Requires 48V systems with 400+ Ah capacity.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Voltage Selection Guide</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          System voltage affects cable size, inverter availability, and practical Ah requirements. Higher voltages reduce current for the same power, allowing thinner cables and lower conduction losses.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Voltage</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Max Practical Power</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Best For</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Cable Gauge</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">12V</td>
+                <td class="p-4 font-mono text-primary">~1.5 kW</td>
+                <td class="p-4 text-muted">Portable, RV, marine, small systems</td>
+                <td class="p-4 text-muted">4–6 AWG for short runs</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">24V</td>
+                <td class="p-4 font-mono text-primary">~5 kW</td>
+                <td class="p-4 text-muted">Medium off-grid, small homes</td>
+                <td class="p-4 text-muted">6–8 AWG for typical runs</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">48V</td>
+                <td class="p-4 font-mono text-primary">~15 kW</td>
+                <td class="p-4 text-muted">Homes, commercial, telecom</td>
+                <td class="p-4 text-muted">8–10 AWG for typical runs</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">400V</td>
+                <td class="p-4 font-mono text-primary">100+ kW</td>
+                <td class="p-4 text-muted">Utility-scale BESS</td>
+                <td class="p-4 text-muted">High-voltage industrial cable</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Worked Example: Choosing from the Chart</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Scenario:</strong> A small off-grid cabin with the following loads:</p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li>LED lighting: 40W × 5h = 200 Wh</li>
+              <li>Mini fridge: 80W × 12h (50% duty) = 480 Wh</li>
+              <li>Laptop: 65W × 3h = 195 Wh</li>
+              <li>Wi-Fi router: 10W × 24h = 240 Wh</li>
+              <li>Phone charging: 15W × 2h = 30 Wh</li>
+            </ul>
+            <p><strong>Total daily load:</strong></p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              200 + 480 + 195 + 240 + 30 = 1,145 Wh (~1.1 kWh)
+            </div>
+            <p><strong>From the chart:</strong> This falls in the "Small cabin (lights, fridge, fan)" row at 1–3 kWh/day. The chart recommends 200–500 Ah at 12V, or 100–250 Ah at 24V.</p>
+            <p><strong>Selection:</strong> A 24V 150Ah LFP bank (3.6 kWh) provides about 3 days of autonomy at this load, with 80% DoD giving 2.88 kWh usable. This is a practical, cost-effective choice for a cabin with reliable solar charging.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Try It</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use the Battery Sizing Calculator for a precise recommendation based on your exact loads.
+          </p>
+          <a href="/tools/battery-sizing-calculator" class="btn-primary text-xs py-3 px-6 inline-block">Open Battery Sizing Calculator</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Home Backup</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Sizing for home backup? Use the Home Backup Calculator with critical load prioritization.
+          </p>
+          <a href="/tools/home-backup-battery-calculator" class="btn-primary-outline text-xs py-3 px-6 inline-block">Open Home Backup Calculator</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Related Articles</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">What Is Battery Sizing?</h4>
+            <p class="text-body-sm text-muted mb-3">Overview of the sizing process, why it matters, and key design considerations.</p>
+            <a href="/learn/what-is-battery-sizing" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Read Guide →</a>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Home Battery Sizing Guide</h4>
+            <p class="text-body-sm text-muted mb-3">Step-by-step guide to sizing a residential battery backup system for essential loads.</p>
+            <a href="/learn/home-battery-sizing-guide" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Read Guide →</a>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

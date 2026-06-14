@@ -1,0 +1,411 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import CalculatorCard from "../../components/CalculatorCard.astro";
+import FAQSection from "../../components/FAQSection.astro";
+import ReferenceChart from "../../components/ReferenceChart.astro";
+
+const faqItems = [
+  {
+    question: "What is depth of discharge (DoD)?",
+    answer:
+      "Depth of discharge is the percentage of total battery capacity that has been used. A 100Ah battery discharged to 50Ah is at 50% DoD. It is the inverse of state of charge: DoD = 100% − SOC. Battery manufacturers specify maximum DoD limits to protect cycle life.",
+  },
+  {
+    question: "How does DoD affect battery lifespan?",
+    answer:
+      "Deeper discharges accelerate degradation. A LiFePO4 battery rated for 5,000 cycles at 80% DoD may last 3,000 cycles at 100% DoD. Lead-acid batteries are even more sensitive — regularly discharging below 50% DoD can cut cycle life by 50% or more.",
+  },
+  {
+    question: "Can I discharge a LiFePO4 battery to 100% DoD?",
+    answer:
+      "Technically yes, LiFePO4 can handle 100% DoD without immediate damage. However, regularly discharging to 100% DoD reduces cycle life compared to limiting discharge to 80% DoD. Most system designers recommend an 80% DoD limit for optimal longevity.",
+  },
+  {
+    question: "What is usable capacity?",
+    answer:
+      "Usable capacity is the amount of energy you can actually draw from a battery given its DoD limit. A 100Ah battery with an 80% DoD limit provides 80Ah of usable capacity. Always size battery banks based on usable capacity, not nominal capacity.",
+  },
+];
+
+const tableOfContents = [
+  { id: "dod-by-chemistry", label: "DoD by Chemistry" },
+  { id: "usable-capacity", label: "Usable Capacity" },
+  { id: "dod-and-cycle-life", label: "DoD and Cycle Life" },
+  { id: "practical-guidelines", label: "Practical Guidelines" },
+  { id: "common-mistakes", label: "Common Mistakes" },
+];
+
+const relatedCalculators = [
+  {
+    title: "Battery Sizing Calculator",
+    href: "/tools/battery-sizing-calculator",
+  },
+  {
+    title: "Battery Degradation Estimator",
+    href: "/tools/battery-degradation-estimator",
+  },
+  { title: "Battery Runtime Calculator", href: "/tools/runtime-calculator" },
+];
+
+const references = [
+  {
+    title: "Battery University — Depth of Discharge",
+    url: "https://batteryuniversity.com/article/bu-501-discharge-characteristics",
+  },
+  {
+    title: "NREL — Battery Cycle Life vs DoD Analysis",
+    url: "https://www.nrel.gov/docs/fy24osti/87655.pdf",
+  },
+];
+---
+
+<Layout
+  title="Battery Depth of Discharge Chart — DoD by Chemistry | Battery Calculators"
+  description="Depth of discharge reference table for LiFePO4, NMC, lead-acid, AGM, and gel batteries. Usable capacity from 100Ah and cycle life implications."
+  faqItems={faqItems}
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a
+        href="/learn"
+        class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block"
+        >&larr; Back to Guides</a
+      >
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4"
+        >REFERENCE</span
+      >
+      <h1 class="text-display-md text-primary mb-6">
+        Battery Depth of Discharge Chart
+      </h1>
+      <p class="text-body-md text-body font-light">
+        How deep you can safely discharge each battery chemistry, how DoD
+        affects usable capacity, and practical guidelines for maximizing cycle
+        life.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section id="dod-by-chemistry">
+        <ReferenceChart
+          type="bar"
+          title="Recommended Usable Capacity by Chemistry"
+          description="Approximate usable capacity from a 100Ah battery. Always verify manufacturer specifications."
+          xLabel="Chemistry"
+          yLabel="Usable Capacity (Ah)"
+          data={[
+            { x: 1, y: 80, label: "LiFePO4 (80Ah)" },
+            { x: 2, y: 80, label: "NMC (80Ah)" },
+            { x: 3, y: 50, label: "AGM (50Ah)" },
+            { x: 4, y: 50, label: "Gel (50Ah)" },
+            { x: 5, y: 50, label: "Flooded Lead-Acid (50Ah)" },
+          ]}
+          yMin={0}
+          yMax={100}
+          caption="Approximate values only. Always verify manufacturer specifications."
+        />
+
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          DoD by Chemistry
+        </h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Different battery chemistries have different safe discharge limits.
+          Exceeding these limits causes accelerated degradation, capacity loss,
+          and in extreme cases, permanent damage. The table below shows typical
+          recommended DoD limits for common chemistries.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-body-sm min-w-[640px]">
+              <thead>
+                <tr class="border-b border-hairline bg-surface-card">
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >Chemistry</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >Typical Max DoD</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >Usable from 100Ah</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >Notes</th
+                  >
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-hairline">
+                <tr>
+                  <td class="p-4 font-mono text-primary">LiFePO4 (LFP)</td>
+                  <td class="p-4 text-muted">80–100%</td>
+                  <td class="p-4 text-muted">80–100 Ah</td>
+                  <td class="p-4 text-muted"
+                    >Can handle 100% DoD; 80% recommended for optimal cycle life</td
+                  >
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">NMC (Lithium)</td>
+                  <td class="p-4 text-muted">80–90%</td>
+                  <td class="p-4 text-muted">80–90 Ah</td>
+                  <td class="p-4 text-muted"
+                    >Slightly more sensitive than LFP to deep discharges</td
+                  >
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">Lead-Acid (Flooded)</td
+                  >
+                  <td class="p-4 text-muted">50%</td>
+                  <td class="p-4 text-muted">50 Ah</td>
+                  <td class="p-4 text-muted"
+                    >Deep discharges cause sulfation and rapid capacity loss</td
+                  >
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">AGM (Sealed)</td>
+                  <td class="p-4 text-muted">50–60%</td>
+                  <td class="p-4 text-muted">50–60 Ah</td>
+                  <td class="p-4 text-muted"
+                    >Slightly better than flooded; still limited by chemistry</td
+                  >
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">Gel (Sealed)</td>
+                  <td class="p-4 text-muted">50%</td>
+                  <td class="p-4 text-muted">50 Ah</td>
+                  <td class="p-4 text-muted"
+                    >Similar to flooded; deep discharge damages gel electrolyte</td
+                  >
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <p class="text-caption text-muted mt-3">
+          Values are typical recommendations. Always check manufacturer
+          specifications for your specific battery model.
+        </p>
+      </section>
+
+      <section id="usable-capacity">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          Usable Capacity
+        </h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Usable capacity is the amount of energy you can actually draw from a
+          battery. A 100Ah battery at 50% DoD only provides 50Ah of usable
+          energy. This is why battery bank sizing must account for DoD limits —
+          a nominal 200Ah lead-acid bank provides only 100Ah of usable capacity
+          at 50% DoD.
+        </p>
+        <p class="text-body-md text-body font-light mb-4">
+          Lithium batteries (LiFePO4 and NMC) offer significantly more usable
+          capacity from the same nominal rating. A 100Ah LiFePO4 battery at 80%
+          DoD provides 80Ah — 60% more usable energy than a lead-acid battery of
+          the same rating. This is one of the primary reasons lithium batteries
+          have lower effective cost per usable Wh over their lifetime.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-body-sm min-w-[480px]">
+              <thead>
+                <tr class="border-b border-hairline bg-surface-card">
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >Nominal Capacity</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >LiFePO4 (80% DoD)</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >Lead-Acid (50% DoD)</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >Difference</th
+                  >
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-hairline">
+                <tr>
+                  <td class="p-4 font-mono text-primary">50 Ah</td>
+                  <td class="p-4 text-muted">40 Ah</td>
+                  <td class="p-4 text-muted">25 Ah</td>
+                  <td class="p-4 text-muted">+60%</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">100 Ah</td>
+                  <td class="p-4 text-muted">80 Ah</td>
+                  <td class="p-4 text-muted">50 Ah</td>
+                  <td class="p-4 text-muted">+60%</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">200 Ah</td>
+                  <td class="p-4 text-muted">160 Ah</td>
+                  <td class="p-4 text-muted">100 Ah</td>
+                  <td class="p-4 text-muted">+60%</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">300 Ah</td>
+                  <td class="p-4 text-muted">240 Ah</td>
+                  <td class="p-4 text-muted">150 Ah</td>
+                  <td class="p-4 text-muted">+60%</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section id="dod-and-cycle-life">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          DoD and Cycle Life
+        </h2>
+        <p class="text-body-md text-body font-light mb-4">
+          The relationship between DoD and cycle life is nonlinear. Deeper
+          discharges cause disproportionately more damage. A battery that lasts
+          5,000 cycles at 20% DoD might only last 1,500 cycles at 80% DoD and
+          500 cycles at 100% DoD. This trade-off is a key factor in battery
+          system design.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">LiFePO4 Cycle Life</h4>
+            <p class="text-body-sm text-muted">
+              At 80% DoD: ~3,000–5,000 cycles<br />
+              At 50% DoD: ~5,000–7,000 cycles<br />
+              At 20% DoD: ~7,000–10,000+ cycles<br />
+              Calendar life: 10–15 years typical
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Lead-Acid Cycle Life</h4>
+            <p class="text-body-sm text-muted">
+              At 50% DoD: ~300–500 cycles<br />
+              At 30% DoD: ~600–1,000 cycles<br />
+              At 20% DoD: ~1,000–1,500 cycles<br />
+              Calendar life: 3–5 years typical
+            </p>
+          </CalculatorCard>
+        </div>
+        <p class="text-body-md text-body font-light mt-4">
+          The optimal DoD depends on your application. For daily-cycled solar
+          storage, a shallower DoD (50–80% for LiFePO4) extends battery life.
+          For emergency backup that rarely cycles, a deeper DoD may be
+          acceptable since cycle count is low.
+        </p>
+      </section>
+
+      <section id="practical-guidelines">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          Practical Guidelines
+        </h2>
+        <p class="text-body-md text-body font-light mb-4">
+          When sizing a battery bank, always calculate based on usable capacity
+          (nominal capacity × DoD limit), not nominal capacity alone. A system
+          requiring 100Ah of usable energy needs a 200Ah lead-acid bank or a
+          125Ah LiFePO4 bank.
+        </p>
+        <p class="text-body-md text-body font-light mb-4">
+          Include a safety margin of 10–20% on top of the DoD-limited usable
+          capacity to account for capacity degradation over the battery's life,
+          temperature effects, and load estimation errors.
+        </p>
+        <p class="text-body-md text-body font-light">
+          For systems with a BMS, set the low-voltage cutoff to match the
+          manufacturer's recommended DoD limit. The BMS will disconnect the load
+          before the battery reaches an unsafe discharge depth.
+        </p>
+      </section>
+
+      <section id="common-mistakes">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          Common Mistakes
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">
+              Sizing from Nominal Capacity
+            </h4>
+            <p class="text-body-sm text-muted">
+              Using nominal capacity without accounting for DoD limits leads to
+              undersized battery banks. A 200Ah lead-acid bank at 50% DoD only
+              provides 100Ah usable. Size from usable capacity, not nominal.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">
+              Applying Lithium Rules to Lead-Acid
+            </h4>
+            <p class="text-body-sm text-muted">
+              Lead-acid batteries cannot tolerate the same DoD as lithium. A 50%
+              DoD that is fine for LiFePO4 will cause rapid sulfation and
+              capacity loss in lead-acid. Use the correct DoD limit for your
+              chemistry.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">
+              Ignoring Degradation Over Time
+            </h4>
+            <p class="text-body-sm text-muted">
+              Batteries lose capacity as they age. A 100Ah battery at 80% DoD
+              provides 80Ah when new, but only 60–70Ah after several years. Plan
+              for end-of-life capacity, not just Day 1 capacity.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">No Safety Margin</h4>
+            <p class="text-body-sm text-muted">
+              Designing right to the edge of usable capacity leaves no buffer
+              for load estimation errors, temperature effects, or capacity
+              degradation. Add 10–20% safety margin to all sizing calculations.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <CalculatorCard class="border-m-blue-light">
+        <h4 class="text-label-uppercase text-primary text-xs mb-3">Try It</h4>
+        <p class="text-body-sm text-muted mb-4">
+          Use the Battery Sizing Calculator to size a battery bank with proper
+          DoD limits, or the Degradation Estimator to see how DoD affects cycle
+          life over time.
+        </p>
+        <a
+          href="/tools/battery-sizing-calculator"
+          class="btn-primary text-xs py-3 px-6 inline-block"
+          >Open Battery Sizing Calculator</a
+        >
+      </CalculatorCard>
+
+      <FAQSection items={faqItems} />
+
+      <section class="border-t border-hairline pt-12">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          References
+        </h2>
+        <ul class="flex flex-col gap-2 text-body-sm text-muted">
+          {
+            references.map((ref) => (
+              <li class="flex gap-2">
+                <span class="text-m-blue-light shrink-0">—</span>
+                <a
+                  href={ref.url}
+                  class="hover:text-primary transition-colors underline underline-offset-2"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {ref.title}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+    </div>
+  </div>
+</Layout>

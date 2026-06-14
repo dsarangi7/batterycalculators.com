@@ -1,0 +1,249 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import CalculatorCard from '../../components/CalculatorCard.astro';
+import FormulaBox from '../../components/FormulaBox.astro';
+import FAQSection from '../../components/FAQSection.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "What size charger do I need for my battery?",
+    answer: "A general rule is 0.2C for lead-acid and 0.5C for lithium. For a 200Ah LFP battery, a 100A charger (0.5C) provides 2–3 hour charge times. For a 200Ah AGM battery, a 40A charger (0.2C) is recommended for 5–6 hour charge times. Match charger voltage to battery bank voltage.",
+  },
+  {
+    question: "Can I use a bigger charger than recommended?",
+    answer: "For lithium batteries with built-in BMS, slightly higher charge rates (up to 1C) are acceptable if the BMS is rated for it. For lead-acid, exceeding 0.3C causes overheating, gassing, and reduced battery life. Always check the battery manufacturer's maximum charge rate specification.",
+  },
+  {
+    question: "What is a multi-stage charger?",
+    answer: "A multi-stage charger cycles through bulk (constant current), absorption (constant voltage), and float (maintenance voltage) phases. This profile optimizes charge time while protecting the battery from overcharging. Modern lithium-specific chargers use a simplified CC-CV profile without a float stage.",
+  },
+  {
+    question: "Do I need a different charger for lithium vs lead-acid?",
+    answer: "Yes. Lithium and lead-acid have different charge voltage requirements. LFP charges at 14.2–14.6V (12V system), while lead-acid charges at 14.4–14.8V with a float stage at 13.2–13.6V. Using a lead-acid charger on lithium can overcharge cells. Use a multi-chemistry charger or a dedicated lithium charger.",
+  },
+];
+---
+
+<Layout
+  title="Charger Sizing Guide | Battery Calculators"
+  description="How to select the right charger size for your battery. Recommended C-rates by chemistry, charger types, multi-stage charging profiles, and worked examples."
+  canonical="https://batterycalculators.com/learn/charger-sizing-guide"
+  schema="faqPage"
+  schemaName="Charger Sizing Guide"
+  schemaDescription="Engineering guide to selecting the right charger size for battery systems."
+  schemaUrl="https://batterycalculators.com/learn/charger-sizing-guide"
+  faqItems={faqItems}
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/learn" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Back to Guides</a>
+      <Breadcrumb items={[
+        { label: "Learning Center", href: "/learn" },
+        { label: "Charger Sizing Guide" }
+      ]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">CHARGING</span>
+      <h1 class="text-display-md text-primary mb-6">Charger Sizing Guide</h1>
+      <p class="text-body-md text-body font-light">
+        Selecting the right charger is as important as sizing the battery bank itself. An undersized charger leaves batteries partially charged and shortens their life. An oversized charger can overheat batteries, trigger BMS protections, and waste energy. This guide covers how to match charger size to battery capacity, chemistry, and application.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Charger Sizing by Chemistry</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          The optimal charger size depends primarily on battery chemistry. Each chemistry has a maximum recommended charge C-rate that balances charge speed with battery longevity. Exceeding this rate causes accelerated degradation — particularly in lead-acid batteries where high current leads to gassing, overheating, and plate damage.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Chemistry</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Max C-Rate</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Recommended</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Charge Profile</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">LFP (LiFePO4)</td>
+                <td class="p-4 font-mono text-primary">1C</td>
+                <td class="p-4 font-mono text-primary">0.5C</td>
+                <td class="p-4 text-muted">CC-CV (no float)</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">NMC</td>
+                <td class="p-4 font-mono text-primary">1C</td>
+                <td class="p-4 font-mono text-primary">0.5C</td>
+                <td class="p-4 text-muted">CC-CV</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">AGM Lead-Acid</td>
+                <td class="p-4 font-mono text-primary">0.3C</td>
+                <td class="p-4 font-mono text-primary">0.2C</td>
+                <td class="p-4 text-muted">Bulk/Absorption/Float</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Flooded Lead-Acid</td>
+                <td class="p-4 font-mono text-primary">0.25C</td>
+                <td class="p-4 font-mono text-primary">0.15C</td>
+                <td class="p-4 text-muted">Bulk/Absorption/Float</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Gel</td>
+                <td class="p-4 font-mono text-primary">0.25C</td>
+                <td class="p-4 font-mono text-primary">0.2C</td>
+                <td class="p-4 text-muted">Bulk/Absorption/Float</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <FormulaBox title="Charger Sizing Formula">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Charger Current (A) = Battery Capacity (Ah) × Recommended C-Rate
+        </div>
+        <p>
+          Example: 200Ah LFP battery at 0.5C → 200 × 0.5 = 100A charger. Example: 200Ah AGM at 0.2C → 200 × 0.2 = 40A charger.
+        </p>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Charger Voltage = Battery Bank Nominal Voltage
+        </div>
+        <p>
+          Match charger voltage to bank voltage: 12V charger for 12V banks, 24V for 24V, 48V for 48V. Never connect a charger with mismatched voltage.
+        </p>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Charger Types</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Linear Charger</h4>
+            <p class="text-body-sm text-muted">
+              Simple, low-cost design using linear regulation. Generates significant heat — suitable only for small batteries (under 50Ah) and low charge rates (0.1–0.2C). Inefficient at higher currents. Found in basic float chargers and maintainers.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Switching Charger</h4>
+            <p class="text-body-sm text-muted">
+              High-efficiency (90–98%) design using PWM or resonant switching. Generates less heat, handles higher currents, and supports multi-stage profiles. The standard for modern marine, RV, and home battery charging. Available in 12V, 24V, and 48V configurations.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Multi-Stage Charger</h4>
+            <p class="text-body-sm text-muted">
+              Cycles through bulk, absorption, and float stages to optimize charge time and battery protection. Essential for lead-acid batteries. Many modern units support lithium profiles via selectable chemistry modes or automatic detection.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">MPPT Solar Controller</h4>
+            <p class="text-body-sm text-muted">
+              Maximum Power Point Tracking controllers optimize solar panel output for battery charging. Sized by panel wattage, not C-rate. A 400W panel array on 12V produces ~30A — suitable for 100–200Ah batteries at 0.15–0.3C.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Multi-Stage Charging Profiles</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Multi-stage charging protects batteries while maximizing charge speed. Each stage serves a specific purpose in the charge cycle. Understanding these stages helps you select the right charger and troubleshoot charging issues.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Stage</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Voltage</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Current</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Purpose</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">Bulk</td>
+                <td class="p-4 font-mono text-primary">Rising</td>
+                <td class="p-4 font-mono text-primary">Constant max</td>
+                <td class="p-4 text-muted">Deliver 70–80% of capacity quickly</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Absorption</td>
+                <td class="p-4 font-mono text-primary">Constant max</td>
+                <td class="p-4 font-mono text-primary">Tapering</td>
+                <td class="p-4 text-muted">Top off remaining 20–30% safely</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Float</td>
+                <td class="p-4 font-mono text-primary">Reduced</td>
+                <td class="p-4 font-mono text-primary">Minimal</td>
+                <td class="p-4 text-muted">Maintain full charge without overcharging</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-body-sm text-muted mt-4">
+          LFP batteries typically do not use a float stage — the BMS handles overcharge protection. After reaching full charge, the charger may maintain a reduced voltage or enter standby mode.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Worked Example: Charger Selection</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Given:</strong> 300Ah 12V LFP house bank, need to recharge 80% (240 Ah) during 3 hours of engine running</p>
+            <p><strong>Step 1:</strong> Required charge current:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              240 Ah / 3 h = 80A
+            </div>
+            <p><strong>Step 2:</strong> Check C-rate:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              80A / 300 Ah = 0.27C
+            </div>
+            <p><strong>Step 3:</strong> Verify against recommended C-rate. 0.27C is well below the 0.5C recommended maximum for LFP — the charger size is appropriate.</p>
+            <p><strong>Step 4:</strong> Select charger. A 100A 12V marine alternator with external regulator or a 100A standalone charger provides the required current with margin for losses. This delivers 80A net to the bank after accounting for electrical system loads.</p>
+            <p><strong>Step 5:</strong> Verify AC input requirement. For a 100A charger: 100A × 14.6V / 0.95 = 1,537W. A 2,000W inverter or 20A 120V AC circuit is sufficient.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Try It</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use the Charging Time Calculator to determine how long your selected charger will take to fully charge your battery.
+          </p>
+          <a href="/tools/charging-time-calculator" class="btn-primary text-xs py-3 px-6 inline-block">Open Charging Time Calculator</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Next Step</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Calculate the C-rate for your charger and battery combination with the C-Rate Calculator.
+          </p>
+          <a href="/tools/c-rate-calculator" class="btn-primary text-xs py-3 px-6 inline-block">Open C-Rate Calculator</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Related Articles</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <a href="/learn/battery-charging-formula" class="text-primary hover:underline font-bold block mb-2">Battery Charging Formula</a>
+            <p class="text-body-sm text-muted">
+              Complete formula reference for CC phase time, CV phase estimation, and energy consumption calculations.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <a href="/learn/how-long-to-charge-a-lithium-battery" class="text-primary hover:underline font-bold block mb-2">How Long to Charge a Lithium Battery</a>
+            <p class="text-body-sm text-muted">
+              Lithium-specific charging times with CC-CV profiles and recommended C-rates by chemistry.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

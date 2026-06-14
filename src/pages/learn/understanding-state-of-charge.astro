@@ -1,0 +1,224 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import CalculatorCard from '../../components/CalculatorCard.astro';
+import FormulaBox from '../../components/FormulaBox.astro';
+import FAQSection from '../../components/FAQSection.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "What is the difference between SOC and SoH?",
+    answer: "SOC (State of Charge) indicates how much energy is currently available in the battery, similar to a fuel gauge. SoH (State of Health) measures the battery's current capacity relative to its original rated capacity, indicating overall degradation.",
+  },
+  {
+    question: "Should I keep my battery at 100% SOC?",
+    answer: "For most lithium chemistries, maintaining 100% SOC accelerates calendar aging. Storing at 40-60% SOC is recommended for long-term storage. For daily use, keeping SOC between 20-80% significantly extends cycle life.",
+  },
+  {
+    question: "Why does my battery's SOC jump after resting?",
+    answer: "Under load, voltage sags due to internal resistance. When the load is removed, the terminal voltage recovers as chemical equilibrium is restored. Voltage-based SOC estimators read higher after rest, causing the apparent SOC jump.",
+  },
+  {
+    question: "Can I fully discharge a lithium battery?",
+    answer: "Fully discharging a lithium battery (0% SOC) risks permanent damage. Most battery management systems (BMS) enforce a low-voltage cutoff to prevent over-discharge. Operating below 10% SOC repeatedly accelerates degradation.",
+  },
+];
+---
+
+<Layout
+  title="Understanding State of Charge (SOC) | Battery Calculators"
+  description="A clear guide to battery State of Charge: what SOC means, how it relates to DoD, how it is measured, and why managing SOC is critical for battery longevity."
+  faqItems={faqItems}
+>
+  <div class="max-w-3xl mx-auto">
+    <Breadcrumb items={[
+      { label: "Learning Center", href: "/learn" },
+      { label: "Understanding State of Charge (SOC)" },
+    ]} />
+
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/learn" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Back to Guides</a>
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">CELL FUNDAMENTALS</span>
+      <h1 class="text-display-md text-primary mb-6">Understanding State of Charge (SOC)</h1>
+      <p class="text-body-md text-body font-light">
+        State of Charge is the single most important real-time parameter in battery management. It tells you how much energy remains in a cell relative to its available capacity, and getting it right is essential for safe operation, accurate range prediction, and long cycle life.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">What Is State of Charge?</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          State of Charge (SOC) expresses the remaining usable energy in a battery as a percentage of its total available capacity. A cell at 100% SOC is fully charged; a cell at 0% SOC is fully depleted. In practice, batteries are never operated at either extreme because doing so causes rapid degradation and can be hazardous.
+        </p>
+        <p class="text-body-md text-body font-light mb-4">
+          The simplest analogy is a fuel gauge in a car. Just as the gauge shows how much fuel is left in the tank relative to its full capacity, SOC shows how much electrochemical energy is stored relative to the battery's maximum. However, unlike a fuel tank whose volume is fixed and measurable, a battery's available capacity changes with temperature, age, and discharge rate — making SOC significantly harder to pin down.
+        </p>
+        <p class="text-body-md text-body font-light">
+          For engineers designing battery systems, SOC feeds directly into charge scheduling, load sharing, thermal management decisions, and user-facing range estimates. An inaccurate SOC reading can lead to overcharging, over-discharging, or premature system shutdowns — all of which reduce battery lifespan and user trust.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">SOC, DoD, and Remaining Capacity</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          SOC and Depth of Discharge (DoD) are complementary metrics. SOC tells you what is left; DoD tells you what has been used. At any point in time, the sum of SOC and DoD equals 100%. If a battery is at 60% SOC, it has been discharged to 40% DoD.
+        </p>
+        <p class="text-body-md text-body font-light mb-4">
+          Understanding this relationship matters because different industries emphasize different metrics. Consumer electronics and EV manufacturers talk in terms of SOC — "your phone is at 15%." Energy storage system designers and warranty providers typically specify DoD limits — "this battery is warrantied for 80% DoD depth." Both are referring to the same physical state, just from opposite ends of the scale.
+        </p>
+        <p class="text-body-md text-body font-light">
+          Remaining capacity is the actual amp-hours or watt-hours still available at the current SOC. It is not simply a linear function of SOC because usable capacity itself shrinks as the battery ages, operates at extreme temperatures, or discharges at high C-rates. A battery at 50% SOC with degraded capacity delivers far less energy than the same battery at 50% SOC when new.
+        </p>
+      </section>
+
+      <FormulaBox title="SOC Formulas">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          SOC (%) = (Remaining Capacity / Full Capacity) × 100
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          DoD (%) = 100 − SOC (%)
+        </div>
+        <p>
+          For example, a 100 Ah battery with 65 Ah remaining: SOC = (65 / 100) × 100 = 65%. Its corresponding DoD is 100 − 65 = 35%.
+        </p>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">SOC Reference by Chemistry</h2>
+        <p class="text-body-md text-body font-light mb-6">
+          Different battery chemistries have different voltage profiles across their SOC range, and each has a recommended operating window that balances usable capacity against cycle life. The table below summarizes key parameters for common chemistries.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Chemistry</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Nominal SOC Window</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Recommended Range</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Full-Charge Voltage (per cell)</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">LFP (LiFePO4)</td>
+                <td class="p-4 text-muted">0–100%</td>
+                <td class="p-4 text-muted">10–90%</td>
+                <td class="p-4 font-mono text-primary">3.65 V</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">NMC (LiNiMnCoO2)</td>
+                <td class="p-4 text-muted">0–100%</td>
+                <td class="p-4 text-muted">10–90%</td>
+                <td class="p-4 font-mono text-primary">4.20 V</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">NCA (LiNiCoAlO2)</td>
+                <td class="p-4 text-muted">0–100%</td>
+                <td class="p-4 text-muted">15–85%</td>
+                <td class="p-4 font-mono text-primary">4.20 V</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">Lead-Acid (VRLA)</td>
+                <td class="p-4 text-muted">0–100%</td>
+                <td class="p-4 text-muted">20–80%</td>
+                <td class="p-4 font-mono text-primary">2.40–2.45 V</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-body-sm text-muted mt-4">
+          LFP has an exceptionally flat voltage curve between 20–80% SOC, which makes voltage-based SOC estimation particularly challenging for this chemistry. NMC and NCA have steeper voltage gradients, making voltage-based estimation more accurate in practice.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">How SOC Is Measured</h2>
+        <p class="text-body-md text-body font-light mb-6">
+          There is no direct physical sensor that reads SOC the way a voltmeter reads voltage. Instead, SOC must be estimated using one or more indirect methods, each with distinct strengths and weaknesses. Modern battery management systems typically combine multiple approaches.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Voltage-Based Estimation</h4>
+            <p class="text-body-sm text-muted">
+              Measures the open-circuit voltage (OCV) of the cell and maps it to SOC using a lookup table derived from the chemistry's OCV-SOC curve. Simple and low-cost, but accurate only when the battery is at rest. Under load, IR drop distorts the reading. LFP's flat voltage plateau between 20–80% makes this method especially unreliable for that chemistry.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Coulomb Counting</h4>
+            <p class="text-body-sm text-muted">
+              Integrates current flow over time to track how much charge has entered or left the battery. It provides good dynamic tracking during charge and discharge, but accumulates error over time (drift) because small measurement biases compound. Requires periodic recalibration against a known SOC reference point, typically at full charge.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Impedance-Based Methods</h4>
+            <p class="text-body-sm text-muted">
+              Measures the cell's internal impedance, which varies with SOC, temperature, and state of health. Useful for detecting very low or very high SOC conditions where impedance changes are most pronounced. Less effective in the mid-SOC range where impedance is relatively flat. Often used as a supplementary check rather than a primary method.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Why SOC Estimation Is Hard</h4>
+            <p class="text-body-sm text-muted">
+              Temperature shifts both capacity and voltage, aging changes the OCV-SOC relationship itself, and measurement drift accumulates in coulomb counters. A cell at 50% SOC at 25°C may read 47% at 0°C due to capacity reduction. After 1,000 cycles, the full capacity reference may be 15% lower than the original, shifting every SOC calculation. These compounding effects are why advanced BMS implementations use Kalman filters and model-based fusion.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">SOC and Battery Health</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Managing SOC is not just about knowing how much energy is left — it directly impacts how long the battery lasts. Lithium-ion cells degrade fastest at the extremes of their SOC range. Operating consistently at 100% SOC accelerates electrolyte decomposition and cathode degradation. Operating at very low SOC risks copper dissolution from the anode current collector and increases the chance of over-discharge events.
+        </p>
+        <p class="text-body-md text-body font-light mb-4">
+          Research consistently shows that keeping lithium batteries between 20% and 80% SOC dramatically extends cycle life. An LFP cell cycled between 20–80% SOC may deliver 6,000+ cycles, while the same cell cycled between 0–100% might only reach 2,000–3,000 cycles. This is why many EV manufacturers limit the usable window and why energy storage warranties specify DoD limits.
+        </p>
+        <p class="text-body-md text-body font-light mb-4">
+          Calendar aging — degradation that occurs regardless of cycling — is also strongly SOC-dependent. Storing a lithium battery at 100% SOC and elevated temperature (e.g., 40°C) can lose 20–30% of capacity within a year. Storing at 50% SOC under the same conditions reduces that loss significantly. For long-term storage, the industry consensus is 40–60% SOC in a cool environment.
+        </p>
+        <p class="text-body-md text-body font-light">
+          For system designers, this means the BMS should enforce SOC windows, provide accurate SOC readouts to users, and implement charge-limiting strategies. Tools like the <a href="/tools" class="text-m-blue-light hover:underline">BatteryCalculators.com's calculator suite</a> help quantify the trade-offs between usable capacity and cycle life for your specific application.
+        </p>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Try It</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Estimate SOC from voltage and temperature for your specific cell chemistry.
+          </p>
+          <a href="/tools/soc-estimator" class="btn-primary text-xs py-3 px-6 inline-block">Open SOC Estimator</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Related</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Calculate the charge and discharge current for a given C-rate and capacity.
+          </p>
+          <a href="/tools/c-rate-calculator" class="btn-primary text-xs py-3 px-6 inline-block">Open C-Rate Calculator</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Related Articles</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">What Is Battery C-Rate?</h4>
+            <p class="text-body-sm text-muted mb-4">
+              Understand how C-rate defines charge and discharge speed relative to battery capacity.
+            </p>
+            <a href="/learn/what-is-battery-c-rate" class="text-m-blue-light text-body-sm hover:underline">Read article →</a>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Battery Degradation Explained</h4>
+            <p class="text-body-sm text-muted mb-4">
+              Learn why batteries lose capacity over time and how usage patterns affect longevity.
+            </p>
+            <a href="/learn/battery-degradation-explained" class="text-m-blue-light text-body-sm hover:underline">Read article →</a>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

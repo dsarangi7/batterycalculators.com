@@ -1,0 +1,38 @@
+---
+export interface Props {
+  title?: string;
+  variant?: 'info' | 'warning' | 'tip' | 'engineering';
+}
+
+const {
+  title = 'Expert Note',
+  variant = 'engineering',
+} = Astro.props;
+
+const borderColors: Record<string, string> = {
+  info: 'border-m-blue-light',
+  warning: 'border-m-red',
+  tip: 'border-green-600',
+  engineering: 'border-m-blue-dark',
+};
+
+const icons: Record<string, string> = {
+  info: 'i',
+  warning: '!',
+  tip: '✓',
+  engineering: '⚡',
+};
+
+const borderClass = borderColors[variant] || borderColors.engineering;
+const icon = icons[variant] || icons.engineering;
+---
+
+<aside class={`bg-surface-soft border-l-4 ${borderClass} p-5 my-8`}>
+  <div class="flex items-center gap-2 mb-3">
+    <span class="text-label-uppercase text-[10px] text-primary tracking-wider font-bold bg-surface-card border border-hairline px-2 py-0.5 inline-block">{icon}</span>
+    <span class="text-label-uppercase text-[10px] text-muted tracking-wider">{title}</span>
+  </div>
+  <div class="text-body-sm text-body font-light leading-relaxed">
+    <slot />
+  </div>
+</aside>

@@ -1,0 +1,313 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import CalculatorCard from '../../components/CalculatorCard.astro';
+import FormulaBox from '../../components/FormulaBox.astro';
+import FAQSection from '../../components/FAQSection.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "How big of a battery do I need for home backup?",
+    answer: "For essential loads only (refrigerator, lights, router, medical devices), a 10–15 kWh battery covers 1–2 days. For whole-home backup including HVAC and appliances, you need 20–40+ kWh. The right size depends on your daily consumption, how many days of backup you want, and whether you have solar to recharge during the outage.",
+  },
+  {
+    question: "What is the difference between critical loads and full-home backup?",
+    answer: "Critical loads are essential circuits — refrigerator, medical equipment, lighting, communication devices, well pump. These typically total 3–8 kWh/day and can be backed up with a moderate battery. Full-home backup includes HVAC, electric range, dryer, EV charging — pushing daily consumption to 20–60 kWh and requiring a much larger (and more expensive) battery system.",
+  },
+  {
+    question: "How long will a home battery last during an outage?",
+    answer: "A 10 kWh battery running 5 kWh of critical loads lasts about 20 hours (at 80% usable capacity). The same battery running 15 kWh of full-home loads lasts about 3.2 hours. Runtime scales linearly with load — reducing consumption extends duration proportionally.",
+  },
+  {
+    question: "Should I pair my home battery with solar panels?",
+    answer: "Solar panels extend battery runtime by recharging during daylight hours. A 5 kW solar array can generate 15–25 kWh per day depending on location and season. With solar, a smaller battery can sustain loads through multi-day outages because it is being replenished each day. Without solar, the battery must carry the entire load from its stored capacity alone.",
+  },
+];
+---
+
+<Layout
+  title="Home Battery Sizing Guide | Battery Calculators"
+  description="How to size a home battery backup system. Covers critical load selection, duration planning, voltage selection, and worked examples for overnight essential load coverage."
+  canonical="https://batterycalculators.com/learn/home-battery-sizing-guide"
+  schema="faqPage"
+  schemaName="Home Battery Sizing Guide"
+  schemaDescription="Step-by-step guide to sizing a residential battery backup system for essential household loads during power outages."
+  schemaUrl="https://batterycalculators.com/learn/home-battery-sizing-guide"
+  faqItems={faqItems}
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/learn" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Back to Guides</a>
+      <Breadcrumb items={[
+        { label: "Learning Center", href: "/learn" },
+        { label: "Home Battery Sizing Guide" }
+      ]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">HOME BACKUP</span>
+      <h1 class="text-display-md text-primary mb-6">Home Battery Sizing Guide</h1>
+      <p class="text-body-md text-body font-light">
+        A home battery backup system keeps essential circuits running during grid outages. Unlike a UPS that provides minutes of runtime, a properly sized home battery can sustain critical loads for hours or even days. This guide walks through the process of identifying critical loads, calculating energy needs, and selecting the right battery capacity.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Step 1: Identify Critical Loads</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Not every circuit in your home needs backup. Identifying critical loads keeps the battery system affordable and manageable. Critical loads are the devices and circuits that must remain powered during an outage — either for safety, health, or basic habitability.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Load Category</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Typical Power</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Hours/Day</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Energy (Wh)</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">Refrigerator</td>
+                <td class="p-4 font-mono text-primary">150W</td>
+                <td class="p-4 font-mono text-primary">8h (40% duty)</td>
+                <td class="p-4 font-mono text-primary">1,200</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">LED lighting (5 rooms)</td>
+                <td class="p-4 font-mono text-primary">50W</td>
+                <td class="p-4 font-mono text-primary">6h</td>
+                <td class="p-4 font-mono text-primary">300</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Wi-Fi router + modem</td>
+                <td class="p-4 font-mono text-primary">20W</td>
+                <td class="p-4 font-mono text-primary">24h</td>
+                <td class="p-4 font-mono text-primary">480</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Medical equipment (CPAP, oxygen)</td>
+                <td class="p-4 font-mono text-primary">100W</td>
+                <td class="p-4 font-mono text-primary">8h</td>
+                <td class="p-4 font-mono text-primary">800</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Phone / laptop charging</td>
+                <td class="p-4 font-mono text-primary">60W</td>
+                <td class="p-4 font-mono text-primary">3h</td>
+                <td class="p-4 font-mono text-primary">180</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Well pump (if applicable)</td>
+                <td class="p-4 font-mono text-primary">750W</td>
+                <td class="p-4 font-mono text-primary">1h</td>
+                <td class="p-4 font-mono text-primary">750</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Garage door opener</td>
+                <td class="p-4 font-mono text-primary">350W</td>
+                <td class="p-4 font-mono text-primary">0.1h</td>
+                <td class="p-4 font-mono text-primary">35</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Step 2: Calculate Total Critical Load</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Sum the energy consumption for all critical loads. This gives you the daily energy requirement in watt-hours. For backup planning, you also need to decide how many hours of coverage you want — overnight (12h), a full day (24h), or multiple days (48–72h).
+        </p>
+        <FormulaBox title="Home Backup Sizing Formula">
+          <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+            Required Capacity (Wh) = Total Critical Load (Wh) × Coverage Hours / 24 / DoD / η_system
+          </div>
+          <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+            Required Capacity (Ah) = Required Capacity (Wh) / System Voltage (V)
+          </div>
+          <p>
+            System efficiency for a home battery with inverter is typically 85–90%. DoD depends on chemistry: 80% for LFP, 50% for lead-acid. Coverage hours is how long you want the battery to sustain the loads without any recharge input.
+          </p>
+        </FormulaBox>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Step 3: Select System Voltage</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Home battery systems typically operate at 48V for systems above 3 kW. Lower voltages (12V or 24V) are possible for small systems but require thick cables and produce higher conduction losses. Most residential battery products (Tesla Powerwall, Enphase, SolarEdge) operate at 400V DC internally with a built-in inverter.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">System Voltage</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Max Practical Load</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Best For</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">12V DC</td>
+                <td class="p-4 font-mono text-primary">~1.5 kW</td>
+                <td class="p-4 text-muted">Small cabin, RV, very limited backup</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">24V DC</td>
+                <td class="p-4 font-mono text-primary">~5 kW</td>
+                <td class="p-4 text-muted">Small home, essential circuits only</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">48V DC</td>
+                <td class="p-4 font-mono text-primary">~15 kW</td>
+                <td class="p-4 text-muted">Standard residential, most home backup</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">400V DC</td>
+                <td class="p-4 font-mono text-primary">100+ kW</td>
+                <td class="p-4 text-muted">Integrated battery-inverter systems</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Worked Example: Essential Loads Overnight</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Scenario:</strong> Size a battery to run essential household loads for 14 hours overnight during a winter power outage.</p>
+            <p><strong>Given critical loads:</strong></p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li>Refrigerator: 150W × 8h (cycling) = 1,200 Wh</li>
+              <li>LED lighting: 50W × 6h = 300 Wh</li>
+              <li>Wi-Fi + modem: 20W × 14h = 280 Wh</li>
+              <li>CPAP machine: 100W × 8h = 800 Wh</li>
+              <li>Phone charging: 15W × 3h = 45 Wh</li>
+              <li>Gas furnace fan: 300W × 14h = 4,200 Wh</li>
+            </ul>
+            <p><strong>Total critical load:</strong></p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              1,200 + 300 + 280 + 800 + 45 + 4,200 = 6,825 Wh (~6.8 kWh)
+            </div>
+            <p><strong>Step 1:</strong> Apply system parameters:</p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li>Coverage: 14 hours overnight</li>
+              <li>DoD limit: 80% (LFP)</li>
+              <li>System efficiency: 88% (inverter + wiring)</li>
+            </ul>
+            <p><strong>Step 2:</strong> Required battery capacity:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              6,825 Wh / 0.80 / 0.88 = 9,690 Wh (~9.7 kWh)
+            </div>
+            <p><strong>Step 3:</strong> At 48V system voltage:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              9,690 Wh / 48V = 201.9 Ah
+            </div>
+            <p><strong>Step 4:</strong> Select battery. A 48V 200Ah LFP battery (9.6 kWh) meets the requirement almost exactly. For margin against capacity fade and colder temperatures, a 48V 280Ah battery (13.4 kWh) provides 38% headroom — recommended for systems that must be reliable through harsh winters.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Critical vs Full-Home Comparison</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          The difference between critical-load backup and whole-home backup is dramatic in both capacity and cost. Understanding this tradeoff helps set realistic expectations.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Parameter</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Critical Loads</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Full Home</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">Daily energy</td>
+                <td class="p-4 font-mono text-primary">3–8 kWh</td>
+                <td class="p-4 font-mono text-primary">20–60 kWh</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Battery capacity needed</td>
+                <td class="p-4 font-mono text-primary">10–20 kWh</td>
+                <td class="p-4 font-mono text-primary">40–120 kWh</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">1-day autonomy cost (est.)</td>
+                <td class="p-4 font-mono text-primary">$5,000–$10,000</td>
+                <td class="p-4 font-mono text-primary">$20,000–$60,000</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Weight (LFP)</td>
+                <td class="p-4 font-mono text-primary">80–160 kg</td>
+                <td class="p-4 font-mono text-primary">320–960 kg</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Installation complexity</td>
+                <td class="p-4 text-muted">Subpanel, critical loads panel</td>
+                <td class="p-4 text-muted">Whole-home transfer switch</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Solar Integration</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Pairing a home battery with solar panels transforms the system from a finite energy store into a replenishable one. During a daytime outage, solar panels recharge the battery while it simultaneously powers loads. This dramatically extends effective runtime — from hours to potentially unlimited days, weather permitting.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">With Solar (5 kW array)</h4>
+            <p class="text-body-sm text-muted">
+              A 5 kW solar array generates 15–25 kWh/day depending on location. If daily critical loads are 7 kWh, solar produces a 2–3× surplus during daylight. The battery only needs to cover overnight loads (3–5 kWh), allowing a much smaller and cheaper battery bank.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Without Solar</h4>
+            <p class="text-body-sm text-muted">
+              Without solar, the battery must carry the full load for the entire outage duration. A 3-day outage at 7 kWh/day requires 21 kWh of usable battery capacity — a 26 kWh installed bank at 80% DoD. This is significantly more expensive than the solar-supplemented approach.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Try It</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use the Home Backup Calculator to input your critical loads and get a battery recommendation.
+          </p>
+          <a href="/tools/home-backup-battery-calculator" class="btn-primary text-xs py-3 px-6 inline-block">Open Home Backup Calculator</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">General Sizing</h4>
+          <p class="text-body-sm text-muted mb-4">
+            For a complete sizing calculation with all parameters, use the Battery Sizing Calculator.
+          </p>
+          <a href="/tools/battery-sizing-calculator" class="btn-primary-outline text-xs py-3 px-6 inline-block">Open Battery Sizing Calculator</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Related Articles</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">What Is Battery Sizing?</h4>
+            <p class="text-body-sm text-muted mb-3">Overview of the sizing process, why it matters, and key design considerations.</p>
+            <a href="/learn/what-is-battery-sizing" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Read Guide →</a>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">How Many kWh Do I Need for My House?</h4>
+            <p class="text-body-sm text-muted mb-3">Understanding whole-home energy consumption and what it means for battery sizing.</p>
+            <a href="/learn/how-to-size-solar-battery-bank" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Read Guide →</a>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

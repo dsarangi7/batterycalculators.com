@@ -1,0 +1,314 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import CalculatorCard from '../../components/CalculatorCard.astro';
+import FormulaBox from '../../components/FormulaBox.astro';
+import FAQSection from '../../components/FAQSection.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "How long can a solar battery power my home during a blackout?",
+    answer: "It depends on battery capacity and your loads. A 13.5 kWh usable battery powering a 500W overnight load runs for roughly 22 hours. A full home consuming 1.5 kW averages about 9 hours of backup from the same battery. Larger banks or reduced loads extend runtime proportionally.",
+  },
+  {
+    question: "Do I need a special inverter for battery backup?",
+    answer: "Yes. Backup requires a hybrid inverter or a battery-backed inverter with automatic transfer switch (ATS) capability. Standard grid-tied inverters shut down during outages for safety. A hybrid inverter disconnects from the grid and seamlessly switches to battery power within milliseconds.",
+  },
+  {
+    question: "Will my solar panels charge the battery during a blackout?",
+    answer: "Only with a hybrid inverter designed for backup operation. During a grid outage, a hybrid inverter can continue directing solar energy to the battery while keeping the home's critical loads powered. Standard grid-tied systems shut down entirely when the grid goes down.",
+  },
+  {
+    question: "How is backup different from off-grid solar?",
+    answer: "Backup systems are grid-tied with battery storage — they use the grid as primary power and the battery for outages. Off-grid systems have no grid connection at all and must be sized for full autonomy. Backup systems can be smaller because the grid handles daily supply, while off-grid systems need enough storage for multi-day cloudy periods.",
+  },
+];
+---
+
+<Layout
+  title="Solar Battery Backup Guide | Battery Calculators"
+  description="Complete guide to using solar batteries for home backup power during grid outages. Covers hybrid vs off-grid systems, critical load panels, and backup sizing."
+  canonical="https://batterycalculators.com/learn/solar-battery-backup-guide"
+  schema="faqPage"
+  schemaName="Solar Battery Backup Guide"
+  schemaDescription="Comprehensive guide to solar battery backup systems for grid outage protection."
+  schemaUrl="https://batterycalculators.com/learn/solar-battery-backup-guide"
+  faqItems={faqItems}
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/learn" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Back to Guides</a>
+      <Breadcrumb items={[
+        { label: "Learning Center", href: "/learn" },
+        { label: "Solar Battery Backup Guide" }
+      ]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">SOLAR</span>
+      <h1 class="text-display-md text-primary mb-6">Solar Battery Backup Guide</h1>
+      <p class="text-body-md text-body font-light">
+        Solar battery backup systems store excess daytime energy to power your home when the grid fails. Unlike simple grid-tied solar, a backup-enabled system keeps your lights on during outages — but sizing it correctly requires understanding the difference between whole-home and critical-load backup, hybrid versus off-grid architectures, and the runtime math that governs how long your battery lasts.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">How Solar Battery Backup Works</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          A solar battery backup system operates in two distinct modes. During normal operation, the solar array charges the battery while the grid supplies any deficit. When the grid fails, the system detects the outage, disconnects from the utility (anti-islanding), and switches to battery power — typically within 20 milliseconds. Your home continues running on stored energy with no perceptible interruption.
+        </p>
+        <p class="text-body-md text-body font-light mb-4">
+          Once the grid returns, the system reconnects and resumes normal operation. If the battery was depleted during the outage, the solar array recharges it for the next event. This cycle repeats indefinitely, giving you automatic, maintenance-free backup protection.
+        </p>
+        <p class="text-body-md text-body font-light">
+          The critical component is the hybrid inverter — a device that manages power flow between the solar array, battery, grid, and home loads. Standard grid-tied inverters lack this capability and shut down entirely during outages, even if batteries are present.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Hybrid vs. Off-Grid: Key Differences</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          The choice between a hybrid (grid-tied with backup) and a fully off-grid system fundamentally changes how you size the battery. Each architecture has distinct requirements and trade-offs.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden mb-4">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Feature</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Hybrid (Grid-Tied + Backup)</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Off-Grid</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">Grid dependency</td>
+                <td class="p-4 text-muted">Grid as primary, battery for outages</td>
+                <td class="p-4 text-muted">No grid connection</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Battery sizing driver</td>
+                <td class="p-4 text-muted">Critical load runtime during outages</td>
+                <td class="p-4 text-muted">Full daily consumption × autonomy days</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Typical battery size</td>
+                <td class="p-4 font-mono text-primary">10–30 kWh</td>
+                <td class="p-4 font-mono text-primary">30–100+ kWh</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Solar array sizing</td>
+                <td class="p-4 text-muted">Can be smaller (grid covers deficit)</td>
+                <td class="p-4 text-muted">Must cover full daily consumption + losses</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Monthly grid bill</td>
+                <td class="p-4 text-muted">Reduced but not eliminated</td>
+                <td class="p-4 text-muted">Zero (no grid connection)</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Complexity</td>
+                <td class="p-4 text-muted">Moderate — hybrid inverter + transfer switch</td>
+                <td class="p-4 text-muted">High — full system design for autonomy</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-body-md text-body font-light">
+          For most homeowners, a hybrid system with 10–20 kWh of backup storage provides the best balance of cost and resilience. Full off-grid is reserved for remote properties where grid connection is unavailable or prohibitively expensive.
+        </p>
+      </section>
+
+      <FormulaBox title="Backup Runtime Formula">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Backup Runtime (hours) = Usable Battery Energy (Wh) / (Load Power (W) / Efficiency)
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Usable Battery Energy = Rated Capacity (Wh) × DoD
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Critical Load Power = Sum of all loads on the backup panel (W)
+        </div>
+        <p>
+          Efficiency accounts for inverter losses during battery discharge. Use 0.90–0.92 for modern hybrid inverters.
+        </p>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Critical Load Panel Strategy</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Not every circuit in your home needs backup power. A critical load panel (sub-panel) separates essential circuits from non-essential ones. This approach reduces battery size, extends runtime, and lowers system cost.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Critical Loads (Back Up These)</h4>
+            <ul class="text-body-sm text-muted list-disc pl-4 flex flex-col gap-1">
+              <li>Refrigerator / freezer</li>
+              <li>LED lighting (selected rooms)</li>
+              <li>Internet router / modem</li>
+              <li>Medical equipment</li>
+              <li>Sump pump</li>
+              <li>Phone / laptop charging</li>
+              <li>Security system</li>
+            </ul>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Non-Critical Loads (Skip These)</h4>
+            <ul class="text-body-sm text-muted list-disc pl-4 flex flex-col gap-1">
+              <li>Electric clothes dryer</li>
+              <li>Electric oven / range</li>
+              <li>Central air conditioning</li>
+              <li>Hot tub / pool pump</li>
+              <li>Garage door opener</li>
+              <li>EV charger (unless critical)</li>
+              <li>Decorative / landscape lighting</li>
+            </ul>
+          </CalculatorCard>
+        </div>
+        <p class="text-body-md text-body font-light">
+          A typical critical load panel carries 1.0–2.0 kW of continuous load. With a 10 kWh usable battery, this provides 5–10 hours of backup — enough to cover most overnight outages or bridge until solar recharges the battery the next morning.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Worked Example: Backup During a Grid Outage</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Given:</strong></p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li>Battery: 48V 200Ah LFP (10,240 Wh rated)</li>
+              <li>DoD limit: 80%</li>
+              <li>Inverter efficiency: 92%</li>
+              <li>Critical loads: fridge (150W) + lights (80W) + router (12W) + sump pump (400W intermittent) = 642W average</li>
+              <li>Outage duration: overnight (14 hours)</li>
+            </ul>
+            <p><strong>Step 1:</strong> Calculate usable battery energy:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              10,240 Wh × 0.80 = 8,192 Wh usable
+            </div>
+            <p><strong>Step 2:</strong> Calculate effective load including inverter losses:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              642 W / 0.92 = 698 W
+            </div>
+            <p><strong>Step 3:</strong> Calculate backup runtime:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              8,192 Wh / 698 W = 11.7 hours
+            </div>
+            <p class="text-muted mt-2">This battery provides approximately <strong>11.7 hours of backup</strong> for the critical loads — enough to cover most overnight outages. If the outage extends into the next day, solar panels can recharge the battery while the grid remains down, extending protection indefinitely.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Backup Runtime by Battery Size</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          The table below shows approximate backup runtime for a 1,500W critical load panel using LFP batteries at 80% DoD and 92% inverter efficiency.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Battery Size (Rated)</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Usable Energy</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Runtime at 1,500W</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">5 kWh</td>
+                <td class="p-4 text-muted">4.0 kWh</td>
+                <td class="p-4 font-mono text-primary">2.7 hours</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">10 kWh</td>
+                <td class="p-4 text-muted">8.0 kWh</td>
+                <td class="p-4 font-mono text-primary">5.3 hours</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">13.5 kWh</td>
+                <td class="p-4 text-muted">10.8 kWh</td>
+                <td class="p-4 font-mono text-primary">7.2 hours</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">20 kWh</td>
+                <td class="p-4 text-muted">16.0 kWh</td>
+                <td class="p-4 font-mono text-primary">10.7 hours</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">30 kWh</td>
+                <td class="p-4 text-muted">24.0 kWh</td>
+                <td class="p-4 font-mono text-primary">16.0 hours</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Design Considerations for Backup Systems</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Automatic Transfer Switch</h4>
+            <p class="text-body-sm text-muted">
+              The ATS detects grid failure and switches to battery power. Modern hybrid inverters integrate this function. Ensure the transfer time is under 20ms to avoid disrupting sensitive electronics. Some loads (UPS-protected computers) tolerate longer gaps; others (CPAP machines, medical devices) do not.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Solar Recharge During Outage</h4>
+            <p class="text-body-sm text-muted">
+              A key advantage of hybrid systems is solar recharge during extended outages. If the sun is shining, your panels can replenish the battery while the grid is down, effectively extending backup runtime indefinitely. This requires a hybrid inverter that supports island-mode solar charging.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Battery Chemistry for Backup</h4>
+            <p class="text-body-sm text-muted">
+              LFP is the preferred chemistry for backup systems due to its long cycle life, thermal stability, and deep discharge capability. Unlike lead-acid, LFP can sit at partial charge without sulfation, making it ideal for backup applications where the battery may sit at 80% SOC for weeks between events.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Monitoring and Alerts</h4>
+            <p class="text-body-sm text-muted">
+              Choose a system with app-based monitoring that sends push notifications during outages. Real-time SOC, load power, and solar production data help you manage consumption during extended events. Some systems support automatic load shedding to preserve battery for the most critical loads.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Try It</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use the Solar Battery Sizing Calculator to determine the right backup battery size for your critical loads.
+          </p>
+          <a href="/tools/solar-battery-sizing-calculator" class="btn-primary text-xs py-3 px-6 inline-block">Open Solar Battery Sizing Calculator</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Next Step</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Estimate how long your backup battery will power your specific home loads during an outage.
+          </p>
+          <a href="/tools/home-backup-calculator" class="btn-primary-outline text-xs py-3 px-6 inline-block">Open Home Backup Calculator</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Related Articles</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">How Long Will My Solar Battery Last?</h4>
+            <p class="text-body-sm text-muted mb-3">
+              Estimate solar battery runtime at night and during extended cloudy periods.
+            </p>
+            <a href="/learn/how-long-will-my-solar-battery-last" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Read Guide →</a>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Power Outage Battery Guide</h4>
+            <p class="text-body-sm text-muted mb-3">
+              General guide to battery backup during power outages for all battery types.
+            </p>
+            <a href="/learn/power-outage-battery-guide" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Read Guide →</a>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

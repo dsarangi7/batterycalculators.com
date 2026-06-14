@@ -1,0 +1,179 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import CalculatorCard from '../../components/CalculatorCard.astro';
+import FormulaBox from '../../components/FormulaBox.astro';
+import FAQSection from '../../components/FAQSection.astro';
+
+const faqItems = [
+  {
+    question: "What is acceptable voltage drop?",
+    answer: "For most DC systems, keep voltage drop below 3% from source to load. For critical electronics, target below 1%. In 12V systems, a 0.5V drop is already 4.2%, which is often unacceptable. Higher system voltages (48V, 400V) are inherently more tolerant.",
+  },
+  {
+    question: "How does wire gauge affect voltage drop?",
+    answer: "Voltage drop is inversely proportional to the cross-sectional area of the conductor. A 10 AWG wire has roughly twice the resistance of an 8 AWG wire, meaning double the voltage drop. Larger gauge (smaller number) = less drop.",
+  },
+  {
+    question: "Why does temperature matter for voltage drop?",
+    answer: "Metal conductors increase in resistance as temperature rises. Copper resistance increases approximately 0.393% per degree Celsius. A cable running through a hot engine bay (60°C) has about 15.7% higher resistance than at 20°C.",
+  },
+  {
+    question: "Should I use copper or aluminum?",
+    answer: "Copper has lower resistivity and is easier to work with, but costs more and is heavier. Aluminum is lighter and cheaper but requires approximately 1.6 times the cross-sectional area for equivalent performance. Aluminum is common in long-distance utility runs.",
+  },
+];
+---
+
+<Layout
+  title="Voltage Drop Explained | Battery Calculators"
+  description="Understand why DC voltage drop occurs, how to calculate it using cable length, gauge, current, and temperature, and how to select the right wire size."
+  faqItems={faqItems}
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/learn" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Back to Guides</a>
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">ELECTRICAL</span>
+      <h1 class="text-display-md text-primary mb-6">Voltage Drop Explained</h1>
+      <p class="text-body-md text-body font-light">
+        Voltage drop is the loss of electrical potential along a conductor caused by its internal resistance. In DC battery systems, this directly reduces the voltage and power available at the load.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Why Voltage Drop Happens</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Every conductor has some internal resistance. When current flows through a wire, a portion of the electrical energy is converted to heat by this resistance. The result is a measurable drop in voltage between the two ends of the cable.
+        </p>
+        <p class="text-body-md text-body font-light">
+          In low-voltage DC systems (12V, 24V, 48V), even small voltage drops represent a significant percentage of system voltage. A 0.5V drop on a 12V system is a 4.2% loss, while the same 0.5V drop on a 48V system is only 1.0%. This is why higher system voltages are preferred for high-power applications.
+        </p>
+      </section>
+
+      <FormulaBox title="Voltage Drop Formula">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          V_drop = (2 × L × I × R) / A
+        </div>
+        <p>
+          Where L is the one-way cable length, I is the current, R is the resistivity of the conductor material, and A is the cross-sectional area. The factor of 2 accounts for the round-trip (positive and negative conductors).
+        </p>
+        <p>
+          For copper at 20°C, resistivity R = 1.72 × 10⁻⁸ Ω·m. For aluminum, R = 2.82 × 10⁻⁸ Ω·m.
+        </p>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Voltage Drop (%) = (V_drop / V_system) × 100
+        </div>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Worked Example</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Given:</strong></p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li>System voltage: 12.8V (4S LFP)</li>
+              <li>Load current: 20 A</li>
+              <li>Cable length (one-way): 3 meters</li>
+              <li>Wire: 10 AWG copper (5.26 mm² cross-section)</li>
+            </ul>
+            <p><strong>Step 1:</strong> Calculate voltage drop:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              V_drop = (2 × 3 × 20 × 1.72 × 10⁻⁸) / (5.26 × 10⁻⁶) = 0.039 V
+            </div>
+            <p><strong>Step 2:</strong> Express as percentage:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              (0.039 / 12.8) × 100 = 0.31%
+            </div>
+            <p>This is well within the 3% target. However, increasing the cable to 5 meters would double the drop to 0.62%, and a 15-meter run would reach 1.84%.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Copper vs Aluminum Reference</h2>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Property</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Copper</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Aluminum</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">Resistivity (Ω·m)</td>
+                <td class="p-4 font-mono text-primary">1.72 × 10⁻⁸</td>
+                <td class="p-4 font-mono text-primary">2.82 × 10⁻⁸</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Relative Resistance</td>
+                <td class="p-4 font-mono text-primary">1.00×</td>
+                <td class="p-4 font-mono text-primary">1.64×</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Weight</td>
+                <td class="p-4 text-muted">Heavier</td>
+                <td class="p-4 text-muted">Lighter</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Cost</td>
+                <td class="p-4 text-muted">Higher</td>
+                <td class="p-4 text-muted">Lower</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Design Guidelines</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Increase System Voltage</h4>
+            <p class="text-body-sm text-muted">
+              The most effective way to reduce voltage drop is to increase system voltage. A 48V system draws 4× less current than a 12V system for the same power, reducing cable losses by 16× (I²R).
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Shorten Cable Runs</h4>
+            <p class="text-body-sm text-muted">
+              Place batteries as close to the inverter/load as practical. Every meter of cable adds resistance. If long runs are unavoidable, increase wire gauge to compensate.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Check Both Criteria</h4>
+            <p class="text-body-sm text-muted">
+              Cables must satisfy both voltage drop limits and ampacity (current-carrying capacity) limits. A wire that meets voltage drop requirements may still be undersized for thermal safety.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Temperature Compensation</h4>
+            <p class="text-body-sm text-muted">
+              Cables in hot environments (engine bays, rooftop solar) have higher resistance. Design for the worst-case ambient temperature, not room temperature.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Try It</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use the DC Voltage Drop Calculator to check your cable sizing.
+          </p>
+          <a href="/tools/voltage-drop-calculator" class="btn-primary text-xs py-3 px-6 inline-block">Open Voltage Drop Calculator</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Related</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Calculate actual power loss (I²R) with the DC Cable Loss Calculator.
+          </p>
+          <a href="/tools/dc-cable-loss-calculator" class="btn-primary-outline text-xs py-3 px-6 inline-block">Open Cable Loss Calculator</a>
+        </CalculatorCard>
+      </div>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

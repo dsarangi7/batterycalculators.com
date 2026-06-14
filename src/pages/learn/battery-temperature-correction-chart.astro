@@ -1,0 +1,418 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import CalculatorCard from "../../components/CalculatorCard.astro";
+import FAQSection from "../../components/FAQSection.astro";
+import ReferenceChart from "../../components/ReferenceChart.astro";
+
+const faqItems = [
+  {
+    question: "How does cold temperature affect battery capacity?",
+    answer:
+      "Cold temperatures increase internal resistance and slow the chemical reactions inside the battery. At 0°C, a lithium battery may deliver only 80–90% of its rated capacity. At −20°C, capacity can drop to 50–70%. Lead-acid batteries are even more severely affected, losing up to 50% capacity at −20°C.",
+  },
+  {
+    question: "Can I charge a battery in freezing temperatures?",
+    answer:
+      "Charging lithium batteries below 0°C (32°F) risks lithium plating on the anode, which permanently damages the cell and can create safety hazards. Most BMS units disable charging below 0°C. Lead-acid batteries accept charge at low temperatures but very slowly, and freezing of the electrolyte is a risk if the battery is deeply discharged.",
+  },
+  {
+    question: "How does high temperature affect batteries?",
+    answer:
+      "High temperatures (above 40°C) accelerate calendar aging and chemical degradation. A battery stored at 40°C may age 2–3x faster than one stored at 25°C. High temperatures also increase self-discharge rates. However, high temperatures slightly increase available capacity in the short term, while accelerating long-term degradation.",
+  },
+  {
+    question: "What is temperature derating?",
+    answer:
+      "Temperature derating is the practice of reducing the expected capacity of a battery based on the operating temperature. A battery rated at 100Ah at 25°C might be derated to 85Ah at 10°C or 70Ah at 0°C. Always apply temperature derating when sizing batteries for environments that experience temperature extremes.",
+  },
+];
+
+const tableOfContents = [
+  { id: "temperature-table", label: "Temperature Effects Table" },
+  { id: "charging-cautions", label: "Charging Cautions" },
+  { id: "degradation-risk", label: "Degradation Risk" },
+  { id: "practical-guidelines", label: "Practical Guidelines" },
+  { id: "common-mistakes", label: "Common Mistakes" },
+];
+
+const relatedCalculators = [
+  {
+    title: "Battery Degradation Estimator",
+    href: "/tools/battery-degradation-estimator",
+  },
+  { title: "Battery Runtime Calculator", href: "/tools/runtime-calculator" },
+  {
+    title: "Charging Time Calculator",
+    href: "/tools/charging-time-calculator",
+  },
+];
+
+const references = [
+  {
+    title: "Battery University — Temperature Effects on Batteries",
+    url: "https://batteryuniversity.com/article/bu-706-how-to-temperature-condition-batteries",
+  },
+  {
+    title: "NREL — Temperature Effects on Battery Performance",
+    url: "https://www.nrel.gov/docs/fy20osti/76169.pdf",
+  },
+];
+---
+
+<Layout
+  title="Battery Temperature Correction Chart — Capacity vs Temperature | Battery Calculators"
+  description="How temperature affects battery capacity, charging safety, and degradation risk. Reference table with correction factors for lithium and lead-acid batteries."
+  faqItems={faqItems}
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a
+        href="/learn"
+        class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block"
+        >&larr; Back to Guides</a
+      >
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4"
+        >REFERENCE</span
+      >
+      <h1 class="text-display-md text-primary mb-6">
+        Battery Temperature Correction Chart
+      </h1>
+      <p class="text-body-md text-body font-light">
+        How temperature affects available capacity, charging safety, and
+        long-term degradation. Essential reference for batteries in extreme
+        environments.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section id="temperature-table">
+        <ReferenceChart
+          type="bar"
+          title="Approximate Battery Capacity vs Temperature"
+          description="Approximate values only. Temperature effects vary by chemistry, age, current rate, and manufacturer."
+          xLabel="Temperature Range"
+          yLabel="Capacity (%)"
+          data={[
+            { x: 1, y: 60, label: "Below 0°C" },
+            { x: 2, y: 75, label: "0–10°C" },
+            { x: 3, y: 95, label: "10–25°C" },
+            { x: 4, y: 100, label: "25–40°C" },
+            { x: 5, y: 90, label: "Above 40°C" },
+          ]}
+          yMin={0}
+          yMax={110}
+          caption="Approximate values only. Temperature effects vary by chemistry, age, current rate, and manufacturer."
+        />
+
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          Temperature Effects on Battery Capacity
+        </h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Battery capacity is rated at 25°C (77°F). Deviations from this
+          temperature affect available capacity, internal resistance, and
+          chemical reaction rates. Cold temperatures reduce capacity and
+          increase internal resistance. High temperatures increase capacity
+          slightly but accelerate aging.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-body-sm min-w-[700px]">
+              <thead>
+                <tr class="border-b border-hairline bg-surface-card">
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >Temperature</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >Lithium Capacity</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >Lead-Acid Capacity</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >Charging Caution</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >Degradation Risk</th
+                  >
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-hairline">
+                <tr>
+                  <td class="p-4 font-mono text-primary">Below 0°C (32°F)</td>
+                  <td class="p-4 text-muted">70–85%</td>
+                  <td class="p-4 text-muted">50–80%</td>
+                  <td class="p-4 text-muted">Do not charge lithium below 0°C</td
+                  >
+                  <td class="p-4 text-muted"
+                    >Lithium plating risk if charged cold</td
+                  >
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">0–10°C (32–50°F)</td>
+                  <td class="p-4 text-muted">85–95%</td>
+                  <td class="p-4 text-muted">80–90%</td>
+                  <td class="p-4 text-muted"
+                    >Reduce charge rate, warm battery first</td
+                  >
+                  <td class="p-4 text-muted">Low if charged correctly</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">10–25°C (50–77°F)</td>
+                  <td class="p-4 text-muted">95–100%</td>
+                  <td class="p-4 text-muted">90–100%</td>
+                  <td class="p-4 text-muted">Standard charging is safe</td>
+                  <td class="p-4 text-muted">Minimal — ideal range</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">25–40°C (77–104°F)</td>
+                  <td class="p-4 text-muted">100–103%</td>
+                  <td class="p-4 text-muted">100–105%</td>
+                  <td class="p-4 text-muted"
+                    >Monitor for overcharge, reduce absorb time</td
+                  >
+                  <td class="p-4 text-muted"
+                    >Moderate — accelerated calendar aging</td
+                  >
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">Above 40°C (104°F)</td>
+                  <td class="p-4 text-muted">100–105% (short term)</td>
+                  <td class="p-4 text-muted">105% (short term)</td>
+                  <td class="p-4 text-muted"
+                    >Reduce charge rate, active cooling needed</td
+                  >
+                  <td class="p-4 text-muted">High — 2–3x faster degradation</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <p class="text-caption text-muted mt-3">
+          Capacity values are approximate percentages of the 25°C rated
+          capacity. Values vary by chemistry and manufacturer.
+        </p>
+      </section>
+
+      <section id="charging-cautions">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          Charging Cautions by Temperature
+        </h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Charging a battery at the wrong temperature is one of the fastest ways
+          to damage it. Lithium batteries are particularly sensitive — charging
+          below 0°C causes lithium metal to plate on the anode surface, which is
+          irreversible and creates internal short-circuit risks.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Lithium Charging Limits</h4>
+            <p class="text-body-sm text-muted">
+              Below 0°C: Do not charge (BMS should block)<br />
+              0–10°C: Reduce charge rate to 0.1–0.2C<br />
+              10–45°C: Standard charging OK<br />
+              Above 45°C: Reduce charge rate, active cooling
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">
+              Lead-Acid Charging Limits
+            </h4>
+            <p class="text-body-sm text-muted">
+              Below −15°C: Do not charge (electrolyte may freeze)<br />
+              −15–0°C: Reduce charge rate significantly<br />
+              0–25°C: Standard charging OK<br />
+              Above 45°C: Reduce absorb voltage
+            </p>
+          </CalculatorCard>
+        </div>
+        <p class="text-body-md text-body font-light mt-4">
+          Most modern BMS units include temperature-based charge blocking. If
+          your BMS does not have this feature, add a temperature sensor and
+          charge controller that disables charging below 0°C for lithium
+          batteries.
+        </p>
+      </section>
+
+      <section id="degradation-risk">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          Degradation Risk by Temperature
+        </h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Battery degradation follows the Arrhenius equation — chemical reaction
+          rates approximately double for every 10°C increase in temperature. A
+          battery stored at 35°C ages roughly twice as fast as one stored at
+          25°C. This affects both calendar aging (time on the shelf) and cycle
+          aging (charge-discharge degradation).
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-body-sm min-w-[480px]">
+              <thead>
+                <tr class="border-b border-hairline bg-surface-card">
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >Storage Temperature</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >Relative Aging Rate</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >Effect on Lifespan</th
+                  >
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-hairline">
+                <tr>
+                  <td class="p-4 font-mono text-primary">15°C (59°F)</td>
+                  <td class="p-4 text-muted">0.5x</td>
+                  <td class="p-4 text-muted"
+                    >Battery lasts ~2x longer than at 25°C</td
+                  >
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">25°C (77°F)</td>
+                  <td class="p-4 text-muted">1.0x (baseline)</td>
+                  <td class="p-4 text-muted">Standard rated lifespan</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">35°C (95°F)</td>
+                  <td class="p-4 text-muted">2.0x</td>
+                  <td class="p-4 text-muted">Battery ages ~2x faster</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">45°C (113°F)</td>
+                  <td class="p-4 text-muted">4.0x</td>
+                  <td class="p-4 text-muted">Battery ages ~4x faster</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <p class="text-caption text-muted mt-3">
+          Aging rate relative to 25°C baseline. Actual rates vary by chemistry
+          and state of charge during storage.
+        </p>
+      </section>
+
+      <section id="practical-guidelines">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          Practical Guidelines
+        </h2>
+        <p class="text-body-md text-body font-light mb-4">
+          When sizing a battery system for extreme temperatures, apply
+          temperature derating to the rated capacity. A 100Ah battery in a
+          location that regularly sees 0°C should be sized as roughly 120–130Ah
+          to account for the 15–25% capacity reduction.
+        </p>
+        <p class="text-body-md text-body font-light mb-4">
+          For battery enclosures in hot climates, provide ventilation or active
+          cooling to keep temperatures below 40°C. For cold climates, consider
+          insulated battery boxes or indoor installation to keep temperatures
+          above 0°C.
+        </p>
+        <p class="text-body-md text-body font-light">
+          Always check the manufacturer's operating temperature range. Most
+          lithium batteries specify 0–45°C for charging and −20–60°C for
+          discharge. Lead-acid batteries have wider operating ranges but reduced
+          capacity at temperature extremes.
+        </p>
+      </section>
+
+      <section id="common-mistakes">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          Common Mistakes
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">
+              Charging Lithium Below Freezing
+            </h4>
+            <p class="text-body-sm text-muted">
+              Charging a lithium battery below 0°C causes lithium plating, which
+              permanently reduces capacity and can create safety risks. Always
+              warm the battery above 0°C before charging, or use a BMS that
+              blocks cold charging.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">
+              Ignoring Hot Environment Sizing
+            </h4>
+            <p class="text-body-sm text-muted">
+              A battery in a hot enclosure (50°C+) will degrade 4x faster than
+              one at 25°C. If your battery will operate in high temperatures,
+              oversize the bank and provide cooling to extend life.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">
+              Using Room-Temperature Ratings in Cold Climates
+            </h4>
+            <p class="text-body-sm text-muted">
+              A 100Ah battery rated at 25°C may only deliver 75Ah at 0°C. If you
+              size a system based on the 25°C rating but operate in a cold
+              environment, you will have 25% less capacity than expected. Apply
+              temperature derating.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">
+              Not Monitoring Battery Temperature
+            </h4>
+            <p class="text-body-sm text-muted">
+              Without temperature monitoring, you cannot detect when the battery
+              is outside its safe operating range. Add temperature sensors to
+              the BMS or charge controller for automatic protection.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <CalculatorCard class="border-m-blue-light">
+        <h4 class="text-label-uppercase text-primary text-xs mb-3">Try It</h4>
+        <p class="text-body-sm text-muted mb-4">
+          Use the Battery Degradation Estimator to see how temperature and DoD
+          affect cycle life, or the Charging Time Calculator for
+          temperature-adjusted charge times.
+        </p>
+        <a
+          href="/tools/battery-degradation-estimator"
+          class="btn-primary text-xs py-3 px-6 inline-block"
+          >Open Degradation Estimator</a
+        >
+      </CalculatorCard>
+
+      <FAQSection items={faqItems} />
+
+      <section class="border-t border-hairline pt-12">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          References
+        </h2>
+        <ul class="flex flex-col gap-2 text-body-sm text-muted">
+          {
+            references.map((ref) => (
+              <li class="flex gap-2">
+                <span class="text-m-blue-light shrink-0">—</span>
+                <a
+                  href={ref.url}
+                  class="hover:text-primary transition-colors underline underline-offset-2"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {ref.title}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+    </div>
+  </div>
+</Layout>

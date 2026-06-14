@@ -1,0 +1,145 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import CalculatorCard from '../../components/CalculatorCard.astro';
+import FormulaBox from '../../components/FormulaBox.astro';
+import FAQSection from '../../components/FAQSection.astro';
+
+const faqItems = [
+  {
+    question: "Why does the runtime calculator ask for efficiency?",
+    answer: "Inverters, DC-DC converters, and cable resistance all consume power between the battery and the load. A 90% efficient inverter means 10% of your battery energy is lost as heat before it reaches the load. Ignoring efficiency overestimates runtime.",
+  },
+  {
+    question: "How does temperature affect runtime?",
+    answer: "Cold temperatures increase internal resistance and reduce the electrochemical reaction rate. At 0°C, a lithium battery may deliver 90% of its rated capacity. At -20°C, usable capacity can drop to 70% or less, directly reducing runtime proportionally.",
+  },
+  {
+    question: "What is Depth of Discharge (DoD)?",
+    answer: "DoD is the percentage of total battery capacity that has been discharged. Discharging to 80% DoD means 80% of the capacity was used. Most lithium batteries should not be regularly discharged beyond 80-90% DoD to preserve cycle life.",
+  },
+  {
+    question: "Why is runtime different from capacity divided by load?",
+    answer: "Simple division (capacity / load) assumes 100% efficiency, 100% DoD, and ideal conditions. Real-world runtime accounts for inverter losses, cable resistance, temperature effects, and the fact that you typically don't discharge to 0%.",
+  },
+];
+---
+
+<Layout
+  title="How to Calculate Battery Runtime | Battery Calculators"
+  description="Step-by-step guide to calculating battery discharge runtime from capacity, load power, efficiency, and depth of discharge. Includes worked examples and formulas."
+  faqItems={faqItems}
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/learn" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Back to Guides</a>
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">SYSTEM DESIGN</span>
+      <h1 class="text-display-md text-primary mb-6">How to Calculate Battery Runtime</h1>
+      <p class="text-body-md text-body font-light">
+        Estimating how long a battery will power a given load requires more than dividing capacity by current. This guide walks through the complete calculation including efficiency, depth of discharge, and voltage.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">The Basic Principle</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Battery runtime is the ratio of usable energy to the power demanded by the load. Usable energy depends on the battery's rated capacity, its nominal voltage, and how much of it you are willing to discharge (DoD limit).
+        </p>
+        <p class="text-body-md text-body font-light">
+          The load power seen by the battery is higher than the load itself because the inverter and wiring consume a fraction of the energy. This is why system efficiency must be factored in.
+        </p>
+      </section>
+
+      <FormulaBox title="Runtime Calculation">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Usable Energy (Wh) = Capacity (Ah) × Voltage (V) × (DoD% / 100)
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Effective Load (W) = Load (W) / (Efficiency% / 100)
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Runtime (hours) = Usable Energy (Wh) / Effective Load (W)
+        </div>
+        <p>
+          The efficiency factor accounts for inverter conversion losses, cable resistance, and battery management system overhead.
+        </p>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Worked Example</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Given:</strong></p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li>Battery: 100 Ah at 12.8V (LFP 4S pack)</li>
+              <li>DoD limit: 80%</li>
+              <li>System efficiency: 90% (inverter + wiring)</li>
+              <li>Continuous load: 250 W</li>
+            </ul>
+            <p><strong>Step 1:</strong> Calculate usable energy:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              100 Ah × 12.8V × 0.80 = 1,024 Wh
+            </div>
+            <p><strong>Step 2:</strong> Calculate effective load seen by battery:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              250 W / 0.90 = 277.8 W
+            </div>
+            <p><strong>Step 3:</strong> Divide usable energy by effective load:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              1,024 Wh / 277.8 W = 3.69 hours ≈ 3 hours 41 minutes
+            </div>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Factors That Reduce Runtime</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Temperature</h4>
+            <p class="text-body-sm text-muted">
+              At 0°C, lithium capacity drops roughly 10%. At -20°C, it can drop 30% or more. Lead-acid is even more sensitive to cold.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Peukert Effect</h4>
+            <p class="text-body-sm text-muted">
+              Lead-acid batteries deliver less total energy at high discharge rates. A 100 Ah lead-acid battery at 1C may only deliver 60-70 Ah of usable capacity.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Battery Age</h4>
+            <p class="text-body-sm text-muted">
+              As batteries age, internal resistance increases and capacity fades. A 5-year-old battery may deliver 80% of its original capacity, directly reducing runtime.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Voltage Sag</h4>
+            <p class="text-body-sm text-muted">
+              Under heavy load, battery terminal voltage drops. If the inverter's low-voltage cutoff triggers early, the battery is disconnected before its rated capacity is fully depleted.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Try It</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use the Runtime Calculator to estimate discharge duration for your specific system.
+          </p>
+          <a href="/tools/runtime-calculator" class="btn-primary text-xs py-3 px-6 inline-block">Open Runtime Calculator</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Related</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Need to size the battery first? Use the Battery Sizing Calculator to determine the required capacity.
+          </p>
+          <a href="/tools/battery-sizing-calculator" class="btn-primary-outline text-xs py-3 px-6 inline-block">Open Sizing Calculator</a>
+        </CalculatorCard>
+      </div>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

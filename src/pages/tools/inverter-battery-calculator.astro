@@ -1,0 +1,307 @@
+---
+import CalculatorLayout from '../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../components/CalculatorCard.astro';
+import InputField from '../../components/InputField.astro';
+import ResultBox from '../../components/ResultBox.astro';
+import FormulaBox from '../../components/FormulaBox.astro';
+import FAQSection from '../../components/FAQSection.astro';
+
+const whatIs = `An inverter battery calculator determines the DC battery bank capacity required to power AC loads through a DC-to-AC inverter. Inverters convert 12V, 24V, or 48V battery power into 120V/240V household AC power—but this conversion is not 100% efficient. The calculator accounts for inverter efficiency losses (typically 8–15%), depth-of-discharge limits, and surge current demands. Whether you're sizing a backup system for home appliances or an off-grid solar setup, this tool ensures your battery bank can sustain the required AC load for the desired runtime without premature battery failure.`;
+
+const whyItMatters = [
+  "Undersized battery banks cause inverters to shut down under load when voltage sags below the low-voltage cutoff—often in the middle of the night during an outage.",
+  "Ignoring inverter efficiency (typically 10–15% loss) leads to a battery bank that appears sufficient on paper but delivers 15% less runtime than expected.",
+  "Failing to account for surge currents from motors and compressors causes inverter overload trips—refrigerators and pumps can draw 3–5× their running wattage at startup.",
+  "Using lead-acid batteries beyond 50% DoD with an inverter creates voltage sag that triggers low-battery alarms even when the inverter is nowhere near its power rating.",
+  "Mismatching battery voltage to inverter rating forces excessive DC current—drawing 200A from a 12V battery requires 00-gauge wire and creates significant resistive losses."
+];
+
+const practicalApplications = [
+  { title: "Home Power Outage Backup", description: "Size a battery bank to run essential AC appliances—refrigerator, lights, router, medical equipment—during grid outages lasting 8–48 hours." },
+  { title: "Off-Grid Solar Storage", description: "Calculate the battery capacity needed to store solar energy for overnight AC loads in cabins, tiny homes, or remote installations." },
+  { title: "Workshop & Job Site Power", description: "Size portable inverter systems for running power tools, lighting, and equipment in locations without grid access." },
+  { title: "Emergency & Disaster Preparedness", description: "Design a battery backup system with enough capacity to maintain critical communication, refrigeration, and medical devices for multi-day outages." }
+];
+
+const expertNotes: { title: string; variant: 'engineering' | 'warning'; content: string }[] = [
+  {
+    title: "Inverter Efficiency at Different Load Levels",
+    variant: "engineering",
+    content: "Inverter efficiency is not constant—at 10% of rated load, efficiency may be only 80–85%. At 50–80% load, it peaks at 90–95%. For accurate sizing, use 90% as a conservative average for loads between 25–75% of inverter capacity. For very light loads (standby power), consider that the inverter itself consumes 5–20W even with no load connected."
+  },
+  {
+    title: "Surge vs Continuous Power Rating",
+    variant: "warning",
+    content: "Inverters have two power ratings: continuous (sustained output) and surge (peak for 1–10 seconds). A motor starting can draw 3–7× its running current for 1–3 seconds. If your battery bank cannot supply this surge current without excessive voltage drop, the inverter will trip even though the continuous load is within rating. Always verify your battery's maximum discharge rate matches the inverter's surge specification."
+  }
+];
+
+const trustSection = {
+  text: "This calculator applies standard DC-to-AC conversion efficiency factors (88–95% depending on load level) and chemistry-specific DoD limits. All formulas are derived from manufacturer datasheets and IEEE standards for battery discharge. The math is fully transparent—you can verify each step independently.",
+  link: { label: "View our methodology and formula derivations", href: "/methodology" }
+};
+
+const references = [
+  { title: "IEEE 1189 — Guide for Selection of Valve-Regulated Lead-Acid Batteries", url: "https://standards.ieee.org/ieee/1189/5989/", source: "IEEE Standards Association" },
+  { title: "NREL — Inverter Efficiency Curves for Battery Sizing", url: "https://www.nrel.gov/docs/fy23osti/85472.pdf", source: "National Renewable Energy Laboratory" },
+  { title: "Victron Energy — Inverter and Battery Bank Sizing Guide", url: "https://www.victronenergy.com/learn/inverter-battery-sizing", source: "Victron Energy Technical Library" },
+  { title: "Battery University — Sizing the Battery Bank", url: "https://batteryuniversity.com/article/sizing-the-bank", source: "Battery University (Cadex Electronics)" }
+];
+
+const faqItems = [
+  {
+    question: "What inverter efficiency should I assume?",
+    answer: "Modern pure sine wave inverters operate at 88–95% efficiency. A conservative estimate of 90% accounts for conversion losses at typical load levels. Efficiency drops at very light loads (below 10% of rated capacity) and increases toward rated load.",
+  },
+  {
+    question: "What depth of discharge is safe for inverter batteries?",
+    answer: "LFP (LiFePO4) batteries can safely discharge to 80–90% DoD. Lead-acid (AGM/Gel) should not exceed 50% DoD for acceptable cycle life. NMC lithium can use 80% DoD. Exceeding recommended DoD significantly reduces battery lifespan.",
+  },
+  {
+    question: "Can I run an inverter from a 12V, 24V, or 48V battery?",
+    answer: "Yes, but battery voltage affects current draw. A 2000W load on a 12V battery draws ~185A (requiring thick cables), while the same load on 48V draws ~46A (thinner cables, lower losses). Higher voltage systems are more efficient for loads above 2000W.",
+  },
+  {
+    question: "How do I calculate the runtime of my battery with an inverter?",
+    answer: "Runtime = (Battery Wh × DoD% × Inverter Efficiency) / Load Power. For example, a 12V 200Ah LFP battery (2400Wh) at 80% DoD with 90% inverter efficiency running a 1000W load: (2400 × 0.80 × 0.90) / 1000 = 1.73 hours.",
+  },
+  {
+    question: "What is the difference between pure sine wave and modified sine wave inverters?",
+    answer: "Pure sine wave inverters produce clean AC power identical to grid power, compatible with all appliances including sensitive electronics. Modified sine wave inverters produce a stepped approximation that can damage motors, produce audible buzzing, and reduce efficiency. Always use pure sine wave for medical equipment, refrigerators, and electronics.",
+  },
+  {
+    question: "How do I account for surge current from appliances?",
+    answer: "Motors and compressors draw 3–7× their running current for 1–3 seconds at startup. A 500W refrigerator compressor may surge to 1500–2000W briefly. Ensure your inverter's surge rating exceeds the highest startup demand, and your battery bank can supply the surge current without voltage drop below the inverter's low-voltage cutoff.",
+  },
+  {
+    question: "Can I use car batteries with an inverter?",
+    answer: "<span class=\"text-primary font-bold\">Not recommended.</span> Car starting batteries are designed for high-current, short-duration cranking—not deep discharge. Running an inverter from a car battery below 50% DoD will damage it within weeks. Use deep-cycle AGM, Gel, or LFP batteries specifically designed for sustained discharge rates.",
+  },
+  {
+    question: "How does battery voltage affect inverter performance?",
+    answer: "Higher battery voltage reduces DC current for the same AC power output. At 12V, a 2000W load draws ~185A (requiring thick 4/0 AWG cables). At 48V, the same load draws ~46A (standard 6 AWG cable). Lower current means less voltage drop, smaller cables, and higher efficiency. For systems above 2000W, 48V is strongly preferred.",
+  },
+  {
+    question: "What happens when battery voltage drops too low?",
+    answer: "When battery voltage sags below the inverter's low-voltage cutoff (typically 10.5V for 12V systems, 21V for 24V, 42V for 48V), the inverter shuts down to protect the battery. With lead-acid, this deep discharge causes sulfation and permanent capacity loss. LFP batteries tolerate low voltage better but still require a BMS cutoff.",
+  },
+  {
+    question: "Do I need a battery management system (BMS) for inverter use?",
+    answer: "Yes, for lithium batteries (LFP/NMC) a BMS is essential—it protects against over-discharge, over-charge, over-current, and temperature extremes. Lead-acid systems use a charge controller and voltage monitor. The BMS low-voltage cutoff should be set higher than the inverter's cutoff to prevent cell damage.",
+  },
+  {
+    question: "Can I run an air conditioner from a battery inverter?",
+    answer: "It depends on BTU rating and battery capacity. A 5000 BTU window AC draws ~500W running but 1000–1500W surge at startup. A 48V 200Ah LFP bank (9.6 kWh) can run it for 6–8 hours. Larger AC units require 48V systems with 400Ah+ capacity. Consider mini-split heat pumps which are more efficient.",
+  },
+  {
+    question: "How long does it take to recharge the battery after inverter use?",
+    answer: "Recharge time = (Energy used / Charger power) / efficiency. If you discharge 5 kWh from a battery and charge at 1 kW (grid or solar), it takes ~5.5 hours (accounting for 90% charge efficiency). Solar recharging depends on panel wattage and sun hours—400W of panels provide ~1.6 kWh per day in average conditions.",
+  },
+];
+
+const relatedCalculators = [
+  { href: "/tools/runtime-calculator", title: "Runtime Calculator", description: "Calculate discharge time from capacity and load." },
+  { href: "/tools/battery-sizing-calculator", title: "Battery Sizing Calculator", description: "Full battery bank sizing with temperature derating." },
+  { href: "/tools/energy-conversion-calculator", title: "Energy Conversion", description: "Convert between Ah and Wh at any voltage." },
+  { href: "/tools/parallel-string-calculator", title: "Parallel String Calculator", description: "Design series/parallel cell configurations for your bank." },
+  { href: "/tools/c-rate-calculator", title: "C-Rate Calculator", description: "Verify battery discharge rates match inverter demands." },
+  { href: "/tools/home-backup-battery-calculator", title: "Home Backup Calculator", description: "Size a complete home backup system with critical loads." },
+];
+---
+
+<CalculatorLayout
+  title="Inverter Battery Calculator | Battery Calculators"
+  description="Calculate the battery capacity you need for your inverter load. Determine required Ah and kWh for AC loads with DoD and inverter efficiency."
+  faqItems={faqItems}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+  relatedCalculators={relatedCalculators}
+>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+
+    <!-- Input Form -->
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Load Parameters</h3>
+      <div class="flex flex-col gap-6">
+
+        <InputField id="ac-load" label="AC Load Power" value={2000} min={100} step={100} unit="W" helperText="Total wattage of all AC devices connected to the inverter." />
+
+        <InputField id="runtime-hours" label="Required Runtime" value={2} min={0.5} max={72} step={0.5} unit="hours" helperText="How long the battery must power the AC load." />
+
+        <InputField id="inverter-efficiency" label="Inverter Efficiency" value={90} min={70} max={100} step={1} unit="%" helperText="Pure sine wave: 90–95%. Use 90% for conservative sizing." />
+
+        <InputField id="battery-voltage" label="Battery System Voltage" value={48} min={12} step={1} unit="V" helperText="12V small, 24V mid-size, 48V whole-home or high-power." />
+
+        <InputField id="usable-dod" label="Usable Depth of Discharge" value={80} min={20} max={100} step={1} unit="%" helperText="LFP: 80–90%, Lead-Acid: 50% recommended." />
+
+      </div>
+    </CalculatorCard>
+
+    <!-- Results -->
+    <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Sizing Results</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <ResultBox
+            label="AC Energy Required"
+            value="4,000 Wh"
+            suffix="Load × runtime"
+            variant="primary"
+            id="result-ac-energy"
+          />
+          <ResultBox
+            label="DC Battery Energy Required"
+            value="4,444 Wh"
+            suffix="After inverter losses"
+            id="result-dc-energy"
+          />
+          <ResultBox
+            label="Recommended Capacity"
+            value="116.1 Ah"
+            suffix="At 48V nominal"
+            id="result-capacity"
+          />
+          <ResultBox
+            label="Recommended Bank Size"
+            value="5.56 kWh"
+            suffix="Total battery energy"
+            id="result-bank-size"
+          />
+        </div>
+      </div>
+
+      <div class="border-t border-hairline pt-6">
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">Battery Recommendation</h4>
+        <p class="text-body-sm text-muted" id="battery-recommendation">
+          For a 2,000W AC load over 2 hours at 48V, a 48V 120Ah LFP battery (5.76 kWh) provides the required backup runtime.
+        </p>
+      </div>
+    </CalculatorCard>
+
+  </div>
+
+  <!-- Formulas -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+
+      <FormulaBox title="Mathematical Formulas">
+        <p>
+          Inverter battery sizing converts AC load requirements back to DC battery capacity, accounting for conversion losses:
+        </p>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          AC Energy = Load Power × Runtime
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          DC Energy = AC Energy / Inverter Efficiency
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Adjusted Battery Energy = DC Energy / DoD%
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Required Ah = Adjusted Battery Energy / Battery Voltage
+        </div>
+        <p>
+          The inverter efficiency factor (typically 90%) accounts for DC-to-AC conversion losses. The DoD factor ensures you do not over-discharge the battery.
+        </p>
+      </FormulaBox>
+
+      <div>
+        <h2 class="text-title-lg text-primary uppercase mb-6 tracking-wider">Worked Engineering Example</h2>
+        <div class="text-body-sm text-muted flex flex-col gap-4">
+          <p>Given system parameters:</p>
+          <ul class="list-disc pl-6 flex flex-col gap-1">
+            <li><strong>AC load:</strong> 2,000W | <strong>Runtime:</strong> 2 hours</li>
+            <li><strong>Inverter efficiency:</strong> 90% | <strong>Battery voltage:</strong> 48V</li>
+            <li><strong>Usable DoD:</strong> 80%</li>
+          </ul>
+
+          <p><strong>Step 1:</strong> Calculate AC energy required:</p>
+          <div class="font-mono text-primary">AC Energy = 2,000W × 2h = 4,000 Wh</div>
+
+          <p><strong>Step 2:</strong> Calculate DC battery energy (account for inverter losses):</p>
+          <div class="font-mono text-primary">DC Energy = 4,000 / 0.90 = 4,444 Wh</div>
+
+          <p><strong>Step 3:</strong> Adjust for depth of discharge:</p>
+          <div class="font-mono text-primary">Battery Energy = 4,444 / 0.80 = 5,556 Wh</div>
+
+          <p><strong>Step 4:</strong> Convert to Amp-hours:</p>
+          <div class="font-mono text-primary">Ah = 5,556 Wh / 48V = 115.7 Ah</div>
+
+          <p><strong>Result:</strong> A 48V 120Ah LFP battery (5.76 kWh) provides sufficient energy to run a 2,000W AC load for 2 hours through a 90% efficient inverter.</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <FAQSection items={faqItems} />
+
+  <!-- Calculation Script -->
+  <script>
+    import { calculateInverterBattery } from '../../utils/calculators';
+
+    const acLoadInput = document.getElementById('ac-load') as HTMLInputElement;
+    const runtimeHoursInput = document.getElementById('runtime-hours') as HTMLInputElement;
+    const inverterEfficiencyInput = document.getElementById('inverter-efficiency') as HTMLInputElement;
+    const batteryVoltageInput = document.getElementById('battery-voltage') as HTMLInputElement;
+    const usableDodInput = document.getElementById('usable-dod') as HTMLInputElement;
+
+    const resultAcEnergyBox = document.getElementById('result-ac-energy');
+    const resultAcEnergyValue = resultAcEnergyBox?.querySelector('.text-display-md') as HTMLElement;
+    const resultAcEnergySuffix = resultAcEnergyBox?.querySelector('.text-caption') as HTMLElement;
+
+    const resultDcEnergyBox = document.getElementById('result-dc-energy');
+    const resultDcEnergyValue = resultDcEnergyBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultDcEnergySuffix = resultDcEnergyBox?.querySelector('.text-caption') as HTMLElement;
+
+    const resultCapacityBox = document.getElementById('result-capacity');
+    const resultCapacityValue = resultCapacityBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultCapacitySuffix = resultCapacityBox?.querySelector('.text-caption') as HTMLElement;
+
+    const resultBankSizeBox = document.getElementById('result-bank-size');
+    const resultBankSizeValue = resultBankSizeBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultBankSizeSuffix = resultBankSizeBox?.querySelector('.text-caption') as HTMLElement;
+
+    const batteryRecommendationEl = document.getElementById('battery-recommendation');
+
+    function updateCalculations() {
+      const acLoad = parseFloat(acLoadInput.value) || 2000;
+      const runtimeHours = parseFloat(runtimeHoursInput.value) || 2;
+      const inverterEfficiency = parseFloat(inverterEfficiencyInput.value) || 90;
+      const batteryVoltage = parseFloat(batteryVoltageInput.value) || 48;
+      const usableDod = parseFloat(usableDodInput.value) || 80;
+
+      const results = calculateInverterBattery(acLoad, runtimeHours, inverterEfficiency, batteryVoltage, usableDod);
+
+      if (resultAcEnergyValue) resultAcEnergyValue.textContent = `${Math.round(results.acEnergyWh).toLocaleString()} Wh`;
+      if (resultAcEnergySuffix) resultAcEnergySuffix.textContent = 'Load × runtime';
+
+      if (resultDcEnergyValue) resultDcEnergyValue.textContent = `${Math.round(results.dcEnergyWh).toLocaleString()} Wh`;
+      if (resultDcEnergySuffix) resultDcEnergySuffix.textContent = 'After inverter losses';
+
+      if (resultCapacityValue) resultCapacityValue.textContent = `${results.requiredCapacityAh.toFixed(1)} Ah`;
+      if (resultCapacitySuffix) resultCapacitySuffix.textContent = `At ${batteryVoltage}V nominal`;
+
+      if (resultBankSizeValue) resultBankSizeValue.textContent = `${results.adjustedBatteryEnergyKwh.toFixed(2)} kWh`;
+      if (resultBankSizeSuffix) resultBankSizeSuffix.textContent = 'Total battery energy';
+
+      if (batteryRecommendationEl) {
+        const recommendedAh = Math.ceil(results.requiredCapacityAh / 10) * 10;
+        batteryRecommendationEl.textContent = `For a ${acLoad.toLocaleString()}W AC load over ${runtimeHours} hours at ${batteryVoltage}V, a ${batteryVoltage}V ${recommendedAh}Ah LFP battery (${(recommendedAh * batteryVoltage / 1000).toFixed(1)} kWh) provides the required backup runtime.`;
+      }
+    }
+
+    [acLoadInput, runtimeHoursInput, inverterEfficiencyInput, batteryVoltageInput, usableDodInput].forEach(el => {
+      el.addEventListener('input', updateCalculations);
+    });
+
+    updateCalculations();
+  </script>
+
+</CalculatorLayout>

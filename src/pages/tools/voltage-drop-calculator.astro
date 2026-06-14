@@ -1,0 +1,314 @@
+---
+import CalculatorLayout from '../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../components/CalculatorCard.astro';
+import InputField from '../../components/InputField.astro';
+import ResultBox from '../../components/ResultBox.astro';
+import FormulaBox from '../../components/FormulaBox.astro';
+import FAQSection from '../../components/FAQSection.astro';
+import RelatedTools from '../../components/RelatedTools.astro';
+
+const wireSizes = [
+  { label: "16 AWG (1.31 mm²)", value: 1.31 },
+  { label: "14 AWG (2.08 mm²)", value: 2.08 },
+  { label: "12 AWG (3.31 mm²)", value: 3.31 },
+  { label: "10 AWG (5.26 mm²)", value: 5.26 },
+  { label: "8 AWG (8.37 mm²)", value: 8.37 },
+  { label: "6 AWG (13.3 mm²)", value: 13.3 },
+  { label: "4 AWG (21.15 mm²)", value: 21.15 },
+  { label: "2 AWG (33.6 mm²)", value: 33.6 },
+  { label: "1/0 AWG (53.5 mm²)", value: 53.5 },
+  { label: "2/0 AWG (67.4 mm²)", value: 67.4 },
+  { label: "4/0 AWG (107 mm²)", value: 107.0 },
+  { label: "Custom Metric Size (mm²)", value: "-1" },
+];
+
+const materialOptions = [
+  { label: "Copper (High conductivity)", value: "copper" },
+  { label: "Aluminum", value: "aluminum" },
+];
+
+const whatIs = `DC voltage drop is the reduction in electrical potential along a conductor carrying current between a battery source and its connected load. It is caused by the inherent resistance of the wire, which converts electrical energy into heat (I²R losses). Voltage drop depends on four factors: <strong>current magnitude</strong>, <strong>cable length</strong>, <strong>conductor cross-sectional area</strong>, and <strong>conductor material resistivity</strong> (with temperature correction). Excessive voltage drop causes electronic devices to malfunction, reduces lighting brightness, decreases motor efficiency, and wastes energy. In 12V systems, even a 0.5V drop represents a 4% loss — significant enough to cause problems. Proper cable sizing according to voltage drop limits is required by marine (ISO 13297), automotive (SAE J1127), and solar (NEC 690) standards.`;
+
+const whyItMatters = [
+  "A 5% voltage drop in a 12V system means 0.6V lost — enough to cause inverter shutdowns and LED dimming.",
+  "Long cable runs between battery and load compound voltage drop — a 10m run at 30A can lose 1V or more with undersized wire.",
+  "Undersized cables cause overheating and fire hazards, not just performance degradation.",
+  "Voltage drop is proportional to current — doubling the load current doubles the drop for the same cable.",
+  "Higher system voltages (48V vs 12V) reduce current for the same power, dramatically reducing voltage drop.",
+];
+
+const practicalApplications = [
+  { title: "Marine Electrical Systems", description: "Size battery cables to meet ISO 13297 voltage drop limits for navigation, lighting, and propulsion." },
+  { title: "Solar PV Wiring", description: "Calculate voltage drop in DC wiring from solar charge controllers to battery banks." },
+  { title: "Automotive & RV", description: "Size battery-to-inverter cables for RV and automotive DC systems." },
+  { title: "Telecom Installations", description: "Verify cable sizing for 48V DC power distribution to telecom equipment." },
+  { title: "Off-Grid Cabin Wiring", description: "Calculate wire sizing for long cable runs between remote battery banks and loads." },
+];
+
+const expertNotes = [
+  { title: 'Marine Standards', variant: 'engineering', content: 'Standard marine guidelines (ISO 13297) permit a maximum 3% voltage drop for critical components (navigation lights, bilge pumps, electronics) and 10% drop for non-critical loads (lighting circuits, domestic devices).' },
+  { title: 'Temperature Sensitivity', variant: 'warning', content: 'Copper resistance increases by 0.393% per °C. In a hot engine compartment at 60°C, cable resistance increases by ~15.7%. Always account for the actual operating temperature of the cable run, not ambient room temperature.' },
+];
+
+const trustSection = {
+  text: "This calculator uses the standard resistivity-based voltage drop model with temperature correction factors for copper and aluminum conductors. All formulas follow IEEE and IEC conductor sizing standards.",
+  link: { label: "View our full methodology", href: "/methodology" },
+};
+
+const references = [
+  { title: "ISO 13297 — Marine Electrical Installation", url: "https://www.iso.org/standard/68333.html", source: "International Organization for Standardization" },
+  { title: "NEC Article 690 — Solar Photovoltaic Systems", url: "https://www.nfpa.org/codes-and-standards/nfpa-70-standard-for-electrical-safety-in-the-workplace", source: "NFPA / National Electrical Code" },
+  { title: "SAE J1127 — Battery Cables", url: "https://www.sae.org/standards/content/j1127_202004/", source: "SAE International" },
+  { title: "Copper Development Association — Wire Resistance Tables", url: "https://www.copper.org/", source: "Copper Development Association" },
+];
+
+const faqItems = [
+  {
+    question: "Why does voltage drop increase at higher temperatures?",
+    answer: "In metallic conductors like copper and aluminum, thermal vibrations of atoms disrupt the path of conducting electrons, increasing internal resistance. For copper, resistance increases by roughly 0.393% for every 1°C increase. If a cable runs through a hot engine compartment (e.g. 60°C), its resistance increases by about 15.7%.",
+  },
+  {
+    question: "Why is voltage drop critical in 12V systems compared to 48V systems?",
+    answer: "Voltage drop is proportional to current, not voltage. A 480W load pulls 37.5A at 12.8V, but only 9.37A at 51.2V. At 12.8V, a 0.5V drop is 3.9% of system potential. At 51.2V, the drop is reduced to 0.125V due to lower current, representing a negligible 0.24% loss. Increasing system voltage is the best way to resolve cable loss.",
+  },
+  {
+    question: "Should I size cables for voltage drop or safety current limits (ampacity)?",
+    answer: "You must check both. Ampacity limits are defined by fire safety codes to prevent wire insulation from melting under load. However, a cable that is thermal-safe can still exhibit unacceptable voltage drop over long runs. Always select the larger wire size determined by the two criteria.",
+  },
+  {
+    question: "What is the resistivity of aluminum vs copper?",
+    answer: "Aluminum resistivity is approximately 64% higher than copper (2.82 x 10^-8 ohm.m vs 1.72 x 10^-8 ohm.m). An aluminum cable requires roughly 1.6 times the cross-sectional area of a copper cable to carry the same electrical load with identical voltage drop.",
+  },
+  {
+    question: "What is an acceptable voltage drop percentage?",
+    answer: "For DC power systems: 3% maximum for critical loads (navigation, safety equipment), 5% for general loads, and 10% maximum for non-critical lighting. Solar installations typically target 2% or less for DC wiring between charge controller and battery.",
+  },
+  {
+    question: "How does cable length affect voltage drop?",
+    answer: "Voltage drop is directly proportional to cable length. Doubling the cable distance doubles the voltage drop. For a 5m cable with 0.5V drop, a 10m cable will have a 1.0V drop with the same current and wire size.",
+  },
+  {
+    question: "Can I use aluminum instead of copper to save cost?",
+    answer: "Aluminum is lighter and cheaper per ampacity but requires 1.6× the cross-sectional area of copper for equivalent voltage drop. Aluminum also requires anti-oxidant compound at connections and proper torque to prevent loosening. Copper is preferred for most battery and solar installations.",
+  },
+  {
+    question: "How does voltage drop affect battery performance?",
+    answer: "Voltage drop at the battery terminals causes the BMS to read lower voltage than actual, potentially triggering premature low-voltage disconnects. It also reduces the effective energy delivered to loads, decreasing apparent runtime.",
+  },
+  {
+    question: "What AWG wire do I need for 30 amps at 5 meters?",
+    answer: "For 30A at 5m one-way on a 12V system with 3% max drop: 6 AWG (13.3 mm²) copper wire is needed. At 48V, 10 AWG (5.26 mm²) may suffice due to lower current for the same power.",
+  },
+  {
+    question: "Does wire insulation type affect voltage drop?",
+    answer: "No, insulation does not affect electrical resistance. However, insulation temperature rating determines the maximum safe operating temperature. Using wire rated for 90°C allows higher current loads without exceeding insulation thermal limits.",
+  },
+  {
+    question: "How do I measure actual voltage drop in my system?",
+    answer: "Measure voltage at the battery terminals under load, then measure voltage at the load terminals under the same load. The difference is the voltage drop. Compare the drop percentage to your system voltage to determine if cable sizing is adequate.",
+  },
+];
+---
+
+<CalculatorLayout
+  title="DC Voltage Drop Calculator | Battery Calculators"
+  description="Calculate voltage drop along DC battery cables based on current load, cable length, conductor material, and gauge size."
+  faqItems={faqItems}
+  relatedCalculators={[
+    { href: "/tools/dc-cable-loss-calculator", title: "DC Cable Loss", description: "Calculate resistive power wattage losses directly." },
+    { href: "/tools/battery-sizing-calculator", title: "Battery Sizing Tool", description: "Determine daily consumption sizing requirements." },
+    { href: "/tools/parallel-string-calculator", title: "Parallel String Tool", description: "Configure series and parallel strings layout." },
+    { href: "/tools/runtime-calculator", title: "Runtime Calculator", description: "Compute runtime from load wattage profiles." },
+    { href: "/tools/battery-pack-calculator", title: "Battery Pack Calculator", description: "Design series/parallel cell configurations." },
+    { href: "/tools/energy-conversion-calculator", title: "Energy Conversion", description: "Convert between capacity Ah and energy Wh." },
+  ]}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+>
+
+  <!-- Main Calculator Grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+
+    <!-- Input Form -->
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Cable Parameters</h3>
+      <div class="flex flex-col gap-6">
+        <InputField id="voltage" label="System DC Voltage (V)" value={12.8} min={1} step="any" helperText="Common: 12.8V, 25.6V, 51.2V" />
+        <InputField id="current" label="Continuous Load Current (Amperes)" value={30} min={0.1} step="any" />
+        <InputField id="length" label="One-Way Run Distance (Meters)" value={5} min={0.1} step="any" helperText="The calculator doubles this to account for positive and return conductors." />
+        <InputField id="wire-dropdown" label="Conductor Size" type="select" options={wireSizes} value="13.3" />
+        <InputField id="custom-area" label="Custom Cross-Sectional Area (mm²)" value={10} min={0.01} step="any" wrapperId="custom-area-wrapper" />
+        <InputField id="material" label="Conductor Material" type="select" options={materialOptions} value="copper" />
+        <InputField id="temperature" label="Conductor Operating Temp (°C)" value={25} min={-40} max={200} helperText="Resistance increases with temperature (copper temperature coef: 0.393%/°C)" />
+      </div>
+    </CalculatorCard>
+
+    <!-- Calculation Results -->
+    <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Estimated Outputs</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <ResultBox
+            label="Voltage Drop"
+            value="4.03%"
+            suffix="0.52 V drop along loop"
+            variant="primary"
+            id="result-status-card"
+          />
+          <ResultBox
+            label="Voltage at Load Terminal"
+            value="12.28 V"
+            suffix="Available potential"
+            id="result-end-voltage-box"
+          />
+          <ResultBox
+            label="Loop Resistance"
+            value="0.0172 Ω"
+            suffix="Adjusted for temp"
+            id="result-resistance-box"
+          />
+        </div>
+      </div>
+
+      <!-- Action Area -->
+      <div class="border-t border-hairline pt-6">
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">DC Cable Engineering Guidelines</h4>
+        <p class="text-body-sm text-muted">
+          Standard marine guidelines (ISO 13297) permit a maximum <span class="text-primary font-bold">3% voltage drop</span> for critical components (navigation lights, bilge pumps, electronics) and <span class="text-primary font-bold">10% drop</span> for non-critical loads (lighting circuits, domestic devices).
+        </p>
+      </div>
+    </CalculatorCard>
+
+  </div>
+
+  <!-- Technical Explanation and Equations -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+
+      <!-- Formulas -->
+      <FormulaBox title="Mathematical Formulas">
+        <p>
+          The resistance of the conductor loop is calculated based on distance, thickness, material resistivity, and thermal coefficients:
+        </p>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Resistivity ρ(T) = ρ(20°C) × [1 + α × (T - 20)]
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Loop Resistance (Ω) = ρ(T) × (2 × Distance (m)) / Area (m²)
+        </div>
+        <p>
+          Voltage drop is derived using Ohm's Law (V = I x R):
+        </p>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Voltage Drop (V) = Load Current (A) × Loop Resistance (Ω)
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Drop Percentage (%) = (Voltage Drop (V) / Source Voltage (V)) × 100
+        </div>
+      </FormulaBox>
+
+      <!-- Worked Example -->
+      <div>
+        <h2 class="text-title-lg text-primary uppercase mb-6 tracking-wider">Worked Engineering Example</h2>
+        <div class="text-body-sm text-muted flex flex-col gap-4">
+          <p>Given system parameters:</p>
+          <ul class="list-disc pl-6 flex flex-col gap-1">
+            <li><strong>Conductor:</strong> Copper, 10 mm² (~8 AWG)</li>
+            <li><strong>One-Way Distance:</strong> 5 meters (10m loop)</li>
+            <li><strong>Current:</strong> 30 Amperes | <strong>Source Voltage:</strong> 12.8 V</li>
+            <li><strong>Temperature:</strong> 20°C</li>
+          </ul>
+          <p><strong>Step 1:</strong> Identify resistivity at 20°C (copper):</p>
+          <div class="font-mono text-primary">p = 1.72 x 10^-8 ohm.m</div>
+
+          <p><strong>Step 2:</strong> Solve Loop resistance:</p>
+          <div class="font-mono text-primary">R_loop = 1.72 x 10^-8 x (2 x 5 m) / (10 x 10^-6 m^2) = 0.0172 ohm</div>
+
+          <p><strong>Step 3:</strong> Calculate voltage drop:</p>
+          <div class="font-mono text-primary">V_drop = 30 A x 0.0172 ohm = 0.516 V</div>
+
+          <p><strong>Step 4:</strong> Find drop percentage and end voltage:</p>
+          <div class="font-mono text-primary">% V_drop = (0.516 V / 12.8 V) x 100% = 4.03%</div>
+          <div class="font-mono text-primary">V_end = 12.8 V - 0.516 V = 12.284 V</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <FAQSection items={faqItems} />
+
+  <!-- Calculation Script -->
+  <script>
+    import { calculateVoltageDrop } from '../../utils/calculators';
+
+    const voltageInput = document.getElementById('voltage') as HTMLInputElement;
+    const currentInput = document.getElementById('current') as HTMLInputElement;
+    const lengthInput = document.getElementById('length') as HTMLInputElement;
+    const wireDropdown = document.getElementById('wire-dropdown') as HTMLSelectElement;
+    const customAreaWrapper = document.getElementById('custom-area-wrapper');
+    const customAreaInput = document.getElementById('custom-area') as HTMLInputElement;
+    const materialSelect = document.getElementById('material') as HTMLSelectElement;
+    const temperatureInput = document.getElementById('temperature') as HTMLInputElement;
+
+    // Outputs
+    const resultStatusCard = document.getElementById('result-status-card');
+    const resultDropPercent = resultStatusCard?.querySelector('.text-display-md') as HTMLElement;
+    const resultDropVoltage = resultStatusCard?.querySelector('.text-caption') as HTMLElement;
+    const resultEndVoltage = document.getElementById('result-end-voltage-box')?.querySelector('.text-title-lg') as HTMLElement;
+    const resultResistance = document.getElementById('result-resistance-box')?.querySelector('.text-title-lg') as HTMLElement;
+
+    function toggleCustomArea() {
+      const isCustom = wireDropdown.value === "-1";
+      if (isCustom) {
+        customAreaWrapper?.classList.remove('hidden');
+      } else {
+        customAreaWrapper?.classList.add('hidden');
+      }
+      updateCalculations();
+    }
+
+    function updateCalculations() {
+      const voltage = parseFloat(voltageInput.value) || 12.8;
+      const current = parseFloat(currentInput.value) || 0;
+      const length = parseFloat(lengthInput.value) || 0;
+      const material = materialSelect.value as "copper" | "aluminum";
+      const temperature = parseFloat(temperatureInput.value) || 25;
+
+      const dropdownArea = parseFloat(wireDropdown.value);
+      const wireSize = dropdownArea === -1 ? (parseFloat(customAreaInput.value) || 0.1) : dropdownArea;
+
+      const results = calculateVoltageDrop(voltage, current, length, wireSize, material, temperature);
+
+      // Render percentage
+      if (resultDropPercent) resultDropPercent.textContent = `${results.voltageDropPercent.toFixed(2)}%`;
+      if (resultDropVoltage) resultDropVoltage.textContent = `${results.voltageDropV.toFixed(3)} V drop along loop`;
+      if (resultEndVoltage) resultEndVoltage.textContent = `${results.endVoltageV.toFixed(2)} V`;
+
+      // Resistance per wire = loop resistance / 2.
+      // But loop resistance is results.voltageDropV / current.
+      const loopR = current > 0 ? results.voltageDropV / current : 0;
+      if (resultResistance) resultResistance.textContent = `${loopR.toFixed(4)} Ω`;
+
+      // Update card color border based on safety threshold (3% target)
+      if (resultStatusCard) {
+        resultStatusCard.className = "bg-surface-soft p-6 border col-span-1 md:col-span-2 " +
+          (results.voltageDropPercent > 10 ? "border-red-600" :
+           results.voltageDropPercent > 3 ? "border-yellow-500" : "border-hairline");
+      }
+    }
+
+    wireDropdown.addEventListener('change', toggleCustomArea);
+    [voltageInput, currentInput, lengthInput, customAreaInput, materialSelect, temperatureInput].forEach(el => {
+      el.addEventListener('input', updateCalculations);
+    });
+
+    // Run on boot
+    toggleCustomArea();
+  </script>
+</CalculatorLayout>

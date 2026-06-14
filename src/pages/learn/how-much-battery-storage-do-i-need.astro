@@ -1,0 +1,327 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import CalculatorCard from '../../components/CalculatorCard.astro';
+import FormulaBox from '../../components/FormulaBox.astro';
+import FAQSection from '../../components/FAQSection.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "How much battery storage do I need for my home?",
+    answer: "A typical home consuming 10–15 kWh/day needs 25–50 kWh of usable battery storage for 2 days of autonomy at 85% DoD. The exact number depends on your consumption, desired backup duration, and battery chemistry. Use the formula: Required Capacity = Daily Consumption × Autonomy Days / (DoD × Efficiency).",
+  },
+  {
+    question: "Is 10 kWh of battery storage enough?",
+    answer: "10 kWh of usable storage provides roughly 1 day of backup for a home consuming 10 kWh/day, or half a day for a 20 kWh/day household. For most homes, 10 kWh is a starting point — adequate for overnight bridging but insufficient for multi-day outages without solar recharge.",
+  },
+  {
+    question: "Should I size for peak demand or average consumption?",
+    answer: "Size for average daily consumption multiplied by your autonomy days. Peak demand is handled by the inverter's power rating, not the battery's energy capacity. The battery stores watt-hours (energy); the inverter delivers watts (power). These are separate specifications.",
+  },
+  {
+    question: "How does depth of discharge affect storage size?",
+    answer: "Lower DoD means you need more total capacity to access the same usable energy. At 50% DoD (lead-acid), a 20 kWh bank only gives you 10 kWh usable. At 85% DoD (LFP), the same 20 kWh bank gives you 17 kWh usable. LFP chemistry allows smaller banks for the same usable energy.",
+  },
+];
+---
+
+<Layout
+  title="How Much Battery Storage Do I Need? | Battery Calculators"
+  description="Calculate exactly how much battery storage capacity you need based on daily consumption, autonomy days, and battery chemistry. Includes reference tables and worked examples."
+  canonical="https://batterycalculators.com/learn/how-much-battery-storage-do-i-need"
+  schema="faqPage"
+  schemaName="How Much Battery Storage Do I Need"
+  schemaDescription="Guide to calculating total battery storage capacity from daily consumption and autonomy requirements."
+  schemaUrl="https://batterycalculators.com/learn/how-much-battery-storage-do-i-need"
+  faqItems={faqItems}
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/learn" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Back to Guides</a>
+      <Breadcrumb items={[
+        { label: "Learning Center", href: "/learn" },
+        { label: "How Much Battery Storage Do I Need" }
+      ]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">SOLAR</span>
+      <h1 class="text-display-md text-primary mb-6">How Much Battery Storage Do I Need?</h1>
+      <p class="text-body-md text-body font-light">
+        Battery storage capacity is measured in kilowatt-hours (kWh) — the total energy your batteries can store and deliver. Sizing this correctly ensures your system can power your loads through the night and survive cloudy days without running dry. This guide explains how to calculate the exact storage capacity your installation requires.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Understanding Usable vs. Rated Capacity</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Every battery has a rated (nameplate) capacity and a usable capacity. The usable portion is determined by the depth of discharge (DoD) limit — the percentage of total capacity you can safely draw before recharging. Exceeding this limit damages cells and shortens cycle life.
+        </p>
+        <p class="text-body-md text-body font-light mb-4">
+          For example, a 48V 200Ah LFP battery has a rated capacity of 9,600 Wh (9.6 kWh). At 85% DoD, its usable capacity is 8,160 Wh (8.16 kWh). When sizing storage, always work from usable capacity, not rated capacity.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Chemistry</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Typical DoD</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Usable per Rated kWh</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">LFP (LiFePO4)</td>
+                <td class="p-4 font-mono text-primary">80–90%</td>
+                <td class="p-4 text-muted">0.80–0.90 kWh usable per 1 kWh rated</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">NMC (Lithium)</td>
+                <td class="p-4 font-mono text-primary">80–90%</td>
+                <td class="p-4 text-muted">0.80–0.90 kWh usable per 1 kWh rated</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">Lead-Acid (AGM/Gel)</td>
+                <td class="p-4 font-mono text-primary">50%</td>
+                <td class="p-4 text-muted">0.50 kWh usable per 1 kWh rated</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <FormulaBox title="Storage Sizing Formula">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Required Usable Storage (Wh) = Daily Consumption (Wh) × Autonomy Days / System Efficiency
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Required Rated Storage (Wh) = Required Usable Storage (Wh) / DoD
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Required Rated Storage (kWh) = Required Rated Storage (Wh) / 1,000
+        </div>
+        <p>
+          System efficiency (typically 0.90–0.95) accounts for inverter losses, wiring losses, and BMS overhead. DoD is expressed as a decimal (e.g., 0.85 for 85%).
+        </p>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Step-by-Step Sizing Method</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          The sizing process follows three straightforward steps. Start with your daily consumption in watt-hours, multiply by autonomy days to get total required usable energy, then divide by DoD and efficiency to find the rated capacity you need to purchase.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Step 1</h4>
+            <p class="text-body-sm text-muted">Audit your daily consumption. List every load, multiply power by runtime, and sum the total watt-hours per day.</p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Step 2</h4>
+            <p class="text-body-sm text-muted">Multiply by autonomy days. Two days is standard; three or more for critical loads or cloudy regions.</p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Step 3</h4>
+            <p class="text-body-sm text-muted">Divide by DoD and efficiency. This gives you the rated kWh to purchase. Round up to the nearest available battery size.</p>
+          </CalculatorCard>
+        </div>
+        <p class="text-body-md text-body font-light">
+          The result is your minimum rated storage capacity. Adding a 20–30% margin for load growth, temperature derating, and aging is standard practice.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Storage Requirements by Daily Consumption</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          The table below shows required rated battery storage (in kWh) for common daily consumption levels. Values assume 85% DoD (LFP), 92% system efficiency, and the indicated number of autonomy days.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Daily Consumption</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">1 Day Autonomy</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">2 Days Autonomy</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">3 Days Autonomy</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">5 kWh/day</td>
+                <td class="p-4 text-muted">6.4 kWh rated</td>
+                <td class="p-4 text-muted">12.8 kWh rated</td>
+                <td class="p-4 text-muted">19.2 kWh rated</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">10 kWh/day</td>
+                <td class="p-4 text-muted">12.8 kWh rated</td>
+                <td class="p-4 text-muted">25.6 kWh rated</td>
+                <td class="p-4 text-muted">38.4 kWh rated</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">15 kWh/day</td>
+                <td class="p-4 text-muted">19.2 kWh rated</td>
+                <td class="p-4 text-muted">38.4 kWh rated</td>
+                <td class="p-4 text-muted">57.6 kWh rated</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">20 kWh/day</td>
+                <td class="p-4 text-muted">25.6 kWh rated</td>
+                <td class="p-4 text-muted">51.1 kWh rated</td>
+                <td class="p-4 text-muted">76.7 kWh rated</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">30 kWh/day</td>
+                <td class="p-4 text-muted">38.4 kWh rated</td>
+                <td class="p-4 text-muted">76.7 kWh rated</td>
+                <td class="p-4 text-muted">115.1 kWh rated</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-body-md text-body font-light mt-4">
+          For context, a typical Tesla Powerwall stores 13.5 kWh. A home consuming 10 kWh/day with 2 days autonomy needs roughly two Powerwalls (27 kWh rated) to meet the requirement.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Worked Example</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Given:</strong></p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li>Daily consumption: 10,000 Wh (10 kWh)</li>
+              <li>Desired autonomy: 2 days</li>
+              <li>Battery chemistry: LFP at 85% DoD</li>
+              <li>System efficiency: 92%</li>
+            </ul>
+            <p><strong>Step 1:</strong> Calculate required usable storage:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              10,000 Wh × 2 / 0.92 = 21,739 Wh usable
+            </div>
+            <p><strong>Step 2:</strong> Convert to rated capacity:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              21,739 Wh / 0.85 = 25,575 Wh rated
+            </div>
+            <p><strong>Step 3:</strong> Convert to kWh:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              25,575 Wh / 1,000 = 25.6 kWh rated capacity
+            </div>
+            <p class="text-muted mt-2">You need approximately <strong>25.6 kWh of rated LFP battery storage</strong>. In practice, this could be three 48V 100Ah modules (15.36 kWh rated) plus one 48V 200Ah module (10.24 kWh rated), or any combination of LFP modules totaling at least 25.6 kWh nameplate. Adding a 20% margin for load growth brings the target to roughly 30.7 kWh.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Common Battery Sizes for Solar Storage</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          The table below maps typical daily consumption levels to recommended battery configurations using standard 48V LFP modules.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Consumption</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Storage Needed (2 days)</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Recommended Config</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">5 kWh/day</td>
+                <td class="p-4 text-muted">~12.8 kWh</td>
+                <td class="p-4 text-muted">3 × 48V 100Ah (15.4 kWh)</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">10 kWh/day</td>
+                <td class="p-4 text-muted">~25.6 kWh</td>
+                <td class="p-4 text-muted">5 × 48V 100Ah (25.6 kWh)</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">15 kWh/day</td>
+                <td class="p-4 text-muted">~38.4 kWh</td>
+                <td class="p-4 text-muted">8 × 48V 100Ah (41.0 kWh)</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">20 kWh/day</td>
+                <td class="p-4 text-muted">~51.1 kWh</td>
+                <td class="p-4 text-muted">10 × 48V 100Ah (51.2 kWh)</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">30 kWh/day</td>
+                <td class="p-4 text-muted">~76.7 kWh</td>
+                <td class="p-4 text-muted">15 × 48V 100Ah (76.8 kWh)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">When to Oversize Storage</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Seasonal Buffer</h4>
+            <p class="text-body-sm text-muted">
+              Winter produces 30–50% less solar energy than summer. If your system must maintain autonomy year-round, size storage for the worst-case season. A 30–40% oversize beyond summer requirements covers the winter gap.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Load Growth Margin</h4>
+            <p class="text-body-sm text-muted">
+              Household consumption tends to increase over time — new appliances, EV charging, home office equipment. Adding a 20–30% margin now avoids the cost of retrofitting the battery bank later.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Battery Aging</h4>
+            <p class="text-body-sm text-muted">
+              LFP batteries retain 80% capacity after 3,000–5,000 cycles. Sizing to 100% of your need on day one means you will be undersized by year five. A 15–20% oversize compensates for capacity fade over the system's lifetime.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Critical Loads</h4>
+            <p class="text-body-sm text-muted">
+              Medical equipment, refrigeration for medications, or communication systems cannot tolerate interruption. For critical loads, size for 3–5 days of autonomy regardless of climate, and consider a backup generator.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Try It</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use the Solar Battery Sizing Calculator to determine the exact storage capacity for your specific consumption and autonomy needs.
+          </p>
+          <a href="/tools/solar-battery-sizing-calculator" class="btn-primary text-xs py-3 px-6 inline-block">Open Solar Battery Sizing Calculator</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Next Step</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Compare storage requirements across different battery chemistries with the Battery Sizing Calculator.
+          </p>
+          <a href="/tools/battery-sizing-calculator" class="btn-primary-outline text-xs py-3 px-6 inline-block">Open Battery Sizing Calculator</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Related Articles</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">How Many Batteries for Solar?</h4>
+            <p class="text-body-sm text-muted mb-3">
+              Calculate the exact number of battery modules your solar system requires.
+            </p>
+            <a href="/learn/how-many-batteries-for-solar" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Read Guide →</a>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">How to Size a Solar Battery Bank</h4>
+            <p class="text-body-sm text-muted mb-3">
+              The complete engineering method for sizing solar battery banks step by step.
+            </p>
+            <a href="/learn/how-to-size-solar-battery-bank" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Read Guide →</a>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

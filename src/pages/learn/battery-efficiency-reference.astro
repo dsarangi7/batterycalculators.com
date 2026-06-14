@@ -1,0 +1,251 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import CalculatorCard from '../../components/CalculatorCard.astro';
+import FAQSection from '../../components/FAQSection.astro';
+
+const faqItems = [
+  {
+    question: "What is round-trip efficiency?",
+    answer: "Round-trip efficiency is the percentage of energy that can be retrieved from a battery compared to the energy put in during charging. A battery with 90% round-trip efficiency loses 10% of input energy as heat during the charge-discharge cycle. LiFePO4 typically achieves 95–98% round-trip efficiency.",
+  },
+  {
+    question: "Why does inverter efficiency matter?",
+    answer: "Inverters convert DC battery power to AC for household loads. This conversion is not 100% efficient — typically 85–95%. A 1,000W AC load requires 1,050–1,175W from the battery. Inverter efficiency must be factored into all runtime and sizing calculations.",
+  },
+  {
+    question: "How does temperature affect battery efficiency?",
+    answer: "Cold temperatures increase internal resistance, which reduces both charge and discharge efficiency. At 0°C, a lithium battery may lose 5–10% efficiency compared to 25°C. At high temperatures, efficiency improves slightly but calendar aging accelerates.",
+  },
+  {
+    question: "Which battery chemistry has the best efficiency?",
+    answer: "LiFePO4 has the highest round-trip efficiency at 95–98%. NMC lithium-ion achieves 92–96%. AGM lead-acid reaches 80–85%. Flooded lead-acid is typically 70–80%. Higher efficiency means more usable energy from the same battery capacity.",
+  },
+];
+
+const tableOfContents = [
+  { id: "chemistry-efficiency", label: "Chemistry Efficiency" },
+  { id: "inverter-efficiency", label: "Inverter Efficiency" },
+  { id: "system-efficiency", label: "System Efficiency" },
+  { id: "common-mistakes", label: "Common Mistakes" },
+];
+
+const relatedCalculators = [
+  { title: "Runtime Calculator", href: "/tools/runtime-calculator" },
+  { title: "Inverter Battery Calculator", href: "/tools/inverter-battery-calculator" },
+  { title: "Battery Sizing Calculator", href: "/tools/battery-sizing-calculator" },
+];
+
+const references = [
+  { title: "Battery University — Charge Efficiency", url: "https://batteryuniversity.com/article/bu-407-charging-lithium-ion" },
+  { title: "NREL — Battery Efficiency Testing", url: "https://www.nrel.gov/docs/fy24osti/87655.pdf" },
+];
+---
+
+<Layout
+  title="Battery Efficiency Reference — Round-Trip, Inverter, and System Losses | Battery Calculators"
+  description="Battery efficiency reference: round-trip efficiency by chemistry, inverter efficiency ratings, and total system loss calculations for accurate runtime estimation."
+  faqItems={faqItems}
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/learn" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">&larr; Back to Guides</a>
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">REFERENCE</span>
+      <h1 class="text-display-md text-primary mb-6">Battery Efficiency Reference</h1>
+      <p class="text-body-md text-body font-light">
+        Understanding efficiency losses at every stage of a battery system. From cell chemistry to inverter output, every conversion step loses energy.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section id="chemistry-efficiency">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Round-Trip Efficiency by Chemistry</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Round-trip efficiency measures how much energy comes out of the battery compared to what went in during charging. The difference is lost as heat due to internal resistance and chemical inefficiencies.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-body-sm min-w-[480px]">
+              <thead>
+                <tr class="border-b border-hairline bg-surface-card">
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Chemistry</th>
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Round-Trip Efficiency</th>
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Loss per Cycle</th>
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Notes</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-hairline">
+                <tr>
+                  <td class="p-4 font-mono text-primary">LiFePO4</td>
+                  <td class="p-4 text-muted">95–98%</td>
+                  <td class="p-4 text-muted">2–5%</td>
+                  <td class="p-4 text-muted">Best available — minimal heat loss</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">NMC (Lithium)</td>
+                  <td class="p-4 text-muted">92–96%</td>
+                  <td class="p-4 text-muted">4–8%</td>
+                  <td class="p-4 text-muted">Very good — slightly higher internal resistance</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">AGM (Sealed Lead-Acid)</td>
+                  <td class="p-4 text-muted">80–85%</td>
+                  <td class="p-4 text-muted">15–20%</td>
+                  <td class="p-4 text-muted">Moderate — significant heat generation</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">Flooded Lead-Acid</td>
+                  <td class="p-4 text-muted">70–80%</td>
+                  <td class="p-4 text-muted">20–30%</td>
+                  <td class="p-4 text-muted">Lowest — Peukert effect compounds losses</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <p class="text-caption text-muted mt-3">Efficiency measured at 25°C at 0.5C rate. Actual efficiency varies with temperature, C-rate, and battery age.</p>
+      </section>
+
+      <section id="inverter-efficiency">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Inverter Efficiency Ratings</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Inverters convert DC battery power to AC for household loads. The efficiency rating describes how much DC energy is converted to useful AC energy. Modern pure sine wave inverters typically achieve 88–95% efficiency at rated load.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-body-sm min-w-[480px]">
+              <thead>
+                <tr class="border-b border-hairline bg-surface-card">
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Inverter Type</th>
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Efficiency Range</th>
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Best For</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-hairline">
+                <tr>
+                  <td class="p-4 font-mono text-primary">Pure Sine Wave</td>
+                  <td class="p-4 text-muted">90–95%</td>
+                  <td class="p-4 text-muted">Sensitive electronics, medical devices</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">Modified Sine Wave</td>
+                  <td class="p-4 text-muted">85–90%</td>
+                  <td class="p-4 text-muted">Basic loads, tools, lighting</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">Hybrid Inverter</td>
+                  <td class="p-4 text-muted">92–97%</td>
+                  <td class="p-4 text-muted">Solar + battery systems</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <p class="text-body-md text-body font-light mt-4">
+          Inverter efficiency varies with load. At 20% load, efficiency may drop to 80–85%. At 50–80% load, efficiency peaks at 90–95%. At full load, efficiency drops slightly due to thermal losses. Size your inverter so typical loads fall in the 30–70% range for best efficiency.
+        </p>
+      </section>
+
+      <section id="system-efficiency">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Total System Efficiency</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          A complete battery system has efficiency losses at every stage: charge controller, battery, inverter, and wiring. Total system efficiency is the product of all individual efficiencies.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-body-sm min-w-[480px]">
+              <thead>
+                <tr class="border-b border-hairline bg-surface-card">
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Component</th>
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Typical Efficiency</th>
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Notes</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-hairline">
+                <tr>
+                  <td class="p-4 font-mono text-primary">Solar Charge Controller (MPPT)</td>
+                  <td class="p-4 text-muted">95–98%</td>
+                  <td class="p-4 text-muted">MPPT slightly better than PWM</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">Battery (LiFePO4)</td>
+                  <td class="p-4 text-muted">95–98%</td>
+                  <td class="p-4 text-muted">Round-trip efficiency</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">Inverter (Pure Sine)</td>
+                  <td class="p-4 text-muted">90–95%</td>
+                  <td class="p-4 text-muted">Varies with load level</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">Wiring Losses</td>
+                  <td class="p-4 text-muted">97–99%</td>
+                  <td class="p-4 text-muted">Depends on wire gauge and length</td>
+                </tr>
+                <tr class="bg-surface-card">
+                  <td class="p-4 font-bold text-primary">Total System (LFP + MPPT + Inverter)</td>
+                  <td class="p-4 font-mono font-bold text-primary">78–90%</td>
+                  <td class="p-4 text-muted">Product of all component efficiencies</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <p class="text-body-md text-body font-light mt-4">
+          For a typical LiFePO4 system with MPPT charge controller and pure sine inverter, total system efficiency is approximately 80–88%. This means for every 1,000Wh of solar energy captured, approximately 800–880Wh reaches your AC loads.
+        </p>
+      </section>
+
+      <section id="common-mistakes">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Common Mistakes</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Ignoring Inverter Losses</h4>
+            <p class="text-body-sm text-muted">
+              A 1,000W AC load requires 1,050–1,111W from the battery at 90–95% inverter efficiency. Ignoring this 5–15% overhead means the battery drains faster than calculated.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Assuming 100% Battery Efficiency</h4>
+            <p class="text-body-sm text-muted">
+              No battery is 100% efficient. Lead-acid batteries lose 15–30% of input energy as heat during charge and discharge. Even LiFePO4 loses 2–5%. Always factor round-trip efficiency into calculations.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Ignoring Wiring Losses</h4>
+            <p class="text-body-sm text-muted">
+              Long cable runs with undersized wire cause significant voltage drop and power loss. A 3% voltage drop means 3% of your energy is wasted as heat in the cables. Use proper wire gauges.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Oversizing the Inverter</h4>
+            <p class="text-body-sm text-muted">
+              An oversized inverter operating at 10–20% load has significantly lower efficiency than one operating at 50–70% load. Match inverter size to your typical load range for best efficiency.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <CalculatorCard class="border-m-blue-light">
+        <h4 class="text-label-uppercase text-primary text-xs mb-3">Try It</h4>
+        <p class="text-body-sm text-muted mb-4">
+          Use the Runtime Calculator with efficiency factored in for accurate discharge duration estimates.
+        </p>
+        <a href="/tools/runtime-calculator" class="btn-primary text-xs py-3 px-6 inline-block">Open Runtime Calculator</a>
+      </CalculatorCard>
+
+      <FAQSection items={faqItems} />
+
+      <section class="border-t border-hairline pt-12">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">References</h2>
+        <ul class="flex flex-col gap-2 text-body-sm text-muted">
+          {references.map((ref) => (
+            <li class="flex gap-2">
+              <span class="text-m-blue-light shrink-0">—</span>
+              <a href={ref.url} class="hover:text-primary transition-colors underline underline-offset-2" target="_blank" rel="noopener noreferrer">{ref.title}</a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    </div>
+  </div>
+</Layout>

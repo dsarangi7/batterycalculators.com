@@ -1,0 +1,339 @@
+---
+import CalculatorLayout from '../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../components/CalculatorCard.astro';
+import InputField from '../../components/InputField.astro';
+import ResultBox from '../../components/ResultBox.astro';
+import FormulaBox from '../../components/FormulaBox.astro';
+import FAQSection from '../../components/FAQSection.astro';
+import RelatedTools from '../../components/RelatedTools.astro';
+import MiniSimulationChart from '../../components/MiniSimulationChart.astro';
+
+const whatIs = `Battery charging time is the duration required to restore a battery from a given state of charge to a target SOC using a specified charger current. Lithium-ion batteries charge in two distinct phases: <strong>Constant Current (CC)</strong>, where the charger delivers full current until the cell reaches its upper voltage limit (typically around 80% SOC), followed by <strong>Constant Voltage (CV)</strong>, where the charger holds voltage steady while current exponentially decays as the cell approaches 100% SOC. The CV phase can account for 20–30% of total charge time despite delivering only the final 20% of capacity. Understanding charge time is essential for scheduling EV charging, planning solar battery recharge windows, managing off-grid power budgets, and optimizing fleet vehicle turnaround times.`;
+
+const whyItMatters = [
+  "The CV phase adds 20–40% more time than a simple capacity/current calculation suggests — leading to underestimated charge times.",
+  "Charging above the recommended C-rate accelerates lithium plating and thermal stress, reducing battery lifespan by 20–40%.",
+  "Lead-acid batteries require extended absorption and float phases that can double the expected charge time compared to lithium.",
+  "BMS balancing at high SOC can slow or halt charging when cell voltages diverge, adding unpredictable overhead.",
+  "Solar-charged systems must account for variable charge rates based on available sunlight hours and panel output.",
+];
+
+const practicalApplications = [
+  { title: "EV Charging Scheduling", description: "Estimate charge times for level 1, level 2, and DC fast charging to plan vehicle availability." },
+  { title: "Solar Recharge Planning", description: "Determine if available daylight hours are sufficient to recharge batteries before evening loads." },
+  { title: "Fleet Vehicle Management", description: "Schedule charging windows for commercial EV fleets to minimize downtime." },
+  { title: "Off-Grid Power Budgets", description: "Plan generator run times and solar charging windows to maintain battery SOC through load cycles." },
+  { title: "Marine Battery Recharge", description: "Estimate alternator or shore power charge times for marine house banks." },
+];
+
+const expertNotes = [
+  { title: 'CV Phase Impact', variant: 'engineering', content: 'The last 20% of charging (CV phase) takes disproportionately longer because the charger restricts current to prevent overvoltage. This is normal CC-CV behavior — not a charger malfunction. Planning for 80% charge provides the best time-to-energy ratio.' },
+  { title: 'Lead-Acid vs Lithium', variant: 'info', content: 'Lead-acid batteries require significantly longer absorption (CV) and float phases compared to lithium. Their lower charge efficiency (80–85%) also means more energy must be input than is stored. Expect lead-acid charge times to be 1.5–2× longer than lithium for the same capacity and current.' },
+];
+
+const trustSection = {
+  text: "This calculator models the standard CC-CV charging profile used universally in lithium-ion battery chargers. The CC stage calculates linear charge delivery, while the CV stage uses an empirical overhead model based on exponential current decay. All intermediate values are displayed for verification.",
+  link: { label: "View our full methodology", href: "/methodology" },
+};
+
+const references = [
+  { title: "Battery University — Charging Lithium-Ion Batteries", url: "https://batteryuniversity.com/article/bu-409-charging-lithium-ion-batteries", source: "Battery University / Cadex Electronics" },
+  { title: "TI Application Note — Li-Ion Charging Profile", url: "https://www.ti.com/lit/an/slua480/slua480.pdf", source: "Texas Instruments" },
+  { title: "IEEE Std 1188 — Battery Charging Practices", url: "https://standards.ieee.org/ieee/1188/1076/", source: "IEEE Standards Association" },
+];
+
+const faqItems = [
+  {
+    question: "Why does the last 20% of charging take so long?",
+    answer: "This is due to the CV (Constant Voltage) phase. As the battery cells approach full charge, their terminal voltage matches the charger's voltage. To prevent overcharging the cells, the charger locks the voltage and allows current to decay exponentially, resulting in slower charge transfer rates.",
+  },
+  {
+    question: "Can I calculate charging time for Lead-Acid?",
+    answer: "Lead-acid batteries can be estimated, but they have a much longer absorption (CV) and float phase compared to lithium. Their efficiency is also lower (typically 80–85%). A standard rule of thumb is to double the CV overhead factor for lead-acid profiles.",
+  },
+  {
+    question: "What is the recommended charging C-rate for LiFePO4 cells?",
+    answer: "Standard LiFePO4 cells prefer a 0.2C to 0.5C charging rate for prolonged life. For example, a 100 Ah battery is optimally charged at 20A to 50A. Faster charging (1C) is supported by many high-power cells but can increase cell internal temperatures.",
+  },
+  {
+    question: "How do balancer losses impact charge time?",
+    answer: "When cell voltages drift, the battery management system (BMS) balances the cells by bypassing current through shunt resistors on high cells. If cell mismatch is high, charging will halt or slow significantly at the top end to let balancing complete, adding unpredictable overhead.",
+  },
+  {
+    question: "How long does it take to charge a 100Ah battery?",
+    answer: "At 0.2C (20A), a 100Ah battery from 20% to 100% takes approximately 5 hours. At 0.5C (50A), it takes about 2 hours. At 1C (100A), it takes about 1 hour, though the CV phase adds 20–30 minutes to reach full 100% SOC.",
+  },
+  {
+    question: "Can I speed up charging without damaging the battery?",
+    answer: "Increasing charge current speeds up the CC phase but generates more heat and can accelerate degradation. Most manufacturers recommend 0.2C–0.5C for optimal life. Charging at 1C is acceptable for occasional fast charges but not for daily use.",
+  },
+  {
+    question: "Does temperature affect charging time?",
+    answer: "Yes. Cold temperatures increase internal resistance, causing the BMS to reduce charge current to prevent lithium plating. At 0°C, many BMS units reduce charge rate to 0.1C or lower. Optimal charging occurs between 10–35°C.",
+  },
+  {
+    question: "What is the difference between CC and CV charging?",
+    answer: "CC (Constant Current) delivers a fixed current until the battery reaches its voltage limit (~80% SOC). CV (Constant Voltage) holds voltage constant while current decays exponentially as the battery approaches 100% SOC. Both phases are necessary for safe, full charging.",
+  },
+  {
+    question: "Should I charge to 80% or 100%?",
+    answer: "Charging to 80% avoids the slow CV phase and reduces calendar aging stress on the cells. For daily use, 80% is recommended for optimal battery longevity. Charge to 100% only when full capacity is needed for an upcoming trip or outage.",
+  },
+  {
+    question: "How does charger efficiency affect charge time?",
+    answer: "Charger efficiency (typically 90–95%) means 5–10% of input energy is lost as heat. A 95% efficient charger must supply 105Wh to store 100Wh, extending charge time proportionally. This calculator accounts for charger efficiency in its calculations.",
+  },
+  {
+    question: "Can I charge lithium batteries with a lead-acid charger?",
+    answer: "Not recommended. Lead-acid chargers use different voltage setpoints and multi-stage profiles (bulk, absorption, float) that can overcharge or undercharge lithium cells. Always use a charger designed for lithium-ion or LiFePO4 chemistry.",
+  },
+];
+---
+
+<CalculatorLayout
+  title="Battery Charging Time Calculator | Battery Calculators"
+  description="Estimate CC-CV charging times for lithium-ion and LFP batteries based on capacity, charger current, and target SOC."
+  faqItems={faqItems}
+  relatedCalculators={[
+    { href: "/tools/c-rate-calculator", title: "C-Rate Calculator", description: "Convert between Amps current and C-rate values." },
+    { href: "/tools/soc-estimator", title: "SOC Estimator", description: "Look up State of Charge based on OCV lines." },
+    { href: "/tools/battery-sizing-calculator", title: "Battery Sizing Tool", description: "Determine daily consumption sizing requirements." },
+    { href: "/tools/runtime-calculator", title: "Runtime Calculator", description: "Compute runtime from load wattage profiles." },
+    { href: "/tools/battery-degradation-estimator", title: "Degradation Estimator", description: "Estimate capacity fading over time." },
+    { href: "/tools/solar-battery-sizing-calculator", title: "Solar Battery Sizing", description: "Size solar battery banks from daily consumption." },
+  ]}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+>
+
+  <!-- Main Calculator Grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+
+    <!-- Input Form -->
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Parameters</h3>
+      <div class="flex flex-col gap-6">
+        <InputField id="capacity" label="Battery Capacity (Ah)" value={100} min={0.1} step="any" />
+        <InputField id="voltage" label="Nominal Voltage (V)" value={12.8} min={1} step="any" />
+        <InputField id="charge-current" label="Charger Output Current (Amperes)" value={20} min={0.1} step="any" helperText="Common charger rates: 5A, 10A, 20A, 50A" />
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <InputField id="start-soc" label="Start SOC (%)" value={20} min={0} max={100} />
+          <InputField id="target-soc" label="Target SOC (%)" value={100} min={0} max={100} />
+        </div>
+        <InputField id="efficiency" label="Charger Efficiency (%)" value={95} min={50} max={100} helperText="Thermal power conversion losses in charger circuitry (90-95% typical)" />
+      </div>
+    </CalculatorCard>
+
+    <!-- Calculation Results -->
+    <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Estimated Outputs</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <ResultBox
+            label="Total Charging Time"
+            value="5h 01m"
+            suffix="5.01 hours"
+            variant="primary"
+            id="result-time"
+          />
+          <ResultBox
+            label="Energy Added"
+            value="1,024 Wh"
+            suffix="1.02 kWh"
+            id="result-energy-box"
+          />
+          <ResultBox
+            label="Charging C-Rate"
+            value="0.20 C"
+            suffix="Slow speed charge"
+            id="result-c-rate-box"
+          />
+        </div>
+
+        <MiniSimulationChart
+          title="SOC Charge Profile"
+          description="State of charge rise during CC-CV charging"
+          xLabel="Time (hours)"
+          yLabel="SOC (%)"
+          chartId="chart-charging"
+        />
+      </div>
+
+      <!-- Action Area -->
+      <div class="border-t border-hairline pt-6">
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">Note on CV Saturation Phase</h4>
+        <p class="text-body-sm text-muted">
+          Li-ion and LiFePO4 batteries charge in two stages: Constant Current (CC) up to ~80% SOC, then Constant Voltage (CV) to 100%. In CV mode, the battery restricts current intake, adding an overhead duration model.
+        </p>
+      </div>
+    </CalculatorCard>
+
+  </div>
+
+  <!-- Technical Explanation and Equations -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+
+      <FormulaBox title="Mathematical Formulas">
+        <p>
+          The charging time T_total accounts for constant current charging efficiency and the CV saturation offset:
+        </p>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Amp-Hours Needed (Ah) = Capacity (Ah) x (Target SOC% - Start SOC%) / 100
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          CC Stage Time (Hours) = Ah Needed / (Charger Current (A) x (Efficiency% / 100))
+        </div>
+        <p>
+          If target SOC is 80% or above, we add an empirical CV stage overhead representing exponential current decay:
+        </p>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          CV Stage Overhead = (Target SOC% - max(80, Start SOC%)) x 0.04 Hours/%
+        </div>
+      </FormulaBox>
+
+      <!-- Worked Example -->
+      <div>
+        <h2 class="text-title-lg text-primary uppercase mb-6 tracking-wider">Worked Engineering Example</h2>
+        <div class="text-body-sm text-muted flex flex-col gap-4">
+          <p>Given system parameters:</p>
+          <ul class="list-disc pl-6 flex flex-col gap-1">
+            <li><strong>Capacity:</strong> 100 Ah</li>
+            <li><strong>Voltage:</strong> 12.8 V</li>
+            <li><strong>Start SOC:</strong> 20% | <strong>Target SOC:</strong> 100%</li>
+            <li><strong>Charger Output:</strong> 20 A</li>
+            <li><strong>Efficiency:</strong> 95%</li>
+          </ul>
+          <p><strong>Step 1:</strong> Calculate Capacity needed:</p>
+          <div class="font-mono text-primary">Ah_needed = 100 Ah x (100 - 20)/100 = 80 Ah</div>
+
+          <p><strong>Step 2:</strong> Solve CC charging stage time:</p>
+          <div class="font-mono text-primary">T_CC = 80 Ah / (20 A x 0.95) = 4.21 hours</div>
+
+          <p><strong>Step 3:</strong> Calculate CV saturation overhead (for SOC > 80%):</p>
+          <div class="font-mono text-primary">T_CV = (100 - 80) x 0.04 = 20 x 0.04 = 0.80 hours</div>
+
+          <p><strong>Step 4:</strong> Total calculated time:</p>
+          <div class="font-mono text-primary">T_total = 4.21 + 0.80 = 5.01 hours ≈ 5 hours 1 minute</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <FAQSection items={faqItems} />
+
+  <!-- Calculation Script -->
+  <script>
+    import { calculateChargingTime } from '../../utils/calculators';
+    import { renderLineChart, clearChart } from '../../utils/charting';
+
+    const capacityInput = document.getElementById('capacity') as HTMLInputElement;
+    const voltageInput = document.getElementById('voltage') as HTMLInputElement;
+    const chargeCurrentInput = document.getElementById('charge-current') as HTMLInputElement;
+    const startSocInput = document.getElementById('start-soc') as HTMLInputElement;
+    const targetSocInput = document.getElementById('target-soc') as HTMLInputElement;
+    const efficiencyInput = document.getElementById('efficiency') as HTMLInputElement;
+
+    // Outputs - Primary result box
+    const resultTimeCard = document.getElementById('result-time');
+    const resultTime = resultTimeCard?.querySelector('.text-display-md') as HTMLElement;
+    const resultHoursDecimal = resultTimeCard?.querySelector('.text-caption') as HTMLElement;
+
+    // Outputs - Secondary result boxes
+    const resultEnergy = document.getElementById('result-energy-box')?.querySelector('.text-title-lg') as HTMLElement;
+    const resultKwh = document.getElementById('result-energy-box')?.querySelector('.text-caption') as HTMLElement;
+    const resultCRate = document.getElementById('result-c-rate-box')?.querySelector('.text-title-lg') as HTMLElement;
+    const resultCRateDesc = document.getElementById('result-c-rate-box')?.querySelector('.text-caption') as HTMLElement;
+
+    const chartSvg = document.getElementById('chart-charging') as unknown as SVGElement;
+
+    function updateCalculations() {
+      const cap = parseFloat(capacityInput.value) || 100;
+      const voltage = parseFloat(voltageInput.value) || 12.8;
+      const current = parseFloat(chargeCurrentInput.value) || 20;
+      const startSoc = parseFloat(startSocInput.value) || 0;
+      const targetSoc = parseFloat(targetSocInput.value) || 100;
+      const eff = parseFloat(efficiencyInput.value) || 95;
+
+      const results = calculateChargingTime(cap, voltage, startSoc, targetSoc, current, eff);
+
+      // Render Time
+      if (results.chargeTimeHours <= 0) {
+        if (resultTime) resultTime.textContent = '0h 00m';
+        if (resultHoursDecimal) resultHoursDecimal.textContent = '0.00 hours';
+      } else {
+        const totalMinutes = Math.round(results.chargeTimeHours * 60);
+        const hours = Math.floor(totalMinutes / 60);
+        const mins = totalMinutes % 60;
+
+        if (resultTime) resultTime.textContent = `${hours}h ${mins < 10 ? '0' : ''}${mins}m`;
+        if (resultHoursDecimal) resultHoursDecimal.textContent = `${results.chargeTimeHours.toFixed(2)} hours`;
+      }
+
+      // Render Energy
+      if (resultEnergy) resultEnergy.textContent = `${Math.round(results.energyAddedWh).toLocaleString()} Wh`;
+      if (resultKwh) resultKwh.textContent = `${(results.energyAddedWh / 1000).toFixed(3)} kWh`;
+
+      // Render C-rate
+      const cRate = cap > 0 ? current / cap : 0;
+      if (resultCRate) resultCRate.textContent = `${cRate.toFixed(2)} C`;
+
+      let desc = 'Slow speed charge';
+      if (cRate >= 1.0) {
+        desc = 'Ultra high speed (thermal stress risk)';
+      } else if (cRate >= 0.5) {
+        desc = 'Standard fast charge rate';
+      } else if (cRate >= 0.1) {
+        desc = 'Optimal slow charge rate';
+      } else {
+        desc = 'Trickle/maintenance charge';
+      }
+      if (resultCRateDesc) resultCRateDesc.textContent = desc;
+
+      if (chartSvg && results.chargeTimeHours > 0 && cap > 0 && current > 0 && targetSoc > startSoc) {
+        const totalT = results.chargeTimeHours;
+        const ccEndSoc = Math.min(80, targetSoc);
+        const effectiveI = current * eff / 100;
+        const ccAh = cap * Math.max(0, ccEndSoc - startSoc) / 100;
+        const ccTime = effectiveI > 0 ? ccAh / effectiveI : 0;
+        const cvTime = Math.max(0, totalT - ccTime);
+
+        const pts: { x: number; y: number }[] = [];
+        for (let i = 0; i < 20; i++) {
+          const t = totalT * (i / 19);
+          let soc: number;
+          if (ccTime > 0 && t <= ccTime) {
+            soc = startSoc + (ccEndSoc - startSoc) * (t / ccTime);
+          } else if (cvTime > 0) {
+            const cvProg = (t - ccTime) / cvTime;
+            soc = ccEndSoc + (targetSoc - ccEndSoc) * (1 - Math.exp(-3 * cvProg));
+          } else {
+            soc = targetSoc;
+          }
+          pts.push({ x: t, y: Math.max(0, Math.min(100, soc)) });
+        }
+        renderLineChart(chartSvg, pts, {
+          width: 320, height: 160,
+          xLabel: 'Time (hours)', yLabel: 'SOC (%)',
+          xMin: 0, xMax: Math.ceil(totalT),
+          yMin: Math.max(0, startSoc - 5), yMax: Math.min(100, targetSoc + 5),
+        });
+      } else if (chartSvg) {
+        clearChart(chartSvg);
+      }
+    }
+
+    [capacityInput, voltageInput, chargeCurrentInput, startSocInput, targetSocInput, efficiencyInput].forEach(el => {
+      el.addEventListener('input', updateCalculations);
+    });
+
+    // Run on boot
+    updateCalculations();
+  </script>
+</CalculatorLayout>

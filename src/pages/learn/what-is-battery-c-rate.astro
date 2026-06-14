@@ -1,0 +1,157 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import CalculatorCard from '../../components/CalculatorCard.astro';
+import FormulaBox from '../../components/FormulaBox.astro';
+import FAQSection from '../../components/FAQSection.astro';
+
+const faqItems = [
+  {
+    question: "What does 1C mean for a 100 Ah battery?",
+    answer: "1C means the charge or discharge current that will fully charge or discharge the battery in one hour. For a 100 Ah battery, 1C = 100 A. A 0.5C rate (50 A) takes two hours; a 2C rate (200 A) takes thirty minutes.",
+  },
+  {
+    question: "Can I charge a battery at a higher C-rate than specified?",
+    answer: "Exceeding the manufacturer's recommended charge C-rate causes excessive internal heating and can trigger lithium plating on the anode. This permanently damages capacity and may create safety risks. Always stay within the datasheet limits.",
+  },
+  {
+    question: "Does C-rate affect battery lifespan?",
+    answer: "Yes. Higher C-rates generate more internal heat (I²R losses), which accelerates chemical degradation. A battery cycled at 0.5C will typically deliver significantly more cycles than the same battery cycled at 2C.",
+  },
+  {
+    question: "Why do lead-acid batteries have lower usable capacity at high C-rates?",
+    answer: "Lead-acid chemistry depends on acid diffusion into the plate material. At high currents, the acid near the plates depletes faster than it can be replenished, causing voltage to drop prematurely. This is called the Peukert effect.",
+  },
+];
+---
+
+<Layout
+  title="What Is Battery C-Rate? | Battery Calculators"
+  description="A practical guide to battery C-rate: what it means, how to calculate charge and discharge currents, and how C-rate affects cell longevity and thermal performance."
+  faqItems={faqItems}
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/learn" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Back to Guides</a>
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">CELL FUNDAMENTALS</span>
+      <h1 class="text-display-md text-primary mb-6">What Is Battery C-Rate?</h1>
+      <p class="text-body-md text-body font-light">
+        C-rate is the ratio of charge or discharge current to the battery's rated capacity. It standardizes how fast a battery is being charged or discharged, regardless of its absolute size.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">The Core Concept</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          A battery rated at 100 Ah can theoretically deliver 100 amps for one hour. That is a 1C discharge rate. The same battery delivering 50 amps is operating at 0.5C, and will theoretically run for two hours. Delivering 200 amps is a 2C rate, depleting it in thirty minutes.
+        </p>
+        <p class="text-body-md text-body font-light">
+          C-rate removes ambiguity when comparing batteries of different sizes. A 10 Ah cell and a 200 Ah cell both operating at 0.5C are discharging at proportionally similar stress levels, even though their absolute currents are very different.
+        </p>
+      </section>
+
+      <FormulaBox title="C-Rate Formulas">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          C-Rate = Current (A) / Capacity (Ah)
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Current (A) = C-Rate × Capacity (Ah)
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Time (h) = 1 / C-Rate
+        </div>
+        <p>
+          For example, a 200 Ah battery at 0.5C: Current = 0.5 × 200 = 100 A. Time = 1 / 0.5 = 2 hours.
+        </p>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Why C-Rate Matters</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Thermal Stress</h4>
+            <p class="text-body-sm text-muted">
+              Internal resistance produces heat proportional to the square of current (I²R). Doubling the C-rate quadruples heat generation. Thermal management becomes critical above 1C for most lithium cells.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Cycle Life</h4>
+            <p class="text-body-sm text-muted">
+              High C-rates accelerate lithium plating and solid-electrolyte interphase (SEI) growth. A battery cycled at 0.3C may deliver 5,000 cycles, while the same cell at 2C might only reach 1,500 cycles.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Usable Capacity</h4>
+            <p class="text-body-sm text-muted">
+              At high discharge rates, voltage sags below the cutoff threshold before the battery is fully depleted. This reduces the actual delivered energy below the rated capacity.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Charging Speed</h4>
+            <p class="text-body-sm text-muted">
+              Fast charging requires high C-rates (1C to 3C). The trade-off is increased cell temperature and potential lithium plating if the battery is cold or the charge profile is not properly controlled.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Practical C-Rate Reference</h2>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">C-Rate</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">100 Ah Battery Current</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Approx. Time</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Typical Use</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">0.05C</td>
+                <td class="p-4 text-muted">5 A</td>
+                <td class="p-4 text-muted">~20 hours</td>
+                <td class="p-4 text-muted">Trickle charging, standby</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">0.2C</td>
+                <td class="p-4 text-muted">20 A</td>
+                <td class="p-4 text-muted">~5 hours</td>
+                <td class="p-4 text-muted">Slow charge, LFP longevity</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">0.5C</td>
+                <td class="p-4 text-muted">50 A</td>
+                <td class="p-4 text-muted">~2 hours</td>
+                <td class="p-4 text-muted">Standard charge/discharge</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">1C</td>
+                <td class="p-4 text-muted">100 A</td>
+                <td class="p-4 text-muted">~1 hour</td>
+                <td class="p-4 text-muted">Fast charge, EV driving</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">2C</td>
+                <td class="p-4 text-muted">200 A</td>
+                <td class="p-4 text-muted">~30 minutes</td>
+                <td class="p-4 text-muted">High-power discharge, fast charge</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <CalculatorCard class="border-m-blue-light">
+        <h4 class="text-label-uppercase text-primary text-xs mb-3">Try It</h4>
+        <p class="text-body-sm text-muted mb-4">
+          Use the C-Rate Calculator to convert between current, capacity, and C-rate for your specific battery.
+        </p>
+        <a href="/tools/c-rate-calculator" class="btn-primary text-xs py-3 px-6 inline-block">Open C-Rate Calculator</a>
+      </CalculatorCard>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

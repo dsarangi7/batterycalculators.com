@@ -1,0 +1,149 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { searchData } from '../utils/search-data';
+
+const serializedData = JSON.stringify(searchData);
+---
+
+<Layout
+  title="Search | Battery Calculators"
+  description="Search battery calculators, sizing tools, and engineering guides on Battery Calculators."
+  canonical="https://batterycalculators.com/search"
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-10 border-b border-hairline pb-8">
+      <h1 class="text-title-lg text-primary mb-6">Search</h1>
+
+      <!-- Search Input -->
+      <input
+        id="search-input"
+        type="text"
+        placeholder="Search calculators, guides, and categories"
+        class="text-input w-full"
+        autocomplete="off"
+        autofocus
+      />
+    </div>
+
+    <!-- Results Container -->
+    <div id="search-results" class="flex flex-col gap-3 md:gap-4"></div>
+
+    <!-- Empty State -->
+    <div id="search-empty" class="hidden py-16 text-center">
+      <span class="text-label-uppercase text-muted text-xs block mb-3">NO RESULTS</span>
+      <p class="text-body-md text-muted">No results found. Try a different search term.</p>
+    </div>
+
+    <!-- Initial State -->
+    <div id="search-initial" class="py-16 text-center">
+      <span class="text-label-uppercase text-muted text-xs block mb-3">TYPE TO SEARCH</span>
+      <p class="text-body-md text-muted">Start typing to find calculators, guides, and categories.</p>
+    </div>
+  </div>
+
+  <script is:inline define:vars={{ serializedData }}>
+    const data = JSON.parse(serializedData);
+    const input = document.getElementById('search-input');
+    const resultsContainer = document.getElementById('search-results');
+    const emptyState = document.getElementById('search-empty');
+    const initialState = document.getElementById('search-initial');
+
+    const TYPE_LABELS = {
+      calculator: 'Calculator',
+      guide: 'Guide',
+      category: 'Category',
+      page: 'Page',
+    };
+
+    function norm(s) {
+      return s.toLowerCase().replace(/-/g, ' ').replace(/\s+/g, ' ').trim();
+    }
+
+    function scoreResult(item, lower) {
+      let score = 0;
+      const titleLower = norm(item.title);
+      const descLower = norm(item.description);
+      const catLower = norm(item.category);
+      const typeLower = norm(item.type);
+      const qLower = norm(lower);
+
+      if (titleLower === qLower) score += 100;
+      else if (titleLower.includes(qLower)) score += 60;
+
+      for (const kw of item.keywords) {
+        const kwNorm = norm(kw);
+        if (kwNorm === qLower) score += 50;
+        else if (kwNorm.includes(qLower)) score += 35;
+      }
+
+      if (descLower.includes(qLower)) score += 20;
+      if (catLower.includes(qLower)) score += 10;
+      if (typeLower.includes(qLower)) score += 5;
+
+      return score;
+    }
+
+    function performSearch(query) {
+      initialState.classList.add('hidden');
+      const lower = norm(query);
+
+      const scored = data
+        .map((item) => ({ item, score: scoreResult(item, lower) }))
+        .filter((entry) => entry.score > 0)
+        .sort((a, b) => b.score - a.score);
+
+      if (scored.length === 0) {
+        resultsContainer.innerHTML = '';
+        emptyState.classList.remove('hidden');
+        return;
+      }
+
+      emptyState.classList.add('hidden');
+      resultsContainer.innerHTML = scored
+        .map(({ item }) => `
+          <div class="bg-surface-card border border-hairline p-4 md:p-6 flex flex-col gap-3 md:flex-row md:items-center md:gap-4 hover:border-primary transition-colors">
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 md:gap-3 mb-2 flex-wrap">
+                <span class="text-label-uppercase text-m-blue-light text-[10px] tracking-wider">${TYPE_LABELS[item.type] || item.type}</span>
+                <span class="text-label-uppercase text-muted text-[10px] tracking-wider">${item.category}</span>
+              </div>
+              <h3 class="text-title-md text-primary mb-1 break-words">${item.title}</h3>
+              <p class="text-body-sm text-muted line-clamp-2">${item.description}</p>
+            </div>
+            <a
+              href="${item.url}"
+              class="btn-primary-outline text-[10px] h-10 px-4 whitespace-nowrap shrink-0 self-start md:self-center"
+            >
+              Open Page
+            </a>
+          </div>
+        `)
+        .join('');
+    }
+
+    // Check URL for query param
+    const params = new URLSearchParams(window.location.search);
+    const initialQuery = params.get('q');
+    if (initialQuery) {
+      input.value = initialQuery;
+      performSearch(initialQuery);
+    }
+
+    input.addEventListener('input', (e) => {
+      const query = e.target.value.trim();
+      if (query.length === 0) {
+        resultsContainer.innerHTML = '';
+        emptyState.classList.add('hidden');
+        initialState.classList.remove('hidden');
+        const url = new URL(window.location);
+        url.searchParams.delete('q');
+        window.history.replaceState({}, '', url);
+        return;
+      }
+      const url = new URL(window.location);
+      url.searchParams.set('q', query);
+      window.history.replaceState({}, '', url);
+      performSearch(query);
+    });
+  </script>
+</Layout>

@@ -1,0 +1,256 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import CalculatorCard from '../../components/CalculatorCard.astro';
+import FAQSection from '../../components/FAQSection.astro';
+import RelatedTools from '../../components/RelatedTools.astro';
+
+const faqItems = [
+  {
+    question: "What is the difference between gravimetric and volumetric energy density?",
+    answer: "Gravimetric energy density (Wh/kg) measures how much energy a battery stores per unit of weight. Volumetric energy density (Wh/L) measures how much energy it stores per unit of volume. A battery with high gravimetric density is lightweight; one with high volumetric density is compact. LiFePO4 has moderate gravimetric density but lower volumetric density than NMC.",
+  },
+  {
+    question: "Why is LiFePO4 heavier than NMC for the same capacity?",
+    answer: "LiFePO4 uses an iron-phosphate cathode, which is heavier per unit of stored energy compared to the nickel-manganese-cobalt (NMC) cathode. However, LiFePO4 offers significantly longer cycle life (3,000–10,000 cycles vs. 1,000–2,000 for NMC), better thermal stability, and no cobalt content — making it the preferred choice for stationary storage despite the weight penalty.",
+  },
+  {
+    question: "How does energy density affect RV and marine applications?",
+    answer: "Weight and space are at a premium in RVs and boats. Higher energy density means more usable energy in less weight and volume. A 100Ah LiFePO4 battery at ~13kg replaces a 100Ah lead-acid at ~30kg — saving 17kg per battery. In a 4-battery bank, that is nearly 70kg of weight savings, which directly improves fuel efficiency and cargo capacity.",
+  },
+  {
+    question: "What is the energy density of the latest solid-state batteries?",
+    answer: "Solid-state batteries are projected to achieve 400–500 Wh/kg gravimetrically, roughly double current lithium-ion cells. However, they remain in development or early commercial stages as of 2025. Current production batteries top out around 260 Wh/kg (NMC) for consumer applications and 160 Wh/kg (LiFePO4) for commercial/industrial cells.",
+  },
+];
+
+const relatedTools = [
+  { title: "Battery Sizing Calculator", href: "/tools/battery-sizing-calculator", description: "Calculate the right battery capacity for your application" },
+  { title: "Battery Pack Calculator", href: "/tools/battery-pack-calculator", description: "Design series and parallel battery configurations" },
+];
+
+const references = [
+  { title: "Battery University — Energy Density", url: "https://batteryuniversity.com/article/bu-106-advantages-and-limitations-of-batteries" },
+  { title: "USDOE — Battery Energy Density Comparison", url: "https://www.energy.gov/eere/vehicles/batteries" },
+];
+---
+
+<Layout
+  title="Battery Energy Density Chart — Wh/kg and Wh/L by Chemistry | Battery Calculators"
+  description="Compare energy density of LiFePO4, NMC, lead-acid, AGM, and gel batteries. Weight and volume energy density reference table."
+  faqItems={faqItems}
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/learn" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">&larr; Back to Guides</a>
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">REFERENCE</span>
+      <h1 class="text-display-md text-primary mb-6">Battery Energy Density Chart</h1>
+      <p class="text-body-md text-body font-light">
+        Compare the weight and volume energy density of every major battery chemistry. Understand why LiFePO4, NMC, and lead-acid differ — and which matters for your application.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section id="density-table">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Energy Density by Chemistry</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          The table below compares gravimetric (Wh/kg) and volumetric (Wh/L) energy density for common battery chemistries, along with the typical weight of a 12V 100Ah pack of each type.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-body-sm min-w-[640px]">
+              <thead>
+                <tr class="border-b border-hairline bg-surface-card">
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Chemistry</th>
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Gravimetric (Wh/kg)</th>
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Volumetric (Wh/L)</th>
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Typical Weight (12V 100Ah)</th>
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Notes</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-hairline">
+                <tr>
+                  <td class="p-4 font-mono text-primary">LiFePO4</td>
+                  <td class="p-4 text-muted">90–160</td>
+                  <td class="p-4 text-muted">200–350</td>
+                  <td class="p-4 text-muted">10–14 kg</td>
+                  <td class="p-4 text-muted">Best cycle life, safest lithium</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">NMC</td>
+                  <td class="p-4 text-muted">150–260</td>
+                  <td class="p-4 text-muted">400–700</td>
+                  <td class="p-4 text-muted">8–12 kg</td>
+                  <td class="p-4 text-muted">Highest density, EV standard</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">NCA</td>
+                  <td class="p-4 text-muted">200–260</td>
+                  <td class="p-4 text-muted">500–650</td>
+                  <td class="p-4 text-muted">8–12 kg</td>
+                  <td class="p-4 text-muted">Used in Tesla, high energy</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">Lead-Acid Flooded</td>
+                  <td class="p-4 text-muted">25–40</td>
+                  <td class="p-4 text-muted">60–110</td>
+                  <td class="p-4 text-muted">28–35 kg</td>
+                  <td class="p-4 text-muted">Cheapest, heaviest, oldest</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">AGM</td>
+                  <td class="p-4 text-muted">30–45</td>
+                  <td class="p-4 text-muted">70–120</td>
+                  <td class="p-4 text-muted">25–32 kg</td>
+                  <td class="p-4 text-muted">Maintenance-free lead-acid</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">Gel</td>
+                  <td class="p-4 text-muted">30–40</td>
+                  <td class="p-4 text-muted">60–110</td>
+                  <td class="p-4 text-muted">26–33 kg</td>
+                  <td class="p-4 text-muted">Deep-cycle optimized, sealed</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <p class="text-caption text-muted mt-3">Ranges represent typical commercial cells. Values vary by manufacturer, cell format (prismatic, pouch, cylindrical), and BMS weight.</p>
+      </section>
+
+      <section id="gravimetric-vs-volumetric">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Gravimetric vs Volumetric Density</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Gravimetric energy density (Wh/kg) tells you how much energy you get per kilogram. This is the critical metric when weight matters — in EVs, drones, portable devices, and boats where displacement is a concern.
+        </p>
+        <p class="text-body-md text-body font-light mb-4">
+          Volumetric energy density (Wh/L) tells you how much energy you get per liter of space. This is critical when space is constrained — in tight engine bays, under seats, in wall-mounted enclosures, or inside compact battery cabinets.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Weight Priority</h4>
+            <p class="text-body-sm text-muted">
+              Choose NMC or NCA when weight is the primary constraint. At 200+ Wh/kg, these chemistries deliver nearly 5–6× the energy per kilogram compared to lead-acid. Ideal for EVs, drones, and weight-sensitive marine applications.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Volume Priority</h4>
+            <p class="text-body-sm text-muted">
+              Choose NMC or LiFePO4 prismatic cells when space is tight. NMC offers 400–700 Wh/L, making it the most compact option. LiFePO4 prismatic cells are larger but compensate with longer cycle life and safety.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <section id="practical-comparison">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Practical Weight Comparison</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          The table below compares the actual weight and approximate volume of a 12V 100Ah (1,200Wh) battery pack for each chemistry. This is the most direct way to see the real-world impact of energy density differences.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-body-sm min-w-[640px]">
+              <thead>
+                <tr class="border-b border-hairline bg-surface-card">
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Chemistry</th>
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Pack Weight</th>
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Approx. Volume</th>
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Cost Range</th>
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Cycle Life</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-hairline">
+                <tr>
+                  <td class="p-4 font-mono text-primary">LiFePO4</td>
+                  <td class="p-4 text-muted">10–14 kg</td>
+                  <td class="p-4 text-muted">~13–15 L</td>
+                  <td class="p-4 text-muted">$400–$800</td>
+                  <td class="p-4 text-muted">3,000–10,000</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">NMC</td>
+                  <td class="p-4 text-muted">8–12 kg</td>
+                  <td class="p-4 text-muted">~5–8 L</td>
+                  <td class="p-4 text-muted">$500–$1,000</td>
+                  <td class="p-4 text-muted">1,000–2,000</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">Lead-Acid Flooded</td>
+                  <td class="p-4 text-muted">28–35 kg</td>
+                  <td class="p-4 text-muted">~18–25 L</td>
+                  <td class="p-4 text-muted">$100–$200</td>
+                  <td class="p-4 text-muted">300–500</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">AGM</td>
+                  <td class="p-4 text-muted">25–32 kg</td>
+                  <td class="p-4 text-muted">~16–22 L</td>
+                  <td class="p-4 text-muted">$200–$400</td>
+                  <td class="p-4 text-muted">400–800</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">Gel</td>
+                  <td class="p-4 text-muted">26–33 kg</td>
+                  <td class="p-4 text-muted">~17–23 L</td>
+                  <td class="p-4 text-muted">$250–$450</td>
+                  <td class="p-4 text-muted">500–1,000</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <p class="text-caption text-muted mt-3">Cost ranges are approximate and vary by region, brand, and purchase volume. Cycle life assumes 80% depth-of-discharge.</p>
+      </section>
+
+      <section id="why-density-matters">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Why Energy Density Matters</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Energy density directly impacts system design, cost, and performance. The right chemistry depends on whether weight, space, or budget is your primary constraint.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">RV & Camper</h4>
+            <p class="text-body-sm text-muted">
+              Weight impacts fuel economy and payload. A 400Ah LiFePO4 bank weighs ~50kg vs ~130kg for lead-acid. The 80kg savings means more gear, better mileage, and less wear on suspension. Space savings allow mounting in tighter compartments.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Marine</h4>
+            <p class="text-body-sm text-muted">
+              Every kilogram above the waterline affects vessel stability and handling. High-density batteries low in the hull keep center of gravity down. Lighter batteries also mean faster acceleration and better fuel economy for powerboats.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Electric Vehicles</h4>
+            <p class="text-body-sm text-muted">
+              Energy density determines range per kilogram of battery. A 75kWh NMC pack at 160kg gives 500km range. The same energy in lead-acid would weigh over 2,000kg — making the vehicle impractical. EV viability depends entirely on gravimetric density.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <CalculatorCard class="border-m-blue-light">
+        <h4 class="text-label-uppercase text-primary text-xs mb-3">Try It</h4>
+        <p class="text-body-sm text-muted mb-4">
+          Use the Battery Pack Calculator to design a pack with the right chemistry, configuration, and total energy for your application.
+        </p>
+        <a href="/tools/battery-pack-calculator" class="btn-primary text-xs py-3 px-6 inline-block">Open Battery Pack Calculator</a>
+      </CalculatorCard>
+
+      <FAQSection items={faqItems} />
+
+      <RelatedTools tools={relatedTools} />
+
+      <section class="border-t border-hairline pt-12">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">References</h2>
+        <ul class="flex flex-col gap-2 text-body-sm text-muted">
+          {references.map((ref) => (
+            <li class="flex gap-2">
+              <span class="text-m-blue-light shrink-0">—</span>
+              <a href={ref.url} class="hover:text-primary transition-colors underline underline-offset-2" target="_blank" rel="noopener noreferrer">{ref.title}</a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    </div>
+  </div>
+</Layout>

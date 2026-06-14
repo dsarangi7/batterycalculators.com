@@ -1,0 +1,278 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import CalculatorCard from '../../components/CalculatorCard.astro';
+import FormulaBox from '../../components/FormulaBox.astro';
+import FAQSection from '../../components/FAQSection.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "How long does it take to charge a 100Ah battery?",
+    answer: "It depends on the charger current. At 0.2C (20A), a 100Ah LFP battery charges in approximately 5 hours. At 0.5C (50A), it charges in about 2 hours. The final CV (constant voltage) phase adds 30–60 minutes as the battery tops off.",
+  },
+  {
+    question: "Why does charging slow down near full?",
+    answer: "Lithium batteries use a CC-CV (constant current, constant voltage) profile. During the CC phase, current is constant and charging is fast. During the CV phase, the charger holds voltage constant while current tapers, taking progressively longer to add each percent of charge.",
+  },
+  {
+    question: "Can I charge a battery faster than 1C?",
+    answer: "Some lithium chemistries support 1C to 2C charging, but faster rates generate more heat and accelerate degradation. LFP chemistry is typically charged at 0.2C to 0.5C for optimal cycle life. Always follow the manufacturer's recommended charge rate.",
+  },
+  {
+    question: "Does temperature affect charging time?",
+    answer: "Yes. Cold batteries accept less current because the BMS limits charge rate to prevent lithium plating. Below 0°C, most lithium batteries should not be charged at all. Charging in cold conditions extends the CV phase, increasing total charge time.",
+  },
+];
+---
+
+<Layout
+  title="How Long to Charge a Battery | Battery Calculators"
+  description="Learn how to estimate battery charging time using C-rate, charger current, and CC-CV profiles. Includes worked examples, formulas, and practical reference tables."
+  canonical="https://batterycalculators.com/learn/how-long-to-charge-a-battery"
+  schema="faqPage"
+  schemaName="How Long to Charge a Battery"
+  schemaDescription="Guide to estimating battery charging time from C-rate, charger current, and CC-CV profiles."
+  schemaUrl="https://batterycalculators.com/learn/how-long-to-charge-a-battery"
+  faqItems={faqItems}
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/learn" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Back to Guides</a>
+      <Breadcrumb items={[
+        { label: "Learning Center", href: "/learn" },
+        { label: "How Long to Charge a Battery" }
+      ]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">CHARGING</span>
+      <h1 class="text-display-md text-primary mb-6">How Long to Charge a Battery</h1>
+      <p class="text-body-md text-body font-light">
+        Charging time depends on the charger's current output, the battery's capacity, and the charging profile used. A battery does not charge at a constant rate throughout the entire cycle — the last 10–20% takes significantly longer than the first 80%.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">The Two-Phase Charging Profile</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Most lithium-ion and LFP batteries use a CC-CV (Constant Current, Constant Voltage) charging profile. Understanding these two phases is essential for estimating accurate charge times.
+        </p>
+        <p class="text-body-md text-body font-light mb-4">
+          During the <strong class="text-primary">CC phase</strong>, the charger delivers a constant current (for example, 50A into a 100Ah battery). The battery voltage rises steadily during this phase. This is the fast-charging portion, typically adding 80% of the capacity.
+        </p>
+        <p class="text-body-md text-body font-light">
+          During the <strong class="text-primary">CV phase</strong>, the charger holds the voltage constant at the battery's maximum (e.g., 3.65V per cell for LFP) while the current tapers exponentially. This phase adds the final 10–20% but takes disproportionately longer because the current is decreasing.
+        </p>
+      </section>
+
+      <FormulaBox title="Charging Time Formulas">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          CC Phase Time (h) = Capacity (Ah) × (Target SOC% − Start SOC%) / Charge Current (A)
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Total Time ≈ CC Phase Time × 1.25 to 1.35
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          C-Rate = Charge Current (A) / Capacity (Ah)
+        </div>
+        <p>
+          The 1.25–1.35 multiplier accounts for the CV phase where current tapers. The exact multiplier depends on how deeply the battery was discharged and the chemistry's CV taper characteristics.
+        </p>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Charge Time by C-Rate</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          C-rate standardizes charging speed regardless of battery size. A 100Ah battery at 0.5C charges at 50A; a 200Ah battery at 0.5C charges at 100A. Both take roughly the same time because the rate is proportional to capacity.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">C-Rate</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">100Ah Current</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Approx. Time</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Notes</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">0.1C</td>
+                <td class="p-4 text-muted">10 A</td>
+                <td class="p-4 text-muted">~12 hours</td>
+                <td class="p-4 text-muted">Trickle, maximum battery life</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">0.2C</td>
+                <td class="p-4 text-muted">20 A</td>
+                <td class="p-4 text-muted">~6 hours</td>
+                <td class="p-4 text-muted">Slow charge, LFP longevity</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">0.5C</td>
+                <td class="p-4 text-muted">50 A</td>
+                <td class="p-4 text-muted">~2.5 hours</td>
+                <td class="p-4 text-muted">Standard fast charge</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">1C</td>
+                <td class="p-4 text-muted">100 A</td>
+                <td class="p-4 text-muted">~1.25 hours</td>
+                <td class="p-4 text-muted">Aggressive, more heat</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">2C</td>
+                <td class="p-4 text-muted">200 A</td>
+                <td class="p-4 text-muted">~40 minutes</td>
+                <td class="p-4 text-muted">Very fast, reduced cycle life</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Worked Example</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Given:</strong></p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li>Battery: 200 Ah at 48V (LFP server rack)</li>
+              <li>Charger: 48V 50A (0.25C rate)</li>
+              <li>Starting SOC: 20%</li>
+              <li>Target SOC: 100%</li>
+            </ul>
+            <p><strong>Step 1:</strong> Calculate charge required (Ah):</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              200 Ah × (1.00 − 0.20) = 160 Ah to add
+            </div>
+            <p><strong>Step 2:</strong> CC phase time:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              160 Ah / 50 A = 3.2 hours
+            </div>
+            <p><strong>Step 3:</strong> Estimate total time including CV taper:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              3.2 hours × 1.30 ≈ 4.16 hours ≈ 4 hours 10 minutes
+            </div>
+            <p class="text-muted mt-2">At a higher 1C charger (100A), the same 80% to 100% charge would take approximately 1 hour 18 minutes. The trade-off is increased cell heating and potential long-term capacity degradation.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Charging Time by Battery Size</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          The table below shows typical charging times from 20% to 100% SOC for common battery sizes using a 0.2C charger.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Battery Size</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">0.2C Charger</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">0.5C Charger</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">1C Charger</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">50 Ah 12.8V</td>
+                <td class="p-4 text-muted">~5.2 hrs</td>
+                <td class="p-4 text-muted">~2.1 hrs</td>
+                <td class="p-4 text-muted">~1.0 hrs</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">100 Ah 12.8V</td>
+                <td class="p-4 text-muted">~5.2 hrs</td>
+                <td class="p-4 text-muted">~2.1 hrs</td>
+                <td class="p-4 text-muted">~1.0 hrs</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">200 Ah 48V</td>
+                <td class="p-4 text-muted">~5.2 hrs</td>
+                <td class="p-4 text-muted">~2.1 hrs</td>
+                <td class="p-4 text-muted">~1.0 hrs</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">300 Ah 48V</td>
+                <td class="p-4 text-muted">~5.2 hrs</td>
+                <td class="p-4 text-muted">~2.1 hrs</td>
+                <td class="p-4 text-muted">~1.0 hrs</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-body-md text-body font-light mt-4">
+          The times are similar across battery sizes because C-rate is proportional. A larger battery gets proportionally more current from a larger charger, keeping the charge time constant.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Factors That Affect Charge Time</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Starting SOC</h4>
+            <p class="text-body-sm text-muted">
+              Charging from 0% takes longer than from 20% because the CC phase covers a larger portion of capacity. The CV taper phase remains roughly constant regardless of starting SOC.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Temperature</h4>
+            <p class="text-body-sm text-muted">
+              Cold batteries accept less current. Below 0°C, lithium BMS units typically block charging entirely. Between 0–10°C, charge rates may be reduced to 0.1C, extending charge time significantly.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Charger Power Limit</h4>
+            <p class="text-body-sm text-muted">
+              The charger's maximum current output is the bottleneck. A 100Ah battery with a 25A charger (0.25C) charges much slower than with a 100A charger (1C), regardless of the battery's capability.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Battery Age</h4>
+            <p class="text-body-sm text-muted">
+              Aging batteries have higher internal resistance, which causes the CV phase to trigger earlier and the taper to be slower. This extends total charge time by 10–20% for batteries at 80% SOH.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Try It</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use the Charging Time Calculator to estimate charge duration for your specific battery and charger configuration.
+          </p>
+          <a href="/tools/charging-time-calculator" class="btn-primary text-xs py-3 px-6 inline-block">Open Charging Time Calculator</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Related</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Understand how C-rate governs both charge and discharge current limits.
+          </p>
+          <a href="/learn/what-is-battery-c-rate" class="btn-primary-outline text-xs py-3 px-6 inline-block">Read C-Rate Guide</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Related Articles</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">What Is Battery C-Rate?</h4>
+            <p class="text-body-sm text-muted mb-3">
+              Understand the ratio of current to capacity and how it governs charge speed.
+            </p>
+            <a href="/learn/what-is-battery-c-rate" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Read Guide →</a>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">How Long Will a Battery Last?</h4>
+            <p class="text-body-sm text-muted mb-3">
+              The complementary guide: estimating discharge runtime from capacity and load.
+            </p>
+            <a href="/learn/how-long-will-a-battery-last" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Read Guide →</a>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

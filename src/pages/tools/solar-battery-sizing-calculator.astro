@@ -1,0 +1,372 @@
+---
+import CalculatorLayout from '../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../components/CalculatorCard.astro';
+import InputField from '../../components/InputField.astro';
+import ResultBox from '../../components/ResultBox.astro';
+import FormulaBox from '../../components/FormulaBox.astro';
+import FAQSection from '../../components/FAQSection.astro';
+import RelatedTools from '../../components/RelatedTools.astro';
+import MiniSimulationChart from '../../components/MiniSimulationChart.astro';
+
+const whatIs = `Solar battery sizing determines the total energy capacity a battery bank must store to power a home or facility through periods without solar production — nights, cloudy days, and seasonal low-light periods. The calculation integrates <strong>daily energy consumption</strong> from the household, <strong>days of autonomy</strong> to bridge periods without sun, <strong>battery chemistry</strong> (which determines safe depth of discharge), and <strong>system voltage</strong>. Unlike general battery sizing, solar-specific sizing must account for the solar production cycle, seasonal variation in sunlight hours, and the interaction between charge rate and discharge rate.`;
+
+const whyItMatters = [
+  "Undersized solar batteries cause frequent deep discharges during cloudy periods, accelerating degradation and reducing system lifespan.",
+  "Oversized banks waste capital on lithium cells that sit unused during sunny months when solar production exceeds consumption.",
+  "Ignoring seasonal variation — a system sized for summer may fail during winter when solar production drops 50–70%.",
+  "Choosing the wrong chemistry — lead-acid at 50% DoD requires twice the capacity of LFP at 80% DoD for the same usable energy.",
+  "Not matching inverter and battery voltage can force expensive equipment replacements or limit future expandability.",
+];
+
+const practicalApplications = [
+  { title: "Grid-Tied Solar + Battery", description: "Size battery storage for solar self-consumption optimization and time-of-use rate arbitrage in grid-tied homes." },
+  { title: "Off-Grid Solar Systems", description: "Determine battery bank capacity for homes and cabins entirely disconnected from the utility grid." },
+  { title: "Solar + Backup Hybrid", description: "Size batteries for grid-tied homes that want backup power during outages with solar recharging capability." },
+  { title: "Commercial Solar Storage", description: "Size battery systems for commercial facilities seeking to maximize solar self-consumption and minimize demand charges." },
+  { title: "Community Solar + Storage", description: "Size shared battery systems for community solar projects serving multiple households." },
+];
+
+const expertNotes = [
+  { title: 'Seasonal Planning', variant: 'warning', content: 'Solar battery systems sized only for summer conditions will fail during winter months. In northern latitudes (above 40°N), winter solar production can be 50–70% lower than summer. Size for the worst-case month, not the annual average.' },
+  { title: 'Chemistry Selection', variant: 'engineering', content: 'LFP (LiFePO4) is the recommended chemistry for solar applications due to its 5,000+ cycle life, 80–90% usable DoD, and thermal stability. NMC offers higher energy density but shorter cycle life. Lead-acid is cheapest upfront but requires 50% DoD limiting and replacement every 3–5 years.' },
+];
+
+const trustSection = {
+  text: "This calculator uses standard solar engineering sizing methodology. The model accounts for energy scaling by autonomy, derating by depth of discharge limits, and chemistry-specific constraints. All intermediate values are displayed for independent verification. Our formulas follow industry practices from NREL, DOE, and major inverter manufacturers.",
+  link: { label: "View our full methodology", href: "/methodology" },
+};
+
+const references = [
+  { title: "NREL — Solar Plus Storage Sizing Guide", url: "https://www.nrel.gov/solar/solar-plus-storage-sizing.html", source: "National Renewable Energy Laboratory" },
+  { title: "US DOE — Solar Battery Storage Overview", url: "https://www.energy.gov/eere/solar/solar-plus-storage", source: "U.S. Department of Energy" },
+  { title: "Battery University — Batteries for Solar Energy Storage", url: "https://batteryuniversity.com/article/bu-402-what-is-the-peukert-effect", source: "Battery University" },
+  { title: "Solar Energy Industries Association — Storage Guidelines", url: "https://www.seia.org/solar-plus-storage", source: "SEIA" },
+  { title: "Victron Energy — Solar Battery Sizing", url: "https://www.victronenergy.com/help-center", source: "Victron Energy" },
+];
+
+const faqItems = [
+  {
+    question: "How do I estimate my daily solar energy consumption?",
+    answer: "Add up the wattage of every appliance you use daily and multiply by its hours of use. For example: 5 LED lights (10W each × 6 hours) = 300 Wh, refrigerator (150W × 8 hours) = 1,200 Wh, TV (100W × 4 hours) = 400 Wh. Total: 1,900 Wh or 1.9 kWh.",
+  },
+  {
+    question: "What battery chemistry is best for solar?",
+    answer: "LFP (LiFePO4) is recommended for most solar installations due to its long cycle life (5,000+ cycles), safety, and high usable DoD (90%). NMC offers higher energy density but shorter cycle life. Lead-acid is cheapest upfront but requires 50% DoD limiting and frequent replacement.",
+  },
+  {
+    question: "How many days of autonomy do I need?",
+    answer: "Grid-tied systems with battery backup typically need 1–2 days. Off-grid systems need 2–4 days depending on climate and solar resource. More autonomy means more battery capacity and higher cost, but greater resilience during cloudy periods.",
+  },
+  {
+    question: "What is Depth of Discharge (DoD)?",
+    answer: "DoD is the percentage of battery capacity that can be safely used before recharging. Discharging beyond recommended DoD shortens battery life. LFP batteries allow 80–90% DoD, NMC allows 70–80%, and lead-acid should stay above 50% DoD.",
+  },
+  {
+    question: "How many batteries do I need for a 5kW solar system?",
+    answer: "A 5kW solar system producing 20 kWh/day with 2 days autonomy at 80% DoD needs: (20,000 × 2) / 0.80 = 50,000 Wh = 50 kWh battery bank. At 48V, that is approximately 1,042 Ah — equivalent to 4 large 280Ah LFP batteries in a 48V configuration.",
+  },
+  {
+    question: "Should I oversize my solar battery bank?",
+    answer: "A 15–20% margin above calculated minimum provides safety for temperature derating, battery aging, and seasonal variation. Excessive oversizing wastes capital. Design for modular expansion if you expect load growth.",
+  },
+  {
+    question: "Can I expand my solar battery bank later?",
+    answer: "Most modern lithium battery systems support modular expansion by adding parallel strings. However, all strings should be the same chemistry, age, and capacity. Plan for expansion from the start by choosing a scalable battery platform.",
+  },
+  {
+    question: "How does winter affect solar battery sizing?",
+    answer: "Winter solar production can be 50–70% lower than summer. Off-grid systems must be sized for the shortest days. Grid-tied systems with backup may need more autonomy during winter cloudy periods. Consider seasonal variation in your sizing.",
+  },
+  {
+    question: "What is the difference between AC-coupled and DC-coupled solar storage?",
+    answer: "DC-coupled systems connect batteries to the solar charge controller directly, with higher efficiency (no double conversion). AC-coupled systems connect batteries through an inverter, offering more flexibility but slightly lower efficiency. Both are viable; DC-coupled is more efficient for new installations.",
+  },
+  {
+    question: "How do I calculate solar production for battery sizing?",
+    answer: "Estimate daily solar production by multiplying system size (kW) by peak sun hours for your location. A 5kW system in an area with 4 peak sun hours produces approximately 20 kWh/day before losses. Apply a system efficiency factor of 0.75–0.85 to account for inverter, wiring, and temperature losses.",
+  },
+  {
+    question: "Can solar batteries power my home at night?",
+    answer: "Yes. Solar batteries store excess daytime production for use at night. The battery discharges during evening and nighttime hours, then recharges from solar panels the next day. Proper sizing ensures enough stored energy for nighttime consumption.",
+  },
+  {
+    question: "What happens during extended cloudy periods?",
+    answer: "During multi-day cloudy periods, the battery bank must supply loads from stored energy. With 2 days of autonomy, the system can sustain loads for 2 days without solar input. Beyond autonomy limits, loads must be shed or grid backup engaged.",
+  },
+];
+
+const relatedTools = [
+  { href: "/tools/runtime-calculator", title: "Runtime Calculator", description: "Verify how long a battery bank will power your load." },
+  { href: "/tools/energy-conversion-calculator", title: "Energy Conversion", description: "Convert between Ah and Wh for any voltage." },
+  { href: "/tools/parallel-string-calculator", title: "Parallel String Tool", description: "Configure series/parallel packs to match your target." },
+  { href: "/tools/battery-sizing-calculator", title: "Battery Sizing Tool", description: "General battery sizing from consumption and autonomy." },
+  { href: "/tools/home-backup-battery-calculator", title: "Home Backup Calculator", description: "Size home battery backup for critical loads." },
+  { href: "/tools/battery-degradation-estimator", title: "Degradation Estimator", description: "Estimate how battery capacity fades over time." },
+  { href: "/tools/soc-estimator", title: "SOC Estimator", description: "Interpolate State of Charge from voltage." },
+  { href: "/tools/charging-time-calculator", title: "Charging Time Calculator", description: "Estimate charge durations from solar production." },
+];
+
+const commonMistakes = [
+  "Using household average consumption instead of actual measured data — check your utility bill for real daily kWh usage rather than estimating from individual appliance wattages.",
+  "Sizing only for sunny days — off-grid solar must account for consecutive cloudy days. In many regions, 3–4 days of autonomy is necessary for reliable power.",
+  "Ignoring DoD limits — discharging lead-acid below 50% or lithium below 80% significantly reduces cycle life. Size the bank so normal usage stays within safe DoD limits.",
+  "Forgetting inverter and wiring losses — the battery must supply more energy than the loads consume because inverter efficiency (88–96%) and wiring losses reduce usable energy.",
+  "Not accounting for seasonal variation — winter solar production is 50–70% lower than summer. Size autonomy for the worst-case month, not the annual average.",
+  "Choosing wrong system voltage — 12V systems require extremely thick cables for loads above 1kW. Use 48V for residential solar systems to minimize wiring losses.",
+  "Mixing old and new batteries — never add new batteries to an existing degraded bank. Mismatched internal resistance causes uneven loading and accelerated degradation.",
+];
+
+const relatedArticles = [
+  { href: "/learn/how-to-size-solar-battery-bank", title: "How to Size a Solar Battery Bank" },
+  { href: "/learn/how-many-batteries-for-solar", title: "How Many Batteries for Solar?" },
+  { href: "/learn/how-much-battery-storage-do-i-need", title: "How Much Battery Storage Do I Need?" },
+  { href: "/learn/solar-storage-sizing-guide", title: "Solar Storage Sizing Guide" },
+];
+---
+
+<CalculatorLayout
+  title="Solar Battery Sizing Calculator | Battery Calculators"
+  description="Size your solar battery bank based on daily energy consumption, autonomy days, battery chemistry, and depth of discharge."
+  faqItems={faqItems}
+  commonMistakes={commonMistakes}
+  relatedCalculators={relatedTools}
+  relatedArticles={relatedArticles}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+
+    <!-- Input Form -->
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Solar System Inputs</h3>
+      <div class="flex flex-col gap-6">
+
+        <InputField id="daily-consumption" label="Daily Energy Consumption" value={5} min={0.1} step="any" unit="kWh/day" helperText="Total household energy use per day. Check your utility bill for average daily consumption. Note: Wh/day = kWh/day × 1,000" />
+
+        <InputField id="autonomy" label="Days of Autonomy" value={2} min={1} max={7} step={1} helperText="How many days the battery must power your home without solar input." />
+
+        <InputField id="voltage" label="Battery System Voltage" value={48} min={12} step={1} unit="V" helperText="Common: 12V, 24V, or 48V for residential systems." />
+
+        <InputField
+          id="chemistry"
+          label="Battery Chemistry"
+          type="select"
+          value="lfp"
+          helperText="LFP recommended for solar: longest life and safest."
+          options={[
+            { label: "LFP (LiFePO4)", value: "lfp" },
+            { label: "NMC (Lithium Nickel Manganese Cobalt)", value: "nmc" },
+            { label: "Lead-Acid (AGM/Gel)", value: "lead-acid" },
+          ]}
+        />
+
+        <InputField id="dod" label="Maximum Depth of Discharge" value={80} min={10} max={100} step={1} unit="%" helperText="Safe limit. LFP: 90%, NMC: 80%, Lead-Acid: 50%." />
+
+      </div>
+    </CalculatorCard>
+
+    <!-- Results -->
+    <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Sizing Results</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <ResultBox
+            label="Required Battery Energy"
+            value="12,500 Wh"
+            suffix="12.50 kWh total capacity"
+            variant="primary"
+            id="result-energy"
+          />
+          <ResultBox
+            label="Recommended Capacity"
+            value="260.4 Ah"
+            suffix="At 48V nominal"
+            id="result-capacity"
+          />
+          <ResultBox
+            label="Usable Capacity"
+            value="10,000 Wh"
+            suffix="10.00 kWh after DoD"
+            id="result-usable"
+          />
+          <ResultBox
+            label="Battery Recharge Target"
+            value="12,500 Wh/day"
+            suffix="12.50 kWh/day"
+            helperText="Average energy required per day to fully restore the battery bank over the selected autonomy period."
+            id="result-daily"
+          />
+        </div>
+
+        <MiniSimulationChart
+          title="Autonomy vs Battery Size"
+          description="Required battery capacity for different autonomy periods"
+          xLabel="Autonomy Days"
+          yLabel="Battery Size (kWh)"
+          chartId="chart-solar"
+        />
+      </div>
+
+      <div class="border-t border-hairline pt-6">
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">Design Notes</h4>
+        <p class="text-body-sm text-muted" id="design-notes">
+          For a 5 kWh daily load with 2 days autonomy at 48V LFP, you need approximately 12.5 kWh of total battery capacity with 260 Ah at 48V.
+        </p>
+      </div>
+    </CalculatorCard>
+
+  </div>
+
+  <!-- Formulas -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+
+      <FormulaBox title="Mathematical Formulas">
+        <p>
+          The required battery energy capacity is calculated by scaling daily consumption by autonomy days and dividing by DoD:
+        </p>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Required Energy (Wh) = (Daily Consumption × Autonomy Days) / DoD%
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Capacity (Ah) = Required Energy (Wh) / System Voltage (V)
+        </div>
+        <p>
+          The usable capacity is the energy you can actually draw:
+        </p>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Usable Energy = Daily Consumption × Autonomy Days
+        </div>
+        <p class="text-xs text-muted mt-4">
+          <strong>Variables:</strong> Daily Consumption in kWh or Wh, Autonomy in days, DoD as percentage, Voltage in V. Assumptions: constant daily load, standard discharge curves, no seasonal adjustment (apply manually for off-grid).
+        </p>
+      </FormulaBox>
+
+      <div>
+        <h2 class="text-title-lg text-primary uppercase mb-6 tracking-wider">Worked Examples</h2>
+        <div class="text-body-sm text-muted flex flex-col gap-6">
+
+          <div class="border-l-2 border-m-blue-light pl-4">
+            <p class="font-bold text-primary mb-2">Example 1: Grid-Tied Home — 5 kWh/day, 48V LFP</p>
+            <p>Given: 5 kWh/day consumption, 2 days autonomy, 48V LFP battery at 80% DoD</p>
+            <p class="mt-2"><strong>Step 1:</strong> Usable energy = 5,000 × 2 = <span class="font-mono text-primary">10,000 Wh</span></p>
+            <p><strong>Step 2:</strong> Total capacity = 10,000 / 0.80 = <span class="font-mono text-primary">12,500 Wh</span></p>
+            <p><strong>Step 3:</strong> Ah = 12,500 / 48 = <span class="font-mono text-primary">260.4 Ah</span></p>
+          </div>
+
+          <div class="border-l-2 border-m-blue-dark pl-4">
+            <p class="font-bold text-primary mb-2">Example 2: Off-Grid Cabin — 8 kWh/day, 48V LFP, 3 days</p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li><strong>Consumption:</strong> 8 kWh/day | <strong>Autonomy:</strong> 3 days | <strong>DoD:</strong> 85%</li>
+            </ul>
+            <p class="mt-2"><strong>Usable energy:</strong> 8,000 × 3 = <span class="font-mono text-primary">24,000 Wh</span></p>
+            <p><strong>Total capacity:</strong> 24,000 / 0.85 = <span class="font-mono text-primary">28,235 Wh (28.24 kWh)</span></p>
+            <p><strong>Ah:</strong> 28,235 / 48 = <span class="font-mono text-primary">588.2 Ah</span></p>
+          </div>
+
+          <div class="border-l-2 border-m-red pl-4">
+            <p class="font-bold text-primary mb-2">Example 3: Small RV System — 2 kWh/day, 12V LFP</p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li><strong>Consumption:</strong> 2 kWh/day | <strong>Autonomy:</strong> 2 days | <strong>DoD:</strong> 80%</li>
+            </ul>
+            <p class="mt-2"><strong>Usable energy:</strong> 2,000 × 2 = <span class="font-mono text-primary">4,000 Wh</span></p>
+            <p><strong>Total capacity:</strong> 4,000 / 0.80 = <span class="font-mono text-primary">5,000 Wh</span></p>
+            <p><strong>Ah:</strong> 5,000 / 12.8 = <span class="font-mono text-primary">390.6 Ah</span> — Requires 2 parallel 200Ah LFP batteries</p>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <FAQSection items={faqItems} />
+  <RelatedTools tools={relatedTools} />
+
+  <!-- Calculation Script -->
+  <script>
+    import { calculateSolarBatterySizing } from '../../utils/calculators';
+    import { renderBarChart, clearChart } from '../../utils/charting';
+
+    const consumptionInput = document.getElementById('daily-consumption') as HTMLInputElement;
+    const autonomyInput = document.getElementById('autonomy') as HTMLInputElement;
+    const voltageInput = document.getElementById('voltage') as HTMLInputElement;
+    const chemistrySelect = document.getElementById('chemistry') as HTMLSelectElement;
+    const dodInput = document.getElementById('dod') as HTMLInputElement;
+
+    const resultEnergyBox = document.getElementById('result-energy');
+    const resultEnergyValue = resultEnergyBox?.querySelector('.text-display-md') as HTMLElement;
+    const resultEnergyKwh = resultEnergyBox?.querySelector('.text-caption') as HTMLElement;
+
+    const resultCapacityBox = document.getElementById('result-capacity');
+    const resultCapacityValue = resultCapacityBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultCapacityRef = resultCapacityBox?.querySelector('.text-caption') as HTMLElement;
+
+    const resultUsableBox = document.getElementById('result-usable');
+    const resultUsableValue = resultUsableBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultUsableKwh = resultUsableBox?.querySelector('.text-caption') as HTMLElement;
+
+    const resultDailyBox = document.getElementById('result-daily');
+    const resultDailyValue = resultDailyBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultDailyKwh = resultDailyBox?.querySelector('.text-caption') as HTMLElement;
+
+    const designNotes = document.getElementById('design-notes');
+
+    const chartSvg = document.getElementById('chart-solar') as unknown as SVGElement;
+
+    function updateCalculations() {
+      const consumption = parseFloat(consumptionInput.value) || 5;
+      const autonomy = parseFloat(autonomyInput.value) || 2;
+      const voltage = parseFloat(voltageInput.value) || 48;
+      const chemistry = chemistrySelect.value as "lfp" | "nmc" | "lead-acid";
+      const dod = parseFloat(dodInput.value) || 80;
+
+      const results = calculateSolarBatterySizing(consumption, autonomy, voltage, chemistry, dod);
+
+      if (resultEnergyValue) resultEnergyValue.textContent = `${Math.round(results.requiredEnergyWh).toLocaleString()} Wh`;
+      if (resultEnergyKwh) resultEnergyKwh.textContent = `${(results.requiredEnergyWh / 1000).toFixed(2)} kWh total capacity`;
+
+      if (resultCapacityValue) resultCapacityValue.textContent = `${results.requiredCapacityAh.toFixed(1)} Ah`;
+      if (resultCapacityRef) resultCapacityRef.textContent = `At ${voltage}V nominal`;
+
+      if (resultUsableValue) resultUsableValue.textContent = `${Math.round(results.usableCapacityWh).toLocaleString()} Wh`;
+      if (resultUsableKwh) resultUsableKwh.textContent = `${(results.usableCapacityWh / 1000).toFixed(2)} kWh after DoD`;
+
+      if (resultDailyValue) resultDailyValue.textContent = `${Math.round(results.dailyProductionNeededWh).toLocaleString()} Wh/day`;
+      if (resultDailyKwh) resultDailyKwh.textContent = `${(results.dailyProductionNeededWh / 1000).toFixed(2)} kWh/day`;
+
+      if (designNotes) {
+        const chemistryName = chemistry === "lfp" ? "LFP" : chemistry === "nmc" ? "NMC" : "Lead-Acid";
+        designNotes.textContent = `For a ${consumption} kWh daily load with ${autonomy} day${autonomy > 1 ? 's' : ''} autonomy at ${voltage}V ${chemistryName}, you need approximately ${(results.requiredEnergyWh / 1000).toFixed(1)} kWh of total battery capacity with ${results.requiredCapacityAh.toFixed(0)} Ah at ${voltage}V.`;
+      }
+
+      if (chartSvg && consumption > 0) {
+        const pts: { x: number; y: number; label: string }[] = [];
+        for (let days = 1; days <= 5; days++) {
+          const r = calculateSolarBatterySizing(consumption, days, voltage, chemistry, dod);
+          pts.push({ x: days, y: r.requiredEnergyWh / 1000, label: String(days) });
+        }
+        renderBarChart(chartSvg, pts, {
+          width: 320, height: 160,
+          xLabel: 'Autonomy Days', yLabel: 'Battery Size (kWh)',
+          yMin: 0,
+        });
+      } else if (chartSvg) {
+        clearChart(chartSvg);
+      }
+    }
+
+    [consumptionInput, autonomyInput, voltageInput, chemistrySelect, dodInput].forEach(el => {
+      el.addEventListener('input', updateCalculations);
+    });
+
+    updateCalculations();
+  </script>
+
+</CalculatorLayout>

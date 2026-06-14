@@ -1,0 +1,171 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import CalculatorCard from '../../components/CalculatorCard.astro';
+import FormulaBox from '../../components/FormulaBox.astro';
+import FAQSection from '../../components/FAQSection.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "How do I calculate inverter battery runtime?",
+    answer: "Divide the battery's usable energy (Ah × V × DoD) by the effective load (load watts ÷ inverter efficiency). A 200Ah 12.8V LFP at 80% DoD with a 1000W load through a 90% efficient inverter runs for approximately 1.8 hours.",
+  },
+  {
+    question: "What size inverter do I need for my battery?",
+    answer: "Match the inverter's continuous wattage rating to your maximum expected load. For a 200Ah 12V battery, a 2000W inverter is typical. The battery's maximum discharge rate (C-rate) must also support the inverter's peak current draw.",
+  },
+  {
+    question: "Does inverter efficiency vary with load?",
+    answer: "Yes. Inverters are most efficient at 50–80% of their rated capacity. At very light loads (5–10%), efficiency drops to 70–80%. At full load, efficiency is typically 85–92%. This means light loads consume proportionally more battery energy.",
+  },
+  {
+    question: "Can I run an air conditioner from a battery through an inverter?",
+    answer: "Yes, but the startup surge (3–5× rated power) requires a battery and inverter sized for peak current. A 1500W AC unit needs at least a 3000W inverter and a battery bank capable of delivering 300–400A momentarily.",
+  },
+];
+---
+
+<Layout
+  title="Inverter Battery Runtime Guide | Battery Calculators"
+  description="How to calculate battery runtime through an inverter. Covers inverter efficiency curves, sizing, and practical runtime calculations for AC loads."
+  canonical="https://batterycalculators.com/learn/inverter-battery-runtime-guide"
+  schema="faqPage"
+  schemaName="Inverter Battery Runtime Guide"
+  schemaDescription="Engineering guide to calculating battery runtime through inverters."
+  schemaUrl="https://batterycalculators.com/learn/inverter-battery-runtime-guide"
+  faqItems={faqItems}
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/learn" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Back to Guides</a>
+      <Breadcrumb items={[
+        { label: "Learning Center", href: "/learn" },
+        { label: "Inverter Battery Runtime Guide" }
+      ]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">ELECTRICAL</span>
+      <h1 class="text-display-md text-primary mb-6">Inverter Battery Runtime Guide</h1>
+      <p class="text-body-md text-body font-light">
+        Most battery loads in RV, marine, and home backup systems pass through an inverter. The inverter converts DC battery power to AC for standard appliances, but it consumes 8–15% of the energy in the process. Understanding this conversion loss is essential for accurate runtime calculations.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">How Inverter Efficiency Affects Runtime</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          An inverter rated at 90% efficiency means 10% of the battery energy is lost as heat during DC-to-AC conversion. This directly reduces runtime by 10%. For a 1000W load, the battery actually supplies 1,111W — the extra 111W is the inverter's consumption.
+        </p>
+        <p class="text-body-md text-body font-light">
+          Inverter efficiency varies with load level. Most inverters are optimized for 50–80% of their rated capacity. Running a 3000W inverter at 100W may only achieve 75–80% efficiency, while running it at 2000W achieves 90–92%. Match your inverter size to your typical load range for best results.
+        </p>
+      </section>
+
+      <FormulaBox title="Inverter Runtime Formula">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Effective Load (W) = AC Load (W) / Inverter Efficiency
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Runtime (h) = Battery Wh × DoD / Effective Load
+        </div>
+        <p>
+          For DC loads (no inverter), remove the efficiency step. DC loads draw directly from the battery with only wiring losses (1–5%).
+        </p>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Worked Example</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Given:</strong> 200Ah 12.8V LFP, 2000W inverter (90% eff), 500W AC load</p>
+            <p><strong>Step 1:</strong> Usable energy:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              200 × 12.8 × 0.80 = 2,048 Wh
+            </div>
+            <p><strong>Step 2:</strong> Effective load:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              500 / 0.90 = 555.6 W
+            </div>
+            <p><strong>Step 3:</strong> Runtime:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              2,048 / 555.6 = 3.69 hours ≈ 3 hours 41 minutes
+            </div>
+            <p class="mt-2 text-muted">Without the inverter (DC load), runtime would be 4.1 hours — the inverter reduces it by 10%.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Inverter Efficiency by Load Level</h2>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Load %</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Typical Efficiency</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Effective Load at 500W</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">10%</td>
+                <td class="p-4 text-muted">75–80%</td>
+                <td class="p-4 text-muted">625–667 W</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">25%</td>
+                <td class="p-4 text-muted">82–85%</td>
+                <td class="p-4 text-muted">588–610 W</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">50%</td>
+                <td class="p-4 font-mono text-primary">88–91%</td>
+                <td class="p-4 text-muted">549–568 W</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">75%</td>
+                <td class="p-4 font-mono text-primary">90–92%</td>
+                <td class="p-4 text-muted">543–556 W</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">100%</td>
+                <td class="p-4 text-muted">88–90%</td>
+                <td class="p-4 text-muted">556–568 W</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Try It</h4>
+          <p class="text-body-sm text-muted mb-4">Use the Runtime Calculator with inverter efficiency factored in.</p>
+          <a href="/tools/runtime-calculator" class="btn-primary text-xs py-3 px-6 inline-block">Open Runtime Calculator</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Related</h4>
+          <p class="text-body-sm text-muted mb-4">Size the right battery bank for your inverter load.</p>
+          <a href="/tools/inverter-battery-calculator" class="btn-primary-outline text-xs py-3 px-6 inline-block">Inverter Battery Calculator</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Related Articles</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">12V vs 24V vs 48V Runtime</h4>
+            <p class="text-body-sm text-muted mb-3">How system voltage affects inverter performance and runtime.</p>
+            <a href="/learn/12v-vs-24v-vs-48v-runtime" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Read Guide →</a>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Battery Runtime Formula</h4>
+            <p class="text-body-sm text-muted mb-3">Reference for all runtime formulas including inverter losses.</p>
+            <a href="/learn/battery-runtime-formula" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Read Guide →</a>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

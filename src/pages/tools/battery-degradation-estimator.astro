@@ -1,0 +1,327 @@
+---
+import CalculatorLayout from '../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../components/CalculatorCard.astro';
+import InputField from '../../components/InputField.astro';
+import ResultBox from '../../components/ResultBox.astro';
+import FormulaBox from '../../components/FormulaBox.astro';
+import FAQSection from '../../components/FAQSection.astro';
+import RelatedTools from '../../components/RelatedTools.astro';
+
+const chemistryOptions = [
+  { label: "Lithium Iron Phosphate (LiFePO4 / LFP)", value: "lfp" },
+  { label: "Lithium Nickel Manganese Cobalt (NMC)", value: "nmc" },
+  { label: "Lithium Titanate (LTO - high cycles)", value: "lto" },
+  { label: "Deep-Cycle Lead-Acid", value: "lead-acid" },
+];
+
+const whatIs = `Battery degradation estimation predicts how a battery's maximum capacity (State of Health, SOH) decreases over time due to two primary mechanisms: <strong>cycle aging</strong> (capacity loss from repeated charge-discharge cycling) and <strong>calendar aging</strong> (capacity loss from chemical reactions occurring even when idle). The degradation model uses the Arrhenius equation to account for temperature effects, a power-law relationship for depth-of-discharge impact, and chemistry-specific rated cycle counts. Understanding degradation is essential for predicting battery replacement timelines, evaluating BESS project economics, and planning maintenance schedules for energy storage systems.`;
+
+const whyItMatters = [
+  "A battery at 80% SOH has lost 20% of its original capacity — a 100Ah battery now behaves like an 80Ah battery, reducing runtime and storage.",
+  "Degradation rates vary dramatically by chemistry — LFP may last 10+ years while lead-acid may need replacement in 3–5 years under similar conditions.",
+  "Temperature is the single biggest controllable factor — every 10°C above 25°C roughly doubles the degradation rate due to Arrhenius kinetics.",
+  "Ignoring degradation in financial models overstates BESS ROI by 20–40%, leading to poor investment decisions.",
+  "End-of-life (80% SOH) arrives sooner than expected when batteries are operated at high DoD or elevated temperatures.",
+];
+
+const practicalApplications = [
+  { title: "BESS Financial Modeling", description: "Incorporate realistic degradation curves into NPV and payback calculations for commercial battery storage projects." },
+  { title: "EV Battery Lifecycle", description: "Predict when EV battery capacity will drop below 80% to estimate vehicle range degradation and replacement timing." },
+  { title: "Solar Storage Planning", description: "Plan for battery replacement cycles in off-grid solar systems based on expected degradation rates." },
+  { title: "Warranty Validation", description: "Compare actual degradation against manufacturer warranty claims to verify SOH guarantees." },
+  { title: "Telecom Maintenance", description: "Schedule proactive battery replacements at telecom sites before capacity drops below backup requirements." },
+  { title: "Grid-Scale Asset Management", description: "Optimize replacement schedules and残值 (residual value) estimates for utility-scale battery assets." },
+];
+
+const expertNotes = [
+  { title: 'Arrhenius Effect', variant: 'warning', content: 'Aging speed doubles for every 10°C above 25°C. A battery operating at 35°C ages twice as fast as one at 25°C. At 45°C, it ages four times faster. Temperature management is the most effective way to extend battery life.' },
+  { title: 'DoD Impact', variant: 'engineering', content: 'Cycle degradation follows a power-law relationship with depth of discharge. Shallow cycling (20% DoD) can extend cycle life by 3–5× compared to deep cycling (80% DoD). This is why many BESS systems limit daily throughput.' },
+  { title: 'EOL Definition', variant: 'info', content: 'In solar, EV, and BESS applications, a battery reaches End-of-Life (EOL) when SOH drops below 80%. At this point, internal resistance increases significantly and capacity becomes less predictable.' },
+];
+
+const trustSection = {
+  text: "This estimator uses the Arrhenius equation for temperature-dependent calendar aging and a DoD power-law model for cycle aging — both are well-established electrochemical degradation models published in peer-reviewed literature. Chemistry-specific rated cycles are based on manufacturer datasheets and published research. All intermediate values are displayed for independent verification.",
+  link: { label: "View our full methodology", href: "/methodology" },
+};
+
+const references = [
+  { title: "Battery University — How to Prolong Lithium-Ion Batteries", url: "https://batteryuniversity.com/article/bu-705-how-to-prolong-lithium-based-batteries", source: "Battery University / Cadex Electronics" },
+  { title: "Journal of Power Sources — Aging Models for Li-Ion Batteries", url: "https://www.sciencedirect.com/journal/journal-of-power-sources", source: "Elsevier / Journal of Power Sources" },
+  { title: "NREL — Battery Degradation Modeling", url: "https://www.nrel.gov/analysis/battery-degradation.html", source: "National Renewable Energy Laboratory" },
+  { title: "IEEE — Calendar and Cycle Aging of Li-Ion Batteries", url: "https://ieeexplore.ieee.org/", source: "IEEE Xplore" },
+  { title: "Sandia National Laboratories — Battery Abuse Testing", url: "https://www.sandia.gov/ess-ssl/battery-abuse-testing/", source: "Sandia National Laboratories" },
+];
+
+const faqItems = [
+  {
+    question: "What is the difference between SOC and SOH?",
+    answer: "State of Charge (SOC) measures the current amount of electrical energy remaining in the battery relative to its *current maximum capacity* (like a fuel gauge). State of Health (SOH) measures the *maximum storage capacity remaining* relative to the battery's *original design capacity when new*.",
+  },
+  {
+    question: "Why does temperature accelerate calendar aging?",
+    answer: "Lithium batteries suffer from parasitic chemical reactions between the active lithium, plates, and liquid electrolyte. These reactions occur constantly, even when the battery is sitting idle. Since chemical reaction speeds follow the Arrhenius law, higher temperatures accelerate this parasitic degradation.",
+  },
+  {
+    question: "How does charging state affect calendar aging?",
+    answer: "Storing lithium-ion batteries (specifically NMC) at high voltage (100% SOC) increases physical stress on the anode and cathode crystal structures, accelerating calendar degradation. For storage, it is recommended to keep lithium batteries at 40%–60% SOC in a cool environment.",
+  },
+  {
+    question: "Can LFP batteries really run 5,000 cycles?",
+    answer: "Yes, high-quality prismatic LiFePO4 cells regularly achieve 4,000 to 6,000 cycles at 80% DoD before hitting their EOL limit (80% SOH), provided they are operated between 20°C and 30°C and charged at low C-rates. Proper battery temperature management is key to cycle life.",
+  },
+  {
+    question: "How does DoD affect cycle life?",
+    answer: "Deeper discharges cause more mechanical stress on electrode materials. A battery cycled at 80% DoD may achieve 2,000 cycles, while the same battery at 20% DoD may achieve 10,000+ cycles. The relationship follows a power law — shallow cycling dramatically extends life.",
+  },
+  {
+    question: "What is calendar aging?",
+    answer: "Calendar aging is capacity loss that occurs even when the battery is not being used. Chemical side reactions between the electrolyte and electrodes cause gradual lithium inventory loss. Calendar aging is temperature-dependent and occurs faster at high SOC storage levels.",
+  },
+  {
+    question: "How do I slow battery degradation?",
+    answer: "Keep batteries at moderate temperatures (20–25°C), avoid frequent deep discharges (use 60–80% DoD rather than 100%), store at 40–60% SOC when not in use, and avoid charging below 0°C. These practices can extend battery life by 2–3× compared to aggressive use.",
+  },
+  {
+    question: "What happens when SOH drops below 80%?",
+    answer: "Below 80% SOH, internal resistance increases significantly, causing greater voltage sag under load. Capacity becomes less predictable and may drop more rapidly. For most applications (solar, EV, BESS), 80% SOH is considered end-of-life, and replacement should be planned.",
+  },
+  {
+    question: "How accurate is this degradation estimate?",
+    answer: "This tool provides a first-order approximation based on published degradation models. Actual degradation varies by manufacturer, cell quality, charge rates, and specific operating conditions. Use this for planning purposes and validate with real-world monitoring data.",
+  },
+  {
+    question: "Does fast charging affect degradation?",
+    answer: "Yes. High charge rates (above 1C) increase lithium plating risk, especially at low temperatures. This accelerates capacity loss. Most manufacturers recommend 0.5C or lower for optimal cycle life. Fast charging can reduce cycle life by 20–40% compared to slow charging.",
+  },
+  {
+    question: "How do I monitor actual SOH?",
+    answer: "SOH can be estimated by comparing current full-charge capacity to original rated capacity. Most BMS units track this automatically. Manual methods include fully charging, discharging at a known rate, and measuring total Ah delivered vs. rated capacity.",
+  },
+];
+
+const relatedTools = [
+  { href: "/tools/bess-roi-calculator", title: "BESS ROI Calculator", description: "Integrate this degradation curve into long-term financial NPV." },
+  { href: "/tools/battery-sizing-calculator", title: "Battery Sizing Tool", description: "Calculate pack storage sizing from continuous loads." },
+  { href: "/tools/soc-estimator", title: "SOC Estimator", description: "Interpolate battery State of Charge from cell voltages." },
+  { href: "/tools/runtime-calculator", title: "Runtime Calculator", description: "Compute runtime from load wattage profiles." },
+  { href: "/tools/c-rate-calculator", title: "C-Rate Calculator", description: "Calculate charge and discharge current rates." },
+  { href: "/tools/solar-battery-sizing-calculator", title: "Solar Battery Sizing", description: "Size solar battery banks from daily consumption." },
+];
+
+const commonMistakes = [
+  "Assuming SOH stays at 100% — all batteries degrade. A 5-year-old battery typically has 85–90% SOH depending on usage patterns and temperature.",
+  "Ignoring temperature in degradation models — temperature is the most significant controllable factor. A battery at 40°C ages 4× faster than one at 25°C.",
+  "Using nameplate capacity for financial projections — always model capacity decline year-over-year. A 2% annual degradation rate means 18% less capacity by year 10.",
+  "Storing batteries at 100% SOC — high SOC storage accelerates calendar aging. Store lithium batteries at 40–60% SOC in cool environments.",
+  "Deep cycling without adjusting expectations — repeated 100% DoD cycling can halve cycle life compared to 80% DoD operation.",
+  "Ignoring charge rate effects — charging above 1C increases lithium plating risk and accelerates degradation, especially at low temperatures.",
+];
+
+const relatedArticles = [
+  { href: "/learn/battery-degradation-explained", title: "Battery Degradation Explained" },
+  { href: "/learn/how-to-extend-battery-life", title: "How to Extend Battery Life" },
+  { href: "/learn/battery-soh-vs-soc", title: "Battery SOH vs SOC" },
+];
+---
+
+<CalculatorLayout
+  title="Battery Degradation & Life Estimator | Battery Calculators"
+  description="Estimate capacity fade and remaining State of Health (SOH) for LFP, NMC, LTO, or Lead-Acid batteries based on cycles, age, and temperature. Note: This tool provides educational approximations only. Results are not diagnostic measurements or certified battery health predictions. Actual degradation varies based on charge rates, storage conditions, and manufacturer-specific cell formulations."
+  faqItems={faqItems}
+  commonMistakes={commonMistakes}
+  relatedCalculators={relatedTools}
+  relatedArticles={relatedArticles}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+>
+
+  <!-- Main Calculator Grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+
+    <!-- Input Form -->
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Operational Parameters</h3>
+      <div class="flex flex-col gap-6">
+        <InputField id="chemistry" label="Battery Chemistry" type="select" options={chemistryOptions} value="lfp" />
+        <InputField id="cycles" label="Completed Cycles" value={1500} min={0} step={1} helperText="A full cycle represents discharging from 100% to 0% and charging back." />
+        <InputField id="dod" label="Average Depth of Discharge (DoD %)" value={80} min={10} max={100} helperText="Typical depth of discharge per cycle." />
+        <InputField id="temperature" label="Average Cell Temperature (°C)" value={30} min={5} max={60} helperText="Arrhenius factor: aging speed doubles for every 10°C above 25°C." />
+        <InputField id="age" label="Calendar Age (Years)" value={3} min={0} step={0.5} />
+      </div>
+    </CalculatorCard>
+
+    <!-- Calculation Results -->
+    <CalculatorCard class="border-m-red flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Estimated Health Status</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <ResultBox
+            label="State of Health (SOH)"
+            value="85.2%"
+            suffix="System has degraded by 14.8%"
+            variant="primary"
+            id="soh-status-card"
+          />
+          <ResultBox
+            label="Cycle Degradation Loss"
+            value="8.5%"
+            suffix="Due to battery cycles"
+            id="result-cycle-loss-box"
+          />
+          <ResultBox
+            label="Calendar Aging Loss"
+            value="6.4%"
+            suffix="Due to chemical aging"
+            id="result-calendar-loss-box"
+          />
+        </div>
+      </div>
+
+      <!-- Action Area -->
+      <div class="border-t border-hairline pt-6">
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">End of Life (EOL) Threshold</h4>
+        <p class="text-body-sm text-muted">
+          In solar, electric vehicle, and BESS applications, a battery is considered to reach its End-of-Life when its SOH drops below <span class="text-primary font-bold">80%</span>. At this point, resistance increases and cell capacity becomes volatile.
+        </p>
+      </div>
+    </CalculatorCard>
+
+  </div>
+
+  <!-- Technical Explanation and Equations -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+
+      <!-- Formulas -->
+      <FormulaBox title="Mathematical Formulas">
+        <p>
+          The degradation model calculates capacity fade as a sum of cycle aging and calendar aging (Arrhenius temperature-dependence):
+        </p>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          TempFactor = 2^((Temperature - 25) / 10) (for T > 25°C)
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          DoDFactor = (DoD / NomDoD)^1.7
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Cycle Loss (%) = (Cycles / RatedCycles) × 20 × DoDFactor × TempFactor
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Calendar Loss (%) = Age (Years) × BaseRate × TempFactor
+        </div>
+        <p>
+          Standard rating assumptions (at 25°C):
+        </p>
+        <ul class="list-disc pl-6 flex flex-col gap-1 text-xs">
+          <li><strong>LFP:</strong> 5000 cycles to 80% SOH. Base calendar rate = 1.5% SOH / year.</li>
+          <li><strong>NMC:</strong> 2000 cycles to 80% SOH. Base calendar rate = 2.0% SOH / year.</li>
+          <li><strong>LTO:</strong> 15000 cycles to 80% SOH. Base calendar rate = 0.8% SOH / year.</li>
+          <li><strong>Lead-Acid:</strong> 500 cycles to 80% SOH at 50% DoD. Base calendar rate = 3.0% SOH / year.</li>
+        </ul>
+      </FormulaBox>
+
+      <!-- Worked Examples -->
+      <div>
+        <h2 class="text-title-lg text-primary uppercase mb-6 tracking-wider">Worked Examples</h2>
+        <div class="text-body-sm text-muted flex flex-col gap-6">
+
+          <div class="border-l-2 border-m-blue-light pl-4">
+            <p class="font-bold text-primary mb-2">Example 1: LFP — 1500 cycles, 30°C, 3 years</p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li><strong>Chemistry:</strong> LFP | <strong>Cycles:</strong> 1500 | <strong>DoD:</strong> 80%</li>
+              <li><strong>Temperature:</strong> 30°C | <strong>Age:</strong> 3 years</li>
+            </ul>
+            <p class="mt-2"><strong>Temp factor:</strong> 2^((30-25)/10) = <span class="font-mono text-primary">1.414</span></p>
+            <p><strong>Cycle loss:</strong> (1500/5000) × 20 × (80/80)^1.7 × 1.414 = <span class="font-mono text-primary">8.48%</span></p>
+            <p><strong>Calendar loss:</strong> 3 × 1.5 × 1.414 = <span class="font-mono text-primary">6.36%</span></p>
+            <p><strong>SOH:</strong> 100 - 8.48 - 6.36 = <span class="font-mono text-primary">85.16%</span></p>
+          </div>
+
+          <div class="border-l-2 border-m-blue-dark pl-4">
+            <p class="font-bold text-primary mb-2">Example 2: NMC — 2000 cycles, 35°C, 5 years</p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li><strong>Chemistry:</strong> NMC | <strong>Cycles:</strong> 2000 | <strong>DoD:</strong> 80%</li>
+              <li><strong>Temperature:</strong> 35°C | <strong>Age:</strong> 5 years</li>
+            </ul>
+            <p class="mt-2"><strong>Temp factor:</strong> 2^((35-25)/10) = <span class="font-mono text-primary">2.0</span></p>
+            <p><strong>Cycle loss:</strong> (2000/2000) × 20 × 1.0 × 2.0 = <span class="font-mono text-primary">40.0%</span></p>
+            <p><strong>Calendar loss:</strong> 5 × 2.0 × 2.0 = <span class="font-mono text-primary">20.0%</span></p>
+            <p><strong>SOH:</strong> 100 - 40 - 20 = <span class="font-mono text-primary">40.0%</span> — <span class="text-m-red font-bold">Below EOL</span></p>
+          </div>
+
+          <div class="border-l-2 border-m-red pl-4">
+            <p class="font-bold text-primary mb-2">Example 3: LFP — 3000 cycles, 25°C, 5 years (cool operation)</p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li><strong>Chemistry:</strong> LFP | <strong>Cycles:</strong> 3000 | <strong>DoD:</strong> 80%</li>
+              <li><strong>Temperature:</strong> 25°C | <strong>Age:</strong> 5 years</li>
+            </ul>
+            <p class="mt-2"><strong>Temp factor:</strong> 2^((25-25)/10) = <span class="font-mono text-primary">1.0</span></p>
+            <p><strong>Cycle loss:</strong> (3000/5000) × 20 × 1.0 × 1.0 = <span class="font-mono text-primary">12.0%</span></p>
+            <p><strong>Calendar loss:</strong> 5 × 1.5 × 1.0 = <span class="font-mono text-primary">7.5%</span></p>
+            <p><strong>SOH:</strong> 100 - 12 - 7.5 = <span class="font-mono text-primary">80.5%</span> — Just above EOL</p>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <FAQSection items={faqItems} />
+  <RelatedTools tools={relatedTools} />
+
+  <!-- Calculation Script -->
+  <script>
+    import { calculateDegradation } from '../../utils/calculators';
+
+    const chemistrySelect = document.getElementById('chemistry') as HTMLSelectElement;
+    const cyclesInput = document.getElementById('cycles') as HTMLInputElement;
+    const dodInput = document.getElementById('dod') as HTMLInputElement;
+    const temperatureInput = document.getElementById('temperature') as HTMLInputElement;
+    const ageInput = document.getElementById('age') as HTMLInputElement;
+
+    // Outputs
+    const resultSohCard = document.getElementById('soh-status-card');
+    const resultSoh = resultSohCard?.querySelector('.text-display-md') as HTMLElement;
+    const resultStatusDesc = resultSohCard?.querySelector('.text-caption') as HTMLElement;
+    const resultCycleLoss = document.getElementById('result-cycle-loss-box')?.querySelector('.text-title-lg') as HTMLElement;
+    const resultCalendarLoss = document.getElementById('result-calendar-loss-box')?.querySelector('.text-title-lg') as HTMLElement;
+
+    function updateCalculations() {
+      const chemistry = chemistrySelect.value as "lfp" | "nmc" | "lto" | "lead-acid";
+      const cycles = parseFloat(cyclesInput.value) || 0;
+      const dod = parseFloat(dodInput.value) || 0;
+      const temperature = parseFloat(temperatureInput.value) || 25;
+      const age = parseFloat(ageInput.value) || 0;
+
+      const results = calculateDegradation(chemistry, cycles, dod, temperature, age);
+
+      // Render Outputs
+      if (resultSoh) resultSoh.textContent = `${results.remainingSohPercent.toFixed(1)}%`;
+
+      const fade = 100 - results.remainingSohPercent;
+      if (resultStatusDesc) resultStatusDesc.textContent = `System has degraded by ${fade.toFixed(1)}%`;
+
+      if (resultCycleLoss) resultCycleLoss.textContent = `${results.cycleLossPercent.toFixed(1)}%`;
+      if (resultCalendarLoss) resultCalendarLoss.textContent = `${results.calendarLossPercent.toFixed(1)}%`;
+
+      // Status card color highlights for EOL (SOH < 80%)
+      if (resultSohCard) {
+        resultSohCard.className = "bg-surface-soft p-6 border col-span-1 md:col-span-2 " +
+          (results.remainingSohPercent < 80 ? "border-red-600 animate-pulse" : "border-hairline");
+      }
+    }
+
+    [chemistrySelect, cyclesInput, dodInput, temperatureInput, ageInput].forEach(el => {
+      el.addEventListener('input', updateCalculations);
+    });
+
+    // Run on boot
+    updateCalculations();
+  </script>
+</CalculatorLayout>

@@ -1,0 +1,413 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import CalculatorCard from '../../components/CalculatorCard.astro';
+import FormulaBox from '../../components/FormulaBox.astro';
+import FAQSection from '../../components/FAQSection.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "What is the best way to size solar battery storage?",
+    answer: "Start with a complete load audit to determine daily consumption in watt-hours. Multiply by your desired autonomy days (typically 2–3). Divide by depth of discharge and system efficiency to get rated capacity. This four-step method accounts for all variables and gives you the minimum bank size to purchase.",
+  },
+  {
+    question: "How do I choose between LFP and NMC batteries for solar?",
+    answer: "LFP (LiFePO4) is preferred for stationary solar storage due to its longer cycle life (3,000–5,000 vs 2,000–3,000), better thermal stability, and lower cost per kWh. NMC offers higher energy density but carries greater thermal management requirements and higher cost. For solar, LFP is the standard choice.",
+  },
+  {
+    question: "Should I oversize my solar storage?",
+    answer: "Yes, by 20–30% beyond minimum calculations. This accounts for battery aging (capacity fades 15–20% over 10 years), seasonal variation, load growth, and temperature derating. Oversizing now is cheaper than retrofitting later, and it reduces battery stress by operating at lower average depth of discharge.",
+  },
+  {
+    question: "How does system voltage affect storage sizing?",
+    answer: "System voltage does not change the required energy capacity (kWh), but it affects the number of modules and wiring complexity. A 48V system requires fewer parallel strings than 12V or 24V, reducing copper losses and simplifying installation. For systems over 10 kWh, 48V is strongly recommended.",
+  },
+];
+---
+
+<Layout
+  title="Solar Storage Sizing Guide | Battery Calculators"
+  description="Complete guide to sizing solar battery storage: from consumption analysis to battery chemistry selection. Includes reference tables, worked examples, and design best practices."
+  canonical="https://batterycalculators.com/learn/solar-storage-sizing-guide"
+  schema="faqPage"
+  schemaName="Solar Storage Sizing Guide"
+  schemaDescription="Comprehensive engineering guide to sizing solar battery storage systems from consumption analysis to final battery selection."
+  schemaUrl="https://batterycalculators.com/learn/solar-storage-sizing-guide"
+  faqItems={faqItems}
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/learn" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Back to Guides</a>
+      <Breadcrumb items={[
+        { label: "Learning Center", href: "/learn" },
+        { label: "Solar Storage Sizing Guide" }
+      ]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">SOLAR</span>
+      <h1 class="text-display-md text-primary mb-6">Solar Storage Sizing Guide</h1>
+      <p class="text-body-md text-body font-light">
+        Sizing solar battery storage is the most consequential design decision in a solar energy system. Get it right, and your system delivers reliable power for a decade or more. Get it wrong, and you face chronic underperformance, accelerated battery degradation, or unnecessary cost. This guide covers the complete engineering process — from consumption analysis through battery chemistry selection.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">The Sizing Framework</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Solar storage sizing follows a deterministic engineering process. Four variables drive the result: daily consumption, autonomy days, depth of discharge, and system efficiency. Understanding how each variable affects the outcome lets you make informed trade-offs between cost, resilience, and performance.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Daily Consumption</h4>
+            <p class="text-body-sm text-muted">
+              The total watt-hours your household or facility uses per day. This is the foundation of all sizing calculations. Accurate load audits prevent both oversizing (wasted cost) and undersizing (power shortages).
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Autonomy Days</h4>
+            <p class="text-body-sm text-muted">
+              How many days the battery must power loads without solar input. Ranges from 1 day (sunny climate, generator backup) to 5+ days (cloudy region, critical loads, no generator).
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Depth of Discharge</h4>
+            <p class="text-body-sm text-muted">
+              The percentage of total capacity you can safely use. LFP allows 80–90%; lead-acid is limited to 50%. Lower DoD means larger banks for the same usable energy.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">System Efficiency</h4>
+            <p class="text-body-sm text-muted">
+              Accounts for inverter losses, wiring resistance, and BMS overhead. Typically 0.90–0.95 for modern equipment. Higher efficiency means smaller required capacity.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FormulaBox title="Core Sizing Formulas">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Required Usable Capacity (Wh) = Daily Consumption (Wh) × Autonomy Days / Efficiency
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Required Rated Capacity (Wh) = Required Usable Capacity (Wh) / DoD
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Required Rated Capacity (kWh) = Required Rated Capacity (Wh) / 1,000
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Minimum Solar Array (W) = Daily Consumption (Wh) / (Peak Sun Hours × Efficiency)
+        </div>
+        <p>
+          These formulas are universal — they apply to any battery chemistry, system voltage, or installation type. The variables change; the method does not.
+        </p>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Step 1: Consumption Analysis</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Begin by cataloging every electrical load the solar system must support. For each device, record the power draw in watts and the estimated daily runtime in hours. The product gives watt-hours per day. Sum all devices to get total daily consumption.
+        </p>
+        <p class="text-body-md text-body font-light mb-4">
+          Common household consumption ranges from 5–30 kWh/day depending on size, climate, and electrification level. Homes with electric heating, air conditioning, and EV charging consume 20–40 kWh/day. Efficient small homes with heat pumps and LED lighting may use 5–10 kWh/day.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Home Type</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Typical Consumption</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Key Loads</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">Small efficient home</td>
+                <td class="p-4 font-mono text-primary">5–8 kWh/day</td>
+                <td class="p-4 text-muted">LED lights, efficient fridge, laptop, router</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Average 3-bedroom home</td>
+                <td class="p-4 font-mono text-primary">15–25 kWh/day</td>
+                <td class="p-4 text-muted">Standard appliances, AC/heat pump, washer</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Large all-electric home</td>
+                <td class="p-4 font-mono text-primary">25–40 kWh/day</td>
+                <td class="p-4 text-muted">Electric heat, EV charging, dryer, hot tub</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Off-grid cabin</td>
+                <td class="p-4 font-mono text-primary">3–8 kWh/day</td>
+                <td class="p-4 text-muted">Minimal loads, efficient appliances only</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Step 2: Battery Storage Reference Table</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          The table below maps daily consumption levels to required rated battery storage for common autonomy scenarios. All values assume LFP chemistry at 85% DoD and 92% system efficiency.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Daily Consumption</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">1 Day Autonomy</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">2 Days Autonomy</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">3 Days Autonomy</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">With 25% Margin</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">5 kWh/day</td>
+                <td class="p-4 text-muted">6.4 kWh</td>
+                <td class="p-4 text-muted">12.8 kWh</td>
+                <td class="p-4 text-muted">19.2 kWh</td>
+                <td class="p-4 font-mono text-primary">24.0 kWh</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">10 kWh/day</td>
+                <td class="p-4 text-muted">12.8 kWh</td>
+                <td class="p-4 text-muted">25.6 kWh</td>
+                <td class="p-4 text-muted">38.4 kWh</td>
+                <td class="p-4 font-mono text-primary">48.0 kWh</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">15 kWh/day</td>
+                <td class="p-4 text-muted">19.2 kWh</td>
+                <td class="p-4 text-muted">38.4 kWh</td>
+                <td class="p-4 text-muted">57.6 kWh</td>
+                <td class="p-4 font-mono text-primary">72.0 kWh</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">20 kWh/day</td>
+                <td class="p-4 text-muted">25.6 kWh</td>
+                <td class="p-4 text-muted">51.1 kWh</td>
+                <td class="p-4 text-muted">76.7 kWh</td>
+                <td class="p-4 font-mono text-primary">95.9 kWh</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">30 kWh/day</td>
+                <td class="p-4 text-muted">38.4 kWh</td>
+                <td class="p-4 text-muted">76.7 kWh</td>
+                <td class="p-4 text-muted">115.1 kWh</td>
+                <td class="p-4 font-mono text-primary">143.9 kWh</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-body-md text-body font-light mt-4">
+          The "With 25% Margin" column accounts for battery aging, temperature derating, and load growth over the system's lifetime. This is the recommended column for real-world sizing decisions.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Step 3: Battery Chemistry Selection</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Battery chemistry determines the usable capacity, cycle life, safety profile, and cost per kWh. For solar storage, LFP (LiFePO4) has become the dominant choice due to its combination of deep discharge capability, long cycle life, and thermal stability.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Chemistry</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">DoD</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Cycle Life</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Cost/kWh</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Safety</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">LFP (LiFePO4)</td>
+                <td class="p-4 font-mono text-primary">85–90%</td>
+                <td class="p-4 text-muted">3,000–5,000</td>
+                <td class="p-4 text-muted">$250–400</td>
+                <td class="p-4 text-muted">Excellent — no thermal runaway</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">NMC (Lithium)</td>
+                <td class="p-4 font-mono text-primary">80–90%</td>
+                <td class="p-4 text-muted">2,000–3,000</td>
+                <td class="p-4 text-muted">$300–500</td>
+                <td class="p-4 text-muted">Good — requires thermal management</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">Lead-Acid (AGM)</td>
+                <td class="p-4 font-mono text-primary">50%</td>
+                <td class="p-4 text-muted">500–1,000</td>
+                <td class="p-4 text-muted">$150–250</td>
+                <td class="p-4 text-muted">Good — mature technology</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">Sodium-Ion</td>
+                <td class="p-4 font-mono text-primary">80–90%</td>
+                <td class="p-4 text-muted">2,000–4,000</td>
+                <td class="p-4 text-muted">$150–300</td>
+                <td class="p-4 text-muted">Excellent — emerging technology</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-body-md text-body font-light mt-4">
+          When comparing cost, look at lifetime cost per kWh delivered, not just upfront price. A $350/kWh LFP battery delivering 4,000 cycles at 85% DoD costs $0.10 per kWh delivered. A $200/kWh lead-acid battery delivering 800 cycles at 50% DoD costs $0.50 per kWh delivered — five times more expensive over its lifetime.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Worked Example: Complete Sizing</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Given:</strong></p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li>Home type: Average 3-bedroom, all-electric</li>
+              <li>Daily consumption: 15,000 Wh (15 kWh)</li>
+              <li>Autonomy: 2 days</li>
+              <li>Battery: LFP at 85% DoD</li>
+              <li>System efficiency: 92%</li>
+              <li>System voltage: 48V</li>
+              <li>Peak sun hours: 5</li>
+            </ul>
+            <p><strong>Step 1:</strong> Required usable capacity:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              15,000 Wh × 2 / 0.92 = 32,609 Wh usable
+            </div>
+            <p><strong>Step 2:</strong> Required rated capacity:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              32,609 Wh / 0.85 = 38,363 Wh rated (38.4 kWh)
+            </div>
+            <p><strong>Step 3:</strong> Add 25% margin:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              38,363 Wh × 1.25 = 47,954 Wh → 48.0 kWh rated
+            </div>
+            <p><strong>Step 4:</strong> Minimum solar array:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              15,000 Wh / (5 h × 0.92) = 3,261 W → oversize to 4,200 W (1.3×)
+            </div>
+            <p class="text-muted mt-2">This home needs a <strong>48 kWh rated LFP battery bank</strong> and a <strong>4.2 kW solar array</strong>. In practice, this could be nine 48V 100Ah LFP modules (46.1 kWh) or a combination of rack-mounted 48V batteries. The 4.2 kW array recharges the daily 15 kWh consumption in approximately 4.1 peak sun hours, leaving margin for system losses and cloudy days.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Recommended Battery Configurations</h2>
+        <div class="bg-surface-soft border border-hairline overflow-hidden mb-4">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Daily Consumption</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Storage (2 days + 25%)</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Recommended Battery Config</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Solar Array</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">5 kWh/day</td>
+                <td class="p-4 text-muted">~16 kWh</td>
+                <td class="p-4 text-muted">3 × 48V 100Ah LFP</td>
+                <td class="p-4 font-mono text-primary">1.7 kW</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">10 kWh/day</td>
+                <td class="p-4 text-muted">~32 kWh</td>
+                <td class="p-4 text-muted">6 × 48V 100Ah LFP</td>
+                <td class="p-4 font-mono text-primary">3.4 kW</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">15 kWh/day</td>
+                <td class="p-4 text-muted">~48 kWh</td>
+                <td class="p-4 text-muted">9 × 48V 100Ah LFP</td>
+                <td class="p-4 font-mono text-primary">4.2 kW</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">20 kWh/day</td>
+                <td class="p-4 text-muted">~64 kWh</td>
+                <td class="p-4 text-muted">12 × 48V 100Ah LFP</td>
+                <td class="p-4 font-mono text-primary">5.6 kW</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">30 kWh/day</td>
+                <td class="p-4 text-muted">~96 kWh</td>
+                <td class="p-4 text-muted">18 × 48V 100Ah LFP</td>
+                <td class="p-4 font-mono text-primary">8.4 kW</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Design Best Practices</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Size for Winter</h4>
+            <p class="text-body-sm text-muted">
+              Solar production drops 30–50% in winter. If your system must maintain autonomy year-round, size the array for winter peak sun hours and the battery for the worst-case month. A system sized only for summer will fail in January.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Use 48V Architecture</h4>
+            <p class="text-body-sm text-muted">
+              For systems over 10 kWh, 48V is the industry standard. It reduces copper losses by 75% compared to 12V, simplifies wiring, and is compatible with all modern hybrid inverters and MPPT charge controllers.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Match Battery Age</h4>
+            <p class="text-body-sm text-muted">
+              If expanding an existing bank, use batteries of the same chemistry, capacity, and ideally the same manufacturing batch. Mixing old and new cells creates imbalance and reduces overall bank performance and lifespan.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Monitor Performance</h4>
+            <p class="text-body-sm text-muted">
+              Install battery monitoring that tracks SOC, voltage, current, and temperature. Data logging reveals capacity fade trends, identifies cell imbalance early, and confirms that your sizing assumptions hold in practice.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Try It</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use the Solar Battery Sizing Calculator to compute the exact storage capacity and array size for your installation.
+          </p>
+          <a href="/tools/solar-battery-sizing-calculator" class="btn-primary text-xs py-3 px-6 inline-block">Open Solar Battery Sizing Calculator</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Compare Chemistries</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use the Battery Sizing Calculator to compare LFP, NMC, and lead-acid configurations side by side.
+          </p>
+          <a href="/tools/battery-sizing-calculator" class="btn-primary-outline text-xs py-3 px-6 inline-block">Open Battery Sizing Calculator</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Related Articles</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">How Much Battery Storage Do I Need?</h4>
+            <p class="text-body-sm text-muted mb-3">
+              Calculate total storage capacity from daily consumption and autonomy days.
+            </p>
+            <a href="/learn/how-much-battery-storage-do-i-need" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Read Guide →</a>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">LiFePO4 for Solar Storage</h4>
+            <p class="text-body-sm text-muted mb-3">
+              Why LFP chemistry is the optimal choice for stationary solar battery systems.
+            </p>
+            <a href="/learn/lifepo4-for-solar-storage" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Read Guide →</a>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

@@ -1,0 +1,228 @@
+---
+import Layout from './Layout.astro';
+import FeedbackWidget from '../components/FeedbackWidget.astro';
+import CalculatorCard from '../components/CalculatorCard.astro';
+
+export interface FAQItem {
+  question: string;
+  answer: string;
+}
+
+export interface RelatedLink {
+  href: string;
+  title: string;
+  description?: string;
+}
+
+export interface ReferenceLink {
+  title: string;
+  url: string;
+  source: string;
+}
+
+export interface Props {
+  title: string;
+  description: string;
+  canonical?: string;
+  ogImage?: string;
+  faqItems?: FAQItem[];
+  relatedCalculators?: RelatedLink[];
+  relatedArticles?: RelatedLink[];
+  commonMistakes?: string[];
+  whatIs?: string;
+  whyItMatters?: string[];
+  practicalApplications?: { title: string; description: string }[];
+  trustSection?: { text: string; link?: { label: string; href: string } };
+  references?: ReferenceLink[];
+  expertNotes?: { title?: string; variant?: 'info' | 'warning' | 'tip' | 'engineering'; content: string }[];
+}
+
+const {
+  title,
+  description,
+  canonical,
+  ogImage,
+  faqItems = [],
+  relatedCalculators = [],
+  relatedArticles = [],
+  commonMistakes = [],
+  whatIs,
+  whyItMatters = [],
+  practicalApplications = [],
+  trustSection,
+  references = [],
+  expertNotes = [],
+} = Astro.props as Props;
+const calculatorName = title.split('|')[0].trim();
+
+const breadcrumbs = [
+  { label: 'Tools', href: '/tools' },
+  { label: calculatorName },
+];
+---
+
+<Layout 
+  title={title} 
+  description={description}
+  canonical={canonical}
+  ogType="website"
+  ogImage={ogImage}
+  schema="webApplication"
+  schemaName={calculatorName}
+  schemaDescription={description}
+  faqItems={faqItems}
+  breadcrumbs={breadcrumbs}
+>
+  <div class="mb-8 min-w-0">
+    <a href="/tools" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors">← Back to Calculators</a>
+    <h1 class="text-display-md text-primary mt-4 mb-2 break-words">{calculatorName}</h1>
+    <p class="text-body-md text-body font-light min-w-0">
+      {description}
+    </p>
+  </div>
+
+  <slot />
+
+  <!-- What Is Section -->
+  {whatIs && (
+    <section class="mb-16 border-t border-hairline pt-12">
+      <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">What Is {calculatorName.replace(' Calculator', '').replace(' | Battery Calculators', '')}?</h2>
+      <div class="text-body-sm text-muted leading-relaxed max-w-3xl" set:html={whatIs} />
+    </section>
+  )}
+
+  <!-- Why This Calculation Matters -->
+  {whyItMatters.length > 0 && (
+    <section class="mb-16 border-t border-hairline pt-12">
+      <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Why This Calculation Matters</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {whyItMatters.map((item) => (
+          <CalculatorCard>
+            <p class="text-body-sm text-muted flex gap-3">
+              <span class="text-m-blue-light shrink-0 mt-0.5">→</span>
+              <span>{item}</span>
+            </p>
+          </CalculatorCard>
+        ))}
+      </div>
+    </section>
+  )}
+
+  <!-- Expert Notes -->
+  {expertNotes.length > 0 && (
+    <section class="mb-16">
+      {expertNotes.map((note) => (
+        <aside class={`bg-surface-soft border-l-4 ${note.variant === 'warning' ? 'border-m-red' : note.variant === 'tip' ? 'border-green-600' : note.variant === 'info' ? 'border-m-blue-light' : 'border-m-blue-dark'} p-4 md:p-5 my-4 overflow-hidden`}>
+          <div class="flex items-center gap-2 mb-3">
+            <span class="text-label-uppercase text-[10px] text-primary tracking-wider font-bold bg-surface-card border border-hairline px-2 py-0.5 inline-block">
+              {note.variant === 'warning' ? '!' : note.variant === 'tip' ? '✓' : note.variant === 'info' ? 'i' : '⚡'}
+            </span>
+            <span class="text-label-uppercase text-[10px] text-muted tracking-wider">{note.title || 'Expert Note'}</span>
+          </div>
+          <div class="text-body-sm text-body font-light leading-relaxed" set:html={note.content} />
+        </aside>
+      ))}
+    </section>
+  )}
+
+  <!-- Practical Applications -->
+  {practicalApplications.length > 0 && (
+    <section class="mb-16 border-t border-hairline pt-12">
+      <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Practical Applications</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {practicalApplications.map((app) => (
+          <CalculatorCard>
+            <h4 class="text-primary font-bold text-sm mb-2">{app.title}</h4>
+            <p class="text-body-sm text-muted">{app.description}</p>
+          </CalculatorCard>
+        ))}
+      </div>
+    </section>
+  )}
+
+  <!-- Common Mistakes Section -->
+  {commonMistakes.length > 0 && (
+    <section class="mb-16 border-t border-hairline pt-12">
+      <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Common Mistakes to Avoid</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {commonMistakes.map((mistake) => (
+          <CalculatorCard>
+            <p class="text-body-sm text-muted flex gap-3">
+              <span class="text-m-red shrink-0 mt-0.5">✗</span>
+              <span>{mistake}</span>
+            </p>
+          </CalculatorCard>
+        ))}
+      </div>
+    </section>
+  )}
+
+  <!-- Trust Layer -->
+  {trustSection && (
+    <section class="mb-16 border-t border-hairline pt-12">
+      <div class="bg-surface-soft border border-hairline p-6">
+        <h3 class="text-title-sm text-primary uppercase tracking-wider mb-3">Why Trust These Calculations?</h3>
+        <p class="text-body-sm text-muted leading-relaxed">{trustSection.text}</p>
+        {trustSection.link && (
+          <a href={trustSection.link.href} class="text-m-blue-light text-xs mt-3 inline-block hover:underline">{trustSection.link.label} →</a>
+        )}
+      </div>
+    </section>
+  )}
+
+  <!-- Related Calculators -->
+  {relatedCalculators.length > 0 && (
+    <section class="mb-16 border-t border-hairline pt-12">
+      <span class="text-label-uppercase text-muted text-[10px] block mb-4">RELATED CALCULATORS</span>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {relatedCalculators.map((calc) => (
+          <a href={calc.href} class="bg-surface-card border border-hairline p-5 hover:border-primary transition-colors block">
+            <h4 class="text-primary font-bold text-sm mb-1">{calc.title}</h4>
+            <p class="text-xs text-muted">{calc.description}</p>
+          </a>
+        ))}
+      </div>
+    </section>
+  )}
+
+  <!-- Related Articles -->
+  {relatedArticles.length > 0 && (
+    <section class="mb-16 border-t border-hairline pt-12">
+      <span class="text-label-uppercase text-muted text-[10px] block mb-4">RELATED GUIDES</span>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {relatedArticles.map((article) => (
+          <a href={article.href} class="bg-surface-card border border-hairline p-4 hover:border-primary transition-colors">
+            <span class="text-label-uppercase text-muted text-[10px] block mb-2">LEARNING CENTER</span>
+            <h3 class="text-title-sm text-primary">{article.title}</h3>
+          </a>
+        ))}
+      </div>
+    </section>
+  )}
+
+  <!-- References -->
+  {references.length > 0 && (
+    <section class="mb-16 border-t border-hairline pt-12">
+      <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">References & Further Reading</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        {references.map((ref) => (
+          <a href={ref.url} target="_blank" rel="noopener noreferrer" class="bg-surface-soft border border-hairline p-4 hover:border-primary transition-colors flex flex-col gap-1">
+            <span class="text-body-sm text-primary font-bold">{ref.title}</span>
+            <span class="text-caption text-muted">{ref.source}</span>
+          </a>
+        ))}
+      </div>
+    </section>
+  )}
+
+  <!-- Feedback Widget -->
+  <FeedbackWidget calculatorName={calculatorName} />
+
+  <!-- Engineering Disclaimer Box -->
+  <section class="bg-surface-soft border border-hairline p-6 text-caption text-muted mb-16">
+    <span class="text-primary font-bold text-[10px] tracking-wider uppercase border border-hairline px-1.5 py-0.5 mr-2 inline-block mb-3">
+      Engineering Disclaimer
+    </span>
+    This tool provides sizing estimates only. Actual runtimes will vary depending on temperature, internal resistance, wiring termination losses, cell aging, and load volatility. All safety critical designs must be verified by certified professionals.
+  </section>
+</Layout>

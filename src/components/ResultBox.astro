@@ -1,0 +1,49 @@
+<!-- src/components/ResultBox.astro -->
+---
+export interface Props {
+  label: string;
+  value: string;
+  suffix?: string;
+  variant?: 'primary' | 'secondary';
+  borderColor?: 'hairline' | 'blue-light' | 'red' | 'yellow';
+  id?: string;
+  helperText?: string;
+}
+
+const {
+  label,
+  value,
+  suffix,
+  variant = 'secondary',
+  borderColor = 'hairline',
+  id,
+  helperText,
+} = Astro.props as Props;
+
+const borderClass = {
+  hairline: 'border-hairline',
+  'blue-light': 'border-m-blue-light',
+  red: 'border-red-600',
+  yellow: 'border-yellow-500',
+}[borderColor];
+
+const valueClass = variant === 'primary'
+  ? 'text-display-md text-primary font-bold'
+  : 'text-title-lg text-primary';
+
+const wrapperClass = variant === 'primary'
+  ? `bg-surface-soft p-5 md:p-6 border ${borderClass} col-span-1 md:col-span-2 overflow-hidden`
+  : `bg-surface-soft p-5 md:p-6 border border-hairline overflow-hidden`;
+---
+
+<div class={wrapperClass} id={id}>
+  <span class="text-label-uppercase text-muted text-[10px] block mb-1">{label}</span>
+  <div class={valueClass}>{value}</div>
+  {suffix && (
+    <span class="text-caption text-muted block mt-1">{suffix}</span>
+  )}
+  {helperText && (
+    <span class="text-caption text-muted block mt-1 opacity-70">{helperText}</span>
+  )}
+  <slot />
+</div>

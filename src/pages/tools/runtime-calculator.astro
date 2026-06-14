@@ -1,0 +1,451 @@
+---
+import CalculatorLayout from '../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../components/CalculatorCard.astro';
+import InputField from '../../components/InputField.astro';
+import ResultBox from '../../components/ResultBox.astro';
+import FormulaBox from '../../components/FormulaBox.astro';
+import FAQSection from '../../components/FAQSection.astro';
+import RelatedTools from '../../components/RelatedTools.astro';
+import MiniSimulationChart from '../../components/MiniSimulationChart.astro';
+
+const whatIs = `Battery runtime is the amount of time a battery can sustain a given electrical load before its voltage drops below a usable threshold. It depends on four interrelated factors: <strong>total stored energy</strong> (measured in watt-hours), <strong>the continuous power draw</strong> of the connected load, <strong>depth of discharge limits</strong> imposed by the battery chemistry to preserve cycle life, and <strong>system efficiency losses</strong> in the inverter, wiring, and battery management system. Calculating runtime correctly is essential for sizing off-grid solar arrays, planning RV power budgets, designing marine hotel load systems, specifying UPS backup duration, and configuring home battery backup during grid outages. An inaccurate runtime estimate can leave you without power during critical moments or lead to overspending on unnecessary battery capacity.`;
+
+const whyItMatters = [
+  "Unexpected power outages can leave critical loads — medical devices, communication equipment, refrigeration — without backup when runtime is overestimated.",
+  "Oversizing a battery bank wastes capital. Undersizing causes premature voltage sag and forced shutdowns before the load cycle completes.",
+  "Inverter efficiency losses of 4–12% are commonly ignored, meaning the actual runtime is shorter than the naive capacity-to-load calculation suggests.",
+  "Temperature extremes can reduce usable capacity by 10–30%, making warm-lab runtime estimates unreliable for cold-weather or outdoor deployments.",
+  "Ignoring depth of discharge limits accelerates battery degradation — a battery cycled to 100% DoD may lose 20–40% of its rated cycle life.",
+];
+
+const practicalApplications = [
+  { title: "RV & Camping", description: "Plan power budgets for lights, refrigeration, fans, and electronics during multi-day off-grid camping trips." },
+  { title: "Solar Off-Grid", description: "Determine how many cloudy days your battery bank can sustain household loads without solar input." },
+  { title: "Marine Hotel Loads", description: "Size battery banks for navigation electronics, lighting, refrigeration, and bilge pumps on vessels." },
+  { title: "Home Backup Power", description: "Estimate how long a home battery system can power critical loads during grid outages." },
+  { title: "UPS & Critical Loads", description: "Verify that uninterruptible power supply batteries can sustain server or medical loads through outage durations." },
+  { title: "Telecom Backup", description: "Validate that telecom tower batteries meet minimum autonomy requirements during power failures." },
+];
+
+const expertNotes = [
+  { title: 'Marine Systems', variant: 'engineering', content: 'Marine battery systems often operate at different depth-of-discharge limits than residential systems. A marine house bank is typically sized to 50% DoD to preserve cycle life, while a dedicated engine-start bank may be sized for much higher burst currents at lower DoD.' },
+  { title: 'Temperature Impact', variant: 'warning', content: 'Battery runtime decreases significantly at low temperatures. At 0°C, lithium capacity drops approximately 10%. At -20°C, usable energy can fall by 30% or more. Always size for your worst-case operating temperature, not lab conditions.' },
+  { title: 'Chemistry Matters', variant: 'info', content: 'LFP (LiFePO4) batteries maintain a flatter voltage curve during discharge compared to NMC or lead-acid. This means usable capacity is more predictable across the discharge cycle, but the knee at end-of-discharge is steeper — monitor voltage closely below 20% SOC.' },
+];
+
+const trustSection = {
+  text: "All formulas used in this calculator are derived from publicly documented battery engineering principles. The runtime model accounts for usable capacity (Ah × V × DoD), efficiency-adjusted load (W / η), and discharge current calculations. No black-box algorithms are used — every intermediate value is displayed so you can verify the math independently. Our methodology follows standard practices from Battery University, IEEE standards, and manufacturer application notes.",
+  link: { label: "View our full methodology", href: "/methodology" },
+};
+
+const references = [
+  { title: "Battery University — Discharge Rate and Runtime", url: "https://batteryuniversity.com/article/bu-502-discharging-at-high-current", source: "Battery University / Cadex Electronics" },
+  { title: "IEEE Std 1188-1996 — Recommended Practice for Stationary Battery Maintenance", url: "https://standards.ieee.org/ieee/1188/1076/", source: "IEEE Standards Association" },
+  { title: "Peukert's Effect and Lead-Acid Runtime", url: "https://batteryuniversity.com/article/bu-402-what-is-the-peukert-effect", source: "Battery University" },
+  { title: "Victron Energy — Battery Runtime Calculations", url: "https://www.victronenergy.com/help-center", source: "Victron Energy" },
+  { title: "US Department of Energy — Battery Storage Technology Overview", url: "https://www.energy.gov/eere/storage/battery-storage-technology", source: "U.S. DOE" },
+];
+
+const faqItems = [
+  {
+    question: "How does the C-rate affect battery runtime?",
+    answer: "High discharge currents (high C-rates) cause internal heating and increase voltage drop due to internal resistance (I²R loss). Consequently, the actual delivered energy is less than nominal specifications. In lithium cells, this effect is small (typically <5%), but in lead-acid batteries, Peukert's effect can reduce available capacity by over 30% at a 1C rate.",
+  },
+  {
+    question: "What is a safe Depth of Discharge (DoD) for lithium batteries?",
+    answer: "Lithium Iron Phosphate (LiFePO4) cells can be discharged to 80%–90% DoD regularly without critical cycle-life penalties. Nickel Manganese Cobalt (NMC) cells are typically limited to 80% to protect cycle integrity. Discharging down to 100% SoC will accelerate calendar aging and risks cell damage.",
+  },
+  {
+    question: "Why is inverter efficiency factored in?",
+    answer: "DC-to-AC inverters have peak efficiencies ranging from 88% to 96%. Operating inverters at low loads or extreme high loads shifts the efficiency downward. We include a standard efficiency multiplier to model these thermal losses and prevent overestimating runtime.",
+  },
+  {
+    question: "How does ambient temperature affect discharge?",
+    answer: "Lower temperatures increase internal chemical resistance, lowering output voltage and reducing overall capacity. At 0°C, typical lithium cell capacities decrease by approximately 10%. At -20°C, usable energy can drop by 30% or more.",
+  },
+  {
+    question: "How long will a 100Ah battery last?",
+    answer: "A 100Ah 12.8V LFP battery at 80% DoD stores 1,024 Wh. With a 250W load and 90% inverter efficiency, it will last approximately 3 hours 41 minutes. At a 100W load, the same battery lasts roughly 9 hours 13 minutes. Runtime scales linearly with load in the ideal case.",
+  },
+  {
+    question: "How long will a 200Ah battery last?",
+    answer: "A 200Ah 12.8V LFP battery at 80% DoD stores 2,048 Wh. With a 250W load and 90% inverter efficiency, it lasts approximately 7 hours 22 minutes. Double the capacity of a 100Ah bank doubles runtime for the same load.",
+  },
+  {
+    question: "How do I calculate battery runtime?",
+    answer: "Divide the usable energy (Capacity × Voltage × DoD) by the efficiency-adjusted load (Load Power / System Efficiency). The formula is: Runtime (hours) = (Ah × V × DoD%) / (Load W / Efficiency%). Always use watt-hours, not amp-hours, for the energy calculation.",
+  },
+  {
+    question: "What affects battery runtime the most?",
+    answer: "Load power draw is the dominant factor — halving the load doubles runtime. Secondary factors include depth of discharge limits, inverter efficiency, ambient temperature, battery age (SOH), and internal resistance which increases with high C-rate discharge.",
+  },
+  {
+    question: "Does temperature affect battery runtime?",
+    answer: "Yes. At 0°C, lithium batteries lose approximately 10% of rated capacity. At -20°C, losses can reach 30%. Lead-acid batteries are even more temperature-sensitive. Cold-weather applications should apply temperature derating factors to runtime calculations.",
+  },
+  {
+    question: "What is the difference between Ah and Wh?",
+    answer: "Amp-hours (Ah) measure charge capacity at a given voltage. Watt-hours (Wh) measure total energy. A 100Ah battery at 12V stores 1,200 Wh, while the same 100Ah at 48V stores 4,800 Wh. Always convert to Wh when comparing batteries at different voltages or calculating runtime with power loads in watts.",
+  },
+  {
+    question: "Can I use this calculator for lead-acid batteries?",
+    answer: "Yes, but adjust the DoD to 50% for flooded lead-acid or 80% for AGM/Gel. Lead-acid batteries also suffer from Peukert's effect — at high discharge rates, available capacity drops significantly. For accurate lead-acid results, use a Peukert-adjusted capacity value.",
+  },
+  {
+    question: "How does battery age affect runtime?",
+    answer: "As batteries age, their State of Health (SOH) decreases. A battery at 80% SOH delivers only 80% of its original rated capacity. A 100Ah battery with 80% SOH effectively behaves like an 80Ah battery. Factor SOH into runtime calculations for aged battery banks.",
+  },
+];
+
+const relatedTools = [
+  { href: "/tools/c-rate-calculator", title: "C-Rate Calculator", description: "Calculate charge and discharge current rates for any battery configuration." },
+  { href: "/tools/battery-sizing-calculator", title: "Battery Sizing Tool", description: "Determine daily consumption and autonomy-based sizing requirements." },
+  { href: "/tools/energy-conversion-calculator", title: "Energy Conversion", description: "Convert between capacity Ah and energy Wh at any voltage." },
+  { href: "/tools/charging-time-calculator", title: "Charging Time Calculator", description: "Estimate CC-CV charge durations for lithium and lead-acid batteries." },
+  { href: "/tools/soc-estimator", title: "SOC Estimator", description: "Interpolate battery State of Charge from open-circuit voltage." },
+  { href: "/tools/solar-battery-sizing-calculator", title: "Solar Battery Sizing", description: "Size your solar battery bank from daily consumption data." },
+  { href: "/tools/home-backup-battery-calculator", title: "Home Backup Calculator", description: "Size a home battery backup system for critical loads." },
+  { href: "/tools/rv-battery-calculator", title: "RV Battery Calculator", description: "Plan RV power budgets for off-grid camping trips." },
+];
+
+const commonMistakes = [
+  "Ignoring inverter efficiency — a 90% efficient inverter means 10% of your battery energy is lost as heat before reaching the load. Always factor in system efficiency.",
+  "Using 100% Depth of Discharge — discharging lithium batteries to 0% SoC accelerates degradation. Use 80% DoD for LFP and 80% for NMC to preserve cycle life.",
+  "Forgetting temperature effects — at 0°C, lithium capacity drops ~10%. At -20°C, it can drop 30% or more. Size for your worst-case operating temperature.",
+  "Confusing Ah and Wh — a 100Ah battery at 12V stores 1,280 Wh, not 100 Wh. Always verify you are using the correct unit for your load calculation.",
+  "Ignoring battery age — a battery at 80% SOH delivers only 80% of rated capacity. Old batteries provide less runtime than their label suggests.",
+  "Assuming linear discharge — real battery voltage sags under load, especially at high C-rates. The actual usable energy is less than the nominal capacity times voltage.",
+  "Using peak load for runtime estimates — continuous runtime should use average continuous load, not momentary peak loads from motor startups or inrush currents.",
+  "Neglecting self-discharge — over multi-day periods, battery self-discharge (1–5% per month for lithium, higher for lead-acid) reduces available energy.",
+  "Not accounting for cable losses — long cable runs between battery and load introduce voltage drop, reducing the effective energy delivered to the load.",
+  "Oversizing for safety margin — adding excessive derating factors (e.g., 50% efficiency) results in unnecessarily large and expensive battery banks.",
+];
+
+const relatedArticles = [
+  { href: "/learn/how-to-calculate-battery-runtime", title: "How to Calculate Battery Runtime" },
+  { href: "/learn/battery-runtime-formula", title: "Battery Runtime Formula" },
+  { href: "/learn/how-long-will-a-battery-last", title: "How Long Will a Battery Last?" },
+  { href: "/learn/12v-vs-24v-vs-48v-runtime", title: "12V vs 24V vs 48V Runtime" },
+  { href: "/learn/battery-runtime-vs-temperature", title: "Battery Runtime vs Temperature" },
+];
+---
+
+<CalculatorLayout
+  title="Battery Runtime Calculator (Lithium + Marine) | Battery Calculators"
+  description="Use this battery runtime calculator to estimate lithium battery runtime and marine battery runtime. Enter Ah/Wh, voltage, load watts (W), DoD %, and system efficiency % to get total energy and estimated runtime in hours and minutes with transparent engineering formulas."
+  faqItems={faqItems}
+  commonMistakes={commonMistakes}
+  relatedCalculators={relatedTools}
+  relatedArticles={relatedArticles}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+>
+
+  <!-- Main Calculator Grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+
+    <!-- Input Form -->
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">System Parameters</h3>
+      <div class="flex flex-col gap-5 md:gap-6">
+
+        <!-- Capacity (number + unit select side by side) -->
+        <div class="flex flex-col gap-2">
+          <label for="capacity" class="text-label-uppercase text-xs text-primary">Battery Capacity</label>
+          <div class="grid grid-cols-3 gap-2">
+            <input type="number" id="capacity" value="100" class="text-input col-span-2" min="1" step="any" />
+            <select id="capacity-unit" class="select-input">
+              <option value="ah">Ah</option>
+              <option value="wh">Wh</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Voltage -->
+        <InputField
+          id="voltage"
+          label="Nominal Voltage (V)"
+          value={12.8}
+          min={1}
+          step="any"
+          wrapperId="voltage-wrapper"
+          helperText="Common: LFP (12.8V / 25.6V), NMC (11.1V / 37V), Lead-Acid (12V)"
+        />
+
+        <!-- DoD -->
+        <InputField
+          id="dod"
+          label="Max Depth of Discharge (DoD %)"
+          value={80}
+          min={1}
+          max={100}
+          helperText="Recommended limits: LFP (80-90%), NMC (80%), Lead-Acid (50%)"
+        />
+
+        <!-- Inverter / System Efficiency -->
+        <InputField
+          id="efficiency"
+          label="System Efficiency (%)"
+          value={90}
+          min={1}
+          max={100}
+          helperText="Accounts for inverter conversions, cable resistance, and self-discharge losses."
+        />
+
+        <!-- Power Load -->
+        <InputField
+          id="load"
+          label="Continuous Load (Watts)"
+          value={250}
+          min={1}
+          step="any"
+        />
+
+      </div>
+    </CalculatorCard>
+
+    <!-- Calculation Results -->
+    <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Estimated Outputs</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <!-- Main Output -->
+          <ResultBox
+            label="Backup Runtime"
+            value="3h 41m"
+            suffix="3.68 hours"
+            variant="primary"
+            id="result-runtime"
+          />
+
+          <!-- Energy Metrics -->
+          <ResultBox
+            label="Battery Usable Energy"
+            value="1,024 Wh"
+            suffix="1.02 kWh"
+            id="result-energy-box"
+            helperText="Available after depth-of-discharge limits."
+          />
+
+          <ResultBox
+            label="Delivered System Energy"
+            value="921.6 Wh"
+            suffix="0.92 kWh"
+            id="result-delivered-box"
+            helperText="Available to load after inverter and system losses."
+          />
+
+          <ResultBox
+            label="Discharge Current"
+            value="19.53 A"
+            suffix="0.20 C"
+            id="result-current-box"
+          />
+        </div>
+
+        <MiniSimulationChart
+          title="Energy Depletion Curve"
+          description="Battery energy remaining over discharge time"
+          xLabel="Time (hours)"
+          yLabel="Energy (%)"
+          chartId="chart-runtime"
+        />
+      </div>
+
+      <!-- Action Area -->
+      <div class="border-t border-hairline pt-6">
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">Technical Warning / Safety Notice</h4>
+        <p class="text-body-sm text-muted">
+          Estimates are based on standard discharge curves. Continuous high-current loads will increase cell temperatures and degrade total capacity due to the Peukert effect.
+        </p>
+      </div>
+    </CalculatorCard>
+
+  </div>
+
+  <!-- Technical Explanation and Equations -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+
+      <FormulaBox title="Mathematical Formulas">
+        <p>
+          The runtime T is computed by dividing usable battery capacity by the efficiency-adjusted discharge load:
+        </p>
+        <div class="bg-surface-soft p-3 md:p-4 font-mono text-primary border border-hairline my-2 overflow-x-auto whitespace-nowrap md:whitespace-normal text-xs md:text-sm">
+          Total Energy (Wh) = Capacity (Ah) x Voltage (V)
+        </div>
+        <div class="bg-surface-soft p-3 md:p-4 font-mono text-primary border border-hairline my-2 overflow-x-auto whitespace-nowrap md:whitespace-normal text-xs md:text-sm">
+          Battery Usable Energy (Wh) = Total Energy (Wh) x (DoD% / 100)
+        </div>
+        <div class="bg-surface-soft p-3 md:p-4 font-mono text-primary border border-hairline my-2 overflow-x-auto whitespace-nowrap md:whitespace-normal text-xs md:text-sm">
+          Delivered System Energy (Wh) = Battery Usable Energy (Wh) x (Efficiency% / 100)
+        </div>
+        <div class="bg-surface-soft p-3 md:p-4 font-mono text-primary border border-hairline my-2 overflow-x-auto whitespace-nowrap md:whitespace-normal text-xs md:text-sm">
+          Runtime (Hours) = Delivered System Energy (Wh) / Load (W)
+        </div>
+        <p>
+          Discharge current I and C-rate are defined as:
+        </p>
+        <div class="bg-surface-soft p-3 md:p-4 font-mono text-primary border border-hairline my-2 overflow-x-auto whitespace-nowrap md:whitespace-normal text-xs md:text-sm">
+          Discharge Current (A) = Load (W) / Voltage (V)
+        </div>
+        <div class="bg-surface-soft p-3 md:p-4 font-mono text-primary border border-hairline my-2 overflow-x-auto whitespace-nowrap md:whitespace-normal text-xs md:text-sm">
+          C-Rate = Discharge Current (A) / Capacity (Ah)
+        </div>
+        <p class="text-xs text-muted mt-4">
+          <strong>Variables:</strong> Capacity in Ah, Voltage in V (nominal), DoD as percentage (0–100), Load in continuous Watts, Efficiency as percentage (0–100). Assumptions: constant load, nominal voltage throughout discharge, standard temperature (25°C).
+        </p>
+      </FormulaBox>
+
+      <!-- Worked Examples -->
+      <div>
+        <h2 class="text-title-lg text-primary uppercase mb-6 tracking-wider">Worked Examples</h2>
+        <div class="text-body-sm text-muted flex flex-col gap-6">
+
+          <div class="border-l-2 border-m-blue-light pl-3 md:pl-4">
+            <p class="font-bold text-primary mb-2">Example 1: Small System — 12V 100Ah LFP</p>
+            <ul class="list-disc pl-5 md:pl-6 flex flex-col gap-1">
+              <li><strong>Capacity:</strong> 100 Ah | <strong>Voltage:</strong> 12.8V | <strong>DoD:</strong> 80%</li>
+              <li><strong>Efficiency:</strong> 90% | <strong>Load:</strong> 250W</li>
+            </ul>
+            <p class="mt-2"><strong>Step 1:</strong> Total Energy = 100 x 12.8 = <span class="font-mono text-primary">1,280 Wh</span></p>
+            <p><strong>Step 2:</strong> Battery Usable Energy = 1,280 x 0.80 = <span class="font-mono text-primary">1,024 Wh</span></p>
+            <p><strong>Step 3:</strong> Delivered System Energy = 1,024 x 0.90 = <span class="font-mono text-primary">921.6 Wh</span></p>
+            <p><strong>Step 4:</strong> Runtime = 921.6 / 250 = <span class="font-mono text-primary">3.69 hours (3h 41m)</span></p>
+          </div>
+
+          <div class="border-l-2 border-m-blue-dark pl-3 md:pl-4">
+            <p class="font-bold text-primary mb-2">Example 2: Medium System — 24V 200Ah LFP</p>
+            <ul class="list-disc pl-5 md:pl-6 flex flex-col gap-1">
+              <li><strong>Capacity:</strong> 200 Ah | <strong>Voltage:</strong> 25.6V | <strong>DoD:</strong> 80%</li>
+              <li><strong>Efficiency:</strong> 92% | <strong>Load:</strong> 1,500W</li>
+            </ul>
+            <p class="mt-2"><strong>Step 1:</strong> Total Energy = 200 x 25.6 = <span class="font-mono text-primary">5,120 Wh</span></p>
+            <p><strong>Step 2:</strong> Battery Usable Energy = 5,120 x 0.80 = <span class="font-mono text-primary">4,096 Wh</span></p>
+            <p><strong>Step 3:</strong> Delivered System Energy = 4,096 x 0.92 = <span class="font-mono text-primary">3,768.32 Wh</span></p>
+            <p><strong>Step 4:</strong> Runtime = 3,768.32 / 1,500 = <span class="font-mono text-primary">2.51 hours (2h 31m)</span></p>
+          </div>
+
+          <div class="border-l-2 border-m-red pl-3 md:pl-4">
+            <p class="font-bold text-primary mb-2">Example 3: Large System — 48V 280Ah LFP Bank</p>
+            <ul class="list-disc pl-5 md:pl-6 flex flex-col gap-1">
+              <li><strong>Capacity:</strong> 280 Ah | <strong>Voltage:</strong> 51.2V | <strong>DoD:</strong> 85%</li>
+              <li><strong>Efficiency:</strong> 93% | <strong>Load:</strong> 5,000W</li>
+            </ul>
+            <p class="mt-2"><strong>Step 1:</strong> Total Energy = 280 x 51.2 = <span class="font-mono text-primary">14,336 Wh</span></p>
+            <p><strong>Step 2:</strong> Battery Usable Energy = 14,336 x 0.85 = <span class="font-mono text-primary">12,185.6 Wh</span></p>
+            <p><strong>Step 3:</strong> Delivered System Energy = 12,185.6 x 0.93 = <span class="font-mono text-primary">11,332.61 Wh</span></p>
+            <p><strong>Step 4:</strong> Runtime = 11,332.61 / 5,000 = <span class="font-mono text-primary">2.27 hours (2h 16m)</span></p>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <FAQSection items={faqItems} />
+  <RelatedTools tools={relatedTools} />
+
+  <!-- Client-side Calculation Script -->
+  <script>
+    import { calculateRuntime } from '../../utils/calculators';
+    import { renderLineChart, clearChart } from '../../utils/charting';
+
+    const capacityInput = document.getElementById('capacity') as HTMLInputElement;
+    const capacityUnit = document.getElementById('capacity-unit') as HTMLSelectElement;
+    const voltageInput = document.getElementById('voltage') as HTMLInputElement;
+    const dodInput = document.getElementById('dod') as HTMLInputElement;
+    const efficiencyInput = document.getElementById('efficiency') as HTMLInputElement;
+    const loadInput = document.getElementById('load') as HTMLInputElement;
+
+    // Outputs — query inner elements from ResultBox wrappers
+    const resultRuntimeBox = document.getElementById('result-runtime');
+    const resultRuntime = resultRuntimeBox?.querySelector('.text-display-md') as HTMLElement;
+    const resultHoursDecimal = resultRuntimeBox?.querySelector('.text-caption') as HTMLElement;
+    const resultEnergyBox = document.getElementById('result-energy-box');
+    const resultEnergy = resultEnergyBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultKwh = resultEnergyBox?.querySelector('.text-caption') as HTMLElement;
+    const resultDeliveredBox = document.getElementById('result-delivered-box');
+    const resultDelivered = resultDeliveredBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultDeliveredKwh = resultDeliveredBox?.querySelector('.text-caption') as HTMLElement;
+    const resultCurrentBox = document.getElementById('result-current-box');
+    const resultCurrent = resultCurrentBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultCRate = resultCurrentBox?.querySelector('.text-caption') as HTMLElement;
+
+    const chartSvg = document.getElementById('chart-runtime') as unknown as SVGElement;
+
+    function updateCalculations() {
+      const cap = parseFloat(capacityInput.value) || 0;
+      const isWh = capacityUnit.value === 'wh';
+      const voltage = parseFloat(voltageInput.value) || 12.8;
+      const dod = parseFloat(dodInput.value) || 80;
+      const eff = parseFloat(efficiencyInput.value) || 90;
+      const load = parseFloat(loadInput.value) || 0;
+
+      // Handle visibility of voltage input (if in Wh, voltage is only needed for discharge current, but still important)
+      if (isWh) {
+        // We can keep it visible but document it's only for current
+      }
+
+      const results = calculateRuntime(cap, isWh, voltage, dod, eff, load);
+
+      // Render Runtime hours/minutes
+      if (results.runtimeHours <= 0) {
+        if (resultRuntime) resultRuntime.textContent = '0h 00m';
+        if (resultHoursDecimal) resultHoursDecimal.textContent = '0.00 hours';
+      } else {
+        const totalMinutes = Math.round(results.runtimeHours * 60);
+        const hours = Math.floor(totalMinutes / 60);
+        const mins = totalMinutes % 60;
+
+        if (resultRuntime) resultRuntime.textContent = `${hours}h ${mins < 10 ? '0' : ''}${mins}m`;
+        if (resultHoursDecimal) resultHoursDecimal.textContent = `${results.runtimeHours.toFixed(2)} hours`;
+      }
+
+      // Render Battery Usable Energy
+      if (resultEnergy) resultEnergy.textContent = `${Math.round(results.usableEnergyWh).toLocaleString()} Wh`;
+      if (resultKwh) resultKwh.textContent = `${(results.usableEnergyWh / 1000).toFixed(3)} kWh`;
+
+      // Render Delivered System Energy
+      if (resultDelivered) resultDelivered.textContent = `${Math.round(results.deliveredEnergyWh).toLocaleString()} Wh`;
+      if (resultDeliveredKwh) resultDeliveredKwh.textContent = `${(results.deliveredEnergyWh / 1000).toFixed(3)} kWh`;
+
+      // Render Current
+      if (resultCurrent) resultCurrent.textContent = `${results.dischargeCurrentA.toFixed(2)} A`;
+
+      // Calculate C-rate
+      const capacityAh = isWh ? cap / voltage : cap;
+      const cRate = capacityAh > 0 ? results.dischargeCurrentA / capacityAh : 0;
+      if (resultCRate) resultCRate.textContent = `${cRate.toFixed(2)} C`;
+
+      if (chartSvg && results.runtimeHours > 0 && load > 0) {
+        const pts: { x: number; y: number }[] = [];
+        for (let i = 0; i < 20; i++) {
+          pts.push({ x: results.runtimeHours * (i / 19), y: 100 * (1 - i / 19) });
+        }
+        renderLineChart(chartSvg, pts, {
+          width: 320, height: 160,
+          xLabel: 'Time (hours)', yLabel: 'Energy (%)',
+          xMin: 0, xMax: Math.ceil(results.runtimeHours),
+          yMin: 0, yMax: 100,
+        });
+      } else if (chartSvg) {
+        clearChart(chartSvg);
+      }
+    }
+
+    [capacityInput, capacityUnit, voltageInput, dodInput, efficiencyInput, loadInput].forEach(el => {
+      el.addEventListener('input', updateCalculations);
+      el.addEventListener('change', updateCalculations);
+    });
+
+    // Run once on load
+    updateCalculations();
+  </script>
+</CalculatorLayout>

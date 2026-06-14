@@ -1,0 +1,439 @@
+---
+import CalculatorLayout from '../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../components/CalculatorCard.astro';
+import InputField from '../../components/InputField.astro';
+import ResultBox from '../../components/ResultBox.astro';
+import FormulaBox from '../../components/FormulaBox.astro';
+import FAQSection from '../../components/FAQSection.astro';
+
+const whatIs = `An RV battery calculator determines the battery bank size needed for off-grid camping by summing all appliance loads, multiplying by daily usage hours, and accounting for chemistry-specific depth-of-discharge limits. RV power systems face unique constraints: space and weight limitations, 12V native DC systems, alternator charging while driving, and the need to balance capacity against cargo weight. Whether you're planning weekend campground trips or full-time boondocking, this calculator ensures your battery bank sustains your lifestyle without requiring daily generator runs or shore power connections.`;
+
+const whyItMatters = [
+  "Undersized RV battery banks leave you without refrigeration or lighting by midnight—ending your camping trip early or forcing an emergency generator purchase.",
+  "Oversized banks consume precious cargo weight and storage space; on a Class B van, every 100Ah of LFP capacity takes up about 30cm × 20cm × 20cm of cabinet space.",
+  "Ignoring alternator charging limits means driving all day doesn't fully replenish your bank—a 50A alternator needs 4+ hours to recharge 200Ah from 50% DoD.",
+  "Using lead-acid batteries at 80% DoD repeatedly can reduce cycle life from 500 cycles to under 100—costing more in replacements than an upfront LFP upgrade.",
+  "Not accounting for parasitic draws (CO detectors, fridge control boards, phantom loads) can drain 20–40Ah overnight even with all appliances turned off."
+];
+
+const practicalApplications = [
+  { title: "Weekend Camping Trips", description: "Size a moderate 200–400Ah LFP bank for 2–3 days of off-grid camping with fridge, lights, and device charging without shore power." },
+  { title: "Full-Time Boondocking", description: "Calculate the 600–1000Ah+ bank needed for full-time RV living with high-draw appliances like induction cooking, microwave, and coffee maker." },
+  { title: "Solar-Augmented RV Systems", description: "Plan battery capacity to store solar energy harvested during the day for overnight use, reducing reliance on alternator or generator charging." },
+  { title: "Van Conversion & Camper Builds", description: "Design compact, weight-efficient battery systems for Class B vans where every kilogram and cubic centimeter matters for payload and handling." }
+];
+
+const expertNotes: { title: string; variant: 'engineering' | 'tip'; content: string }[] = [
+  {
+    title: "12V vs 24V for RV Systems",
+    variant: "engineering",
+    content: "Most RVs use 12V systems because RV appliances (fridge, water pump, lighting) run natively on 12V DC. For systems under 2000W total load, 12V is practical and simple. For high-power setups (induction cooktop, residential microwave, mini-split AC), 24V reduces current draw by half, enabling thinner wire runs and lower voltage drop. A 24V system with a DC-DC converter to step down to 12V for appliances is an efficient modern approach for Class A motorhomes and large fifth-wheels."
+  },
+  {
+    title: "Portable vs Permanent Installation",
+    variant: "tip",
+    content: "Portable battery stations (Goal Zero, EcoFlow) are ideal for occasional weekend campers—no wiring required, plug-and-play. Permanent installations (Victron, Battleborn, Renogy) offer higher capacity, lower cost per kWh, and integration with alternator charging and solar. If you camp more than 10 weekends per year or live in your RV, a permanent LFP system pays for itself within 2–3 years compared to portable units."
+  }
+];
+
+const trustSection = {
+  text: "This calculator applies standard RV electrical design methodology used by Airstream, Winnebago, and custom van builders. Load profiles are based on manufacturer wattage ratings and typical usage patterns from RV industry surveys. All formulas are transparent and independently verifiable.",
+  link: { label: "View our methodology and formula derivations", href: "/methodology" }
+};
+
+const references = [
+  { title: "RVIA — Recreational Vehicle Industry Association Standards", url: "https://www.rvia.org/", source: "RVIA Technical Standards" },
+  { title: "Victron Energy — Mobile Power Systems Design Guide", url: "https://www.victronenergy.com/learn/mobile-power", source: "Victron Energy Technical Library" },
+  { title: "Battleborn Batteries — RV Battery Sizing Guide", url: "https://battlebornbatteries.com/rv-battery-sizing/", source: "Battleborn Batteries" },
+  { title: "Expedition Portal — Overland Vehicle Electrical Systems", url: "https://expeditionportal.com/", source: "Expedition Portal Community" }
+];
+
+const faqItems = [
+  {
+    question: "How do I calculate my RV appliance loads?",
+    answer: "Check the wattage rating on each appliance or multiply amps × volts. Common RV loads: LED lights (10W each), refrigerator (150W when running), laptop (60W), phone charger (10W), water pump (60W), ventilation fan (20W). Multiply each by daily hours of use.",
+  },
+  {
+    question: "What battery chemistry is best for RV use?",
+    answer: "LFP (LiFePO4) is the best choice for RV applications: lightweight, 80% usable DoD, 5,000+ cycle life, and safe for enclosed spaces. AGM lead-acid is a budget option but limited to 50% DoD and heavier. NMC lithium is lighter but more expensive than LFP.",
+  },
+  {
+    question: "How many camping days should I plan for?",
+    answer: "For weekend trips (2–3 days), a moderate battery bank is sufficient. For extended boondocking (5–7 days), you need significantly more capacity or a way to recharge (solar, generator, shore power). Most RVers plan for 2–4 days with recharging capability.",
+  },
+  {
+    question: "Should I size for 12V or 24V?",
+    answer: "Most RVs use 12V systems. If you have high power demands (air conditioning, induction cooking), consider a 24V system with an inverter. 24V systems use thinner wire and have lower current losses for the same power.",
+  },
+  {
+    question: "How do I account for my RV refrigerator's power consumption?",
+    answer: "A propane/electric fridge uses minimal battery power (2–5W for the control board). A 12V compressor fridge (Dometic, Isotherm) draws 40–80W when the compressor runs, cycling 30–50% of the time—so average draw is 20–40W. A residential-style fridge with an inverter draws 100–150W but requires a larger battery bank.",
+  },
+  {
+    question: "What parasitic draws should I account for?",
+    answer: "Even with everything turned off, RVs have phantom loads: CO/smoke detectors (1–2W each), fridge control board (2–5W), water heater pilot (3–5W), stereo memory (1W), and solar charge controller standby (0.5W). These add up to 15–40W continuously—draining 360–960Wh per day even when the RV is parked.",
+  },
+  {
+    question: "Can I charge my RV battery while driving?",
+    answer: "Yes—your vehicle alternator charges the house battery through the RV's charging system or a DC-DC charger. A standard 50A alternator provides ~50Ah per hour of driving. A dedicated DC-DC charger (e.g., Victron Orion) can provide 20–60A of controlled charging, protecting both starter and house batteries.",
+  },
+  {
+    question: "How does cold weather affect RV batteries?",
+    answer: "LFP batteries lose 10–15% capacity below 0°C and should not be charged below -10°C without a battery heater. Lead-acid loses 20–30% capacity at -10°C. For winter camping, insulate your battery compartment and consider a low-temperature charging cutoff. AGM batteries handle cold better than flooded lead-acid.",
+  },
+  {
+    question: "What is the difference between Class A, B, and C RV battery needs?",
+    answer: "Class B vans have limited space (200–400Ah LFP typical). Class C motorhomes support larger banks (400–800Ah). Class A coaches can accommodate 800–1200Ah+ with multiple battery banks. Size matches available storage space and the typical power demands of each RV class.",
+  },
+  {
+    question: "Do I need a battery monitor for my RV?",
+    answer: "Yes—highly recommended. A battery monitor with a shunt (Victron BMV-712, Renogy 500A) provides accurate state-of-charge reading, remaining runtime estimates, and historical usage data. Voltage-based SOC reading is unreliable for lithium batteries due to their flat discharge curve.",
+  },
+  {
+    question: "How do I reduce my RV power consumption?",
+    answer: "Switch to LED lighting throughout (saves 80% vs incandescent). Use a 12V compressor fridge instead of propane/electric. Charge devices from 12V DC directly instead of through an inverter (avoids 10–15% conversion loss). Turn off phantom loads when parked. Use a timer for ventilation fans.",
+  },
+  {
+    question: "Can I run an air conditioner from RV batteries?",
+    answer: "Running a 13,500 BTU RV AC requires ~1,500W continuous (~3,500W startup). A 48V 400Ah LFP bank (19.2 kWh) can run it for 6–8 hours. This requires a high-capacity inverter and significant battery investment. Portable evaporative coolers (200–400W) are a more practical alternative for most RVers.",
+  },
+];
+
+const relatedCalculators = [
+  { href: "/tools/runtime-calculator", title: "Runtime Calculator", description: "Verify how long your battery bank will last." },
+  { href: "/tools/energy-conversion-calculator", title: "Energy Conversion", description: "Convert between Ah and Wh for your system voltage." },
+  { href: "/tools/battery-sizing-calculator", title: "Battery Sizing Calculator", description: "Full battery bank sizing with temperature derating." },
+  { href: "/tools/inverter-battery-calculator", title: "Inverter Battery Calculator", description: "Size inverter capacity for AC RV appliances." },
+  { href: "/tools/parallel-string-calculator", title: "Parallel String Calculator", description: "Design custom battery pack configurations." },
+  { href: "/tools/voltage-drop-calculator", title: "Voltage Drop Calculator", description: "Ensure cable runs meet RV voltage drop specs." },
+];
+---
+
+<CalculatorLayout
+  title="RV Battery Calculator | Battery Calculators"
+  description="Calculate the battery bank size you need for your RV or camper. Estimate daily consumption and required capacity for your camping trips."
+  faqItems={faqItems}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+  relatedCalculators={relatedCalculators}
+>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+
+    <!-- Input Form -->
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">RV Load Profile</h3>
+      <div class="flex flex-col gap-6">
+
+        <div id="appliance-list" class="flex flex-col gap-4">
+          <div class="appliance-row flex flex-col gap-3 p-3 bg-surface-soft border border-hairline rounded" data-index="0">
+            <div class="flex items-center justify-between">
+              <span class="text-label-uppercase text-xs text-primary">Appliance 1</span>
+              <button type="button" class="remove-row text-caption text-red-600 hover:text-red-400 cursor-pointer hidden" aria-label="Remove appliance row">✕</button>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div class="flex flex-col gap-1">
+                <label for="appliance-name-0" class="text-label-uppercase text-[10px] text-muted">Name</label>
+                <input id="appliance-name-0" type="text" class="text-input w-full" value="Refrigerator" aria-label="Appliance 1 name" />
+              </div>
+              <div class="flex flex-col gap-1">
+                <label for="appliance-power-0" class="text-label-uppercase text-[10px] text-muted">Power (W)</label>
+                <input id="appliance-power-0" type="number" class="text-input w-full" value={150} min={0} step={10} aria-label="Appliance 1 power in watts" />
+              </div>
+              <div class="flex flex-col gap-1">
+                <label for="appliance-hours-0" class="text-label-uppercase text-[10px] text-muted">Hours/day</label>
+                <input id="appliance-hours-0" type="number" class="text-input w-full" value={8} min={0} max={24} step={0.5} aria-label="Appliance 1 hours per day" />
+              </div>
+            </div>
+          </div>
+
+          <div class="appliance-row flex flex-col gap-3 p-3 bg-surface-soft border border-hairline rounded" data-index="1">
+            <div class="flex items-center justify-between">
+              <span class="text-label-uppercase text-xs text-primary">Appliance 2</span>
+              <button type="button" class="remove-row text-caption text-red-600 hover:text-red-400 cursor-pointer hidden" aria-label="Remove appliance row">✕</button>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div class="flex flex-col gap-1">
+                <label for="appliance-name-1" class="text-label-uppercase text-[10px] text-muted">Name</label>
+                <input id="appliance-name-1" type="text" class="text-input w-full" value="LED Lights" aria-label="Appliance 2 name" />
+              </div>
+              <div class="flex flex-col gap-1">
+                <label for="appliance-power-1" class="text-label-uppercase text-[10px] text-muted">Power (W)</label>
+                <input id="appliance-power-1" type="number" class="text-input w-full" value={100} min={0} step={10} aria-label="Appliance 2 power in watts" />
+              </div>
+              <div class="flex flex-col gap-1">
+                <label for="appliance-hours-1" class="text-label-uppercase text-[10px] text-muted">Hours/day</label>
+                <input id="appliance-hours-1" type="number" class="text-input w-full" value={6} min={0} max={24} step={0.5} aria-label="Appliance 2 hours per day" />
+              </div>
+            </div>
+          </div>
+
+          <div class="appliance-row flex flex-col gap-3 p-3 bg-surface-soft border border-hairline rounded" data-index="2">
+            <div class="flex items-center justify-between">
+              <span class="text-label-uppercase text-xs text-primary">Appliance 3</span>
+              <button type="button" class="remove-row text-caption text-red-600 hover:text-red-400 cursor-pointer hidden" aria-label="Remove appliance row">✕</button>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div class="flex flex-col gap-1">
+                <label for="appliance-name-2" class="text-label-uppercase text-[10px] text-muted">Name</label>
+                <input id="appliance-name-2" type="text" class="text-input w-full" value="Laptop" aria-label="Appliance 3 name" />
+              </div>
+              <div class="flex flex-col gap-1">
+                <label for="appliance-power-2" class="text-label-uppercase text-[10px] text-muted">Power (W)</label>
+                <input id="appliance-power-2" type="number" class="text-input w-full" value={60} min={0} step={10} aria-label="Appliance 3 power in watts" />
+              </div>
+              <div class="flex flex-col gap-1">
+                <label for="appliance-hours-2" class="text-label-uppercase text-[10px] text-muted">Hours/day</label>
+                <input id="appliance-hours-2" type="number" class="text-input w-full" value={4} min={0} max={24} step={0.5} aria-label="Appliance 3 hours per day" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button type="button" id="add-appliance" class="w-full py-2 px-4 border border-dashed border-m-blue-light text-m-blue-light hover:bg-m-blue-light hover:text-on-primary rounded cursor-pointer text-caption font-bold uppercase tracking-wider transition-colors">
+          + Add Appliance
+        </button>
+
+        <div class="border-t border-hairline pt-6">
+          <InputField id="voltage" label="Battery System Voltage" value={12} min={12} max={48} step={12} unit="V" helperText="Most RVs use 12V. Consider 24V for high-power setups." />
+
+          <InputField id="camping-days" label="Camping Days" value={3} min={1} max={14} step={1} unit="days" helperText="Number of days between recharges." />
+
+          <InputField
+            id="chemistry"
+            label="Battery Chemistry"
+            type="select"
+            value="lfp"
+            helperText="LFP recommended: lightweight and 80% usable DoD."
+            options={[
+              { label: "LFP (LiFePO4)", value: "lfp" },
+              { label: "NMC (Lithium Nickel Manganese Cobalt)", value: "nmc" },
+              { label: "Lead-Acid (AGM/Gel)", value: "lead-acid" },
+            ]}
+          />
+        </div>
+
+      </div>
+    </CalculatorCard>
+
+    <!-- Results -->
+    <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Sizing Results</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <ResultBox
+            label="Daily Consumption"
+            value="1,820 Wh"
+            suffix="1.82 kWh per day"
+            variant="primary"
+            id="result-daily"
+          />
+          <ResultBox
+            label="Required Capacity"
+            value="455.0 Ah"
+            suffix="At 12V nominal"
+            id="result-capacity"
+          />
+          <ResultBox
+            label="Recommended Bank"
+            value="460 Ah"
+            suffix="Rounded to practical size"
+            id="result-recommended"
+          />
+        </div>
+      </div>
+
+      <div class="border-t border-hairline pt-6">
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">System Notes</h4>
+        <p class="text-body-sm text-muted" id="system-notes">
+          For 3 days of boondocking with 1,820 Wh daily consumption at 12V LFP, you need a 460 Ah battery bank.
+        </p>
+      </div>
+    </CalculatorCard>
+
+  </div>
+
+  <!-- Formulas -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+
+      <FormulaBox title="Mathematical Formulas">
+        <p>
+          Daily consumption is the sum of all appliance loads multiplied by their usage hours:
+        </p>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Daily Consumption (Wh) = Σ (Appliance Power × Hours Used)
+        </div>
+        <p>
+          Required capacity accounts for DoD limits and camping duration:
+        </p>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Capacity (Ah) = (Daily Consumption × Days) / (DoD% × Voltage)
+        </div>
+        <p>
+          DoD limits: LFP 80%, NMC 80%, Lead-Acid 50%.
+        </p>
+      </FormulaBox>
+
+      <div>
+        <h2 class="text-title-lg text-primary uppercase mb-6 tracking-wider">Worked Example</h2>
+        <div class="text-body-sm text-muted flex flex-col gap-4">
+          <p>Given: Refrigerator (150W × 8h), Lights (100W × 6h), Devices (60W × 4h), 12V LFP, 3 days</p>
+
+          <p><strong>Step 1:</strong> Calculate daily consumption:</p>
+          <div class="font-mono text-primary">Daily = (150×8) + (100×6) + (60×4) = 1,200 + 600 + 240 = 2,040 Wh</div>
+
+          <p><strong>Step 2:</strong> Calculate total energy for trip:</p>
+          <div class="font-mono text-primary">Total = 2,040 Wh × 3 days = 6,120 Wh</div>
+
+          <p><strong>Step 3:</strong> Account for DoD and convert to Ah:</p>
+          <div class="font-mono text-primary">Ah = 6,120 Wh / (0.80 × 12V) = 637.5 Ah</div>
+
+          <p><strong>Result:</strong> A 12V 640 Ah LFP battery bank provides 7,680 Wh, enough for 3 days of boondocking with these loads.</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <FAQSection items={faqItems} />
+
+  <!-- Calculation Script -->
+  <script>
+    import { calculateRVBattery } from '../../utils/calculators';
+
+    const applianceList = document.getElementById('appliance-list') as HTMLElement;
+    const addApplianceBtn = document.getElementById('add-appliance') as HTMLButtonElement;
+    const voltageInput = document.getElementById('voltage') as HTMLInputElement;
+    const campingDays = document.getElementById('camping-days') as HTMLInputElement;
+    const chemistrySelect = document.getElementById('chemistry') as HTMLSelectElement;
+
+    const resultDailyBox = document.getElementById('result-daily');
+    const resultDailyValue = resultDailyBox?.querySelector('.text-display-md') as HTMLElement;
+    const resultDailyKwh = resultDailyBox?.querySelector('.text-caption') as HTMLElement;
+
+    const resultCapacityBox = document.getElementById('result-capacity');
+    const resultCapacityValue = resultCapacityBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultCapacityRef = resultCapacityBox?.querySelector('.text-caption') as HTMLElement;
+
+    const resultRecommendedBox = document.getElementById('result-recommended');
+    const resultRecommendedValue = resultRecommendedBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultRecommendedRef = resultRecommendedBox?.querySelector('.text-caption') as HTMLElement;
+
+    const systemNotes = document.getElementById('system-notes');
+
+    let rowIndex = 3;
+
+    function createApplianceRow(index: number): HTMLElement {
+      const row = document.createElement('div');
+      row.className = 'appliance-row flex flex-col gap-3 p-3 bg-surface-soft border border-hairline rounded';
+      row.dataset.index = String(index);
+      row.innerHTML = `
+        <div class="flex items-center justify-between">
+          <span class="text-label-uppercase text-xs text-primary">Appliance ${index + 1}</span>
+          <button type="button" class="remove-row text-caption text-red-600 hover:text-red-400 cursor-pointer" aria-label="Remove appliance row">✕</button>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div class="flex flex-col gap-1">
+            <label for="appliance-name-${index}" class="text-label-uppercase text-[10px] text-muted">Name</label>
+            <input id="appliance-name-${index}" type="text" class="text-input w-full" value="New Appliance" aria-label="Appliance ${index + 1} name" />
+          </div>
+          <div class="flex flex-col gap-1">
+            <label for="appliance-power-${index}" class="text-label-uppercase text-[10px] text-muted">Power (W)</label>
+            <input id="appliance-power-${index}" type="number" class="text-input w-full" value={0} min={0} step={10} aria-label="Appliance ${index + 1} power in watts" />
+          </div>
+          <div class="flex flex-col gap-1">
+            <label for="appliance-hours-${index}" class="text-label-uppercase text-[10px] text-muted">Hours/day</label>
+            <input id="appliance-hours-${index}" type="number" class="text-input w-full" value={0} min={0} max={24} step={0.5} aria-label="Appliance ${index + 1} hours per day" />
+          </div>
+        </div>
+      `;
+      return row;
+    }
+
+    function updateRemoveButtons() {
+      const rows = applianceList.querySelectorAll('.appliance-row');
+      const removeBtns = applianceList.querySelectorAll('.remove-row');
+      removeBtns.forEach(btn => {
+        if (rows.length <= 1) {
+          (btn as HTMLElement).classList.add('hidden');
+        } else {
+          (btn as HTMLElement).classList.remove('hidden');
+        }
+      });
+    }
+
+    function updateCalculations() {
+      const rows = applianceList.querySelectorAll('.appliance-row');
+      const loads: number[] = [];
+      const hours: number[] = [];
+
+      rows.forEach(row => {
+        const powerInput = row.querySelector('[id^="appliance-power-"]') as HTMLInputElement;
+        const hoursInput = row.querySelector('[id^="appliance-hours-"]') as HTMLInputElement;
+        loads.push(parseFloat(powerInput?.value) || 0);
+        hours.push(parseFloat(hoursInput?.value) || 0);
+      });
+
+      const voltage = parseFloat(voltageInput.value) || 12;
+      const days = parseFloat(campingDays.value) || 3;
+      const chemistry = chemistrySelect.value as "lfp" | "nmc" | "lead-acid";
+
+      const results = calculateRVBattery(loads, hours, voltage, days, chemistry);
+
+      if (resultDailyValue) resultDailyValue.textContent = `${Math.round(results.dailyConsumptionWh).toLocaleString()} Wh`;
+      if (resultDailyKwh) resultDailyKwh.textContent = `${(results.dailyConsumptionWh / 1000).toFixed(2)} kWh per day`;
+
+      if (resultCapacityValue) resultCapacityValue.textContent = `${results.requiredCapacityAh.toFixed(1)} Ah`;
+      if (resultCapacityRef) resultCapacityRef.textContent = `At ${voltage}V nominal`;
+
+      if (resultRecommendedValue) resultRecommendedValue.textContent = `${results.recommendedBankSizeAh} Ah`;
+      if (resultRecommendedRef) resultRecommendedRef.textContent = `Rounded to practical size`;
+
+      if (systemNotes) {
+        const chemistryName = chemistry === "lfp" ? "LFP" : chemistry === "nmc" ? "NMC" : "Lead-Acid";
+        systemNotes.textContent = `For ${days} day${days > 1 ? 's' : ''} of boondocking with ${Math.round(results.dailyConsumptionWh).toLocaleString()} Wh daily consumption at ${voltage}V ${chemistryName}, you need a ${results.recommendedBankSizeAh} Ah battery bank.`;
+      }
+    }
+
+    addApplianceBtn.addEventListener('click', () => {
+      const row = createApplianceRow(rowIndex);
+      applianceList.appendChild(row);
+      rowIndex++;
+      updateRemoveButtons();
+      row.querySelectorAll('input').forEach(input => {
+        input.addEventListener('input', updateCalculations);
+      });
+      row.querySelector('.remove-row')?.addEventListener('click', () => {
+        row.remove();
+        updateRemoveButtons();
+        updateCalculations();
+      });
+      updateCalculations();
+    });
+
+    applianceList.querySelectorAll('.appliance-row').forEach(row => {
+      row.querySelectorAll('input').forEach(input => {
+        input.addEventListener('input', updateCalculations);
+      });
+      row.querySelector('.remove-row')?.addEventListener('click', () => {
+        row.remove();
+        updateRemoveButtons();
+        updateCalculations();
+      });
+    });
+
+    [voltageInput, campingDays, chemistrySelect].forEach(el => {
+      el.addEventListener('input', updateCalculations);
+    });
+
+    updateRemoveButtons();
+    updateCalculations();
+  </script>
+
+</CalculatorLayout>

@@ -1,0 +1,326 @@
+---
+import CalculatorLayout from '../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../components/CalculatorCard.astro';
+import InputField from '../../components/InputField.astro';
+import ResultBox from '../../components/ResultBox.astro';
+import FormulaBox from '../../components/FormulaBox.astro';
+import FAQSection from '../../components/FAQSection.astro';
+
+const whatIs = `A parallel string calculator determines the optimal series (S) and parallel (P) configuration of individual cells or battery modules to achieve a target pack voltage and capacity. In battery pack design, cells in series multiply voltage while cells in parallel multiply capacity—this tool computes the exact SxP arrangement needed. Whether you're building a custom lithium battery pack for an EV, solar storage, or marine application, correct string configuration is critical for BMS compatibility, balanced current distribution, and meeting voltage thresholds of your charge controller and inverter.`;
+
+const whyItMatters = [
+  "An incorrect series count produces a pack voltage that falls outside the operating window of your charge controller or inverter—preventing proper charging or triggering fault codes.",
+  "Too many parallel strings increase cross-current risk—unequal internal resistance between strings causes uneven current sharing, localized heating, and potential cell damage.",
+  "Mixing cells with different capacities or ages in the same pack limits usable capacity to the weakest cell, wasting the investment in stronger cells.",
+  "Exceeding a BMS maximum cell count (e.g., 16S for most LFP BMS units) requires expensive multi-tier balancing hardware that may not be available for your application.",
+  "Underestimating total cell count leads to ordering errors—precision cell matching requires all cells to be from the same production batch for consistent impedance."
+];
+
+const practicalApplications = [
+  { title: "Custom EV Battery Packs", description: "Configure series-parallel arrangements for electric vehicle conversions requiring 48V–400V battery systems with specific energy density targets." },
+  { title: "Solar Off-Grid Battery Banks", description: "Design 48V LFP banks using standard 3.2V cells to match solar charge controller input voltage windows and inverter DC requirements." },
+  { title: "Telecom & UPS Battery Systems", description: "Calculate 48V telecom battery configurations using 3.2V LFP or 2V lead-acid cells to meet precise float voltage specifications." },
+  { title: "Powerwall & Home Storage DIY", description: "Plan parallel-series layouts for home battery projects using salvaged or new 18650/21700 cells to achieve target kWh capacity." }
+];
+
+const expertNotes: { title: string; variant: 'engineering' | 'tip'; content: string }[] = [
+  {
+    title: "Series-First vs Parallel-First Topology",
+    variant: "engineering",
+    content: "Parallel-first (P groups connected in series, e.g., 4P16S) is the industry standard because parallel cells self-balance to the same voltage, reducing BMS channel count. Series-first (S strings in parallel) requires each series string to be individually monitored and matched—only practical for small packs of 4S or fewer. For packs above 100 cells, parallel-first topology significantly simplifies BMS architecture and improves reliability."
+  },
+  {
+    title: "BMS Channel Count and Cell Matching",
+    variant: "tip",
+    content: "A 16S LFP pack requires a BMS with 16 cell-monitoring channels. Adding parallel strings does NOT increase channel count—a 16S4P pack still uses a 16-channel BMS. However, each parallel group must be constructed from cells with matched capacity (within 2%), internal resistance (within 5%), and from the same production date to ensure balanced current distribution."
+  }
+];
+
+const trustSection = {
+  text: "This calculator uses ceiling-roundup functions for integer cell counts and computes actual voltage/capacity from the resulting configuration. The formulas follow standard battery pack design methodology used in BMS datasheets and cell manufacturer application notes. All calculations are transparent and verifiable.",
+  link: { label: "View our methodology and formula derivations", href: "/methodology" }
+};
+
+const references = [
+  { title: "Samsung SDI — Battery Pack Design Guidelines", url: "https://www.samsungsdi.com/battery-library/detail.html?id=52986", source: "Samsung SDI Technical Documents" },
+  { title: "EVE Energy — LFP Cell Series-Parallel Configuration", url: "https://www.evebatteries.com/technical-documents", source: "EVE Energy Technical Library" },
+  { title: "Texas Instruments — Cell Balancing in Series Strings", url: "https://www.ti.com/lit/an/slua749a/slua749a.pdf", source: "Texas Instruments Application Report" },
+  { title: "JBD (Junsi Power) — BMS Wiring and String Configuration", url: "https://www.jbdms.com/technical-documents", source: "JBD BMS Technical Documentation" }
+];
+
+const faqItems = [
+  {
+    question: "Should cells be configured parallel-first or series-first?",
+    answer: "Parallel-first configurations (e.g. 1S4P blocks connected in series, written as 4P16S) are the industry standard for large packs. This configuration reduces the number of voltage monitoring channels needed by the BMS since parallel groups balance themselves automatically to the same voltage level.",
+  },
+  {
+    question: "Why do some 48V lithium battery designs use 15S or 16S configurations?",
+    answer: "A 15S LFP pack has a nominal voltage of 48.0V (charging peak 54.75V). A 16S pack has a nominal voltage of 51.2V (charging peak 58.4V). Many telecom systems are rated for exactly 48V, so 15S is common. Solar off-grid inverters typically prefer 16S configuration because it maximizes performance under 48V inverter limits.",
+  },
+  {
+    question: "What is cross-current in parallel battery strings?",
+    answer: "When parallel strings with different internal resistance or temperatures are charged/discharged, current does not split equally. The string with lower resistance takes a higher current share. In extreme mismatch states, this causes localized thermal overload. Inline fuses for each parallel string are recommended.",
+  },
+  {
+    question: "Can I mix cells with different capacities in series?",
+    answer: "<span class=\"text-primary font-bold\">Never mix capacities in series.</span> The series string's total usable capacity is limited by the weakest cell. The cell with the lowest capacity will deplete first, hitting low-voltage limits while other cells are still full, causing the BMS to shut down the entire pack.",
+  },
+  {
+    question: "What is SxP notation and how do I read it?",
+    answer: "SxP notation describes a battery pack topology. 'S' (series) is the number of cells connected end-to-end to multiply voltage. 'P' (parallel) is the number of cells grouped in parallel to multiply capacity. A 16S4P pack has 16 cells in series, with 4 parallel strings—totaling 64 cells. Example: 16 × 3.2V = 51.2V, 4 × 100Ah = 400Ah.",
+  },
+  {
+    question: "How many parallel strings is too many?",
+    answer: "Most BMS manufacturers recommend a maximum of 4–6 parallel strings. Beyond this, cross-current between strings becomes significant, and the practical benefit diminishes—adding a 7th or 8th parallel string yields marginal capacity gain while increasing complexity and failure points.",
+  },
+  {
+    question: "Do I need fuses on each parallel string?",
+    answer: "<span class=\"text-primary font-bold\">Yes—this is a safety requirement.</span> Each parallel string should have an inline fuse rated at 1.5–2× the string's maximum expected current. If one string develops a short circuit, the fuse prevents other parallel strings from feeding fault current into the failure point, which can cause thermal runaway.",
+  },
+  {
+    question: "What happens if my series count doesn't match the BMS?",
+    answer: "Most BMS units support a fixed series count (e.g., 16S for LFP, 14S for NMC). If your target voltage requires a non-standard series count, you may need a different BMS model or a different cell chemistry. For example, 48V telecom typically uses 15S LFP or 14S NMC—verify BMS compatibility before purchasing cells.",
+  },
+  {
+    question: "Can I add parallel strings to an existing pack later?",
+    answer: "Only if the new string uses cells from the same production batch with matched capacity and impedance. Mismatched strings create uneven current sharing. The new string must also be pre-charged to match the existing pack's state of charge before parallel connection to avoid large equalization currents.",
+  },
+  {
+    question: "How does temperature affect parallel string balancing?",
+    answer: "Temperature differences between parallel strings cause current imbalance—a warmer string has lower internal resistance and draws more current during charging. Maintain uniform temperature across all strings by mounting them in the same enclosure with adequate airflow. Avoid placing strings near heat sources.",
+  },
+  {
+    question: "What is the minimum practical cell count?",
+    answer: "For most applications, 4S (12V LFP) or 7S (24V NMC) is the minimum practical pack size. Below this, individual cell voltage variations have a disproportionate impact on pack performance. For 48V systems, 15S or 16S is the standard minimum.",
+  },
+  {
+    question: "How do I calculate total energy from SxP configuration?",
+    answer: "Total Energy (Wh) = S × Cell Voltage × P × Cell Capacity. Example: 16S4P with 3.2V 100Ah cells = 16 × 3.2 × 4 × 100 = 20,480 Wh (20.48 kWh). This represents the theoretical maximum—actual usable energy depends on DoD limits and BMS cutoff thresholds.",
+  },
+];
+
+const relatedCalculators = [
+  { href: "/tools/battery-sizing-calculator", title: "Battery Sizing Tool", description: "Determine daily energy capacity storage sizing." },
+  { href: "/tools/runtime-calculator", title: "Runtime Calculator", description: "Estimate backup run hours under static Watt loads." },
+  { href: "/tools/c-rate-calculator", title: "C-Rate Calculator", description: "Compute charging speeds and load currents." },
+  { href: "/tools/inverter-battery-calculator", title: "Inverter Battery Calculator", description: "Size battery banks for AC inverter loads." },
+  { href: "/tools/energy-conversion-calculator", title: "Energy Conversion", description: "Convert between Ah and Wh at any voltage." },
+  { href: "/tools/voltage-drop-calculator", title: "Voltage Drop Calculator", description: "Verify cable sizing for your string configuration." },
+];
+---
+
+<CalculatorLayout
+  title="Battery Parallel String Calculator | Battery Calculators"
+  description="Determine the series and parallel configuration of cell stacks or battery modules to meet target voltage and capacity. Free tool."
+  faqItems={faqItems}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+  relatedCalculators={relatedCalculators}
+>
+
+  <!-- Main Calculator Grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+
+    <!-- Input Form -->
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Target Specifications</h3>
+      <div class="flex flex-col gap-6">
+
+        <!-- Target System Voltage -->
+        <InputField id="target-voltage" label="Target System Voltage (V)" value={48} min={1} step="any" helperText="Common targets: 12V, 24V, 48V, 400V, 800V" />
+
+        <!-- Target System Capacity -->
+        <InputField id="target-capacity" label="Target Capacity (Ah)" value={200} min={1} step="any" />
+
+        <h3 class="text-title-sm text-primary uppercase border-t border-hairline pt-6 tracking-wider">Cell / Module Building Block</h3>
+
+        <!-- Cell Voltage -->
+        <InputField id="cell-voltage" label="Single Cell/Module Voltage (V)" value={3.2} min={0.1} step="any" helperText="Common nominal values: LFP cell (3.2V), NMC cell (3.7V), Lead-Acid (12V)" />
+
+        <!-- Cell Capacity -->
+        <InputField id="cell-capacity" label="Single Cell/Module Capacity (Ah)" value={100} min={0.1} step="any" helperText="Capacity of a single cell building block (e.g. 100Ah, 280Ah, 3.2Ah)" />
+
+      </div>
+    </CalculatorCard>
+
+    <!-- Calculation Results -->
+    <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Calculated Layout Configuration</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <!-- Main Output -->
+          <ResultBox
+            label="Configuration Structure"
+            value="15S 2P"
+            suffix="30 total cells or modules required"
+            variant="primary"
+            id="result-structure"
+          />
+
+          <!-- Secondary Outputs -->
+          <ResultBox
+            label="Actual System Voltage"
+            value="48.0 V"
+            suffix="15 cells in series"
+            id="result-actual-voltage"
+          />
+
+          <ResultBox
+            label="Actual Pack Capacity"
+            value="200 Ah"
+            suffix="2 parallel strings"
+            id="result-actual-capacity"
+          />
+
+          <!-- Total Energy Output -->
+          <ResultBox
+            label="Actual Total Energy"
+            value="9,600 Wh"
+            suffix="9.60 kWh battery storage capacity"
+            variant="primary"
+            id="result-actual-energy"
+          />
+        </div>
+      </div>
+
+      <!-- Action Area -->
+      <div class="border-t border-hairline pt-6">
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">String Balancing Safety Note</h4>
+        <p class="text-body-sm text-muted">
+          Parallel strings must always contain identical series cell counts. Mismatched resistance or state of charge between parallel strings causes uneven current sharing, local overheating, and risks cell destruction.
+        </p>
+      </div>
+    </CalculatorCard>
+
+  </div>
+
+  <!-- Technical Explanation and Equations -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+
+      <FormulaBox title="Mathematical Formulas">
+        <p>
+          To configure a pack, series cells increase the voltage potential, and parallel cells or strings scale the available current capacity:
+        </p>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Series Cells (S) = ⌈Target Voltage / Block Voltage⌉
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Parallel Strings (P) = ⌈Target Capacity (Ah) / Block Capacity (Ah)⌉
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Total Blocks (N) = Series Cells (S) × Parallel Strings (P)
+        </div>
+        <p>
+          Actual system capabilities are computed from these integer counts:
+        </p>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Actual System Voltage = S × Block Voltage
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Actual System Capacity = P × Block Capacity
+        </div>
+      </FormulaBox>
+
+      <!-- Worked Example -->
+      <div>
+        <h2 class="text-title-lg text-primary uppercase mb-6 tracking-wider">Worked Engineering Example</h2>
+        <div class="text-body-sm text-muted flex flex-col gap-4">
+          <p>Consider designing a battery module for standard telecommunications:</p>
+          <ul class="list-disc pl-6 flex flex-col gap-1">
+            <li><strong>Target Pack Voltage:</strong> 48 V | <strong>Target Pack Capacity:</strong> 200 Ah</li>
+            <li><strong>Building Block Cell:</strong> 3.2V, 100 Ah (Standard LiFePO4)</li>
+          </ul>
+          <p><strong>Step 1:</strong> Calculate cell count in series (S):</p>
+          <div class="font-mono text-primary">S = ceil(48 V / 3.2 V) = 15 Cells in Series</div>
+
+          <p><strong>Step 2:</strong> Calculate parallel strings (P):</p>
+          <div class="font-mono text-primary">P = ceil(200 Ah / 100 Ah) = 2 Strings in Parallel</div>
+
+          <p><strong>Step 3:</strong> Compute total cells (N) and actual specifications:</p>
+          <div class="font-mono text-primary">N_total = 15 x 2 = 30 Cells</div>
+          <div class="font-mono text-primary">V_actual = 15 x 3.2 V = 48 V</div>
+          <div class="font-mono text-primary">C_actual = 2 x 100 Ah = 200 Ah</div>
+          <div class="font-mono text-primary">E_actual = 48 V x 200 Ah = 9600 Wh = 9.6 kWh</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <FAQSection items={faqItems} />
+
+  <!-- Calculation Script -->
+  <script>
+    import { calculateParallelString } from '../../utils/calculators';
+
+    const targetVoltageInput = document.getElementById('target-voltage') as HTMLInputElement;
+    const targetCapacityInput = document.getElementById('target-capacity') as HTMLInputElement;
+    const cellVoltageInput = document.getElementById('cell-voltage') as HTMLInputElement;
+    const cellCapacityInput = document.getElementById('cell-capacity') as HTMLInputElement;
+
+    // Outputs
+    const resultStructure = document.getElementById('result-structure');
+    const resultStructureValue = resultStructure?.querySelector('.text-display-md') as HTMLElement;
+    const resultStructureSuffix = resultStructure?.querySelector('.text-caption') as HTMLElement;
+
+    const resultActualVoltage = document.getElementById('result-actual-voltage');
+    const resultVoltageValue = resultActualVoltage?.querySelector('.text-title-lg') as HTMLElement;
+    const resultVoltageSuffix = resultActualVoltage?.querySelector('.text-caption') as HTMLElement;
+
+    const resultActualCapacity = document.getElementById('result-actual-capacity');
+    const resultCapacityValue = resultActualCapacity?.querySelector('.text-title-lg') as HTMLElement;
+    const resultCapacitySuffix = resultActualCapacity?.querySelector('.text-caption') as HTMLElement;
+
+    const resultActualEnergy = document.getElementById('result-actual-energy');
+    const resultEnergyValue = resultActualEnergy?.querySelector('.text-title-lg') as HTMLElement;
+    const resultEnergySuffix = resultActualEnergy?.querySelector('.text-caption') as HTMLElement;
+
+    function updateCalculations() {
+      const targetVoltage = parseFloat(targetVoltageInput.value) || 12;
+      const targetCapacity = parseFloat(targetCapacityInput.value) || 100;
+      const cellVoltage = parseFloat(cellVoltageInput.value) || 3.2;
+      const cellCapacity = parseFloat(cellCapacityInput.value) || 100;
+
+      const results = calculateParallelString(targetVoltage, targetCapacity, cellVoltage, cellCapacity);
+
+      // Render Outputs
+      if (resultStructureValue) {
+        resultStructureValue.textContent = `${results.seriesCells}S ${results.parallelStrings}P`;
+      }
+      if (resultStructureSuffix) {
+        resultStructureSuffix.textContent = `${results.totalCells} total cells or modules required`;
+      }
+      if (resultVoltageValue) {
+        resultVoltageValue.textContent = `${results.actualVoltageV.toFixed(1)} V`;
+      }
+      if (resultVoltageSuffix) {
+        resultVoltageSuffix.textContent = `${results.seriesCells} cells in series`;
+      }
+      if (resultCapacityValue) {
+        resultCapacityValue.textContent = `${results.actualCapacityAh.toFixed(1)} Ah`;
+      }
+      if (resultCapacitySuffix) {
+        resultCapacitySuffix.textContent = `${results.parallelStrings} parallel strings`;
+      }
+      if (resultEnergyValue) {
+        resultEnergyValue.textContent = `${results.actualEnergyWh.toLocaleString()} Wh`;
+      }
+      if (resultEnergySuffix) {
+        resultEnergySuffix.textContent = `${(results.actualEnergyWh / 1000).toFixed(2)} kWh battery storage capacity`;
+      }
+    }
+
+    [targetVoltageInput, targetCapacityInput, cellVoltageInput, cellCapacityInput].forEach(el => {
+      el.addEventListener('input', updateCalculations);
+    });
+
+    // Run on boot
+    updateCalculations();
+  </script>
+</CalculatorLayout>
