@@ -334,3 +334,145 @@ The required disclaimer wording remains unchanged in all 3 original locations:
 | File | Change |
 |------|--------|
 | `src/pages/battery-passport-generator.astro` | Added 1 FAQ item, added demo-style clarity notes in 4 locations |
+
+---
+
+## Bing SEO Fix — Multiple H1 Tags
+
+**Date:** June 15, 2026
+
+### Issue
+
+Bing Webmaster Tools reported: "More than one h1 tag — 2 instances found" on `/battery-passport-generator/`.
+
+### Root Cause
+
+The page contained two `<h1>` tags:
+
+1. **Hero section** (line 132): `<h1>Battery Passport Generator</h1>` — correct, page title heading
+2. **Print report header** (line 478): `<h1>Battery Passport Readiness Report</h1>` — in the `print:block` hidden container
+
+Both tags were visible in the DOM (the print report uses `hidden print:block`), so Bing detected 2 `<h1>` instances.
+
+### Fix Applied
+
+Changed the print report heading from `<h1>` to `<h2>` at line 478, preserving the existing CSS classes for consistent print styling:
+
+```html
+<!-- Before -->
+<h1 class="text-2xl font-bold uppercase tracking-wider text-black m-0">Battery Passport Readiness Report</h1>
+
+<!-- After -->
+<h2 class="text-2xl font-bold uppercase tracking-wider text-black m-0">Battery Passport Readiness Report</h2>
+```
+
+No visual design changes. The print heading retains identical styling.
+
+### Verification
+
+| Check | Result |
+|-------|--------|
+| `<h1>` count in source | 1 (hero section only) |
+| `<h1>` count in built HTML | 1 |
+| `npx astro check` | 0 errors (29 pre-existing hints/warnings) |
+| `npm run build` | Passed — 130 pages built in 10.53s |
+| Built HTML inspected | `dist/client/battery-passport-generator/index.html` — single `<h1>` confirmed |
+
+---
+
+## Print/PDF Output Cleanup
+
+**Date:** June 15, 2026
+
+### Issue
+
+The printed PDF output included website chrome (header, footer, navigation, search bar, calculator links, learning center links, reference center section, privacy/terms/contact links, engineering disclaimer, and related tools). The report should look like a standalone A4 engineering document.
+
+### Root Cause
+
+The existing `@media print` CSS:
+- Used element selectors (`header`, `footer`, `nav`) that were overridden by Astro's scoped style specificity (`data-astro-cid-*` attribute selectors)
+- Lacked A4 page sizing (`@page` rule)
+- Had minimal page break logic (only `.page-break-avoid`)
+- Did not target specific section IDs for the content sections (comparison, includes, data-fields, etc.)
+- Did not override `print:hidden` utility classes on elements that needed hiding
+
+### Fix Applied
+
+Rewrote the `<style>` block in `src/pages/battery-passport-generator.astro` with comprehensive print CSS:
+
+**A4 Page Setup:**
+- `@page { size: A4 portrait; margin: 18mm 16mm 18mm 16mm; }` — clean report margins
+
+**Site Chrome Hiding (29 selectors):**
+- `header`, `footer`, `nav` — Layout-level elements (scoped with `data-astro-cid-*`)
+- `#hero-section`, `#generator-tool`, `#comparison-section`, `#includes-section`, `#data-fields`, `#score-section`, `#usecases-section`, `#limitations-section`, `#paid-provider-section`, `#faq-section`, `#related-section` — all page content sections
+- `.content-sections`, `.no-print`, `.print\:hidden`, `.print\:block` — utility class overrides
+- `form`, `button`, `.btn-primary`, `.btn-primary-outline` — interactive elements
+- `[aria-label="Search"]`, `[aria-label="Toggle Navigation Menu"]`, `[aria-label="Toggle dark/light theme"]` — accessibility-labeled controls
+- `footer a`, `footer p`, `footer span`, `footer div`, `footer ul` — footer children
+
+**Print Report Display:**
+- `#print-report { display: block !important; width: 100%; ... }` — overrides `hidden` class
+
+**Print Typography (pt units for A4):**
+- `h2`: 16pt, `h3`: 10pt, `h4`: 9pt, `p`: 9pt, `table`: 8.5pt, `td`: 8.5pt
+
+**Page Break Rules:**
+- All `#print-report > div` containers: `page-break-inside: avoid`
+- `h2`, `h3`, `h4`: `page-break-after: avoid` (no orphaned headings)
+- Last child (QR footer): `page-break-inside: avoid`, `margin-top: 12pt`
+- Gaps & Recommendations section: `page-break-inside: auto` (allows internal breaks)
+
+**Print Colors:**
+- Explicit `print-color-adjust: exact` for all elements
+- Forced border/background/text colors for tables, disclaimers, QR placeholder
+- White backgrounds for print-report sections
+
+**Grid Layout:**
+- `grid-template-columns: 1fr 1fr` for 2-col grids
+- `grid-template-columns: repeat(4, 1fr)` for 4-col summary grid
+- `border-collapse: collapse` for tables
+
+### Report Content in Print Mode
+
+The printed report includes:
+1. Battery Passport Readiness Report title + Passport ID
+2. Disclaimer + demo-style warning
+3. Readiness & Status Summary (Completeness, Readiness Level, Health Grade, Lifecycle Stage)
+4. Section A: Battery Identity (table)
+5. Section B: Performance and Durability (table)
+6. Section C: Lifecycle and Operational Data (table)
+7. Section D: Sustainability and Traceability (table)
+8. Section E: Documentation Checklist (8 items)
+9. Assessed Gaps, Warnings & Recommendations (2-column grid)
+10. QR placeholder + report generated date + batterycalculators.com attribution
+
+### Verification
+
+| Check | Result |
+|-------|--------|
+| `npx astro check` | 0 errors (29 pre-existing hints/warnings) |
+| `npm run build` | Passed — 130 pages built in 10.45s |
+| Built CSS inspected | `dist/client/_astro/battery-passport-generator.T5sx9bsr.css` — `@page`, `@media print`, all rules confirmed |
+| `@page` rule | `size: A4 portrait; margin: 18mm 16mm` |
+| Print hide selectors | 29 selectors targeting all site chrome |
+| Page break rules | `page-break-inside: avoid`, `page-break-after: avoid` |
+| Print typography | h2:16pt, h3:10pt, h4:9pt, p:9pt, table:8.5pt |
+| Grid/table overrides | `grid-template-columns`, `border-collapse` |
+
+### Files Changed
+
+| File | Change |
+|------|--------|
+| `src/pages/battery-passport-generator.astro` | Rewrote `<style>` block: comprehensive `@media print` CSS with A4 page sizing, 29 site-chrome hiding selectors, print typography, page break logic, print colors, grid/table overrides |
+
+### Remaining Limitations
+
+1. **No QR code generation** — Placeholder grid only. Requires registry URL + QR library (deferred to v2).
+2. **Client-side only** — No server-side processing or data persistence.
+3. **No dedicated PDF export** — Uses `window.print()`; users select "Save as PDF" from the browser print dialog. Dedicated PDF generation (e.g. jsPDF, Puppeteer) excluded per build rules.
+4. **No SOH calculator linked** — SOH estimator is not a standalone tool. SOC Estimator is linked instead.
+5. **Passport ID is session-only** — Generated once on page load, not persisted.
+6. **Print CSS relies on browser print engine** — Page break behavior may vary slightly across browsers (Chrome, Firefox, Safari). The `page-break-inside: avoid` rules are best-effort.
+7. **Pre-existing hints** — 29 hints/warnings from unused variables in unrelated files (not errors, not related to this page).
