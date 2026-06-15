@@ -267,6 +267,27 @@ export const searchData: SearchItem[] = [
     ],
   },
   {
+    title: "Battery Passport Generator",
+    description:
+      "Create a battery passport readiness report with lifecycle data, SOH, performance, durability, traceability, carbon footprint, and compliance checklist fields.",
+    url: "/battery-passport-generator/",
+    type: "calculator",
+    category: "Calculator",
+    keywords: [
+      "battery passport generator",
+      "digital battery passport tool",
+      "battery passport template",
+      "EU battery regulation compliance tool",
+      "battery lifecycle report generator",
+      "battery traceability report",
+      "battery passport readiness",
+      "battery compliance checklist",
+      "soh",
+      "carbon footprint",
+      "traceability",
+    ],
+  },
+  {
     title: "Solar Battery Sizing Calculator",
     description:
       "Size your solar battery bank based on daily energy consumption, autonomy days, battery chemistry, and depth of discharge.",

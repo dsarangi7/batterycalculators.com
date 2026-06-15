@@ -1,0 +1,1521 @@
+---
+import Layout from '../layouts/Layout.astro';
+import CalculatorCard from '../components/CalculatorCard.astro';
+import InputField from '../components/InputField.astro';
+import FAQSection from '../components/FAQSection.astro';
+import RelatedTools from '../components/RelatedTools.astro';
+import Breadcrumb from '../components/Breadcrumb.astro';
+
+// Dropdown options
+const applicationOptions = [
+  { label: "Stationary ESS", value: "Stationary ESS" },
+  { label: "Marine ESS", value: "Marine ESS" },
+  { label: "EV (Electric Vehicle)", value: "EV" },
+  { label: "Industrial Pack", value: "Industrial" },
+  { label: "UPS / Backup Power", value: "UPS" },
+  { label: "Second-life Storage", value: "Second-life" },
+  { label: "Other Application", value: "Other" }
+];
+
+const chemistryOptions = [
+  { label: "LFP (Lithium Iron Phosphate / LiFePO4)", value: "LFP / LiFePO4" },
+  { label: "NMC (Nickel Manganese Cobalt)", value: "NMC" },
+  { label: "NCA (Nickel Cobalt Aluminum)", value: "NCA" },
+  { label: "LTO (Lithium Titanate)", value: "LTO" },
+  { label: "Lead-Acid (Deep Cycle)", value: "Lead-acid" },
+  { label: "Sodium-Ion", value: "Sodium-ion" },
+  { label: "Other Chemistry", value: "Other" }
+];
+
+const carbonUnitOptions = [
+  { label: "kg CO2e / kWh", value: "kg CO2e/kWh" },
+  { label: "kg CO2e total", value: "kg CO2e total" },
+  { label: "Unknown / Undeclared", value: "Unknown" }
+];
+
+const secondLifeOptions = [
+  { label: "High suitability (SOH >= 80%, low cycle count)", value: "High" },
+  { label: "Medium suitability (SOH 70-79%, moderate stress)", value: "Medium" },
+  { label: "Low suitability (SOH < 70% or safety events logged)", value: "Low" },
+  { label: "Unknown / Untested", value: "Unknown" }
+];
+
+// FAQ list for FAQPage schema and display
+const faqItems = [
+  {
+    question: "What is a battery passport?",
+    answer: "A battery passport is a structured digital record that stores and shares key information about a battery's lifecycle. It tracks details such as manufacturing origin, material composition, carbon footprint, performance history, State of Health (SOH), and recycling instructions to promote safety, transparency, and circular economy reuse."
+  },
+  {
+    question: "Who needs a battery passport?",
+    answer: "Under regulations like the EU Battery Regulation, battery passports are mandatory for industrial batteries (above 2 kWh), electric vehicle (EV) batteries, and large Light Means of Transport (LMT) batteries. Target users include manufacturers, OEMs, battery labs, ESS developers, and recycling teams."
+  },
+  {
+    question: "Is this a certified EU Battery Passport?",
+    answer: "No. This tool generates a Battery Passport readiness report for engineering and planning purposes. It is not a legal compliance certification. Official compliance requires independent verification, specific data architectures (like decentralized registries), secure digital identifiers, and audited carbon footprint models."
+  },
+  {
+    question: "Can I use this report as an official Battery Passport?",
+    answer: "No. This report is a readiness and data-gap assessment for engineering and planning. An official Battery Passport may require verified data, approved data models, digital identifiers, QR infrastructure, supplier declarations, carbon footprint methodology, authenticated records, and regulatory review."
+  },
+  {
+    question: "What battery data is needed for a battery passport?",
+    answer: "Required data is split into five main groups: 1) Battery Identity (serial numbers, chemistry, manufacturer), 2) Performance & Durability (SOH, round-trip efficiency, cycles), 3) Lifecycle & Operational data (temperatures, safety events), 4) Sustainability (carbon footprint, raw materials, recycled content), and 5) Documentation (declarations of conformity, safety manuals)."
+  },
+  {
+    question: "Does a battery passport include SOH data?",
+    answer: "Yes. State of Health (SOH) is a critical runtime parameter. It must be updated periodically during the battery's active life to inform operators, second-life evaluators, and recyclers of the remaining capability and capacity fade of the system."
+  },
+  {
+    question: "What is battery passport readiness?",
+    answer: "Battery passport readiness measures how complete and accurate a manufacturer's or operator's data is relative to regulatory requirements. A high readiness score indicates that all identity, performance, carbon footprint, and safety documents are compiled and ready for formal registry submission."
+  },
+  {
+    question: "Can this tool create a QR code?",
+    answer: "This tool generates a visual QR code placeholder in the preview card and printed report. It does not generate or host a live, persistent database URL. In production systems, the QR code links to a secure digital product passport registry page."
+  },
+  {
+    question: "Can I use this for marine ESS batteries?",
+    answer: "Yes. Marine energy storage system (ESS) teams can use this tool to compile baseline data, track operational events, assess SOH, and verify if their documentation meets standard industrial battery regulations."
+  },
+  {
+    question: "What is missing from a complete battery passport?",
+    answer: "A production-ready passport requires: secure distributed ledger integration (or authorized API registries), verified life cycle carbon footprint declarations (ISO 14067/14044), official supply chain chain-of-custody audits, and a real-time BMS connection to push telemetry data."
+  },
+  {
+    question: "When does the EU Battery Passport requirement start?",
+    answer: "The EU Battery Passport requirement is scheduled to take effect in February 2027. Industrial and EV batteries placed on the EU market must carry a visible QR code linked to their digital passport registry entry by this deadline."
+  },
+  {
+    question: "How much does a Battery Passport cost?",
+    answer: "Cost varies by implementation scope. For internal readiness assessments, free tools like this can help structure data. Formal compliance typically involves software platforms, audits, and registry fees. Budget for data management infrastructure, third-party verification, and ongoing maintenance when planning a full Battery Passport program."
+  },
+  {
+    question: "Can I prepare Battery Passport data without a paid provider?",
+    answer: "Yes, you can start by organizing existing data using spreadsheets or free tools. However, formal compliance requires secure digital identifiers, verified carbon footprint calculations, and registry integration. Most organizations use specialized platforms for the final implementation, but early data preparation can be done independently."
+  },
+  {
+    question: "What is the difference between a Battery Passport and a battery datasheet?",
+    answer: "A battery datasheet provides static technical specifications from the manufacturer. A Battery Passport is a dynamic digital record that tracks the battery's entire lifecycle, including real-time performance data, maintenance history, carbon footprint, and recycling instructions. Passports update over time, while datasheets remain fixed."
+  },
+  {
+    question: "Does a Battery Passport need carbon footprint data?",
+    answer: "Yes, carbon footprint data is a core requirement under regulations like the EU Battery Regulation. You need to declare the product carbon footprint (PCF) using recognized methodologies like ISO 14067 or PEF guidelines. This includes lifecycle emissions from raw material extraction through manufacturing, use, and end-of-life processing."
+  }
+];
+
+const relatedTools = [
+  { href: "/tools/battery-degradation-estimator/", title: "Degradation Estimator", description: "Calculate capacity fade and SOH over time." },
+  { href: "/tools/runtime-calculator/", title: "Runtime Calculator", description: "Estimate runtime from capacity, load, and efficiency." },
+  { href: "/tools/battery-sizing-calculator/", title: "Battery Sizing Calculator", description: "Size storage packs based on electrical load profiles." },
+  { href: "/tools/soc-estimator/", title: "SOC Estimator", description: "Estimate State of Charge from voltage or current integration." }
+];
+
+const breadcrumbs = [
+  { label: 'Tools', href: '/tools' },
+  { label: 'Battery Passport Generator' }
+];
+---
+
+<Layout
+  title="Battery Passport Generator | Digital Battery Passport Readiness Tool"
+  description="Create a battery passport readiness report with lifecycle data, SOH, performance, durability, traceability, carbon footprint, and compliance checklist fields."
+  schema="webApplication"
+  schemaName="Battery Passport Generator"
+  schemaDescription="A structured battery passport readiness assessment and engineering report generator."
+  breadcrumbs={breadcrumbs}
+  faqItems={faqItems}
+>
+  <div class="mb-8 print:hidden">
+    <Breadcrumb items={breadcrumbs} />
+    <span class="text-label-uppercase text-m-blue-light text-[11px] block mt-4 mb-2">ENGINEERING PLANNING UTILITY</span>
+    <h1 class="text-display-md text-primary leading-tight mb-3">Battery Passport Generator</h1>
+    <p class="text-body-md text-body font-light max-w-4xl">
+      Create a structured battery lifecycle and compliance-readiness report using battery identity, SOH, performance, durability, traceability, carbon footprint, and documentation data.
+    </p>
+  </div>
+
+  <!-- Hero Highlight / Mockup Area -->
+  <section id="hero-section" class="bg-surface-card border border-hairline p-6 md:p-8 mb-12 print:hidden relative overflow-hidden">
+    <!-- Glowing background accent -->
+    <div class="absolute -right-24 -top-24 w-72 h-72 rounded-full bg-m-blue-dark/15 blur-[80px] pointer-events-none"></div>
+    <div class="absolute -left-24 -bottom-24 w-72 h-72 rounded-full bg-m-red/10 blur-[80px] pointer-events-none"></div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-8 items-center relative z-10">
+      <div>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-3">Compliance &amp; Lifecycle Planning</h2>
+        <p class="text-body-sm text-body leading-relaxed mb-6">
+          Regulations like the upcoming EU Battery Regulation and global mineral traceability initiatives require industrial battery systems to document core technical, safety, and carbon parameters. Use this engineering planning tool to self-assess your dataset, measure your compliance readiness level, and export a formatted lifecycle readiness report.
+        </p>
+        <div class="flex flex-wrap gap-4">
+          <a href="#generator-tool" class="btn-primary text-xs h-11 inline-flex items-center">
+            Start Battery Passport Report
+          </a>
+          <a href="#data-fields" class="btn-primary-outline text-xs h-11 inline-flex items-center">
+            View Required Data Fields
+          </a>
+        </div>
+      </div>
+
+      <!-- Simulated Preview Card -->
+      <div class="bg-canvas border border-hairline p-6 relative rounded-none flex flex-col justify-between h-full min-h-[200px]">
+        <div class="absolute top-0 left-0 w-full h-[4px] bg-gradient-to-r from-m-blue-light via-m-blue-dark to-m-red"></div>
+        <div>
+          <div class="flex justify-between items-start mb-4">
+            <div>
+              <span class="text-[9px] text-muted tracking-wider uppercase block">PASSPORT INITIAL PREVIEW</span>
+              <span class="text-sm font-mono text-primary font-bold">BP-2026-X9B2</span>
+            </div>
+            <span class="text-[9px] font-bold border border-m-blue-light text-m-blue-light px-2 py-0.5 uppercase tracking-wider">Ready for Review</span>
+          </div>
+
+          <div class="grid grid-cols-2 gap-y-3 gap-x-2 border-t border-hairline pt-3 mb-4 text-xs font-light text-body">
+            <div>
+              <span class="text-[10px] text-muted block">Battery Model:</span>
+              <span class="text-primary font-medium">LiFePO4 Marine ESS</span>
+            </div>
+            <div>
+              <span class="text-[10px] text-muted block">Chemistry:</span>
+              <span class="text-primary font-medium">LFP / LiFePO4</span>
+            </div>
+            <div>
+              <span class="text-[10px] text-muted block">Nominal Voltage:</span>
+              <span class="text-primary font-medium">51.2 V</span>
+            </div>
+            <div>
+              <span class="text-[10px] text-muted block">Nominal Capacity:</span>
+              <span class="text-primary font-medium">200 Ah</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex justify-between items-end border-t border-hairline pt-3">
+          <div>
+            <span class="text-[10px] text-muted block">Data Completeness:</span>
+            <div class="flex items-center gap-2">
+              <div class="w-24 h-2 bg-surface-card rounded-none overflow-hidden">
+                <div class="bg-m-blue-light h-full" style="width: 82%"></div>
+              </div>
+              <span class="text-xs font-mono text-primary font-bold">82%</span>
+            </div>
+          </div>
+          <div class="w-10 h-10 border border-hairline flex items-center justify-center p-0.5 bg-white shrink-0">
+            <!-- QR code visual placeholder -->
+            <div class="w-full h-full bg-canvas grid grid-cols-3 gap-0.5 p-0.5">
+              <div class="bg-primary"></div><div class="bg-primary"></div><div class="bg-canvas"></div>
+              <div class="bg-primary"></div><div class="bg-canvas"></div><div class="bg-primary"></div>
+              <div class="bg-canvas"></div><div class="bg-primary"></div><div class="bg-primary"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Interactive Generator Section -->
+  <section id="generator-tool" class="mb-16 scroll-mt-6">
+    <div class="grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-8">
+      
+      <!-- Input Form Column -->
+      <div id="form-column" class="flex flex-col gap-6 print:hidden">
+        
+        <!-- SECTION A: Battery Identity -->
+        <CalculatorCard>
+          <div class="flex items-center gap-3 mb-6">
+            <span class="w-6 h-6 border border-m-blue-light text-m-blue-light flex items-center justify-center font-mono text-xs font-bold">A</span>
+            <h3 class="text-title-lg text-primary uppercase tracking-wider">Battery Identity</h3>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <InputField id="identity-name" label="Battery Pack/System Name" type="text" value="" placeholder="e.g. Navis Marine LFP-10" />
+            <InputField id="identity-manufacturer" label="Manufacturer / Organization" type="text" value="" placeholder="e.g. Apex Power Systems" />
+            <InputField id="identity-application" label="Application Profile" type="select" options={applicationOptions} value="Stationary ESS" />
+            <InputField id="identity-category" label="Battery Category" type="text" value="" placeholder="e.g. Industrial / ESS Pack" />
+            <InputField id="identity-chemistry" label="Cell Chemistry" type="select" options={chemistryOptions} value="LFP / LiFePO4" />
+            <InputField id="identity-nominal-voltage" label="Nominal Voltage (V)" type="number" value="" placeholder="e.g. 51.2" min={0.1} step="any" />
+            <InputField id="identity-nominal-capacity" label="Nominal Capacity (Ah)" type="number" value="" placeholder="e.g. 200" min={0.1} step="any" />
+            <div class="flex flex-col gap-2 w-full">
+              <label for="identity-energy-capacity" class="text-label-uppercase text-xs text-primary flex justify-between">
+                <span>Energy Capacity (kWh)</span>
+                <span id="auto-calc-indicator" class="text-[9px] text-m-blue-light lowercase tracking-normal hidden">Auto-calculated</span>
+              </label>
+              <div class="relative flex items-center">
+                <input id="identity-energy-capacity" type="number" class="text-input w-full" placeholder="e.g. 10.24" min={0.01} step="any" />
+                <span class="absolute right-3 text-caption text-muted">kWh</span>
+              </div>
+              <p class="text-caption text-muted">Leave empty to auto-calculate from Volts × Ah.</p>
+            </div>
+            <InputField id="identity-manufacturing-date" label="Manufacturing Date" type="text" value="" placeholder="YYYY-MM-DD" />
+            <InputField id="identity-country" label="Country of Manufacture" type="text" value="" placeholder="e.g. Germany" />
+            <InputField id="identity-serial-number" label="Serial Number / Pack ID" type="text" value="" placeholder="e.g. SN-LFP4-883719" />
+          </div>
+        </CalculatorCard>
+
+        <!-- SECTION B: Performance and Durability -->
+        <CalculatorCard>
+          <div class="flex items-center gap-3 mb-6">
+            <span class="w-6 h-6 border border-m-blue-dark text-m-blue-dark flex items-center justify-center font-mono text-xs font-bold">B</span>
+            <h3 class="text-title-lg text-primary uppercase tracking-wider">Performance &amp; Durability</h3>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <InputField id="perf-rated-cycles" label="Rated Cycle Life (cycles)" type="number" value="" placeholder="e.g. 6000" min={1} />
+            <InputField id="perf-current-cycles" label="Current Cycle Count" type="number" value="" placeholder="e.g. 120" min={0} />
+            <InputField id="perf-soh" label="State of Health (SOH %)" type="number" value="" placeholder="e.g. 98" min={0} max={120} />
+            <InputField id="perf-efficiency" label="Round-Trip Efficiency (%)" type="number" value="" placeholder="e.g. 95" min={0} max={100} />
+            <InputField id="perf-temp-min" label="Min Operating Temp (°C)" type="number" value="" placeholder="e.g. -10" step="any" />
+            <InputField id="perf-temp-max" label="Max Operating Temp (°C)" type="number" value="" placeholder="e.g. 45" step="any" />
+            <InputField id="perf-dod" label="Recommended DoD (%)" type="number" value="" placeholder="e.g. 80" min={0} max={100} />
+            <InputField id="perf-warranty" label="Warranty Period (Years)" type="number" value="" placeholder="e.g. 10" min={0} />
+            <InputField id="perf-service-life" label="Expected Service Life (Years)" type="number" value="" placeholder="e.g. 15" min={0} />
+          </div>
+        </CalculatorCard>
+
+        <!-- SECTION C: Lifecycle and Operational Data -->
+        <CalculatorCard>
+          <div class="flex items-center gap-3 mb-6">
+            <span class="w-6 h-6 border border-m-red text-m-red flex items-center justify-center font-mono text-xs font-bold">C</span>
+            <h3 class="text-title-lg text-primary uppercase tracking-wider">Lifecycle &amp; Operational Data</h3>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <InputField id="life-commissioning-date" label="Commissioning Date" type="text" value="" placeholder="YYYY-MM-DD" />
+            <InputField id="life-profile" label="Operational Profile" type="text" value="" placeholder="e.g. Solar Peak Shaving" />
+            <InputField id="life-average-c-rate" label="Average C-Rate" type="number" value="" placeholder="e.g. 0.5" min={0} step="any" />
+            <InputField id="life-max-discharge" label="Max Discharge Current (A)" type="number" value="" placeholder="e.g. 200" min={0} step="any" />
+            <InputField id="life-max-charge" label="Max Charge Current (A)" type="number" value="" placeholder="e.g. 100" min={0} step="any" />
+            <InputField id="life-average-temp" label="Average Operating Temp (°C)" type="number" value="" placeholder="e.g. 23" step="any" />
+            <InputField id="life-thermal-events" label="Thermal Events Observed" type="number" value="" placeholder="e.g. 0" min={0} />
+            <InputField id="life-safety-incidents" label="Safety Incidents Observed" type="number" value="" placeholder="e.g. 0" min={0} />
+            <InputField id="life-maintenance-status" label="Maintenance Status" type="text" value="" placeholder="e.g. Nominal" />
+          </div>
+        </CalculatorCard>
+
+        <!-- SECTION D: Sustainability and Traceability -->
+        <CalculatorCard>
+          <div class="flex items-center gap-3 mb-6">
+            <span class="w-6 h-6 border border-hairline text-muted flex items-center justify-center font-mono text-xs font-bold">D</span>
+            <h3 class="text-title-lg text-primary uppercase tracking-wider">Sustainability &amp; Traceability</h3>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <InputField id="sust-carbon-value" label="Carbon Footprint Value" type="number" value="" placeholder="e.g. 68" min={0} step="any" />
+            <InputField id="sust-carbon-unit" label="Carbon Footprint Unit" type="select" options={carbonUnitOptions} value="kg CO2e/kWh" />
+            <InputField id="sust-carbon-method" label="LCA Methodology Standard" type="text" value="" placeholder="e.g. ISO 14067" />
+            
+            <InputField id="sust-recycled" label="Recycled Content Declared?" type="select" options={[{label: "Undeclared", value: ""}, {label: "Yes", value: "yes"}, {label: "No", value: "no"}]} value="" />
+            <InputField id="sust-critical-materials" label="Critical Materials Declared?" type="select" options={[{label: "Undeclared", value: ""}, {label: "Yes", value: "yes"}, {label: "No", value: "no"}]} value="" />
+            <InputField id="sust-traceability" label="Supplier Traceability Available?" type="select" options={[{label: "Undeclared", value: ""}, {label: "Yes", value: "yes"}, {label: "No", value: "no"}]} value="" />
+            <InputField id="sust-recycling-instructions" label="Recycling Instructions Declared?" type="select" options={[{label: "Undeclared", value: ""}, {label: "Yes", value: "yes"}, {label: "No", value: "no"}]} value="" />
+            
+            <InputField id="sust-second-life" label="Second-Life Suitability Assessment" type="select" options={secondLifeOptions} value="Unknown" />
+          </div>
+        </CalculatorCard>
+
+        <!-- SECTION E: Documentation Checklist -->
+        <CalculatorCard>
+          <div class="flex items-center gap-3 mb-6">
+            <span class="w-6 h-6 border border-hairline text-muted flex items-center justify-center font-mono text-xs font-bold">E</span>
+            <h3 class="text-title-lg text-primary uppercase tracking-wider">Documentation Checklist</h3>
+          </div>
+          <p class="text-caption text-muted mb-4">Check all documentation files compiled for this battery system:</p>
+          <div class="flex flex-col gap-3">
+            {[
+              { id: "doc-datasheet", label: "Technical datasheet compiled" },
+              { id: "doc-conformity", label: "CE / UL Declaration of Conformity signed" },
+              { id: "doc-safety-manual", label: "Operator safety manual published" },
+              { id: "doc-transport", label: "UN 38.3 transport safety certification filed" },
+              { id: "doc-bms", label: "BMS firmware communication protocol / telemetry export mapped" },
+              { id: "doc-carbon-decl", label: "Product Carbon Footprint (PCF) declaration certified" },
+              { id: "doc-material", label: "Detailed material composition & critical raw materials inventory" },
+              { id: "doc-recycling", label: "End-of-life recycling and processing instructions" }
+            ].map(doc => (
+              <label class="flex items-start gap-3 text-body-sm text-body cursor-pointer select-none">
+                <input id={doc.id} type="checkbox" class="w-4 h-4 border border-hairline text-primary focus:ring-0 focus:outline-none accent-m-blue-light mt-0.5 rounded-none" />
+                <span>{doc.label}</span>
+              </label>
+            ))}
+          </div>
+        </CalculatorCard>
+
+      </div>
+
+      <!-- Right Column: Live Assessment Report & Preview -->
+      <div id="preview-column" class="lg:sticky lg:top-8 h-fit flex flex-col gap-6 print:hidden">
+        
+        <!-- Live Preview Card -->
+        <CalculatorCard class="border-m-blue-light relative bg-surface-card overflow-hidden">
+          <div class="absolute top-0 left-0 w-full h-[4px] bg-gradient-to-r from-m-blue-light via-m-blue-dark to-m-red"></div>
+
+          <div class="flex justify-between items-start mb-6">
+            <div>
+              <span class="text-[10px] text-muted tracking-wider uppercase block">BATTERY LIFECYCLE PASSPORT ID</span>
+              <span id="out-passport-id" class="text-xl font-mono text-primary font-bold">BP-2026-PEND</span>
+            </div>
+            <div>
+              <span class="text-[10px] text-muted tracking-wider uppercase block text-right">PASSPORT STATUS</span>
+              <span id="out-status" class="text-[10px] font-bold border border-m-red text-m-red px-2.5 py-0.5 uppercase tracking-wider inline-block mt-1">Draft</span>
+            </div>
+          </div>
+
+          <!-- Progress / Score Rings -->
+          <div class="grid grid-cols-2 gap-4 mb-8">
+            <div class="bg-surface-soft border border-hairline p-4 text-center">
+              <span class="text-[10px] text-muted block uppercase tracking-wider mb-1">Completeness</span>
+              <span id="out-completeness" class="text-3xl font-mono text-primary font-bold">0%</span>
+              <div class="w-full bg-canvas h-1.5 mt-2 overflow-hidden rounded-none">
+                <div id="out-completeness-bar" class="bg-m-red h-full transition-all duration-300" style="width: 0%"></div>
+              </div>
+            </div>
+
+            <div class="bg-surface-soft border border-hairline p-4 text-center">
+              <span class="text-[10px] text-muted block uppercase tracking-wider mb-1">Readiness Tier</span>
+              <span id="out-readiness" class="text-xl text-m-red font-bold uppercase tracking-wider block mt-1.5">Low</span>
+              <span class="text-[9px] text-muted block mt-1">Readiness Alignment</span>
+            </div>
+          </div>
+
+          <!-- Technical Metrics Summary Card -->
+          <div class="bg-surface-soft border border-hairline p-4 mb-6">
+            <h4 class="text-label-uppercase text-xs text-primary mb-3">Battery Specifications Summary</h4>
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-y-3 gap-x-2 text-xs font-light text-body">
+              <div>
+                <span class="text-[10px] text-muted block">System Name:</span>
+                <span id="sum-name" class="text-primary font-medium truncate block max-w-full">Not set</span>
+              </div>
+              <div>
+                <span class="text-[10px] text-muted block">Chemistry:</span>
+                <span id="sum-chemistry" class="text-primary font-medium">Not set</span>
+              </div>
+              <div>
+                <span class="text-[10px] text-muted block">Energy Capacity:</span>
+                <span id="sum-energy" class="text-primary font-medium">Not set</span>
+              </div>
+              <div>
+                <span class="text-[10px] text-muted block">Nominal Voltage &amp; Ah:</span>
+                <span id="sum-volts-ah" class="text-primary font-medium">Not set</span>
+              </div>
+              <div>
+                <span class="text-[10px] text-muted block">Health Status (SOH):</span>
+                <span id="sum-health" class="text-primary font-medium">Not set</span>
+              </div>
+              <div>
+                <span class="text-[10px] text-muted block">Lifecycle Stage:</span>
+                <span id="sum-stage" class="text-primary font-medium">Not set</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Critical Gaps / Warnings -->
+          <div id="preview-warnings-container" class="mb-6 hidden">
+            <h4 class="text-label-uppercase text-xs text-primary mb-2">Missing Critical Data Fields</h4>
+            <ul id="preview-missing-fields" class="list-disc pl-5 text-xs text-m-red font-light flex flex-col gap-1 mb-4">
+              <!-- Dynamically populated -->
+            </ul>
+            <div id="preview-warnings" class="flex flex-col gap-2">
+              <!-- Dynamically populated warnings -->
+            </div>
+          </div>
+
+          <!-- Recommendations -->
+          <div class="mb-6">
+            <h4 class="text-label-uppercase text-xs text-primary mb-2">Required Actions / Recommendations</h4>
+            <ul id="preview-recommendations" class="list-decimal pl-5 text-xs text-muted font-light flex flex-col gap-1.5 font-sans leading-relaxed">
+              <!-- Dynamically populated -->
+            </ul>
+          </div>
+
+          <!-- Printable QR Code & Footer Block -->
+          <div class="border-t border-hairline pt-6 flex justify-between items-end">
+            <div>
+              <h4 class="text-[10px] text-muted uppercase tracking-wider block font-bold">Digital Registry Link</h4>
+              <p class="text-caption text-body max-w-xs leading-relaxed mt-1">
+                A QR code links stakeholders to recycling, safety, and supply chain records.
+              </p>
+            </div>
+            
+            <div class="w-16 h-16 border border-hairline flex flex-col items-center justify-center p-1 bg-white shrink-0">
+              <!-- QR code visual representation -->
+              <div class="w-full h-full bg-canvas grid grid-cols-4 gap-0.5 p-0.5">
+                <div class="bg-primary"></div><div class="bg-primary"></div><div class="bg-canvas"></div><div class="bg-primary"></div>
+                <div class="bg-primary"></div><div class="bg-canvas"></div><div class="bg-primary"></div><div class="bg-canvas"></div>
+                <div class="bg-canvas"></div><div class="bg-primary"></div><div class="bg-primary"></div><div class="bg-primary"></div>
+                <div class="bg-primary"></div><div class="bg-canvas"></div><div class="bg-canvas"></div><div class="bg-primary"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Disclaimer Spot 1: Near Live Result -->
+          <div class="mt-6 pt-4 border-t border-hairline text-[10px] text-muted leading-relaxed font-light">
+            <strong>Disclaimer:</strong> This tool generates a Battery Passport readiness report for engineering and planning purposes. It is not a legal compliance certification. Battery Passport requirements may vary by jurisdiction, product category, and implementation timeline. Consult qualified regulatory specialists for formal compliance.
+          </div>
+          <div class="mt-3 text-[10px] text-muted leading-relaxed font-light">
+            <strong>Important:</strong> This is a demo-style Battery Passport readiness report generator for engineering planning. It is not a ready-to-submit official Battery Passport template, legal compliance file, certified regulatory record, or approved EU Battery Passport.
+          </div>
+        </CalculatorCard>
+
+        <!-- Print Action Card -->
+        <CalculatorCard class="print:hidden">
+          <h3 class="text-title-sm text-primary mb-2 uppercase tracking-wider">Export Readiness Report</h3>
+          <p class="text-body-sm text-muted mb-4 leading-relaxed font-light">
+            Download your completed self-assessment report as a clean engineering PDF or print it for project files. Background colors and form sections will format automatically.
+          </p>
+          <div class="mb-4 text-[10px] text-muted leading-relaxed font-light">
+            <strong>Note:</strong> This is a demo-style Battery Passport readiness report generator for engineering planning. It is not a ready-to-submit official Battery Passport template, legal compliance file, certified regulatory record, or approved EU Battery Passport.
+          </div>
+          <button id="button-print" class="btn-primary w-full text-xs" aria-label="Download or print the Battery Passport readiness report as PDF">
+            Download Readiness Report (PDF/Print)
+          </button>
+        </CalculatorCard>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- PRINT-SPECIFIC assessment report container (Hidden on screen, visible only on print) -->
+  <div id="print-report" class="hidden print:block w-full text-black font-body text-xs leading-normal">
+    <!-- Print report header -->
+    <div class="border-b-2 border-black pb-4 mb-6">
+      <div class="flex justify-between items-end">
+        <div>
+          <h1 class="text-2xl font-bold uppercase tracking-wider text-black m-0">Battery Passport Readiness Report</h1>
+          <p class="text-xs text-black mt-1 font-light">Engineering Planning &amp; Self-Assessment lifecycle documentation</p>
+        </div>
+        <div class="text-right shrink-0">
+          <span class="text-[10px] text-gray-600 block uppercase tracking-wider font-bold">Passport ID</span>
+          <span id="print-passport-id-header" class="text-sm font-mono font-bold text-black">BP-2026-PEND</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Disclaimer Spot 2: Inside Printed Report -->
+    <div class="border border-black p-4 mb-6 text-[10px] bg-gray-50 leading-relaxed font-light">
+      <strong>Disclaimer:</strong> This tool generates a Battery Passport readiness report for engineering and planning purposes. It is not a legal compliance certification. Battery Passport requirements may vary by jurisdiction, product category, and implementation timeline. Consult qualified regulatory specialists for formal compliance.
+    </div>
+    <div class="border border-black p-4 mb-6 text-[10px] bg-gray-50 leading-relaxed font-light">
+      <strong>Important:</strong> This is a demo-style Battery Passport readiness report generator for engineering planning. It is not a ready-to-submit official Battery Passport template, legal compliance file, certified regulatory record, or approved EU Battery Passport.
+    </div>
+
+    <!-- Summary section -->
+    <div class="border border-black p-4 mb-6">
+      <h2 class="text-xs font-bold uppercase tracking-wider border-b border-black pb-2 mb-3">Readiness &amp; Status Summary</h2>
+      <div class="grid grid-cols-4 gap-4">
+        <div>
+          <span class="text-[10px] uppercase font-bold text-gray-500 block">Completeness:</span>
+          <span id="print-completeness" class="text-xl font-mono font-bold text-black">0%</span>
+        </div>
+        <div>
+          <span class="text-[10px] uppercase font-bold text-gray-500 block">Readiness Level:</span>
+          <span id="print-readiness" class="text-xl font-bold uppercase text-black">Low</span>
+        </div>
+        <div>
+          <span class="text-[10px] uppercase font-bold text-gray-500 block">Health Grade:</span>
+          <span id="print-health" class="text-xl font-bold uppercase text-black">Unknown</span>
+        </div>
+        <div>
+          <span class="text-[10px] uppercase font-bold text-gray-500 block">Lifecycle Stage:</span>
+          <span id="print-stage" class="text-xl font-bold uppercase text-black">Unknown</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section A: Identity Table -->
+    <div class="mb-6">
+      <h3 class="text-xs font-bold uppercase tracking-wider bg-gray-100 p-2 mb-2">Section A: Battery Identity</h3>
+      <table class="w-full text-left border-collapse text-[10px]">
+        <tbody class="divide-y divide-gray-200">
+          <tr>
+            <td class="py-1.5 font-bold w-[25%]">Battery Name:</td>
+            <td id="print-name" class="py-1.5 w-[25%]">Undeclared</td>
+            <td class="py-1.5 font-bold w-[25%]">Manufacturer:</td>
+            <td id="print-manufacturer" class="py-1.5 w-[25%]">Undeclared</td>
+          </tr>
+          <tr>
+            <td class="py-1.5 font-bold">Application Profile:</td>
+            <td id="print-application" class="py-1.5">Undeclared</td>
+            <td class="py-1.5 font-bold">Battery Category:</td>
+            <td id="print-category" class="py-1.5">Undeclared</td>
+          </tr>
+          <tr>
+            <td class="py-1.5 font-bold">Cell Chemistry:</td>
+            <td id="print-chemistry" class="py-1.5">Undeclared</td>
+            <td class="py-1.5 font-bold">Serial Number / Pack ID:</td>
+            <td id="print-serial-number" class="py-1.5">Undeclared</td>
+          </tr>
+          <tr>
+            <td class="py-1.5 font-bold">Nominal Voltage:</td>
+            <td id="print-volts" class="py-1.5">Undeclared</td>
+            <td class="py-1.5 font-bold">Nominal Capacity:</td>
+            <td id="print-capacity-ah" class="py-1.5">Undeclared</td>
+          </tr>
+          <tr>
+            <td class="py-1.5 font-bold">Energy Capacity:</td>
+            <td id="print-energy" class="py-1.5">Undeclared</td>
+            <td class="py-1.5 font-bold">Mfg Date &amp; Country:</td>
+            <td id="print-mfg-info" class="py-1.5">Undeclared</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Section B: Performance Table -->
+    <div class="mb-6 page-break-avoid">
+      <h3 class="text-xs font-bold uppercase tracking-wider bg-gray-100 p-2 mb-2">Section B: Performance and Durability</h3>
+      <table class="w-full text-left border-collapse text-[10px]">
+        <tbody class="divide-y divide-gray-200">
+          <tr>
+            <td class="py-1.5 font-bold w-[25%]">Rated Cycle Life:</td>
+            <td id="print-rated-cycles" class="py-1.5 w-[25%]">Undeclared</td>
+            <td class="py-1.5 font-bold w-[25%]">Current Cycle Count:</td>
+            <td id="print-current-cycles" class="py-1.5 w-[25%]">Undeclared</td>
+          </tr>
+          <tr>
+            <td class="py-1.5 font-bold">State of Health (SOH):</td>
+            <td id="print-soh" class="py-1.5">Undeclared</td>
+            <td class="py-1.5 font-bold">Round-Trip Efficiency:</td>
+            <td id="print-efficiency" class="py-1.5">Undeclared</td>
+          </tr>
+          <tr>
+            <td class="py-1.5 font-bold">Operating Temp Range:</td>
+            <td id="print-temp-range" class="py-1.5">Undeclared</td>
+            <td class="py-1.5 font-bold">Recommended DoD:</td>
+            <td id="print-dod" class="py-1.5">Undeclared</td>
+          </tr>
+          <tr>
+            <td class="py-1.5 font-bold">Warranty Period:</td>
+            <td id="print-warranty" class="py-1.5">Undeclared</td>
+            <td class="py-1.5 font-bold">Expected Service Life:</td>
+            <td id="print-service-life" class="py-1.5">Undeclared</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Section C: Lifecycle Table -->
+    <div class="mb-6 page-break-avoid">
+      <h3 class="text-xs font-bold uppercase tracking-wider bg-gray-100 p-2 mb-2">Section C: Lifecycle and Operational Data</h3>
+      <table class="w-full text-left border-collapse text-[10px]">
+        <tbody class="divide-y divide-gray-200">
+          <tr>
+            <td class="py-1.5 font-bold w-[25%]">Commissioning Date:</td>
+            <td id="print-commission-date" class="py-1.5 w-[25%]">Undeclared</td>
+            <td class="py-1.5 font-bold w-[25%]">Operational Profile:</td>
+            <td id="print-profile" class="py-1.5 w-[25%]">Undeclared</td>
+          </tr>
+          <tr>
+            <td class="py-1.5 font-bold">Average C-Rate:</td>
+            <td id="print-c-rate" class="py-1.5">Undeclared</td>
+            <td class="py-1.5 font-bold">Max Current (Chg/Dischg):</td>
+            <td id="print-max-currents" class="py-1.5">Undeclared</td>
+          </tr>
+          <tr>
+            <td class="py-1.5 font-bold">Average Temp:</td>
+            <td id="print-avg-temp" class="py-1.5">Undeclared</td>
+            <td class="py-1.5 font-bold">Thermal Events Logged:</td>
+            <td id="print-thermal-events" class="py-1.5">Undeclared</td>
+          </tr>
+          <tr>
+            <td class="py-1.5 font-bold">Safety Incidents:</td>
+            <td id="print-safety-incidents" class="py-1.5">Undeclared</td>
+            <td class="py-1.5 font-bold">Maintenance Status:</td>
+            <td id="print-maintenance" class="py-1.5">Undeclared</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Section D: Sustainability Table -->
+    <div class="mb-6 page-break-avoid">
+      <h3 class="text-xs font-bold uppercase tracking-wider bg-gray-100 p-2 mb-2">Section D: Sustainability and Traceability</h3>
+      <table class="w-full text-left border-collapse text-[10px]">
+        <tbody class="divide-y divide-gray-200">
+          <tr>
+            <td class="py-1.5 font-bold w-[25%]">Carbon Footprint:</td>
+            <td id="print-carbon" class="py-1.5 w-[25%]">Undeclared</td>
+            <td class="py-1.5 font-bold w-[25%]">LCA Methodology:</td>
+            <td id="print-carbon-method" class="py-1.5 w-[25%]">Undeclared</td>
+          </tr>
+          <tr>
+            <td class="py-1.5 font-bold">Recycled Content:</td>
+            <td id="print-recycled" class="py-1.5">Undeclared</td>
+            <td class="py-1.5 font-bold">Critical Raw Materials:</td>
+            <td id="print-critical" class="py-1.5">Undeclared</td>
+          </tr>
+          <tr>
+            <td class="py-1.5 font-bold">Supplier Traceability:</td>
+            <td id="print-traceability" class="py-1.5">Undeclared</td>
+            <td class="py-1.5 font-bold">Recycling Instructions:</td>
+            <td id="print-recycling" class="py-1.5">Undeclared</td>
+          </tr>
+          <tr>
+            <td class="py-1.5 font-bold" colspan="2">Second-Life Suitability:</td>
+            <td id="print-second-life" class="py-1.5" colspan="2">Undeclared</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Section E: Documentation checklist -->
+    <div class="mb-6 page-break-avoid">
+      <h3 class="text-xs font-bold uppercase tracking-wider bg-gray-100 p-2 mb-2">Section E: Documentation Checklist</h3>
+      <div class="grid grid-cols-2 gap-y-1.5 gap-x-4 text-[10px]">
+        <div id="print-doc-1">Technical datasheet: Undeclared</div>
+        <div id="print-doc-2">Declaration of Conformity: Undeclared</div>
+        <div id="print-doc-3">Safety manual: Undeclared</div>
+        <div id="print-doc-4">Transport safety certification: Undeclared</div>
+        <div id="print-doc-5">BMS telemetry export protocol: Undeclared</div>
+        <div id="print-doc-6">Carbon footprint declaration: Undeclared</div>
+        <div id="print-doc-7">Material composition declaration: Undeclared</div>
+        <div id="print-doc-8">End-of-life instructions: Undeclared</div>
+      </div>
+    </div>
+
+    <!-- Print Gaps, Warnings & Recommendations -->
+    <div class="mb-6 page-break-avoid">
+      <h3 class="text-xs font-bold uppercase tracking-wider bg-gray-100 p-2 mb-2">Assessed Gaps, Warnings &amp; Recommendations</h3>
+      <div class="grid grid-cols-2 gap-6 text-[10px]">
+        <div>
+          <h4 class="font-bold text-gray-700 uppercase mb-1">Missing Critical Fields &amp; Warnings:</h4>
+          <ul id="print-missing-warnings" class="list-disc pl-5 flex flex-col gap-1 text-red-700">
+            <li>None</li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="font-bold text-gray-700 uppercase mb-1">Actionable Recommendations:</h4>
+          <ol id="print-recommendations" class="list-decimal pl-5 flex flex-col gap-1 text-gray-800">
+            <li>None</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <!-- Print report footer -->
+    <div class="border-t border-black pt-4 mt-8 flex justify-between items-end text-[9px] text-gray-500">
+      <div>
+        <p>Report Generated on: <span id="print-date">YYYY-MM-DD</span></p>
+        <p>Battery Passport Self-Assessment Tool | batterycalculators.com</p>
+      </div>
+      <div class="w-12 h-12 border border-black flex items-center justify-center p-0.5 bg-white shrink-0">
+        <!-- Print QR placeholder -->
+        <div class="w-full h-full bg-black grid grid-cols-4 gap-0.5 p-0.5">
+          <div class="bg-white"></div><div class="bg-white"></div><div class="bg-black"></div><div class="bg-white"></div>
+          <div class="bg-white"></div><div class="bg-black"></div><div class="bg-white"></div><div class="bg-white"></div>
+          <div class="bg-black"></div><div class="bg-white"></div><div class="bg-white"></div><div class="bg-black"></div>
+          <div class="bg-white"></div><div class="bg-white"></div><div class="bg-white"></div><div class="bg-black"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Explanation Sections (Print Hidden) -->
+  <div class="content-sections print:hidden">
+
+    <!-- Section comparison: Battery Passport vs Battery Passport Readiness Report -->
+    <section class="mb-16 border-t border-hairline pt-12 scroll-mt-6" id="comparison-section">
+      <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Battery Passport vs Battery Passport Readiness Report</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-body-sm text-muted leading-relaxed">
+        <div>
+          <h3 class="text-title-sm text-primary font-bold mb-3 uppercase">Official Digital Battery Passport</h3>
+          <p class="mb-4">
+            An official, regulated Battery Passport (such as mandated by the EU Battery Regulation) is an interoperable digital product passport system. It requires:
+          </p>
+          <ul class="list-disc pl-5 flex flex-col gap-2 mb-4">
+            <li><strong>Verified Data:</strong> Audit trails and third-party certifications of materials and carbon footprint data.</li>
+            <li><strong>Regulated Identifiers:</strong> Pinned unique digital identifiers (e.g. decentralized identifiers or registered URLs) mapped to the physical battery.</li>
+            <li><strong>QR Infrastructure:</strong> Persistent QR codes linked to secure digital registry entries for physical-digital traceability.</li>
+            <li><strong>Approved Data Models:</strong> Standardized data schemas (e.g. W3C, Catena-X, or battery-specific ontologies) ensuring cross-system compatibility.</li>
+            <li><strong>Verification Workflows:</strong> Independent validation processes for data accuracy before registry submission.</li>
+            <li><strong>Access Control:</strong> Secure, role-based access control protecting proprietary BMS parameters while exposing public recycling and lifecycle data.</li>
+            <li><strong>Interoperability:</strong> Standardized data exchange protocols (like Catena-X or W3C standards) to integrate with national registries and global recycling networks.</li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-title-sm text-primary font-bold mb-3 uppercase">Readiness Planning Report (This Tool)</h3>
+          <p class="mb-4">
+            This tool is an engineering planning and self-assessment utility. It helps teams:
+          </p>
+          <ul class="list-disc pl-5 flex flex-col gap-2 mb-4">
+            <li><strong>Organize Data:</strong> Structure existing records of battery identity, SOH, chemistry, operational limits, and raw materials.</li>
+            <li><strong>Identify Gaps:</strong> Track missing fields and documentation items before starting formal verification audits.</li>
+            <li><strong>Assess Readiness:</strong> Calculate a completeness percentage to measure compliance alignment.</li>
+            <li><strong>Export PDF/Printouts:</strong> Save structured lifecycle reports for engineering files, R&D records, or customer discussions.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- What This Report Includes -->
+    <section class="mb-16 border-t border-hairline pt-12 scroll-mt-6" id="includes-section">
+      <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">What This Readiness Report Includes</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <CalculatorCard>
+          <h4 class="text-primary font-bold text-sm mb-2">1. Battery Identity</h4>
+          <p class="text-body-sm text-muted leading-relaxed font-light">
+            Consolidates manufacturer origin, country of assembly, chemistries (such as LFP or NMC), and nominal systems voltages to verify battery specifications are indexable.
+          </p>
+        </CalculatorCard>
+        <CalculatorCard>
+          <h4 class="text-primary font-bold text-sm mb-2">2. Performance &amp; Durability</h4>
+          <p class="text-body-sm text-muted leading-relaxed font-light">
+            Models rated capacities against current cycle count and SOH, tracking degradation factors to project the remaining operational capabilities of cells.
+          </p>
+        </CalculatorCard>
+        <CalculatorCard>
+          <h4 class="text-primary font-bold text-sm mb-2">3. Operational Lifecycle Data</h4>
+          <p class="text-body-sm text-muted leading-relaxed font-light">
+            Logs ongoing operations like average charge rates, extreme temperatures, safety sensor events, and thermal history to construct a full stress profile.
+          </p>
+        </CalculatorCard>
+        <CalculatorCard>
+          <h4 class="text-primary font-bold text-sm mb-2">4. Sustainability &amp; Traceability</h4>
+          <p class="text-body-sm text-muted leading-relaxed font-light">
+            Assesses the product's carbon footprint (kg CO2e/kWh), supply chain materials transparency, recycled component ratios, and second-life opportunities.
+          </p>
+        </CalculatorCard>
+        <CalculatorCard>
+          <h4 class="text-primary font-bold text-sm mb-2">5. Documentation Checklist</h4>
+          <p class="text-body-sm text-muted leading-relaxed font-light">
+            Validates compliance documents such as technical datasheets, Declarations of Conformity, safety instructions, and transport certifications.
+          </p>
+        </CalculatorCard>
+      </div>
+    </section>
+
+    <!-- Data Fields Table -->
+    <section class="mb-16 border-t border-hairline pt-12 scroll-mt-6" id="data-fields">
+      <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Battery Passport Data Fields</h2>
+      <p class="text-body-sm text-muted mb-6 max-w-3xl font-light">
+        Official digital product passport guidelines catalog extensive variables. Below is an overview of the primary field groups modeled in this readiness tool:
+      </p>
+      <div class="overflow-x-auto border border-hairline bg-surface-soft mb-8">
+        <table class="w-full text-left border-collapse min-w-[600px] text-xs">
+          <thead>
+            <tr class="border-b border-hairline bg-surface-card">
+              <th class="p-4 text-label-uppercase text-primary text-[10px] tracking-wider w-[180px]">Field Group</th>
+              <th class="p-4 text-label-uppercase text-primary text-[10px] tracking-wider">Example Fields</th>
+              <th class="p-4 text-label-uppercase text-primary text-[10px] tracking-wider">Why It Matters</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-hairline font-light text-body">
+            <tr>
+              <td class="p-4 font-bold text-primary">Battery Identity</td>
+              <td class="p-4 text-muted">Serial Number, Manufacturer, Brand, Chemistry, Nominal V/Ah, Assembly Location</td>
+              <td class="p-4 text-muted">Ensures unambiguous system identification and baseline sizing alignment.</td>
+            </tr>
+            <tr>
+              <td class="p-4 font-bold text-primary">Performance &amp; Durability</td>
+              <td class="p-4 text-muted">Rated Cycle Life, SOH %, Round-trip efficiency %, Operating Temp bounds, DoD Limits</td>
+              <td class="p-4 text-muted">Verifies system capacity margins and assesses suitability for secondary reuse.</td>
+            </tr>
+            <tr>
+              <td class="p-4 font-bold text-primary">Lifecycle telemetry</td>
+              <td class="p-4 text-muted">Cycle count, Commissioning date, Max currents, Thermal events, Safety indicators</td>
+              <td class="p-4 text-muted">Identifies mechanical or thermal stress events, alerting developers to replacement cycles.</td>
+            </tr>
+            <tr>
+              <td class="p-4 font-bold text-primary">Sustainability</td>
+              <td class="p-4 text-muted">Carbon footprint value, Recycled content, Critical raw materials, Second-life score</td>
+              <td class="p-4 text-muted">Measures ecological impact and tracks rare minerals (e.g. cobalt, lithium).</td>
+            </tr>
+            <tr>
+              <td class="p-4 font-bold text-primary">Documentation</td>
+              <td class="p-4 text-muted">Technical datasheet, Conformity files, Safety manual, UN 38.3 transport safety</td>
+              <td class="p-4 text-muted">Supports conformity documentation and establishes safety clearances for logistics and operators.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Scoring Mechanism -->
+    <section class="mb-16 border-t border-hairline pt-12" id="score-section">
+      <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">How the Readiness Score Works</h2>
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div>
+          <p class="text-body-sm text-body leading-relaxed mb-4 font-light">
+            The data completeness score is calculated by evaluating the presence of standard fields in five weighted categories. If a field is filled with valid data, it contributes to its category score.
+          </p>
+          <ul class="list-disc pl-5 text-xs text-muted flex flex-col gap-2 font-light">
+            <li><strong>Battery Identity (20%):</strong> Covers 11 primary tags including chemistry, country, voltage, capacity, and serial codes.</li>
+            <li><strong>Performance &amp; Durability (25%):</strong> Evaluates 9 lifetime ratings such as current cycle counts, efficiency, and temperature limits.</li>
+            <li><strong>Operational Lifecycle (20%):</strong> Assesses 9 logging fields including C-rate, temperature average, and safety incidents.</li>
+            <li><strong>Sustainability &amp; Traceability (25%):</strong> Analyzes 8 ESG metrics including carbon output value, recycled content, and materials declaration.</li>
+            <li><strong>Documentation Checklist (10%):</strong> Evaluates the presence of 8 key manuals, compliance reports, and certifications.</li>
+          </ul>
+        </div>
+        <div class="bg-surface-soft border border-hairline p-6">
+          <h4 class="text-label-uppercase text-xs text-primary mb-3 font-bold">Compliance Readiness Levels</h4>
+          <div class="flex flex-col gap-4 text-xs font-light text-body">
+            <div class="border-l-2 border-green-600 pl-3">
+              <strong class="text-primary block font-bold">High Readiness</strong>
+              Completeness score >= 85%, and all critical fields populated. The system data is structured for registry planning.
+            </div>
+            <div class="border-l-2 border-m-blue-light pl-3">
+              <strong class="text-primary block font-bold">Medium Readiness</strong>
+              Completeness score >= 60%, but has minor missing critical fields. Data is partially compiled but gaps must be filled.
+            </div>
+            <div class="border-l-2 border-m-red pl-3">
+              <strong class="text-primary block font-bold">Low Readiness</strong>
+              Completeness score &lt; 60%, or missing critical sustainability/documentation fields (e.g. carbon footprint, supplier traceability, material declaration).
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Example Use Cases -->
+    <section class="mb-16 border-t border-hairline pt-12" id="usecases-section">
+      <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Example Use Cases</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <CalculatorCard>
+          <h4 class="text-primary font-bold text-sm mb-2">1. Marine ESS Manufacturer</h4>
+          <p class="text-body-sm text-muted leading-relaxed font-light">
+            A shipyard marine electrical design team needs to structure battery records, temperature logs, and safety certifications. They use the generator to compile a unified readiness report for vessel classification society inspectors.
+          </p>
+        </CalculatorCard>
+        <CalculatorCard>
+          <h4 class="text-primary font-bold text-sm mb-2">2. Battery Testing Laboratory</h4>
+          <p class="text-body-sm text-muted leading-relaxed font-light">
+            An engineering test lab uses the tool to generate a standardized baseline report summarizing capacity, round-trip efficiency, and temperature limits after completing life-cycle stress testing.
+          </p>
+        </CalculatorCard>
+        <CalculatorCard>
+          <h4 class="text-primary font-bold text-sm mb-2">3. OEM Compliance Teams</h4>
+          <p class="text-body-sm text-muted leading-relaxed font-light">
+            An OEM team gathers supplier details and carbon footprint measurements. They run the checklist to build a readiness score, identifying missing supplier certifications before starting formal registry work.
+          </p>
+        </CalculatorCard>
+        <CalculatorCard>
+          <h4 class="text-primary font-bold text-sm mb-2">4. Second-Life Battery Evaluators</h4>
+          <p class="text-body-sm text-muted leading-relaxed font-light">
+            A developer acquiring decommissioned EV packs evaluates their suitability for stationary grid backup. The tool structures SOH degradation parameters to output lifecycle recommendations.
+          </p>
+        </CalculatorCard>
+      </div>
+    </section>
+
+    <!-- Limitations and Disclaimer (Disclaimer Spot 3) -->
+    <section class="mb-16 border-t border-hairline pt-12 scroll-mt-6" id="limitations-section">
+      <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Limitations &amp; Legal Disclaimer</h2>
+      <div class="bg-surface-soft border border-hairline p-6 text-body-sm text-muted leading-relaxed flex flex-col gap-4">
+        <p class="font-light">
+          This Battery Passport Generator provides a data structuring self-assessment checklist and readiness report. It is intended for engineering, feasibility research, and internal planning purposes. It does not provide legal compliance certification or official battery registration.
+        </p>
+        <p class="font-light">
+          Official implementation of the digital battery passport involves rigorous third-party audits, decentralized registry databases, compliance verification authorities, strict product carbon footprint (PCF) declarations modeled after PEF guidelines, and authenticated data exchanges.
+        </p>
+        <div class="border-t border-hairline pt-4 font-light text-[13px] text-body leading-relaxed">
+          <strong class="text-m-red uppercase block text-xs tracking-wider mb-1 font-bold">Engineering Disclaimer</strong>
+          "This tool generates a Battery Passport readiness report for engineering and planning purposes. It is not a legal compliance certification. Battery Passport requirements may vary by jurisdiction, product category, and implementation timeline. Consult qualified regulatory specialists for formal compliance."
+        </div>
+        <div class="border-t border-hairline pt-4 font-light text-[13px] text-body leading-relaxed">
+          <strong class="text-m-red uppercase block text-xs tracking-wider mb-1 font-bold">Important Note</strong>
+          "This is a demo-style Battery Passport readiness report generator for engineering planning. It is not a ready-to-submit official Battery Passport template, legal compliance file, certified regulatory record, or approved EU Battery Passport."
+        </div>
+      </div>
+    </section>
+
+    <!-- When to use a paid Battery Passport provider -->
+    <section class="mb-16 border-t border-hairline pt-12 scroll-mt-6" id="paid-provider-section">
+      <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">When Do You Need a Paid Battery Passport Provider?</h2>
+      <div class="bg-surface-soft border border-hairline p-6 text-body-sm text-muted leading-relaxed">
+        <p class="mb-4 font-light">
+          Free tools like this Battery Passport Generator help you organize data and assess readiness. However, formal regulatory implementation typically requires paid provider services for:
+        </p>
+        <ul class="list-disc pl-5 flex flex-col gap-2 mb-4 font-light">
+          <li><strong>Formal regulatory implementation:</strong> Meeting legal compliance deadlines with verified documentation</li>
+          <li><strong>Verified supplier data:</strong> Audit trails and third-party certifications of materials and carbon footprint data</li>
+          <li><strong>Carbon footprint methodology:</strong> Product carbon footprint (PCF) calculations using ISO 14067 or PEF guidelines</li>
+          <li><strong>QR infrastructure:</strong> Persistent QR codes linked to secure digital registry entries</li>
+          <li><strong>Authenticated records:</strong> Secure, tamper-proof data storage with access controls</li>
+          <li><strong>Digital identifiers:</strong> Unique, regulated identifiers mapped to physical batteries</li>
+          <li><strong>Interoperability:</strong> Standardized data exchange protocols for cross-system compatibility</li>
+          <li><strong>Audit-ready compliance documentation:</strong> Complete records for regulatory submissions and verification</li>
+        </ul>
+        <p class="font-light text-[13px]">
+          <strong>Engineering Note:</strong> Start data preparation now using free tools. When regulatory deadlines approach or you need formal verification, engage a specialized Battery Passport platform provider.
+        </p>
+      </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="mb-16 border-t border-hairline pt-12" id="faq-section">
+      <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Frequently Asked Questions</h2>
+      <FAQSection items={faqItems} />
+    </section>
+
+    <!-- Related Tools Section -->
+    <section class="mb-16 border-t border-hairline pt-12" id="related-section">
+      <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Related Battery Engineering Tools</h2>
+      <RelatedTools tools={relatedTools} />
+    </section>
+
+  </div>
+
+  <!-- Engineering Disclaimer at page footer -->
+  <section class="bg-surface-soft border border-hairline p-6 text-caption text-muted mb-8 print:hidden">
+    <span class="text-primary font-bold text-[10px] tracking-wider uppercase border border-hairline px-1.5 py-0.5 mr-2 inline-block mb-3">
+      Engineering Disclaimer
+    </span>
+    This tool is designed to support structured data collection and self-auditing. The outputs do not replace qualified legal counsel, formal life-cycle carbon calculations, or regulatory audits. Always coordinate with compliance authorities.
+  </section>
+
+  <!-- Script for client-side interactivity -->
+  <script>
+    import { 
+      calculateEnergyCapacity,
+      calculateDataCompleteness,
+      classifyBatteryHealth,
+      estimateLifecycleStage,
+      generateMissingFieldsList,
+      calculateComplianceReadiness,
+      generateMissingFieldWarnings,
+      generateRecommendations,
+      generatePassportId
+    } from '../utils/batteryPassport';
+
+    // Form Inputs
+    const nameInput = document.getElementById('identity-name') as HTMLInputElement;
+    const manufacturerInput = document.getElementById('identity-manufacturer') as HTMLInputElement;
+    const applicationInput = document.getElementById('identity-application') as HTMLSelectElement;
+    const categoryInput = document.getElementById('identity-category') as HTMLInputElement;
+    const chemistryInput = document.getElementById('identity-chemistry') as HTMLSelectElement;
+    const nominalVoltageInput = document.getElementById('identity-nominal-voltage') as HTMLInputElement;
+    const nominalCapacityInput = document.getElementById('identity-nominal-capacity') as HTMLInputElement;
+    const energyCapacityInput = document.getElementById('identity-energy-capacity') as HTMLInputElement;
+    const manufacturingDateInput = document.getElementById('identity-manufacturing-date') as HTMLInputElement;
+    const countryInput = document.getElementById('identity-country') as HTMLInputElement;
+    const serialNumberInput = document.getElementById('identity-serial-number') as HTMLInputElement;
+
+    const ratedCyclesInput = document.getElementById('perf-rated-cycles') as HTMLInputElement;
+    const currentCyclesInput = document.getElementById('perf-current-cycles') as HTMLInputElement;
+    const sohInput = document.getElementById('perf-soh') as HTMLInputElement;
+    const efficiencyInput = document.getElementById('perf-efficiency') as HTMLInputElement;
+    const tempMinInput = document.getElementById('perf-temp-min') as HTMLInputElement;
+    const tempMaxInput = document.getElementById('perf-temp-max') as HTMLInputElement;
+    const dodInput = document.getElementById('perf-dod') as HTMLInputElement;
+    const warrantyInput = document.getElementById('perf-warranty') as HTMLInputElement;
+    const serviceLifeInput = document.getElementById('perf-service-life') as HTMLInputElement;
+
+    const commissioningDateInput = document.getElementById('life-commissioning-date') as HTMLInputElement;
+    const profileInput = document.getElementById('life-profile') as HTMLInputElement;
+    const avgCRateInput = document.getElementById('life-average-c-rate') as HTMLInputElement;
+    const maxDischargeInput = document.getElementById('life-max-discharge') as HTMLInputElement;
+    const maxChargeInput = document.getElementById('life-max-charge') as HTMLInputElement;
+    const avgTempInput = document.getElementById('life-average-temp') as HTMLInputElement;
+    const thermalEventsInput = document.getElementById('life-thermal-events') as HTMLInputElement;
+    const safetyIncidentsInput = document.getElementById('life-safety-incidents') as HTMLInputElement;
+    const maintenanceStatusInput = document.getElementById('life-maintenance-status') as HTMLInputElement;
+
+    const carbonValueInput = document.getElementById('sust-carbon-value') as HTMLInputElement;
+    const carbonUnitInput = document.getElementById('sust-carbon-unit') as HTMLSelectElement;
+    const carbonMethodInput = document.getElementById('sust-carbon-method') as HTMLInputElement;
+    const recycledInput = document.getElementById('sust-recycled') as HTMLSelectElement;
+    const criticalInput = document.getElementById('sust-critical-materials') as HTMLSelectElement;
+    const traceabilityInput = document.getElementById('sust-traceability') as HTMLSelectElement;
+    const recyclingInput = document.getElementById('sust-recycling-instructions') as HTMLSelectElement;
+    const secondLifeInput = document.getElementById('sust-second-life') as HTMLSelectElement;
+
+    // Documentation checkboxes
+    const docs = [
+      'doc-datasheet', 'doc-conformity', 'doc-safety-manual', 'doc-transport',
+      'doc-bms', 'doc-carbon-decl', 'doc-material', 'doc-recycling'
+    ].map(id => document.getElementById(id) as HTMLInputElement);
+
+    // Screen Outputs Elements
+    const outPassportId = document.getElementById('out-passport-id') as HTMLElement;
+    const outStatus = document.getElementById('out-status') as HTMLElement;
+    const outCompleteness = document.getElementById('out-completeness') as HTMLElement;
+    const outCompletenessBar = document.getElementById('out-completeness-bar') as HTMLElement;
+    const outReadiness = document.getElementById('out-readiness') as HTMLElement;
+
+    // Summary Card Elements
+    const sumName = document.getElementById('sum-name') as HTMLElement;
+    const sumChemistry = document.getElementById('sum-chemistry') as HTMLElement;
+    const sumEnergy = document.getElementById('sum-energy') as HTMLElement;
+    const sumVoltsAh = document.getElementById('sum-volts-ah') as HTMLElement;
+    const sumHealth = document.getElementById('sum-health') as HTMLElement;
+    const sumStage = document.getElementById('sum-stage') as HTMLElement;
+
+    // Gaps & Warnings Lists
+    const warningsContainer = document.getElementById('preview-warnings-container') as HTMLElement;
+    const missingFieldsList = document.getElementById('preview-missing-fields') as HTMLElement;
+    const warningsList = document.getElementById('preview-warnings') as HTMLElement;
+    const recommendationsList = document.getElementById('preview-recommendations') as HTMLElement;
+
+    // Print & Utility Buttons
+    const buttonPrint = document.getElementById('button-print') as HTMLButtonElement;
+    const autoCalcIndicator = document.getElementById('auto-calc-indicator') as HTMLElement;
+
+    // Keep track of manual capacity overrides and random ID on load
+    let energyManualOverride = false;
+    const pageLoadPassportId = generatePassportId();
+
+    // Init passport ID display
+    if (outPassportId) {
+      outPassportId.textContent = pageLoadPassportId;
+    }
+
+    // Set listener for manual energy capacity adjustments
+    energyCapacityInput?.addEventListener('input', () => {
+      energyManualOverride = (energyCapacityInput.value.trim() !== '');
+      validateInputs();
+      updateCalculations();
+    });
+
+    function getNumber(el: HTMLInputElement): number | null {
+      const val = parseFloat(el.value);
+      return isNaN(val) ? null : val;
+    }
+
+    function getBoolean(el: HTMLSelectElement): boolean | null {
+      const val = el.value;
+      if (val === 'yes') return true;
+      if (val === 'no') return false;
+      return null;
+    }
+
+    function getStatusText(val: boolean | null | undefined): string {
+      if (val === true) return 'Yes (Declared)';
+      if (val === false) return 'No (Undeclared)';
+      return 'Undeclared';
+    }
+
+    // Interactive input validations
+    function validateInputs() {
+      // Add red border on negative values where non-negativity is required
+      const numericInputs = [
+        nominalVoltageInput, nominalCapacityInput, energyCapacityInput,
+        ratedCyclesInput, currentCyclesInput, sohInput, efficiencyInput,
+        avgCRateInput, maxDischargeInput, maxChargeInput,
+        thermalEventsInput, safetyIncidentsInput, carbonValueInput
+      ];
+
+      numericInputs.forEach(el => {
+        if (!el) return;
+        const val = parseFloat(el.value);
+        if (!isNaN(val) && val < 0) {
+          el.classList.add('border-m-red', 'focus:border-m-red');
+          el.classList.remove('border-hairline');
+        } else {
+          el.classList.remove('border-m-red', 'focus:border-m-red');
+          el.classList.add('border-hairline');
+        }
+      });
+    }
+
+    function updateCalculations() {
+      const volts = getNumber(nominalVoltageInput);
+      const capacityAh = getNumber(nominalCapacityInput);
+
+      // Auto calculate energy capacity if not manually overridden
+      if (!energyManualOverride && volts !== null && capacityAh !== null && volts > 0 && capacityAh > 0) {
+        const kwh = calculateEnergyCapacity(volts, capacityAh);
+        if (kwh !== null) {
+          energyCapacityInput.value = String(kwh);
+          autoCalcIndicator?.classList.remove('hidden');
+        }
+      } else if (energyCapacityInput.value === '') {
+        autoCalcIndicator?.classList.add('hidden');
+      }
+
+      // Build structured input
+      const input = {
+        identity: {
+          name: nameInput.value,
+          manufacturer: manufacturerInput.value,
+          application: applicationInput.value as any,
+          category: categoryInput.value,
+          chemistry: chemistryInput.value as any,
+          nominalVoltage: volts,
+          nominalCapacity: capacityAh,
+          energyCapacity: getNumber(energyCapacityInput),
+          manufacturingDate: manufacturingDateInput.value,
+          countryOfManufacture: countryInput.value,
+          serialNumber: serialNumberInput.value
+        },
+        performance: {
+          ratedCycleLife: getNumber(ratedCyclesInput),
+          currentCycleCount: getNumber(currentCyclesInput),
+          sohPercent: getNumber(sohInput),
+          roundTripEfficiency: getNumber(efficiencyInput),
+          tempMin: getNumber(tempMinInput),
+          tempMax: getNumber(tempMaxInput),
+          recommendedDoD: getNumber(dodInput),
+          warrantyYears: getNumber(warrantyInput),
+          expectedServiceLife: getNumber(serviceLifeInput)
+        },
+        lifecycle: {
+          commissioningDate: commissioningDateInput.value,
+          applicationProfile: profileInput.value,
+          averageCRate: getNumber(avgCRateInput),
+          maxDischargeCurrent: getNumber(maxDischargeInput),
+          maxChargeCurrent: getNumber(maxChargeInput),
+          averageTemp: getNumber(avgTempInput),
+          thermalEvents: getNumber(thermalEventsInput),
+          safetyIncidents: getNumber(safetyIncidentsInput),
+          maintenanceStatus: maintenanceStatusInput.value
+        },
+        sustainability: {
+          carbonFootprint: getNumber(carbonValueInput),
+          carbonFootprintUnit: carbonUnitInput.value as any,
+          carbonFootprintMethod: carbonMethodInput.value,
+          recycledContentAvailable: getBoolean(recycledInput),
+          criticalMaterialsDeclared: getBoolean(criticalInput),
+          supplierTraceability: getBoolean(traceabilityInput),
+          recyclingInstructionsAvailable: getBoolean(recyclingInput),
+          secondLifeSuitability: secondLifeInput.value as any
+        },
+        documentation: {
+          technicalDatasheet: docs[0].checked,
+          declarationOfConformity: docs[1].checked,
+          safetyManual: docs[2].checked,
+          transportCertification: docs[3].checked,
+          bmsDataExport: docs[4].checked,
+          carbonFootprintDeclaration: docs[5].checked,
+          materialCompositionDeclaration: docs[6].checked,
+          endOfLifeInstructions: docs[7].checked
+        }
+      };
+
+      // Calculate outputs
+      const completeness = calculateDataCompleteness(input);
+      const readiness = calculateComplianceReadiness(input, completeness);
+      const health = classifyBatteryHealth(input.performance.sohPercent);
+      const stage = estimateLifecycleStage(
+        input.performance.currentCycleCount,
+        input.performance.ratedCycleLife,
+        input.performance.sohPercent
+      );
+      
+      const missingFields = generateMissingFieldsList(input);
+      const warningsListArray = generateMissingFieldWarnings(input);
+      
+      const statusValue = (completeness >= 85 && missingFields.length === 0) ? 'Ready for Review' : (completeness >= 40 ? 'Partial' : 'Draft');
+
+      // Update basic status fields in screen view
+      if (outStatus) {
+        outStatus.textContent = statusValue;
+        outStatus.className = 'text-[10px] font-bold px-2.5 py-0.5 uppercase tracking-wider inline-block mt-1 border ' +
+          (statusValue === 'Ready for Review' ? 'border-green-600 text-green-600 bg-green-950/10' : 
+           (statusValue === 'Partial' ? 'border-m-blue-light text-m-blue-light bg-m-blue-light/10' : 'border-m-red text-m-red bg-m-red/10'));
+      }
+
+      if (outCompleteness) {
+        outCompleteness.textContent = `${completeness}%`;
+      }
+      if (outCompletenessBar) {
+        outCompletenessBar.style.width = `${completeness}%`;
+        outCompletenessBar.className = 'h-full transition-all duration-300 ' +
+          (completeness >= 80 ? 'bg-green-600' : (completeness >= 50 ? 'bg-m-blue-light' : 'bg-m-red'));
+      }
+
+      if (outReadiness) {
+        outReadiness.textContent = readiness;
+        outReadiness.className = 'text-xl font-bold uppercase tracking-wider block mt-1.5 ' +
+          (readiness === 'High' ? 'text-green-600' : (readiness === 'Medium' ? 'text-m-blue-light' : 'text-m-red'));
+      }
+
+      // Update Summary Card in screen view
+      if (sumName) sumName.textContent = input.identity.name || 'Not set';
+      if (sumChemistry) sumChemistry.textContent = input.identity.chemistry || 'Not set';
+      if (sumEnergy) {
+        sumEnergy.textContent = input.identity.energyCapacity ? `${input.identity.energyCapacity} kWh` : 'Not set';
+      }
+      if (sumVoltsAh) {
+        if (volts !== null || capacityAh !== null) {
+          sumVoltsAh.textContent = `${volts || '—'}V / ${capacityAh || '—'}Ah`;
+        } else {
+          sumVoltsAh.textContent = 'Not set';
+        }
+      }
+      if (sumHealth) sumHealth.textContent = health === 'Unknown' ? 'Undeclared' : health;
+      if (sumStage) sumStage.textContent = stage === 'Unknown' ? 'Undeclared' : stage;
+
+      // Update Warnings and Gaps in screen view
+      if (missingFields.length > 0 || warningsListArray.length > 0) {
+        warningsContainer?.classList.remove('hidden');
+      } else {
+        warningsContainer?.classList.add('hidden');
+      }
+
+      if (missingFieldsList) {
+        missingFieldsList.innerHTML = '';
+        missingFields.forEach(field => {
+          const li = document.createElement('li');
+          li.textContent = field;
+          missingFieldsList.appendChild(li);
+        });
+      }
+
+      if (warningsList) {
+        warningsList.innerHTML = '';
+        warningsListArray.forEach(w => {
+          const div = document.createElement('div');
+          div.className = 'bg-m-red/10 border-l-4 border-m-red p-3 my-2 text-xs font-light text-primary flex gap-2 items-start';
+          div.innerHTML = `<span class="font-bold">⚠️</span> <span>${w}</span>`;
+          warningsList.appendChild(div);
+        });
+      }
+
+      // Update Recommendations in screen view
+      if (recommendationsList) {
+        recommendationsList.innerHTML = '';
+        const recs = generateRecommendations(input, {
+          passportId: pageLoadPassportId,
+          status: statusValue as any,
+          completenessScore: completeness,
+          complianceReadiness: readiness,
+          healthClassification: health,
+          lifecycleStage: stage,
+          missingCriticalFields: missingFields,
+          warnings: warningsListArray
+        });
+        recs.forEach(rec => {
+          const li = document.createElement('li');
+          li.textContent = rec;
+          recommendationsList.appendChild(li);
+        });
+      }
+
+      // ─── Update Print Assessment Report Container ───
+      const pPassportIdHeader = document.getElementById('print-passport-id-header');
+      const pCompleteness = document.getElementById('print-completeness');
+      const pReadiness = document.getElementById('print-readiness');
+      const pHealth = document.getElementById('print-health');
+      const pStage = document.getElementById('print-stage');
+      const pDate = document.getElementById('print-date');
+
+      if (pPassportIdHeader) pPassportIdHeader.textContent = pageLoadPassportId;
+      if (pCompleteness) pCompleteness.textContent = `${completeness}%`;
+      if (pReadiness) {
+        pReadiness.textContent = readiness;
+        pReadiness.className = 'text-xl font-bold uppercase ' +
+          (readiness === 'High' ? 'text-green-700' : (readiness === 'Medium' ? 'text-blue-700' : 'text-red-700'));
+      }
+      if (pHealth) pHealth.textContent = health === 'Unknown' ? 'Undeclared' : health;
+      if (pStage) pStage.textContent = stage === 'Unknown' ? 'Undeclared' : stage;
+      if (pDate) pDate.textContent = new Date().toLocaleDateString();
+
+      // Section A print fields
+      const pName = document.getElementById('print-name');
+      const pManufacturer = document.getElementById('print-manufacturer');
+      const pApplication = document.getElementById('print-application');
+      const pCategory = document.getElementById('print-category');
+      const pChemistry = document.getElementById('print-chemistry');
+      const pVolts = document.getElementById('print-volts');
+      const pCapacityAh = document.getElementById('print-capacity-ah');
+      const pEnergy = document.getElementById('print-energy');
+      const pSerialNumber = document.getElementById('print-serial-number');
+      const pMfgInfo = document.getElementById('print-mfg-info');
+
+      if (pName) pName.textContent = input.identity.name || 'Undeclared';
+      if (pManufacturer) pManufacturer.textContent = input.identity.manufacturer || 'Undeclared';
+      if (pApplication) pApplication.textContent = input.identity.application || 'Undeclared';
+      if (pCategory) pCategory.textContent = input.identity.category || 'Undeclared';
+      if (pChemistry) pChemistry.textContent = input.identity.chemistry || 'Undeclared';
+      if (pVolts) pVolts.textContent = volts !== null ? `${volts} V` : 'Undeclared';
+      if (pCapacityAh) pCapacityAh.textContent = capacityAh !== null ? `${capacityAh} Ah` : 'Undeclared';
+      if (pEnergy) pEnergy.textContent = input.identity.energyCapacity ? `${input.identity.energyCapacity} kWh` : 'Undeclared';
+      if (pSerialNumber) pSerialNumber.textContent = input.identity.serialNumber || 'Undeclared';
+      if (pMfgInfo) {
+        const country = input.identity.countryOfManufacture || '—';
+        const date = input.identity.manufacturingDate || '—';
+        pMfgInfo.textContent = `${date} (assembled in ${country})`;
+      }
+
+      // Section B print fields
+      const pRatedCycles = document.getElementById('print-rated-cycles');
+      const pCurrentCycles = document.getElementById('print-current-cycles');
+      const pSoh = document.getElementById('print-soh');
+      const pEfficiency = document.getElementById('print-efficiency');
+      const pTempRange = document.getElementById('print-temp-range');
+      const pDod = document.getElementById('print-dod');
+      const pWarranty = document.getElementById('print-warranty');
+      const pServiceLife = document.getElementById('print-service-life');
+
+      if (pRatedCycles) pRatedCycles.textContent = input.performance.ratedCycleLife !== null ? `${input.performance.ratedCycleLife} cycles` : 'Undeclared';
+      if (pCurrentCycles) pCurrentCycles.textContent = input.performance.currentCycleCount !== null ? `${input.performance.currentCycleCount} cycles` : 'Undeclared';
+      if (pSoh) pSoh.textContent = input.performance.sohPercent !== null ? `${input.performance.sohPercent}%` : 'Undeclared';
+      if (pEfficiency) pEfficiency.textContent = input.performance.roundTripEfficiency !== null ? `${input.performance.roundTripEfficiency}%` : 'Undeclared';
+      if (pTempRange) {
+        const min = input.performance.tempMin !== null ? `${input.performance.tempMin}°C` : '—';
+        const max = input.performance.tempMax !== null ? `${input.performance.tempMax}°C` : '—';
+        pTempRange.textContent = (min !== '—' || max !== '—') ? `${min} to ${max}` : 'Undeclared';
+      }
+      if (pDod) pDod.textContent = input.performance.recommendedDoD !== null ? `${input.performance.recommendedDoD}%` : 'Undeclared';
+      if (pWarranty) pWarranty.textContent = input.performance.warrantyYears !== null ? `${input.performance.warrantyYears} years` : 'Undeclared';
+      if (pServiceLife) pServiceLife.textContent = input.performance.expectedServiceLife !== null ? `${input.performance.expectedServiceLife} years` : 'Undeclared';
+
+      // Section C print fields
+      const pCommissionDate = document.getElementById('print-commission-date');
+      const pProfile = document.getElementById('print-profile');
+      const pCRate = document.getElementById('print-c-rate');
+      const pMaxCurrents = document.getElementById('print-max-currents');
+      const pAvgTemp = document.getElementById('print-avg-temp');
+      const pThermalEvents = document.getElementById('print-thermal-events');
+      const pSafetyIncidents = document.getElementById('print-safety-incidents');
+      const pMaintenance = document.getElementById('print-maintenance');
+
+      if (pCommissionDate) pCommissionDate.textContent = input.lifecycle.commissioningDate || 'Undeclared';
+      if (pProfile) pProfile.textContent = input.lifecycle.applicationProfile || 'Undeclared';
+      if (pCRate) pCRate.textContent = input.lifecycle.averageCRate !== null ? `${input.lifecycle.averageCRate}C` : 'Undeclared';
+      if (pMaxCurrents) {
+        const disc = input.lifecycle.maxDischargeCurrent !== null ? `${input.lifecycle.maxDischargeCurrent}A` : '—';
+        const chg = input.lifecycle.maxChargeCurrent !== null ? `${input.lifecycle.maxChargeCurrent}A` : '—';
+        pMaxCurrents.textContent = (disc !== '—' || chg !== '—') ? `Dischg: ${disc} / Chg: ${chg}` : 'Undeclared';
+      }
+      if (pAvgTemp) pAvgTemp.textContent = input.lifecycle.averageTemp !== null ? `${input.lifecycle.averageTemp}°C` : 'Undeclared';
+      if (pThermalEvents) pThermalEvents.textContent = input.lifecycle.thermalEvents !== null ? `${input.lifecycle.thermalEvents} logged` : 'Undeclared';
+      if (pSafetyIncidents) pSafetyIncidents.textContent = input.lifecycle.safetyIncidents !== null ? `${input.lifecycle.safetyIncidents} logged` : 'Undeclared';
+      if (pMaintenance) pMaintenance.textContent = input.lifecycle.maintenanceStatus || 'Undeclared';
+
+      // Section D print fields
+      const pCarbon = document.getElementById('print-carbon');
+      const pCarbonMethod = document.getElementById('print-carbon-method');
+      const pRecycled = document.getElementById('print-recycled');
+      const pCritical = document.getElementById('print-critical');
+      const pTraceability = document.getElementById('print-traceability');
+      const pRecycling = document.getElementById('print-recycling');
+      const pSecondLife = document.getElementById('print-second-life');
+
+      if (pCarbon) {
+        const val = input.sustainability.carbonFootprint;
+        const unit = input.sustainability.carbonFootprintUnit;
+        pCarbon.textContent = val !== null ? `${val} ${unit === 'Unknown' ? '' : unit}` : 'Undeclared';
+      }
+      if (pCarbonMethod) pCarbonMethod.textContent = input.sustainability.carbonFootprintMethod || 'Undeclared';
+      if (pRecycled) pRecycled.textContent = getStatusText(input.sustainability.recycledContentAvailable);
+      if (pCritical) pCritical.textContent = getStatusText(input.sustainability.criticalMaterialsDeclared);
+      if (pTraceability) pTraceability.textContent = getStatusText(input.sustainability.supplierTraceability);
+      if (pRecycling) pRecycling.textContent = getStatusText(input.sustainability.recyclingInstructionsAvailable);
+      if (pSecondLife) pSecondLife.textContent = input.sustainability.secondLifeSuitability || 'Undeclared';
+
+      // Section E print fields
+      const docNames = [
+        "Technical datasheet",
+        "CE / UL Declaration of Conformity",
+        "Operator safety manual",
+        "UN 38.3 transport safety certification",
+        "BMS telemetry export protocol",
+        "Carbon footprint declaration",
+        "Material composition declaration",
+        "End-of-life recycling instructions"
+      ];
+      for (let i = 1; i <= 8; i++) {
+        const docEl = document.getElementById(`print-doc-${i}`);
+        if (docEl) {
+          const isChecked = docs[i - 1].checked;
+          docEl.textContent = `${docNames[i - 1]}: ${isChecked ? '✓ Available' : '✗ Missing'}`;
+          docEl.className = isChecked ? 'text-green-700' : 'text-red-700';
+        }
+      }
+
+      // Print Gaps & Warnings
+      const pMissingWarnings = document.getElementById('print-missing-warnings');
+      if (pMissingWarnings) {
+        pMissingWarnings.innerHTML = '';
+        if (missingFields.length === 0 && warningsListArray.length === 0) {
+          pMissingWarnings.innerHTML = '<li>None</li>';
+        } else {
+          missingFields.forEach(f => {
+            const li = document.createElement('li');
+            li.textContent = `Missing critical: ${f}`;
+            pMissingWarnings.appendChild(li);
+          });
+          warningsListArray.forEach(w => {
+            const li = document.createElement('li');
+            li.textContent = `Warning: ${w}`;
+            pMissingWarnings.appendChild(li);
+          });
+        }
+      }
+
+      // Print Recommendations
+      const pRecommendations = document.getElementById('print-recommendations');
+      if (pRecommendations) {
+        pRecommendations.innerHTML = '';
+        const recs = generateRecommendations(input, {
+          passportId: pageLoadPassportId,
+          status: statusValue as any,
+          completenessScore: completeness,
+          complianceReadiness: readiness,
+          healthClassification: health,
+          lifecycleStage: stage,
+          missingCriticalFields: missingFields,
+          warnings: warningsListArray
+        });
+        recs.forEach(rec => {
+          const li = document.createElement('li');
+          li.textContent = rec;
+          pRecommendations.appendChild(li);
+        });
+      }
+    }
+
+    // Set Event Listeners on all controls
+    const allFormControls = [
+      nameInput, manufacturerInput, applicationInput, categoryInput, chemistryInput,
+      nominalVoltageInput, nominalCapacityInput, manufacturingDateInput, countryInput, serialNumberInput,
+      ratedCyclesInput, currentCyclesInput, sohInput, efficiencyInput, tempMinInput, tempMaxInput,
+      dodInput, warrantyInput, serviceLifeInput, commissioningDateInput, profileInput, avgCRateInput,
+      maxDischargeInput, maxChargeInput, avgTempInput, thermalEventsInput, safetyIncidentsInput, maintenanceStatusInput,
+      carbonValueInput, carbonUnitInput, carbonMethodInput, recycledInput, criticalInput,
+      traceabilityInput, recyclingInput, secondLifeInput, ...docs
+    ];
+
+    allFormControls.forEach(ctrl => {
+      if (!ctrl) return;
+      if (ctrl.type === 'checkbox') {
+        ctrl.addEventListener('change', () => {
+          updateCalculations();
+        });
+      } else {
+        ctrl.addEventListener('input', () => {
+          validateInputs();
+          updateCalculations();
+        });
+      }
+    });
+
+    buttonPrint?.addEventListener('click', () => {
+      window.print();
+    });
+
+    // Run on mount
+    validateInputs();
+    updateCalculations();
+  </script>
+
+  <style>
+    /* Custom button resets for Design System */
+    .btn-primary {
+      cursor: pointer;
+    }
+    
+    /* Styling elements for printing PDF report */
+    @media print {
+      body {
+        background: #ffffff !important;
+        color: #000000 !important;
+      }
+      /* Hide all elements that are not part of the print report container */
+      header, footer, nav, #hero-section, #form-column, #preview-column, .content-sections, .no-print, main > a, .breadcrumbs {
+        display: none !important;
+      }
+      /* Remove main padding for pure document spacing */
+      main {
+        padding: 0 !important;
+        margin: 0 !important;
+        max-width: 100% !important;
+        width: 100% !important;
+      }
+      /* Display print container */
+      #print-report {
+        display: block !important;
+      }
+      /* Page break logic for clean printing */
+      .page-break-avoid {
+        page-break-inside: avoid !important;
+      }
+    }
+  </style>
+
+</Layout>
