@@ -508,7 +508,10 @@ const decisionBlocks = [
       e.preventDefault();
 
       const honeypot = form.querySelector('input[name="honeypot"]') as HTMLInputElement;
-      if (honeypot?.value) return;
+      if (honeypot?.value) {
+        console.log('[MarineForm] Honeypot triggered, aborting.');
+        return;
+      }
 
       const submitBtn = form.querySelector('button[type="submit"]') as HTMLButtonElement;
       if (submitBtn) {
@@ -518,12 +521,16 @@ const decisionBlocks = [
 
       try {
         const formData = new FormData(form);
+        console.log('[MarineForm] Submitting to Web3Forms...');
+        console.log('[MarineForm] Fields:', Object.fromEntries(formData.entries()));
+
         const response = await fetch('https://api.web3forms.com/submit', {
           method: 'POST',
           body: formData,
         });
 
         const result = await response.json();
+        console.log('[MarineForm] Response:', result);
 
         if (result.success) {
           form.reset();
@@ -531,9 +538,11 @@ const decisionBlocks = [
           if (errorDiv) errorDiv.classList.add('hidden');
           setTimeout(() => { if (successDiv) successDiv.classList.add('hidden'); }, 10000);
         } else {
-          throw new Error('Submission failed');
+          console.error('[MarineForm] Submission failed:', result.message);
+          throw new Error(result.message || 'Submission failed');
         }
-      } catch {
+      } catch (err) {
+        console.error('[MarineForm] Error:', err);
         if (errorDiv) errorDiv.classList.remove('hidden');
         if (successDiv) successDiv.classList.add('hidden');
         setTimeout(() => { if (errorDiv) errorDiv.classList.add('hidden'); }, 8000);
