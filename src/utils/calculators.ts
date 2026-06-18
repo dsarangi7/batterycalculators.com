@@ -1167,3 +1167,317 @@ export function calculatePowerOutageBackup(
     solarSufficient,
   };
 }
+
+// 22. Shore Power Savings Calculator
+export interface ShorePowerInputs {
+  portCallsPerYear: number;
+  hoursAtBerthPerCall: number;
+  auxiliaryLoadKw: number;
+  generatorFuelConsumptionLPerHour: number;
+  fuelCostPerLiter: number;
+  gridElectricityCostPerKwh: number;
+  gridCarbonIntensityKgPerKwh: number;
+}
+
+export interface ShorePowerResult {
+  annualGeneratorHours: number;
+  annualGeneratorFuelLiters: number;
+  annualGeneratorFuelCost: number;
+  annualShorePowerCostKwh: number;
+  annualShorePowerCost: number;
+  annualFuelCostAvoided: number;
+  annualNetSavings: number;
+  annualCo2ReductionTonnes: number;
+  annualNoxReductionKg: number;
+  annualSoxReductionKg: number;
+  equivalentCarsRemoved: number;
+  baselineCo2Tonnes: number;
+  shorePowerCo2Tonnes: number;
+}
+
+export function calculateShorePowerSavings(inputs: ShorePowerInputs): ShorePowerResult {
+  const portCalls = Math.max(0, inputs.portCallsPerYear);
+  const hoursPerCall = Math.max(0, inputs.hoursAtBerthPerCall);
+  const auxLoad = Math.max(0, inputs.auxiliaryLoadKw);
+  const genFuelRate = Math.max(0, inputs.generatorFuelConsumptionLPerHour);
+  const fuelCost = Math.max(0, inputs.fuelCostPerLiter);
+  const elecCost = Math.max(0, inputs.gridElectricityCostPerKwh);
+  const carbonIntensity = Math.max(0, inputs.gridCarbonIntensityKgPerKwh);
+
+  // Annual generator hours at berth
+  const annualGeneratorHours = portCalls * hoursPerCall;
+
+  // Annual fuel consumed by generators at berth
+  const annualGeneratorFuelLiters = annualGeneratorHours * genFuelRate;
+
+  // Annual cost of running generators at berth
+  const annualGeneratorFuelCost = annualGeneratorFuelLiters * fuelCost;
+
+  // Annual shore power energy consumed
+  const annualShorePowerCostKwh = annualGeneratorHours * auxLoad;
+
+  // Annual shore power cost
+  const annualShorePowerCost = annualShorePowerCostKwh * elecCost;
+
+  // Net savings
+  const annualFuelCostAvoided = annualGeneratorFuelCost;
+  const annualNetSavings = annualGeneratorFuelCost - annualShorePowerCost;
+
+  // Emissions - Generator mode (MGO emission factor: 3.206 kg CO2/liter)
+  const co2FactorPerLiter = 3.206;
+  const noxFactorPerLiter = 0.059; // kg NOx per liter MGO
+  const soxFactorPerLiter = 0.002; // kg SOx per liter MGO (0.1% sulfur)
+
+  const baselineCo2Tonnes = (annualGeneratorFuelLiters * co2FactorPerLiter) / 1000;
+
+  // Shore power emissions from grid
+  const shorePowerCo2Tonnes = (annualShorePowerCostKwh * carbonIntensity) / 1000;
+
+  // Net CO2 reduction
+  const annualCo2ReductionTonnes = baselineCo2Tonnes - shorePowerCo2Tonnes;
+
+  // NOx and SOx eliminated (generators produce these, shore power does not)
+  const annualNoxReductionKg = annualGeneratorFuelLiters * noxFactorPerLiter;
+  const annualSoxReductionKg = annualGeneratorFuelLiters * soxFactorPerLiter;
+
+  // Cars removed (EPA: 4.6 tonnes CO2/car/year)
+  const equivalentCarsRemoved = annualCo2ReductionTonnes / 4.6;
+
+  return {
+    annualGeneratorHours,
+    annualGeneratorFuelLiters,
+    annualGeneratorFuelCost,
+    annualShorePowerCostKwh,
+    annualShorePowerCost,
+    annualFuelCostAvoided,
+    annualNetSavings,
+    annualCo2ReductionTonnes,
+    annualNoxReductionKg,
+    annualSoxReductionKg,
+    equivalentCarsRemoved,
+    baselineCo2Tonnes,
+    shorePowerCo2Tonnes,
+  };
+}
+
+// 23. Ferry Battery Sizing Calculator
+export interface FerryBatteryInputs {
+  routeDistanceKm: number;
+  tripsPerDay: number;
+  averageSpeedKmh: number;
+  propulsionPowerKw: number;
+  hotelLoadKw: number;
+  chargingOpportunity: 'end_of_day' | 'terminal' | 'opportunity';
+  reserveMarginPercent: number;
+  batteryChemistry: 'lfp' | 'nmc';
+}
+
+export interface FerryBatteryResult {
+  tripTimeHours: number;
+  energyPerTripKwh: number;
+  dailyEnergyDemandKwh: number;
+  usableCapacityKwh: number;
+  installedCapacityKwh: number;
+  batteryWeightKg: number;
+  batteryVolumeM3: number;
+  suggestedChargingPowerKw: number;
+  chargingWindowMinutes: number;
+  chargingAssessment: string;
+  roundTripsOnSingleCharge: number;
+}
+
+export function calculateFerryBatterySizing(inputs: FerryBatteryInputs): FerryBatteryResult {
+  const routeDistance = Math.max(1, inputs.routeDistanceKm);
+  const tripsPerDay = Math.max(1, Math.round(inputs.tripsPerDay));
+  const avgSpeed = Math.max(1, inputs.averageSpeedKmh);
+  const propPower = Math.max(1, inputs.propulsionPowerKw);
+  const hotelLoad = Math.max(0, inputs.hotelLoadKw);
+  const reserveMargin = Math.max(0, Math.min(50, inputs.reserveMarginPercent)) / 100;
+
+  // Chemistry-specific properties
+  const isLfp = inputs.batteryChemistry === 'lfp';
+  const energyDensityKgPerKwh = isLfp ? 6.5 : 5.0; // installed pack level
+  const volumePerKwh = isLfp ? 0.0055 : 0.004; // m3 per kWh installed
+  const dodPercent = isLfp ? 0.90 : 0.80;
+
+  // Trip time
+  const tripTimeHours = routeDistance / avgSpeed;
+
+  // Energy per trip: propulsion + hotel load for trip duration
+  // Propulsion power is at average speed; adjust for actual operating profile
+  const propulsionEnergyPerTrip = propPower * tripTimeHours * 0.85; // 85% efficiency
+  const hotelEnergyPerTrip = hotelLoad * tripTimeHours;
+  const energyPerTripKwh = propulsionEnergyPerTrip + hotelEnergyPerTrip;
+
+  // Daily energy demand
+  const dailyEnergyDemandKwh = energyPerTripKwh * tripsPerDay;
+
+  // Usable capacity needed (per trip, not daily, since we charge between trips for terminal/opportunity)
+  let usableCapacityKwh: number;
+  let chargingWindowMinutes: number;
+  let suggestedChargingPowerKw: number;
+  let chargingAssessment: string;
+
+  if (inputs.chargingOpportunity === 'end_of_day') {
+    // Must store full day's energy
+    usableCapacityKwh = dailyEnergyDemandKwh;
+    const chargingHours = 8; // overnight charging window
+    suggestedChargingPowerKw = usableCapacityKwh / chargingHours;
+    chargingWindowMinutes = chargingHours * 60;
+    chargingAssessment = `Overnight charging (${chargingHours}h window) at ${Math.round(suggestedChargingPowerKw)} kW provides full daily energy.`;
+  } else if (inputs.chargingOpportunity === 'terminal') {
+    // Charge between each trip
+    usableCapacityKwh = energyPerTripKwh;
+    const turnaroundMinutes = 30; // typical terminal turnaround
+    const chargingHours = turnaroundMinutes / 60;
+    suggestedChargingPowerKw = energyPerTripKwh / chargingHours * 1.2; // 20% headroom
+    chargingWindowMinutes = turnaroundMinutes;
+    chargingAssessment = `Terminal charging (${turnaroundMinutes} min turnaround) at ${Math.round(suggestedChargingPowerKw)} kW enables single-trip battery operation.`;
+  } else {
+    // Opportunity charging — charge at both terminals
+    usableCapacityKwh = energyPerTripKwh * 0.7; // only need 70% since charging both ends
+    const chargeTimeMinutes = 15;
+    const chargingHours = chargeTimeMinutes / 60;
+    suggestedChargingPowerKw = (energyPerTripKwh * 0.3) / chargingHours; // charge 30% in 15 min
+    chargingWindowMinutes = chargeTimeMinutes;
+    chargingAssessment = `Opportunity charging at both terminals (${chargeTimeMinutes} min) at ${Math.round(suggestedChargingPowerKw)} kW supplements onboard energy.`;
+  }
+
+  // Apply reserve margin
+  const usableWithReserve = usableCapacityKwh * (1 + reserveMargin);
+
+  // Installed capacity (accounting for DoD)
+  const installedCapacityKwh = usableWithReserve / dodPercent;
+
+  // Weight and volume
+  const batteryWeightKg = installedCapacityKwh * energyDensityKgPerKwh;
+  const batteryVolumeM3 = installedCapacityKwh * volumePerKwh;
+
+  // Round trips on single charge
+  const roundTripsOnSingleCharge = usableCapacityKwh / energyPerTripKwh;
+
+  return {
+    tripTimeHours,
+    energyPerTripKwh,
+    dailyEnergyDemandKwh,
+    usableCapacityKwh,
+    installedCapacityKwh,
+    batteryWeightKg,
+    batteryVolumeM3,
+    suggestedChargingPowerKw,
+    chargingWindowMinutes,
+    chargingAssessment,
+    roundTripsOnSingleCharge,
+  };
+}
+
+// 24. CII Calculator (Educational)
+export interface CiiInputs {
+  annualFuelConsumptionTonnes: number;
+  fuelType: 'mgo' | 'mdo' | 'hfo' | 'lng';
+  distanceTravelledNm: number;
+  deadweightTonnage: number;
+}
+
+export interface CiiResult {
+  annualCo2EmissionsTonnes: number;
+  transportWorkTnm: number;
+  attainedCii: number;
+  ratingBand: string;
+  ratingColor: string;
+  baselineCii: number;
+  improvedCii: number;
+  improvedRating: string;
+  improvementNote: string;
+}
+
+// CII reference lines for different vessel types (g CO2 / DWT-nm)
+// Simplified educational benchmarks based on IMO DCS data averages
+const CII_FUEL_FACTORS: Record<string, number> = {
+  mgo: 3.206,  // kg CO2 per liter -> tonnes CO2 per tonne fuel
+  mdo: 3.206,
+  hfo: 3.114,
+  lng: 2.750,
+};
+
+const CII_RATINGS = [
+  { min: 0, max: 0.8, label: 'A', color: '#0fa336' },   // Major superior
+  { min: 0.8, max: 0.9, label: 'B', color: '#16a34a' },  // Minor superior
+  { min: 0.9, max: 1.0, label: 'C', color: '#f4b400' },  // Moderate
+  { min: 1.0, max: 1.1, label: 'D', color: '#ea580c' },  // Inferior
+  { min: 1.1, max: Infinity, label: 'E', color: '#e22718' }, // Significantly inferior
+];
+
+function getCiiRating(ciiValue: number): { label: string; color: string } {
+  // Lower CII is better (g CO2 per DWT-nm)
+  // We normalize against a reference line. For educational purposes,
+  // we use ratios: A is below 80% of reference, E is above 110%.
+  // But actually, the CII rating depends on the reference line for the vessel type.
+  // For educational purposes, we'll compute a simplified ratio.
+
+  // The attained CII = annual CO2 emissions / (DWT × distance)
+  // Units: g CO2 / (DWT × nm)
+  // Typical ranges for bulk carriers: 2-10 g CO2/DWT-nm
+  // We'll normalize to a "reference" value of 5.0 g CO2/DWT-nm
+
+  const referenceCii = 5.0;
+  const ratio = ciiValue / referenceCii;
+
+  for (const band of CII_RATINGS) {
+    if (ratio >= band.min && ratio < band.max) {
+      return { label: band.label, color: band.color };
+    }
+  }
+  return { label: 'E', color: '#e22718' };
+}
+
+export function calculateCii(inputs: CiiInputs): CiiResult {
+  const fuelTonnes = Math.max(0, inputs.annualFuelConsumptionTonnes);
+  const distanceNm = Math.max(1, inputs.distanceTravelledNm);
+  const dwt = Math.max(1, inputs.deadweightTonnage);
+
+  // Fuel to CO2 conversion
+  const co2Factor = CII_FUEL_FACTORS[inputs.fuelType] || 3.206;
+  const annualCo2EmissionsTonnes = fuelTonnes * co2Factor;
+
+  // Transport work: DWT × distance (DWT-nm)
+  const transportWorkTnm = dwt * distanceNm;
+
+  // Attained CII: grams CO2 per DWT-nm
+  const attainedCii = (annualCo2EmissionsTonnes * 1000000) / transportWorkTnm; // g CO2 / DWT-nm
+
+  // Get rating
+  const rating = getCiiRating(attainedCii);
+
+  // Reference baseline (typical for this vessel category)
+  const baselineCii = 5.0; // g CO2/DWT-nm (educational reference)
+
+  // Improvement scenarios
+  // Hybridization (15% reduction), shore power (5% reduction), operational efficiency (10% reduction)
+  const hybridEffect = 0.85;
+  const shorePowerEffect = 0.95;
+  const opsEffect = 0.90;
+  const improvedCii = attainedCii * hybridEffect * shorePowerEffect * opsEffect;
+  const improvedRating = getCiiRating(improvedCii);
+
+  let improvementNote = '';
+  if (rating.label === 'D' || rating.label === 'E') {
+    improvementNote = `Your vessel's estimated CII rating of ${rating.label} requires improvement. A combination of hybridization (-15%), shore power (-5%), and operational efficiency measures (-10%) could reduce CII to ${improvedCii.toFixed(2)} g CO₂/DWT-nm, potentially achieving a ${improvedRating.label} rating.`;
+  } else if (rating.label === 'C') {
+    improvementNote = `Your vessel achieves a moderate CII rating of ${rating.label}. With hybridization, shore power, and operational efficiency improvements, the CII could improve to ${improvedCii.toFixed(2)} g CO₂/DWT-nm, potentially reaching a ${improvedRating.label} rating.`;
+  } else {
+    improvementNote = `Your vessel achieves a favorable CII rating of ${rating.label}. Continued operational improvements can maintain or improve this rating as IMO benchmarks tighten through 2030.`;
+  }
+
+  return {
+    annualCo2EmissionsTonnes,
+    transportWorkTnm,
+    attainedCii,
+    ratingBand: rating.label,
+    ratingColor: rating.color,
+    baselineCii,
+    improvedCii,
+    improvedRating: improvedRating.label,
+    improvementNote,
+  };
+}
