@@ -1,0 +1,471 @@
+---
+import CalculatorLayout from '../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../components/CalculatorCard.astro';
+import InputField from '../../components/InputField.astro';
+import ResultBox from '../../components/ResultBox.astro';
+import FormulaBox from '../../components/FormulaBox.astro';
+import FAQSection from '../../components/FAQSection.astro';
+import RelatedTools from '../../components/RelatedTools.astro';
+
+const whatIs = `The Marine CO₂ Reduction Calculator estimates emissions reductions achievable through vessel hybridization, battery-electric propulsion, and shore power adoption. It quantifies fuel savings, CO₂, NOx, and SOx reductions using industry-standard emission factors from the Fourth IMO GHG Study (2020). This tool helps vessel owners, operators, and naval architects evaluate the environmental impact of decarbonization strategies before committing to capital investments in hybrid or electric propulsion systems.`;
+
+const whyItMatters = [
+  "The IMO targets a 40% reduction in carbon intensity by 2030 and net-zero GHG emissions by or around 2050 — quantifying your reduction potential is the first step toward compliance.",
+  "Hybrid and battery-electric vessels can reduce fuel consumption by 15–30%, directly lowering operating costs and carbon exposure in emission trading schemes.",
+  "Port authorities increasingly require emissions reporting and offer incentives for shore power adoption — knowing your baseline and reduction potential unlocks these benefits.",
+  "NOx and SOx reductions improve air quality in ports and coastal communities, supporting compliance with ECAs (Emission Control Areas) and regional regulations.",
+  "Investors and charterers are demanding verifiable emissions data — a documented reduction strategy strengthens your vessel's commercial competitiveness."
+];
+
+const practicalApplications = [
+  { title: "Hybrid Propulsion Planning", description: "Estimate emissions reductions before investing in diesel-electric hybrid retrofit for ferries, offshore support vessels, or workboats." },
+  { title: "Shore Power Business Case", description: "Quantify emission reductions and fuel savings from cold ironing to justify shore power infrastructure investment." },
+  { title: "CII Rating Improvement", description: "Model the CII improvement from hybridization or electrification to meet IMO Carbon Intensity Indicator targets." },
+  { title: "Regulatory Compliance Strategy", description: "Build a documented emissions reduction baseline for flag-state submissions and environmental impact assessments." }
+];
+
+const expertNotes: { title: string; variant: 'warning' | 'engineering' | 'info'; content: string }[] = [
+  {
+    title: "Emission Factor Assumptions",
+    variant: "engineering",
+    content: "This calculator uses emission factors from the Fourth IMO Greenhouse Gas Study (2020): MGO at 3.206 kg CO₂/liter, MDO at 3.206 kg CO₂/liter, HFO at 3.114 kg CO₂/liter, and LNG at 2.750 kg CO₂/liter. NOx and SOx factors vary by fuel sulfur content and engine type. Actual emissions depend on engine load, combustion efficiency, exhaust gas cleaning, and fuel quality. These values represent well-moderate marine diesel engine operation at typical cruising loads."
+  },
+  {
+    title: "Hybridization Fuel Savings",
+    variant: "info",
+    content: "The hybridization percentage represents the proportion of total fuel consumption eliminated through battery-electric operation, load leveling, and optimized engine loading. Real-world hybrid savings depend heavily on the vessel's duty cycle — vessels with variable loads (ferries, tugs, PSVs) achieve higher savings than vessels with steady cruising loads. Typical savings range from 15–30% for well-designed hybrid systems."
+  },
+  {
+    title: "Limitations",
+    variant: "warning",
+    content: "This tool provides educational estimates only. It does not account for engine-specific emission curves, exhaust aftertreatment (SCR, EGR), fuel sulfur variations, methane slip (LNG), or operational factors like speed optimization and weather routing. For official emissions reporting or IMO compliance, use certified emission calculation tools approved by your classification society."
+  }
+];
+
+const trustSection = {
+  text: "Emission factors are sourced from the Fourth IMO Greenhouse Gas Study (2020) and peer-reviewed maritime emission literature. All formulas and assumptions are documented below.",
+  link: { label: "View our methodology and formula derivations", href: "/methodology" }
+};
+
+const references = [
+  { title: "Fourth IMO GHG Study 2020", url: "https://www.imo.org/en/OurWork/Environment/Pages/Fourth-IMO-Greenhouse-Gas-Study-2020.aspx", source: "International Maritime Organization" },
+  { title: "IMO Initial GHG Strategy (Resolution MEPC.304(72))", url: "https://www.imo.org/en/OurWork/Environment/Pages/Strategy-on-reduction-of-GHG-emissions-from-ships.aspx", source: "International Maritime Organization" },
+  { title: "EPA Greenhouse Gas Equivalencies Calculator", url: "https://www.epa.gov/energy/greenhouse-gas-equivalencies-calculator", source: "U.S. Environmental Protection Agency" },
+  { title: "EMEP/EEA Air Pollutant Emission Inventory Guidebook 2019", url: "https://www.eea.europa.eu/publications/emep-eea-guidebook-2019", source: "European Environment Agency" }
+];
+
+const faqItems = [
+  {
+    question: "How accurate are the emission factors used in this calculator?",
+    answer: "The emission factors are sourced from the Fourth IMO GHG Study (2020), the most comprehensive and widely referenced maritime emissions dataset. MGO and MDO share the same CO₂ factor (3.206 kg/liter) because they have similar carbon content. HFO has a slightly lower CO₂ factor but significantly higher NOx and SOx due to higher sulfur and nitrogen content. Actual emissions vary by engine type, load, and fuel quality."
+  },
+  {
+    question: "What does 'hybridization percentage' mean?",
+    answer: "Hybridization percentage represents the portion of annual fuel consumption eliminated through battery-electric propulsion, load leveling, and optimized engine loading. A 20% hybridization on a vessel consuming 500,000 liters/year means 100,000 liters are saved annually. Real-world savings depend on the duty cycle — vessels with variable loads (ferries, tugs) achieve higher savings than steady-cruise vessels."
+  },
+  {
+    question: "How does shore power reduce emissions?",
+    answer: "Shore power (cold ironing) allows vessels to shut down diesel generators while at berth, connecting to the port's electrical grid instead. This eliminates all onboard combustion emissions during port stays. The net emission reduction depends on the grid's carbon intensity — if the grid is powered by renewables, the reduction is substantial. If the grid uses coal, the benefit is reduced."
+  },
+  {
+    question: "What are typical NOx and SOx reduction levels?",
+    answer: "NOx reductions from hybridization range from 15–30%, proportional to fuel saved. SOx reductions follow fuel sulfur content — MGO and MDO have low sulfur (0.1% in ECAs), while HFO has higher sulfur (up to 3.5% globally). LNG eliminates SOx entirely and reduces NOx by ~50%. Aftertreatment systems (SCR, scrubbers) can further reduce these pollutants beyond what fuel switching achieves."
+  },
+  {
+    question: "Can I use this calculator for IMO CII compliance?",
+    answer: "This calculator provides preliminary estimates for planning and feasibility analysis. It is not a substitute for certified CII calculation tools. For official IMO CII rating submissions, you must use the IMO's own CII calculator and data verified by your classification society. However, this tool helps you model improvement scenarios and estimate the impact of hybridization on your CII trajectory."
+  },
+  {
+    question: "How do I convert CO₂ reductions to equivalent cars or trees?",
+    answer: "The calculator uses EPA-based equivalencies: one passenger vehicle emits approximately 4.6 tonnes of CO₂ per year, and one tree absorbs approximately 21 kg of CO₂ per year. These are approximate averages — actual values vary by vehicle type, driving patterns, tree species, and climate. The equivalencies help communicate emission reductions in relatable terms for stakeholders and public reporting."
+  },
+  {
+    question: "What is the impact of LNG on emissions?",
+    answer: "LNG reduces CO₂ by ~10–15% compared to MGO on a per-liter basis, eliminates SOx entirely, and reduces NOx by ~50%. However, LNG introduces methane slip — unburned methane released during combustion — which has a global warming potential 80× that of CO₂ over 20 years. When accounting for methane slip, LNG's net GHG benefit is contested and depends heavily on engine technology and methane slip rates."
+  },
+  {
+    question: "Should I consider well-to-tank emissions?",
+    answer: "This calculator addresses tank-to-wake (TTW) emissions only — what is burned onboard. Well-to-tank (WTT) emissions from fuel production, refining, and transportation are not included. For a full lifecycle assessment, WTT adds approximately 15–25% to TTW emissions for fossil fuels. Battery-electric and shore power systems shift emissions upstream to the power grid, making WTT analysis essential for accurate comparison."
+  }
+];
+
+const relatedCalculators = [
+  { href: "/tools/hybrid-vessel-roi-calculator", title: "Hybrid Vessel ROI Calculator", description: "Evaluate the financial return on hybrid propulsion investment." },
+  { href: "/tools/vessel-energy-storage-calculator", title: "Vessel Energy Storage Calculator", description: "Determine battery capacity for hybrid or electric vessel systems." },
+  { href: "/marine", title: "Marine Electrification Hub", description: "Explore all marine decarbonization tools and resources." },
+];
+
+const fuelOptions = [
+  { label: 'Marine Gas Oil (MGO)', value: 'mgo' },
+  { label: 'Marine Diesel Oil (MDO)', value: 'mdo' },
+  { label: 'Heavy Fuel Oil (HFO)', value: 'hfo' },
+  { label: 'LNG', value: 'lng' },
+];
+---
+
+<CalculatorLayout
+  title="Marine CO₂ Reduction Calculator | Battery Calculators"
+  description="Estimate CO₂, NOx, and SOx emission reductions from vessel hybridization, electrification, and shore power adoption using industry-standard emission factors."
+  faqItems={faqItems}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+  relatedCalculators={relatedCalculators}
+>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+
+    <!-- Input Form -->
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Vessel Configuration</h3>
+      <div class="flex flex-col gap-6">
+
+        <InputField
+          id="fuel-type"
+          label="Fuel Type"
+          type="select"
+          value="mgo"
+          options={fuelOptions}
+          helperText="Select the primary fuel used by the vessel."
+        />
+
+        <InputField
+          id="annual-fuel"
+          label="Annual Fuel Consumption"
+          value={200000}
+          min={100}
+          step={1000}
+          unit="L/yr"
+          helperText="Total fuel consumed per year in liters."
+        />
+
+        <InputField
+          id="operating-hours"
+          label="Operating Hours"
+          value={5000}
+          min={100}
+          max={8760}
+          step={100}
+          unit="hrs/yr"
+          helperText="Total annual operating hours (max 8,760)."
+        />
+
+        <InputField
+          id="hybrid-percent"
+          label="Hybridization Percentage"
+          value={20}
+          min={0}
+          max={100}
+          step={1}
+          unit="%"
+          helperText="Portion of fuel eliminated through hybrid/electric operation (0–100%)."
+        />
+
+        <InputField
+          id="shore-power-percent"
+          label="Shore Power Usage Percentage"
+          value={10}
+          min={0}
+          max={100}
+          step={1}
+          unit="%"
+          helperText="Portion of time connected to shore power at berth (0–100%)."
+        />
+
+      </div>
+    </CalculatorCard>
+
+    <!-- Results -->
+    <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Emissions Reduction Results</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <ResultBox
+            label="Annual Fuel Saved"
+            value="50,000 L"
+            suffix="25.0% reduction"
+            variant="primary"
+            id="result-fuel-saved"
+          />
+          <ResultBox
+            label="Annual CO₂ Reduction"
+            value="160.3 t"
+            suffix="tonnes CO₂ eliminated"
+            id="result-co2"
+          />
+          <ResultBox
+            label="Annual NOx Reduction"
+            value="0 kg"
+            suffix="kg NOx eliminated"
+            id="result-nox"
+          />
+          <ResultBox
+            label="Annual SOx Reduction"
+            value="0 kg"
+            suffix="kg SOx eliminated"
+            id="result-sox"
+          />
+          <ResultBox
+            label="Equivalent Cars Removed"
+            value="0"
+            suffix="passenger vehicles off the road"
+            id="result-cars"
+          />
+          <ResultBox
+            label="Equivalent Trees Planted"
+            value="0"
+            suffix="trees absorbing CO₂ for one year"
+            id="result-trees"
+          />
+        </div>
+      </div>
+
+      <div class="border-t border-hairline pt-6">
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">Reduction Summary</h4>
+        <p class="text-body-sm text-muted" id="reduction-summary">
+          Hybridizing at 20% with 10% shore power usage reduces annual CO₂ emissions from 641.2 tonnes to 480.9 tonnes.
+        </p>
+      </div>
+    </CalculatorCard>
+
+  </div>
+
+  <!-- Before vs After Emissions Chart -->
+  <section class="mb-16">
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-4 uppercase tracking-wider">Before vs After Emissions Comparison</h3>
+      <p class="text-body-sm text-muted mb-6">Baseline emissions (left) versus reduced emissions (right) for each pollutant.</p>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- CO2 Chart -->
+        <div>
+          <span class="text-label-uppercase text-primary text-[10px] block mb-2">CO₂ (tonnes/year)</span>
+          <div id="chart-co2" class="flex flex-col gap-2"></div>
+        </div>
+        <!-- NOx Chart -->
+        <div>
+          <span class="text-label-uppercase text-primary text-[10px] block mb-2">NOx (kg/year)</span>
+          <div id="chart-nox" class="flex flex-col gap-2"></div>
+        </div>
+        <!-- SOx Chart -->
+        <div>
+          <span class="text-label-uppercase text-primary text-[10px] block mb-2">SOx (kg/year)</span>
+          <div id="chart-sox" class="flex flex-col gap-2"></div>
+        </div>
+      </div>
+      <div class="flex items-center gap-4 mt-6 text-caption text-muted">
+        <span class="flex items-center gap-1.5"><span class="w-3 h-3 bg-m-blue-light inline-block"></span> Baseline</span>
+        <span class="flex items-center gap-1.5"><span class="w-3 h-3 bg-green-600 inline-block"></span> After Reduction</span>
+      </div>
+    </CalculatorCard>
+  </section>
+
+  <!-- Formulas -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+
+      <FormulaBox title="Mathematical Formulas">
+        <p>
+          Emission reductions are calculated using industry-standard fuel-specific emission factors:
+        </p>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Fuel Saved = Annual Fuel × [(Hybrid% × (1 - ShorePower%)) + ShorePower%]
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          CO₂ Reduction (t) = Fuel Saved × CO₂ Factor / 1000
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          NOx Reduction (kg) = Fuel Saved × NOx Factor
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          SOx Reduction (kg) = Fuel Saved × SOx Factor
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Cars Equivalent = CO₂ Reduction / 4.6
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Trees Equivalent = CO₂ Reduction (kg) / 21
+        </div>
+        <p class="mt-4">
+          CO₂ factors (kg/liter): MGO 3.206, MDO 3.206, HFO 3.114, LNG 2.750<br/>
+          Equivalencies: 4.6 t CO₂/car/year (EPA), 21 kg CO₂/tree/year (EPA)
+        </p>
+      </FormulaBox>
+
+      <div>
+        <h2 class="text-title-lg text-primary uppercase mb-6 tracking-wider">Worked Engineering Example</h2>
+        <div class="text-body-sm text-muted flex flex-col gap-4">
+          <p>Given vessel parameters:</p>
+          <ul class="list-disc pl-6 flex flex-col gap-1">
+            <li><strong>Fuel:</strong> MGO (3.206 kg CO₂/L)</li>
+            <li><strong>Annual consumption:</strong> 200,000 liters</li>
+            <li><strong>Hybridization:</strong> 20% | <strong>Shore power:</strong> 10%</li>
+          </ul>
+
+          <p><strong>Step 1:</strong> Calculate fuel saved from hybridization:</p>
+          <div class="font-mono text-primary">Hybrid fuel saved = 200,000 × 0.20 × (1 - 0.10) = 36,000 L</div>
+
+          <p><strong>Step 2:</strong> Calculate fuel saved from shore power:</p>
+          <div class="font-mono text-primary">Shore power saved = 200,000 × 0.10 = 20,000 L</div>
+
+          <p><strong>Step 3:</strong> Total fuel saved:</p>
+          <div class="font-mono text-primary">Total = 36,000 + 20,000 = 56,000 L (28.0%)</div>
+
+          <p><strong>Step 4:</strong> Calculate CO₂ reduction:</p>
+          <div class="font-mono text-primary">CO₂ = 56,000 × 3.206 / 1000 = 179.5 tonnes</div>
+
+          <p><strong>Step 5:</strong> Calculate NOx reduction:</p>
+          <div class="font-mono text-primary">NOx = 56,000 × 0.059 = 3,304 kg</div>
+
+          <p><strong>Step 6:</strong> Calculate equivalent cars and trees:</p>
+          <div class="font-mono text-primary">Cars = 179.5 / 4.6 = 39.0 | Trees = 179,536 / 21 = 8,549</div>
+
+          <p><strong>Result:</strong> A vessel burning 200,000 L MGO/year with 20% hybridization and 10% shore power saves 56,000 liters of fuel, eliminating 179.5 tonnes of CO₂ — equivalent to removing 39 passenger cars from the road for one year.</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Assumptions Section -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Assumptions & Limitations</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <CalculatorCard>
+        <h4 class="text-primary font-bold text-sm mb-3">Emission Factors</h4>
+        <ul class="text-body-sm text-muted flex flex-col gap-2">
+          <li class="flex gap-2"><span class="text-m-blue-light shrink-0">→</span> CO₂ factors from Fourth IMO GHG Study (2020)</li>
+          <li class="flex gap-2"><span class="text-m-blue-light shrink-0">→</span> NOx factors assume moderate engine load (75% MCR)</li>
+          <li class="flex gap-2"><span class="text-m-blue-light shrink-0">→</span> SOx factors assume 0.5% sulfur (global) for HFO, 0.1% for MGO/MDO</li>
+          <li class="flex gap-2"><span class="text-m-blue-light shrink-0">→</span> LNG SOx is zero (no sulfur content)</li>
+        </ul>
+      </CalculatorCard>
+      <CalculatorCard>
+        <h4 class="text-primary font-bold text-sm mb-3">What This Calculator Does Not Include</h4>
+        <ul class="text-body-sm text-muted flex flex-col gap-2">
+          <li class="flex gap-2"><span class="text-m-red shrink-0">✗</span> Engine-specific emission curves or load-dependent factors</li>
+          <li class="flex gap-2"><span class="text-m-red shrink-0">✗</span> Exhaust aftertreatment (SCR, EGR, scrubbers)</li>
+          <li class="flex gap-2"><span class="text-m-red shrink-0">✗</span> Methane slip from LNG engines</li>
+          <li class="flex gap-2"><span class="text-m-red shrink-0">✗</span> Well-to-tank upstream emissions</li>
+          <li class="flex gap-2"><span class="text-m-red shrink-0">✗</span> Operational measures (speed optimization, weather routing)</li>
+        </ul>
+      </CalculatorCard>
+    </div>
+  </section>
+
+  <FAQSection items={faqItems} />
+  <RelatedTools tools={relatedCalculators} />
+
+  <!-- Calculation Script -->
+  <script>
+    import { calculateMarineCo2Reduction } from '../../utils/calculators';
+
+    const fuelTypeInput = document.getElementById('fuel-type') as HTMLSelectElement;
+    const annualFuelInput = document.getElementById('annual-fuel') as HTMLInputElement;
+    const operatingHoursInput = document.getElementById('operating-hours') as HTMLInputElement;
+    const hybridPercentInput = document.getElementById('hybrid-percent') as HTMLInputElement;
+    const shorePowerPercentInput = document.getElementById('shore-power-percent') as HTMLInputElement;
+
+    function getResultElements(id: string) {
+      const box = document.getElementById(id);
+      return {
+        value: box?.querySelector('.text-display-md, .text-title-lg') as HTMLElement,
+        suffix: box?.querySelector('.text-caption') as HTMLElement,
+      };
+    }
+
+    const fuelSaved = getResultElements('result-fuel-saved');
+    const co2Result = getResultElements('result-co2');
+    const noxResult = getResultElements('result-nox');
+    const soxResult = getResultElements('result-sox');
+    const carsResult = getResultElements('result-cars');
+    const treesResult = getResultElements('result-trees');
+    const summaryEl = document.getElementById('reduction-summary');
+
+    function fmt(n: number, decimals = 1): string {
+      return n.toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+    }
+
+    function updateChart(containerId: string, baseline: number, reduced: number) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      const maxVal = Math.max(baseline, 0.001);
+      const baselinePct = (baseline / maxVal) * 100;
+      const reducedPct = (reduced / maxVal) * 100;
+      const pctReduced = maxVal > 0 ? ((baseline - reduced) / baseline) * 100 : 0;
+
+      container.innerHTML = `
+        <div class="flex flex-col gap-1">
+          <div class="flex items-center gap-2">
+            <span class="text-caption text-muted w-16 text-right shrink-0">Before</span>
+            <div class="flex-1 h-5 bg-surface-soft border border-hairline relative overflow-hidden">
+              <div class="h-full bg-m-blue-light transition-all duration-300" style="width: ${baselinePct}%"></div>
+            </div>
+            <span class="text-caption text-primary font-mono w-20 shrink-0">${fmt(baseline)}</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-caption text-muted w-16 text-right shrink-0">After</span>
+            <div class="flex-1 h-5 bg-surface-soft border border-hairline relative overflow-hidden">
+              <div class="h-full bg-green-600 transition-all duration-300" style="width: ${reducedPct}%"></div>
+            </div>
+            <span class="text-caption text-primary font-mono w-20 shrink-0">${fmt(reduced)}</span>
+          </div>
+          <span class="text-caption text-green-500 font-mono text-[10px]">↓ ${fmt(pctReduced)}% reduction</span>
+        </div>
+      `;
+    }
+
+    function updateCalculations() {
+      const fuelType = fuelTypeInput.value as 'mgo' | 'mdo' | 'hfo' | 'lng';
+      const annualFuel = parseFloat(annualFuelInput.value) || 200000;
+      const operatingHours = parseFloat(operatingHoursInput.value) || 5000;
+      const hybridPercent = parseFloat(hybridPercentInput.value) || 0;
+      const shorePowerPercent = parseFloat(shorePowerPercentInput.value) || 0;
+
+      const result = calculateMarineCo2Reduction({
+        fuelType,
+        annualFuelLiters: annualFuel,
+        operatingHours,
+        hybridPercent,
+        shorePowerPercent,
+      });
+
+      if (fuelSaved.value) fuelSaved.value.textContent = `${Math.round(result.annualFuelSavedLiters).toLocaleString()} L`;
+      if (fuelSaved.suffix) fuelSaved.suffix.textContent = `${fmt(result.annualFuelSavedPercent)}% reduction`;
+
+      if (co2Result.value) co2Result.value.textContent = `${fmt(result.co2ReductionTonnes)} t`;
+      if (co2Result.suffix) co2Result.suffix.textContent = 'tonnes CO₂ eliminated';
+
+      if (noxResult.value) noxResult.value.textContent = `${fmt(result.noxReductionKg)} kg`;
+      if (noxResult.suffix) noxResult.suffix.textContent = 'kg NOx eliminated';
+
+      if (soxResult.value) soxResult.value.textContent = `${fmt(result.soxReductionKg)} kg`;
+      if (soxResult.suffix) soxResult.suffix.textContent = 'kg SOx eliminated';
+
+      if (carsResult.value) carsResult.value.textContent = `${fmt(result.equivalentCarsRemoved, 0)}`;
+      if (carsResult.suffix) carsResult.suffix.textContent = 'passenger vehicles off the road';
+
+      if (treesResult.value) treesResult.value.textContent = `${Math.round(result.equivalentTreesPlanted).toLocaleString()}`;
+      if (treesResult.suffix) treesResult.suffix.textContent = 'trees absorbing CO₂ for one year';
+
+      if (summaryEl) {
+        summaryEl.textContent = `Hybridizing at ${fmt(hybridPercent)}% with ${fmt(shorePowerPercent)}% shore power usage reduces annual CO₂ emissions from ${fmt(result.baselineCo2Tonnes)} tonnes to ${fmt(result.reducedCo2Tonnes)} tonnes.`;
+      }
+
+      // Update charts
+      updateChart('chart-co2', result.baselineCo2Tonnes, result.reducedCo2Tonnes);
+      updateChart('chart-nox', result.baselineNoxKg, result.reducedNoxKg);
+      updateChart('chart-sox', result.baselineSoxKg, result.reducedSoxKg);
+    }
+
+    [fuelTypeInput, annualFuelInput, operatingHoursInput, hybridPercentInput, shorePowerPercentInput].forEach(el => {
+      el.addEventListener('input', updateCalculations);
+    });
+
+    updateCalculations();
+  </script>
+
+</CalculatorLayout>

@@ -766,7 +766,276 @@ export function calculateInverterBattery(
   };
 }
 
-// 18. Power Outage Battery Backup Calculator
+// 18. Marine CO₂ Reduction Calculator
+export type MarineFuelType = 'mgo' | 'mdo' | 'hfo' | 'lng';
+
+export interface MarineCo2Inputs {
+  fuelType: MarineFuelType;
+  annualFuelLiters: number;
+  operatingHours: number;
+  hybridPercent: number;
+  shorePowerPercent: number;
+}
+
+export interface MarineCo2Result {
+  annualFuelSavedLiters: number;
+  annualFuelSavedPercent: number;
+  co2ReductionTonnes: number;
+  noxReductionKg: number;
+  soxReductionKg: number;
+  equivalentCarsRemoved: number;
+  equivalentTreesPlanted: number;
+  baselineCo2Tonnes: number;
+  baselineNoxKg: number;
+  baselineSoxKg: number;
+  reducedCo2Tonnes: number;
+  reducedNoxKg: number;
+  reducedSoxKg: number;
+}
+
+// Industry-standard emission factors (Fourth IMO GHG Study 2020)
+export const MARINE_FUEL_EMISSION_FACTORS: Record<MarineFuelType, {
+  co2: number; // kg CO2 per liter
+  nox: number; // kg NOx per liter
+  sox: number; // kg SOx per liter
+  label: string;
+}> = {
+  mgo: { co2: 3.206, nox: 0.059, sox: 0.0053, label: 'Marine Gas Oil (MGO)' },
+  mdo: { co2: 3.206, nox: 0.055, sox: 0.010, label: 'Marine Diesel Oil (MDO)' },
+  hfo: { co2: 3.114, nox: 0.087, sox: 0.032, label: 'Heavy Fuel Oil (HFO)' },
+  lng: { co2: 2.750, nox: 0.025, sox: 0.000, label: 'LNG' },
+};
+
+export function calculateMarineCo2Reduction(inputs: MarineCo2Inputs): MarineCo2Result {
+  const factors = MARINE_FUEL_EMISSION_FACTORS[inputs.fuelType];
+  const hybridDec = Math.max(0, Math.min(100, inputs.hybridPercent)) / 100;
+  const shoreDec = Math.max(0, Math.min(100, inputs.shorePowerPercent)) / 100;
+
+  // Fuel saved from hybridization (reduces consumption during non-shore-power hours)
+  const fuelDuringEngineHours = inputs.annualFuelLiters * (1 - shoreDec);
+  const hybridFuelSaved = fuelDuringEngineHours * hybridDec;
+  // Fuel saved from shore power (eliminates fuel during port/berth time)
+  const shoreFuelSaved = inputs.annualFuelLiters * shoreDec;
+  // Total fuel saved (avoid double-counting)
+  const annualFuelSaved = Math.min(inputs.annualFuelLiters, hybridFuelSaved + shoreFuelSaved);
+  const annualFuelSavedPercent = inputs.annualFuelLiters > 0
+    ? (annualFuelSaved / inputs.annualFuelLiters) * 100
+    : 0;
+
+  // Baseline emissions (in kg)
+  const baselineCo2Kg = inputs.annualFuelLiters * factors.co2;
+  const baselineNoxKg = inputs.annualFuelLiters * factors.nox;
+  const baselineSoxKg = inputs.annualFuelLiters * factors.sox;
+
+  // Reductions
+  const co2ReductionKg = annualFuelSaved * factors.co2;
+  const noxReductionKg = annualFuelSaved * factors.nox;
+  const soxReductionKg = annualFuelSaved * factors.sox;
+
+  const co2ReductionTonnes = co2ReductionKg / 1000;
+
+  // Equivalencies (EPA-based approximations)
+  const equivalentCarsRemoved = co2ReductionTonnes / 4.6; // ~4.6 tonnes CO2/year per passenger car
+  const equivalentTreesPlanted = co2ReductionKg / 21; // ~21 kg CO2 absorbed per tree per year
+
+  return {
+    annualFuelSavedLiters: annualFuelSaved,
+    annualFuelSavedPercent,
+    co2ReductionTonnes,
+    noxReductionKg,
+    soxReductionKg,
+    equivalentCarsRemoved,
+    equivalentTreesPlanted,
+    baselineCo2Tonnes: baselineCo2Kg / 1000,
+    baselineNoxKg,
+    baselineSoxKg,
+    reducedCo2Tonnes: (baselineCo2Kg - co2ReductionKg) / 1000,
+    reducedNoxKg: baselineNoxKg - noxReductionKg,
+    reducedSoxKg: baselineSoxKg - soxReductionKg,
+  };
+}
+
+// 19. Vessel Energy Storage Calculator
+export type BatteryChemistryType = 'lfp' | 'nmc';
+
+export interface VesselEnergyStorageInputs {
+  hotelLoadKw: number;
+  propulsionLoadKw: number;
+  peakLoadKw: number;
+  operatingHours: number;
+  reserveMarginPercent: number;
+  batteryChemistry: BatteryChemistryType;
+}
+
+export interface VesselEnergyStorageResult {
+  dailyEnergyDemandKwh: number;
+  requiredUsableCapacityKwh: number;
+  recommendedInstalledCapacityKwh: number;
+  estimatedBatteryWeightKg: number;
+  estimatedBatteryVolumeLiters: number;
+  suggestedDcVoltage: number;
+  maxContinuousCurrentA: number;
+  chemistryNote: string;
+}
+
+const CHEMISTRY_PROPS: Record<BatteryChemistryType, {
+  dodPercent: number;
+  weightKgPerKwh: number;
+  volumeLPerKwh: number;
+  label: string;
+  note: string;
+}> = {
+  lfp: {
+    dodPercent: 90,
+    weightKgPerKwh: 6.5,
+    volumeLPerKwh: 6.8,
+    label: 'LFP (LiFePO4)',
+    note: 'LFP offers superior cycle life (5000+ cycles), thermal stability, and 90% usable DoD. Preferred for marine applications requiring high cycle count and safety.',
+  },
+  nmc: {
+    dodPercent: 80,
+    weightKgPerKwh: 5.0,
+    volumeLPerKwh: 5.2,
+    label: 'NMC (Nickel Manganese Cobalt)',
+    note: 'NMC provides higher energy density (20–30% lighter than LFP) but lower cycle life (~2000 cycles) and tighter thermal management requirements.',
+  },
+};
+
+export function calculateVesselEnergyStorage(inputs: VesselEnergyStorageInputs): VesselEnergyStorageResult {
+  const hotelLoad = Math.max(0, inputs.hotelLoadKw);
+  const propulsionLoad = Math.max(0, inputs.propulsionLoadKw);
+  const peakLoad = Math.max(inputs.hotelLoadKw + inputs.propulsionLoadKw, Math.max(0, inputs.peakLoadKw));
+  const operatingHours = Math.max(0.1, inputs.operatingHours);
+  const reserveMargin = Math.max(0, Math.min(100, inputs.reserveMarginPercent)) / 100;
+
+  const props = CHEMISTRY_PROPS[inputs.batteryChemistry];
+
+  // Daily energy demand based on continuous operating loads
+  const dailyEnergyDemandKwh = (hotelLoad + propulsionLoad) * operatingHours;
+
+  // Required usable capacity (energy the battery must deliver)
+  const requiredUsableCapacityKwh = dailyEnergyDemandKwh * (1 + reserveMargin);
+
+  // Installed capacity accounts for DoD limits
+  const recommendedInstalledCapacityKwh = requiredUsableCapacityKwh / (props.dodPercent / 100);
+
+  // Physical estimates
+  const estimatedBatteryWeightKg = recommendedInstalledCapacityKwh * props.weightKgPerKwh;
+  const estimatedBatteryVolumeLiters = recommendedInstalledCapacityKwh * props.volumeLPerKwh;
+
+  // Suggested DC system voltage based on peak power
+  let suggestedDcVoltage = 48;
+  if (peakLoad <= 10) suggestedDcVoltage = 48;
+  else if (peakLoad <= 50) suggestedDcVoltage = 48;
+  else if (peakLoad <= 200) suggestedDcVoltage = 150;
+  else if (peakLoad <= 500) suggestedDcVoltage = 400;
+  else suggestedDcVoltage = 600;
+
+  const maxContinuousCurrentA = suggestedDcVoltage > 0
+    ? (peakLoad * 1000) / suggestedDcVoltage
+    : 0;
+
+  return {
+    dailyEnergyDemandKwh,
+    requiredUsableCapacityKwh,
+    recommendedInstalledCapacityKwh,
+    estimatedBatteryWeightKg,
+    estimatedBatteryVolumeLiters,
+    suggestedDcVoltage,
+    maxContinuousCurrentA,
+    chemistryNote: props.note,
+  };
+}
+
+// 20. Hybrid Vessel ROI Calculator
+export interface HybridVesselRoiInputs {
+  fuelCostPerLiter: number;
+  annualFuelConsumptionLiters: number;
+  batterySystemCost: number;
+  electricityCostPerKwh: number;
+  expectedFuelReductionPercent: number;
+  projectLifetimeYears: number;
+  discountRatePercent: number;
+}
+
+export interface HybridVesselRoiResult {
+  annualFuelCostBaseline: number;
+  annualFuelSavedLiters: number;
+  annualFuelCostSavings: number;
+  annualElectricityCostIncrease: number;
+  annualNetOperatingSavings: number;
+  simplePaybackYears: number | null;
+  lifetimeSavings: number;
+  npv: number;
+  roiPercent: number;
+  paybackNote: string;
+}
+
+export function calculateHybridVesselRoi(inputs: HybridVesselRoiInputs): HybridVesselRoiResult {
+  const fuelReduction = Math.max(0, Math.min(100, inputs.expectedFuelReductionPercent)) / 100;
+  const discountRate = Math.max(0, Math.min(50, inputs.discountRatePercent)) / 100;
+  const lifetime = Math.max(1, Math.round(inputs.projectLifetimeYears));
+
+  // Baseline annual fuel cost
+  const annualFuelCostBaseline = inputs.annualFuelConsumptionLiters * inputs.fuelCostPerLiter;
+
+  // Fuel saved
+  const annualFuelSavedLiters = inputs.annualFuelConsumptionLiters * fuelReduction;
+  const annualFuelCostSavings = annualFuelSavedLiters * inputs.fuelCostPerLiter;
+
+  // Additional electricity cost (charging batteries from shore power/grid)
+  // Assume batteries are charged ~300 cycles/year, storing ~installed_kwh
+  // Simplified: electricity cost increase = (fuel saved in kWh equivalent) * electricity cost
+  // Fuel energy content: MGO ~10.0 kWh/liter. Battery round-trip efficiency ~90%.
+  const fuelEnergyKwh = annualFuelSavedLiters * 10.0;
+  const electricityConsumedKwh = fuelEnergyKwh / 0.90; // round-trip losses
+  const annualElectricityCostIncrease = electricityConsumedKwh * inputs.electricityCostPerKwh;
+
+  // Net operating savings
+  const annualNetOperatingSavings = annualFuelCostSavings - annualElectricityCostIncrease;
+
+  // Simple payback
+  let simplePaybackYears: number | null = null;
+  let paybackNote = '';
+  if (annualNetOperatingSavings > 0) {
+    simplePaybackYears = inputs.batterySystemCost / annualNetOperatingSavings;
+    paybackNote = `At $${Math.round(annualNetOperatingSavings).toLocaleString()} net annual savings, the battery system pays for itself in ${simplePaybackYears.toFixed(1)} years.`;
+  } else {
+    paybackNote = 'Annual net operating savings are negative — the fuel cost savings do not exceed the additional electricity costs at current rates. Consider increasing fuel reduction percentage or reducing battery system cost.';
+  }
+
+  // NPV and lifetime savings
+  let npv = -inputs.batterySystemCost;
+  let lifetimeSavings = -inputs.batterySystemCost;
+  let cumulativeCash = -inputs.batterySystemCost;
+
+  for (let year = 1; year <= lifetime; year++) {
+    const yearSavings = annualNetOperatingSavings;
+    cumulativeCash += yearSavings;
+    lifetimeSavings += yearSavings;
+    npv += yearSavings / Math.pow(1 + discountRate, year);
+  }
+
+  // ROI %
+  const roiPercent = inputs.batterySystemCost > 0
+    ? ((lifetimeSavings + inputs.batterySystemCost) / inputs.batterySystemCost) * 100
+    : 0;
+
+  return {
+    annualFuelCostBaseline,
+    annualFuelSavedLiters,
+    annualFuelCostSavings,
+    annualElectricityCostIncrease,
+    annualNetOperatingSavings,
+    simplePaybackYears,
+    lifetimeSavings,
+    npv,
+    roiPercent,
+    paybackNote,
+  };
+}
+
+// 21. Power Outage Battery Backup Calculator
 export interface ApplianceLoad {
   name: string;
   runningW: number;

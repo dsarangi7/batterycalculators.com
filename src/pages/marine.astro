@@ -3,124 +3,234 @@ import Layout from '../layouts/Layout.astro';
 import Breadcrumb from '../components/Breadcrumb.astro';
 import CategoryToolGrid from '../components/CategoryToolGrid.astro';
 import FAQSection from '../components/FAQSection.astro';
+import RelatedTools from '../components/RelatedTools.astro';
 
 const tools = [
   {
     name: "Marine Battery Sizing Calculator",
     href: "/tools/marine-battery-sizing-calculator",
-    description: "Size your boat house bank based on hotel loads, usage hours, battery voltage, and depth of discharge.",
+    description: "Size your vessel battery bank based on hotel loads, usage hours, battery voltage, and depth of discharge for reliable marine electrical systems.",
     available: true,
   },
   {
-    name: "Yacht Battery Runtime Calculator",
-    href: "/tools/runtime-calculator",
-    description: "Estimate how long your marine battery will power navigation, lighting, refrigeration, and entertainment systems.",
+    name: "Vessel Energy Storage Calculator",
+    href: "/tools/vessel-energy-storage-calculator",
+    description: "Determine optimal energy storage capacity for vessel propulsion, hotel loads, and hybrid power management systems.",
     available: true,
   },
   {
-    name: "Hotel Load Calculator",
-    href: "/tools/energy-conversion-calculator",
-    description: "Convert between Ah and Wh to match your boat's hotel load requirements with battery bank capacity.",
+    name: "Marine CO₂ Reduction Calculator",
+    href: "/tools/marine-co2-reduction-calculator",
+    description: "Estimate fuel savings and CO₂ emission reductions from hybrid or battery-electric vessel configurations.",
     available: true,
+  },
+  {
+    name: "Hybrid Vessel ROI Calculator",
+    href: "/tools/hybrid-vessel-roi-calculator",
+    description: "Calculate payback period, fuel savings, and return on investment for hybrid and electric propulsion retrofits.",
+    available: true,
+  },
+  {
+    name: "Shore Power Savings Calculator",
+    href: "/tools/shore-power-savings-calculator",
+    description: "Compare shore power costs versus onboard diesel generator operation for vessels at berth or anchor.",
+    available: false,
+  },
+  {
+    name: "Ferry Battery Sizing Calculator",
+    href: "/tools/ferry-battery-sizing-calculator",
+    description: "Size battery packs for short-route ferry electrification based on crossing distance, schedule, and load profile.",
+    available: false,
+  },
+  {
+    name: "CII Calculator",
+    href: "/tools/cii-calculator",
+    description: "Estimate your vessel's Carbon Intensity Indicator rating and identify operational improvements to meet IMO targets.",
+    available: false,
+  },
+  {
+    name: "EEXI Calculator",
+    href: "/tools/eexi-calculator",
+    description: "Evaluate Energy Efficiency Existing Ship Index compliance and model technical upgrades to meet EEXI requirements.",
+    available: false,
+  },
+];
+
+const toolCategories = [
+  {
+    title: "Vessel Energy Storage",
+    description: "Battery sizing, energy storage planning, and power system design for all vessel types — from harbor craft to offshore support vessels and passenger ferries.",
+    icon: "M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z",
+  },
+  {
+    title: "Emissions & CO₂ Reduction",
+    description: "Quantify fuel savings, CO₂ reductions, and NOx/SOx emission improvements from electrification, shore power, and hybrid propulsion strategies.",
+    icon: "M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z",
+  },
+  {
+    title: "Hybrid Vessel Economics",
+    description: "Financial analysis tools for evaluating hybrid and electric propulsion retrofits, including payback periods, fuel cost projections, and lifecycle ROI.",
+    icon: "M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z",
+  },
+  {
+    title: "IMO & Regulatory Tools",
+    description: "Navigate IMO CII ratings, EEXI requirements, and decarbonization regulations with calculators that model compliance pathways and improvement scenarios.",
+    icon: "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z",
   },
 ];
 
 const learnArticles = [
-  { title: "Marine Battery Sizing Guide", href: "/learn/marine-battery-sizing-guide" },
-  { title: "Boat Battery Runtime Guide", href: "/learn/boat-battery-runtime-guide" },
-  { title: "Yacht Battery Planning", href: "/learn/yacht-battery-planning" },
-  { title: "Marine Hotel Load Guide", href: "/learn/marine-hotel-load-guide" },
-  { title: "Lithium Marine Batteries", href: "/learn/lithium-marine-batteries" },
-  { title: "How to Size a Battery Bank", href: "/learn/how-to-size-a-battery-bank" },
-  { title: "Battery Sizing Reference", href: "/learn/battery-sizing-reference" },
-  { title: "Battery Depth of Discharge Chart", href: "/learn/battery-depth-of-discharge-chart" },
-  { title: "Best Battery Chemistry for Marine", href: "/learn/best-battery-chemistry-for-marine" },
-  { title: "Marine Battery Voltage Selection", href: "/learn/marine-battery-voltage-selection" },
+  { title: "What Is Marine Electrification?", href: "/learn/what-is-marine-electrification", planned: true },
+  { title: "Hybrid Propulsion Systems Explained", href: "/learn/hybrid-propulsion-systems-explained", planned: true },
+  { title: "Battery-Electric Ferries Explained", href: "/learn/battery-electric-ferries-explained", planned: true },
+  { title: "Shore Power vs Diesel Generators", href: "/learn/shore-power-vs-diesel-generators", planned: true },
+  { title: "Understanding CII Ratings", href: "/learn/understanding-cii-ratings", planned: true },
+  { title: "Understanding EEXI Requirements", href: "/learn/understanding-eexi-requirements", planned: true },
+  { title: "Vessel Energy Storage Systems Explained", href: "/learn/vessel-energy-storage-systems-explained", planned: true },
+  { title: "How Hybrid Vessels Reduce Emissions", href: "/learn/how-hybrid-vessels-reduce-emissions", planned: true },
+];
+
+const relatedTools = [
+  { href: "/tools/runtime-calculator", title: "Battery Runtime Calculator", description: "Estimate battery runtime based on capacity, load, and voltage." },
+  { href: "/tools/battery-sizing-calculator", title: "Battery Sizing Calculator", description: "General-purpose battery bank sizing for any application." },
+  { href: "/tools/bess-roi-calculator", title: "BESS ROI Calculator", description: "Evaluate return on investment for battery energy storage systems." },
+  { href: "/tools/voltage-drop-calculator", title: "Voltage Drop Calculator", description: "Calculate voltage drop across DC wiring for marine installations." },
+  { href: "/tools/dc-cable-loss-calculator", title: "DC Cable Loss Calculator", description: "Estimate power loss in DC cables for vessel wiring runs." },
 ];
 
 const faqItems = [
   {
-    question: "How do I size a marine battery bank?",
-    answer: "Inventory all hotel loads on your vessel (navigation, lighting, refrigeration, pumps, electronics), estimate daily usage hours for each, calculate total daily energy consumption in Wh, and divide by your system voltage and depth of discharge to get the required bank capacity in Ah. Our Marine Battery Sizing Calculator automates this process.",
+    question: "What is marine electrification?",
+    answer: "Marine electrification is the integration of battery energy storage, electric propulsion motors, and power management systems into vessels to reduce or replace fossil fuel dependency. It ranges from full battery-electric operation on short routes to hybrid diesel-electric systems that supplement main engines with electric drive for improved efficiency and lower emissions.",
   },
   {
-    question: "What battery chemistry is best for marine use?",
-    answer: "LiFePO4 is increasingly preferred for marine house banks due to its deep discharge capability, vibration resistance, and maintenance-free operation. AGM lead-acid remains common for engine starting due to its high burst current. Many marine electricians recommend a dual-bank setup: lithium for house loads and AGM or lithium for engine starting.",
+    question: "How do batteries reduce vessel emissions?",
+    answer: "Batteries reduce emissions by enabling zero-discharge operation in ports and emission control areas, supporting hybrid modes where electric motors handle low-load conditions where diesel engines operate inefficiently, and capturing regenerative energy from thrusters and propulsion systems. A well-designed hybrid system can reduce fuel consumption by 15–30% and significantly cut CO₂, NOx, and SOx emissions.",
   },
   {
-    question: "How long will my marine battery last while anchored?",
-    answer: "A typical cruising yacht with a 400Ah 12V LiFePO4 house bank can run navigation electronics, cabin lighting, refrigeration, and water pumps for 2–3 days at anchor without charging. Adding solar panels or running the engine alternator extends this significantly. Runtime depends heavily on your specific load profile and whether you are running energy-intensive appliances.",
+    question: "What vessels benefit most from hybrid propulsion?",
+    answer: "Vessels with variable load profiles benefit most: ferries with frequent port calls, offshore support vessels with dynamic positioning duty cycles, harbor tugs with intermittent high-power demands, cruise ships with large hotel loads, and fishing vessels with extended idle periods. These vessel types see the greatest fuel savings because batteries can handle peak loads while engines run at optimal efficiency.",
   },
   {
-    question: "Do I need a battery monitor for my boat?",
-    answer: "Yes. A battery monitor (shunt-based coulomb counter) is essential for marine battery systems. It tracks state of charge, current draw, time remaining, and historical usage patterns. Unlike voltage-based SOC estimation, a coulomb-counting monitor provides accurate readings regardless of load-induced voltage sag, which is critical for preventing deep discharge events.",
+    question: "What is shore power?",
+    answer: "Shore power (also called cold ironing or Alternative Maritime Power) allows vessels to connect to the local electrical grid while at berth, shutting down onboard diesel generators. This eliminates exhaust emissions in port, reduces noise, and can lower operating costs when grid electricity is cheaper than marine fuel. Shore power requires compatible vessel infrastructure and port-side power supply systems.",
   },
   {
-    question: "What is the difference between marine house and starting batteries?",
-    answer: "House batteries are designed for deep, sustained discharge cycles to power hotel loads. Starting batteries deliver high burst currents (hundreds of amps) for short durations to crank the engine. Using a starting battery for house loads will damage it quickly. Using a house battery for starting works but may not deliver sufficient cranking amps for large engines.",
+    question: "What is CII?",
+    answer: "The Carbon Intensity Indicator (CII) is an IMO metric that rates ships from A to E based on their operational carbon intensity — measured as CO₂ emissions per transport work. Ships rated D for three consecutive years or E in any year must submit a corrective action plan. CII applies to vessels of 5,000 GT and above and is part of the IMO's strategy to reduce greenhouse gas emissions from international shipping.",
   },
-];
-
-const relatedCategories = [
-  { href: "/rv", title: "RV & Camper", description: "Camper and motorhome battery systems" },
-  { href: "/solar", title: "Solar", description: "Solar battery sizing and off-grid planning" },
-  { href: "/engineering", title: "Engineering", description: "C-rate, SOC, voltage drop, and cable loss tools" },
+  {
+    question: "What is EEXI?",
+    answer: "The Energy Efficiency Existing Ship Index (EEXI) is a mandatory IMO technical measure that requires existing ships to meet a minimum energy efficiency standard. It is a one-time certification based on the ship's design and installed power. EEXI became effective January 1, 2023 and applies to most cargo, tanker, and passenger ships. Compliance typically requires engine power limitations, propeller modifications, or energy-saving device installations.",
+  },
+  {
+    question: "Can batteries fully replace diesel engines on vessels?",
+    answer: "Battery-electric operation is viable for short-route ferries, harbor craft, and inland vessels with predictable schedules and charging infrastructure. For long-voyage ocean-going vessels, batteries alone cannot yet match the energy density of marine fuels. Hybrid systems that combine diesel engines with battery storage offer the most practical near-term pathway, delivering substantial emission reductions while maintaining operational range and reliability.",
+  },
+  {
+    question: "Is this calculator section suitable for official compliance reporting?",
+    answer: "No. All calculators on this site are educational engineering estimators designed for preliminary planning, feasibility analysis, and learning purposes. They do not replace official class society calculations, flag-state submissions, or IMO compliance documentation. Always consult classification societies, marine surveyors, and certified marine engineers for official regulatory compliance and vessel certification.",
+  },
 ];
 
 const breadcrumbItems = [
-  { label: "Marine" },
+  { label: "Marine Electrification & Decarbonization" },
 ];
 ---
 
 <Layout
-  title="Marine Battery Calculators | Battery Calculators"
-  description="Free marine battery calculators for yacht battery sizing, boat runtime estimation, and hotel load calculation."
-  schema="website"
-  schemaName="Marine Battery Calculators"
-  schemaDescription="Engineering-grade battery calculators for yacht, boat, and marine electrical systems."
-  breadcrumbs={[{ label: 'Marine' }]}
+  title="Marine Electrification & Decarbonization Tools | Battery Calculators"
+  description="Engineering calculators and guides for vessel batteries, hybrid propulsion, shore power, emissions reduction, and IMO CII/EEXI decarbonization planning."
+  schema="collectionPage"
+  schemaName="Marine Electrification & Decarbonization Tools"
+  schemaDescription="Engineering-grade calculators for vessel battery sizing, hybrid propulsion economics, marine emissions reduction, shore power savings, and IMO CII/EEXI compliance planning."
+  canonical="https://batterycalculators.com/marine"
+  breadcrumbs={[{ label: 'Marine Electrification & Decarbonization' }]}
+  faqItems={faqItems}
 >
   <Breadcrumb items={breadcrumbItems} />
 
+  <!-- Hero Section -->
   <section class="mb-12 md:mb-16 border-b border-hairline pb-12">
     <div class="max-w-4xl">
-      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">MARINE</span>
-      <h1 class="text-display-md text-primary mb-6">Marine Battery Calculators</h1>
-      <p class="text-body-md text-body max-w-2xl font-light">
-        Design reliable marine battery systems with engineering-grade calculators. Size house banks for cruising, estimate runtime for hotel loads, and plan charging systems.
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">MARINE ELECTRIFICATION & DECARBONIZATION</span>
+      <h1 class="text-display-md text-primary mb-6">Marine Electrification &amp; Decarbonization Tools</h1>
+      <p class="text-body-md text-body max-w-2xl font-light mb-8">
+        Engineering calculators and guides for vessel batteries, hybrid propulsion, shore power, emissions reduction, and IMO decarbonization planning.
       </p>
+      <div class="flex flex-wrap gap-3">
+        <a href="#marine-calculators" class="btn-primary-outline px-6 py-3 text-sm">Explore Marine Calculators</a>
+        <a href="#why-marine-electrification" class="btn-primary px-6 py-3 text-sm">Learn Marine Decarbonization</a>
+      </div>
     </div>
   </section>
 
+  <!-- Tool Category Section -->
   <section class="mb-16">
-    <div class="max-w-4xl text-body-md text-body font-light flex flex-col gap-6">
-      <p>
-        Marine battery systems operate in one of the most demanding electrical environments: constant vibration, humidity, salt air exposure, and the critical requirement that the system must work reliably when you are miles from shore. Unlike automotive or residential applications, a marine battery failure can leave you without navigation, communication, or propulsion in dangerous conditions.
-      </p>
-      <p>
-        Marine electrical design starts with a thorough hotel load analysis. Hotel loads are all the electrical loads on your vessel that operate while at anchor or underway: navigation electronics (chartplotter, radar, AIS, VHF radio), cabin lighting, refrigeration, water pumps, bilge pumps, windlass, and entertainment systems. A typical cruising sailboat draws 50–100Ah per day at anchor. A motor yacht with air conditioning and galley appliances can draw 200–500Ah per day.
-      </p>
-      <p>
-        Battery bank sizing for marine applications must account for the marine environment's unique challenges. Vibration from engine operation and wave action can damage batteries not designed for marine use. Temperature extremes in engine compartments can accelerate degradation. Salt air corrosion affects terminals and connections. Marine-grade batteries address these concerns with reinforced construction, sealed cases, and corrosion-resistant terminals.
-      </p>
-      <p>
-        ABYC (American Boat and Yacht Council) standards specify requirements for marine electrical systems, including battery installation, wiring, and overcurrent protection. Any marine battery installation should comply with ABYC E-11 (AC and DC Electrical Systems on Boats) and ISO 13297 (Electrical installations in boats). Our calculators provide the sizing foundation, but installation must meet these standards.
-      </p>
+    <h2 class="text-title-lg text-primary mb-6">Tool Categories</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {toolCategories.map((cat) => (
+        <div class="bg-surface-card border border-hairline p-6">
+          <div class="flex items-start gap-4">
+            <div class="w-10 h-10 flex-shrink-0 flex items-center justify-center border border-hairline">
+              <svg class="w-5 h-5 text-m-blue-light" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d={cat.icon} />
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-title-md text-primary mb-2">{cat.title}</h3>
+              <p class="text-body-sm text-muted">{cat.description}</p>
+            </div>
+          </div>
+        </div>
+      ))}
     </div>
   </section>
 
-  <section class="mb-16">
-    <h2 class="text-title-lg text-primary mb-6">Available Calculators</h2>
+  <!-- Featured Marine Tools Section -->
+  <section id="marine-calculators" class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-title-lg text-primary mb-6">Marine Electrification Calculators</h2>
     <CategoryToolGrid tools={tools} />
   </section>
 
+  <!-- Why Marine Electrification Matters -->
+  <section id="why-marine-electrification" class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-display-sm text-primary mb-8">Why Marine Electrification Matters</h2>
+    <div class="max-w-4xl text-body-md text-body font-light flex flex-col gap-6">
+      <p>
+        The maritime industry accounts for approximately 2.9% of global greenhouse gas emissions, and regulatory pressure from the IMO is accelerating the transition toward cleaner propulsion technologies. Marine electrification — through battery energy storage, hybrid diesel-electric systems, and shore power connectivity — represents the most practical pathway to meaningful emission reductions across the existing fleet.
+      </p>
+      <p>
+        Fuel cost reduction is one of the strongest economic drivers for electrification. Hybrid propulsion systems capture energy during low-load operations, reduce engine run hours, and enable optimal engine loading — delivering 15–30% fuel savings on vessel types with variable duty cycles. For ferries and harbor craft operating frequent short voyages, full battery-electric operation can eliminate fuel costs entirely during electric mode.
+      </p>
+      <p>
+        Beyond fuel savings, electrification directly reduces CO₂, NOx, and SOx emissions. Batteries enable zero-discharge operation in ports and emission control areas, helping vessels meet increasingly strict regional and international air quality standards. Shore power connections allow vessels to shut down diesel generators at berth, eliminating localized exhaust emissions and reducing port-side noise pollution.
+      </p>
+      <p>
+        The operational benefits extend to efficiency during low-load conditions. Diesel engines operate poorly at low loads — often below 25% of rated power — where fuel consumption per kilowatt-hour increases dramatically and combustion incomplete. Hybrid systems use batteries to handle these inefficient low-load periods, allowing engines to run at their optimal efficiency band or shut down entirely.
+      </p>
+      <p>
+        Vessel types that benefit most from hybrid and electric propulsion include short-route ferries, offshore support vessels with dynamic positioning duty cycles, harbor tugs with intermittent high-power demands, workboats, service vessels, and cruise ships with large hotel loads. Each vessel type presents unique challenges in battery sizing, energy storage planning, and operational profile analysis — which is precisely what these calculators address.
+      </p>
+      <p>
+        Proper battery sizing and energy storage planning are critical to successful marine electrification. Oversized battery packs increase capital cost and weight without proportional benefit. Undersized packs limit electric range and force premature engine starts. Our calculators provide the engineering foundation for finding the optimal balance between battery capacity, vessel requirements, and economic return.
+      </p>
+    </div>
+  </section>
+
+  <!-- Marine Learning Center -->
   {learnArticles.length > 0 && (
     <section class="mb-16 border-t border-hairline pt-12">
-      <h2 class="text-title-lg text-primary mb-6">Marine Battery Guides</h2>
+      <h2 class="text-title-lg text-primary mb-6">Marine Electrification Learning Center</h2>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         {learnArticles.map((article) => (
           <a href={article.href} class="bg-surface-card border border-hairline p-4 hover:border-primary transition-colors">
-            <span class="text-label-uppercase text-muted text-[10px] block mb-2">LEARNING CENTER</span>
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-label-uppercase text-muted text-[10px]">LEARNING CENTER</span>
+              {article.planned && (
+                <span class="text-[10px] text-muted border border-hairline px-2 py-0.5 uppercase tracking-wider">Coming Soon</span>
+              )}
+            </div>
             <h3 class="text-title-sm text-primary">{article.title}</h3>
           </a>
         ))}
@@ -128,26 +238,17 @@ const breadcrumbItems = [
     </section>
   )}
 
+  <!-- Related Tools -->
+  <RelatedTools tools={relatedTools} />
+
+  <!-- FAQ Section -->
   <FAQSection items={faqItems} />
 
-  {relatedCategories.length > 0 && (
-    <section class="mb-16 border-t border-hairline pt-12">
-      <h2 class="text-title-lg text-primary mb-6">Related Categories</h2>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {relatedCategories.map((cat) => (
-          <a href={cat.href} class="bg-surface-card border border-hairline p-6 hover:border-primary transition-colors block">
-            <h3 class="text-title-md text-primary mb-2">{cat.title}</h3>
-            <p class="text-body-sm text-muted">{cat.description}</p>
-          </a>
-        ))}
-      </div>
-    </section>
-  )}
-
+  <!-- Engineering Disclaimer -->
   <section class="bg-surface-soft border border-hairline p-6 text-caption text-muted mb-8">
     <span class="text-primary font-bold text-[10px] tracking-wider uppercase border border-hairline px-1.5 py-0.5 mr-2 inline-block mb-3">
       Engineering Disclaimer
     </span>
-    All calculators provide sizing estimates only. Marine electrical systems must comply with ABYC or ISO standards. Consult a certified marine electrician for installation.
+    All calculators provide educational engineering estimates only. They are intended for preliminary planning, feasibility analysis, and learning purposes. These tools do not replace official class society calculations, flag-state submissions, IMO compliance documentation, or regulatory filings. Marine electrical and propulsion systems must comply with applicable classification society rules, flag-state regulations, and IMO conventions. Consult certified marine engineers and naval architects for final system design and official compliance.
   </section>
 </Layout>
