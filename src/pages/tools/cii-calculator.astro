@@ -1,0 +1,563 @@
+---
+import CalculatorLayout from '../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../components/CalculatorCard.astro';
+import InputField from '../../components/InputField.astro';
+import ResultBox from '../../components/ResultBox.astro';
+import FormulaBox from '../../components/FormulaBox.astro';
+import FAQSection from '../../components/FAQSection.astro';
+import RelatedTools from '../../components/RelatedTools.astro';
+
+const whatIs = `The CII Calculator provides an educational estimate of a vessel's Carbon Intensity Indicator rating based on the IMO's greenhouse gas emissions framework. It calculates estimated CO₂ emissions, transport work, attained CII value, and indicative rating band (A through E). This tool is designed for preliminary assessment and improvement scenario modeling — it is NOT an official IMO compliance calculator. Actual CII ratings depend on vessel-specific parameters, DCS data verification, and IMO-approved calculation methodologies.`;
+
+const whyItMatters = [
+  "The IMO CII mandate requires vessels of 5,000 GT and above to achieve a minimum C rating — vessels rated D for three consecutive years or E in any year must submit corrective action plans.",
+  "CII ratings directly affect vessel commercial value — poor ratings may restrict trade in regions with stricter environmental requirements and reduce charter attractiveness.",
+  "Understanding your current CII position enables proactive improvement planning rather than reactive compliance — early action is always more cost-effective.",
+  "Hybridization, shore power, and operational efficiency improvements can each contribute 5–15% CII improvement — quantifying these pathways is essential for investment decisions.",
+  "The CII framework tightens annually through 2030 — a vessel rated C today may be rated D by 2027 without continuous improvement measures."
+];
+
+const practicalApplications = [
+  { title: "Baseline CII Assessment", description: "Estimate current CII rating based on annual fuel consumption, distance, and deadweight to understand your compliance position." },
+  { title: "Improvement Scenario Modeling", description: "Evaluate the CII impact of hybridization, shore power adoption, speed optimization, and operational efficiency measures." },
+  { title: "Fleet CII Benchmarking", description: "Compare CII ratings across a fleet to prioritize improvement investments on the lowest-rated vessels." },
+  { title: "Pre-DCS Planning", description: "Prepare for annual DCS (Data Collection System) submissions by understanding the relationship between fuel consumption, distance, and CII rating." }
+];
+
+const expertNotes: { title: string; variant: 'warning' | 'engineering' | 'info'; content: string }[] = [
+  {
+    title: "NOT an Official IMO Calculator",
+    variant: "warning",
+    content: "This is an educational estimation tool only. Official CII ratings are calculated using the IMO's own methodology (MEPC.328(74) as amended), verified through DCS data submission and approved by flag states. Actual CII calculations require specific vessel parameters (ship type, deadweight, gross tonnage, cargo carrying capacity, fuel type-specific CO₂ emission factors) and must follow the IMO's prescribed formulas exactly."
+  },
+  {
+    title: "Reference Line and Rating Bands",
+    variant: "engineering",
+    content: "The CII rating is determined by comparing a vessel's attained CII against an annual operational CII reference line specific to its ship type and size. Rating bands are defined as: A (major superior) = below 80% of reference, B (minor superior) = 80–90%, C (moderate) = 90–100%, D (inferior) = 100–110%, E (significantly inferior) = above 110%. This calculator uses a simplified reference line for educational purposes."
+  },
+  {
+    title: "Improvement Scenario Assumptions",
+    variant: "info",
+    content: "The improvement scenarios use representative industry averages: hybridization reduces fuel consumption by 15%, shore power eliminates 5% of annual fuel (at berth), and operational efficiency (speed optimization, hull cleaning, weather routing) reduces consumption by 10%. Actual improvement potential varies significantly by vessel type, route, and operational profile."
+  }
+];
+
+const trustSection = {
+  text: "CII methodology is based on IMO MEPC.328(74) as amended. Rating band definitions follow IMO DCS data analysis. This tool provides educational estimates — consult your classification society for official calculations.",
+  link: { label: "View our methodology and formula derivations", href: "/methodology" }
+};
+
+const references = [
+  { title: "IMO CII Guidelines (MEPC.328(74))", url: "https://www.imo.org/en/OurWork/Environment/Pages/Carbon-Intensity-Indicator-(CII).aspx", source: "International Maritime Organization" },
+  { title: "IMO Fourth GHG Study 2020", url: "https://www.imo.org/en/OurWork/Environment/Pages/Fourth-IMO-Greenhouse-Gas-Study-2020.aspx", source: "International Maritime Organization" },
+  { title: "DNV — CII Assessment and Rating", url: "https://www.dnv.com/maritime/", source: "DNV" },
+  { title: "IMO DCS Data — CII Reference Lines", url: "https://www.imo.org/en/OurWork/Environment/Pages/Initial-IMO-GHG-Strategy.aspx", source: "International Maritime Organization" }
+];
+
+const faqItems = [
+  {
+    question: "What is the Carbon Intensity Indicator (CII)?",
+    answer: "The CII is an IMO measure that rates ships from A to E based on their operational carbon intensity — measured as grams of CO₂ emitted per tonne-mile of cargo transport work. It applies to vessels of 5,000 GT and above engaged in international voyages. Ships rated D for three consecutive years or E in any year must submit a corrective action plan as part of their Ship Energy Efficiency Management Plan (SEEMP)."
+  },
+  {
+    question: "How is CII calculated?",
+    answer: "Attained CII = Annual CO₂ emissions (tonnes) / (Deadweight × Distance traveled in nm). The result is compared to an annual operational CII reference line specific to the ship type and size. The rating is determined by where the attained CII falls relative to this reference line: A is below 80% of reference, B is 80–90%, C is 90–100%, D is 100–110%, and E is above 110%."
+  },
+  {
+    question: "What does each CII rating mean?",
+    answer: "A (Major Superior): Exceeds efficiency requirements significantly. B (Minor Superior): Meets and exceeds requirements. C (Moderate): Meets minimum requirements — this is the IMO's target operational band. D (Inferior): Below requirements — corrective action needed if sustained for 3 consecutive years. E (Significantly Inferior): Well below requirements — corrective action plan required immediately."
+  },
+  {
+    question: "How can I improve my CII rating?",
+    answer: "Key improvement pathways include: speed optimization (10–20% improvement), hull and propeller cleaning (5–10%), weather routing and voyage optimization (3–8%), hybridization or battery-electric systems (10–15%), shore power at berth (3–8%), wind-assisted propulsion (5–15%), and LNG or alternative fuels (10–20%). A combination of operational and technical measures typically achieves the best results."
+  },
+  {
+    question: "Does this calculator replace official IMO compliance?",
+    answer: "No. This tool provides educational estimates for preliminary assessment and improvement scenario modeling. Official CII ratings are determined through the IMO's Data Collection System (DCS), verified by flag states, and must follow the exact methodology prescribed in MEPC.328(74) as amended. Always use your classification society's approved tools for regulatory compliance."
+  },
+  {
+    question: "What vessels are affected by CII?",
+    answer: "CII applies to cargo, cruise, and tanker ships of 5,000 GT and above on international voyages. This includes bulk carriers, container ships, tankers, gas carriers, Ro-Ro cargo ships, and cruise ships. It does not apply to offshore support vessels, fishing vessels, or ships not engaged in international voyages. The scope may expand in future IMO amendments."
+  },
+  {
+    question: "How does hybridization affect CII?",
+    answer: "Hybridization reduces annual fuel consumption by 15–25% through battery-electric operation during low-load periods, load leveling, and optimized engine loading. Since CII is directly proportional to CO₂ emissions (which derive from fuel consumption), a 15% fuel reduction translates to approximately 15% CII improvement. This can shift a vessel from D to C or C to B rating."
+  },
+  {
+    question: "How often is CII reassessed?",
+    answer: "CII is assessed annually as part of the IMO's DCS data collection. Each year, vessels submit fuel consumption, distance traveled, and cargo data to their flag state. The attained CII is calculated and compared to the reference line to determine the annual rating. A vessel's cumulative rating history matters — D ratings for 3 consecutive years trigger corrective action requirements."
+  }
+];
+
+const relatedArticles = [
+  { title: "Understanding CII Ratings and Vessel Carbon Intensity", href: "/learn/understanding-cii-ratings" },
+  { title: "Maritime Decarbonization Roadmap", href: "/learn/maritime-decarbonization-roadmap" },
+];
+
+const relatedCalculators = [
+  { href: "/tools/marine-co2-reduction-calculator", title: "Marine CO₂ Reduction Calculator", description: "Quantify emissions reductions from hybridization and shore power adoption." },
+  { href: "/tools/shore-power-savings-calculator", title: "Shore Power Savings Calculator", description: "Estimate fuel savings and emission reductions from shore power connection." },
+  { href: "/marine", title: "Marine Electrification Hub", description: "Explore all marine decarbonization tools and resources." },
+];
+
+const fuelOptions = [
+  { label: 'Marine Gas Oil (MGO)', value: 'mgo' },
+  { label: 'Marine Diesel Oil (MDO)', value: 'mdo' },
+  { label: 'Heavy Fuel Oil (HFO)', value: 'hfo' },
+  { label: 'LNG', value: 'lng' },
+];
+---
+
+<CalculatorLayout
+  title="CII Calculator | Battery Calculators"
+  description="Estimate your vessel's Carbon Intensity Indicator (CII) rating and model improvement scenarios for IMO compliance. Educational tool — not official IMO calculator."
+  faqItems={faqItems}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+  relatedCalculators={relatedCalculators}
+  relatedArticles={relatedArticles}
+>
+
+  <!-- Prominent Disclaimer Banner -->
+  <div class="bg-m-red/10 border border-m-red/30 p-4 mb-8 flex items-start gap-3">
+    <svg class="w-5 h-5 text-m-red shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z" />
+    </svg>
+    <div>
+      <h3 class="text-primary font-bold text-sm mb-1">Educational Tool — Not Official IMO Compliance Calculator</h3>
+      <p class="text-body-sm text-muted">This calculator provides preliminary estimates for planning and learning. Actual CII ratings are determined through the IMO Data Collection System (DCS) and must be verified by your flag state and classification society using IMO-approved methodologies.</p>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+
+    <!-- Input Form -->
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Vessel Parameters</h3>
+      <div class="flex flex-col gap-6">
+
+        <InputField
+          id="annual-fuel"
+          label="Annual Fuel Consumption"
+          value={5000}
+          min={100}
+          max={100000}
+          step={100}
+          unit="tonnes/yr"
+          helperText="Total fuel consumed per year in metric tonnes."
+        />
+
+        <InputField
+          id="fuel-type"
+          label="Fuel Type"
+          type="select"
+          value="mgo"
+          options={fuelOptions}
+          helperText="Primary fuel used by the vessel."
+        />
+
+        <InputField
+          id="distance-travelled"
+          label="Distance Travelled"
+          value={50000}
+          min={1000}
+          max={500000}
+          step={1000}
+          unit="nm/year"
+          helperText="Total nautical miles sailed per year."
+        />
+
+        <InputField
+          id="dwt"
+          label="Deadweight Tonnage (DWT)"
+          value={50000}
+          min={5000}
+          max={500000}
+          step={1000}
+          unit="DWT"
+          helperText="Vessel deadweight in metric tonnes (≥5,000 for CII applicability)."
+        />
+
+      </div>
+    </CalculatorCard>
+
+    <!-- Results -->
+    <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">CII Assessment</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <ResultBox
+            label="Estimated Annual CO₂ Emissions"
+            value="16,030 t"
+            suffix="tonnes CO₂ per year"
+            variant="primary"
+            id="result-co2-emissions"
+          />
+          <ResultBox
+            label="Transport Work"
+            value="2.5B tnm"
+            suffix="DWT × nautical miles"
+            id="result-transport-work"
+          />
+          <ResultBox
+            label="Estimated Attained CII"
+            value="6.41"
+            suffix="g CO₂ / DWT-nm"
+            id="result-attained-cii"
+          />
+          <ResultBox
+            label="Indicative Rating Band"
+            value="C"
+            suffix="Moderate — meets minimum requirements"
+            id="result-rating-band"
+          />
+        </div>
+      </div>
+
+      <div class="border-t border-hairline pt-6">
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">CII Assessment</h4>
+        <p class="text-body-sm text-muted" id="summary-el">
+          Based on 5,000 tonnes fuel and 50,000 nm distance, this vessel achieves an estimated CII of 6.41 g CO₂/DWT-nm, falling within the C rating band.
+        </p>
+      </div>
+    </CalculatorCard>
+
+  </div>
+
+  <!-- Rating Bands Visualization -->
+  <section class="mb-16">
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-4 uppercase tracking-wider">CII Rating Bands</h3>
+      <p class="text-body-sm text-muted mb-6">Current vessel position relative to IMO rating thresholds (educational reference).</p>
+      <div id="rating-bands-chart" class="flex flex-col gap-3"></div>
+      <div class="flex items-center gap-4 mt-4 text-caption text-muted flex-wrap">
+        <span class="flex items-center gap-1.5"><span class="w-3 h-3 inline-block" style="background-color: #0fa336"></span> A — Major Superior</span>
+        <span class="flex items-center gap-1.5"><span class="w-3 h-3 inline-block" style="background-color: #16a34a"></span> B — Minor Superior</span>
+        <span class="flex items-center gap-1.5"><span class="w-3 h-3 inline-block" style="background-color: #f4b400"></span> C — Moderate</span>
+        <span class="flex items-center gap-1.5"><span class="w-3 h-3 inline-block" style="background-color: #ea580c"></span> D — Inferior</span>
+        <span class="flex items-center gap-1.5"><span class="w-3 h-3 inline-block" style="background-color: #e22718"></span> E — Significantly Inferior</span>
+      </div>
+    </CalculatorCard>
+  </section>
+
+  <!-- Improvement Scenarios Chart -->
+  <section class="mb-16">
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-4 uppercase tracking-wider">Current CII vs Improved CII</h3>
+      <p class="text-body-sm text-muted mb-6">Estimated CII improvement from combined hybridization, shore power, and operational efficiency measures.</p>
+      <div id="improvement-chart" class="flex flex-col gap-4"></div>
+    </CalculatorCard>
+  </section>
+
+  <!-- Formulas -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+
+      <FormulaBox title="Mathematical Formulas">
+        <p>
+          CII is calculated as the ratio of annual CO₂ emissions to transport work:
+        </p>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          CO₂ Emissions = Fuel Consumed × CO₂ Factor
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Transport Work = DWT × Distance (nm)
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Attained CII = CO₂ (tonnes) × 1,000,000 / Transport Work
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          CII Rating Bands (vs reference line R):
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2 text-[12px] leading-relaxed">
+          A: &lt; 0.80 × R<br/>
+          B: 0.80 × R to &lt; 0.90 × R<br/>
+          C: 0.90 × R to &lt; 1.00 × R<br/>
+          D: 1.00 × R to &lt; 1.10 × R<br/>
+          E: ≥ 1.10 × R
+        </div>
+        <p class="mt-4">
+          CO₂ factors (tonnes CO₂/tonne fuel): MGO 3.206, MDO 3.206, HFO 3.114, LNG 2.750<br/>
+          Reference line R = 5.0 g CO₂/DWT-nm (educational simplified benchmark)<br/>
+          IMO DCS data shows typical reference lines vary by ship type and DWT
+        </p>
+      </FormulaBox>
+
+      <div>
+        <h2 class="text-title-lg text-primary uppercase mb-6 tracking-wider">Worked Engineering Example</h2>
+        <div class="text-body-sm text-muted flex flex-col gap-4">
+          <p>Given vessel parameters:</p>
+          <ul class="list-disc pl-6 flex flex-col gap-1">
+            <li><strong>Fuel:</strong> 5,000 tonnes MGO/year (CO₂ factor: 3.206)</li>
+            <li><strong>Distance:</strong> 50,000 nm/year</li>
+            <li><strong>DWT:</strong> 50,000 tonnes</li>
+          </ul>
+
+          <p><strong>Step 1:</strong> Calculate annual CO₂ emissions:</p>
+          <div class="font-mono text-primary">CO₂ = 5,000 × 3.206 = 16,030 tonnes</div>
+
+          <p><strong>Step 2:</strong> Calculate transport work:</p>
+          <div class="font-mono text-primary">Transport Work = 50,000 × 50,000 = 2.5 × 10⁹ DWT-nm</div>
+
+          <p><strong>Step 3:</strong> Calculate attained CII:</p>
+          <div class="font-mono text-primary">CII = (16,030 × 1,000,000) / 2,500,000,000 = 6.41 g CO₂/DWT-nm</div>
+
+          <p><strong>Step 4:</strong> Determine rating band:</p>
+          <div class="font-mono text-primary">Reference R = 5.0 | Ratio = 6.41 / 5.0 = 1.282</div>
+          <div class="font-mono text-primary">Ratio ≥ 1.10 → Rating: E (Significantly Inferior)</div>
+
+          <p><strong>Step 5:</strong> Improvement scenario:</p>
+          <div class="font-mono text-primary">Hybridization (-15%): 6.41 × 0.85 = 5.45</div>
+          <div class="font-mono text-primary">Shore power (-5%): 5.45 × 0.95 = 5.18</div>
+          <div class="font-mono text-primary">Ops efficiency (-10%): 5.18 × 0.90 = 4.66</div>
+          <div class="font-mono text-primary">Improved ratio = 4.66 / 5.0 = 0.932 → Rating: C</div>
+
+          <p><strong>Result:</strong> Combined measures can improve CII from E to C, meeting IMO requirements and avoiding corrective action plan obligations.</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Improvement Scenarios Section -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Improvement Scenario Effects</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <CalculatorCard>
+        <h4 class="text-primary font-bold text-sm mb-3">Hybridization Effect</h4>
+        <p class="text-body-sm text-muted mb-2">Reduces fuel consumption by 15% through battery-electric operation during low-load periods and optimized engine loading.</p>
+        <p class="text-caption text-m-blue-light font-mono">CII reduction: 15%</p>
+      </CalculatorCard>
+      <CalculatorCard>
+        <h4 class="text-primary font-bold text-sm mb-3">Shore Power Effect</h4>
+        <p class="text-body-sm text-muted mb-2">Eliminates 5% of annual fuel consumption by replacing generator operation at berth with grid electricity.</p>
+        <p class="text-caption text-m-blue-light font-mono">CII reduction: 5%</p>
+      </CalculatorCard>
+      <CalculatorCard>
+        <h4 class="text-primary font-bold text-sm mb-3">Operational Efficiency</h4>
+        <p class="text-body-sm text-muted mb-2">Speed optimization, hull cleaning, weather routing, and voyage planning reduce consumption by 10%.</p>
+        <p class="text-caption text-m-blue-light font-mono">CII reduction: 10%</p>
+      </CalculatorCard>
+    </div>
+  </section>
+
+  <!-- Assumptions Section -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Assumptions & Limitations</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <CalculatorCard>
+        <h4 class="text-primary font-bold text-sm mb-3">Calculation Assumptions</h4>
+        <ul class="text-body-sm text-muted flex flex-col gap-2">
+          <li class="flex gap-2"><span class="text-m-blue-light shrink-0">→</span> Simplified reference line: 5.0 g CO₂/DWT-nm (educational)</li>
+          <li class="flex gap-2"><span class="text-m-blue-light shrink-0">→</span> CO₂ factors from Fourth IMO GHG Study (2020)</li>
+          <li class="flex gap-2"><span class="text-m-blue-light shrink-0">→</span> Rating bands follow IMO DCS data analysis proportions</li>
+          <li class="flex gap-2"><span class="text-m-blue-light shrink-0">→</span> Improvement percentages based on published case studies</li>
+        </ul>
+      </CalculatorCard>
+      <CalculatorCard>
+        <h4 class="text-primary font-bold text-sm mb-3">What This Calculator Does Not Include</h4>
+        <ul class="text-body-sm text-muted flex flex-col gap-2">
+          <li class="flex gap-2"><span class="text-m-red shrink-0">✗</span> Ship-type-specific reference lines (varies by vessel category)</li>
+          <li class="flex gap-2"><span class="text-m-red shrink-0">✗</span> Cargo carrying capacity adjustments</li>
+          <li class="flex gap-2"><span class="text-m-red shrink-0">✗</span> Weather and sea state corrections</li>
+          <li class="flex gap-2"><span class="text-m-red shrink-0">✗</span> DCS data verification and flag-state approval</li>
+          <li class="flex gap-2"><span class="text-m-red shrink-0">✗</span> Annual reference line adjustments per IMO amendments</li>
+        </ul>
+      </CalculatorCard>
+    </div>
+  </section>
+
+  <FAQSection items={faqItems} />
+  <RelatedTools tools={relatedCalculators} />
+
+  <!-- Calculation Script -->
+  <script>
+    import { calculateCii } from '../../utils/calculators';
+
+    const annualFuelInput = document.getElementById('annual-fuel') as HTMLInputElement;
+    const fuelTypeInput = document.getElementById('fuel-type') as HTMLSelectElement;
+    const distanceInput = document.getElementById('distance-travelled') as HTMLInputElement;
+    const dwtInput = document.getElementById('dwt') as HTMLInputElement;
+
+    function getResultElements(id: string) {
+      const box = document.getElementById(id);
+      return {
+        value: box?.querySelector('.text-display-md, .text-title-lg') as HTMLElement,
+        suffix: box?.querySelector('.text-caption') as HTMLElement,
+      };
+    }
+
+    const co2Emissions = getResultElements('result-co2-emissions');
+    const transportWork = getResultElements('result-transport-work');
+    const attainedCii = getResultElements('result-attained-cii');
+    const ratingBand = getResultElements('result-rating-band');
+    const summaryEl = document.getElementById('summary-el');
+
+    function fmt(n: number, decimals = 1): string {
+      return n.toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+    }
+
+    function updateRatingBandsChart(attainedCiiValue: number) {
+      const container = document.getElementById('rating-bands-chart');
+      if (!container) return;
+
+      // Reference line = 5.0 for educational purposes
+      const reference = 5.0;
+      const ratio = attainedCiiValue / reference;
+
+      // Scale: 0 to 8 g CO2/DWT-nm
+      const maxScale = 8;
+      const markerPos = Math.min((attainedCiiValue / maxScale) * 100, 100);
+
+      container.innerHTML = `
+        <div class="relative">
+          <div class="flex h-10 border border-hairline overflow-hidden">
+            <div class="flex-[0.8] flex items-center justify-center" style="background-color: #0fa336; opacity: 0.3">
+              <span class="text-[10px] font-bold text-primary">A</span>
+            </div>
+            <div class="flex-[0.1] flex items-center justify-center" style="background-color: #16a34a; opacity: 0.3">
+              <span class="text-[10px] font-bold text-primary">B</span>
+            </div>
+            <div class="flex-[0.1] flex items-center justify-center" style="background-color: #f4b400; opacity: 0.3">
+              <span class="text-[10px] font-bold text-primary">C</span>
+            </div>
+            <div class="flex-[0.1] flex items-center justify-center" style="background-color: #ea580c; opacity: 0.3">
+              <span class="text-[10px] font-bold text-primary">D</span>
+            </div>
+            <div class="flex-[0.9] flex items-center justify-center" style="background-color: #e22718; opacity: 0.3">
+              <span class="text-[10px] font-bold text-primary">E</span>
+            </div>
+          </div>
+          <div class="relative h-4 mt-1">
+            <div class="absolute top-0 w-0.5 h-4 bg-primary transition-all duration-300" style="left: ${markerPos}%"></div>
+            <div class="absolute -top-1 transition-all duration-300" style="left: ${markerPos}%; transform: translateX(-50%)">
+              <div class="w-0 h-0 border-l-4 border-r-4 border-t-6 border-l-transparent border-r-transparent border-t-primary"></div>
+            </div>
+          </div>
+          <div class="flex justify-between text-[10px] text-muted mt-1">
+            <span>0</span>
+            <span>1.0R</span>
+            <span>2.0R</span>
+            <span>3.0R</span>
+            <span>4.0R</span>
+          </div>
+          <div class="mt-2 text-caption text-muted">
+            <span class="text-primary font-bold">Vessel CII:</span> ${fmt(attainedCiiValue)} g CO₂/DWT-nm
+            <span class="text-m-blue-light ml-2">|</span>
+            <span class="ml-2"><span class="text-primary font-bold">Ratio:</span> ${fmt(ratio, 2)}× reference</span>
+          </div>
+        </div>
+      `;
+    }
+
+    function updateImprovementChart(attainedCiiValue: number) {
+      const container = document.getElementById('improvement-chart');
+      if (!container) return;
+
+      const hybridCii = attainedCiiValue * 0.85;
+      const shoreCii = hybridCii * 0.95;
+      const opsCii = shoreCii * 0.90;
+
+      const maxVal = Math.max(attainedCiiValue, 0.001);
+
+      container.innerHTML = `
+        <div class="flex flex-col gap-3">
+          <div class="flex items-center gap-3">
+            <span class="text-caption text-muted w-32 text-right shrink-0">Current</span>
+            <div class="flex-1 h-6 bg-surface-soft border border-hairline relative overflow-hidden">
+              <div class="h-full bg-m-red transition-all duration-300" style="width: ${(attainedCiiValue / maxVal) * 100}%"></div>
+            </div>
+            <span class="text-caption text-primary font-mono w-16 shrink-0">${fmt(attainedCiiValue)}</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="text-caption text-muted w-32 text-right shrink-0">+ Hybridization</span>
+            <div class="flex-1 h-6 bg-surface-soft border border-hairline relative overflow-hidden">
+              <div class="h-full bg-m-blue-light transition-all duration-300" style="width: ${(hybridCii / maxVal) * 100}%"></div>
+            </div>
+            <span class="text-caption text-primary font-mono w-16 shrink-0">${fmt(hybridCii)}</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="text-caption text-muted w-32 text-right shrink-0">+ Shore Power</span>
+            <div class="flex-1 h-6 bg-surface-soft border border-hairline relative overflow-hidden">
+              <div class="h-full bg-m-blue-dark transition-all duration-300" style="width: ${(shoreCii / maxVal) * 100}%"></div>
+            </div>
+            <span class="text-caption text-primary font-mono w-16 shrink-0">${fmt(shoreCii)}</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="text-caption text-muted w-32 text-right shrink-0">+ Ops Efficiency</span>
+            <div class="flex-1 h-6 bg-surface-soft border border-hairline relative overflow-hidden">
+              <div class="h-full bg-green-600 transition-all duration-300" style="width: ${(opsCii / maxVal) * 100}%"></div>
+            </div>
+            <span class="text-caption text-primary font-mono w-16 shrink-0">${fmt(opsCii)}</span>
+          </div>
+        </div>
+        <div class="mt-3 text-caption text-muted flex gap-6">
+          <span><span class="text-m-red font-bold">Current:</span> ${fmt(attainedCiiValue)} g CO₂/DWT-nm</span>
+          <span><span class="text-green-500 font-bold">Improved:</span> ${fmt(opsCii)} g CO₂/DWT-nm</span>
+          <span><span class="text-primary font-bold">Reduction:</span> ${fmt(((attainedCiiValue - opsCii) / attainedCiiValue) * 100, 0)}%</span>
+        </div>
+      `;
+    }
+
+    function updateCalculations() {
+      const annualFuel = parseFloat(annualFuelInput.value) || 5000;
+      const fuelType = fuelTypeInput.value as 'mgo' | 'mdo' | 'hfo' | 'lng';
+      const distance = parseFloat(distanceInput.value) || 50000;
+      const dwt = parseFloat(dwtInput.value) || 50000;
+
+      const result = calculateCii({
+        annualFuelConsumptionTonnes: annualFuel,
+        fuelType,
+        distanceTravelledNm: distance,
+        deadweightTonnage: dwt,
+      });
+
+      if (co2Emissions.value) co2Emissions.value.textContent = `${Math.round(result.annualCo2EmissionsTonnes).toLocaleString()} t`;
+      if (co2Emissions.suffix) co2Emissions.suffix.textContent = 'tonnes CO₂ per year';
+
+      if (transportWork.value) {
+        const tnmBillions = result.transportWorkTnm / 1000000000;
+        transportWork.value.textContent = `${fmt(tnmBillions, 1)}B tnm`;
+      }
+      if (transportWork.suffix) transportWork.suffix.textContent = 'DWT × nautical miles';
+
+      if (attainedCii.value) attainedCii.value.textContent = `${fmt(result.attainedCii)}`;
+      if (attainedCii.suffix) attainedCii.suffix.textContent = 'g CO₂ / DWT-nm';
+
+      if (ratingBand.value) {
+        ratingBand.value.textContent = result.ratingBand;
+        ratingBand.value.style.color = result.ratingColor;
+      }
+      if (ratingBand.suffix) {
+        const descriptions: Record<string, string> = {
+          'A': 'Major superior — exceeds efficiency requirements',
+          'B': 'Minor superior — meets and exceeds requirements',
+          'C': 'Moderate — meets minimum requirements',
+          'D': 'Inferior — corrective action may be required',
+          'E': 'Significantly inferior — corrective action required',
+        };
+        ratingBand.suffix.textContent = descriptions[result.ratingBand] || '';
+      }
+
+      if (summaryEl) {
+        summaryEl.textContent = `Based on ${annualFuel.toLocaleString()} tonnes of ${fuelType.toUpperCase()} and ${distance.toLocaleString()} nm distance, this vessel achieves an estimated CII of ${fmt(result.attainedCii)} g CO₂/DWT-nm, falling within the ${result.ratingBand} rating band. ${result.improvementNote}`;
+      }
+
+      // Update charts
+      updateRatingBandsChart(result.attainedCii);
+      updateImprovementChart(result.attainedCii);
+    }
+
+    [annualFuelInput, fuelTypeInput, distanceInput, dwtInput].forEach(el => {
+      el.addEventListener('input', updateCalculations);
+    });
+
+    updateCalculations();
+  </script>
+
+</CalculatorLayout>

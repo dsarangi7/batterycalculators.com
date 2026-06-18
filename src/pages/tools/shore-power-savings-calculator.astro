@@ -1,0 +1,577 @@
+---
+import CalculatorLayout from '../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../components/CalculatorCard.astro';
+import InputField from '../../components/InputField.astro';
+import ResultBox from '../../components/ResultBox.astro';
+import FormulaBox from '../../components/FormulaBox.astro';
+import FAQSection from '../../components/FAQSection.astro';
+import RelatedTools from '../../components/RelatedTools.astro';
+
+const whatIs = `The Shore Power Savings Calculator estimates emissions reduction and operating cost savings achieved when vessels connect to shore power (cold ironing) instead of running onboard diesel generators during port stays. It quantifies fuel avoidance, cost differentials, CO₂, NOx, and SOx reductions using industry-standard emission factors. This tool helps vessel owners, port authorities, and environmental managers evaluate the economic and environmental case for shore power adoption across a fleet's annual port operations.`;
+
+const whyItMatters = [
+  "Vessel generators running at berth consume 5,000–50,000+ liters of fuel annually per vessel — shore power eliminates this combustion entirely.",
+  "Port emissions are a major source of coastal air pollution — NOx and SOx from generators directly impact port communities and regulatory compliance.",
+  "The EU FuelEU Maritime regulation and IMO CII framework incentivize shore power adoption through emission reduction credits and port fee discounts.",
+  "Shore power typically costs 30–60% less than diesel generator operation when grid electricity is competitively priced against marine fuel.",
+  "Quantifying shore power savings is essential for port infrastructure investment decisions and vessel operator fleet planning."
+];
+
+const practicalApplications = [
+  { title: "Port Infrastructure Investment", description: "Build the business case for shore power installation by quantifying annual fuel savings and emission reductions across vessel calls." },
+  { title: "Fleet Shore Power Planning", description: "Evaluate which vessels in a fleet offer the greatest shore power savings based on port call frequency and berth time." },
+  { title: "Green Port Fee Optimization", description: "Quantify the financial benefit of shore power adoption to qualify for green port fee discounts of 10–30%." },
+  { title: "Emissions Compliance Strategy", description: "Model shore power's contribution to CII rating improvement and ECAs (Emission Control Area) compliance." }
+];
+
+const expertNotes: { title: string; variant: 'warning' | 'engineering' | 'info'; content: string }[] = [
+  {
+    title: "Generator Load Factor",
+    variant: "engineering",
+    content: "This calculator assumes generators operate at moderate load (60–80% of rated capacity) during berth stays, which is typical for hotel load provision. At lower loads, fuel consumption per kWh increases and combustion efficiency decreases. The default generator fuel consumption rate of 200 L/hour represents a medium-speed auxiliary diesel producing approximately 800–1,000 kW of electrical power."
+  },
+  {
+    title: "Grid Carbon Intensity Variability",
+    variant: "info",
+    content: "Shore power emission reductions depend heavily on the local grid's carbon intensity. Nordic ports with hydroelectric grids (20–50 g CO₂/kWh) achieve near-zero emissions from shore power. Coal-heavy grids (800–1000 g CO₂/kWh) may produce more CO₂ than efficient onboard generators. The default of 400 g CO₂/kWh represents a mixed global average grid."
+  },
+  {
+    title: "Limitations",
+    variant: "warning",
+    content: "This tool provides educational estimates only. It does not account for port-specific electricity tariff structures (demand charges, time-of-use pricing), shore power connection/disconnection time, auxiliary system parasitic loads, or the emissions impact of shore power infrastructure construction. For official emissions reporting, use certified calculation tools approved by your classification society."
+  }
+];
+
+const trustSection = {
+  text: "Emission factors are sourced from the Fourth IMO Greenhouse Gas Study (2020) and peer-reviewed maritime emission literature. All formulas and assumptions are documented below.",
+  link: { label: "View our methodology and formula derivations", href: "/methodology" }
+};
+
+const references = [
+  { title: "Fourth IMO GHG Study 2020", url: "https://www.imo.org/en/OurWork/Environment/Pages/Fourth-IMO-Greenhouse-Gas-Study-2020.aspx", source: "International Maritime Organization" },
+  { title: "IEA — Grid Emission Factors by Country", url: "https://www.iea.org/data-and-statistics/charts/grid-emission-factors-for-electricity-generation", source: "International Energy Agency" },
+  { title: "EU FuelEU Maritime Regulation", url: "https://transport.ec.europa.eu/transport-themes/maritime-transport/fuelEU-maritime_en", source: "European Commission" },
+  { title: "DNV — Shore Power Technology Assessment", url: "https://www.dnv.com/maritime/", source: "DNV" }
+];
+
+const faqItems = [
+  {
+    question: "How much fuel do vessel generators consume at berth?",
+    answer: "Typical auxiliary generators consume 150–400 liters per hour of marine fuel depending on engine size and electrical load. A vessel berthed 8 hours per call with a 200 L/hour generator consumes 1,600 liters per call. Over 200 annual port calls, this totals 320,000 liters — representing both a significant cost and emission source that shore power eliminates."
+  },
+  {
+    question: "When does shore power make economic sense?",
+    answer: "Shore power is economically favorable when grid electricity cost per kWh is less than the equivalent fuel cost per kWh from generator operation. For MGO at $0.75/L with 10 kWh/L energy content and 40% generator efficiency, the effective electricity cost from diesel is approximately $0.19/kWh. Below this threshold, shore power saves money. Above it, the benefit shifts to emission reduction and regulatory compliance."
+  },
+  {
+    question: "What NOx and SOx reductions does shore power provide?",
+    answer: "Shore power eliminates 100% of onboard combustion-related NOx and SOx emissions during port stays. NOx reductions range from 500–5,000 kg/year per vessel depending on berth hours and generator size. SOx reductions follow fuel sulfur content — MGO at 0.1% sulfur produces less SOx than HFO, but shore power eliminates all SOx regardless of fuel type. These reductions directly improve port community air quality."
+  },
+  {
+    question: "How does grid carbon intensity affect shore power benefits?",
+    answer: "Grid carbon intensity determines the net CO₂ benefit of shore power. A vessel switching from diesel generators (3.206 kg CO₂/liter MGO, 40% efficient) to a grid at 400 g CO₂/kWh achieves approximately 60% CO₂ reduction. If the grid is at 100 g CO₂/kWh (renewables), the reduction exceeds 90%. If the grid exceeds 800 g CO₂/kWh (coal-heavy), shore power may produce more CO₂ than generators — though local air quality still improves from eliminating port-side combustion."
+  },
+  {
+    question: "What are typical shore power electricity rates?",
+    answer: "Shore power rates vary significantly by region: Norway $0.08–0.12/kWh (hydroelectric), Northern Europe $0.10–0.18/kWh, US West Coast $0.15–0.22/kWh, Asia $0.08–0.25/kWh. Some ports offer preferential rates for vessels connecting during off-peak hours. Demand charges and connection fees may apply in addition to energy charges."
+  },
+  {
+    question: "What vessels benefit most from shore power?",
+    answer: "Vessels with frequent port calls and long berth times benefit most: cruise ships (8–12 hours at berth, large hotel loads), container ships (6–24 hours at berth), and passenger ferries (30–60 minutes per call, but very frequent). Vessels with short port stays (< 1 hour) may not achieve sufficient shore power connection time to offset connection costs."
+  },
+  {
+    question: "What about shore power infrastructure costs?",
+    answer: "Port-side shore power infrastructure costs $2–10 million per berth depending on power capacity and local grid connection requirements. Vessel-side retrofit costs $200,000–$1 million per vessel for switchgear, cables, and control systems. These capital costs are not included in this calculator, which focuses on annual operating savings. A full investment analysis should use the Hybrid Vessel ROI Calculator methodology."
+  },
+  {
+    question: "Can I use this calculator for regulatory compliance?",
+    answer: "This tool provides educational estimates for planning and feasibility analysis. It is not a substitute for certified emission calculations. For official IMO CII reporting, EU MRV compliance, or port authority emissions inventories, use calculation tools approved by your classification society and flag state."
+  }
+];
+
+const relatedArticles = [
+  { title: "Shore Power vs Diesel Generators", href: "/learn/shore-power-vs-diesel-generators" },
+  { title: "What Is Marine Electrification?", href: "/learn/what-is-marine-electrification" },
+];
+
+const relatedCalculators = [
+  { href: "/tools/marine-co2-reduction-calculator", title: "Marine CO₂ Reduction Calculator", description: "Quantify emissions reductions from hybridization and shore power adoption." },
+  { href: "/tools/hybrid-vessel-roi-calculator", title: "Hybrid Vessel ROI Calculator", description: "Evaluate the financial return on hybrid propulsion investment." },
+  { href: "/marine", title: "Marine Electrification Hub", description: "Explore all marine decarbonization tools and resources." },
+];
+---
+
+<CalculatorLayout
+  title="Shore Power Savings Calculator | Battery Calculators"
+  description="Estimate fuel savings, CO₂ reduction, and operating cost benefits from connecting vessels to shore power instead of running generators at berth."
+  faqItems={faqItems}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+  relatedCalculators={relatedCalculators}
+  relatedArticles={relatedArticles}
+>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+
+    <!-- Input Form -->
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Port Operations</h3>
+      <div class="flex flex-col gap-6">
+
+        <InputField
+          id="port-calls"
+          label="Port Calls Per Year"
+          value={200}
+          min={1}
+          max={1000}
+          step={10}
+          unit="calls/yr"
+          helperText="Total annual port calls across all destinations."
+        />
+
+        <InputField
+          id="hours-at-berth"
+          label="Hours At Berth Per Call"
+          value={8}
+          min={0.5}
+          max={72}
+          step={0.5}
+          unit="hrs/call"
+          helperText="Average time vessel remains at berth per call."
+        />
+
+        <InputField
+          id="aux-load"
+          label="Auxiliary Load"
+          value={800}
+          min={10}
+          max={5000}
+          step={10}
+          unit="kW"
+          helperText="Electrical load supplied by generators at berth."
+        />
+
+        <InputField
+          id="gen-fuel-rate"
+          label="Generator Fuel Consumption"
+          value={200}
+          min={10}
+          max={1000}
+          step={5}
+          unit="L/hr"
+          helperText="Fuel burn rate of auxiliary generators at berth load."
+        />
+
+        <InputField
+          id="fuel-cost"
+          label="Fuel Cost"
+          value={0.75}
+          min={0.01}
+          max={5}
+          step={0.05}
+          unit="$/L"
+          helperText="Marine fuel price per liter (MGO/MDO typical)."
+        />
+
+        <InputField
+          id="elec-cost"
+          label="Grid Electricity Cost"
+          value={0.15}
+          min={0.01}
+          max={1}
+          step={0.01}
+          unit="$/kWh"
+          helperText="Shore power electricity rate."
+        />
+
+        <InputField
+          id="grid-carbon"
+          label="Grid Carbon Intensity"
+          value={400}
+          min={0}
+          max={1200}
+          step={10}
+          unit="kg CO₂/MWh"
+          helperText="Local grid emission factor (default 400 = global avg)."
+        />
+
+      </div>
+    </CalculatorCard>
+
+    <!-- Results -->
+    <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Shore Power Savings</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <ResultBox
+            label="Annual Generator Fuel Avoided"
+            value="320,000 L"
+            suffix="liters of marine fuel saved"
+            variant="primary"
+            id="result-fuel-avoided"
+          />
+          <ResultBox
+            label="Annual Fuel Cost Avoided"
+            value="$240,000"
+            suffix="Generator fuel expenditure eliminated"
+            id="result-fuel-cost"
+          />
+          <ResultBox
+            label="Annual Shore Power Cost"
+            value="$192,000"
+            suffix="Grid electricity cost"
+            id="result-shore-cost"
+          />
+          <ResultBox
+            label="Annual Net Savings"
+            value="$48,000"
+            suffix="Fuel savings minus electricity cost"
+            id="result-net-savings"
+          />
+          <ResultBox
+            label="Annual CO₂ Reduction"
+            value="409.6 t"
+            suffix="tonnes CO₂ eliminated"
+            id="result-co2"
+          />
+          <ResultBox
+            label="Annual NOx Reduction"
+            value="18,880 kg"
+            suffix="kg NOx eliminated"
+            id="result-nox"
+          />
+          <ResultBox
+            label="Annual SOx Reduction"
+            value="640 kg"
+            suffix="kg SOx eliminated"
+            id="result-sox"
+          />
+          <ResultBox
+            label="Equivalent Cars Removed"
+            value="89"
+            suffix="passenger vehicles off the road"
+            id="result-cars"
+          />
+        </div>
+      </div>
+
+      <div class="border-t border-hairline pt-6">
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">Shore Power Assessment</h4>
+        <p class="text-body-sm text-muted" id="summary-el">
+          Connecting to shore power for 1,600 hours annually eliminates 320,000 liters of generator fuel, saving $48,000 after electricity costs.
+        </p>
+      </div>
+    </CalculatorCard>
+
+  </div>
+
+  <!-- Generator vs Shore Power Comparison Chart -->
+  <section class="mb-16">
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-4 uppercase tracking-wider">Generator Mode vs Shore Power Comparison</h3>
+      <p class="text-body-sm text-muted mb-6">Annual cost and emissions comparison between running onboard generators and using shore power at berth.</p>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- CO2 Chart -->
+        <div>
+          <span class="text-label-uppercase text-primary text-[10px] block mb-2">CO₂ (tonnes/year)</span>
+          <div id="chart-co2" class="flex flex-col gap-2"></div>
+        </div>
+        <!-- Cost Chart -->
+        <div>
+          <span class="text-label-uppercase text-primary text-[10px] block mb-2">Annual Cost ($)</span>
+          <div id="chart-cost" class="flex flex-col gap-2"></div>
+        </div>
+        <!-- NOx Chart -->
+        <div>
+          <span class="text-label-uppercase text-primary text-[10px] block mb-2">NOx (kg/year)</span>
+          <div id="chart-nox" class="flex flex-col gap-2"></div>
+        </div>
+      </div>
+      <div class="flex items-center gap-4 mt-6 text-caption text-muted">
+        <span class="flex items-center gap-1.5"><span class="w-3 h-3 bg-m-blue-light inline-block"></span> Generator Mode</span>
+        <span class="flex items-center gap-1.5"><span class="w-3 h-3 bg-green-600 inline-block"></span> Shore Power</span>
+      </div>
+    </CalculatorCard>
+  </section>
+
+  <!-- Annual Operating Cost Chart -->
+  <section class="mb-16">
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-4 uppercase tracking-wider">Annual Operating Cost Breakdown</h3>
+      <p class="text-body-sm text-muted mb-6">Generator fuel cost versus shore power electricity cost at current port call frequency.</p>
+      <div id="cost-breakdown-chart" class="flex flex-col gap-3"></div>
+    </CalculatorCard>
+  </section>
+
+  <!-- Formulas -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+
+      <FormulaBox title="Mathematical Formulas">
+        <p>
+          Shore power savings are calculated by comparing generator fuel consumption against grid electricity cost:
+        </p>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Generator Hours = Port Calls × Hours At Berth
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Fuel Avoided = Generator Hours × Fuel Rate (L/hr)
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Fuel Cost Avoided = Fuel Avoided × Fuel Cost ($/L)
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Shore Power Cost = Generator Hours × Aux Load (kW) × Elec Rate ($/kWh)
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Net Savings = Fuel Cost Avoided − Shore Power Cost
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          CO₂ Reduction = (Fuel Avoided × 3.206) − (Shore kWh × Grid CI) / 1000
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Cars Removed = CO₂ Reduction (t) / 4.6
+        </div>
+        <p class="mt-4">
+          MGO CO₂ factor: 3.206 kg/liter (Fourth IMO GHG Study 2020)<br/>
+          NOx factor: 0.059 kg/liter | SOx factor: 0.002 kg/liter<br/>
+          EPA equivalencies: 4.6 t CO₂/car/year
+        </p>
+      </FormulaBox>
+
+      <div>
+        <h2 class="text-title-lg text-primary uppercase mb-6 tracking-wider">Worked Engineering Example</h2>
+        <div class="text-body-sm text-muted flex flex-col gap-4">
+          <p>Given port operations:</p>
+          <ul class="list-disc pl-6 flex flex-col gap-1">
+            <li><strong>Port calls:</strong> 200/year | <strong>Berth time:</strong> 8 hrs/call</li>
+            <li><strong>Aux load:</strong> 800 kW | <strong>Generator rate:</strong> 200 L/hr</li>
+            <li><strong>Fuel:</strong> $0.75/L | <strong>Electricity:</strong> $0.15/kWh | <strong>Grid CI:</strong> 400 g/kWh</li>
+          </ul>
+
+          <p><strong>Step 1:</strong> Calculate annual generator hours:</p>
+          <div class="font-mono text-primary">Hours = 200 × 8 = 1,600 hours/year</div>
+
+          <p><strong>Step 2:</strong> Calculate fuel avoided:</p>
+          <div class="font-mono text-primary">Fuel = 1,600 × 200 = 320,000 liters/year</div>
+
+          <p><strong>Step 3:</strong> Calculate fuel cost avoided:</p>
+          <div class="font-mono text-primary">Fuel Cost = 320,000 × $0.75 = $240,000/year</div>
+
+          <p><strong>Step 4:</strong> Calculate shore power cost:</p>
+          <div class="font-mono text-primary">Shore kWh = 1,600 × 800 = 1,280,000 kWh</div>
+          <div class="font-mono text-primary">Shore Cost = 1,280,000 × $0.15 = $192,000/year</div>
+
+          <p><strong>Step 5:</strong> Calculate net savings:</p>
+          <div class="font-mono text-primary">Net = $240,000 − $192,000 = $48,000/year</div>
+
+          <p><strong>Step 6:</strong> Calculate CO₂ reduction:</p>
+          <div class="font-mono text-primary">Generator CO₂ = 320,000 × 3.206 / 1000 = 1,025.9 t</div>
+          <div class="font-mono text-primary">Shore CO₂ = 1,280,000 × 400 / 1,000,000 = 512.0 t</div>
+          <div class="font-mono text-primary">Net CO₂ = 1,025.9 − 512.0 = 513.9 tonnes/year</div>
+
+          <p><strong>Result:</strong> Shore power saves $48,000 annually while reducing CO₂ by 513.9 tonnes — equivalent to removing 112 passenger cars from the road.</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Assumptions Section -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Assumptions & Limitations</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <CalculatorCard>
+        <h4 class="text-primary font-bold text-sm mb-3">Operating Assumptions</h4>
+        <ul class="text-body-sm text-muted flex flex-col gap-2">
+          <li class="flex gap-2"><span class="text-m-blue-light shrink-0">→</span> Generator operates at 60–80% rated load during berth stays</li>
+          <li class="flex gap-2"><span class="text-m-blue-light shrink-0">→</span> MGO emission factor: 3.206 kg CO₂/liter (Fourth IMO GHG Study)</li>
+          <li class="flex gap-2"><span class="text-m-blue-light shrink-0">→</span> NOx factor: 0.059 kg/liter at moderate engine load</li>
+          <li class="flex gap-2"><span class="text-m-blue-light shrink-0">→</span> SOx factor: 0.002 kg/liter for 0.1% sulfur MGO</li>
+          <li class="flex gap-2"><span class="text-m-blue-light shrink-0">→</span> Grid carbon intensity default: 400 g CO₂/kWh (global average)</li>
+        </ul>
+      </CalculatorCard>
+      <CalculatorCard>
+        <h4 class="text-primary font-bold text-sm mb-3">What This Calculator Does Not Include</h4>
+        <ul class="text-body-sm text-muted flex flex-col gap-2">
+          <li class="flex gap-2"><span class="text-m-red shrink-0">✗</span> Shore power infrastructure capital costs</li>
+          <li class="flex gap-2"><span class="text-m-red shrink-0">✗</span> Vessel-side retrofit costs (switchgear, cables, controls)</li>
+          <li class="flex gap-2"><span class="text-m-red shrink-0">✗</span> Demand charges or time-of-use electricity pricing</li>
+          <li class="flex gap-2"><span class="text-m-red shrink-0">✗</span> Connection/disconnection time and labor costs</li>
+          <li class="flex gap-2"><span class="text-m-red shrink-0">✗</span> Green port fee discounts from shore power use</li>
+        </ul>
+      </CalculatorCard>
+    </div>
+  </section>
+
+  <FAQSection items={faqItems} />
+  <RelatedTools tools={relatedCalculators} />
+
+  <!-- Calculation Script -->
+  <script>
+    import { calculateShorePowerSavings } from '../../utils/calculators';
+
+    const portCallsInput = document.getElementById('port-calls') as HTMLInputElement;
+    const hoursAtBerthInput = document.getElementById('hours-at-berth') as HTMLInputElement;
+    const auxLoadInput = document.getElementById('aux-load') as HTMLInputElement;
+    const genFuelRateInput = document.getElementById('gen-fuel-rate') as HTMLInputElement;
+    const fuelCostInput = document.getElementById('fuel-cost') as HTMLInputElement;
+    const elecCostInput = document.getElementById('elec-cost') as HTMLInputElement;
+    const gridCarbonInput = document.getElementById('grid-carbon') as HTMLInputElement;
+
+    function getResultElements(id: string) {
+      const box = document.getElementById(id);
+      return {
+        value: box?.querySelector('.text-display-md, .text-title-lg') as HTMLElement,
+        suffix: box?.querySelector('.text-caption') as HTMLElement,
+      };
+    }
+
+    const fuelAvoided = getResultElements('result-fuel-avoided');
+    const fuelCost = getResultElements('result-fuel-cost');
+    const shoreCost = getResultElements('result-shore-cost');
+    const netSavings = getResultElements('result-net-savings');
+    const co2Result = getResultElements('result-co2');
+    const noxResult = getResultElements('result-nox');
+    const soxResult = getResultElements('result-sox');
+    const carsResult = getResultElements('result-cars');
+    const summaryEl = document.getElementById('summary-el');
+
+    function fmt(n: number, decimals = 1): string {
+      return n.toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+    }
+
+    function updateBarChart(containerId: string, generatorVal: number, shoreVal: number, unit: string) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      const maxVal = Math.max(generatorVal, 0.001);
+      const genPct = (generatorVal / maxVal) * 100;
+      const shorePct = (shoreVal / maxVal) * 100;
+      const reduction = maxVal > 0 ? ((generatorVal - shoreVal) / generatorVal) * 100 : 0;
+
+      container.innerHTML = `
+        <div class="flex flex-col gap-1">
+          <div class="flex items-center gap-2">
+            <span class="text-caption text-muted w-16 text-right shrink-0">Generator</span>
+            <div class="flex-1 h-5 bg-surface-soft border border-hairline relative overflow-hidden">
+              <div class="h-full bg-m-blue-light transition-all duration-300" style="width: ${genPct}%"></div>
+            </div>
+            <span class="text-caption text-primary font-mono w-20 shrink-0">${fmt(generatorVal)}${unit}</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-caption text-muted w-16 text-right shrink-0">Shore</span>
+            <div class="flex-1 h-5 bg-surface-soft border border-hairline relative overflow-hidden">
+              <div class="h-full bg-green-600 transition-all duration-300" style="width: ${shorePct}%"></div>
+            </div>
+            <span class="text-caption text-primary font-mono w-20 shrink-0">${fmt(shoreVal)}${unit}</span>
+          </div>
+          <span class="text-caption text-green-500 font-mono text-[10px]">↓ ${fmt(reduction)}% reduction</span>
+        </div>
+      `;
+    }
+
+    function updateCalculations() {
+      const portCalls = parseFloat(portCallsInput.value) || 200;
+      const hoursAtBerth = parseFloat(hoursAtBerthInput.value) || 8;
+      const auxLoad = parseFloat(auxLoadInput.value) || 800;
+      const genFuelRate = parseFloat(genFuelRateInput.value) || 200;
+      const fuelCostPerLiter = parseFloat(fuelCostInput.value) || 0.75;
+      const elecCostPerKwh = parseFloat(elecCostInput.value) || 0.15;
+      const gridCarbon = parseFloat(gridCarbonInput.value) || 400;
+
+      const result = calculateShorePowerSavings({
+        portCallsPerYear: portCalls,
+        hoursAtBerthPerCall: hoursAtBerth,
+        auxiliaryLoadKw: auxLoad,
+        generatorFuelConsumptionLPerHour: genFuelRate,
+        fuelCostPerLiter: fuelCostPerLiter,
+        gridElectricityCostPerKwh: elecCostPerKwh,
+        gridCarbonIntensityKgPerKwh: gridCarbon / 1000,
+      });
+
+      if (fuelAvoided.value) fuelAvoided.value.textContent = `${Math.round(result.annualGeneratorFuelLiters).toLocaleString()} L`;
+      if (fuelAvoided.suffix) fuelAvoided.suffix.textContent = 'liters of marine fuel saved';
+
+      if (fuelCost.value) fuelCost.value.textContent = `$${Math.round(result.annualGeneratorFuelCost).toLocaleString()}`;
+      if (fuelCost.suffix) fuelCost.suffix.textContent = 'Generator fuel expenditure eliminated';
+
+      if (shoreCost.value) shoreCost.value.textContent = `$${Math.round(result.annualShorePowerCost).toLocaleString()}`;
+      if (shoreCost.suffix) shoreCost.suffix.textContent = 'Grid electricity cost';
+
+      if (netSavings.value) netSavings.value.textContent = `$${Math.round(result.annualNetSavings).toLocaleString()}`;
+      if (netSavings.suffix) netSavings.suffix.textContent = result.annualNetSavings >= 0 ? 'Fuel savings minus electricity cost' : 'Net cost — shore power exceeds generator cost';
+
+      if (co2Result.value) co2Result.value.textContent = `${fmt(result.annualCo2ReductionTonnes)} t`;
+      if (co2Result.suffix) co2Result.suffix.textContent = 'tonnes CO₂ eliminated';
+
+      if (noxResult.value) noxResult.value.textContent = `${Math.round(result.annualNoxReductionKg).toLocaleString()} kg`;
+      if (noxResult.suffix) noxResult.suffix.textContent = 'kg NOx eliminated';
+
+      if (soxResult.value) soxResult.value.textContent = `${Math.round(result.annualSoxReductionKg).toLocaleString()} kg`;
+      if (soxResult.suffix) soxResult.suffix.textContent = 'kg SOx eliminated';
+
+      if (carsResult.value) carsResult.value.textContent = `${Math.round(result.equivalentCarsRemoved)}`;
+      if (carsResult.suffix) carsResult.suffix.textContent = 'passenger vehicles off the road';
+
+      if (summaryEl) {
+        const hoursText = Math.round(result.annualGeneratorHours).toLocaleString();
+        const fuelText = Math.round(result.annualGeneratorFuelLiters).toLocaleString();
+        const savingsText = Math.abs(Math.round(result.annualNetSavings)).toLocaleString();
+        if (result.annualNetSavings >= 0) {
+          summaryEl.textContent = `Connecting to shore power for ${hoursText} hours annually eliminates ${fuelText} liters of generator fuel, saving $${savingsText} after electricity costs.`;
+        } else {
+          summaryEl.textContent = `Connecting to shore power for ${hoursText} hours eliminates ${fuelText} liters of generator fuel, but shore power costs exceed fuel savings by $${savingsText} at current electricity rates.`;
+        }
+      }
+
+      // Update comparison charts
+      updateBarChart('chart-co2', result.baselineCo2Tonnes, result.shorePowerCo2Tonnes, 't');
+      updateBarChart('chart-cost', result.annualGeneratorFuelCost, result.annualShorePowerCost, '');
+      updateBarChart('chart-nox', result.annualNoxReductionKg + (result.annualNoxReductionKg * 0.01), result.annualNoxReductionKg * 0.01, 'kg');
+
+      // Cost breakdown chart
+      const costContainer = document.getElementById('cost-breakdown-chart');
+      if (costContainer) {
+        const totalCost = Math.max(result.annualGeneratorFuelCost, result.annualShorePowerCost, 1);
+        const genPct = (result.annualGeneratorFuelCost / totalCost) * 100;
+        const shorePct = (result.annualShorePowerCost / totalCost) * 100;
+
+        costContainer.innerHTML = `
+          <div class="flex flex-col gap-2">
+            <div class="flex items-center gap-3">
+              <span class="text-caption text-muted w-24 text-right shrink-0">Generator</span>
+              <div class="flex-1 h-8 bg-surface-soft border border-hairline relative overflow-hidden">
+                <div class="h-full bg-m-blue-light transition-all duration-300 flex items-center pl-2" style="width: ${genPct}%">
+                  <span class="text-caption text-primary font-mono text-[10px] whitespace-nowrap">$${Math.round(result.annualGeneratorFuelCost).toLocaleString()}</span>
+                </div>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="text-caption text-muted w-24 text-right shrink-0">Shore Power</span>
+              <div class="flex-1 h-8 bg-surface-soft border border-hairline relative overflow-hidden">
+                <div class="h-full bg-green-600 transition-all duration-300 flex items-center pl-2" style="width: ${shorePct}%">
+                  <span class="text-caption text-primary font-mono text-[10px] whitespace-nowrap">$${Math.round(result.annualShorePowerCost).toLocaleString()}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="mt-2 text-caption text-muted">
+            <span class="text-primary font-bold">Net annual ${result.annualNetSavings >= 0 ? 'savings' : 'cost'}:</span> $${Math.abs(Math.round(result.annualNetSavings)).toLocaleString()}
+          </div>
+        `;
+      }
+    }
+
+    [portCallsInput, hoursAtBerthInput, auxLoadInput, genFuelRateInput, fuelCostInput, elecCostInput, gridCarbonInput].forEach(el => {
+      el.addEventListener('input', updateCalculations);
+    });
+
+    updateCalculations();
+  </script>
+
+</CalculatorLayout>
