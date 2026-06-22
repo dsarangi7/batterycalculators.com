@@ -22,6 +22,14 @@ const faqItems = [
     question: "How long does the battery sizing process take?",
     answer: "With a load inventory and basic system parameters (voltage, autonomy days, DoD limit), a sizing calculation can be completed in minutes using a spreadsheet or calculator. The more time-consuming step is gathering accurate load data, especially for systems with many intermittent devices.",
   },
+  {
+    question: "What temperature derating factor should I use?",
+    answer: "Temperature derating factors vary by battery chemistry. At 0°C (32°F), LFP batteries deliver approximately 90% of rated capacity (factor 0.90), while lead-acid batteries deliver only 80% (factor 0.80). At -20°C (-4°F), these drop to 70% and 50% respectively. At room temperature (25°C), no derating is needed — the factor is 1.00. Always consult your battery manufacturer's datasheet for precise derating curves, as values vary by model and construction.",
+  },
+  {
+    question: "Which battery chemistry is best for sizing?",
+    answer: "LFP (LiFePO4) is generally the best choice for stationary energy storage due to its deep discharge capability (80–90% DoD), long cycle life (3,000–5,000 cycles), and excellent thermal stability. NMC lithium offers higher energy density but shorter cycle life. Lead-acid is lowest cost upfront but requires 50% DoD limiting and heavier weight. The best chemistry depends on your specific constraints — weight, space, budget, and cycle life requirements.",
+  },
 ];
 ---
 
@@ -151,6 +159,64 @@ const faqItems = [
       </section>
 
       <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Temperature Derating Factors</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Batteries are rated at 25°C. Cold temperatures slow the chemical reactions inside the cells, reducing the energy that can be extracted. The temperature factor is applied as a divisor in the sizing formula — a lower factor means you need more installed capacity to compensate for reduced output in cold conditions.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Temperature</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">LFP (LiFePO4)</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Lead-Acid</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">NMC (Lithium)</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">30°C (86°F)</td>
+                <td class="p-4 font-mono text-primary">1.02</td>
+                <td class="p-4 font-mono text-primary">1.00</td>
+                <td class="p-4 font-mono text-primary">1.01</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">25°C (77°F)</td>
+                <td class="p-4 font-mono text-primary">1.00</td>
+                <td class="p-4 font-mono text-primary">1.00</td>
+                <td class="p-4 font-mono text-primary">1.00</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">10°C (50°F)</td>
+                <td class="p-4 font-mono text-primary">0.95</td>
+                <td class="p-4 font-mono text-primary">0.90</td>
+                <td class="p-4 font-mono text-primary">0.93</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">0°C (32°F)</td>
+                <td class="p-4 font-mono text-primary">0.90</td>
+                <td class="p-4 font-mono text-primary">0.80</td>
+                <td class="p-4 font-mono text-primary">0.85</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">-10°C (14°F)</td>
+                <td class="p-4 font-mono text-primary">0.80</td>
+                <td class="p-4 font-mono text-primary">0.65</td>
+                <td class="p-4 font-mono text-primary">0.75</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">-20°C (-4°F)</td>
+                <td class="p-4 font-mono text-primary">0.70</td>
+                <td class="p-4 font-mono text-primary">0.50</td>
+                <td class="p-4 font-mono text-primary">0.60</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-body-sm text-muted mt-2">Values are approximate and vary by manufacturer. Always consult the specific battery datasheet for precise derating curves.</p>
+      </section>
+
+      <section>
         <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Sizing Across Applications</h2>
         <p class="text-body-md text-body font-light mb-4">
           The sizing method is universal, but the dominant constraints vary by application. Understanding which parameters matter most in your scenario helps prioritize data collection and design decisions.
@@ -193,6 +259,54 @@ const faqItems = [
             </tbody>
           </table>
         </div>
+        <h3 class="text-title-md text-primary mt-8 mb-4">Chemistry Selection Guide</h3>
+        <p class="text-body-md text-body font-light mb-4">
+          Battery chemistry determines the usable capacity, cycle life, safety profile, and cost per kWh. The right chemistry depends on your specific constraints — weight, space, budget, and expected lifespan.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Chemistry</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">DoD</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Cycle Life</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Cost/kWh</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Best For</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">LFP (LiFePO4)</td>
+                <td class="p-4 font-mono text-primary">80–90%</td>
+                <td class="p-4 text-muted">3,000–5,000</td>
+                <td class="p-4 text-muted">$250–400</td>
+                <td class="p-4 text-muted">Solar, home backup, off-grid</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">NMC (Lithium)</td>
+                <td class="p-4 font-mono text-primary">80–90%</td>
+                <td class="p-4 text-muted">2,000–3,000</td>
+                <td class="p-4 text-muted">$300–500</td>
+                <td class="p-4 text-muted">Weight-sensitive mobile applications</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Lead-Acid (AGM)</td>
+                <td class="p-4 font-mono text-primary">50%</td>
+                <td class="p-4 text-muted">500–1,000</td>
+                <td class="p-4 text-muted">$150–250</td>
+                <td class="p-4 text-muted">Budget builds, backup-only systems</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Sodium-Ion</td>
+                <td class="p-4 font-mono text-primary">80–90%</td>
+                <td class="p-4 text-muted">2,000–4,000</td>
+                <td class="p-4 text-muted">$150–300</td>
+                <td class="p-4 text-muted">Emerging stationary storage</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-body-sm text-muted mt-2">When comparing cost, look at lifetime cost per kWh delivered, not just upfront price. A $350/kWh LFP battery delivering 4,000 cycles at 85% DoD costs $0.10 per kWh delivered. A $200/kWh lead-acid battery delivering 800 cycles at 50% DoD costs $0.50 per kWh delivered — five times more expensive over its lifetime.</p>
       </section>
 
       <section>
@@ -222,6 +336,14 @@ const faqItems = [
         </CalculatorCard>
       </section>
 
+      <CalculatorCard class="border-m-blue-light">
+        <h4 class="text-label-uppercase text-primary text-xs mb-3">Next Step: Configure Your Battery Bank</h4>
+        <p class="text-body-sm text-muted mb-4">
+          Once you have determined the required capacity in Ah, the next step is configuring the series and parallel arrangement of cells or modules to achieve your target voltage and total capacity.
+        </p>
+        <a href="/tools/parallel-string-calculator" class="btn-primary-outline text-xs py-3 px-6 inline-block">Open Parallel String Calculator</a>
+      </CalculatorCard>
+
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <CalculatorCard class="border-m-blue-light">
           <h4 class="text-label-uppercase text-primary text-xs mb-3">Try It</h4>
@@ -244,13 +366,33 @@ const faqItems = [
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <CalculatorCard>
             <h4 class="text-primary font-bold mb-2">Battery Sizing Formula</h4>
-            <p class="text-body-sm text-muted mb-3">Complete formula reference with all parameters, temperature derating, and efficiency factors.</p>
+            <p class="text-body-sm text-muted mb-3">Complete formula reference with all parameters, variable definitions, and worked examples.</p>
             <a href="/learn/battery-sizing-formula" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Read Guide →</a>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">How to Size a Battery Bank</h4>
+            <p class="text-body-sm text-muted mb-3">Practical step-by-step tutorial with decision flowchart and common sizing mistakes.</p>
+            <a href="/learn/how-to-size-a-battery-bank" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Read Guide →</a>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Battery Sizing Chart Guide</h4>
+            <p class="text-body-sm text-muted mb-3">Visual reference chart mapping load profiles to recommended battery capacities.</p>
+            <a href="/learn/battery-sizing-chart-guide" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Read Guide →</a>
           </CalculatorCard>
           <CalculatorCard>
             <h4 class="text-primary font-bold mb-2">Home Battery Sizing Guide</h4>
             <p class="text-body-sm text-muted mb-3">How to size a residential battery backup system for essential household loads.</p>
             <a href="/learn/home-battery-sizing-guide" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Read Guide →</a>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Solar Storage Sizing Guide</h4>
+            <p class="text-body-sm text-muted mb-3">Complete guide to sizing solar battery storage with array sizing and chemistry selection.</p>
+            <a href="/learn/solar-storage-sizing-guide" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Read Guide →</a>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Marine Battery Sizing Guide</h4>
+            <p class="text-body-sm text-muted mb-3">How to size house banks and engine starting batteries for marine applications.</p>
+            <a href="/learn/marine-battery-sizing-guide" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Read Guide →</a>
           </CalculatorCard>
         </div>
       </section>
