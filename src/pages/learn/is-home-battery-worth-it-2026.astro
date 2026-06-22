@@ -1,0 +1,646 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import CalculatorCard from '../../components/CalculatorCard.astro';
+import FormulaBox from '../../components/FormulaBox.astro';
+import FAQSection from '../../components/FAQSection.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "Is a home battery worth the cost in 2026?",
+    answer: "A home battery is worth the cost if you face frequent outages, live in a time-of-use rate territory, have high electricity rates above $0.20/kWh, or have solar panels with low feed-in tariffs. For standalone battery purchases without solar in 2026, the financial case is weaker without the federal ITC. Payback periods range from 5–8 years in high-rate TOU markets to 15–20+ years in low-rate areas.",
+  },
+  {
+    question: "How much does a home battery cost in 2026?",
+    answer: "A residential home battery costs $5,000–$35,000 installed depending on capacity. A 5 kWh system runs $5,000–$8,000, a 10 kWh system runs $8,000–$13,000, a 20 kWh system runs $14,000–$24,000, and a 30 kWh system runs $22,000–$35,000. These are fully installed prices including battery, inverter, electrical work, and permits.",
+  },
+  {
+    question: "What is the payback period for a home battery?",
+    answer: "Payback period depends on electricity rates, time-of-use pricing, and solar pairing. In high-rate TOU markets like California or Massachusetts, payback ranges from 5–8 years with solar. At the national average rate of $0.18/kWh, payback is 7–12 years. Without TOU pricing or in low-rate states, payback can exceed 15 years. Assigning backup value to the system shortens effective payback.",
+  },
+  {
+    question: "Are home batteries worth it without solar panels?",
+    answer: "Without solar, home batteries only shift grid energy from off-peak to peak hours. The financial case rests entirely on time-of-use arbitrage and backup value. At average US electricity rates without TOU pricing, standalone batteries rarely achieve financial payback. They are justified as outage insurance, not as a money-saving investment.",
+  },
+  {
+    question: "How long do home batteries last?",
+    answer: "LiFePO4 home batteries last 3,500–7,000 cycles at 80% depth of discharge, which translates to 10–15+ years of daily cycling. Most manufacturers warrant batteries for 10–15 years. Battery capacity typically degrades to 70–80% of original capacity over this period, meaning a 10 kWh battery still delivers 7–8 kWh after its warranty expires.",
+  },
+  {
+    question: "What size home battery do I need?",
+    answer: "Most homes need 10–20 kWh for essential circuit backup (refrigerator, lights, router, medical devices). Whole-home backup requires 20–50+ kWh depending on home size and HVAC loads. A small home under 1,500 sq ft may need 10–15 kWh, while a large home over 2,500 sq ft may need 25–40 kWh for full coverage.",
+  },
+  {
+    question: "Can a home battery power my whole house?",
+    answer: "Yes, if the battery bank is large enough and paired with a sufficiently powerful inverter. A typical home consuming 25–40 kWh per day needs 30–50+ kWh of battery capacity for 24-hour whole-house backup, plus an inverter rated for peak demand of 8–15 kW. Critical-loads backup is more common and cost-effective.",
+  },
+  {
+    question: "Do I still get the federal tax credit for batteries in 2026?",
+    answer: "The 30% federal Residential Clean Energy Credit (Section 25D) was terminated by the One Big Beautiful Bill Act for systems placed in service after December 31, 2025. Homeowners purchasing batteries outright in 2026 cannot claim the federal credit. However, batteries installed through solar lease or PPA arrangements may still qualify for the commercial ITC (Section 48E) through 2032.",
+  },
+  {
+    question: "What state incentives are available for home batteries in 2026?",
+    answer: "State programs continue to offer significant rebates. California SGIP provides up to $1,100/kWh for qualifying households. New York NYSERDA, Connecticut, Colorado, and other states offer $5,000–$16,000 in combined incentives. Check the DSIRE database for current programs in your area.",
+  },
+  {
+    question: "How much can I save with a home battery?",
+    answer: "Savings depend on electricity rates, time-of-use pricing, and solar pairing. In high-rate TOU markets with solar, annual savings of $400–$800 are realistic. At national average rates without TOU pricing, pure electricity savings may be $100–$300 per year. The primary value for many homeowners is backup power, not electricity savings.",
+  },
+  {
+    question: "What is the difference between LiFePO4 and NMC batteries?",
+    answer: "LiFePO4 (LFP) offers 3,500–7,000 cycles, superior thermal stability, and zero cobalt content. NMC offers higher energy density but only 1,500–3,000 cycles and a lower thermal runaway threshold of 150–210°C vs 270°C for LFP. Every major home battery manufacturer in 2026 uses LFP chemistry. For stationary home storage, LFP is the recommended choice.",
+  },
+  {
+    question: "How does a battery affect my solar payback?",
+    answer: "A battery increases solar self-consumption from 25–40% to 60–90%, which is significant when feed-in tariffs are low ($0.03–$0.08/kWh) and retail rates are high ($0.25–$0.45/kWh). Each kilowatt-hour consumed on-site instead of exported saves $0.17–$0.40 in California. This can reduce solar payback by 2–4 years.",
+  },
+  {
+    question: "Should I buy a battery now or wait?",
+    answer: "Battery hardware costs have declined approximately 47% since 2020 and continue falling. However, electricity rates are also rising 3–5% annually. If you live in a high-rate TOU market and need backup, buying sooner captures immediate savings and outage protection. In low-rate markets, waiting for further cost declines is reasonable if backup urgency is low.",
+  },
+  {
+    question: "Can I add a battery to my existing solar system?",
+    answer: "Yes. Adding a battery to an existing grid-tied solar system requires a hybrid inverter or a battery-ready inverter with AC-coupled battery. If your current inverter is battery-ready, the retrofit is straightforward. If not, you may need an inverter upgrade costing $2,000–$5,000. Most modern solar inverters are battery-ready.",
+  },
+  {
+    question: "How much does a whole-house battery backup system cost?",
+    answer: "A whole-house battery backup system costs $15,000–$40,000+ installed. This includes 20–50 kWh of battery capacity, a 10–15 kW hybrid inverter, electrical panel integration, transfer switch, permits, and labor. Critical-loads-only systems cost $5,000–$15,000 and back up essential circuits only.",
+  },
+];
+---
+
+<Layout
+  title="Is a Home Battery Worth It in 2026? | Battery Calculators"
+  description="Honest analysis of whether a home battery is worth it in 2026: costs, savings, payback periods, backup value, sizing guidance, and when batteries make financial sense."
+  canonical="https://batterycalculators.com/learn/is-home-battery-worth-it-2026"
+  schema="faqPage"
+  schemaName="Is a Home Battery Worth It in 2026?"
+  schemaDescription="Comprehensive guide analyzing whether a home battery system is worth the investment in 2026, covering costs, savings, payback periods, and practical recommendations."
+  schemaUrl="https://batterycalculators.com/learn/is-home-battery-worth-it-2026"
+  faqItems={faqItems}
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/learn" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Back to Guides</a>
+      <Breadcrumb items={[
+        { label: "Learning Center", href: "/learn" },
+        { label: "Is a Home Battery Worth It in 2026?" }
+      ]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">HOME BACKUP</span>
+      <h1 class="text-display-md text-primary mb-6">Is a Home Battery Worth It in 2026?</h1>
+      <p class="text-body-md text-body font-light">
+        Electricity rates in the United States have risen 23% over the past four years. Grid outages averaged 11 hours per customer in 2024 — nearly double the previous decade's average. Meanwhile, home battery costs have dropped 47% since 2020. More than 1.5 million US homes now have battery storage, with 600,000+ systems installed in 2024 alone.
+      </p>
+      <p class="text-body-md text-body font-light mt-4">
+        The question on every homeowner's mind is whether the numbers work. This guide provides an engineering-level, economically grounded analysis of when a home battery system makes sense, when it does not, and how to size it correctly for your situation.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+
+      <!-- What Is a Home Battery System? -->
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">What Is a Home Battery System?</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          A home battery system stores electrical energy for later use. It charges from the grid, solar panels, or both, and discharges to power household loads when grid electricity is expensive or unavailable. The core components are a rechargeable battery (typically LiFePO4 lithium-ion in 2026), a hybrid inverter that converts DC battery power to AC household power, a battery management system (BMS) that monitors cell health and safety, and a monitoring platform that provides real-time data.
+        </p>
+        <p class="text-body-md text-body font-light mb-4">
+          Home batteries operate in three primary modes. Grid-connected batteries charge during off-peak hours and discharge during peak hours to reduce electricity bills under time-of-use (TOU) rates. Solar-connected batteries store excess solar energy produced during the day for use at night, increasing solar self-consumption. Backup systems automatically engage during grid outages to power essential or whole-home circuits.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden mb-6">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Mode</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Primary Use</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Best For</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">Grid-Connected (TOU)</td>
+                <td class="p-4 text-muted">Charge at off-peak rates, discharge at peak rates</td>
+                <td class="p-4 text-muted">Homes with time-of-use electricity pricing</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">Solar-Connected</td>
+                <td class="p-4 text-muted">Store excess solar production for nighttime use</td>
+                <td class="p-4 text-muted">Homes with solar panels and low feed-in tariffs</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">Backup Power</td>
+                <td class="p-4 text-muted">Power home circuits during grid outages</td>
+                <td class="p-4 text-muted">Homes with frequent outages or critical loads</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-body-md text-body font-light">
+          Most modern home battery systems combine all three modes. A solar-connected battery also provides TOU arbitrage and backup power. The specific value of each mode depends on your electricity rates, grid reliability, and energy configuration.
+        </p>
+      </section>
+
+      <!-- How Much Does a Home Battery Cost in 2026? -->
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">How Much Does a Home Battery Cost in 2026?</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Installed costs for residential battery systems in 2026 range from $5,000 for a small 5 kWh critical-loads system to $35,000 for a 30 kWh whole-home backup configuration. These prices include the battery unit, hybrid inverter, electrical work, permits, monitoring, and labor. Battery-only hardware costs $400–$800 per kWh for LiFePO4 chemistry, but the inverter and installation typically add 30–50% to the total.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden mb-6">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Battery Size</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Installed Cost Range</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Typical Application</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">5 kWh</td>
+                <td class="p-4 font-mono text-primary">$5,000 – $8,000</td>
+                <td class="p-4 text-muted">Critical loads only: refrigerator, router, phone charging, emergency lighting</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">10 kWh</td>
+                <td class="p-4 font-mono text-primary">$8,000 – $13,000</td>
+                <td class="p-4 text-muted">Essential home backup: fridge, lights, router, medical devices, well pump</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">15 kWh</td>
+                <td class="p-4 font-mono text-primary">$11,000 – $18,000</td>
+                <td class="p-4 text-muted">Extended critical loads with moderate HVAC or additional appliances</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">20 kWh</td>
+                <td class="p-4 font-mono text-primary">$14,000 – $24,000</td>
+                <td class="p-4 text-muted">Partial whole-home backup: critical loads plus selective appliance operation</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">30 kWh</td>
+                <td class="p-4 font-mono text-primary">$22,000 – $35,000</td>
+                <td class="p-4 text-muted">Whole-home backup for most residences, or multi-day critical load coverage</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-body-md text-body font-light">
+          The 30% federal Residential Clean Energy Credit (Section 25D) was terminated by the One Big Beautiful Bill Act for systems placed in service after December 31, 2025. This adds approximately $2,000–$4,500 to the net cost of a typical system compared to 2025 pricing. However, hardware costs have fallen roughly 47% since 2020, partially absorbing this change. State incentives in California, New York, Connecticut, Colorado, and other states continue to offer $5,000–$16,000 in rebates for qualifying installations.
+        </p>
+      </section>
+
+      <!-- When Is a Home Battery Worth It? -->
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">When Is a Home Battery Worth It?</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          A home battery delivers measurable financial and operational value in specific situations. The following scenarios represent the strongest use cases.
+        </p>
+
+        <h3 class="text-title-md text-primary mb-3">Frequent Power Outages</h3>
+        <p class="text-body-md text-body font-light mb-4">
+          If you experience more than 2–3 outages per year, a battery system pays for itself through avoided generator costs, food spoilage prevention, and lost productivity. The average US outage lasted nearly 11 hours in 2024, with hurricane-prone states seeing 30–50+ hours. The US Energy Information Administration reports that equipment failure and severe weather cause 80%+ of outages, and aging infrastructure is not improving reliability.
+        </p>
+
+        <h3 class="text-title-md text-primary mb-3">Time-of-Use Electricity Pricing</h3>
+        <p class="text-body-md text-body font-light mb-4">
+          TOU rates charge 2–4x more during peak hours (typically 4–9 PM). In California, peak rates routinely exceed $0.50/kWh while off-peak rates drop to $0.25–$0.35/kWh. A battery that charges at off-peak rates and discharges during peak captures the spread as savings. This is the strongest financial driver for batteries in the US market.
+        </p>
+
+        <h3 class="text-title-md text-primary mb-3">Solar Self-Consumption Optimization</h3>
+        <p class="text-body-md text-body font-light mb-4">
+          Without a battery, most homes consume only 25–40% of their solar production on-site. The rest is exported at feed-in tariffs of $0.03–$0.08/kWh — far below retail rates of $0.25–$0.45/kWh. Adding a battery increases self-consumption to 60–90%, capturing the difference. Every kilowatt-hour consumed on-site instead of exported represents $0.17–$0.40 in avoided costs in high-rate markets.
+        </p>
+
+        <h3 class="text-title-md text-primary mb-3">Off-Grid Applications</h3>
+        <p class="text-body-md text-body font-light mb-4">
+          For homes without grid access or those seeking complete energy independence, batteries are essential. Off-grid systems require larger battery banks (30–100+ kWh) paired with solar arrays sized for local conditions. The financial case is straightforward: the alternative is running utility lines at $15–$50 per linear foot or relying on diesel generators at $0.30–$0.50/kWh.
+        </p>
+
+        <h3 class="text-title-md text-primary mb-3">High Electricity Price States</h3>
+        <p class="text-body-md text-body font-light mb-4">
+          Residents of Hawaii ($0.42/kWh), Massachusetts ($0.30/kWh), Connecticut ($0.30/kWh), New York ($0.29/kWh), and California ($0.30/kWh) pay 1.5–2.5x the national average. At these rates, even modest TOU arbitrage or self-consumption improvement generates meaningful annual savings.
+        </p>
+      </section>
+
+      <!-- When Is a Home Battery NOT Worth It? -->
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">When Is a Home Battery NOT Worth It?</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Honest analysis requires identifying situations where the financial return does not justify the investment.
+        </p>
+
+        <h3 class="text-title-md text-primary mb-3">Low Electricity Prices</h3>
+        <p class="text-body-md text-body font-light mb-4">
+          In states like Louisiana ($0.08/kWh), North Dakota ($0.08/kWh), Idaho ($0.13/kWh), and Utah ($0.10/kWh), the per-kWh savings from battery arbitrage are minimal. At $0.08/kWh, even shifting 10 kWh daily from peak to off-peak saves only $1.46/month ($17.50/year) — far too little to justify the investment.
+        </p>
+
+        <h3 class="text-title-md text-primary mb-3">Reliable Grid with Rare Outages</h3>
+        <p class="text-body-md text-body font-light mb-4">
+          Some regions maintain excellent grid reliability with SAIDI scores under 60 minutes per year. If outages are rare and short, the backup value of a battery is minimal. Without frequent outages or TOU pricing, the battery sits idle most of the time — costing money without delivering returns.
+        </p>
+
+        <h3 class="text-title-md text-primary mb-3">Limited Cycling Opportunities</h3>
+        <p class="text-body-md text-body font-light mb-4">
+          Batteries degrade regardless of whether they are used. A battery that cycles once per day delivers 5–15 years of useful life. A battery that cycles 100 times per year may last 20+ years but delivers far less total value per dollar invested. Without TOU rates or solar to drive regular cycling, the battery underperforms its economic potential.
+        </p>
+
+        <h3 class="text-title-md text-primary mb-3">Oversized Systems</h3>
+        <p class="text-body-md text-body font-light mb-4">
+          Buying more capacity than you need wastes money on hardware that sits unused. A 30 kWh system for a home that only needs 10 kWh of backup capacity does not deliver 3x the value — it delivers the same outage protection at 3x the cost. Right-sizing based on actual consumption patterns is critical.
+        </p>
+      </section>
+
+      <!-- Home Battery Savings Examples -->
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Home Battery Savings Examples</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          The following worked examples demonstrate savings across three realistic scenarios. All examples assume a 10 kWh LiFePO4 battery system. In 2026, without the federal ITC, net system cost is used at full installed price.
+        </p>
+
+        <h3 class="text-title-md text-primary mb-3">Example 1: Low Savings Case</h3>
+        <div class="bg-surface-soft border border-hairline p-5 mb-4">
+          <p class="text-body-sm text-muted mb-2"><strong class="text-body-strong">Assumptions:</strong> $0.12/kWh average rate, no TOU pricing, no solar, critical load backup only (5 kWh/day), no state incentives.</p>
+          <p class="text-body-sm text-muted mb-2">Net system cost: $10,000</p>
+          <p class="text-body-sm text-muted mb-2">Annual energy shifted: 5 kWh × 365 = 1,825 kWh</p>
+          <p class="text-body-sm text-muted mb-2">Annual savings: 1,825 × $0.12 = $219</p>
+          <p class="text-body-sm text-muted mb-2">Backup value assigned: $300/year (avoided food spoilage, convenience)</p>
+          <p class="text-body-sm text-muted mb-2">Total annual value: $519</p>
+          <p class="text-body-sm text-muted"><strong class="text-body-strong">Simple payback: $10,000 ÷ $519 = 19.3 years</strong></p>
+        </div>
+
+        <h3 class="text-title-md text-primary mb-3">Example 2: Average Savings Case</h3>
+        <div class="bg-surface-soft border border-hairline p-5 mb-4">
+          <p class="text-body-sm text-muted mb-2"><strong class="text-body-strong">Assumptions:</strong> $0.18/kWh average rate, moderate TOU (peak $0.28, off-peak $0.12), solar panels with 30% self-consumption improvement, no state incentives.</p>
+          <p class="text-body-sm text-muted mb-2">Net system cost: $10,000</p>
+          <p class="text-body-sm text-muted mb-2">TOU arbitrage savings: 3 kWh/day × ($0.28 – $0.12) × 365 = $175</p>
+          <p class="text-body-sm text-muted mb-2">Solar self-consumption improvement: 4 kWh/day × ($0.18 – $0.05) × 365 = $189</p>
+          <p class="text-body-sm text-muted mb-2">Total annual savings: $364</p>
+          <p class="text-body-sm text-muted mb-2">Backup value assigned: $400/year</p>
+          <p class="text-body-sm text-muted mb-2">Total annual value: $764</p>
+          <p class="text-body-sm text-muted"><strong class="text-body-strong">Simple payback: $10,000 ÷ $764 = 13.1 years</strong></p>
+        </div>
+
+        <h3 class="text-title-md text-primary mb-3">Example 3: High Savings Case</h3>
+        <div class="bg-surface-soft border border-hairline p-5 mb-4">
+          <p class="text-body-sm text-muted mb-2"><strong class="text-body-strong">Assumptions:</strong> $0.30/kWh average rate, aggressive TOU (peak $0.50, off-peak $0.15), solar panels with 50% self-consumption improvement, California SGIP incentive ($2,500).</p>
+          <p class="text-body-sm text-muted mb-2">Net system cost: $10,000 – $2,500 = $7,500</p>
+          <p class="text-body-sm text-muted mb-2">TOU arbitrage savings: 4 kWh/day × ($0.50 – $0.15) × 365 = $511</p>
+          <p class="text-body-sm text-muted mb-2">Solar self-consumption improvement: 5 kWh/day × ($0.30 – $0.05) × 365 = $456</p>
+          <p class="text-body-sm text-muted mb-2">Total annual savings: $967</p>
+          <p class="text-body-sm text-muted mb-2">Backup value assigned: $500/year</p>
+          <p class="text-body-sm text-muted mb-2">Total annual value: $1,467</p>
+          <p class="text-body-sm text-muted"><strong class="text-body-strong">Simple payback: $7,500 ÷ $1,467 = 5.1 years</strong></p>
+        </div>
+
+        <p class="text-body-md text-body font-light">
+          The difference between the lowest and highest savings cases is dramatic — 19 years versus 5 years. Your specific situation determines where you fall on this spectrum. The key variables are electricity rate, TOU structure, solar pairing, and available incentives.
+        </p>
+      </section>
+
+      <!-- Home Battery Payback Period Analysis -->
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Home Battery Payback Period Analysis</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          The table below summarizes payback periods across common scenarios for a 10 kWh LiFePO4 system at $10,000 installed cost. Values shown exclude backup value — including backup value shortens payback by 2–5 years in most cases.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden mb-6">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Scenario</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Avg Rate</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Annual Savings</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Payback Period</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">Low rate, no TOU, no solar</td>
+                <td class="p-4 font-mono text-primary">$0.10/kWh</td>
+                <td class="p-4 font-mono text-primary">$183</td>
+                <td class="p-4 font-mono text-primary">55 years</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Average rate, moderate TOU</td>
+                <td class="p-4 font-mono text-primary">$0.18/kWh</td>
+                <td class="p-4 font-mono text-primary">$364</td>
+                <td class="p-4 font-mono text-primary">27 years</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Average rate + solar self-consumption</td>
+                <td class="p-4 font-mono text-primary">$0.18/kWh</td>
+                <td class="p-4 font-mono text-primary">$553</td>
+                <td class="p-4 font-mono text-primary">18 years</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">High rate + aggressive TOU + solar</td>
+                <td class="p-4 font-mono text-primary">$0.30/kWh</td>
+                <td class="p-4 font-mono text-primary">$967</td>
+                <td class="p-4 font-mono text-primary">10 years</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">High rate + TOU + solar + state incentive</td>
+                <td class="p-4 font-mono text-primary">$0.30/kWh</td>
+                <td class="p-4 font-mono text-primary">$967</td>
+                <td class="p-4 font-mono text-primary">7.8 years</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-body-md text-body font-light">
+          These payback periods represent electricity cost savings alone. They do not include the value of backup power, generator replacement, demand charge reduction, or intangible benefits like energy independence. Most homeowners who purchase batteries for backup assign $300–$500/year in backup value, which shortens effective payback by 2–5 years.
+        </p>
+        <p class="text-body-md text-body font-light">
+          <strong class="text-body-strong">Important limitation:</strong> Simple payback analysis does not account for the time value of money, electricity rate inflation, or battery degradation. A more rigorous net present value (NPV) or internal rate of return (IRR) analysis would adjust these figures upward by 15–30%.
+        </p>
+      </section>
+
+      <!-- Financial Benefits Beyond Electricity Savings -->
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Financial Benefits Beyond Electricity Savings</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Pure electricity savings tell only part of the story. A home battery system delivers multiple value streams that compound the financial case.
+        </p>
+
+        <h3 class="text-title-md text-primary mb-3">Backup Power Value</h3>
+        <p class="text-body-md text-body font-light mb-4">
+          The value of keeping lights on during an outage is real but hard to quantify. For homeowners with medical equipment, home offices, or food storage, even a single outage per year justifies the backup. A whole-home generator costs $10,000–$20,000 installed, requires fuel at $20–$50 per outage, produces emissions, and needs annual maintenance. A battery provides the same backup with zero fuel costs, zero emissions, and zero maintenance.
+        </p>
+
+        <h3 class="text-title-md text-primary mb-3">Generator Replacement</h3>
+        <p class="text-body-md text-body font-light mb-4">
+          A 22 kW whole-home generator costs $10,000–$15,000 installed, plus $200–$500/year in maintenance. Over 15 years, total generator cost reaches $13,000–$22,500. A 20 kWh battery system at $14,000–$20,000 provides equivalent backup with no ongoing fuel or maintenance costs, and delivers additional TOU arbitrage and solar self-consumption benefits.
+        </p>
+
+        <h3 class="text-title-md text-primary mb-3">Energy Independence</h3>
+        <p class="text-body-md text-body font-light mb-4">
+          A solar-plus-battery system eliminates dependence on grid power for daily needs and utility rate increases. With electricity rates rising 3–5% annually, the fixed cost of a battery system becomes increasingly attractive over time. This hedge against rate inflation is particularly valuable for homeowners planning to stay in their homes for 10+ years.
+        </p>
+
+        <h3 class="text-title-md text-primary mb-3">Demand Charge Reduction</h3>
+        <p class="text-body-md text-body font-light mb-4">
+          Some utilities charge residential demand fees based on peak power draw. A battery with peak-shaving capability reduces demand charges by discharging during high-load periods. While more common in commercial settings, residential demand charges are expanding in some markets.
+        </p>
+
+        <h3 class="text-title-md text-primary mb-3">Future Flexibility</h3>
+        <p class="text-body-md text-body font-light mb-4">
+          Battery systems provide a foundation for future energy upgrades. Adding an EV charger, expanding solar capacity, or participating in virtual power plant (VPP) programs all become more practical with existing battery infrastructure. As grid services evolve, battery owners may earn revenue by dispatching stored energy during grid peaks.
+        </p>
+      </section>
+
+      <!-- How Much Battery Storage Does a Home Need? -->
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">How Much Battery Storage Does a Home Need?</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Sizing depends on two questions: what do you want backed up, and for how long? Essential loads (refrigerator, lights, router, medical devices) consume 5–10 kWh per day. Whole-home loads including HVAC, appliances, and water heating consume 20–60+ kWh per day.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden mb-6">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Home Size</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Daily Usage</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Critical Loads</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Recommended Battery</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">Small home / apartment</td>
+                <td class="p-4 font-mono text-primary">10–15 kWh/day</td>
+                <td class="p-4 font-mono text-primary">3–5 kWh/day</td>
+                <td class="p-4 font-mono text-primary">5–10 kWh</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Average home (1,500–2,500 sq ft)</td>
+                <td class="p-4 font-mono text-primary">20–30 kWh/day</td>
+                <td class="p-4 font-mono text-primary">5–10 kWh/day</td>
+                <td class="p-4 font-mono text-primary">10–20 kWh</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Large home (2,500–4,000 sq ft)</td>
+                <td class="p-4 font-mono text-primary">30–50 kWh/day</td>
+                <td class="p-4 font-mono text-primary">8–15 kWh/day</td>
+                <td class="p-4 font-mono text-primary">15–30 kWh</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Whole-home backup (any size)</td>
+                <td class="p-4 font-mono text-primary">Full daily usage</td>
+                <td class="p-4 font-mono text-primary">N/A</td>
+                <td class="p-4 font-mono text-primary">20–50+ kWh</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-body-md text-body font-light">
+          Critical load backup is the most cost-effective strategy. By backing up only essential circuits, you reduce battery size by 60–80% compared to whole-home backup. A critical load subpanel costs $800–$2,000 to install and allows selective circuit backup. You can always expand later by adding battery modules.
+        </p>
+      </section>
+
+      <!-- LiFePO4 vs Other Battery Chemistries -->
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">LiFePO4 vs Other Battery Chemistries for Home Use</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Chemistry determines cycle life, safety, cost, and maintenance requirements. Every major home battery manufacturer in 2026 uses LiFePO4 (LFP) as their primary chemistry. The following comparison explains why.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden mb-6">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Chemistry</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Cycle Life</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Safety</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Cost</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Maintenance</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">LiFePO4 (LFP)</td>
+                <td class="p-4 font-mono text-primary">3,500 – 7,000</td>
+                <td class="p-4 text-muted">Thermal runaway at ~270°C. Zero cobalt. Safest lithium chemistry.</td>
+                <td class="p-4 font-mono text-primary">$400 – $800/kWh</td>
+                <td class="p-4 text-muted">None</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">NMC</td>
+                <td class="p-4 font-mono text-primary">1,500 – 3,000</td>
+                <td class="p-4 text-muted">Thermal runaway at 150–210°C. Cobalt content raises ethical and safety concerns.</td>
+                <td class="p-4 font-mono text-primary">$400 – $700/kWh</td>
+                <td class="p-4 text-muted">None</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">Lead-Acid</td>
+                <td class="p-4 font-mono text-primary">1,000 – 2,000</td>
+                <td class="p-4 text-muted">Non-flammable. Well-understood chemistry. Hydrogen venting risk in enclosed spaces.</td>
+                <td class="p-4 font-mono text-primary">$150 – $300/kWh</td>
+                <td class="p-4 text-muted">Quarterly: water checks, equalization, terminal cleaning</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">Sodium-Ion</td>
+                <td class="p-4 font-mono text-primary">2,000 – 4,000</td>
+                <td class="p-4 text-muted">Similar safety to LFP. No lithium supply chain risk. Emerging chemistry.</td>
+                <td class="p-4 font-mono text-primary">$200 – $500/kWh</td>
+                <td class="p-4 text-muted">None</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-body-md text-body font-light">
+          <strong class="text-body-strong">Recommendation:</strong> LiFePO4 is the clear choice for home battery storage in 2026. Its 3,500–7,000 cycle life delivers 10–15+ years of daily use. Thermal stability at 270°C provides the highest safety margin. Zero cobalt eliminates supply chain ethical concerns. Higher upfront cost versus lead-acid is offset by 3–5x longer life and zero maintenance. Sodium-ion is an emerging alternative with promising cost and safety characteristics, but limited residential product availability in 2026.
+        </p>
+      </section>
+
+      <!-- Common Home Battery Buying Mistakes -->
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Common Home Battery Buying Mistakes</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          These mistakes cost homeowners thousands of dollars and undermine system performance. Understanding them helps you make a more informed decision.
+        </p>
+
+        <div class="flex flex-col gap-4">
+          <div class="bg-surface-soft border border-hairline p-5">
+            <h4 class="text-primary font-bold mb-2">1. Buying Without Calculating Actual Needs</h4>
+            <p class="text-body-sm text-muted">Many homeowners buy based on manufacturer marketing rather than load analysis. A 30 kWh system for a home that needs 10 kWh wastes $12,000–$15,000 on unused capacity. Always calculate your critical loads and desired runtime before selecting battery size.</p>
+          </div>
+
+          <div class="bg-surface-soft border border-hairline p-5">
+            <h4 class="text-primary font-bold mb-2">2. Ignoring the Inverter Cost</h4>
+            <p class="text-body-sm text-muted">Quotes that list only battery hardware cost omit the $2,000–$5,000 hybrid inverter that makes the system functional. Always request an itemized quote that separates battery, inverter, electrical work, and permits. The inverter represents 20–30% of total system cost.</p>
+          </div>
+
+          <div class="bg-surface-soft border border-hairline p-5">
+            <h4 class="text-primary font-bold mb-2">3. Choosing Lead-Acid Over LiFePO4</h4>
+            <p class="text-body-sm text-muted">Lead-acid's lower upfront cost ($150–$300/kWh) is misleading. At 50% depth of discharge, you need twice the rated capacity. With 1,000–2,000 cycles versus 3,500–7,000, lead-acid requires 3–5 replacements over the system's life. Total lifetime cost of lead-acid is 40–60% higher than LiFePO4.</p>
+          </div>
+
+          <div class="bg-surface-soft border border-hairline p-5">
+            <h4 class="text-primary font-bold mb-2">4. Not Checking Electrical Panel Compatibility</h4>
+            <p class="text-body-sm text-muted">Older homes with 100A or 125A panels may require a $1,500–$4,000 panel upgrade to accommodate a battery system. This surprise cost appears after signing a contract. Verify your panel capacity before committing to a system size.</p>
+          </div>
+
+          <div class="bg-surface-soft border border-hairline p-5">
+            <h4 class="text-primary font-bold mb-2">5. Overlooking State and Utility Incentives</h4>
+            <p class="text-body-sm text-muted">California SGIP, New York NYSERDA, Connecticut, Colorado, and other states offer $5,000–$16,000 in battery incentives. Not checking the DSIRE database before purchasing means leaving money on the table. Some programs have income requirements or application deadlines.</p>
+          </div>
+
+          <div class="bg-surface-soft border border-hairline p-5">
+            <h4 class="text-primary font-bold mb-2">6. Buying Too Large a System</h4>
+            <p class="text-body-sm text-muted">Oversized batteries that never fully discharge waste capacity you paid for. A 20 kWh system for a home that shifts 5 kWh daily operates at 25% utilization. Right-size based on actual consumption patterns and expand later if needed.</p>
+          </div>
+
+          <div class="bg-surface-soft border border-hairline p-5">
+            <h4 class="text-primary font-bold mb-2">7. Not Getting Multiple Quotes</h4>
+            <p class="text-body-sm text-muted">Installer pricing varies 20–40% for identical equipment. A single quote may overstate costs or push unnecessary upgrades. Get at least 3 quotes from certified installers and compare itemized breakdowns, not just bottom-line numbers.</p>
+          </div>
+
+          <div class="bg-surface-soft border border-hairline p-5">
+            <h4 class="text-primary font-bold mb-2">8. Ignoring Warranty Terms</h4>
+            <p class="text-body-sm text-muted">Battery warranties vary significantly in what they cover. Some warrant only 70% capacity retention after 10 years; others warrant 80%. Some require professional installation; others void warranty for DIY setups. Read the warranty document, not just the headline number.</p>
+          </div>
+
+          <div class="bg-surface-soft border border-hairline p-5">
+            <h4 class="text-primary font-bold mb-2">9. Forgetting About Monitoring and Connectivity</h4>
+            <p class="text-body-sm text-muted">Some batteries require brand-specific monitoring apps that may not integrate with your existing solar monitoring. Others charge separately for cloud monitoring ($200–$500). Verify monitoring compatibility and ongoing costs before purchasing.</p>
+          </div>
+
+          <div class="bg-surface-soft border border-hairline p-5">
+            <h4 class="text-primary font-bold mb-2">10. Assuming Batteries Work Without Solar</h4>
+            <p class="text-body-sm text-muted">Without solar panels, a battery only shifts grid energy from one time to another. At average US electricity rates without TOU pricing, this saves minimal money. Batteries without solar are justified primarily as backup power, not as money-saving investments.</p>
+          </div>
+
+          <div class="bg-surface-soft border border-hairline p-5">
+            <h4 class="text-primary font-bold mb-2">11. Not Considering Battery Placement</h4>
+            <p class="text-body-sm text-muted">Battery location affects performance, safety, and cost. Outdoor installations require weatherproof enclosures. Garage installations may need ventilation for code compliance. Long wire runs from the battery to the main panel increase electrical work costs by $500–$2,000.</p>
+          </div>
+
+          <div class="bg-surface-soft border border-hairline p-5">
+            <h4 class="text-primary font-bold mb-2">12. Failing to Plan for Expansion</h4>
+            <p class="text-body-sm text-muted">Choosing a battery system that cannot be expanded limits future flexibility. Modular systems allow adding battery modules as needs grow or electricity rates rise. Verify that your inverter and electrical setup support future battery additions before committing.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Use Our Home Battery Planning Tools -->
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Use Our Home Battery Planning Tools</h2>
+        <p class="text-body-md text-body font-light mb-6">
+          These free calculators help you size your system, estimate backup duration, and determine the right battery configuration for your household consumption and backup goals.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CalculatorCard>
+            <h3 class="text-primary font-bold mb-2">Home Backup Battery Calculator</h3>
+            <p class="text-body-sm text-muted mb-4">Calculate battery capacity needed for critical load backup during grid outages. Enter your essential circuits, power draw, and desired runtime.</p>
+            <a href="/tools/home-backup-battery-calculator" class="text-m-blue-light hover:underline text-sm uppercase tracking-wider font-bold">Use Calculator →</a>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h3 class="text-primary font-bold mb-2">Battery Sizing Calculator</h3>
+            <p class="text-body-sm text-muted mb-4">General-purpose battery sizing for any application. Calculate capacity, runtime, and cell count from load requirements and voltage specifications.</p>
+            <a href="/tools/battery-sizing-calculator" class="text-m-blue-light hover:underline text-sm uppercase tracking-wider font-bold">Use Calculator →</a>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h3 class="text-primary font-bold mb-2">Solar Battery Sizing Calculator</h3>
+            <p class="text-body-sm text-muted mb-4">Determine optimal battery size for a solar-plus-storage system based on daily consumption, autonomy days, chemistry, and depth of discharge.</p>
+            <a href="/tools/solar-battery-sizing-calculator" class="text-m-blue-light hover:underline text-sm uppercase tracking-wider font-bold">Use Calculator →</a>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <!-- Related Guides -->
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Related Guides</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <a href="/learn/home-battery-sizing-guide" class="bg-surface-card border border-hairline p-5 hover:border-m-blue-light transition-colors">
+            <h3 class="text-primary font-bold mb-2">Home Battery Sizing Guide</h3>
+            <p class="text-body-sm text-muted">Step-by-step process for sizing a residential battery backup system based on your actual consumption and backup requirements.</p>
+          </a>
+          <a href="/learn/solar-battery-cost-breakdown-2026" class="bg-surface-card border border-hairline p-5 hover:border-m-blue-light transition-colors">
+            <h3 class="text-primary font-bold mb-2">Solar Battery Cost Breakdown 2026</h3>
+            <p class="text-body-sm text-muted">Complete breakdown of solar battery costs: battery pricing, installation costs, cost per kWh, payback periods, and ROI analysis.</p>
+          </a>
+          <a href="/learn/solar-battery-storage-explained" class="bg-surface-card border border-hairline p-5 hover:border-m-blue-light transition-colors">
+            <h3 class="text-primary font-bold mb-2">Solar Battery Storage Explained</h3>
+            <p class="text-body-sm text-muted">How solar battery storage works, from cell chemistry to system architecture and integration with residential solar arrays.</p>
+          </a>
+          <a href="/learn/what-is-battery-sizing" class="bg-surface-card border border-hairline p-5 hover:border-m-blue-light transition-colors">
+            <h3 class="text-primary font-bold mb-2">What Is Battery Sizing?</h3>
+            <p class="text-body-sm text-muted">Fundamentals of battery sizing: capacity, voltage, C-rate, and depth of discharge explained with practical formulas.</p>
+          </a>
+        </div>
+      </section>
+
+      <!-- Formula Section -->
+      <section>
+        <FormulaBox title="Key Formulas">
+          <div class="bg-surface-soft border border-hairline p-5">
+            <p class="text-primary font-bold mb-2">Simple Payback Period</p>
+            <p class="text-muted">Net System Cost After Incentives ($) ÷ Annual Savings ($) = Payback (Years)</p>
+          </div>
+          <div class="bg-surface-soft border border-hairline p-5">
+            <p class="text-primary font-bold mb-2">Annual TOU Arbitrage Savings</p>
+            <p class="text-muted">Daily kWh Shifted × (Peak Rate – Off-Peak Rate) × 365 = Annual Savings ($)</p>
+          </div>
+          <div class="bg-surface-soft border border-hairline p-5">
+            <p class="text-primary font-bold mb-2">Solar Self-Consumption Improvement</p>
+            <p class="text-muted">Daily kWh Consumed On-Site × (Retail Rate – Feed-in Rate) × 365 = Annual Savings ($)</p>
+          </div>
+          <div class="bg-surface-soft border border-hairline p-5">
+            <p class="text-primary font-bold mb-2">Total Battery Capacity Required</p>
+            <p class="text-muted">Daily Consumption (kWh) ÷ (DoD × Inverter Efficiency) = Required Battery Capacity (kWh)</p>
+          </div>
+        </FormulaBox>
+      </section>
+
+      <!-- FAQ Section -->
+      <FAQSection items={faqItems} />
+
+      <!-- Disclaimer -->
+      <section class="border-t border-hairline pt-8">
+        <p class="text-body-sm text-muted">
+          <strong class="text-body-strong">Disclaimer:</strong> This article provides general information for educational and planning purposes only. It does not constitute financial, electrical, or engineering advice. Actual costs, savings, and payback periods vary by region, electricity rates, equipment selection, installation complexity, and individual consumption patterns. Battery pricing reflects 2026 market estimates and is not a guarantee of specific costs. The federal tax credit information reflects policy as of the date of publication and may change. Always obtain itemized quotes from certified installers and consult a licensed electrician for final system design. BatteryCalculators.com is not affiliated with any battery manufacturer or installer. Use our calculators for planning purposes only.
+        </p>
+      </section>
+
+    </div>
+  </div>
+</Layout>
