@@ -3,15 +3,61 @@ import Layout from '../../layouts/Layout.astro';
 import CalculatorCard from '../../components/CalculatorCard.astro';
 import FAQSection from '../../components/FAQSection.astro';
 
-const weeklyEditions = [
-  {
-    title: 'Battery Industry Weekly Intelligence — Week 26, 2026',
-    slug: 'battery-industry-weekly-2026-week-26',
-    date: 'Jun 22–28, 2026',
-    description: 'Top 10 stories covering EV batteries, marine electrification, grid-scale BESS, battery passport regulation, and research breakthroughs.',
-    categories: ['EV', 'Marine', 'BESS', 'Research'],
-  },
-];
+const newsFiles = import.meta.glob('./*.astro', {
+  eager: true,
+  query: '?raw',
+  import: 'default',
+}) as Record<string, string>;
+
+function extractMeta(raw: string) {
+  const fm = raw.match(/^---\n([\s\S]*?)\n---/)?.[1] || '';
+  const get = (k: string) =>
+    fm.match(new RegExp(`const\\s+${k}\\s*=\\s*["'](.+?)["']`))?.[1] || '';
+  return {
+    title: get('title'),
+    description: get('description'),
+    publishDate: get('publishDate'),
+    lastUpdated: get('lastUpdated'),
+    readingTime: Number(get('readingTime')) || 0,
+  };
+}
+
+function inferCategories(desc: string, title: string): string[] {
+  const text = `${desc} ${title}`.toLowerCase();
+  const cats: string[] = [];
+  if (text.includes('ev ') || text.includes('electric vehicle')) cats.push('EV');
+  if (text.includes('marine') || text.includes('ferry')) cats.push('Marine');
+  if (text.includes('bess') || text.includes('grid-scale') || text.includes('energy storage'))
+    cats.push('BESS');
+  if (text.includes('research') || text.includes('breakthrough') || text.includes('chemistry'))
+    cats.push('Research');
+  return cats.length > 0 ? cats : ['General'];
+}
+
+const weeklyEditions = Object.entries(newsFiles)
+  .filter(([path]) => !path.endsWith('/index.astro'))
+  .map(([path, raw]) => {
+    const slug = path.replace('./', '').replace('.astro', '');
+    const meta = extractMeta(raw as string);
+
+    const weekMatch = slug.match(/week-(\d+)/);
+    const yearMatch = slug.match(/(\d{4})/);
+    const week = weekMatch?.[1] || '';
+    const year = yearMatch?.[1] || '';
+
+    const cleanTitle = meta.title.replace(/\s*\|\s*Battery Calculators\s*$/, '');
+    const dateDisplay = week ? `Week ${week}, ${year}` : meta.publishDate || '';
+
+    return {
+      title: cleanTitle,
+      slug,
+      date: dateDisplay,
+      description: meta.description,
+      categories: inferCategories(meta.description, meta.title),
+      publishDate: meta.publishDate,
+    };
+  })
+  .sort((a, b) => (b.publishDate || '').localeCompare(a.publishDate || ''));
 
 const evHighlights = [
   {
