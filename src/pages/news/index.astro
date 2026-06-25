@@ -1,0 +1,429 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import CalculatorCard from '../../components/CalculatorCard.astro';
+import FAQSection from '../../components/FAQSection.astro';
+
+const weeklyEditions = [
+  {
+    title: 'Battery Industry Weekly Intelligence — Week 26, 2026',
+    slug: 'battery-industry-weekly-2026-week-26',
+    date: 'Jun 22–28, 2026',
+    description: 'Top 10 stories covering EV batteries, marine electrification, grid-scale BESS, battery passport regulation, and research breakthroughs.',
+    categories: ['EV', 'Marine', 'BESS', 'Research'],
+  },
+];
+
+const evHighlights = [
+  {
+    title: 'EV Battery Market Acceleration',
+    description: 'Global EV battery demand continues to surge with new gigafactory announcements and next-generation cell chemistries entering production.',
+    link: '/ev',
+  },
+  {
+    title: '800V Architecture Adoption',
+    description: 'More EV manufacturers adopt 800V battery architectures for faster charging and improved efficiency.',
+    link: '/tools/battery-pack-calculator',
+  },
+  {
+    title: 'Solid-State Battery Commercialization',
+    description: 'Solid-state battery production timelines are accelerating with multiple manufacturers targeting 2027–2028 for volume production.',
+    link: '/tools/c-rate-calculator',
+  },
+];
+
+const marineHighlights = [
+  {
+    title: 'Battery-Electric Ferry Expansion',
+    description: 'New battery-electric ferry routes announced across Europe and Scandinavia with larger vessel classes.',
+    link: '/marine',
+  },
+  {
+    title: 'IMO CII Rating Improvements',
+    description: 'Commercial vessel operators adopt battery systems to improve Carbon Intensity Indicator ratings.',
+    link: '/tools/cii-calculator',
+  },
+  {
+    title: 'Shore Power Infrastructure Growth',
+    description: 'Port electrification accelerates with new shore power installations reducing berth emissions.',
+    link: '/tools/shore-power-savings-calculator',
+  },
+];
+
+const bessHighlights = [
+  {
+    title: 'Grid-Scale BESS Record Deployments',
+    description: 'Utility-scale battery storage deployments hit new records with multi-hundred-MWh systems becoming standard.',
+    link: '/bess',
+  },
+  {
+    title: 'BESS Revenue Stacking',
+    description: 'Battery energy storage operators optimize revenue through energy arbitrage, frequency regulation, and capacity markets.',
+    link: '/tools/bess-roi-calculator',
+  },
+  {
+    title: 'Long-Duration Energy Storage',
+    description: 'Multi-hour and multi-day battery storage systems gain investment as grid operators seek flexibility.',
+    link: '/tools/battery-sizing-calculator',
+  },
+];
+
+const residentialHighlights = [
+  {
+    title: 'Home Battery Adoption Growth',
+    description: 'Residential battery storage continues to grow as homeowners seek energy independence and backup power.',
+    link: '/home-backup',
+  },
+  {
+    title: 'Solar-Plus-Storage Economics',
+    description: 'Declining battery costs improve solar-plus-storage payback periods for residential installations.',
+    link: '/learn/solar-battery-cost-breakdown-2026',
+  },
+  {
+    title: 'Virtual Power Plant Programs',
+    description: 'Utility programs aggregate home batteries into virtual power plants for grid services.',
+    link: '/tools/home-backup-battery-calculator',
+  },
+];
+
+const manufacturingHighlights = [
+  {
+    title: 'Gigafactory Expansion',
+    description: 'New battery manufacturing facilities announced across North America, Europe, and Asia.',
+    link: '/ev',
+  },
+  {
+    title: 'LFP Production Scaling',
+    description: 'Lithium iron phosphate cell production scales rapidly, driving cost reductions for stationary storage.',
+    link: '/learn/battery-sizing-formula',
+  },
+  {
+    title: 'Dry Electrode Manufacturing',
+    description: 'Dry electrode processing technology advances toward commercial production, promising lower costs and energy use.',
+    link: '/tools/battery-pack-calculator',
+  },
+];
+
+const passportHighlights = [
+  {
+    title: 'EU Battery Passport Compliance',
+    description: 'Companies prepare for EU battery passport requirements under Regulation (EU) 2023/1542.',
+    link: '/learn/eu-battery-passport-requirements-2026',
+  },
+  {
+    title: 'Carbon Footprint Declarations',
+    description: 'Battery carbon footprint calculation methodologies standardized across the EU.',
+    link: '/battery-passport-generator',
+  },
+  {
+    title: 'Due Diligence Requirements',
+    description: 'Supply chain due diligence obligations for battery raw materials take effect.',
+    link: '/battery-passport-generator',
+  },
+];
+
+const safetyHighlights = [
+  {
+    title: 'Thermal Runaway Prevention',
+    description: 'New battery safety standards and testing protocols improve thermal runaway prevention.',
+    link: '/learn/battery-runtime-formula',
+  },
+  {
+    title: 'Battery Fire Safety Standards',
+    description: 'Updated safety certifications for battery installations in buildings and vehicles.',
+    link: '/disclaimer',
+  },
+];
+
+const researchHighlights = [
+  {
+    title: 'Sodium-Ion Battery Advances',
+    description: 'Sodium-ion batteries enter commercial production as a cost-effective alternative to lithium-ion.',
+    link: '/tools/battery-sizing-calculator',
+  },
+  {
+    title: 'Silicon Anode Development',
+    description: 'Silicon anode technology improves energy density while addressing cycle life challenges.',
+    link: '/tools/c-rate-calculator',
+  },
+  {
+    title: 'LFP Voltage Characteristics',
+    description: 'Research into LiFePO4 flat voltage plateau characteristics improves SOC estimation accuracy.',
+    link: '/learn/lifepo4-voltage-chart',
+  },
+];
+
+const relatedCalculators = [
+  { href: '/tools/runtime-calculator', title: 'Runtime Calculator', description: 'Calculate battery discharge duration' },
+  { href: '/tools/battery-sizing-calculator', title: 'Battery Sizing Calculator', description: 'Right-size battery capacity' },
+  { href: '/tools/c-rate-calculator', title: 'C-Rate Calculator', description: 'Calculate charge/discharge rates' },
+  { href: '/tools/charging-time-calculator', title: 'Charging Time Calculator', description: 'Estimate charge duration' },
+  { href: '/tools/inverter-battery-calculator', title: 'Inverter Battery Calculator', description: 'Match inverter and battery sizing' },
+  { href: '/tools/parallel-string-calculator', title: 'Parallel String Calculator', description: 'Model parallel string behavior' },
+  { href: '/battery-passport-generator', title: 'Battery Passport Generator', description: 'Generate EU-compliant battery passports' },
+];
+
+const relatedGuides = [
+  { href: '/learn/lifepo4-voltage-chart', title: 'LiFePO4 Voltage Chart', description: 'Voltage reference by SOC' },
+  { href: '/learn/lead-acid-voltage-chart', title: 'Lead-Acid Voltage Chart', description: 'Lead-acid voltage by SOC' },
+  { href: '/learn/battery-runtime-formula', title: 'Battery Runtime Formula', description: 'Complete runtime reference' },
+  { href: '/learn/battery-sizing-formula', title: 'Battery Sizing Formula', description: 'Complete sizing reference' },
+  { href: '/learn/eu-battery-passport-requirements-2026', title: 'EU Battery Passport 2026', description: 'Compliance guide' },
+  { href: '/learn/solar-battery-cost-breakdown-2026', title: 'Solar Battery Cost 2026', description: 'Current pricing analysis' },
+];
+
+const faqItems = [
+  {
+    question: 'What is Battery News & Engineering Insights?',
+    answer: 'Battery News & Engineering Insights is a weekly intelligence digest covering the most important developments in battery technology, EV batteries, marine electrification, grid-scale energy storage, battery passport regulation, safety, manufacturing, and research breakthroughs. Each edition includes original engineering analysis from the BatteryCalculators.com team.',
+  },
+  {
+    question: 'How often is the weekly intelligence published?',
+    answer: 'The weekly intelligence is generated every Friday covering the current week\'s developments. Run the generator script to produce a new edition, or check back each week for the latest digest.',
+  },
+  {
+    question: 'What sources does the intelligence cover?',
+    answer: 'Stories are sourced from trusted RSS feeds including PV Magazine, Energy Storage News, Electrek, CleanTechnica, Maritime Executive, MarineLink, DNV, IMO, US DOE, European Commission, and curated Google News searches across battery technology topics.',
+  },
+  {
+    question: 'Can I use these articles for research or reporting?',
+    answer: 'The articles reference publicly available news with source attribution and links. You may reference and quote factual summaries with proper attribution. BatteryCalculators engineering analysis is original content. Always verify facts with primary sources before publishing.',
+  },
+  {
+    question: 'How does this relate to BatteryCalculators tools?',
+    answer: 'Each weekly digest links to relevant calculators and learning guides so you can apply engineering formulas to the real-world developments covered in the news. For example, EV battery stories link to our battery sizing and C-rate calculators.',
+  },
+  {
+    question: 'Is the content AI-generated?',
+    answer: 'Yes, the weekly intelligence articles are AI-generated drafts compiled from publicly available RSS feeds and news sources. Each article is clearly marked as an editorial draft. BatteryCalculators engineering analysis represents original analysis based on general engineering principles.',
+  },
+];
+---
+
+<Layout
+  title="Battery News & Engineering Insights | Battery Calculators"
+  description="Weekly battery industry intelligence: EV batteries, marine electrification, grid-scale BESS, battery passport regulation, safety, manufacturing, and research breakthroughs with engineering analysis."
+  schema="collectionPage"
+  schemaName="Battery News & Engineering Insights"
+  schemaDescription="Weekly battery industry intelligence digest with engineering analysis from BatteryCalculators.com."
+  faqItems={faqItems}
+  breadcrumbs={[{ label: 'News' }]}
+>
+  <!-- Hero Section -->
+  <div class="mb-16">
+    <div class="bg-surface-card border border-hairline p-8 md:p-12 mb-8">
+      <div class="max-w-3xl">
+        <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">BATTERY NEWS</span>
+        <h1 class="text-display-lg text-primary mb-6">Battery News &amp; Engineering Insights</h1>
+        <p class="text-body-md text-body font-light mb-6 max-w-2xl">
+          Weekly intelligence digest covering the most important developments in battery technology, EV batteries, marine electrification, grid-scale energy storage, and research breakthroughs — with original engineering analysis.
+        </p>
+        <div class="flex flex-wrap gap-3">
+          <a href="#latest-edition" class="btn-primary">Latest Edition</a>
+          <a href="#categories" class="btn-primary-outline">Browse Categories</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Latest Weekly Battery Intelligence -->
+  <section id="latest-edition" class="mb-16">
+    <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">LATEST EDITION</span>
+    <h2 class="text-display-sm text-primary mb-6">Weekly Battery Intelligence</h2>
+    {weeklyEditions.map((edition) => (
+      <a href={`/news/${edition.slug}`} class="block group mb-6">
+        <CalculatorCard class="h-full">
+          <div>
+            <div class="flex flex-wrap items-center gap-3 mb-3">
+              <span class="text-label-uppercase text-m-blue-light text-[10px]">WEEKLY INTELLIGENCE</span>
+              <span class="text-caption text-muted">{edition.date}</span>
+            </div>
+            <h3 class="text-title-lg text-primary mb-3 group-hover:text-m-blue-light transition-colors">{edition.title}</h3>
+            <p class="text-body-sm text-muted mb-4">{edition.description}</p>
+            <div class="flex flex-wrap gap-2">
+              {edition.categories.map((cat) => (
+                <span class="text-[10px] text-primary border border-hairline px-2 py-0.5 uppercase tracking-wider">{cat}</span>
+              ))}
+            </div>
+          </div>
+        </CalculatorCard>
+      </a>
+    ))}
+  </section>
+
+  <!-- EV Battery News -->
+  <section id="ev" class="mb-16 border-t border-hairline pt-12">
+    <div class="flex items-center justify-between mb-6">
+      <div>
+        <span class="text-label-uppercase text-m-blue-light text-xs block mb-2">EV BATTERIES</span>
+        <h2 class="text-display-sm text-primary">EV Battery News</h2>
+      </div>
+      <a href="/ev" class="text-body-sm text-m-blue-light hover:text-primary transition-colors">View All →</a>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {evHighlights.map((item) => (
+        <a href={item.link} class="bg-surface-card border border-hairline p-6 hover:border-primary transition-colors block group">
+          <h3 class="text-title-lg text-primary mb-2 group-hover:text-m-blue-light transition-colors">{item.title}</h3>
+          <p class="text-body-sm text-muted">{item.description}</p>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <!-- Marine Battery News -->
+  <section id="marine" class="mb-16 border-t border-hairline pt-12">
+    <div class="flex items-center justify-between mb-6">
+      <div>
+        <span class="text-label-uppercase text-m-blue-light text-xs block mb-2">MARINE BATTERIES</span>
+        <h2 class="text-display-sm text-primary">Marine Battery News</h2>
+      </div>
+      <a href="/marine" class="text-body-sm text-m-blue-light hover:text-primary transition-colors">View All →</a>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {marineHighlights.map((item) => (
+        <a href={item.link} class="bg-surface-card border border-hairline p-6 hover:border-primary transition-colors block group">
+          <h3 class="text-title-lg text-primary mb-2 group-hover:text-m-blue-light transition-colors">{item.title}</h3>
+          <p class="text-body-sm text-muted">{item.description}</p>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <!-- Grid-Scale BESS News -->
+  <section id="bess" class="mb-16 border-t border-hairline pt-12">
+    <div class="flex items-center justify-between mb-6">
+      <div>
+        <span class="text-label-uppercase text-m-blue-light text-xs block mb-2">GRID-SCALE BESS</span>
+        <h2 class="text-display-sm text-primary">Grid-Scale BESS News</h2>
+      </div>
+      <a href="/bess" class="text-body-sm text-m-blue-light hover:text-primary transition-colors">View All →</a>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {bessHighlights.map((item) => (
+        <a href={item.link} class="bg-surface-card border border-hairline p-6 hover:border-primary transition-colors block group">
+          <h3 class="text-title-lg text-primary mb-2 group-hover:text-m-blue-light transition-colors">{item.title}</h3>
+          <p class="text-body-sm text-muted">{item.description}</p>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <!-- Residential Energy Storage News -->
+  <section id="residential" class="mb-16 border-t border-hairline pt-12">
+    <div class="flex items-center justify-between mb-6">
+      <div>
+        <span class="text-label-uppercase text-m-blue-light text-xs block mb-2">RESIDENTIAL STORAGE</span>
+        <h2 class="text-display-sm text-primary">Residential Energy Storage News</h2>
+      </div>
+      <a href="/home-backup" class="text-body-sm text-m-blue-light hover:text-primary transition-colors">View All →</a>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {residentialHighlights.map((item) => (
+        <a href={item.link} class="bg-surface-card border border-hairline p-6 hover:border-primary transition-colors block group">
+          <h3 class="text-title-lg text-primary mb-2 group-hover:text-m-blue-light transition-colors">{item.title}</h3>
+          <p class="text-body-sm text-muted">{item.description}</p>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <!-- Battery Manufacturing News -->
+  <section id="manufacturing" class="mb-16 border-t border-hairline pt-12">
+    <div class="flex items-center justify-between mb-6">
+      <div>
+        <span class="text-label-uppercase text-m-blue-light text-xs block mb-2">BATTERY MANUFACTURING</span>
+        <h2 class="text-display-sm text-primary">Battery Manufacturing News</h2>
+      </div>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {manufacturingHighlights.map((item) => (
+        <a href={item.link} class="bg-surface-card border border-hairline p-6 hover:border-primary transition-colors block group">
+          <h3 class="text-title-lg text-primary mb-2 group-hover:text-m-blue-light transition-colors">{item.title}</h3>
+          <p class="text-body-sm text-muted">{item.description}</p>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <!-- Battery Passport & Regulation News -->
+  <section id="passport" class="mb-16 border-t border-hairline pt-12">
+    <div class="flex items-center justify-between mb-6">
+      <div>
+        <span class="text-label-uppercase text-m-blue-light text-xs block mb-2">BATTERY PASSPORT &amp; REGULATION</span>
+        <h2 class="text-display-sm text-primary">Battery Passport &amp; Regulation News</h2>
+      </div>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {passportHighlights.map((item) => (
+        <a href={item.link} class="bg-surface-card border border-hairline p-6 hover:border-primary transition-colors block group">
+          <h3 class="text-title-lg text-primary mb-2 group-hover:text-m-blue-light transition-colors">{item.title}</h3>
+          <p class="text-body-sm text-muted">{item.description}</p>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <!-- Battery Safety News -->
+  <section id="safety" class="mb-16 border-t border-hairline pt-12">
+    <div class="flex items-center justify-between mb-6">
+      <div>
+        <span class="text-label-uppercase text-m-blue-light text-xs block mb-2">BATTERY SAFETY</span>
+        <h2 class="text-display-sm text-primary">Battery Safety News</h2>
+      </div>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {safetyHighlights.map((item) => (
+        <a href={item.link} class="bg-surface-card border border-hairline p-6 hover:border-primary transition-colors block group">
+          <h3 class="text-title-lg text-primary mb-2 group-hover:text-m-blue-light transition-colors">{item.title}</h3>
+          <p class="text-body-sm text-muted">{item.description}</p>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <!-- Research & Chemistry Updates -->
+  <section id="research" class="mb-16 border-t border-hairline pt-12">
+    <div class="flex items-center justify-between mb-6">
+      <div>
+        <span class="text-label-uppercase text-m-blue-light text-xs block mb-2">RESEARCH &amp; CHEMISTRY</span>
+        <h2 class="text-display-sm text-primary">Research &amp; Chemistry Updates</h2>
+      </div>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {researchHighlights.map((item) => (
+        <a href={item.link} class="bg-surface-card border border-hairline p-6 hover:border-primary transition-colors block group">
+          <h3 class="text-title-lg text-primary mb-2 group-hover:text-m-blue-light transition-colors">{item.title}</h3>
+          <p class="text-body-sm text-muted">{item.description}</p>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <!-- Related Battery Calculators -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <span class="text-label-uppercase text-muted text-[10px] block mb-4">RELATED BATTERY CALCULATORS</span>
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      {relatedCalculators.map((calc) => (
+        <a href={calc.href} class="bg-surface-card border border-hairline p-4 hover:border-primary transition-colors block">
+          <h4 class="text-primary font-bold mb-1 text-sm">{calc.title}</h4>
+          <p class="text-xs text-muted">{calc.description}</p>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <!-- Related Learning Guides -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <span class="text-label-uppercase text-muted text-[10px] block mb-4">RELATED LEARNING GUIDES</span>
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+      {relatedGuides.map((guide) => (
+        <a href={guide.href} class="bg-surface-card border border-hairline p-4 hover:border-primary transition-colors block">
+          <h4 class="text-primary font-bold mb-1 text-sm">{guide.title}</h4>
+          <p class="text-xs text-muted">{guide.description}</p>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <FAQSection items={faqItems} />
+</Layout>
