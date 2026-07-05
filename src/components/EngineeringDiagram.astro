@@ -1,0 +1,117 @@
+---
+export interface Step {
+  label: string;
+  icon?: string;
+}
+
+export interface Props {
+  title: string;
+  steps: Step[];
+  variant?: 'flow' | 'circuit' | 'system';
+  description?: string;
+}
+
+const {
+  title,
+  steps,
+  variant = 'flow',
+  description,
+} = Astro.props as Props;
+
+const iconMap: Record<string, string> = {
+  battery: 'M13 2H7a2 2 0 00-2 2v16a2 2 0 002 2h6a2 2 0 002-2V4a2 2 0 00-2-2zm0 18H7V4h6v16z M9 6h2v2H9V6zm0 4h2v2H9v-2zm0 4h2v2H9v-2z',
+  inverter: 'M4 4h16v12H4V4zm2 2v8h12V6H6zm-2 14h16v2H4v-2z',
+  load: 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z',
+  cable: 'M2 12h4l2-4 2 8 2-6 2 4h6',
+  solar: 'M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-2h2v-2h-2v-2h2v-2h-2V9h8v10zm-2-8h-2v2h2v-2zm0 4h-2v2h2v-2z',
+  charge: 'M7 2v11h3v9l7-12h-4l4-8z',
+  chart: 'M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z',
+};
+
+const n = steps.length;
+const boxWidth = 140;
+const boxHeight = 56;
+const gap = 48;
+const svgWidth = n * boxWidth + (n - 1) * gap + 80;
+const svgHeight = 120;
+---
+
+<div class="mb-8">
+  <h3 class="text-title-lg text-primary uppercase tracking-wider mb-4">{title}</h3>
+  {description && <p class="text-body-sm text-muted mb-4">{description}</p>}
+  <div class="bg-surface-soft border border-hairline p-6 overflow-x-auto">
+    <svg
+      viewBox={`0 0 ${svgWidth} ${svgHeight}`}
+      class="w-full max-w-2xl"
+      role="img"
+      aria-label={title}
+    >
+      {steps.map((step, i) => {
+        const x = 40 + i * (boxWidth + gap);
+        const y = (svgHeight - boxHeight) / 2;
+        return (
+          <>
+            <rect
+              x={x}
+              y={y}
+              width={boxWidth}
+              height={boxHeight}
+              fill="#1a1a1a"
+              stroke="#3c3c3c"
+              stroke-width="1"
+              rx="0"
+            />
+            <text
+              x={x + boxWidth / 2}
+              y={y + boxHeight / 2 - 4}
+              text-anchor="middle"
+              fill="#ffffff"
+              font-size="12"
+              font-family="BMWTypeNextLatin, sans-serif"
+              font-weight="700"
+            >
+              {step.label}
+            </text>
+            {step.icon && iconMap[step.icon] && (
+              <text
+                x={x + boxWidth / 2}
+                y={y + boxHeight / 2 + 14}
+                text-anchor="middle"
+                fill="#7e7e7e"
+                font-size="10"
+                font-family="BMWTypeNextLatin, sans-serif"
+              >
+                {step.icon}
+              </text>
+            )}
+            {i < n - 1 && (
+              <>
+                <line
+                  x1={x + boxWidth}
+                  y1={svgHeight / 2}
+                  x2={x + boxWidth + gap}
+                  y2={svgHeight / 2}
+                  stroke="#0066b1"
+                  stroke-width="2"
+                  marker-end="url(#arrowhead)"
+                />
+              </>
+            )}
+          </>
+        );
+      })}
+      <defs>
+        <marker
+          id="arrowhead"
+          markerWidth="10"
+          markerHeight="7"
+          refX="10"
+          refY="3.5"
+          orient="auto"
+        >
+          <polygon points="0 0, 10 3.5, 0 7" fill="#0066b1" />
+        </marker>
+      </defs>
+    </svg>
+  </div>
+</div>

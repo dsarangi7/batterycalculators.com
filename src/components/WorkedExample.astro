@@ -1,0 +1,68 @@
+---
+export interface Props {
+  number: number;
+  title: string;
+  scenario: string;
+  inputs: { label: string; value: string }[];
+  steps: { label: string; formula?: string; result: string }[];
+  answer: string;
+  interpretation?: string;
+  variant?: 'default' | 'home' | 'rv' | 'marine' | 'solar' | 'industrial';
+}
+
+const {
+  number,
+  title,
+  scenario,
+  inputs,
+  steps,
+  answer,
+  interpretation,
+  variant = 'default',
+} = Astro.props as Props;
+
+const borderColors: Record<string, string> = {
+  default: 'border-m-blue-light',
+  home: 'border-m-blue-light',
+  rv: 'border-m-blue-dark',
+  marine: 'border-m-red',
+  solar: 'border-green-600',
+  industrial: 'border-m-red',
+};
+const borderColor = borderColors[variant] || borderColors.default;
+---
+
+<div class={`border-l-2 ${borderColor} pl-4 md:pl-5`}>
+  <p class="font-bold text-primary mb-2">Example {number}: {title}</p>
+  <p class="text-body-sm text-muted mb-3">{scenario}</p>
+
+  <div class="mb-3">
+    <p class="text-label-uppercase text-[10px] text-muted tracking-wider mb-1">Given Values</p>
+    <ul class="list-disc pl-5 flex flex-col gap-1 text-body-sm text-muted">
+      {inputs.map((input) => (
+        <li><strong>{input.label}:</strong> {input.value}</li>
+      ))}
+    </ul>
+  </div>
+
+  <div class="flex flex-col gap-2 mb-3">
+    {steps.map((step) => (
+      <div>
+        <p class="text-body-sm text-muted"><strong>{step.label}</strong></p>
+        {step.formula && (
+          <div class="font-mono text-primary text-xs md:text-sm bg-surface-soft border border-hairline p-2 mt-1 mb-1">{step.formula}</div>
+        )}
+        <p class="text-body-sm text-muted">= <span class="font-mono text-primary">{step.result}</span></p>
+      </div>
+    ))}
+  </div>
+
+  <div class="bg-surface-soft border border-hairline p-3 mt-2">
+    <p class="text-label-uppercase text-[10px] text-primary tracking-wider mb-1">Final Answer</p>
+    <p class="font-mono text-primary text-sm">{answer}</p>
+  </div>
+
+  {interpretation && (
+    <p class="text-body-sm text-muted mt-3 italic">{interpretation}</p>
+  )}
+</div>

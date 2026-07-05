@@ -1,0 +1,77 @@
+---
+export interface Props {
+  title: string;
+  description?: string;
+  headers: string[];
+  rows: (string | number)[][];
+  downloadLabel?: string;
+  unit?: string;
+  source?: string;
+}
+
+const {
+  title,
+  description,
+  headers,
+  rows,
+  downloadLabel = 'Download as CSV',
+  unit,
+  source,
+} = Astro.props as Props;
+
+function toCSV(): string {
+  const headerRow = headers.join(',');
+  const dataRows = rows.map(row => row.join(',')).join('\n');
+  return `${headerRow}\n${dataRows}`;
+}
+
+function downloadFilename(): string {
+  return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+$/, '') + '.csv';
+}
+
+const csvData = toCSV();
+const filename = downloadFilename();
+---
+
+<section class="mb-16 border-t border-hairline pt-12">
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+    <div>
+      <h2 class="text-title-lg text-primary uppercase tracking-wider">{title}</h2>
+      {description && <p class="text-body-sm text-muted mt-2">{description}</p>}
+    </div>
+    <a
+      href={`data:text/csv;charset=utf-8,${encodeURIComponent(csvData)}`}
+      download={filename}
+      class="text-label-uppercase text-xs text-m-blue-light hover:underline inline-flex items-center gap-1 shrink-0"
+    >
+      {downloadLabel} →
+    </a>
+  </div>
+
+  <div class="overflow-x-auto">
+    <table class="w-full text-left border-collapse min-w-[480px]">
+      <thead>
+        <tr class="border-b border-hairline-strong bg-surface-card">
+          {headers.map((header) => (
+            <th class="p-3 text-label-uppercase text-[10px] text-primary tracking-wider">{header}</th>
+          ))}
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-hairline">
+        {rows.map((row) => (
+          <tr class="hover:bg-surface-card transition-colors">
+            {row.map((cell, i) => (
+              <td class={`p-3 text-body-sm font-light ${i === 0 ? 'text-primary font-bold' : 'text-body'}`}>
+                {cell}{i === rows[0].length - 1 && unit ? ` ${unit}` : ''}
+              </td>
+            ))}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+
+  {source && (
+    <p class="text-caption text-muted mt-3">Source: {source}</p>
+  )}
+</section>

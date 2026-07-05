@@ -90,12 +90,35 @@ const faqItems = [
     answer: "Wh is the best metric for comparing total energy content. However, for applications requiring high current, also consider max continuous discharge (A) and C-rate. Two batteries with the same Wh may have very different current delivery capabilities.",
   },
 ];
+
+const commonMistakes = [
+  "Comparing batteries by Ah alone without considering voltage — a 100Ah 48V battery stores 4× more energy than a 100Ah 12V battery. Always convert to Wh for fair comparison.",
+  "Using peak charge voltage instead of nominal voltage — Wh calculations must use nominal voltage (e.g., 3.2V for LFP, 3.7V for NMC), not the peak charge voltage (3.65V or 4.2V).",
+  "Ignoring DoD when converting — a 100Ah battery at 80% DoD only provides 80Ah usable. Convert the usable Ah, not the total rated Ah, for runtime calculations.",
+  "Confusing Wh and Ah for load calculations — loads are specified in watts, not amps. Always convert battery capacity to Wh before dividing by load power for runtime.",
+  "Forgetting system efficiency — a 100Ah 12.8V battery stores 1,280 Wh, but after inverter losses (90% efficiency), only 1,152 Wh reaches the load.",
+  "Assuming Ah is independent of discharge rate — higher C-rates reduce usable Ah due to internal resistance losses, especially in lead-acid batteries (Peukert effect).",
+  "Using kWh for small battery comparisons — kWh is appropriate for large systems, but Wh provides more intuitive resolution for small batteries under 5 kWh.",
+  "Mixing units in calculations — never mix Ah and Wh in the same formula without converting. Ah × Voltage = Wh; Wh / Voltage = Ah.",
+  "Ignoring temperature derating — cold temperatures reduce both Ah and Wh capacity. A battery rated at 100Ah at 25°C may only deliver 85Ah at 0°C.",
+  "Not verifying nominal voltage — always check the manufacturer's nominal voltage specification. Using 12V instead of 12.8V for LFP introduces a 6.25% error.",
+];
+
+const relatedArticles = [
+  { href: "/learn/lifepo4-voltage-chart", title: "LiFePO4 Voltage Chart" },
+  { href: "/learn/battery-voltage-systems", title: "Battery Voltage Systems" },
+  { href: "/learn/lifepo4-vs-lead-acid", title: "LiFePO4 vs Lead Acid" },
+  { href: "/learn/battery-efficiency-reference", title: "Battery Efficiency Reference" },
+];
+
 ---
 
 <CalculatorLayout
   title="Battery Capacity Ah to Wh Converter | Battery Calculators"
   description="Convert battery capacity metrics between Amp-hours (Ah) and Watt-hours (Wh) using nominal pack voltage. Fast, transparent calculator."
   faqItems={faqItems}
+  commonMistakes={commonMistakes}
+  relatedArticles={relatedArticles}
   relatedCalculators={[
     { href: "/tools/runtime-calculator", title: "Runtime Calculator", description: "Estimate backup hours given a W load profile." },
     { href: "/tools/c-rate-calculator", title: "C-Rate Calculator", description: "Analyze battery load speed parameters." },

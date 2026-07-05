@@ -1,0 +1,44 @@
+---
+export interface Props {
+  title: string;
+  headers: string[];
+  rows: (string | number)[][];
+  highlightCol?: number;
+  caption?: string;
+}
+
+const {
+  title,
+  headers,
+  rows,
+  highlightCol,
+  caption,
+} = Astro.props as Props;
+---
+
+<div class="mb-8">
+  <h3 class="text-title-lg text-primary uppercase tracking-wider mb-4">{title}</h3>
+  <div class="overflow-x-auto">
+    <table class="w-full text-left border-collapse min-w-[480px]">
+      <thead>
+        <tr class="border-b border-hairline-strong">
+          {headers.map((header, i) => (
+            <th class={`p-3 text-label-uppercase text-[10px] tracking-wider ${i === highlightCol ? 'text-m-blue-light' : 'text-primary'}`}>{header}</th>
+          ))}
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-hairline">
+        {rows.map((row) => (
+          <tr class="hover:bg-surface-card transition-colors">
+            {row.map((cell, i) => (
+              <td class={`p-3 text-body-sm font-light ${i === highlightCol ? 'text-primary font-bold' : 'text-body'}`}>{cell}</td>
+            ))}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+  {caption && (
+    <p class="text-caption text-muted mt-2">{caption}</p>
+  )}
+</div>
