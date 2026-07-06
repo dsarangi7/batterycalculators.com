@@ -5,6 +5,9 @@ import InputField from '../components/InputField.astro';
 import ResultBox from '../components/ResultBox.astro';
 import FormulaBox from '../components/FormulaBox.astro';
 import FAQSection from '../components/FAQSection.astro';
+import WorkedExample from '../components/WorkedExample.astro';
+import ComparisonTable from '../components/ComparisonTable.astro';
+import EngineeringDiagram from '../components/EngineeringDiagram.astro';
 
 const whatIs = `A home power outage battery backup calculator helps you estimate the battery capacity, inverter size, and overall backup power system you need to keep essential appliances running during a grid outage. Whether you're preparing for hurricane season, wildfire shutoffs, winter storms, or unexpected blackouts, this tool sizes your battery bank based on the specific devices you want powered—refrigerator, CPAP machine, sump pump, Wi-Fi router, lights, and more. It accounts for inverter conversion losses, battery chemistry depth-of-discharge limits, and a configurable safety margin to give you a realistic, engineering-grade estimate.`;
 
@@ -331,7 +334,7 @@ const appliancePresets = [
     </CalculatorCard>
   </div>
 
-  <!-- Formulas + Worked Example -->
+  <!-- Formulas + Worked Examples -->
   <section class="mb-16 border-t border-hairline pt-12">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
 
@@ -359,42 +362,73 @@ const appliancePresets = [
       </FormulaBox>
 
       <div>
-        <h2 class="text-title-lg text-primary uppercase mb-6 tracking-wider">Worked Example</h2>
-        <div class="text-body-sm text-muted flex flex-col gap-4">
-          <p><strong>Scenario:</strong> Food protection backup during a hurricane — refrigerator, freezer, Wi-Fi router, and 2 LED lights for 12 hours.</p>
-
-          <div class="border-l-2 border-m-blue-light pl-4">
-            <p class="font-bold text-primary mb-2">Step 1: Calculate running load</p>
-            <div class="font-mono text-primary">Fridge: 150W × 1 = 150W</div>
-            <div class="font-mono text-primary">Freezer: 120W × 1 = 120W</div>
-            <div class="font-mono text-primary">Router: 12W × 1 = 12W</div>
-            <div class="font-mono text-primary">LED Lights: 10W × 2 = 20W</div>
-            <div class="font-mono text-primary font-bold mt-1">Total = 302W</div>
-          </div>
-
-          <div class="border-l-2 border-m-blue-light pl-4">
-            <p class="font-bold text-primary mb-2">Step 2: Calculate surge</p>
-            <div class="font-mono text-primary">Highest surge: Fridge 600W + others 152W = 752W</div>
-          </div>
-
-          <div class="border-l-2 border-m-blue-light pl-4">
-            <p class="font-bold text-primary mb-2">Step 3: Energy required</p>
-            <div class="font-mono text-primary">Raw: 302W × 12h = 3,624 Wh</div>
-            <div class="font-mono text-primary">After efficiency: 3,624 / 0.90 = 4,027 Wh</div>
-            <div class="font-mono text-primary">With 20% margin: 4,027 × 1.20 = 4,832 Wh</div>
-          </div>
-
-          <div class="border-l-2 border-m-blue-light pl-4">
-            <p class="font-bold text-primary mb-2">Step 4: Battery capacity (24V LFP, 80% DoD)</p>
-            <div class="font-mono text-primary">Ah = 4,832 / (24 × 0.80) = 251.7 Ah</div>
-            <div class="font-mono text-primary font-bold mt-1">Result: 24V 260Ah LFP battery bank (≈6.2 kWh)</div>
-          </div>
-
-          <div class="border-l-2 border-m-blue-light pl-4">
-            <p class="font-bold text-primary mb-2">Inverter sizing</p>
-            <div class="font-mono text-primary">Continuous: 302W × 1.25 = 377.5W → round to 500W</div>
-            <div class="font-mono text-primary">Surge: 752W × 1.10 = 827.2W → need 1,000W+ surge</div>
-          </div>
+        <h2 class="text-title-lg text-primary uppercase mb-6 tracking-wider">Worked Examples</h2>
+        <div class="text-body-sm text-muted flex flex-col gap-6">
+          <WorkedExample
+            number={1}
+            title="Essential Loads — 8 Hour Outage"
+            scenario="Keep Wi-Fi, phone charging, a few lights, and a laptop running through an overnight outage (8 hours)."
+            inputs={[
+              { label: "Wi-Fi Router", value: "12W" },
+              { label: "Laptop", value: "60W" },
+              { label: "LED Lights ×2", value: "20W" },
+              { label: "Phone Charger", value: "15W" },
+              { label: "Backup Duration", value: "8 hours" },
+            ]}
+            steps={[
+              { label: "Step 1: Total running load", formula: "12 + 60 + 20 + 15", result: "107W" },
+              { label: "Step 2: Energy for 8 hours", formula: "107W × 8h", result: "856 Wh" },
+              { label: "Step 3: After inverter efficiency (90%)", formula: "856 / 0.90", result: "951 Wh" },
+              { label: "Step 4: With 20% margin", formula: "951 × 1.20", result: "1,141 Wh" },
+              { label: "Step 5: Battery (12V LFP, 80% DoD)", formula: "1,141 / (12 × 0.80)", result: "119 Ah → 12V 120Ah LFP" },
+            ]}
+            answer="A 12V 120Ah LiFePO4 battery (1,536 Wh) covers essential overnight loads with comfortable margin."
+            interpretation="Light essential loads are affordable to back up — a single 12V battery handles them easily."
+          />
+          <WorkedExample
+            number={2}
+            title="Full Home Backup — 24 Hour Outage"
+            scenario="Keep fridge, freezer, Wi-Fi, lights, sump pump, and phone charging running for a full day (24 hours)."
+            inputs={[
+              { label: "Fridge + Freezer", value: "270W (cycling avg ~110W)" },
+              { label: "Wi-Fi Router", value: "12W" },
+              { label: "LED Lights ×4", value: "40W" },
+              { label: "Sump Pump (intermittent)", value: "800W (avg ~50W)" },
+              { label: "Phone + Laptop", value: "75W" },
+              { label: "Backup Duration", value: "24 hours" },
+            ]}
+            steps={[
+              { label: "Step 1: Average running load", formula: "110 + 12 + 40 + 50 + 75", result: "287W average" },
+              { label: "Step 2: Energy for 24 hours", formula: "287W × 24h", result: "6,888 Wh" },
+              { label: "Step 3: After inverter efficiency (90%)", formula: "6,888 / 0.90", result: "7,653 Wh" },
+              { label: "Step 4: With 20% margin", formula: "7,653 × 1.20", result: "9,184 Wh" },
+              { label: "Step 5: Battery (48V LFP, 80% DoD)", formula: "9,184 / (48 × 0.80)", result: "239 Ah → 48V 250Ah LFP" },
+            ]}
+            answer="A 48V 250Ah LiFePO4 battery bank (12 kWh) covers full-home essential loads for 24 hours."
+            interpretation="Whole-day backup requires serious capacity — 48V systems are most efficient for loads this size."
+          />
+          <WorkedExample
+            number={3}
+            title="Critical Medical — 48 Hour Outage"
+            scenario="Power a CPAP machine, oxygen concentrator, phone, Wi-Fi, and a few lights for 2 full days."
+            inputs={[
+              { label: "CPAP Machine", value: "40W" },
+              { label: "Oxygen Concentrator", value: "300W" },
+              { label: "Wi-Fi Router", value: "12W" },
+              { label: "LED Lights ×2", value: "20W" },
+              { label: "Phone Charger", value: "15W" },
+              { label: "Backup Duration", value: "48 hours" },
+            ]}
+            steps={[
+              { label: "Step 1: Total running load", formula: "40 + 300 + 12 + 20 + 15", result: "387W" },
+              { label: "Step 2: Energy for 48 hours", formula: "387W × 48h", result: "18,576 Wh" },
+              { label: "Step 3: After inverter efficiency (90%)", formula: "18,576 / 0.90", result: "20,640 Wh" },
+              { label: "Step 4: With 20% margin", formula: "20,640 × 1.20", result: "24,768 Wh" },
+              { label: "Step 5: Battery (48V LFP, 80% DoD)", formula: "24,768 / (48 × 0.80)", result: "645 Ah → 48V 650Ah LFP" },
+            ]}
+            answer="A 48V 650Ah LiFePO4 battery bank (31.2 kWh) powers critical medical equipment for 48 hours."
+            interpretation="Medical equipment demands serious capacity — solar recharge is essential for multi-day medical backup."
+          />
         </div>
       </div>
 
@@ -552,6 +586,34 @@ const appliancePresets = [
       </CalculatorCard>
     </div>
   </section>
+
+  <EngineeringDiagram
+    title="Home Backup Power System Flow"
+    description="Grid or solar charges the battery bank, which feeds the inverter to power your essential home circuits via a transfer switch."
+    steps={[
+      { label: "Grid / Solar", icon: "solar" },
+      { label: "Charge Controller", icon: "charge" },
+      { label: "Battery Bank", icon: "battery" },
+      { label: "Inverter", icon: "inverter" },
+      { label: "Transfer Switch", icon: "cable" },
+      { label: "Home Loads", icon: "load" },
+    ]}
+    variant="system"
+  />
+
+  <ComparisonTable
+    title="Home Backup Outage Scenarios Compared"
+    headers={["Scenario", "Key Loads", "Duration", "Avg Draw", "Battery Size", "Est. Cost"]}
+    rows={[
+      ["Essential 8h", "Wi-Fi, lights, phone, laptop", "8 hours", "~110W", "12V 120Ah (1.5 kWh)", "$800–$1,200"],
+      ["Food Protection 24h", "Fridge, freezer, Wi-Fi, lights", "24 hours", "~290W", "24V 200Ah (4.8 kWh)", "$2,500–$3,500"],
+      ["Medical Critical 48h", "CPAP, O₂ concentrator, Wi-Fi, lights", "48 hours", "~390W", "48V 650Ah (31 kWh)", "$12,000–$18,000"],
+      ["Storm Emergency 12h", "Fridge, sump pump, Wi-Fi, lights", "12 hours", "~350W", "24V 250Ah (6 kWh)", "$3,500–$5,000"],
+      ["Full Home 24h", "All essential circuits", "24 hours", "~1,500W", "48V 500Ah (24 kWh)", "$10,000–$15,000"],
+      ["Multi-Day + Solar", "Essentials with daily recharge", "72+ hours", "~300W", "48V 200Ah + 1,200W solar", "$8,000–$12,000"],
+    ]}
+    caption="Costs are approximate for LiFePO4 battery systems including inverter. Prices vary significantly by brand and installation complexity."
+  />
 
   <FAQSection items={faqItems} />
 

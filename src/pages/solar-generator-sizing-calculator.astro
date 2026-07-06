@@ -3,6 +3,9 @@ import CalculatorLayout from '../layouts/CalculatorLayout.astro';
 import FormulaBox from '../components/FormulaBox.astro';
 import FAQSection from '../components/FAQSection.astro';
 import PowerOutageForm from '../components/PowerOutageForm.astro';
+import WorkedExample from '../components/WorkedExample.astro';
+import ComparisonTable from '../components/ComparisonTable.astro';
+import EngineeringDiagram from '../components/EngineeringDiagram.astro';
 
 const whatIs = `A solar generator sizing calculator determines the battery capacity, solar panel wattage, charge controller size, and inverter requirements for a complete solar-powered backup system. Unlike gas generators, solar generators recharge from sunlight — providing unlimited runtime as long as the sun shines. This calculator sizes the full system: battery bank for overnight storage, solar panels for daytime recharge, and inverter for AC appliance loads.`;
 
@@ -120,37 +123,93 @@ const presetAppliances = [
         <p class="text-xs text-muted mt-4">For indefinite off-grid operation, daily solar production must exceed daily consumption. Size panels for worst-case season.</p>
       </FormulaBox>
       <div>
-        <h2 class="text-title-lg text-primary uppercase mb-6 tracking-wider">Worked Example</h2>
-        <div class="text-body-sm text-muted flex flex-col gap-4">
-          <p><strong>Scenario:</strong> Size a solar generator for a fridge + freezer + Wi-Fi with 12h overnight backup, recharged by 400W of solar panels.</p>
-          <div class="border-l-2 border-m-blue-light pl-4">
-            <p class="font-bold text-primary mb-2">Step 1: Running load</p>
-            <div class="font-mono text-primary">Fridge: 150W + Freezer: 120W + Wi-Fi: 12W</div>
-            <div class="font-mono text-primary">Total running: 282W</div>
-          </div>
-          <div class="border-l-2 border-m-blue-light pl-4">
-            <p class="font-bold text-primary mb-2">Step 2: Battery for 12h overnight</p>
-            <div class="font-mono text-primary">Raw: 282W × 12h = 3,384 Wh</div>
-            <div class="font-mono text-primary">After efficiency: 3,384 / 0.90 = 3,760 Wh</div>
-            <div class="font-mono text-primary">With 20% margin: 3,760 × 1.20 = 4,512 Wh</div>
-            <div class="font-mono text-primary">24V LFP (80% DoD): 4,512 / 19.2 = 235 Ah</div>
-            <div class="font-mono text-primary font-bold mt-1">→ Battery: 24V 250Ah LFP (6 kWh)</div>
-          </div>
-          <div class="border-l-2 border-m-blue-light pl-4">
-            <p class="font-bold text-primary mb-2">Step 3: Solar panel sizing</p>
-            <div class="font-mono text-primary">Daily consumption: 282W × 24h = 6,768 Wh</div>
-            <div class="font-mono text-primary">At 5 peak sun hours, 95% controller eff:</div>
-            <div class="font-mono text-primary">Panels needed: 6,768 / (5 × 0.95) = 1,425W</div>
-            <div class="font-mono text-primary font-bold mt-1">→ Solar: 1,500W of panels (4× 400W)</div>
-          </div>
-          <div class="border-l-2 border-m-blue-light pl-4">
-            <p class="font-bold text-primary mb-2">Result: Complete system</p>
-            <div class="font-mono text-primary font-bold">24V 250Ah LFP + 1,500W solar + 3,000W inverter</div>
-          </div>
+        <h2 class="text-title-lg text-primary uppercase mb-6 tracking-wider">Worked Examples</h2>
+        <div class="text-body-sm text-muted flex flex-col gap-6">
+          <WorkedExample
+            number={1}
+            title="Camping Weekend Setup"
+            scenario="Power a portable fridge, LED lights, and charge devices during a 3-day camping trip with 4 peak sun hours."
+            inputs={[
+              { label: "Portable Fridge", value: "60W" },
+              { label: "LED Lights ×2", value: "20W total" },
+              { label: "Phone + Camera Charging", value: "30W average" },
+              { label: "Daily Use", value: "12 hours" },
+            ]}
+            steps={[
+              { label: "Step 1: Daily consumption", formula: "110W × 12h = 1,320 Wh/day", result: "1,320 Wh/day" },
+              { label: "Step 2: Battery (2 days autonomy, 24V LFP 80% DoD)", formula: "1,320 × 2 / (24 × 0.80)", result: "137.5 Ah → 24V 150Ah (3.6 kWh)" },
+              { label: "Step 3: Solar panels (4 peak sun hours, 95% controller)", formula: "1,320 / (4 × 0.95)", result: "347W → 400W of panels" },
+            ]}
+            answer="400W of solar panels + 24V 150Ah LFP battery + 1,000W inverter for a comfortable camping weekend."
+            interpretation="Camping loads are modest — a portable 400W panel array recharges the battery daily with margin."
+          />
+          <WorkedExample
+            number={2}
+            title="Emergency Home Backup (72h)"
+            scenario="Keep fridge, freezer, Wi-Fi, and lights running for 3 days with daily solar recharge in winter (3 peak sun hours)."
+            inputs={[
+              { label: "Fridge + Freezer", value: "270W combined" },
+              { label: "Wi-Fi + Router", value: "12W" },
+              { label: "LED Lights ×3", value: "30W" },
+              { label: "Daily Use", value: "24 hours" },
+            ]}
+            steps={[
+              { label: "Step 1: Daily consumption", formula: "312W × 24h = 7,488 Wh/day", result: "7,488 Wh/day" },
+              { label: "Step 2: Battery (1 day autonomy, 48V LFP 80% DoD)", formula: "7,488 / (48 × 0.80)", result: "195 Ah → 48V 200Ah (9.6 kWh)" },
+              { label: "Step 3: Solar panels (3 winter sun hours, 95% eff)", formula: "7,488 / (3 × 0.95)", result: "2,627W → 2,800W of panels" },
+            ]}
+            answer="2,800W of solar panels + 48V 200Ah LFP battery + 4,000W inverter for multi-day winter outage survival."
+            interpretation="Winter solar requires significantly larger panel arrays — summer systems can be roughly half this size."
+          />
+          <WorkedExample
+            number={3}
+            title="Off-Grid Cabin (Full Time)"
+            scenario="Power a small off-grid cabin with fridge, lights, well pump, and basic appliances year-round."
+            inputs={[
+              { label: "Fridge", value: "150W" },
+              { label: "Well Pump", value: "750W (intermittent)" },
+              { label: "Lights + Electronics", value: "100W" },
+              { label: "Daily Use", value: "24 hours" },
+            ]}
+            steps={[
+              { label: "Step 1: Average daily consumption", formula: "~1,500Wh (fridge cycling) + 500Wh (pump) + 2,400Wh (electronics)", result: "4,400 Wh/day average" },
+              { label: "Step 2: Battery (3 days autonomy, 48V LFP 80% DoD)", formula: "4,400 × 3 / (48 × 0.80)", result: "344 Ah → 48V 400Ah (19.2 kWh)" },
+              { label: "Step 3: Solar panels (5 peak sun hours, 95% eff)", formula: "4,400 / (5 × 0.95)", result: "926W → 1,000W of panels" },
+            ]}
+            answer="1,000W of solar panels + 48V 400Ah LFP battery + 3,000W inverter for full-time off-grid cabin power."
+            interpretation="Off-grid cabins need serious battery storage for cloudy day autonomy — 3+ days prevents dead batteries during storms."
+          />
         </div>
       </div>
     </div>
   </section>
+
+  <EngineeringDiagram
+    title="Solar Generator Charging Flow"
+    description="Energy flows from solar panels through the charge controller to the battery bank, then through the inverter to power AC loads."
+    steps={[
+      { label: "Solar Panels", icon: "solar" },
+      { label: "Charge Controller", icon: "charge" },
+      { label: "Battery Bank", icon: "battery" },
+      { label: "Inverter", icon: "inverter" },
+      { label: "AC Loads", icon: "load" },
+    ]}
+    variant="flow"
+  />
+
+  <ComparisonTable
+    title="Solar Generator Panel + Battery Combo Guide"
+    headers={["System Size", "Battery (LFP)", "Solar Panels", "Daily Production", "Best For", "Winter Adequate?"]}
+    rows={[
+      ["Small Portable", "24V 50Ah (1.2 kWh)", "200W", "800–1,000 Wh", "Phones, lights, small fridge", "Summer only"],
+      ["Camping Standard", "24V 100Ah (2.4 kWh)", "400W", "1,600–2,000 Wh", "Fridge, lights, devices", "Yes (mild climate)"],
+      ["Weekend Backup", "24V 200Ah (4.8 kWh)", "600W", "2,400–3,000 Wh", "Fridge + freezer + Wi-Fi", "Yes"],
+      ["Home Emergency", "48V 200Ah (9.6 kWh)", "1,200W", "4,800–6,000 Wh", "Essential home loads", "Yes"],
+      ["Whole-Home", "48V 400Ah (19.2 kWh)", "2,400W", "9,600–12,000 Wh", "Full household backup", "Yes"],
+      ["Off-Grid Cabin", "48V 600Ah (28.8 kWh)", "3,600W", "14,400–18,000 Wh", "Full-time off-grid living", "Yes"],
+    ]}
+    caption="Winter production assumes 3 peak sun hours. Summer production at 5–6 peak sun hours is roughly 60–100% higher."
+  />
 
   <FAQSection items={faqItems} />
 </CalculatorLayout>

@@ -6,6 +6,9 @@ import ResultBox from '../../components/ResultBox.astro';
 import FormulaBox from '../../components/FormulaBox.astro';
 import FAQSection from '../../components/FAQSection.astro';
 import RelatedTools from '../../components/RelatedTools.astro';
+import WorkedExample from '../../components/WorkedExample.astro';
+import ComparisonTable from '../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../components/EngineeringDiagram.astro';
 
 const modeOptions = [
   { label: "Open Circuit Voltage (OCV) Lookup", value: "ocv" },
@@ -247,47 +250,88 @@ const relatedArticles = [
         </p>
       </FormulaBox>
 
-      <!-- Worked Examples -->
-      <div>
-        <h2 class="text-title-lg text-primary uppercase mb-6 tracking-wider">Worked Examples</h2>
-        <div class="text-body-sm text-muted flex flex-col gap-6">
+      <WorkedExample
+        number={1}
+        title="LFP OCV Lookup"
+        scenario="You have a 4S LFP battery pack at rest and measure 3.30V at the cell terminals. Determine the state of charge using the OCV reference curve."
+        inputs={[
+          { label: "Cell Voltage", value: "3.30 V" },
+          { label: "Chemistry", value: "LFP (LiFePO4)" },
+          { label: "Rest Time", value: "> 2 hours" },
+        ]}
+        steps={[
+          "Identify the chemistry: LFP cells have a nominal voltage of 3.2V.",
+          "Locate 3.30V on the LFP OCV reference curve. The curve is extremely flat between 20–80% SOC (3.23V–3.31V).",
+          "Interpolate: 3.30V falls near the upper end of the flat region, corresponding to approximately **65% SOC**.",
+        ]}
+        answer="SOC ≈ 65%"
+        interpretation="The 4S pack voltage would be 3.30 × 4 = 13.20V. This places the battery in the upper-middle range. Because the LFP voltage curve is nearly flat in this region, a small measurement error (10–20mV) can shift the SOC estimate by 15–20%. For reliable LFP SOC, combine OCV at rest with Coulomb counting."
+        variant="blue"
+      />
 
-          <div class="border-l-2 border-m-blue-light pl-4">
-            <p class="font-bold text-primary mb-2">Example 1: LFP OCV Lookup</p>
-            <ul class="list-disc pl-6 flex flex-col gap-1">
-              <li><strong>Voltage:</strong> 13.16 V | <strong>Nominal Voltage:</strong> 12.8 V</li>
-              <li><strong>Step 1:</strong> Identify series cells: 12.8 / 3.2 = 4 Cells</li>
-              <li><strong>Step 2:</strong> Solve cell voltage: 13.16 / 4 = 3.29 V</li>
-              <li><strong>Step 3:</strong> Interpolate curve: 3.29V cell corresponds to exactly <strong>70% SOC</strong>.</li>
-            </ul>
-          </div>
+      <WorkedExample
+        number={2}
+        title="NMC OCV Interpolation"
+        scenario="A 10S NMC battery pack has been resting for 3 hours. The measured cell voltage is 3.75V. Find the state of charge using the NMC reference curve."
+        inputs={[
+          { label: "Cell Voltage", value: "3.75 V" },
+          { label: "Chemistry", value: "NMC (Nickel Manganese Cobalt)" },
+          { label: "Rest Time", value: "> 2 hours" },
+        ]}
+        steps={[
+          "Identify the chemistry: NMC cells have a nominal voltage of 3.6–3.7V.",
+          "Reference curve: 4.20V = 100%, 4.05V = 80%, 3.80V = 50%, 3.60V = 20%, 3.00V = 0%.",
+          "Interpolate: 3.75V falls between 50% (3.80V) and 20% (3.60V). Linear interpolation gives approximately **44% SOC**.",
+        ]}
+        answer="SOC ≈ 44%"
+        interpretation="The 10S pack voltage is 3.75 × 10 = 37.5V. NMC chemistry has a steeper voltage curve than LFP, making OCV-based SOC estimation more accurate. This battery is below nominal charge and should be recharged soon for optimal cycle life."
+        variant="blue"
+      />
 
-          <div class="border-l-2 border-m-blue-dark pl-4">
-            <p class="font-bold text-primary mb-2">Example 2: Coulomb Counting — Discharge</p>
-            <ul class="list-disc pl-6 flex flex-col gap-1">
-              <li><strong>Initial SOC:</strong> 50% | <strong>Capacity:</strong> 100 Ah</li>
-              <li><strong>Current:</strong> -10 A (discharge) | <strong>Duration:</strong> 60 minutes (3600s)</li>
-              <li><strong>Step 1:</strong> Calculate charge change: -10 A x 1 hour = -10 Ah</li>
-              <li><strong>Step 2:</strong> Solve SOC change: (-10 Ah / 100 Ah) x 100% = -10%</li>
-              <li><strong>Step 3:</strong> Solve final SOC: 50% - 10% = <strong>40%</strong></li>
-            </ul>
-          </div>
-
-          <div class="border-l-2 border-m-red pl-4">
-            <p class="font-bold text-primary mb-2">Example 3: NMC OCV Lookup — High Voltage</p>
-            <ul class="list-disc pl-6 flex flex-col gap-1">
-              <li><strong>Voltage:</strong> 38.5 V | <strong>Nominal Voltage:</strong> 37 V (10S NMC)</li>
-              <li><strong>Step 1:</strong> Identify series cells: 37 / 3.7 = 10 Cells</li>
-              <li><strong>Step 2:</strong> Solve cell voltage: 38.5 / 10 = 3.85 V</li>
-              <li><strong>Step 3:</strong> Interpolate NMC curve: 3.85V corresponds to approximately <strong>53% SOC</strong>.</li>
-            </ul>
-          </div>
-
-        </div>
-      </div>
+      <WorkedExample
+        number={3}
+        title="Lead-Acid Voltage-Based SOC"
+        scenario="A 12V lead-acid battery pack measures 12.1V at rest after a full night of no load. Estimate the state of charge using the lead-acid reference curve."
+        inputs={[
+          { label: "Pack Voltage", value: "12.1 V" },
+          { label: "Chemistry", value: "Lead-Acid (6S)" },
+          { label: "Rest Time", value: "> 2 hours" },
+        ]}
+        steps={[
+          "Identify the chemistry: Lead-acid 12V nominal = 6 cells × 2.1V per cell = 12.6V full, 11.63V = 0%.",
+          "Reference curve: 12.72V = 100%, 12.45V = 75%, 12.24V = 50%, 12.06V = 25%, 11.63V = 0%.",
+          "Interpolate: 12.1V falls between 50% (12.24V) and 25% (12.06V). Linear interpolation gives approximately **35% SOC**.",
+        ]}
+        answer="SOC ≈ 35%"
+        interpretation="Lead-acid has a relatively linear voltage-to-SOC relationship, making OCV estimation more reliable than for lithium chemistries. However, this battery is significantly discharged. Recharge to at least 12.45V (75%) to prevent sulfation and maintain battery health."
+        variant="red"
+      />
 
     </div>
   </section>
+
+  <EngineeringDiagram
+    title="SOC Estimation Methods"
+    description="Two primary approaches: voltage-based OCV lookup and coulomb counting integration"
+    variant="flow"
+    steps={[
+      { label: "Battery Voltage", icon: "battery" },
+      { label: "OCV Lookup Table", icon: "chart" },
+      { label: "SOC Estimate", icon: "chart" },
+    ]}
+  />
+
+  <ComparisonTable
+    title="SOC Estimation Accuracy by Method"
+    headers={["Method", "Accuracy", "Requirements", "Limitations", "Best For"]}
+    rows={[
+      ["OCV Lookup", "±5%", "Voltmeter, OCV table", "Must be at rest (>2h)", "Stationary systems"],
+      ["Coulomb Counting", "±2–3%", "Current sensor, timer", "Drifts over time", "Active systems"],
+      ["Impedance-Based", "±5–10%", "AC impedance sensor", "Temperature sensitive", "BMS integration"],
+      ["Hybrid (BMS)", "±1–2%", "Voltage + current + temp", "Complex algorithm", "All lithium systems"],
+    ]}
+    caption="Comparison of state-of-charge estimation techniques"
+  />
 
   <FAQSection items={faqItems} />
   <RelatedTools tools={relatedTools} />

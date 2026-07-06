@@ -7,6 +7,9 @@ import FormulaBox from '../../components/FormulaBox.astro';
 import FAQSection from '../../components/FAQSection.astro';
 import RelatedTools from '../../components/RelatedTools.astro';
 import MiniSimulationChart from '../../components/MiniSimulationChart.astro';
+import WorkedExample from '../../components/WorkedExample.astro';
+import ComparisonTable from '../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../components/EngineeringDiagram.astro';
 
 const whatIs = `Solar battery sizing determines the total energy capacity a battery bank must store to power a home or facility through periods without solar production — nights, cloudy days, and seasonal low-light periods. The calculation integrates <strong>daily energy consumption</strong> from the household, <strong>days of autonomy</strong> to bridge periods without sun, <strong>battery chemistry</strong> (which determines safe depth of discharge), and <strong>system voltage</strong>. Unlike general battery sizing, solar-specific sizing must account for the solar production cycle, seasonal variation in sunlight hours, and the interaction between charge rate and discharge rate.`;
 
@@ -253,39 +256,105 @@ const relatedArticles = [
         <h2 class="text-title-lg text-primary uppercase mb-6 tracking-wider">Worked Examples</h2>
         <div class="text-body-sm text-muted flex flex-col gap-6">
 
-          <div class="border-l-2 border-m-blue-light pl-4">
-            <p class="font-bold text-primary mb-2">Example 1: Grid-Tied Home — 5 kWh/day, 48V LFP</p>
-            <p>Given: 5 kWh/day consumption, 2 days autonomy, 48V LFP battery at 80% DoD</p>
-            <p class="mt-2"><strong>Step 1:</strong> Usable energy = 5,000 × 2 = <span class="font-mono text-primary">10,000 Wh</span></p>
-            <p><strong>Step 2:</strong> Total capacity = 10,000 / 0.80 = <span class="font-mono text-primary">12,500 Wh</span></p>
-            <p><strong>Step 3:</strong> Ah = 12,500 / 48 = <span class="font-mono text-primary">260.4 Ah</span></p>
-          </div>
+          <WorkedExample
+            number={1}
+            title="Small Cabin — 3 kWh/day, 4 Peak Sun Hours"
+            scenario="A small off-grid cabin consumes 3 kWh/day and receives an average of 4 peak sun hours daily. Size a 48V LFP battery bank with 2 days of autonomy at 80% DoD."
+            inputs={[
+              { label: "Daily Consumption", value: "3 kWh/day" },
+              { label: "Peak Sun Hours", value: "4 hours" },
+              { label: "Autonomy", value: "2 days" },
+              { label: "System Voltage", value: "48V" },
+              { label: "Chemistry", value: "LFP (LiFePO4)" },
+              { label: "Max DoD", value: "80%" },
+            ]}
+            steps={[
+              { label: "Usable energy", formula: "3,000 × 2", result: "6,000 Wh" },
+              { label: "Total capacity", formula: "6,000 / 0.80", result: "7,500 Wh (7.5 kWh)" },
+              { label: "Amp-hours", formula: "7,500 / 48", result: "156.3 Ah" },
+              { label: "Solar array needed", formula: "3,000 / (4 × 0.80)", result: "938 W" },
+            ]}
+            answer="7,500 Wh (156.3 Ah at 48V) — a 1,000W solar array is recommended"
+            interpretation="With 4 peak sun hours, the cabin needs roughly 938W of solar panels to recharge the battery bank in one day. A 1kW array provides comfortable margin for cloudy days."
+            variant="solar"
+          />
 
-          <div class="border-l-2 border-m-blue-dark pl-4">
-            <p class="font-bold text-primary mb-2">Example 2: Off-Grid Cabin — 8 kWh/day, 48V LFP, 3 days</p>
-            <ul class="list-disc pl-6 flex flex-col gap-1">
-              <li><strong>Consumption:</strong> 8 kWh/day | <strong>Autonomy:</strong> 3 days | <strong>DoD:</strong> 85%</li>
-            </ul>
-            <p class="mt-2"><strong>Usable energy:</strong> 8,000 × 3 = <span class="font-mono text-primary">24,000 Wh</span></p>
-            <p><strong>Total capacity:</strong> 24,000 / 0.85 = <span class="font-mono text-primary">28,235 Wh (28.24 kWh)</span></p>
-            <p><strong>Ah:</strong> 28,235 / 48 = <span class="font-mono text-primary">588.2 Ah</span></p>
-          </div>
+          <WorkedExample
+            number={2}
+            title="Off-Grid Home — 10 kWh/day, Cloudy Day Buffer"
+            scenario="An off-grid home uses 10 kWh/day. The area averages 3.5 peak sun hours in winter. Account for 3 consecutive cloudy days by sizing for 4 days of autonomy with 85% DoD on 48V LFP."
+            inputs={[
+              { label: "Daily Consumption", value: "10 kWh/day" },
+              { label: "Peak Sun Hours (winter)", value: "3.5 hours" },
+              { label: "Autonomy (cloudy buffer)", value: "4 days" },
+              { label: "System Voltage", value: "48V" },
+              { label: "Chemistry", value: "LFP (LiFePO4)" },
+              { label: "Max DoD", value: "85%" },
+            ]}
+            steps={[
+              { label: "Usable energy", formula: "10,000 × 4", result: "40,000 Wh" },
+              { label: "Total capacity", formula: "40,000 / 0.85", result: "47,059 Wh (47.1 kWh)" },
+              { label: "Amp-hours", formula: "47,059 / 48", result: "980.4 Ah" },
+              { label: "Solar array needed", formula: "10,000 / (3.5 × 0.80)", result: "3,571 W" },
+            ]}
+            answer="47,059 Wh (980.4 Ah at 48V) — a 3,600W solar array is recommended"
+            interpretation="Winter production is the bottleneck. With only 3.5 peak sun hours, you need a large array to recharge 47 kWh in a single day. Consider reducing loads or accepting 2-day recharge cycles."
+            variant="solar"
+          />
 
-          <div class="border-l-2 border-m-red pl-4">
-            <p class="font-bold text-primary mb-2">Example 3: Small RV System — 2 kWh/day, 12V LFP</p>
-            <ul class="list-disc pl-6 flex flex-col gap-1">
-              <li><strong>Consumption:</strong> 2 kWh/day | <strong>Autonomy:</strong> 2 days | <strong>DoD:</strong> 80%</li>
-            </ul>
-            <p class="mt-2"><strong>Usable energy:</strong> 2,000 × 2 = <span class="font-mono text-primary">4,000 Wh</span></p>
-            <p><strong>Total capacity:</strong> 4,000 / 0.80 = <span class="font-mono text-primary">5,000 Wh</span></p>
-            <p><strong>Ah:</strong> 5,000 / 12.8 = <span class="font-mono text-primary">390.6 Ah</span> — Requires 2 parallel 200Ah LFP batteries</p>
-          </div>
+          <WorkedExample
+            number={3}
+            title="RV with Variable Solar — 2 kWh/day"
+            scenario="An RV consumes 2 kWh/day with variable solar input while driving and parked. Use a 12V LFP system with 2 days autonomy at 80% DoD. Peak sun hours vary from 2h (forested stops) to 6h (open desert)."
+            inputs={[
+              { label: "Daily Consumption", value: "2 kWh/day" },
+              { label: "Peak Sun Hours (range)", value: "2–6 hours" },
+              { label: "Autonomy", value: "2 days" },
+              { label: "System Voltage", value: "12V" },
+              { label: "Chemistry", value: "LFP (LiFePO4)" },
+              { label: "Max DoD", value: "80%" },
+            ]}
+            steps={[
+              { label: "Usable energy", formula: "2,000 × 2", result: "4,000 Wh" },
+              { label: "Total capacity", formula: "4,000 / 0.80", result: "5,000 Wh (5.0 kWh)" },
+              { label: "Amp-hours", formula: "5,000 / 12.8", result: "390.6 Ah" },
+              { label: "Solar (worst case, 2h)", formula: "2,000 / (2 × 0.80)", result: "1,250 W" },
+            ]}
+            answer="5,000 Wh (390.6 Ah at 12V) — requires 2 parallel 200Ah LFP batteries"
+            interpretation="Variable solar input means you must plan for the worst case. In forested areas with only 2 peak sun hours, a 1,250W portable panel or roof array keeps the batteries topped up."
+            variant="solar"
+          />
 
         </div>
       </div>
 
     </div>
   </section>
+
+  <EngineeringDiagram
+    title="Solar Battery Charging System"
+    description="Solar panels → charge controller → battery bank → inverter → loads"
+    variant="system"
+    steps={[
+      { label: "Solar Panels", icon: "solar" },
+      { label: "MPPT Controller", icon: "charge" },
+      { label: "Battery Bank", icon: "battery" },
+      { label: "Inverter + Loads", icon: "inverter" },
+    ]}
+  />
+
+  <ComparisonTable
+    title="Solar Sizing by Peak Sun Hours"
+    headers={["Location", "Peak Sun Hours", "Solar Needed (3kWh/day)", "Battery Autonomy", "Panel Array"]}
+    rows={[
+      ["Arizona, USA", "6.5 h", "462 W", "2 days", "600W recommended"],
+      ["London, UK", "2.5 h", "1,200 W", "4 days", "1,500W recommended"],
+      ["Mumbai, India", "5.0 h", "600 W", "2 days", "800W recommended"],
+      ["Oslo, Norway", "2.0 h", "1,500 W", "5 days", "2,000W recommended"],
+      ["Sydney, Australia", "5.5 h", "545 W", "2 days", "700W recommended"],
+    ]}
+    caption="Solar array sizing varies dramatically by location — peak sun hours are the primary design driver"
+  />
 
   <FAQSection items={faqItems} />
   <RelatedTools tools={relatedTools} />

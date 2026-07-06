@@ -1,0 +1,180 @@
+---
+import ArticleLayout from '../../layouts/ArticleLayout.astro';
+import TroubleshootingBlock from '../../components/TroubleshootingBlock.astro';
+import FAQSection from '../../components/FAQSection.astro';
+
+const description = "Diagnose why your battery voltage reads lower than expected. Covers actual discharge state, voltage sag under load, measurement error, temperature effects, and aging with step-by-step checklists.";
+
+const faqItems = [
+  {
+    question: "How long should a battery rest before taking an accurate voltage reading?",
+    answer: "For LiFePO4 batteries, rest for at least 30 minutes after disconnecting the load. For lead-acid, rest for 1-2 hours. Deep-cycle lead-acid may need 4-6 hours for the chemical reactions to stabilize. Surface charge from recent charging inflates readings, so a longer rest provides more accurate OCV.",
+  },
+  {
+    question: "Why does voltage drop when I connect a load?",
+    answer: "This is voltage sag caused by internal resistance. The formula is V_load = OCV - (I x R_internal). A 100Ah LiFePO4 cell with 2 milliohms internal resistance under 50A load will sag 0.1V. Lead-acid has much higher internal resistance, causing larger voltage drops under the same load.",
+  },
+  {
+    question: "Can a bad connection cause low voltage readings?",
+    answer: "Yes. Corroded terminals, loose connections, or undersized cables add external resistance. This resistance causes additional voltage drop that the multimeter reads as low battery voltage. Clean all connections and measure directly at the battery terminals to eliminate wiring as a variable.",
+  },
+  {
+    question: "Does cold weather make a battery read low?",
+    answer: "Cold temperatures reduce open-circuit voltage slightly (roughly 0.05-0.1V per cell at 0C vs 25C) and significantly increase internal resistance. The combined effect means a cold battery reads much lower under load than the same battery at room temperature, even at the same SOC.",
+  },
+  {
+    question: "When should I replace a battery that reads low voltage?",
+    answer: "If the battery reads low voltage after a full charge and adequate rest period, the capacity has likely degraded significantly. Test with a controlled discharge at 0.2C rate. If capacity is below 70% of the original rating, replacement is recommended. Below 50% indicates the end of useful life.",
+  },
+];
+
+const relatedCalculators = [
+  { title: "SOC Estimator", href: "/tools/soc-estimator", type: "calculator" as const },
+  { title: "Battery Runtime Calculator", href: "/tools/runtime-calculator", type: "calculator" as const },
+  { title: "Voltage Drop Calculator", href: "/tools/voltage-drop-calculator", type: "calculator" as const },
+];
+
+const relatedGuides = [
+  { title: "LiFePO4 Voltage Chart", href: "/learn/lifepo4-voltage-chart", type: "guide" as const },
+  { title: "Battery Voltage Systems", href: "/learn/battery-voltage-systems", type: "guide" as const },
+];
+---
+
+<ArticleLayout
+  title="Low Battery Voltage — Troubleshooting Guide | Battery Calculators"
+  description={description}
+  category="TROUBLESHOOTING"
+  categoryHref="/troubleshooting"
+  breadcrumbItems={[{ label: "Low Battery Voltage" }]}
+  relatedCalculators={relatedCalculators}
+  relatedGuides={relatedGuides}
+  faqItems={faqItems}
+>
+  <p class="text-body-md text-body font-light mb-8">
+    When your battery voltage reads lower than expected, the cause may be as simple as a recent load or as serious as permanent capacity loss. This guide walks through the five most common reasons for unexpectedly low voltage readings and how to isolate each one.
+  </p>
+
+  <TroubleshootingBlock
+    problem="Actual Discharge State"
+    causes={[
+      "Battery is genuinely at a lower SOC than expected due to higher-than-estimated loads",
+      "Phantom loads or parasitic drains are continuously depleting the battery",
+      "Charger is not fully charging the battery due to premature termination",
+      "Charge cycle was interrupted before completion",
+    ]}
+    explanation="The simplest explanation is often correct: the battery actually has less charge than you think. Common culprits include loads left on overnight, parasitic drains from inverters or charge controllers, and chargers that terminate too early due to incorrect settings. Voltage is a direct indicator of SOC for most chemistries at rest."
+    checklist={[
+      "Disconnect all loads and the charger, then rest the battery for at least 30 minutes before measuring",
+      "Compare the resting voltage to the chemistry-specific voltage-SOC chart",
+      "Check for phantom loads — inverters, battery monitors, and LED indicators draw current continuously",
+      "Verify the charger completed a full charge cycle and reached the correct absorption voltage",
+      "Use a coulomb-counting battery monitor to track actual energy in and out over several days",
+    ]}
+    solutions={[
+      "Charge the battery fully using the correct profile for its chemistry and verify voltage after rest",
+      "Add a battery disconnect switch to eliminate phantom loads during storage or non-use periods",
+      "Adjust charger termination settings — LiFePO4 should charge to 3.65V per cell, lead-acid to 2.4-2.45V per cell",
+      "Install a battery monitor with coulomb counting for accurate SOC tracking",
+    ]}
+  />
+
+  <TroubleshootingBlock
+    problem="Voltage Sag Under Load"
+    causes={[
+      "Internal resistance causes voltage drop proportional to current draw",
+      "Battery is undersized for the load — C-rate exceeds the rated discharge capability",
+      "High-resistance connections between battery and load amplify the voltage drop",
+      "Battery temperature is low, increasing internal resistance",
+    ]}
+    explanation="All batteries exhibit voltage sag under load due to internal resistance. The relationship is linear: V_sag = I x R_internal. A 100Ah LiFePO4 cell with 2 milliohms resistance under 100A load drops 0.2V. The same cell under 10A drops only 0.02V. If you measure voltage while a load is connected, you will always read lower than the open-circuit voltage."
+    checklist={[
+      "Measure voltage at the battery terminals with no load (open-circuit voltage)",
+      "Measure voltage under the actual load and compare — calculate the voltage drop",
+      "Use the voltage drop to estimate internal resistance: R = V_drop / I_load",
+      "Compare measured resistance to the manufacturer's specification",
+      "Check all connections between battery and load for corrosion, tightness, and wire gauge adequacy",
+    ]}
+    solutions={[
+      "Always measure OCV with the load disconnected for an accurate SOC reading",
+      "If voltage sag is excessive, the battery may be undersized — use a battery sizing calculator to verify",
+      "Clean and tighten all terminals and connections — replace corroded cables",
+      "If internal resistance is significantly higher than specification, the battery may be aging or damaged",
+    ]}
+  />
+
+  <TroubleshootingBlock
+    problem="Measurement Error"
+    causes={[
+      "Multimeter leads have high resistance due to worn or corroded probes",
+      "Measuring at the wrong point in the circuit instead of directly at battery terminals",
+      "Cheap multimeter has insufficient accuracy for the small voltage differences in LiFePO4",
+      "Surface charge from recent charging inflates the reading",
+    ]}
+    explanation="Measurement error is a frequently overlooked cause of apparent low voltage. Poor probe contact, measuring downstream of fuses or switches, and using an uncalibrated meter can all produce inaccurate readings. For LiFePO4, the difference between 80% and 20% SOC is only about 0.4V on a 12V pack — a 0.1V measurement error translates to a 20% SOC estimation error."
+    checklist={[
+      "Touch the multimeter probes together to verify zero reading — any offset indicates meter calibration issues",
+      "Measure directly at the battery terminals, bypassing all fuses, switches, and busbars",
+      "Use a multimeter with at least 0.1% accuracy and 0.001V resolution for LiFePO4 diagnostics",
+      "Ensure probe tips are clean and making solid metal-to-metal contact",
+      "Wait 30 minutes after disconnecting loads to allow surface charge to dissipate",
+    ]}
+    solutions={[
+      "Clean multimeter probes and battery terminal surfaces with isopropyl alcohol",
+      "Measure voltage at the battery posts themselves, not at the load or fuse connections",
+      "Upgrade to a higher-precision multimeter if working with LiFePO4 chemistry regularly",
+      "Always rest the battery for at least 30 minutes before taking an OCV measurement",
+    ]}
+  />
+
+  <TroubleshootingBlock
+    problem="Temperature Effect on Voltage"
+    causes={[
+      "Cold temperatures reduce open-circuit voltage and increase internal resistance",
+      "Battery is stored or operating below its recommended temperature range",
+      "Temperature sensor on BMS is reading incorrectly, showing false low voltage",
+      "Thermal gradients across the pack cause different cell voltages",
+    ]}
+    explanation="Temperature has a significant effect on battery voltage. At 0C, a LiFePO4 cell's open-circuit voltage drops roughly 0.05-0.1V compared to 25C. Combined with increased internal resistance at cold temperatures, a battery can read 0.3-0.5V lower under load at 0C than at room temperature. This is normal behavior, not a defect."
+    checklist={[
+      "Record the ambient temperature where the battery is located",
+      "Compare the voltage reading to the temperature-corrected voltage chart for your chemistry",
+      "Move the battery to a room-temperature environment and re-measure after thermal equilibrium",
+      "Check if the BMS temperature reading is consistent with an independent thermometer",
+      "Note if voltage improves as the battery warms up during discharge — this confirms temperature sensitivity",
+    ]}
+    solutions={[
+      "Account for temperature when interpreting voltage readings — use temperature-corrected SOC charts",
+      "Install battery heating for cold-climate applications to maintain cells above 0C",
+      "Relocate batteries from uninsulated spaces to temperature-controlled areas when possible",
+      "For BMS issues, recalibrate or relocate the temperature sensor to the center of the cell pack",
+    ]}
+  />
+
+  <TroubleshootingBlock
+    problem="Battery Aging and Capacity Loss"
+    causes={[
+      "Cycle life degradation has reduced the battery's actual capacity below its rating",
+      "Calendar aging has permanently degraded electrode material",
+      "Sulfation (lead-acid) or SEI layer growth (lithium) has increased internal resistance",
+      "One or more cells in a series pack have degraded faster than others",
+    ]}
+    explanation="As batteries age, both capacity and voltage characteristics change. Internal resistance increases, causing greater voltage sag under load. The usable SOC window narrows, and the voltage curve shifts. A battery that once held 13.2V at 50% SOC may now read 12.8V at the same SOC because the capacity has shrunk and internal resistance has grown."
+    checklist={[
+      "Perform a full capacity test by discharging at 0.2C rate and measuring total amp-hours delivered",
+      "Compare the measured capacity to the manufacturer's rated capacity and expected cycle count",
+      "Check the battery's age against expected calendar life for its chemistry",
+      "Measure internal resistance using an AC impedance meter or by calculating from voltage sag data",
+      "Compare current performance to historical records if available — progressive decline confirms aging",
+    ]}
+    solutions={[
+      "If capacity is above 80% of rated, the battery is within normal aging parameters",
+      "If capacity is 60-80%, the battery is end-of-life for demanding applications but may still work for light duties",
+      "If capacity is below 60%, retire the battery and replace — further use may be unsafe",
+      "For lead-acid, attempt an equalization charge to recover capacity lost to sulfation",
+    ]}
+  />
+
+  <p class="text-caption text-muted border-t border-hairline pt-8 mt-12">
+    <strong>Disclaimer:</strong> This guide is for educational and diagnostic purposes only. Battery troubleshooting involves electrical hazards. Always follow the manufacturer's safety procedures, wear appropriate PPE, and consult a qualified technician before attempting repairs. Never attempt to open or disassemble a sealed battery cell.
+  </p>
+</ArticleLayout>

@@ -6,6 +6,9 @@ import ResultBox from '../../components/ResultBox.astro';
 import FormulaBox from '../../components/FormulaBox.astro';
 import FAQSection from '../../components/FAQSection.astro';
 import RelatedTools from '../../components/RelatedTools.astro';
+import WorkedExample from '../../components/WorkedExample.astro';
+import ComparisonTable from '../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../components/EngineeringDiagram.astro';
 
 const wireSizes = [
   { label: "16 AWG (1.31 mm²)", value: 1.31 },
@@ -224,32 +227,98 @@ const faqItems = [
         </div>
       </FormulaBox>
 
-      <!-- Worked Example -->
-      <div>
-        <h2 class="text-title-lg text-primary uppercase mb-6 tracking-wider">Worked Engineering Example</h2>
-        <div class="text-body-sm text-muted flex flex-col gap-4">
-          <p>Consider a high-current battery linkage loop:</p>
-          <ul class="list-disc pl-6 flex flex-col gap-1">
-            <li><strong>Current:</strong> 50 A</li>
-            <li><strong>Distance:</strong> 3 meters (6m loop)</li>
-            <li><strong>Size:</strong> 6 AWG (13.3 mm² area)</li>
-            <li><strong>Material:</strong> Copper, 25°C</li>
-            <li><strong>Run Duration:</strong> 4 hours/day</li>
-            <li><strong>Load:</strong> 600 W</li>
-          </ul>
-          <p><strong>Step 1:</strong> Solve temperature-corrected resistivity (copper):</p>
-          <div class="font-mono text-primary">ρ = 1.72 × 10⁻⁸ × (1 + 0.00393 × (25 − 20)) = 1.7538 × 10⁻⁸ Ω·m</div>
-          <p><strong>Step 2:</strong> Solve Loop resistance:</p>
-          <div class="font-mono text-primary">R_loop = 1.7538 × 10⁻⁸ × (2 × 3) / (1.33 × 10⁻⁵) = 0.00791 Ω</div>
-          <p><strong>Step 3:</strong> Calculate continuous power loss:</p>
-          <div class="font-mono text-primary">P_loss = 50² × 0.00791 = 2500 × 0.00791 = 19.78 Watts</div>
-          <p><strong>Step 4:</strong> Find percentage efficiency loss and daily energy loss:</p>
-          <div class="font-mono text-primary">% Loss = (19.78 W / 600 W) × 100% = 3.30%</div>
-          <div class="font-mono text-primary">E_loss = 19.78 W × 4 hours = 79.12 Wh</div>
-        </div>
-      </div>
+      <WorkedExample
+        number={1}
+        title="I²R Loss for 30A, 5m, 10mm² Copper Cable"
+        scenario="A 30A load draws power from a battery through 5 meters of 10mm² copper cable at 25°C. Calculate the continuous I²R power loss."
+        inputs={[
+          "Current (I) = 30 A",
+          "One-way distance = 5 m (10 m loop)",
+          "Conductor area = 10 mm²",
+          "Material = Copper",
+          "Temperature = 25°C",
+        ]}
+        steps={[
+          "Temperature-corrected resistivity: ρ = 1.72 × 10⁻⁸ × (1 + 0.00393 × (25 − 20)) = 1.7538 × 10⁻⁸ Ω·m",
+          "Loop resistance: R = ρ × 2L / A = 1.7538 × 10⁻⁸ × 10 / (10 × 10⁻⁶) = 0.01754 Ω",
+          "Power loss: P_loss = I² × R = 30² × 0.01754 = 900 × 0.01754 = 15.79 W",
+        ]}
+        answer="15.79 W continuous power dissipated as heat in the cable"
+        interpretation="This represents energy wasted as heat. For a 2kW load, this is roughly 0.79% loss — acceptable for short runs but significant over a full day."
+      />
+
+      <WorkedExample
+        number={2}
+        title="12V vs 48V Power Loss Comparison at 2kW Load"
+        scenario="Compare I²R cable losses when delivering 2kW through 5m of 10mm² copper cable at 12V and 48V systems."
+        inputs={[
+          "Load power = 2000 W",
+          "Cable = 5m one-way, 10mm² copper",
+          "Loop resistance (calculated) = 0.01754 Ω",
+          "12V system current = 2000 / 12 = 166.7 A",
+          "48V system current = 2000 / 48 = 41.7 A",
+        ]}
+        steps={[
+          "12V power loss: P = 166.7² × 0.01754 = 27789 × 0.01754 = 487.5 W",
+          "48V power loss: P = 41.7² × 0.01754 = 1739 × 0.01754 = 30.5 W",
+          "Ratio: 487.5 / 30.5 = 16× less loss at 48V",
+          "12V efficiency loss: 487.5 / 2000 × 100 = 24.4% (unacceptable)",
+          "48V efficiency loss: 30.5 / 2000 × 100 = 1.53% (acceptable)",
+        ]}
+        answer="12V: 487.5 W (24.4%) vs 48V: 30.5 W (1.5%) — the 48V system has 16× less cable loss"
+        interpretation="Higher voltage systems dramatically reduce cable losses. The 12V system is completely impractical for this power level, wasting nearly a quarter of all energy as heat."
+      />
+
+      <WorkedExample
+        number={3}
+        title="Temperature Effect on Cable Losses at 60°C"
+        scenario="How do cable losses change when the same 30A, 5m, 10mm² copper cable operates at 60°C instead of 25°C?"
+        inputs={[
+          "Current (I) = 30 A",
+          "One-way distance = 5 m (10 m loop)",
+          "Conductor area = 10 mm²",
+          "Material = Copper",
+          "Baseline temperature = 25°C",
+          "Operating temperature = 60°C",
+        ]}
+        steps={[
+          "Resistivity at 25°C: ρ₂₅ = 1.72 × 10⁻⁸ × (1 + 0.00393 × 5) = 1.7538 × 10⁻⁸ Ω·m",
+          "Resistivity at 60°C: ρ₆₀ = 1.72 × 10⁻⁸ × (1 + 0.00393 × 40) = 1.9878 × 10⁻⁸ Ω·m",
+          "Loop resistance at 25°C: R₂₅ = 1.7538 × 10⁻⁸ × 10 / 10⁻⁵ = 0.01754 Ω",
+          "Loop resistance at 60°C: R₆₀ = 1.9878 × 10⁻⁸ × 10 / 10⁻⁵ = 0.01988 Ω",
+          "Loss at 25°C: P = 900 × 0.01754 = 15.79 W",
+          "Loss at 60°C: P = 900 × 0.01988 = 17.89 W",
+          "Increase: (17.89 − 15.79) / 15.79 × 100 = 13.3% more loss",
+        ]}
+        answer="Cable losses increase from 15.79 W to 17.89 W — a 13.3% increase due to temperature"
+        interpretation="Higher operating temperatures raise copper's resistivity, which increases I²R losses and generates even more heat. This positive feedback loop must be considered in enclosed installations."
+      />
     </div>
   </section>
+
+  <EngineeringDiagram
+    title="DC Cable Loss Flow"
+    description="Power loss in DC cables follows Ohm's law — I²R losses increase with the square of current"
+    variant="flow"
+    steps={[
+      { label: "Battery Output", icon: "battery" },
+      { label: "Cable Resistance", icon: "cable" },
+      { label: "Heat Loss (I²R)", icon: "chart" },
+      { label: "Load receives less", icon: "load" },
+    ]}
+  />
+
+  <ComparisonTable
+    title="Power Loss by Voltage System"
+    headers={["System", "Current at 2kW", "Loss in 5m 10mm² Cu", "Loss %", "Cable Needed"]}
+    rows={[
+      ["12V", "167 A", "48.6 W", "2.43%", "2/0 AWG (67 mm²)"],
+      ["24V", "83 A", "12.1 W", "0.61%", "6 AWG (13.3 mm²)"],
+      ["48V", "42 A", "3.0 W", "0.15%", "10 AWG (5.3 mm²)"],
+      ["96V", "21 A", "0.75 W", "0.04%", "14 AWG (2.1 mm²)"],
+    ]}
+    caption="Higher voltage systems dramatically reduce cable losses for the same power"
+  />
 
   <FAQSection items={faqItems} />
 

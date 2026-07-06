@@ -5,6 +5,9 @@ import InputField from '../../components/InputField.astro';
 import ResultBox from '../../components/ResultBox.astro';
 import FormulaBox from '../../components/FormulaBox.astro';
 import FAQSection from '../../components/FAQSection.astro';
+import WorkedExample from '../../components/WorkedExample.astro';
+import ComparisonTable from '../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../components/EngineeringDiagram.astro';
 
 const whatIs = `An RV battery calculator determines the battery bank size needed for off-grid camping by summing all appliance loads, multiplying by daily usage hours, and accounting for chemistry-specific depth-of-discharge limits. RV power systems face unique constraints: space and weight limitations, 12V native DC systems, alternator charging while driving, and the need to balance capacity against cargo weight. Whether you're planning weekend campground trips or full-time boondocking, this calculator ensures your battery bank sustains your lifestyle without requiring daily generator runs or shore power connections.`;
 
@@ -303,26 +306,108 @@ const relatedCalculators = [
         </p>
       </FormulaBox>
 
-      <div>
-        <h2 class="text-title-lg text-primary uppercase mb-6 tracking-wider">Worked Example</h2>
-        <div class="text-body-sm text-muted flex flex-col gap-4">
-          <p>Given: Refrigerator (150W × 8h), Lights (100W × 6h), Devices (60W × 4h), 12V LFP, 3 days</p>
+      <WorkedExample
+        number={1}
+        title="Weekend Camper — Fridge, Lights, Water Pump"
+        scenario="A couple is heading to a state park campground for a weekend trip. They need power for the fridge, LED lights, and a water pump over 2 days without shore power."
+        inputs={[
+          { label: "Refrigerator", value: "150W × 8h/day" },
+          { label: "LED Lights", value: "40W × 6h/day" },
+          { label: "Water Pump", value: "60W × 1h/day" },
+          { label: "System Voltage", value: "12V" },
+          { label: "Chemistry", value: "LFP (80% DoD)" },
+          { label: "Trip Duration", value: "2 days" },
+        ]}
+        steps={[
+          "Daily load = (150×8) + (40×6) + (60×1) = 1,200 + 240 + 60 = 1,500 Wh/day",
+          "Total trip energy = 1,500 Wh × 2 days = 3,000 Wh",
+          "Required Ah = 3,000 / (0.80 × 12) = 312.5 Ah",
+        ]}
+        answer="A 12V 350 Ah LFP battery bank (rounded to practical size) provides 4,200 Wh, covering the 3,000 Wh weekend need with a comfortable buffer."
+        interpretation="This setup leaves ~30% reserve at the end of day two, accommodating unexpected loads or a late-night fridge cycle. A 350 Ah LFP bank weighs roughly 35 kg—manageable for most truck campers."
+        variant="rv"
+      />
 
-          <p><strong>Step 1:</strong> Calculate daily consumption:</p>
-          <div class="font-mono text-primary">Daily = (150×8) + (100×6) + (60×4) = 1,200 + 600 + 240 = 2,040 Wh</div>
+      <WorkedExample
+        number={2}
+        title="Full-Time RV Living — Extensive Loads with Solar"
+        scenario="A full-time RVer works remotely from a Class C motorhome. The system includes solar charging (400W panel array) that supplements the battery during daylight hours, reducing the required overnight storage."
+        inputs={[
+          { label: "Refrigerator", value: "80W × 12h/day (compressor cycles)" },
+          { label: "Laptop + Monitors", value: "200W × 8h/day" },
+          { label: "LED Lighting", value: "60W × 5h/day" },
+          { label: "Water Pump", value: "60W × 1h/day" },
+          { label: "Router + Starlink", value: "75W × 24h/day" },
+          { label: "Ventilation Fan", value: "20W × 10h/day" },
+          { label: "Phone/Tablet Charging", value: "30W × 3h/day" },
+          { label: "System Voltage", value: "12V" },
+          { label: "Chemistry", value: "LFP (80% DoD)" },
+          { label: "Solar Harvest", value: "~1,600 Wh/day (400W × 4 peak hours)" },
+        ]}
+        steps={[
+          "Daily load = (80×12) + (200×8) + (60×5) + (60×1) + (75×24) + (20×10) + (30×3) = 960 + 1,600 + 300 + 60 + 1,800 + 200 + 90 = 5,010 Wh/day",
+          "Net overnight demand = 5,010 − 1,600 (solar) = 3,410 Wh (solar covers daytime loads)",
+          "Required Ah = 3,410 / (0.80 × 12) = 355.2 Ah",
+          "With 1-day autonomy buffer: 3,410 × 2 / (0.80 × 12) = 710.4 Ah",
+        ]}
+        answer="A 12V 750 Ah LFP battery bank provides 9,000 Wh. With 400W of solar replenishing ~1,600 Wh/day, the system achieves near-equilibrium on sunny days."
+        interpretation="Full-time living demands a larger bank because remote work makes you power-dependent. The solar array is critical—without it, you'd need 1,100+ Ah. On cloudy days, expect 40–60% solar reduction, so a generator backup is recommended."
+        variant="rv"
+      />
 
-          <p><strong>Step 2:</strong> Calculate total energy for trip:</p>
-          <div class="font-mono text-primary">Total = 2,040 Wh × 3 days = 6,120 Wh</div>
-
-          <p><strong>Step 3:</strong> Account for DoD and convert to Ah:</p>
-          <div class="font-mono text-primary">Ah = 6,120 Wh / (0.80 × 12V) = 637.5 Ah</div>
-
-          <p><strong>Result:</strong> A 12V 640 Ah LFP battery bank provides 7,680 Wh, enough for 3 days of boondocking with these loads.</p>
-        </div>
-      </div>
+      <WorkedExample
+        number={3}
+        title="Boondocking Without Solar — Maximize Autonomy"
+        scenario="A boondocker in a truck camper wants 4 days of complete energy independence with no solar, alternator charging, or generator. The goal is to maximize time off-grid before needing to drive to recharge."
+        inputs={[
+          { label: "12V Compressor Fridge", value: "60W × 10h/day (50% duty cycle)" },
+          { label: "LED Puck Lights", value: "20W × 5h/day" },
+          { label: "Water Pump", value: "50W × 0.5h/day" },
+          { label: "Device Charging", value: "40W × 3h/day" },
+          { label: "System Voltage", value: "12V" },
+          { label: "Chemistry", value: "LFP (80% DoD)" },
+          { label: "Autonomy Target", value: "4 days" },
+        ]}
+        steps={[
+          "Daily load = (60×10) + (20×5) + (50×0.5) + (40×3) = 600 + 100 + 25 + 120 = 845 Wh/day",
+          "Total 4-day energy = 845 × 4 = 3,380 Wh",
+          "Required Ah = 3,380 / (0.80 × 12) = 352.1 Ah",
+          "Practical bank size: 400 Ah (rounds to standard 4×100Ah LFP modules)",
+        ]}
+        answer="A 12V 400 Ah LFP battery bank (4,800 Wh) provides 4 full days of power with 1,420 Wh (29.6%) reserve for emergencies."
+        interpretation="Without solar or charging, every Wh matters. This setup assumes disciplined usage—no wasteful loads. Consider a small 200W folding solar panel as an emergency backup; even partial sun adds 200–400 Wh/day and extends autonomy to 5–6 days."
+        variant="rv"
+      />
 
     </div>
   </section>
+
+  <EngineeringDiagram
+    title="RV Power System Architecture"
+    description="Alternator charging, solar input, and battery storage powering RV loads"
+    variant="system"
+    steps={[
+      { label: "Alternator/Solar", icon: "solar" },
+      { label: "Charge Controller", icon: "charge" },
+      { label: "Battery Bank", icon: "battery" },
+      { label: "RV Loads", icon: "load" },
+    ]}
+  />
+
+  <ComparisonTable
+    title="RV Battery Chemistry Comparison"
+    headers={["Feature", "LiFePO4", "AGM Lead-Acid", "Gel Cell"]}
+    rows={[
+      ["Weight (100Ah)", "12 kg", "30 kg", "28 kg"],
+      ["Usable Capacity", "80–90 Ah", "50 Ah", "50 Ah"],
+      ["Cycle Life", "5,000+", "500–1,000", "1,000"],
+      ["Charge Rate", "0.5–1C", "0.1C", "0.1C"],
+      ["Price (100Ah 12V)", "$800–1,200", "$200–300", "$250–350"],
+      ["Self-Discharge", "1–3%/month", "3–5%/month", "2–4%/month"],
+      ["Maintenance", "None", "Water check", "None"],
+    ]}
+    caption="LFP has higher upfront cost but superior lifecycle economics for RV use"
+  />
 
   <FAQSection items={faqItems} />
 

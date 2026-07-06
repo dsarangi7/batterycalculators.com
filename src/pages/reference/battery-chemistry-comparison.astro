@@ -1,0 +1,172 @@
+---
+import ArticleLayout from '../../layouts/ArticleLayout.astro';
+import ReferenceTable from '../../components/ReferenceTable.astro';
+import ComparisonTable from '../../components/ComparisonTable.astro';
+import FAQSection from '../../components/FAQSection.astro';
+
+const faqItems = [
+  {
+    question: "Which battery chemistry is best for solar storage?",
+    answer: "LiFePO4 (LFP) is the recommended chemistry for solar storage. It offers 3,000–5,000 cycles at 80% DoD, 90–160 Wh/kg energy density, and zero maintenance. NMC offers higher energy density but at higher cost and with thermal runaway risks. Lead-acid remains viable only for budget-constrained, infrequent-cycling installations.",
+  },
+  {
+    question: "Is NMC safer than LFP?",
+    answer: "No. LiFePO4 is the safest lithium-ion chemistry with thermal runaway onset above 270°C. NMC has thermal runaway onset around 150–210°C and requires more sophisticated BMS. For residential and marine applications where safety is paramount, LFP is the preferred choice.",
+  },
+  {
+    question: "Can I use lead-acid batteries for solar?",
+    answer: "Yes, but with significant limitations. Flooded lead-acid requires monthly maintenance, 50% DoD limit, and 3–5 year lifespan. AGM and Gel variants are sealed and maintenance-free but cost 1.5–2× more than flooded. Lead-acid is only recommended for budget installations with infrequent cycling or emergency backup.",
+  },
+  {
+    question: "What is the difference between NMC and NCA?",
+    answer: "Both are nickel-based lithium chemistries. NMC (Nickel Manganese Cobalt) offers better cycle life (1,000–2,000 cycles) and thermal stability. NCA (Nickel Cobalt Aluminum) has slightly higher energy density (150–250 Wh/kg) but lower cycle life (500–1,000 cycles) and higher cost. NMC is preferred for stationary storage; NCA is common in EVs.",
+  },
+  {
+    question: "How does temperature affect battery chemistry?",
+    answer: "All chemistries perform best at 20–25°C. LFP operates from −20°C to 60°C but cannot charge below 0°C. Lead-acid capacity drops ~20% at 0°C. NMC and NCA have narrower safe operating windows (0–45°C). Gel batteries handle heat better than AGM but have lower charge rates.",
+  },
+  {
+    question: "What chemistry should I use for an RV or marine application?",
+    answer: "LiFePO4 is the top choice for RV and marine deep-cycle applications. It delivers 80–100% usable capacity, weighs 60% less than lead-acid, and lasts 10–15 years. Gel batteries are a good budget alternative for marine starting, but LFP dominates house battery banks.",
+  },
+];
+
+const relatedCalculators = [
+  { title: 'Solar Battery Sizing Calculator', href: '/tools/solar-battery-sizing-calculator', type: 'calculator' },
+  { title: 'Battery Cost Calculator', href: '/tools/battery-cost-calculator', type: 'calculator' },
+  { title: 'C-Rate Calculator', href: '/tools/c-rate-calculator', type: 'calculator' },
+  { title: 'Battery Degradation Estimator', href: '/tools/battery-degradation-estimator', type: 'calculator' },
+];
+
+const relatedGuides = [
+  { title: 'LiFePO4 vs Lead-Acid', href: '/learn/lifepo4-vs-lead-acid', type: 'guide' },
+  { title: 'Best Battery Chemistry for Solar', href: '/learn/best-battery-chemistry-for-solar', type: 'guide' },
+  { title: 'LiFePO4 Voltage Chart', href: '/learn/lifepo4-voltage-chart', type: 'guide' },
+];
+
+const tableOfContents = [
+  { id: 'chemistry-specs', label: 'Chemistry Specifications' },
+  { id: 'application-matrix', label: 'Application Matrix' },
+  { id: 'electrical-properties', label: 'Electrical Properties' },
+  { id: 'lifecycle-comparison', label: 'Lifecycle Comparison' },
+];
+---
+
+<ArticleLayout
+  title="Battery Chemistry Comparison Reference | Battery Calculators"
+  description="Complete engineering reference for battery chemistries: LiFePO4, NMC, NCA, Lead-Acid, and Gel. Compare voltage, energy density, cycle life, cost, safety, and temperature range."
+  category="REFERENCE"
+  categoryHref="/reference"
+  breadcrumbItems={[{ label: 'Battery Chemistry Comparison' }]}
+  relatedCalculators={relatedCalculators}
+  relatedGuides={relatedGuides}
+  tableOfContents={tableOfContents}
+  faqItems={faqItems}
+>
+  <p class="text-body-md text-body font-light mb-8">
+    This reference covers the five most common battery chemistries used in solar storage, RV, marine, EV, and telecom applications. Data represents typical production cells at 25°C. Actual performance varies by manufacturer, cell grade, and operating conditions.
+  </p>
+
+  <div id="chemistry-specs">
+    <ReferenceTable
+      title="Core Chemistry Specifications"
+      description="Side-by-side comparison of key specifications for LFP, NMC, NCA, Flooded Lead-Acid, and Gel batteries."
+      headers={['Specification', 'LiFePO4 (LFP)', 'NMC', 'NCA', 'Flooded Lead-Acid', 'Gel Lead-Acid']}
+      rows={[
+        ['Nominal Voltage (per cell)', '3.2V', '3.6V', '3.6V', '2.0V', '2.0V'],
+        ['Energy Density (Wh/kg)', '90–160', '150–220', '150–250', '30–50', '30–50'],
+        ['Energy Density (Wh/L)', '200–350', '350–650', '350–650', '60–100', '60–100'],
+        ['Cycle Life (80% DoD)', '3,000–5,000', '1,000–2,000', '500–1,000', '300–500', '500–800'],
+        ['Calendar Life (years)', '10–15', '8–12', '5–8', '3–5', '5–8'],
+        ['Usable DoD', '80–100%', '80–90%', '80–90%', '50%', '50–70%'],
+        ['Self-Discharge (per month)', '1–3%', '1–3%', '1–3%', '5–15%', '2–5%'],
+        ['Cost per kWh ($)', '250–400', '200–350', '250–400', '100–200', '150–250'],
+        ['Safety Rating', 'Excellent', 'Good', 'Fair', 'Fair (acid/venting)', 'Good (sealed)'],
+        ['Operating Temp (°C)', '−20 to 60', '0 to 45', '0 to 45', '−20 to 50', '−20 to 50'],
+        ['Charge Temp (°C)', '0 to 45', '0 to 45', '0 to 45', '−20 to 50', '−20 to 50'],
+        ['Maintenance', 'None', 'None', 'None', 'Monthly watering', 'None'],
+      ]}
+      source="Industry averages from Battery University, DOE Battery2030, and manufacturer datasheets"
+    />
+  </div>
+
+  <div id="application-matrix">
+    <ComparisonTable
+      title="Best Chemistry by Application"
+      headers={['Application', 'Recommended', 'Runner-Up', 'Notes']}
+      rows={[
+        ['Solar Storage (Residential)', 'LiFePO4', 'NMC', 'LFP preferred for daily cycling and safety. NMC only where space is limited.'],
+        ['RV House Battery', 'LiFePO4', 'AGM', 'LFP provides 80–100% DoD and zero maintenance. AGM as budget option.'],
+        ['Marine Deep Cycle', 'LiFePO4', 'Gel', 'LFP excels in vibration resistance and weight. Gel for budget.'],
+        ['Electric Vehicle (EV)', 'NMC', 'NCA', 'NMC dominates EVs for energy density and fast charging. LFP gaining ground.'],
+        ['Telecom Backup', 'LiFePO4', 'VRLA', 'LFP for 10+ year life. VRLA for legacy 48V systems.'],
+        ['Engine Starting (SLI)', 'Flooded Lead-Acid', 'AGM', 'Lead-acid remains dominant for high-crank starting current.'],
+        ['UPS / Emergency Backup', 'VRLA (AGM)', 'LiFePO4', 'VRLA proven in UPS. LFP gaining for long-duration backup.'],
+        ['Golf Cart / Utility', 'LiFePO4', 'Flooded Lead-Acid', 'LFP for weight savings and cycle life. Lead-acid for budget.'],
+      ]}
+      caption="Selection depends on cycling frequency, space constraints, budget, and safety requirements."
+    />
+  </div>
+
+  <div id="electrical-properties">
+    <ReferenceTable
+      title="Electrical Properties at Nominal Voltage"
+      description="Typical electrical characteristics for common pack configurations (4S LFP = 12.8V, 3S NMC = 10.8V, 6V Lead-Acid)."
+      headers={['Property', 'LFP 12.8V Pack', 'NMC 10.8V Pack', 'Lead-Acid 6V Cell']}
+      rows={[
+        ['Charge Voltage', '14.4–14.6V', '12.6–12.8V', '7.0–7.2V'],
+        ['Float Voltage', '13.6V', '12.0V', '6.8V'],
+        ['Discharge Cutoff', '10.0V', '8.0V', '5.25V'],
+        ['Nominal Capacity (100Ah)', '1,280 Wh', '1,080 Wh', '600 Wh (50% DoD)'],
+        ['Usable Capacity (100Ah)', '1,024 Wh', '864 Wh', '300 Wh'],
+        ['Max Continuous Discharge (1C)', '100A', '100A', '25A (0.25C typical)'],
+        ['Internal Resistance (per cell)', '0.5–2.0 mΩ', '5–15 mΩ', '10–30 mΩ'],
+        ['Round-Trip Efficiency', '95–98%', '90–95%', '75–85%'],
+        ['Charge Efficiency', '98–99%', '95–98%', '80–85%'],
+      ]}
+      source="Typical values from manufacturer test data at 25°C, 0.5C rate"
+    />
+  </div>
+
+  <div id="lifecycle-comparison">
+    <ReferenceTable
+      title="Lifecycle Cost Analysis"
+      description="Total cost of ownership comparison for a 5 kWh usable storage system over 10 years."
+      headers={['Cost Factor', 'LiFePO4', 'NMC', 'Gel Lead-Acid', 'Flooded Lead-Acid']}
+      rows={[
+        ['Initial Battery Cost', '$1,250–2,000', '$1,000–1,750', '$750–1,250', '$500–1,000'],
+        ['Replacements in 10 Years', '0–1', '1–2', '1–2', '2–3'],
+        ['Total Battery Cost (10yr)', '$1,250–2,000', '$1,500–2,625', '$1,125–1,875', '$1,000–2,000'],
+        ['BMS Cost (if separate)', '$0–50', '$0–50', 'N/A', 'N/A'],
+        ['Maintenance Cost (10yr)', '$0', '$0', '$0', '$200–400'],
+        ['Energy Loss (10yr @ $0.15/kWh)', '$50–75', '$75–113', '$150–225', '$150–225'],
+        ['Total Cost of Ownership', '$1,300–2,125', '$1,575–2,788', '$1,275–2,100', '$1,350–2,625'],
+        ['Cost per kWh Cycle', '$0.01–0.02', '$0.03–0.06', '$0.05–0.10', '$0.08–0.15'],
+      ]}
+      source="Estimated from industry pricing data and cycle life specifications"
+    />
+  </div>
+
+  <div class="bg-surface-card border border-hairline p-6 mb-12">
+    <h3 class="text-title-lg text-primary uppercase tracking-wider mb-3">Disclaimer</h3>
+    <p class="text-body-sm text-muted font-light">
+      All values in this reference are typical ranges based on published manufacturer data and industry averages as of 2026. Actual performance varies by manufacturer, cell grade, temperature, charge/discharge rate, and operating conditions. This reference is for informational and educational purposes only. Always consult manufacturer datasheets for specific product specifications before making purchasing decisions.
+    </p>
+  </div>
+
+  <section class="mb-12 border-t border-hairline pt-12">
+    <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Related Tools</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <a href="/tools/solar-battery-sizing-calculator" class="block bg-surface-card border border-hairline p-4 hover:border-m-blue-light transition-colors">
+        <span class="text-label-uppercase text-m-blue-light text-xs block mb-2">Calculator</span>
+        <span class="text-primary font-bold">Solar Battery Sizing Calculator</span>
+        <p class="text-body-sm text-muted mt-1">Determine the right battery bank size for your solar system.</p>
+      </a>
+      <a href="/tools/battery-pack-calculator" class="block bg-surface-card border border-hairline p-4 hover:border-m-blue-light transition-colors">
+        <span class="text-label-uppercase text-m-blue-light text-xs block mb-2">Calculator</span>
+        <span class="text-primary font-bold">Battery Pack Calculator</span>
+        <p class="text-body-sm text-muted mt-1">Design series and parallel battery configurations.</p>
+      </a>
+    </div>
+  </section>
+</ArticleLayout>

@@ -1,0 +1,130 @@
+---
+import ArticleLayout from '../../layouts/ArticleLayout.astro';
+import ReferenceTable from '../../components/ReferenceTable.astro';
+import ComparisonTable from '../../components/ComparisonTable.astro';
+import FAQSection from '../../components/FAQSection.astro';
+
+const faqItems = [
+  {
+    question: "What is the difference between MPPT and PWM charge controllers?",
+    answer: "PWM (Pulse Width Modulation) controllers connect panels directly to the battery, reducing voltage to match battery voltage. This wastes excess panel voltage. MPPT (Maximum Power Point Tracking) controllers convert excess voltage to additional current, harvesting 15–30% more energy. MPPT is recommended for all systems above 200W and any system where panel voltage exceeds battery voltage.",
+  },
+  {
+    question: "How do I size a charge controller for my solar panels?",
+    answer: "Divide total panel wattage by battery voltage to get the minimum current rating. For 600W on 12V: 600/12 = 50A. Add 25% safety margin: 62.5A → use 60A controller. For MPPT, also verify the controller can handle the panel Voc in cold weather, as voltage rises with decreasing temperature.",
+  },
+  {
+    question: "Can I connect 24V panels to a 12V battery with MPPT?",
+    answer: "Yes. This is the primary advantage of MPPT controllers. An MPPT controller accepts higher panel voltage (e.g., 36V Vmp) and converts it to 12V battery charging voltage efficiently. You can connect two 12V panels in series (36V Vmp) to a 12V battery bank through an MPPT controller with no energy loss from voltage mismatch.",
+  },
+  {
+    question: "What is the maximum number of solar panels I can connect to one controller?",
+    answer: "The maximum is determined by: (1) total panel wattage ÷ battery voltage ≤ controller current rating, and (2) panel Voc (in coldest temperature) ≤ controller maximum input voltage. For a 60A MPPT on 12V: max 720W (60A × 12V). For 24V: max 1,440W. Always check both voltage and current limits.",
+  },
+  {
+    question: "Do I need a charge controller for my solar panels?",
+    answer: "Yes. Solar panels produce 16–22V (for 12V nominal panels) which will overcharge and destroy batteries if connected directly. A charge controller regulates voltage and current to safely charge batteries. Even small trickle-charge panels (5–10W) benefit from a controller to prevent overcharge.",
+  },
+  {
+    question: "What features should I look for in an MPPT controller?",
+    answer: "Key features: (1) Maximum input voltage ≥ your panel Voc, (2) Current rating ≥ your panel short circuit current × number of panels, (3) Battery voltage compatibility (12/24/48V), (4) Temperature compensation for lead-acid, (5) Remote monitoring (Bluetooth/app), (6) Load terminals for DC disconnect, (7) Multiple charging stages (bulk, absorption, float).",
+  },
+];
+
+const relatedCalculators = [
+  { title: 'Solar Battery Sizing Calculator', href: '/tools/solar-battery-sizing-calculator', type: 'calculator' },
+  { title: 'Solar Generator Sizing Calculator', href: '/tools/solar-generator-sizing-calculator', type: 'calculator' },
+  { title: 'Charging Time Calculator', href: '/tools/charging-time-calculator', type: 'calculator' },
+];
+
+const relatedGuides = [
+  { title: 'Charger Sizing Guide', href: '/learn/charger-sizing-guide', type: 'guide' },
+  { title: 'Best Battery Chemistry for Solar', href: '/learn/best-battery-chemistry-for-solar', type: 'guide' },
+];
+
+const tableOfContents = [
+  { id: 'mppt-specs', label: 'MPPT Controller Specifications' },
+  { id: 'pwm-specs', label: 'PWM Controller Specifications' },
+  { id: 'mppt-vs-pwm', label: 'MPPT vs PWM Comparison' },
+];
+---
+
+<ArticleLayout
+  title="Charge Controller Specifications Reference | Battery Calculators"
+  description="Complete solar charge controller reference covering MPPT and PWM controllers with max PV input, battery voltage, current rating, features, and efficiency comparison."
+  category="REFERENCE"
+  categoryHref="/reference"
+  breadcrumbItems={[{ label: 'Charge Controller Specs' }]}
+  relatedCalculators={relatedCalculators}
+  relatedGuides={relatedGuides}
+  tableOfContents={tableOfContents}
+  faqItems={faqItems}
+>
+  <p class="text-body-md text-body font-light mb-8">
+    Solar charge controllers regulate the voltage and current from solar panels to safely charge batteries. This reference covers the most common MPPT and PWM controllers used in residential, RV, marine, and off-grid solar systems.
+  </p>
+
+  <div id="mppt-specs">
+    <ReferenceTable
+      title="MPPT Charge Controller Specifications"
+      description="Popular MPPT controllers with maximum PV input, battery voltage range, current rating, and key features."
+      headers={['Model/Class', 'Max PV Input (W)', 'Battery Voltage', 'Max Current', 'Max PV Voltage', 'Features']}
+      rows={[
+        ['15A Class', '200W (12V)', '12/24V', '15A', '75V', 'LCD display, temp sensor'],
+        ['20A Class', '260W (12V)', '12/24V', '20A', '100V', 'LCD, Bluetooth, MPPT'],
+        ['30A Class', '400W (12V)', '12/24V', '30A', '100V', 'LCD, Bluetooth, load control'],
+        ['40A Class', '550W (12V)', '12/24V', '40A', '150V', 'LCD, MPPT, temp compensation'],
+        ['50A Class', '700W (12V)', '12/24/48V', '50A', '150V', 'LCD, Bluetooth, load control'],
+        ['60A Class', '850W (12V)', '12/24/48V', '60A', '150V', 'Color LCD, app monitoring'],
+        ['80A Class', '1,100W (12V)', '12/24/48V', '80A', '200V', 'Color LCD, app, relay'],
+        ['100A Class', '1,400W (12V)', '12/24/48V', '100A', '200V', 'Color LCD, WiFi/BT, dual MPPT'],
+      ]}
+      source="Specifications from Victron SmartSolar, EPEver, Renogy, and Morningstar product lines"
+    />
+  </div>
+
+  <div id="pwm-specs">
+    <ReferenceTable
+      title="PWM Charge Controller Specifications"
+      description="Budget-friendly PWM controllers for small solar systems and trickle charging."
+      headers={['Model/Class', 'Max PV Input (W)', 'Battery Voltage', 'Max Current', 'Key Features']}
+      rows={[
+        ['5A PWM', '60W (12V)', '12/24V', '5A', 'LED indicators, basic'],
+        ['10A PWM', '130W (12V)', '12/24V', '10A', 'LCD, USB port, temp sensor'],
+        ['15A PWM', '200W (12V)', '12/24V', '15A', 'LCD, USB, load control'],
+        ['20A PWM', '260W (12V)', '12/24V', '20A', 'LCD, USB, temp compensation'],
+        ['30A PWM', '400W (12V)', '12/24V', '30A', 'LCD, dual USB, load control'],
+        ['40A PWM', '520W (12V)', '12/24V', '40A', 'LCD, dual USB, timer'],
+        ['60A PWM', '800W (12V)', '12/24V', '60A', 'LCD, heavy-duty terminals'],
+      ]}
+      source="Specifications from Renogy, Victron BlueSolar, and generic PWM controller lines"
+    />
+  </div>
+
+  <div id="mppt-vs-pwm">
+    <ComparisonTable
+      title="MPPT vs PWM Efficiency and Cost"
+      headers={['Feature', 'MPPT', 'PWM', 'Winner']}
+      rows={[
+        ['Energy Harvest', '93–98% efficiency', '75–85% efficiency', 'MPPT'],
+        ['Additional Energy vs PWM', '+15–30%', 'Baseline', 'MPPT'],
+        ['Price (30A class)', '$150–350', '$30–80', 'PWM'],
+        ['Panel Compatibility', 'Any Vmp', 'Vmp must match battery', 'MPPT'],
+        ['Series Panel Support', 'Yes (higher voltage)', 'No (voltage drops)', 'MPPT'],
+        ['Complexity', 'Higher', 'Lower', 'PWM'],
+        ['Best System Size', '>200W or 24/48V', '<200W, 12V only', '—'],
+        ['Winter Performance', 'Excellent', 'Poor (voltage waste)', 'MPPT'],
+        ['Multi-panel Arrays', 'Ideal', 'Limited', 'MPPT'],
+        ['Recommended For', 'All serious solar', 'Trickle charge, budget', 'MPPT'],
+      ]}
+      caption="MPPT controllers cost more upfront but pay for themselves within 1–2 years through increased energy harvest. PWM is acceptable only for small (<200W) 12V systems."
+    />
+  </div>
+
+  <div class="bg-surface-card border border-hairline p-6 mb-12">
+    <h3 class="text-title-lg text-primary uppercase tracking-wider mb-3">Disclaimer</h3>
+    <p class="text-body-sm text-muted font-light">
+      Charge controller specifications vary by manufacturer and model. Always verify maximum PV input voltage (Voc at coldest temperature) and maximum charging current before installation. Improper sizing can damage batteries or the controller. Follow manufacturer wiring guidelines and local electrical codes. This reference is for informational and educational purposes only.
+    </p>
+  </div>
+</ArticleLayout>

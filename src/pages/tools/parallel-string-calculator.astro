@@ -5,6 +5,9 @@ import InputField from '../../components/InputField.astro';
 import ResultBox from '../../components/ResultBox.astro';
 import FormulaBox from '../../components/FormulaBox.astro';
 import FAQSection from '../../components/FAQSection.astro';
+import WorkedExample from '../../components/WorkedExample.astro';
+import ComparisonTable from '../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../components/EngineeringDiagram.astro';
 
 const whatIs = `A parallel string calculator determines the optimal series (S) and parallel (P) configuration of individual cells or battery modules to achieve a target pack voltage and capacity. In battery pack design, cells in series multiply voltage while cells in parallel multiply capacity—this tool computes the exact SxP arrangement needed. Whether you're building a custom lithium battery pack for an EV, solar storage, or marine application, correct string configuration is critical for BMS compatibility, balanced current distribution, and meeting voltage thresholds of your charge controller and inverter.`;
 
@@ -241,31 +244,86 @@ const relatedCalculators = [
         </div>
       </FormulaBox>
 
-      <!-- Worked Example -->
-      <div>
-        <h2 class="text-title-lg text-primary uppercase mb-6 tracking-wider">Worked Engineering Example</h2>
-        <div class="text-body-sm text-muted flex flex-col gap-4">
-          <p>Consider designing a battery module for standard telecommunications:</p>
-          <ul class="list-disc pl-6 flex flex-col gap-1">
-            <li><strong>Target Pack Voltage:</strong> 48 V | <strong>Target Pack Capacity:</strong> 200 Ah</li>
-            <li><strong>Building Block Cell:</strong> 3.2V, 100 Ah (Standard LiFePO4)</li>
-          </ul>
-          <p><strong>Step 1:</strong> Calculate cell count in series (S):</p>
-          <div class="font-mono text-primary">S = ceil(48 V / 3.2 V) = 15 Cells in Series</div>
+      <!-- Worked Examples -->
+      <div class="flex flex-col gap-8">
+        <WorkedExample
+          number={1}
+          title="Series Cells for 48V from 3.2V LFP Cells"
+          scenario="Design a 48V nominal battery string using standard 3.2V LiFePO4 cells arranged in series."
+          inputs={[
+            { label: "Target Voltage", value: "48 V" },
+            { label: "Cell Voltage", value: "3.2 V (LFP)" },
+          ]}
+          steps={[
+            { label: "Calculate series count", detail: "S = ⌈48 V / 3.2 V⌉ = 15 cells" },
+            { label: "Compute actual voltage", detail: "V_actual = 15 × 3.2 V = 48.0 V" },
+          ]}
+          answer="15S configuration — 15 cells in series produces exactly 48.0 V nominal."
+          interpretation="This is the most common 48V LFP configuration used in telecom and solar storage. A 16S option (51.2V) is preferred when inverter headroom is needed."
+        />
 
-          <p><strong>Step 2:</strong> Calculate parallel strings (P):</p>
-          <div class="font-mono text-primary">P = ceil(200 Ah / 100 Ah) = 2 Strings in Parallel</div>
+        <WorkedExample
+          number={2}
+          title="Parallel Strings for 400Ah from 100Ah Cells"
+          scenario="Scale capacity to 400Ah by connecting identical 100Ah LFP cells in parallel."
+          inputs={[
+            { label: "Target Capacity", value: "400 Ah" },
+            { label: "Cell Capacity", value: "100 Ah" },
+          ]}
+          steps={[
+            { label: "Calculate parallel count", detail: "P = ⌈400 Ah / 100 Ah⌉ = 4 strings" },
+            { label: "Compute actual capacity", detail: "Ah_actual = 4 × 100 Ah = 400 Ah" },
+          ]}
+          answer="4P configuration — 4 parallel strings yield 400 Ah total."
+          interpretation="Each parallel group must use matched cells (same batch, capacity within 2%). Add inline fuses on each string to prevent cross-current faults."
+        />
 
-          <p><strong>Step 3:</strong> Compute total cells (N) and actual specifications:</p>
-          <div class="font-mono text-primary">N_total = 15 x 2 = 30 Cells</div>
-          <div class="font-mono text-primary">V_actual = 15 x 3.2 V = 48 V</div>
-          <div class="font-mono text-primary">C_actual = 2 x 100 Ah = 200 Ah</div>
-          <div class="font-mono text-primary">E_actual = 48 V x 200 Ah = 9600 Wh = 9.6 kWh</div>
-        </div>
+        <WorkedExample
+          number={3}
+          title="Combined 16S4P for 48V 400Ah Pack"
+          scenario="Build a complete 48V 400Ah battery pack using 3.2V 100Ah LFP cells in a 16S4P topology."
+          inputs={[
+            { label: "Target Voltage", value: "48 V" },
+            { label: "Target Capacity", value: "400 Ah" },
+            { label: "Cell Voltage", value: "3.2 V (LFP)" },
+            { label: "Cell Capacity", value: "100 Ah" },
+          ]}
+          steps={[
+            { label: "Calculate series count", detail: "S = ⌈48 V / 3.2 V⌉ = 16 cells (rounds up to 51.2V nominal)" },
+            { label: "Calculate parallel count", detail: "P = ⌈400 Ah / 100 Ah⌉ = 4 strings" },
+            { label: "Total cells required", detail: "N = 16 × 4 = 64 cells" },
+            { label: "Actual specifications", detail: "V = 51.2 V, Ah = 400 Ah, E = 20,480 Wh (20.48 kWh)" },
+          ]}
+          answer="16S4P — 64 cells total, delivering 51.2V at 400Ah (20.48 kWh)."
+          interpretation="This pack exceeds the 48V target slightly (51.2V nominal) which provides better performance with 48V inverters. A 16-channel BMS is required for series monitoring."
+        />
       </div>
 
     </div>
   </section>
+
+  <EngineeringDiagram
+    title="Series vs Parallel Battery Wiring"
+    description="Series increases voltage, parallel increases capacity"
+    variant="circuit"
+    steps={[
+      { label: "Single Cell", icon: "battery" },
+      { label: "Series (Voltage↑)", icon: "battery" },
+      { label: "Parallel (Capacity↑)", icon: "battery" },
+      { label: "Combined Pack", icon: "battery" },
+    ]}
+  />
+
+  <ComparisonTable
+    title="Series vs Parallel Comparison"
+    headers={["Wiring", "Effect", "Voltage", "Capacity", "Risk"]}
+    rows={[
+      ["Series", "Voltage adds", "V_total = n × V_cell", "Same as single cell", "Cell imbalance"],
+      ["Parallel", "Capacity adds", "Same as single cell", "Ah_total = n × Ah_cell", "Current imbalance"],
+      ["Series-Parallel", "Both increase", "nS × V_cell", "mP × Ah_cell", "Complex balancing"],
+    ]}
+    caption="Fundamental rules of battery string configuration"
+  />
 
   <FAQSection items={faqItems} />
 

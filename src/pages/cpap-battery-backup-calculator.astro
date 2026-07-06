@@ -3,6 +3,9 @@ import CalculatorLayout from '../layouts/CalculatorLayout.astro';
 import FormulaBox from '../components/FormulaBox.astro';
 import FAQSection from '../components/FAQSection.astro';
 import PowerOutageForm from '../components/PowerOutageForm.astro';
+import WorkedExample from '../components/WorkedExample.astro';
+import ComparisonTable from '../components/ComparisonTable.astro';
+import EngineeringDiagram from '../components/EngineeringDiagram.astro';
 
 const whatIs = `A CPAP battery backup calculator determines the battery capacity and runtime you need to power your CPAP machine through a full night of sleep during a power outage. CPAP machines are life-sustaining medical devices — losing power mid-sleep can cause dangerous apnea episodes. This calculator sizes your battery based on your CPAP's actual running wattage (with or without humidifier), accounting for inverter efficiency, depth-of-discharge limits, and a configurable safety margin.`;
 
@@ -115,28 +118,95 @@ const presetAppliances = [
         <p class="text-xs text-muted mt-4">For CPAP backup, consider 12V DC direct connection to eliminate inverter losses and extend runtime.</p>
       </FormulaBox>
       <div>
-        <h2 class="text-title-lg text-primary uppercase mb-6 tracking-wider">Worked Example</h2>
-        <div class="text-body-sm text-muted flex flex-col gap-4">
-          <p><strong>Scenario:</strong> Power a CPAP with humidifier through a 10-hour night during a power outage.</p>
-          <div class="border-l-2 border-m-blue-light pl-4">
-            <p class="font-bold text-primary mb-2">Step 1: Running load</p>
-            <div class="font-mono text-primary">CPAP with humidifier: 40W × 1 = 40W</div>
-          </div>
-          <div class="border-l-2 border-m-blue-light pl-4">
-            <p class="font-bold text-primary mb-2">Step 2: Energy required</p>
-            <div class="font-mono text-primary">Raw: 40W × 10h = 400 Wh</div>
-            <div class="font-mono text-primary">After efficiency: 400 / 0.90 = 444 Wh</div>
-            <div class="font-mono text-primary">With 20% margin: 444 × 1.20 = 533 Wh</div>
-          </div>
-          <div class="border-l-2 border-m-blue-light pl-4">
-            <p class="font-bold text-primary mb-2">Step 3: Battery (12V LFP, 80% DoD)</p>
-            <div class="font-mono text-primary">Ah = 533 / (12 × 0.80) = 55.5 Ah</div>
-            <div class="font-mono text-primary font-bold mt-1">Result: 12V 60Ah LFP battery (≈768 Wh)</div>
-          </div>
+        <h2 class="text-title-lg text-primary uppercase mb-6 tracking-wider">Worked Examples</h2>
+        <div class="text-body-sm text-muted flex flex-col gap-6">
+          <WorkedExample
+            number={1}
+            title="CPAP with Humidifier (Full Night)"
+            scenario="Power a CPAP machine with heated humidifier through a full 8-hour night during a power outage."
+            inputs={[
+              { label: "CPAP + Humidifier", value: "40W" },
+              { label: "Backup Duration", value: "8 hours" },
+              { label: "Battery Voltage", value: "12V" },
+              { label: "Inverter Efficiency", value: "90%" },
+            ]}
+            steps={[
+              { label: "Step 1: Energy required", formula: "40W × 8h = 320 Wh", result: "320 Wh" },
+              { label: "Step 2: After inverter efficiency", formula: "320 / 0.90", result: "356 Wh" },
+              { label: "Step 3: With 20% safety margin", formula: "356 × 1.20", result: "427 Wh" },
+              { label: "Step 4: Battery capacity (12V LFP, 80% DoD)", formula: "427 / (12 × 0.80)", result: "44.5 Ah → 12V 50Ah LFP" },
+            ]}
+            answer="A 12V 50Ah LiFePO4 battery (640 Wh) provides a full night's CPAP power with humidifier plus margin."
+            interpretation="The heated humidifier doubles power draw — if you can tolerate reduced humidity, battery life extends significantly."
+          />
+          <WorkedExample
+            number={2}
+            title="CPAP without Humidifier (Extended Trip)"
+            scenario="Power a CPAP without humidifier for 3 consecutive nights while camping (10 hours per night)."
+            inputs={[
+              { label: "CPAP (no humidifier)", value: "20W" },
+              { label: "Nightly Duration", value: "10 hours" },
+              { label: "Nights", value: "3" },
+              { label: "Total Energy", value: "20W × 30h = 600 Wh" },
+            ]}
+            steps={[
+              { label: "Step 1: Total energy needed", formula: "20W × 30h = 600 Wh", result: "600 Wh" },
+              { label: "Step 2: After inverter efficiency", formula: "600 / 0.90", result: "667 Wh" },
+              { label: "Step 3: With 20% safety margin", formula: "667 × 1.20", result: "800 Wh" },
+              { label: "Step 4: Battery capacity (12V LFP, 80% DoD)", formula: "800 / (12 × 0.80)", result: "83.3 Ah → 12V 100Ah LFP" },
+            ]}
+            answer="A 12V 100Ah LiFePO4 battery (1,280 Wh) runs a CPAP without humidifier for 3 full camping nights."
+            interpretation="Disabling the humidifier dramatically extends battery life — ideal for multi-night camping trips."
+          />
+          <WorkedExample
+            number={3}
+            title="Travel CPAP (12V DC Direct)"
+            scenario="Run a travel CPAP on 12V DC direct (no inverter) for 2 nights during a road trip."
+            inputs={[
+              { label: "Travel CPAP (12V DC)", value: "25W" },
+              { label: "Nightly Duration", value: "8 hours" },
+              { label: "Nights", value: "2" },
+              { label: "Inverter Bypassed", value: "100% efficiency" },
+            ]}
+            steps={[
+              { label: "Step 1: Total energy needed", formula: "25W × 16h = 400 Wh", result: "400 Wh" },
+              { label: "Step 2: No inverter losses (12V DC direct)", formula: "400 / 1.00", result: "400 Wh" },
+              { label: "Step 3: With 20% safety margin", formula: "400 × 1.20", result: "480 Wh" },
+              { label: "Step 4: Battery capacity (12V LFP, 80% DoD)", formula: "480 / (12 × 0.80)", result: "50 Ah → 12V 50Ah LFP" },
+            ]}
+            answer="A 12V 50Ah LFP battery runs a travel CPAP for 2 nights on DC direct — 15% more runtime than AC inverter."
+            interpretation="12V DC direct connection eliminates inverter losses and is the most efficient way to power a CPAP from battery."
+          />
         </div>
       </div>
     </div>
   </section>
+
+  <EngineeringDiagram
+    title="CPAP Battery Power Path"
+    description="Two paths: AC inverter (with losses) and DC direct connection (no inverter losses, more efficient)."
+    steps={[
+      { label: "Battery 12V", icon: "battery" },
+      { label: "Inverter", icon: "inverter" },
+      { label: "AC Adapter", icon: "cable" },
+      { label: "CPAP Machine", icon: "load" },
+    ]}
+    variant="circuit"
+  />
+
+  <ComparisonTable
+    title="CPAP Power Requirements by Configuration"
+    headers={["Configuration", "Power Draw", "8h Energy", "Battery Needed (12V LFP)", "Runtime on 100Ah"]}
+    rows={[
+      ["CPAP with humidifier (high)", "50W", "400 Wh", "12V 60Ah (768 Wh)", "15–16 h"],
+      ["CPAP with humidifier (typical)", "40W", "320 Wh", "12V 50Ah (640 Wh)", "16–20 h"],
+      ["CPAP without humidifier", "20W", "160 Wh", "12V 25Ah (320 Wh)", "32–40 h"],
+      ["Travel CPAP (12V DC direct)", "25W", "200 Wh", "12V 30Ah (384 Wh)", "28–32 h"],
+      ["CPAP + phone charging", "55W", "440 Wh", "12V 60Ah (768 Wh)", "14–16 h"],
+      ["CPAP + Wi-Fi + light", "72W", "576 Wh", "12V 75Ah (960 Wh)", "11–13 h"],
+    ]}
+    caption="Runtimes based on 12V 100Ah LiFePO4 battery (1,280 Wh) at 80% DoD. DC direct eliminates 10–15% inverter losses."
+  />
 
   <FAQSection items={faqItems} />
 </CalculatorLayout>

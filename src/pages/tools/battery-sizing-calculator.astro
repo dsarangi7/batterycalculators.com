@@ -4,6 +4,9 @@ import CalculatorCard from '../../components/CalculatorCard.astro';
 import InputField from '../../components/InputField.astro';
 import ResultBox from '../../components/ResultBox.astro';
 import FormulaBox from '../../components/FormulaBox.astro';
+import WorkedExample from '../../components/WorkedExample.astro';
+import ComparisonTable from '../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../components/EngineeringDiagram.astro';
 import FAQSection from '../../components/FAQSection.astro';
 import RelatedTools from '../../components/RelatedTools.astro';
 
@@ -237,48 +240,113 @@ const relatedArticles = [
       </FormulaBox>
 
       <!-- Worked Examples -->
-      <div>
-        <h2 class="text-title-lg text-primary uppercase mb-6 tracking-wider">Worked Examples</h2>
-        <div class="text-body-sm text-muted flex flex-col gap-6">
+      <WorkedExample
+        number={1}
+        title="Small Cabin — 1.5 kWh/day, 25.6V"
+        scenario="Size a battery bank for a small off-grid cabin with 1,500 Wh daily consumption, 2 days autonomy, 80% DoD, at 10°C."
+        inputs={[
+          { label: "Daily Load", value: "1,500 Wh" },
+          { label: "Autonomy", value: "2 days" },
+          { label: "DoD Limit", value: "80%" },
+          { label: "System Voltage", value: "25.6 V" },
+          { label: "Efficiency", value: "90%" },
+          { label: "Temperature", value: "10°C" },
+        ]}
+        steps={[
+          { label: "Step 1: Temperature multiplier", formula: "0.90 + 0.10 × (10/25)", result: "0.94" },
+          { label: "Step 2: Required energy", formula: "(1500 × 2) / (0.80 × 0.90 × 0.94)", result: "4,433 Wh (4.43 kWh)" },
+          { label: "Step 3: Required capacity", formula: "4433 / 25.6", result: "173.2 Ah" },
+        ]}
+        answer="4.43 kWh battery bank, 173.2 Ah at 25.6V — approximately 8× 280Ah LFP cells in an 8S configuration"
+        interpretation="The 10°C temperature reduces available capacity by 6%. For this cabin, a single 280Ah 25.6V LFP battery would be insufficient — you need approximately 173Ah at 25.6V."
+        variant="home"
+      />
 
-          <div class="border-l-2 border-m-blue-light pl-4">
-            <p class="font-bold text-primary mb-2">Example 1: Small Cabin — 1.5 kWh/day, 25.6V</p>
-            <ul class="list-disc pl-6 flex flex-col gap-1">
-              <li><strong>Daily load:</strong> 1,500 Wh | <strong>Autonomy:</strong> 2 days | <strong>DoD:</strong> 80%</li>
-              <li><strong>Efficiency:</strong> 90% | <strong>Temperature:</strong> 10°C</li>
-            </ul>
-            <p class="mt-2"><strong>Temp multiplier:</strong> 0.90 + 0.10 × (10/25) = <span class="font-mono text-primary">0.94</span></p>
-            <p><strong>Required energy:</strong> (1,500 × 2) / (0.80 × 0.90 × 0.94) = <span class="font-mono text-primary">4,433 Wh (4.43 kWh)</span></p>
-            <p><strong>Capacity:</strong> 4,433 / 25.6 = <span class="font-mono text-primary">173.2 Ah</span></p>
-          </div>
+      <WorkedExample
+        number={2}
+        title="Off-Grid Home — 8 kWh/day, 48V"
+        scenario="Design a battery system for a family home consuming 8 kWh daily with 3 days autonomy at 20°C."
+        inputs={[
+          { label: "Daily Load", value: "8,000 Wh" },
+          { label: "Autonomy", value: "3 days" },
+          { label: "DoD Limit", value: "85%" },
+          { label: "System Voltage", value: "48 V" },
+          { label: "Efficiency", value: "92%" },
+          { label: "Temperature", value: "20°C" },
+        ]}
+        steps={[
+          { label: "Step 1: Temperature multiplier", formula: "0.90 + 0.10 × (20/25)", result: "0.98" },
+          { label: "Step 2: Required energy", formula: "(8000 × 3) / (0.85 × 0.92 × 0.98)", result: "31,358 Wh (31.36 kWh)" },
+          { label: "Step 3: Required capacity", formula: "31358 / 48", result: "653.3 Ah" },
+        ]}
+        answer="31.36 kWh battery bank, 653.3 Ah at 48V — equivalent to 8× 280Ah LFP batteries in a 16S2P configuration"
+        interpretation="Three days of autonomy provides good resilience against multi-day cloud cover. The 48V system keeps currents manageable for residential wiring."
+        variant="home"
+      />
 
-          <div class="border-l-2 border-m-blue-dark pl-4">
-            <p class="font-bold text-primary mb-2">Example 2: Off-Grid Home — 8 kWh/day, 48V</p>
-            <ul class="list-disc pl-6 flex flex-col gap-1">
-              <li><strong>Daily load:</strong> 8,000 Wh | <strong>Autonomy:</strong> 3 days | <strong>DoD:</strong> 85%</li>
-              <li><strong>Efficiency:</strong> 92% | <strong>Temperature:</strong> 20°C</li>
-            </ul>
-            <p class="mt-2"><strong>Temp multiplier:</strong> 0.90 + 0.10 × (20/25) = <span class="font-mono text-primary">0.98</span></p>
-            <p><strong>Required energy:</strong> (8,000 × 3) / (0.85 × 0.92 × 0.98) = <span class="font-mono text-primary">31,358 Wh (31.36 kWh)</span></p>
-            <p><strong>Capacity:</strong> 31,358 / 48 = <span class="font-mono text-primary">653.3 Ah</span></p>
-          </div>
-
-          <div class="border-l-2 border-m-red pl-4">
-            <p class="font-bold text-primary mb-2">Example 3: Telecom Tower — 5 kWh/day, 48V, Cold Climate</p>
-            <ul class="list-disc pl-6 flex flex-col gap-1">
-              <li><strong>Daily load:</strong> 5,000 Wh | <strong>Autonomy:</strong> 4 days | <strong>DoD:</strong> 80%</li>
-              <li><strong>Efficiency:</strong> 90% | <strong>Temperature:</strong> -10°C</li>
-            </ul>
-            <p class="mt-2"><strong>Temp multiplier:</strong> 0.70 + 0.20 × ((-10+20)/20) = <span class="font-mono text-primary">0.80</span></p>
-            <p><strong>Required energy:</strong> (5,000 × 4) / (0.80 × 0.90 × 0.80) = <span class="font-mono text-primary">34,722 Wh (34.72 kWh)</span></p>
-            <p><strong>Capacity:</strong> 34,722 / 48 = <span class="font-mono text-primary">723.4 Ah</span></p>
-          </div>
-
-        </div>
-      </div>
+      <WorkedExample
+        number={3}
+        title="Telecom Tower — Cold Climate"
+        scenario="Size a 48V telecom backup battery for 5 kWh/day load with 4 days autonomy at -10°C."
+        inputs={[
+          { label: "Daily Load", value: "5,000 Wh" },
+          { label: "Autonomy", value: "4 days" },
+          { label: "DoD Limit", value: "80%" },
+          { label: "System Voltage", value: "48 V" },
+          { label: "Efficiency", value: "90%" },
+          { label: "Temperature", value: "-10°C" },
+        ]}
+        steps={[
+          { label: "Step 1: Temperature multiplier", formula: "0.70 + 0.20 × ((-10+20)/20)", result: "0.80" },
+          { label: "Step 2: Required energy", formula: "(5000 × 4) / (0.80 × 0.90 × 0.80)", result: "34,722 Wh (34.72 kWh)" },
+          { label: "Step 3: Required capacity", formula: "34722 / 48", result: "723.4 Ah" },
+        ]}
+        answer="34.72 kWh battery bank, 723.4 Ah at 48V — the 20% cold derating significantly increases sizing requirements"
+        interpretation="Cold climate telecom installations require 25-40% more capacity than temperate designs. Battery heating systems can restore full capacity but add cost and parasitic load."
+        variant="industrial"
+      />
 
     </div>
   </section>
+
+  <EngineeringDiagram
+    title="Battery Sizing System Overview"
+    description="Energy flow from daily consumption through sizing calculations to final battery bank configuration"
+    variant="system"
+    steps={[
+      { label: "Daily Loads", icon: "load" },
+      { label: "Sizing Formula", icon: "chart" },
+      { label: "Battery Bank", icon: "battery" },
+      { label: "Inverter Output", icon: "inverter" },
+    ]}
+  />
+
+  <ComparisonTable
+    title="Battery Chemistry Sizing Impact"
+    headers={["Parameter", "LiFePO4 (LFP)", "NMC", "Lead-Acid (AGM)"]}
+    rows={[
+      ["Recommended DoD", "80–90%", "70–80%", "50%"],
+      ["Cycle Life at DoD", "5,000+", "2,000", "500–1,000"],
+      ["Usable Ah per 100Ah", "80–90 Ah", "70–80 Ah", "50 Ah"],
+      ["Temp Derating (0°C)", "~10%", "~15%", "~20%"],
+      ["Charge Temp Limit", "0°C (critical)", "-10°C", "-20°C"],
+      ["Round-Trip Efficiency", "95–98%", "92–95%", "80–85%"],
+      ["Self-Discharge/Month", "1–3%", "1–3%", "3–5%"],
+    ]}
+    caption="How chemistry choice affects battery bank sizing requirements"
+  />
+
+  <ComparisonTable
+    title="System Voltage Selection Guide"
+    headers={["System Voltage", "Max Recommended Load", "Current at 2kW", "Cable Size", "Best For"]}
+    rows={[
+      ["12V", "1 kW", "167 A", "4/0 AWG (107 mm²)", "Small portable systems"],
+      ["24V", "3 kW", "83 A", "2/0 AWG (67 mm²)", "Medium RV, small cabin"],
+      ["48V", "10+ kW", "42 A", "4 AWG (21 mm²)", "Residential, telecom, marine"],
+      ["96V", "20+ kW", "21 A", "8 AWG (8.4 mm²)", "Commercial/industrial BESS"],
+    ]}
+    caption="Higher voltage = lower current = thinner cables and lower losses"
+  />
 
   <FAQSection items={faqItems} />
   <RelatedTools tools={relatedTools} />

@@ -4,6 +4,9 @@ import CalculatorCard from '../../components/CalculatorCard.astro';
 import InputField from '../../components/InputField.astro';
 import ResultBox from '../../components/ResultBox.astro';
 import FormulaBox from '../../components/FormulaBox.astro';
+import WorkedExample from '../../components/WorkedExample.astro';
+import ComparisonTable from '../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../components/EngineeringDiagram.astro';
 import FAQSection from '../../components/FAQSection.astro';
 import RelatedTools from '../../components/RelatedTools.astro';
 
@@ -208,26 +211,85 @@ const relatedTools = [
         </div>
       </FormulaBox>
 
-      <!-- Worked Example -->
-      <div>
-        <h2 class="text-title-lg text-primary uppercase mb-6 tracking-wider">Worked Engineering Example</h2>
-        <div class="text-body-sm text-muted flex flex-col gap-4">
-          <p>Given system parameters:</p>
-          <ul class="list-disc pl-6 flex flex-col gap-1">
-            <li><strong>Capacity:</strong> 200 Ah</li>
-            <li><strong>Continuous load current:</strong> 100 Amperes</li>
-          </ul>
-          <p><strong>Step 1:</strong> Calculate C-rate:</p>
-          <div class="font-mono text-primary">C = 100 A / 200 Ah = 0.50 C</div>
+      <WorkedExample
+        number={1}
+        title="Calculate C-Rate from Current"
+        scenario="A 200Ah LiFePO4 battery is discharging at 100A continuous current. What is the C-rate and theoretical runtime?"
+        inputs={[
+          { label: "Battery Capacity", value: "200 Ah" },
+          { label: "Discharge Current", value: "100 A" },
+        ]}
+        steps={[
+          { label: "Step 1: Calculate C-rate", formula: "C = I / Capacity = 100 A / 200 Ah", result: "0.50 C" },
+          { label: "Step 2: Calculate theoretical discharge time", formula: "T = 1 / C-rate = 1 / 0.50", result: "2.00 hours" },
+          { label: "Step 3: Apply 80% DoD limit", formula: "T_actual = 2.00 h × 0.80", result: "1.60 hours (1h 36m)" },
+        ]}
+        answer="C-rate = 0.50C, theoretical runtime = 2.00 hours (1.60 hours at 80% DoD)"
+        interpretation="At 0.5C, this LFP battery is within its optimal discharge range. The 80% DoD adjustment accounts for recommended depth-of-discharge limits to preserve cycle life."
+        variant="default"
+      />
 
-          <p><strong>Step 2:</strong> Solve the theoretical discharge duration:</p>
-          <div class="font-mono text-primary">T = 1 / 0.50 = 2.00 hours</div>
+      <WorkedExample
+        number={2}
+        title="Calculate Current from C-Rate"
+        scenario="You want to discharge a 100Ah NMC battery at 0.5C. What current should you draw, and how long will it last?"
+        inputs={[
+          { label: "Battery Capacity", value: "100 Ah" },
+          { label: "Target C-Rate", value: "0.5 C" },
+        ]}
+        steps={[
+          { label: "Step 1: Calculate discharge current", formula: "I = Capacity × C-rate = 100 Ah × 0.5", result: "50 A" },
+          { label: "Step 2: Calculate theoretical runtime", formula: "T = 1 / C-rate = 1 / 0.5", result: "2.00 hours" },
+        ]}
+        answer="Discharge current = 50 A, runtime = 2.00 hours"
+        interpretation="A 0.5C rate is moderate for NMC chemistry — it balances performance with longevity. Charging at this rate would take approximately 2.5 hours accounting for the CV phase."
+      />
 
-          <p><strong>Notice:</strong> This is a 100% Depth of Discharge value. If you restrict the discharge to an 80% DoD safety margin, the actual run time is: 2 hours x 0.80 = 1.6 hours (1 hour and 36 minutes).</p>
-        </div>
-      </div>
+      <WorkedExample
+        number={3}
+        title="High C-Rate Lead-Acid Comparison"
+        scenario="A 100Ah lead-acid battery is discharged at 50A (0.5C). Compare usable capacity with a lithium equivalent."
+        inputs={[
+          { label: "Battery Capacity", value: "100 Ah (both)" },
+          { label: "Discharge Current", value: "50 A (0.5C)" },
+          { label: "Chemistry", value: "Lead-Acid vs LFP" },
+        ]}
+        steps={[
+          { label: "Lead-Acid at 0.5C", formula: "Usable capacity ≈ 100 Ah × 0.60 (Peukert)", result: "60 Ah delivered" },
+          { label: "LFP at 0.5C", formula: "Usable capacity ≈ 100 Ah × 0.95", result: "95 Ah delivered" },
+          { label: "Capacity difference", formula: "95 Ah - 60 Ah", result: "35 Ah more from LFP" },
+        ]}
+        answer="Lead-Acid delivers ~60Ah, LFP delivers ~95Ah at 0.5C — a 58% advantage for lithium"
+        interpretation="Lead-acid Peukert effect causes severe capacity loss at higher C-rates. At 0.5C, lead-acid loses ~40% of rated capacity while lithium retains nearly all of it."
+        variant="default"
+      />
     </div>
   </section>
+
+  <EngineeringDiagram
+    title="C-Rate System Flow"
+    description="How battery capacity, current, and C-rate relate in a discharge system"
+    variant="flow"
+    steps={[
+      { label: "Battery Bank", icon: "battery" },
+      { label: "Current Draw", icon: "cable" },
+      { label: "Connected Load", icon: "load" },
+      { label: "Runtime Output", icon: "chart" },
+    ]}
+  />
+
+  <ComparisonTable
+    title="C-Rate by Chemistry — Recommended Limits"
+    headers={["Chemistry", "Max Continuous Discharge", "Recommended Charge", "Burst Discharge", "Cycle Life Impact"]}
+    rows={[
+      ["LiFePO4 (LFP)", "1C", "0.5C", "3C", "Minimal at ≤1C"],
+      ["NMC (Li-ion)", "2C", "0.7C", "3C", "Moderate at >1C"],
+      ["Lead-Acid (AGM)", "0.2C", "0.1C", "0.5C", "Severe Peukert loss"],
+      ["Lead-Acid (Flooded)", "0.1C", "0.1C", "0.3C", "Severe Peukert loss"],
+      ["Gel Cell", "0.2C", "0.1C", "0.5C", "Moderate Peukert loss"],
+    ]}
+    caption="Recommended continuous C-rates for optimal cycle life. Exceeding these limits accelerates degradation."
+  />
 
   <FAQSection items={faqItems} />
 

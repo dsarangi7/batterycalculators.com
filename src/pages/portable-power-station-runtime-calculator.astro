@@ -3,6 +3,9 @@ import CalculatorLayout from '../layouts/CalculatorLayout.astro';
 import FormulaBox from '../components/FormulaBox.astro';
 import FAQSection from '../components/FAQSection.astro';
 import PowerOutageForm from '../components/PowerOutageForm.astro';
+import WorkedExample from '../components/WorkedExample.astro';
+import ComparisonTable from '../components/ComparisonTable.astro';
+import EngineeringDiagram from '../components/EngineeringDiagram.astro';
 
 const whatIs = `A portable power station runtime calculator estimates how long a portable power station (battery generator) will run your specific appliances during a power outage. Unlike gas generators, portable power stations are silent, emission-free, and indoor-safe — but they have limited capacity. This calculator tells you exactly how many hours your station will last based on your actual load, helping you choose the right size and plan energy usage during extended outages.`;
 
@@ -118,29 +121,93 @@ const presetAppliances = [
         <p class="text-xs text-muted mt-4">For portable power stations, Battery Voltage and DoD are internal — compare the Energy Required to the station's usable Wh rating.</p>
       </FormulaBox>
       <div>
-        <h2 class="text-title-lg text-primary uppercase mb-6 tracking-wider">Worked Example</h2>
-        <div class="text-body-sm text-muted flex flex-col gap-4">
-          <p><strong>Scenario:</strong> How long will a portable power station run a fridge, Wi-Fi, and two lights?</p>
-          <div class="border-l-2 border-m-blue-light pl-4">
-            <p class="font-bold text-primary mb-2">Step 1: Running load</p>
-            <div class="font-mono text-primary">Fridge: 150W, Wi-Fi: 12W, LED×2: 20W</div>
-            <div class="font-mono text-primary">Total running: 182W</div>
-          </div>
-          <div class="border-l-2 border-m-blue-light pl-4">
-            <p class="font-bold text-primary mb-2">Step 2: Energy for 8 hours</p>
-            <div class="font-mono text-primary">Raw: 182W × 8h = 1,456 Wh</div>
-            <div class="font-mono text-primary">After efficiency (85%): 1,456 / 0.85 = 1,713 Wh</div>
-            <div class="font-mono text-primary">With 20% margin: 1,713 × 1.20 = 2,056 Wh</div>
-          </div>
-          <div class="border-l-2 border-m-blue-light pl-4">
-            <p class="font-bold text-primary mb-2">Step 3: Station recommendation</p>
-            <div class="font-mono text-primary">Need ≈2,056 Wh usable → 2,500Wh rated station</div>
-            <div class="font-mono text-primary font-bold mt-1">Result: Look for a 2,500Wh+ LiFePO4 portable power station</div>
-          </div>
+        <h2 class="text-title-lg text-primary uppercase mb-6 tracking-wider">Worked Examples</h2>
+        <div class="text-body-sm text-muted flex flex-col gap-6">
+          <WorkedExample
+            number={1}
+            title="Phone Charging & Small Devices"
+            scenario="Charge two phones and run a Wi-Fi router for an evening power outage (6 hours)."
+            inputs={[
+              { label: "Phone Chargers ×2", value: "15W each = 30W total" },
+              { label: "Wi-Fi Router", value: "12W" },
+              { label: "Backup Duration", value: "6 hours" },
+            ]}
+            steps={[
+              { label: "Step 1: Total running load", formula: "30W + 12W", result: "42W" },
+              { label: "Step 2: Energy for 6 hours", formula: "42W × 6h = 252 Wh", result: "252 Wh" },
+              { label: "Step 3: After inverter efficiency (85%)", formula: "252 / 0.85", result: "296 Wh" },
+              { label: "Step 4: With 20% safety margin", formula: "296 × 1.20", result: "356 Wh" },
+            ]}
+            answer="A 400Wh portable power station provides ample capacity for phone charging and Wi-Fi through a 6-hour evening outage."
+            interpretation="Small device loads are easy to back up — even compact power stations handle them comfortably."
+          />
+          <WorkedExample
+            number={2}
+            title="Laptop Work Setup"
+            scenario="Keep a laptop and desk lamp running during a daytime work outage (4 hours)."
+            inputs={[
+              { label: "Laptop", value: "60W" },
+              { label: "LED Desk Lamp", value: "10W" },
+              { label: "Backup Duration", value: "4 hours" },
+            ]}
+            steps={[
+              { label: "Step 1: Total running load", formula: "60W + 10W", result: "70W" },
+              { label: "Step 2: Energy for 4 hours", formula: "70W × 4h = 280 Wh", result: "280 Wh" },
+              { label: "Step 3: After inverter efficiency (85%)", formula: "280 / 0.85", result: "329 Wh" },
+              { label: "Step 4: With 20% safety margin", formula: "329 × 1.20", result: "395 Wh" },
+            ]}
+            answer="A 400–500Wh portable power station covers a laptop work setup for a half-day outage."
+            interpretation="Laptops are moderate loads — plan for at least 400Wh to leave headroom for battery degradation."
+          />
+          <WorkedExample
+            number={3}
+            title="Camping Lights & Fan"
+            scenario="Power LED string lights and a small fan while camping overnight (10 hours)."
+            inputs={[
+              { label: "LED String Lights ×2", value: "10W each = 20W total" },
+              { label: "Portable Fan", value: "50W" },
+              { label: "Backup Duration", value: "10 hours" },
+            ]}
+            steps={[
+              { label: "Step 1: Total running load", formula: "20W + 50W", result: "70W" },
+              { label: "Step 2: Energy for 10 hours", formula: "70W × 10h = 700 Wh", result: "700 Wh" },
+              { label: "Step 3: After inverter efficiency (85%)", formula: "700 / 0.85", result: "824 Wh" },
+              { label: "Step 4: With 20% safety margin", formula: "824 × 1.20", result: "988 Wh" },
+            ]}
+            answer="A 1,000Wh portable power station comfortably runs lights and a fan through a full camping night."
+            interpretation="Overnight loads add up — a 1,000Wh station is the sweet spot for camping comfort."
+          />
         </div>
       </div>
     </div>
   </section>
+
+  <EngineeringDiagram
+    title="Portable Power Station Energy Flow"
+    description="Energy flows from the internal DC battery through the inverter to your AC appliances, with losses at each conversion step."
+    steps={[
+      { label: "DC Battery", icon: "battery" },
+      { label: "BMS Protection", icon: "charge" },
+      { label: "DC-to-AC Inverter", icon: "inverter" },
+      { label: "AC Output", icon: "cable" },
+      { label: "Your Appliances", icon: "load" },
+    ]}
+    variant="system"
+  />
+
+  <ComparisonTable
+    title="Portable Power Station Capacity Comparison"
+    headers={["Station Capacity", "Usable Wh (85% eff.)", "Fridge Runtime", "Phone Charges", "Laptop Runtime", "Best For"]}
+    rows={[
+      ["250 Wh", "213 Wh", "1–2 h", "~14", "~3.5 h", "Phone & device charging"],
+      ["500 Wh", "425 Wh", "2–3 h", "~28", "~7 h", "Small device + lights"],
+      ["1,000 Wh", "850 Wh", "5–6 h", "~56", "~14 h", "Fridge + devices overnight"],
+      ["1,500 Wh", "1,275 Wh", "8–10 h", "~85", "~21 h", "Fridge + lights + Wi-Fi"],
+      ["2,000 Wh", "1,700 Wh", "10–12 h", "~113", "~28 h", "Full essential load 12h"],
+      ["2,500 Wh", "2,125 Wh", "13–15 h", "~142", "~35 h", "Extended outage backup"],
+    ]}
+    caption="Runtimes assume standard refrigerator cycling (30–50% duty cycle). Phone charges based on 15Wh per charge. Laptop runtime at 60W continuous."
+  />
 
   <FAQSection items={faqItems} />
 </CalculatorLayout>

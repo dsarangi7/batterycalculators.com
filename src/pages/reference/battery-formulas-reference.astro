@@ -1,0 +1,146 @@
+---
+import ArticleLayout from '../../layouts/ArticleLayout.astro';
+import ReferenceTable from '../../components/ReferenceTable.astro';
+import ComparisonTable from '../../components/ComparisonTable.astro';
+import FAQSection from '../../components/FAQSection.astro';
+
+const relatedCalculators = [
+  { title: 'C-Rate Calculator', href: '/tools/c-rate-calculator', type: 'calculator' as const },
+  { title: 'Voltage Drop Calculator', href: '/tools/voltage-drop-calculator', type: 'calculator' as const },
+  { title: 'Runtime Calculator', href: '/tools/runtime-calculator', type: 'calculator' as const },
+  { title: 'Battery Sizing Calculator', href: '/tools/battery-sizing-calculator', type: 'calculator' as const },
+  { title: 'DC Cable Loss Calculator', href: '/tools/dc-cable-loss-calculator', type: 'calculator' as const },
+  { title: 'Charging Time Calculator', href: '/tools/charging-time-calculator', type: 'calculator' as const },
+];
+
+const relatedGuides = [
+  { title: 'Battery Sizing Formula', href: '/learn/battery-sizing-formula', type: 'guide' as const },
+  { title: 'Battery Runtime Formula', href: '/learn/battery-runtime-formula', type: 'guide' as const },
+  { title: 'Battery Charging Formula', href: '/learn/battery-charging-formula', type: 'guide' as const },
+];
+
+const faqItems = [
+  {
+    question: 'What is the most important battery formula?',
+    answer: 'The fundamental formula is Energy (Wh) = Voltage (V) × Capacity (Ah). This relates voltage, capacity, and total energy storage. From this, you can derive runtime (Runtime = Ah ÷ Load Current), C-rate (C-rate = Current ÷ Ah), and sizing requirements. Mastering this relationship is the foundation of all battery calculations.',
+  },
+  {
+    question: 'How do I calculate battery runtime?',
+    answer: 'Runtime (hours) = Battery Capacity (Ah) ÷ Load Current (A). For a 200Ah battery powering a 25A load: 200 ÷ 25 = 8 hours. For energy-based calculation: Runtime (hours) = Battery Energy (Wh) × System Efficiency ÷ Load Power (W). System efficiency is typically 0.85–0.95 for lithium and 0.75–0.85 for lead-acid.',
+  },
+  {
+    question: 'How do I calculate voltage drop in a cable?',
+    answer: 'Voltage Drop (V) = (2 × L × I × R) / 1000, where L is one-way cable length in feet, I is current in amps, and R is resistance in ohms per 1000 feet. For metric: VD = (2 × L × I × ρ) / A, where L is length in meters, ρ is resistivity (1.68×10⁻⁸ Ω·m for copper), and A is cross-section area in m².',
+  },
+  {
+    question: 'How do I calculate C-rate from current and capacity?',
+    answer: 'C-rate = Current (A) ÷ Capacity (Ah). A 100Ah battery discharged at 50A is at 0.5C. To find current from C-rate: Current = C-rate × Capacity. At 2C for a 200Ah battery: 2 × 200 = 400A. C-rate is dimensionless and independent of voltage.',
+  },
+  {
+    question: 'How do I convert between Wh and Ah?',
+    answer: 'To convert Wh to Ah: Ah = Wh ÷ Voltage. A 4,800Wh battery at 48V has 100Ah capacity. To convert Ah to Wh: Wh = Ah × Voltage. A 200Ah battery at 12V stores 2,400Wh. The voltage is the key bridge between these two units.',
+  },
+  {
+    question: 'What efficiency factor should I use for battery calculations?',
+    answer: 'Use 0.90–0.95 for lithium (LFP/NMC) round-trip efficiency. Use 0.75–0.85 for lead-acid round-trip efficiency. For charge efficiency (energy into battery vs. energy out of charger), use 0.98–1.00 for lithium and 0.80–0.90 for lead-acid. Inverter efficiency (DC to AC) is typically 0.90–0.95 and should be applied separately.',
+  },
+];
+---
+
+<ArticleLayout
+  title="Battery Formulas Reference | Battery Calculators"
+  description="Complete reference of all essential battery formulas: Ohm's law, C-rate calculation, voltage drop, battery sizing, energy capacity, runtime, and charging formulas with worked examples."
+  category="REFERENCE"
+  categoryHref="/reference"
+  breadcrumbItems={[{ label: 'Battery Formulas Reference' }]}
+  relatedCalculators={relatedCalculators}
+  relatedGuides={relatedGuides}
+  faqItems={faqItems}
+>
+  <p class="text-body-md text-body font-light mb-8">
+    Every battery calculation is built from a handful of fundamental formulas. This reference consolidates all essential equations for sizing, runtime, cable selection, energy, and charging into a single downloadable table. Use these formulas alongside the calculator tools for precise system design.
+  </p>
+
+  <ReferenceTable
+    title="Core Battery Formulas"
+    description="Fundamental equations for battery system calculations."
+    headers={['Formula Name', 'Equation', 'Units', 'Variables']}
+    rows={[
+      ['Energy Capacity', 'E = V × Ah', 'Wh or kWh', 'V = nominal voltage, Ah = capacity'],
+      ['Runtime (hours)', 't = Ah ÷ I', 'hours', 'Ah = capacity, I = load current (A)'],
+      ['Runtime (energy-based)', 't = (E × η) ÷ P', 'hours', 'E = energy (Wh), η = efficiency, P = load (W)'],
+      ['C-Rate', 'C = I ÷ Ah', 'dimensionless', 'I = current (A), Ah = capacity'],
+      ['Current from C-Rate', 'I = C × Ah', 'Amps (A)', 'C = C-rate, Ah = capacity'],
+      ['Coulomb Counting', 'SOC = SOC₀ + (I × t / Ah) × 100', '%', 'SOC₀ = initial SOC, I = current, t = time'],
+      ['Open Circuit Voltage', 'OCV = V_min + (SOC × (V_max - V_min))', 'Volts (V)', 'V_min/max = voltage limits'],
+    ]}
+    source="Standard battery engineering formulas"
+  />
+
+  <ReferenceTable
+    title="Electrical Formulas (Ohm's Law)"
+    description="Basic electrical relationships used in battery system design."
+    headers={['Formula Name', 'Equation', 'Rearranged', 'Use Case']}
+    rows={[
+      ['Voltage', 'V = I × R', 'I = V ÷ R', 'Calculate voltage drop across resistance'],
+      ['Current', 'I = V ÷ R', 'V = I × R', 'Calculate current from voltage and resistance'],
+      ['Power (DC)', 'P = V × I', 'I = P ÷ V', 'Calculate power or current from load'],
+      ['Power (resistive)', 'P = I² × R', 'R = P ÷ I²', 'Calculate power loss in cables'],
+      ['Power (voltage-based)', 'P = V² ÷ R', 'R = V² ÷ P', 'Calculate resistance from voltage and power'],
+      ['Energy', 'E = P × t', 'P = E ÷ t', 'Calculate energy from power and time'],
+      ['Energy (battery)', 'E = V × Ah', 'Ah = E ÷ V', 'Convert between Wh and Ah'],
+    ]}
+    source="Ohm's Law, Kirchhoff's Laws"
+  />
+
+  <ReferenceTable
+    title="Cable and Voltage Drop Formulas"
+    description="Formulas for sizing cables and calculating voltage drop in DC systems."
+    headers={['Formula Name', 'Equation', 'Units', 'Notes']}
+    rows={[
+      ['Voltage Drop (US units)', 'VD = (2 × L × I × R) / 1000', 'Volts (V)', 'L = one-way length (ft), R = ohms/1000ft'],
+      ['Voltage Drop (metric)', 'VD = (2 × L × I × ρ) / A', 'Volts (V)', 'L = length (m), ρ = 1.68×10⁻⁸, A = m²'],
+      ['Cable Resistance', 'R = (ρ × L) / A', 'Ohms (Ω)', 'ρ = resistivity, L = length, A = area'],
+      ['Max Cable Length', 'L = (VD_max × 1000) / (2 × I × R)', 'feet', 'For a given max voltage drop'],
+      ['Min Cable Area', 'A = (2 × L × I × ρ) / VD_max', 'm²', 'Minimum cross-section for max VD'],
+    ]}
+    source="NEC Chapter 9, IEC 60364"
+  />
+
+  <ComparisonTable
+    title="Formula Selection Guide by Calculation Type"
+    headers={['What You Need', 'Primary Formula', 'Secondary Formula', 'Typical Application']}
+    rows={[
+      ['Battery capacity from load', 'Ah = (P × t) / (V × η)', 'E = P × t ÷ η', 'Sizing battery bank for autonomy'],
+      ['Runtime from battery', 't = Ah ÷ I', 't = (V × Ah × η) ÷ P', 'Estimating run time'],
+      ['C-rate from current', 'C = I ÷ Ah', 'I = C × Ah', 'Checking discharge limits'],
+      ['Cable voltage drop', 'VD = (2 × L × I × R) / 1000', 'L = (VD × 1000) / (2 × I × R)', 'Sizing cables for DC runs'],
+      ['Energy from capacity', 'E = V × Ah', 'Ah = E ÷ V', 'Converting between Wh and Ah'],
+      ['Charge time', 't = Ah ÷ (C × Ah)', 't = Ah ÷ I_charge', 'Estimating recharge duration'],
+      ['Power from voltage/current', 'P = V × I', 'I = P ÷ V', 'Calculating load or current'],
+      ['Number of panels', 'N = (E_daily) / (W_panel × PSH × η)', 'Array = E_daily ÷ (PSH × η)', 'Solar array sizing'],
+      ['Parallel capacity', 'Ah_total = Ah_cell × N_parallel', 'Np = Ah_target ÷ Ah_cell', 'Building capacity from cells'],
+      ['Series voltage', 'V_total = V_cell × N_series', 'Ns = V_target ÷ V_cell', 'Building voltage from cells'],
+    ]}
+    highlightCol={1}
+    caption="η = system efficiency (0.85–0.95 for lithium, 0.75–0.85 for lead-acid)"
+  />
+
+  <ReferenceTable
+    title="Common Unit Conversions"
+    description="Quick conversion factors for battery engineering calculations."
+    headers={['From', 'To', 'Multiply By', 'Example']}
+    rows={[
+      ['Ah → Wh', 'Wh', 'Voltage (V)', '100Ah × 12V = 1,200Wh'],
+      ['Wh → Ah', 'Ah', '÷ Voltage (V)', '2,400Wh ÷ 24V = 100Ah'],
+      ['Wh → kWh', 'kWh', '÷ 1,000', '4,800Wh ÷ 1,000 = 4.8kWh'],
+      ['kWh → Wh', 'Wh', '× 1,000', '5kWh × 1,000 = 5,000Wh'],
+      ['W → kW', 'kW', '÷ 1,000', '2,500W ÷ 1,000 = 2.5kW'],
+      ['Ah → Coulombs', 'C', '× 3,600', '100Ah × 3,600 = 360,000C'],
+      ['C → Ah', 'Ah', '÷ 3,600', '360,000C ÷ 3,600 = 100Ah'],
+      ['kW → HP', 'HP', '× 1.341', '5kW × 1.341 = 6.7 HP'],
+      ['BTU/h → W', 'W', '÷ 3.412', '10,000 BTU/h ÷ 3.412 = 2,931W'],
+    ]}
+    source="Standard engineering unit conversions"
+  />
+</ArticleLayout>

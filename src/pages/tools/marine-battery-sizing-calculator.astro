@@ -5,6 +5,9 @@ import InputField from '../../components/InputField.astro';
 import ResultBox from '../../components/ResultBox.astro';
 import FormulaBox from '../../components/FormulaBox.astro';
 import FAQSection from '../../components/FAQSection.astro';
+import WorkedExample from '../../components/WorkedExample.astro';
+import ComparisonTable from '../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../components/EngineeringDiagram.astro';
 
 const whatIs = `A marine battery sizing calculator determines the correct battery bank capacity for powering a vessel's hotel loads—navigation electronics, cabin lighting, refrigeration, freshwater pumps, and auxiliary systems—while at anchor or underway. Proper sizing ensures reliable power during extended cruises without shore power, preventing dead batteries mid-voyage. Marine electrical systems face unique constraints: vibration, moisture exposure, alternator charging limits, and the need to reserve cranking power for engine starts. This calculator applies depth-of-discharge limits and system efficiency factors specific to the marine environment, aligning with ISO 13297 yacht electrical installation standards.`;
 
@@ -243,33 +246,116 @@ const relatedCalculators = [
         </p>
       </FormulaBox>
 
-      <div>
-        <h2 class="text-title-lg text-primary uppercase mb-6 tracking-wider">Worked Engineering Example</h2>
-        <div class="text-body-sm text-muted flex flex-col gap-4">
-          <p>Given hotel load profile:</p>
-          <ul class="list-disc pl-6 flex flex-col gap-1">
-            <li><strong>Navigation:</strong> 180W | <strong>Lighting:</strong> 80W | <strong>Refrigeration:</strong> 100W</li>
-            <li><strong>Pumps:</strong> 40W | <strong>Other:</strong> 30W | <strong>Usage:</strong> 14 hours</li>
-            <li><strong>Battery voltage:</strong> 12V | <strong>DoD:</strong> 80% | <strong>Efficiency:</strong> 90%</li>
-          </ul>
+      <div class="flex flex-col gap-6">
+        <WorkedExample
+          number={1}
+          title="Day Cruiser — Overnight Anchoring"
+          scenario="A 28ft day cruiser is anchored overnight. The owner needs navigation lights, a fish finder, VHF radio, cabin lighting, and a small fridge running for 8 hours before the engine is started at dawn."
+          inputs={[
+            { label: "Navigation lights", value: "20W" },
+            { label: "Fish finder", value: "15W" },
+            { label: "VHF radio (standby)", value: "5W" },
+            { label: "Cabin lights", value: "30W" },
+            { label: "Compact fridge", value: "45W" },
+            { label: "Usage duration", value: "8 hours" },
+            { label: "System voltage", value: "12V" },
+            { label: "DoD limit", value: "80% (LFP)" },
+            { label: "System efficiency", value: "90%" },
+          ]}
+          steps={[
+            "Sum all loads: 20 + 15 + 5 + 30 + 45 = 115W",
+            "Daily energy demand: 115W × 8h = 920 Wh",
+            "Adjust for DoD and efficiency: 920 / (0.80 × 0.90) = 1,278 Wh",
+            "Convert to Amp-hours: 1,278 Wh / 12V = 106.5 Ah",
+          ]}
+          answer="A 12V 120Ah LFP battery bank (1.44 kWh) is recommended."
+          interpretation="This provides 8 hours of overnight hotel loads with a 13% safety margin above the calculated minimum. The bank weighs approximately 14 kg—manageable for a small cruiser. Starting the engine at dawn for 1–2 hours will replenish the bank via alternator."
+          variant="marine"
+        />
 
-          <p><strong>Step 1:</strong> Sum all hotel loads:</p>
-          <div class="font-mono text-primary">Total = 180 + 80 + 100 + 40 + 30 = 430W</div>
+        <WorkedExample
+          number={2}
+          title="Cruising Yacht — 24-Hour Hotel Loads"
+          scenario="A 45ft cruising yacht at anchor runs extensive hotel loads: chartplotter, radar overlay, LED lighting throughout, refrigeration, watermaker, and entertainment systems. The owner wants full 24-hour autonomy without engine charging."
+          inputs={[
+            { label: "Chartplotter + radar", value: "120W" },
+            { label: "AIS transponder", value: "30W" },
+            { label: "LED lighting (all zones)", value: "90W" },
+            { label: "Refrigeration + freezer", value: "180W" },
+            { label: "Watermaker", value: "250W" },
+            { label: "Entertainment + USB", value: "60W" },
+            { label: "Pumps + auxiliaries", value: "50W" },
+            { label: "Usage duration", value: "24 hours" },
+            { label: "System voltage", value: "24V" },
+            { label: "DoD limit", value: "80% (LFP)" },
+            { label: "System efficiency", value: "92%" },
+          ]}
+          steps={[
+            "Sum all loads: 120 + 30 + 90 + 180 + 250 + 60 + 50 = 780W",
+            "Daily energy demand: 780W × 24h = 18,720 Wh",
+            "Adjust for DoD and efficiency: 18,720 / (0.80 × 0.92) = 25,435 Wh",
+            "Convert to Amp-hours: 25,435 Wh / 24V = 1,059.8 Ah",
+          ]}
+          answer="A 24V 1,100Ah LFP battery bank (26.4 kWh) is recommended."
+          interpretation="This meets 24-hour autonomy for a full hotel load profile. The bank weighs approximately 195 kg, requiring proper structural mounting below the waterline. Solar panels (300W+) on the bimini could offset 2–3 kWh daily, reducing bank size requirements."
+          variant="marine"
+        />
 
-          <p><strong>Step 2:</strong> Calculate daily energy demand:</p>
-          <div class="font-mono text-primary">Daily = 430W × 14h = 6,020 Wh</div>
-
-          <p><strong>Step 3:</strong> Adjust for DoD and efficiency:</p>
-          <div class="font-mono text-primary">Required = 6,020 / (0.80 × 0.90) = 8,361 Wh</div>
-
-          <p><strong>Step 4:</strong> Convert to Amp-hours:</p>
-          <div class="font-mono text-primary">Ah = 8,361 Wh / 12V = 696.8 Ah</div>
-
-          <p><strong>Result:</strong> A 12V 700Ah LFP battery bank provides 8.4 kWh, delivering approximately 14 hours of reliable hotel load power for your vessel.</p>
-        </div>
+        <WorkedExample
+          number={3}
+          title="Trolling Motor — High Discharge Analysis"
+          scenario="A 20ft bass boat uses an 80lb-thrust trolling motor drawing 46A at 12V. The angler wants to fish for 6 hours continuously, running the motor at medium speed (60% throttle) with intermittent fish finder and navigation lights."
+          inputs={[
+            { label: "Trolling motor (60% throttle)", value: "27.6A × 12V = 331W" },
+            { label: "Fish finder", value: "15W" },
+            { label: "Navigation lights", value: "20W" },
+            { label: "Usage duration", value: "6 hours" },
+            { label: "System voltage", value: "12V" },
+            { label: "DoD limit", value: "80% (LFP)" },
+            { label: "System efficiency", value: "88%" },
+          ]}
+          steps={[
+            "Sum all loads: 331 + 15 + 20 = 366W",
+            "Current draw at 12V: 366W / 12V = 30.5A",
+            "Daily energy demand: 366W × 6h = 2,196 Wh",
+            "Adjust for DoD and efficiency: 2,196 / (0.80 × 0.88) = 3,120 Wh",
+            "Convert to Amp-hours: 3,120 Wh / 12V = 260 Ah",
+          ]}
+          answer="A 12V 260Ah LFP battery bank (3.12 kWh) is recommended."
+          interpretation="At 30.5A continuous draw, a 260Ah bank provides 6 hours with a small safety margin. Note: at high discharge rates, battery voltage sag becomes significant—LFP maintains voltage better than lead-acid under this load. A 300Ah bank provides comfortable margin for longer fishing days."
+          variant="marine"
+        />
       </div>
 
     </div>
+  </section>
+
+  <section class="mb-16">
+    <EngineeringDiagram
+      title="Marine Electrical System"
+      description="Dual battery bank setup with alternator charging and load distribution"
+      variant="system"
+      steps={[
+        { label: "Alternator", icon: "charge" },
+        { label: "House Bank", icon: "battery" },
+        { label: "Start Bank", icon: "battery" },
+        { label: "Marine Loads", icon: "load" },
+      ]}
+    />
+  </section>
+
+  <section class="mb-16">
+    <ComparisonTable
+      title="Marine Battery Standards"
+      headers={["Standard", "Scope", "Key Requirements", "Voltage Drop Limit"]}
+      rows={[
+        ["ISO 13297", "Marine electrical installation", "Cable sizing, fusing, labeling", "3% critical / 10% non-critical"],
+        ["ABYC E-11", "AC/DC systems on boats", "Wire color coding, overcurrent protection", "3% for helm instruments"],
+        ["USCG 33 CFR 183", "Electrical systems on boats", "Ignition protection, fuel tank bonding", "N/A (safety focused)"],
+        ["IEC 60092", "Marine electrical installations", "Shipboard wiring, switchboards", "Varies by circuit type"],
+      ]}
+      caption="Key marine electrical standards governing battery system design"
+    />
   </section>
 
   <FAQSection items={faqItems} />

@@ -1,0 +1,205 @@
+---
+import ArticleLayout from '../../layouts/ArticleLayout.astro';
+import TroubleshootingBlock from '../../components/TroubleshootingBlock.astro';
+
+const relatedCalculators = [
+  { title: 'C-Rate Calculator', href: '/tools/c-rate-calculator', type: 'calculator' as const },
+  { title: 'Runtime Calculator', href: '/tools/runtime-calculator', type: 'calculator' as const },
+  { title: 'Charging Time Calculator', href: '/tools/charging-time-calculator', type: 'calculator' as const },
+  { title: 'Battery Sizing Calculator', href: '/tools/battery-sizing-calculator', type: 'calculator' as const },
+];
+
+const relatedGuides = [
+  { title: 'Battery Temperature Correction Chart', href: '/learn/battery-temperature-correction-chart', type: 'guide' as const },
+  { title: 'LiFePO4 Pack Design', href: '/learn/lifepo4-pack-design', type: 'guide' as const },
+  { title: 'Battery Degradation Explained', href: '/learn/battery-degradation-explained', type: 'guide' as const },
+];
+
+const faqItems = [
+  {
+    question: 'What temperature is too hot for a lithium battery?',
+    answer: 'LiFePO4 cells should operate below 60°C (140°F) during discharge and below 45°C (113°F) during charging. NMC lithium-ion cells have tighter limits: below 45°C for discharge and below 40°C for charging. Sustained operation above these temperatures accelerates degradation and can lead to thermal runaway. A battery that feels hot to the touch (>50°C surface temperature) needs immediate attention.',
+  },
+  {
+    question: 'Can overheating permanently damage a battery?',
+    answer: 'Yes. Sustained high temperatures cause accelerated SEI layer growth on the anode, electrolyte decomposition, and loss of active lithium — all of which permanently reduce capacity. A single overheat event above 70°C may cause immediate capacity loss. Repeated exposure to 50–60°C can reduce cycle life by 50% or more. If a battery has been significantly overheated, perform a capacity test to assess permanent damage.',
+  },
+  {
+    question: 'Why does my battery get warm during fast charging?',
+    answer: 'Some warmth during charging is normal — internal resistance converts a portion of the charging energy to heat (Q = I²R). At 0.5C charge rate, a well-cooled battery may rise 5–10°C above ambient. At 1C, expect 10–20°C rise. If the battery becomes too hot to touch or exceeds 45°C, the charge rate is too high for the cooling capacity, or internal resistance is elevated from aging or cell damage.',
+  },
+  {
+    question: 'How do I improve battery ventilation?',
+    answer: 'Ensure at least 5–10cm (2–4 inches) of clearance on all sides of the battery for airflow. In enclosed spaces, install ventilation fans to exhaust heat. Mount batteries vertically if possible to improve natural convection. Avoid placing batteries in sealed, uninsulated compartments. In vehicles, ensure battery boxes have intake and exhaust vents. Consider active cooling (fan-forced air or liquid cooling) for high-power applications.',
+  },
+  {
+    question: 'What does a BMS thermal shutdown mean?',
+    answer: 'The BMS has temperature sensors on the cells or busbars. When temperature exceeds the safe threshold, the BMS disconnects both charge and discharge MOSFETs to prevent damage. This is a protective action, not a fault. The battery will resume operation once it cools below the threshold (typically with a 5°C hysteresis). If thermal shutdown occurs frequently, the underlying cause (high C-rate, poor ventilation, or ambient heat) must be addressed.',
+  },
+  {
+    question: 'Can I use a fan to cool my battery?',
+    answer: 'Yes, forced-air cooling is effective for batteries in enclosed spaces. A small fan moving air across battery surfaces can reduce temperature by 5–15°C. Position the fan to blow air across the battery terminals and busbars, which generate the most heat. Ensure the fan does not introduce moisture or dust into the battery enclosure. For critical applications, consider thermostatic fan control that activates above a set temperature.',
+  },
+];
+---
+
+<ArticleLayout
+  title="Battery Overheating — Troubleshooting Guide | Battery Calculators"
+  description="Diagnose why your battery gets hot during charge or discharge. Troubleshoot excessive C-rate, ambient temperature, ventilation, internal faults, and BMS failure with step-by-step checklists."
+  category="TROUBLESHOOTING"
+  categoryHref="/troubleshooting"
+  breadcrumbItems={[{ label: 'Battery Overheating' }]}
+  relatedCalculators={relatedCalculators}
+  relatedGuides={relatedGuides}
+  faqItems={faqItems}
+>
+  <p class="text-body-md text-body font-light mb-8">
+    Battery overheating is one of the most serious operational issues — it accelerates degradation, reduces cycle life, and in extreme cases can lead to thermal runaway and fire. Understanding the root cause of excessive heat generation is critical for both safety and long-term battery health. This guide covers the five most common causes of battery overheating with diagnostic and corrective actions.
+  </p>
+
+  <TroubleshootingBlock
+    problem="Excessive C-Rate — Charging or Discharging Too Fast"
+    causes={[
+      'Charge or discharge current exceeds battery manufacturer specification',
+      'Undersized battery bank for the connected load',
+      'High-power appliances drawing more current than battery can handle',
+      'Rapid charging from oversized solar array or high-current charger',
+      'Parallel string imbalance causing one string to carry disproportionate current',
+    ]}
+    explanation="C-rate measures charge/discharge current relative to battery capacity. A 100Ah battery at 1C charges or discharges at 100A; at 0.5C, it handles 50A. Every battery has a maximum recommended C-rate — exceeding it generates excessive heat through I²R losses in the cell's internal resistance. For example, a 100Ah LiFePO4 cell with 2mΩ internal resistance generates 20W of heat at 1C (100A) but 80W at 2C (200A) — four times the heat for double the current. Lead-acid batteries are particularly sensitive: charging above 0.3C causes gassing and heat buildup that can warp plates and dry out electrolyte. The relationship between current and heat generation is quadratic (I²), so even modest overcurrent causes disproportionate heating."
+    checklist={[
+      'Measure charge and discharge current with a clamp meter',
+      'Compare measured current to battery maximum C-rate specification',
+      'Calculate C-rate: Current (A) ÷ Battery Capacity (Ah)',
+      'Check if multiple loads are running simultaneously during discharge',
+      'Verify charger current rating is appropriate for battery capacity',
+      'Check parallel string current balance if applicable',
+      'Monitor battery temperature during peak load periods',
+    ]}
+    solutions={[
+      'Reduce charge/discharge current to within manufacturer specification (typically ≤0.5C for LFP)',
+      'Add parallel batteries to share the load and reduce per-battery current',
+      'Limit simultaneous high-power loads or stagger their operation',
+      'Use a charger with adjustable current limit matched to battery capacity',
+      'Use the C-Rate Calculator to verify current is within safe limits',
+      'For solar systems, ensure MPPT controller current rating matches battery capacity',
+    ]}
+  />
+
+  <TroubleshootingBlock
+    problem="Ambient Temperature — Battery Operating in Too-Hot Environment"
+    causes={[
+      'Battery installed in direct sunlight or uninsulated enclosure',
+      'Proximity to engine, generator, or other heat sources',
+      'Enclosed compartment with no ventilation (vehicle, boat, shed)',
+      'Hot climate with sustained ambient temperatures above 35°C',
+      'Heat generated by nearby electronics radiating to battery',
+    ]}
+    explanation="Batteries have two heat sources: internal heat from I²R losses during charge/discharge, and external heat from the environment. When ambient temperature is high, the temperature differential between the battery and environment is reduced, slowing heat dissipation. A battery operating at 25°C ambient with 10°C of self-heating reaches 35°C — well within limits. The same battery at 40°C ambient reaches 50°C — approaching the danger zone. High ambient temperature also accelerates calendar aging independent of cycling. Lead-acid batteries are particularly affected: every 10°C rise above 25°C approximately halves the battery's float life. LiFePO4 is more tolerant but still suffers accelerated degradation above 40°C."
+    checklist={[
+      'Measure ambient temperature at battery location with thermometer',
+      'Check for direct sunlight exposure on battery enclosure',
+      'Identify nearby heat sources (engines, exhaust, transformers, electronics)',
+      'Verify battery enclosure is not sealed or poorly ventilated',
+      'Check if overheating correlates with time of day (afternoon sun exposure)',
+      'Measure temperature differential between battery and room ambient',
+    ]}
+    solutions={[
+      'Relocate battery to a shaded, temperature-controlled environment',
+      'Add insulation or reflective shielding to battery enclosure from radiant heat',
+      'Increase ventilation with intake and exhaust vents for natural convection',
+      'Install forced-air cooling fans for batteries in hot climates',
+      'Maintain ambient temperature below 30°C for optimal battery life',
+      'Consider active liquid cooling for high-power applications in hot environments',
+    ]}
+  />
+
+  <TroubleshootingBlock
+    problem="Inadequate Ventilation — Heat Trapped in Battery Enclosure"
+    causes={[
+      'Battery box or enclosure has no ventilation openings',
+      'Ventilation openings blocked by debris, insulation, or installation',
+      'Battery mounted in sealed compartment (RV under-seat, boat lazarette)',
+      'Cooling fan failed or disconnected',
+      'Enclosure too small for battery size — insufficient air volume',
+    ]}
+    explanation="Even a correctly sized battery generates heat during operation that must be dissipated to the environment. In an enclosed space, this heat accumulates with no escape path, causing the battery temperature to rise continuously until thermal equilibrium is reached — which may be well above safe limits. The problem is compounded during charging because the battery generates heat AND the charger generates heat (typically 10–20% of charge power). A 100A charger in a sealed compartment with a battery adds approximately 150–300W of heat to the enclosure. Without ventilation, this heat raises the enclosed air temperature rapidly. Natural convection requires ventilation openings at both low (intake) and high (exhaust) points to create airflow. A single opening is insufficient for effective heat removal."
+    checklist={[
+      'Inspect battery enclosure for ventilation openings',
+      'Verify ventilation openings are not blocked or obstructed',
+      'Check that enclosure volume is at least 3× the battery volume',
+      'Feel for warm air exhaust at the top of the enclosure during charging',
+      'Test cooling fans (if installed) for operation',
+      'Measure temperature inside enclosure vs outside ambient',
+      'Check for proper intake (low) and exhaust (high) vent placement',
+    ]}
+    solutions={[
+      'Add ventilation openings: minimum 1 sq inch per 100Ah of battery capacity',
+      'Install intake vent at bottom and exhaust vent at top for natural convection',
+      'Add thermostatically controlled exhaust fans for enclosed compartments',
+      'Ensure battery enclosure is at least 3× the battery volume for air circulation',
+      'Remove obstructions from existing ventilation openings',
+      'Use the Battery Sizing Calculator to verify enclosure requirements',
+    ]}
+  />
+
+  <TroubleshootingBlock
+    problem="Internal Fault — Cell Damage Causing Abnormal Heat Generation"
+    causes={[
+      'Internal micro-short in one cell creating localized heating',
+      'Dendrite growth causing intermittent short circuit between electrodes',
+      'Electrolyte contamination increasing internal resistance',
+      'Mechanical damage from impact or vibration causing internal contact',
+      'Manufacturing defect in cell separator allowing electrode contact',
+    ]}
+    explanation="An internal cell fault creates a localized heat source that is fundamentally different from normal I²R heating. A micro-short between electrodes allows current to flow continuously through the fault point, generating concentrated heat that can thermalize surrounding cells. The heat is localized rather than distributed across the cell, creating hot spots detectable with infrared imaging. Internal faults are particularly dangerous because they can be progressive — the initial micro-short generates heat that damages surrounding material, enlarging the fault and increasing heat generation in a positive feedback loop. If the heat generation rate exceeds the cooling rate, thermal runaway can occur. Early detection through temperature monitoring is critical for preventing catastrophic failure."
+    checklist={[
+      'Feel for uneven temperature distribution across battery pack',
+      'Use infrared thermometer to map temperature across cell surfaces',
+      'Identify any cell significantly hotter than its neighbors (>5°C difference)',
+      'Monitor if the hot spot persists or worsens over multiple charge cycles',
+      'Check for unusual swelling or bulging of battery case',
+      'Listen for hissing or popping sounds indicating electrolyte decomposition',
+      'Smell for unusual chemical odor near the battery',
+    ]}
+    solutions={[
+      'Immediately reduce charge/discharge current to minimize heat generation',
+      'Increase cooling to the affected area (fan, heat sink, or ice pack in emergency)',
+      'Isolate the affected cell group if possible by disconnecting series connections',
+      'Do NOT continue to charge a battery with an active internal fault',
+      'Contact manufacturer for inspection and possible warranty replacement',
+      'If thermal runaway is suspected (rapidly rising temperature, smoke, or fire), evacuate and call emergency services',
+      'Dispose of damaged batteries at certified recycling facilities',
+    ]}
+  />
+
+  <TroubleshootingBlock
+    problem="BMS Failure — Battery Management System Not Regulating Properly"
+    causes={[
+      'BMS temperature sensor failed or disconnected',
+      'BMS current sensor reading low, allowing excessive current',
+      'BMS MOSFETs partially failed, creating resistance and heat',
+      'BMS balancing circuit stuck on, continuously dissipating energy',
+      'BMS firmware bug causing incorrect current limit calculation',
+    ]}
+    explanation="The BMS is responsible for keeping the battery within safe operating limits. If the BMS fails to accurately measure temperature, current, or voltage, it cannot apply the correct protections. A failed temperature sensor may read low, causing the BMS to allow higher currents than the battery can safely handle. Failed charge/discharge MOSFETs can develop high on-resistance, generating significant heat at high currents (a MOSFET with 5mΩ resistance generates 50W of heat at 100A). A stuck balancing circuit continuously bleeds current through the balancing resistors, generating localized heat on the BMS board. BMS failures are particularly insidious because the battery appears to operate normally while being unprotected from damaging conditions."
+    checklist={[
+      'Check BMS temperature readings via Bluetooth app or display',
+      'Compare BMS temperature reading to external thermometer on battery',
+      'If readings differ significantly (>10°C), BMS sensor may be faulty',
+      'Check BMS board for hot spots using infrared thermometer',
+      'Verify BMS current reading matches clamp meter measurement',
+      'Listen for buzzing or smell for burning near BMS board',
+      'Check BMS error logs for fault codes',
+    ]}
+    solutions={[
+      'Replace faulty BMS temperature sensor (match resistance and calibration)',
+      'Replace BMS if current sensor is inaccurate and cannot be recalibrated',
+      'Replace BMS MOSFETs or entire BMS board if MOSFETs have failed',
+      'Reset BMS to factory defaults if firmware bug is suspected',
+      'Update BMS firmware to latest version from manufacturer',
+      'For critical systems, install a secondary independent temperature monitor',
+      'Contact manufacturer for BMS replacement or repair under warranty',
+    ]}
+  />
+</ArticleLayout>

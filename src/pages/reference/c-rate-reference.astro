@@ -1,0 +1,124 @@
+---
+import ArticleLayout from '../../layouts/ArticleLayout.astro';
+import ReferenceTable from '../../components/ReferenceTable.astro';
+import ComparisonTable from '../../components/ComparisonTable.astro';
+import FAQSection from '../../components/FAQSection.astro';
+
+const relatedCalculators = [
+  { title: 'C-Rate Calculator', href: '/tools/c-rate-calculator', type: 'calculator' as const },
+  { title: 'Runtime Calculator', href: '/tools/runtime-calculator', type: 'calculator' as const },
+  { title: 'Charging Time Calculator', href: '/tools/charging-time-calculator', type: 'calculator' as const },
+  { title: 'Battery Sizing Calculator', href: '/tools/battery-sizing-calculator', type: 'calculator' as const },
+];
+
+const relatedGuides = [
+  { title: 'What is Battery C-Rate?', href: '/learn/what-is-battery-c-rate', type: 'guide' as const },
+  { title: 'Battery C-Rate Reference', href: '/learn/battery-c-rate-reference', type: 'guide' as const },
+  { title: 'Charger Sizing Guide', href: '/learn/charger-sizing-guide', type: 'guide' as const },
+];
+
+const faqItems = [
+  {
+    question: 'What does 1C mean for a 100Ah battery?',
+    answer: '1C for a 100Ah battery means a current of 100A. At this rate, the battery will fully discharge in approximately 1 hour. A 0.5C rate means 50A (2-hour discharge), and a 2C rate means 200A (30-minute discharge). The C-rate is the standard way to express charge and discharge speed relative to battery capacity.',
+  },
+  {
+    question: 'What C-rate is safe for LiFePO4 batteries?',
+    answer: 'Most LiFePO4 batteries are rated for 1C continuous discharge and 0.5C continuous charge. High-performance cells can handle 2C–3C discharge. Exceeding the rated C-rate causes excessive heating, accelerated degradation, and may trigger the BMS. Always check the manufacturer\'s specific C-rate ratings for your cells.',
+  },
+  {
+    question: 'How does C-rate affect battery capacity?',
+    answer: 'Higher C-rates reduce usable capacity due to Peukert\'s effect and increased internal losses. At 0.1C, a battery may deliver 100% of its rated capacity. At 1C, you might see 95–98%. At 5C, capacity can drop to 85–90%. This effect is more pronounced in lead-acid (Peukert exponent ~1.2) than in lithium (Peukert exponent ~1.01–1.05).',
+  },
+  {
+    question: 'What is the difference between charge C-rate and discharge C-rate?',
+    answer: 'Charge C-rate refers to the current used to charge the battery, while discharge C-rate refers to the current drawn during use. Most batteries accept charge at a lower rate than they can discharge — for example, LFP may charge at 0.5C but discharge at 2C. Charging at too high a C-rate causes lithium plating, heat generation, and safety risks.',
+  },
+  {
+    question: 'How do I calculate C-rate from amps?',
+    answer: 'C-rate = Current (A) ÷ Capacity (Ah). For a 200Ah battery being charged at 100A: C-rate = 100/200 = 0.5C. To find current from C-rate: Current = C-rate × Capacity. At 2C for a 200Ah battery: Current = 2 × 200 = 400A.',
+  },
+  {
+    question: 'Can I charge and discharge at different C-rates?',
+    answer: 'Yes, most batteries have different maximum charge and discharge C-rates. A typical LFP battery might accept 0.5C charge but support 2C discharge. NMC cells often allow 1C charge and 3C discharge. The BMS enforces these limits independently for charge and discharge protection.',
+  },
+];
+---
+
+<ArticleLayout
+  title="C-Rate Reference | Battery Calculators"
+  description="Complete C-rate reference table from 0.05C to 5C with discharge currents for 50Ah, 100Ah, 200Ah, and 300Ah batteries. Includes C-rate limits by battery chemistry."
+  category="REFERENCE"
+  categoryHref="/reference"
+  breadcrumbItems={[{ label: 'C-Rate Reference' }]}
+  relatedCalculators={relatedCalculators}
+  relatedGuides={relatedGuides}
+  faqItems={faqItems}
+>
+  <p class="text-body-md text-body font-light mb-8">
+    C-rate expresses charge and discharge speed relative to battery capacity. A 1C rate means the battery fully charges or discharges in one hour. This reference provides current values for common capacities at every standard C-rate, helping you size cables, fuses, and charge controllers.
+  </p>
+
+  <ReferenceTable
+    title="Discharge Current by C-Rate and Capacity"
+    description="Current in Amps for common battery capacities at standard C-rates."
+    headers={['C-Rate', '50Ah Battery', '100Ah Battery', '200Ah Battery', '300Ah Battery', 'Discharge Time']}
+    rows={[
+      ['0.05C', '2.5A', '5A', '10A', '15A', '~20 hours'],
+      ['0.1C', '5A', '10A', '20A', '30A', '~10 hours'],
+      ['0.2C', '10A', '20A', '40A', '60A', '~5 hours'],
+      ['0.5C', '25A', '50A', '100A', '150A', '~2 hours'],
+      ['1C', '50A', '100A', '200A', '300A', '~1 hour'],
+      ['2C', '100A', '200A', '400A', '600A', '~30 minutes'],
+      ['3C', '150A', '300A', '600A', '900A', '~20 minutes'],
+      ['5C', '250A', '500A', '1000A', '1500A', '~12 minutes'],
+    ]}
+    source="Standard C-rate definitions, IEC 61960"
+  />
+
+  <ReferenceTable
+    title="Charge Current by C-Rate and Capacity"
+    description="Typical charge currents for common battery capacities. Maximum charge rate varies by chemistry and manufacturer."
+    headers={['C-Rate', '50Ah Battery', '100Ah Battery', '200Ah Battery', '300Ah Battery', 'Charge Time (80%)']}
+    rows={[
+      ['0.05C', '2.5A', '5A', '10A', '15A', '~16 hours'],
+      ['0.1C', '5A', '10A', '20A', '30A', '~8 hours'],
+      ['0.2C', '10A', '20A', '40A', '60A', '~4 hours'],
+      ['0.5C', '25A', '50A', '100A', '150A', '~1.6 hours'],
+      ['1C', '50A', '100A', '200A', '300A', '~48 minutes'],
+      ['2C', '100A', '200A', '400A', '600A', '~24 minutes'],
+    ]}
+    source="Typical values, actual charge time varies by BMS profile and temperature"
+  />
+
+  <ComparisonTable
+    title="Maximum C-Rate Limits by Chemistry"
+    headers={['Chemistry', 'Max Charge C-Rate', 'Max Discharge C-Rate', 'Typical Continuous Discharge', 'Notes']}
+    rows={[
+      ['LiFePO4 (LFP)', '1C', '3C', '0.5–1C', 'Most common for solar and marine. Long cycle life at moderate C-rates.'],
+      ['NMC (Li-ion)', '1C', '3C', '1C', 'Higher energy density than LFP. Common in EVs and consumer electronics.'],
+      ['NCA (Li-ion)', '0.7C', '3C', '1C', 'Used in Tesla vehicles. High energy density but tighter thermal limits.'],
+      ['Lead-Acid (Flooded)', '0.15C', '3C', '0.25C', 'Peukert effect reduces capacity at high discharge rates significantly.'],
+      ['AGM Lead-Acid', '0.25C', '5C', '0.3C', 'Better high-rate performance than flooded. Lower internal resistance.'],
+      ['Gel Lead-Acid', '0.15C', '3C', '0.2C', 'Best deep-cycle performance among lead-acid. Sensitive to charge voltage.'],
+    ]}
+    highlightCol={3}
+    caption="C-rates are continuous ratings. Brief pulses may be higher. Always verify with manufacturer datasheet."
+  />
+
+  <ReferenceTable
+    title="C-Rate to Runtime Conversion"
+    description="Approximate discharge time for common C-rates accounting for Peukert losses."
+    headers={['C-Rate', 'Nominal Runtime', 'LFP Actual Runtime', 'NMC Actual Runtime', 'Lead-Acid Actual Runtime']}
+    rows={[
+      ['0.05C', '20 hours', '20 hours', '20 hours', '19 hours'],
+      ['0.1C', '10 hours', '10 hours', '10 hours', '9.2 hours'],
+      ['0.2C', '5 hours', '5 hours', '5 hours', '4.3 hours'],
+      ['0.5C', '2 hours', '2 hours', '2 hours', '1.5 hours'],
+      ['1C', '1 hour', '59 min', '59 min', '45 min'],
+      ['2C', '30 min', '29 min', '29 min', '18 min'],
+      ['5C', '12 min', '11.5 min', '11.5 min', '6 min'],
+    ]}
+    source="Peukert equation for lead-acid (exponent 1.2), minimal derating for lithium at moderate C-rates"
+  />
+</ArticleLayout>

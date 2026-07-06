@@ -6,6 +6,9 @@ import ResultBox from '../../components/ResultBox.astro';
 import FormulaBox from '../../components/FormulaBox.astro';
 import FAQSection from '../../components/FAQSection.astro';
 import RelatedTools from '../../components/RelatedTools.astro';
+import WorkedExample from '../../components/WorkedExample.astro';
+import ComparisonTable from '../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../components/EngineeringDiagram.astro';
 
 const whatIs = `A battery pack calculator designs series-parallel configurations from individual cells to achieve target voltage, capacity, and current specifications. <strong>Series connections</strong> increase voltage (cells stacked end-to-end), while <strong>parallel connections</strong> increase capacity (cells side-by-side). The SxP notation (e.g., 8S4P) describes the configuration: S = series count (sets voltage), P = parallel count (sets capacity). This tool calculates pack voltage, total capacity (Ah), energy (Wh/kWh), and maximum continuous current from cell-level specifications. Battery pack design is fundamental to EV battery modules, home energy storage systems, DIY powerwalls, marine propulsion banks, and custom portable power solutions.`;
 
@@ -221,34 +224,97 @@ const faqItems = [
         </p>
       </FormulaBox>
 
-      <div>
-        <h2 class="text-title-lg text-primary uppercase mb-6 tracking-wider">Worked Engineering Example</h2>
-        <div class="text-body-sm text-muted flex flex-col gap-4">
-          <p>Given cell parameters:</p>
-          <ul class="list-disc pl-6 flex flex-col gap-1">
-            <li><strong>Cell voltage:</strong> 3.2V (LFP) | <strong>Cell capacity:</strong> 100Ah</li>
-            <li><strong>Series count:</strong> 8 | <strong>Parallel count:</strong> 4</li>
-            <li><strong>Max current per cell:</strong> 50A</li>
-          </ul>
+      <div class="flex flex-col gap-8">
+        <WorkedExample
+          number={1}
+          title="48V 200Ah LFP Pack from 3.2V 100Ah Cells"
+          scenario="You need a 48V nominal battery pack for a residential solar system using LFP prismatic cells. Each cell is 3.2V nominal with 100Ah capacity."
+          inputs={[
+            { label: "Cell Voltage", value: "3.2V (LFP)" },
+            { label: "Cell Capacity", value: "100Ah" },
+            { label: "Target Pack Voltage", value: "48V nominal" },
+            { label: "Target Pack Capacity", value: "200Ah" },
+          ]}
+          steps={[
+            { label: "Step 1: Determine series count for 48V", formula: "S = 48V ÷ 3.2V = 15 → round up to 16S", result: "16S × 3.2V = 51.2V nominal" },
+            { label: "Step 2: Determine parallel count for 200Ah", formula: "P = 200Ah ÷ 100Ah = 2P", result: "2P × 100Ah = 200Ah" },
+            { label: "Step 3: Total cell count", formula: "16 × 2 = 32 cells", result: "32 cells required" },
+            { label: "Step 4: Pack energy", formula: "51.2V × 200Ah = 10,240 Wh", result: "10.24 kWh" },
+          ]}
+          answer="16S2P pack: 51.2V, 200Ah, 10.24 kWh from 32 × 100Ah LFP cells."
+          interpretation="This is a standard residential solar configuration. 16S LFP is the most common 48Vnom format — compatible with most 48V inverters and charge controllers."
+          variant="solar"
+        />
 
-          <p><strong>Step 1:</strong> Calculate pack voltage:</p>
-          <div class="font-mono text-primary">Pack Voltage = 3.2V × 8 = 25.6V</div>
+        <WorkedExample
+          number={2}
+          title="12V 50Ah Starter Battery from NMC Cells"
+          scenario="You're building a compact 12V starter battery for a marine application using 3.7V NMC cylindrical cells with 5Ah capacity each."
+          inputs={[
+            { label: "Cell Voltage", value: "3.7V (NMC)" },
+            { label: "Cell Capacity", value: "5Ah" },
+            { label: "Target Pack Voltage", value: "12V nominal" },
+            { label: "Target Pack Capacity", value: "50Ah" },
+          ]}
+          steps={[
+            { label: "Step 1: Determine series count for 12V", formula: "S = 12V ÷ 3.7V = 3.24 → round up to 4S", result: "4S × 3.7V = 14.8V nominal" },
+            { label: "Step 2: Determine parallel count for 50Ah", formula: "P = 50Ah ÷ 5Ah = 10P", result: "10P × 5Ah = 50Ah" },
+            { label: "Step 3: Total cell count", formula: "4 × 10 = 40 cells", result: "40 cells required" },
+            { label: "Step 4: Pack energy", formula: "14.8V × 50Ah = 740 Wh", result: "740 Wh" },
+          ]}
+          answer="4S10P pack: 14.8V, 50Ah, 740 Wh from 40 × 5Ah NMC cells."
+          interpretation="4S NMC provides 14.8V nominal which works well as a '12V' starter battery — the voltage range (12.0–16.8V) matches standard 12V charge profiles."
+          variant="marine"
+        />
 
-          <p><strong>Step 2:</strong> Calculate pack capacity:</p>
-          <div class="font-mono text-primary">Pack Capacity = 100Ah × 4 = 400Ah</div>
-
-          <p><strong>Step 3:</strong> Calculate pack energy:</p>
-          <div class="font-mono text-primary">Pack Energy = 25.6V × 400Ah = 10,240 Wh = 10.24 kWh</div>
-
-          <p><strong>Step 4:</strong> Calculate max continuous current:</p>
-          <div class="font-mono text-primary">Max Current = 50A × 4 = 200A</div>
-
-          <p><strong>Result:</strong> An 8S4P pack of 32 × 100Ah LFP cells delivers 25.6V, 400Ah, 10.24 kWh, with a 200A continuous discharge limit.</p>
-        </div>
-      </div>
+        <WorkedExample
+          number={3}
+          title="Scale a 24V Pack to 48V by Adding Series Cells"
+          scenario="You have an existing 24V (8S) LFP pack with 2 parallel strings (8S2P, 200Ah). You want to double the voltage to 48V by adding another 8 cells in series to each string."
+          inputs={[
+            { label: "Existing Configuration", value: "8S2P LFP (3.2V 100Ah cells)" },
+            { label: "Current Pack Voltage", value: "25.6V" },
+            { label: "Target Pack Voltage", value: "51.2V (16S)" },
+            { label: "Pack Capacity (unchanged)", value: "200Ah" },
+          ]}
+          steps={[
+            { label: "Step 1: Current pack specs", formula: "8S × 3.2V = 25.6V | 2P × 100Ah = 200Ah", result: "25.6V, 200Ah, 5,120 Wh" },
+            { label: "Step 2: Add 8 cells in series per string", formula: "8S → 16S | 16 × 3.2V = 51.2V", result: "New voltage: 51.2V" },
+            { label: "Step 3: Capacity unchanged (same parallel count)", formula: "2P × 100Ah = 200Ah", result: "Capacity stays 200Ah" },
+            { label: "Step 4: New energy", formula: "51.2V × 200Ah = 10,240 Wh", result: "Doubled from 5,120 Wh → 10,240 Wh" },
+          ]}
+          answer="8S2P → 16S2P: 51.2V, 200Ah, 10.24 kWh. Energy doubled by adding 16 cells in series."
+          interpretation="This is how most DIY builders scale voltage: add series cells to existing strings. The added cells must be identical to the originals. A new BMS rated for 16S is required."
+          variant="home"
+        />
 
     </div>
   </section>
+
+  <EngineeringDiagram
+    title="Battery Pack Series-Parallel Configuration"
+    description="Cells connected in series for voltage, parallel strings for capacity"
+    variant="system"
+    steps={[
+      { label: "Individual Cell", icon: "battery" },
+      { label: "Series String", icon: "battery" },
+      { label: "Parallel Group", icon: "battery" },
+      { label: "Pack Output", icon: "inverter" },
+    ]}
+  />
+
+  <ComparisonTable
+    title="Pack Configuration Impact"
+    headers={["Configuration", "Voltage", "Capacity", "Energy", "Use Case"]}
+    rows={[
+      ["8S1P (LFP)", "25.6V", "100 Ah", "2,560 Wh", "RV, small solar"],
+      ["16S1P (LFP)", "51.2V", "100 Ah", "5,120 Wh", "Residential solar"],
+      ["16S2P (LFP)", "51.2V", "200 Ah", "10,240 Wh", "Whole-home backup"],
+      ["7S3P (NMC)", "25.9V", "300 Ah", "7,770 Wh", "Marine house bank"],
+      ["14S1P (NMC)", "51.8V", "100 Ah", "5,180 Wh", "Telecom backup"],
+    ]}
+    caption="Common LFP and NMC pack configurations for different applications"
+  />
 
   <FAQSection items={faqItems} />
 

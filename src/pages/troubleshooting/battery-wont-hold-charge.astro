@@ -1,0 +1,180 @@
+---
+import ArticleLayout from '../../layouts/ArticleLayout.astro';
+import TroubleshootingBlock from '../../components/TroubleshootingBlock.astro';
+import FAQSection from '../../components/FAQSection.astro';
+
+const description = "Diagnose why your battery won't hold a charge. Covers cell imbalance, internal short circuits, high self-discharge, temperature damage, and calendar aging with step-by-step checklists.";
+
+const faqItems = [
+  {
+    question: "How do I know if my battery has excessive self-discharge?",
+    answer: "Fully charge the battery, then measure the voltage after 24–48 hours of rest at room temperature. A healthy LiFePO4 cell should lose less than 1% SOC per month. If voltage drops more than 0.1V per cell in a day, self-discharge is abnormally high.",
+  },
+  {
+    question: "Can a BMS fix cell imbalance over time?",
+    answer: "A passive balancing BMS can slowly equalize cells during the top charge phase, but it only shunts small currents (typically 50–200mA). Active balancing BMS units can move energy between cells more aggressively. Neither can recover a truly failed cell.",
+  },
+  {
+    question: "Is battery swelling a sign of internal short circuit?",
+    answer: "Yes. Swelling indicates gas generation inside the cell, which can result from internal micro-shorts, overcharging, or electrolyte decomposition. A swollen battery should be retired immediately and disposed of at a battery recycling facility.",
+  },
+  {
+    question: "How does calendar aging affect charge retention?",
+    answer: "All batteries degrade over time even when not used. LiFePO4 loses roughly 1–3% of capacity per year at 25°C. Lead-acid degrades faster, losing 5–15% per year. Storing batteries at high SOC and high temperature accelerates calendar aging significantly.",
+  },
+  {
+    question: "Can temperature exposure permanently damage a battery?",
+    answer: "Yes. Sustained temperatures above 45°C accelerate electrolyte decomposition and SEI layer growth, permanently reducing capacity. Freezing a charged lithium battery can cause internal short circuits as lithium plating forms during low-temperature charging.",
+  },
+];
+
+const relatedCalculators = [
+  { title: "Battery Runtime Calculator", href: "/tools/runtime-calculator", type: "calculator" as const },
+  { title: "SOC Estimator", href: "/tools/soc-estimator", type: "calculator" as const },
+  { title: "Battery Degradation Estimator", href: "/tools/battery-degradation-estimator", type: "calculator" as const },
+];
+
+const relatedGuides = [
+  { title: "LiFePO4 Voltage Chart", href: "/learn/lifepo4-voltage-chart", type: "guide" as const },
+  { title: "How Long Will My Solar Battery Last", href: "/learn/how-long-will-my-solar-battery-last", type: "guide" as const },
+];
+---
+
+<ArticleLayout
+  title="Battery Won't Hold Charge — Troubleshooting Guide | Battery Calculators"
+  description={description}
+  category="TROUBLESHOOTING"
+  categoryHref="/troubleshooting"
+  breadcrumbItems={[{ label: "Battery Won't Hold Charge" }]}
+  relatedCalculators={relatedCalculators}
+  relatedGuides={relatedGuides}
+  faqItems={faqItems}
+>
+  <p class="text-body-md text-body font-light mb-8">
+    A battery that loses charge quickly — even when idle — typically suffers from one of five root causes: cell imbalance, an internal short, excessive self-discharge, thermal damage, or simple calendar aging. This guide walks you through each possibility with diagnostic checklists and solutions.
+  </p>
+
+  <TroubleshootingBlock
+    problem="Cell Imbalance"
+    causes={[
+      "Individual cells in the pack have drifted to different SOC levels over time",
+      "Passive balancing BMS cannot equalize large SOC differences",
+      "One or more cells have higher self-discharge than the rest",
+      "Pack was assembled from mismatched cells or different production batches",
+    ]}
+    explanation="In a series-connected battery pack, the total voltage is the sum of all cell voltages. If cells are imbalanced, the BMS must truncate charge or discharge when the weakest cell hits a limit — even though other cells still have usable energy. A cell at 3.5V alongside one at 3.2V means the pack effectively has less usable capacity than its rating suggests."
+    checklist={[
+      "Measure individual cell voltages with a multimeter after a full charge",
+      "Compare cell voltages — any cell more than 0.05V from the average indicates imbalance",
+      "Check if the BMS balance function is active during the final stage of charging",
+      "Record cell voltages at 50% SOC to confirm the imbalance persists across the range",
+      "Note if imbalance worsens after deep discharge cycles",
+    ]}
+    solutions={[
+      "Perform a full charge cycle with the BMS balancing enabled — this may take 24–48 hours for passive balancing",
+      "Use an external cell balizer to equalize cells before reassembling the pack",
+      "Replace any cell that cannot be balanced within 0.03V of the others after a full cycle",
+      "Ensure all cells in the pack are from the same manufacturer, batch, and capacity rating",
+    ]}
+  />
+
+  <TroubleshootingBlock
+    problem="Internal Short Circuit"
+    causes={[
+      "Dendrite growth piercing the separator between electrodes",
+      "Manufacturing defect allowing metal particle contamination",
+      "Physical damage from dropping, crushing, or puncture",
+      "Overcharging causing lithium plating that eventually bridges the separator",
+    ]}
+    explanation="An internal micro-short creates a parasitic current path that slowly drains the cell. The cell may still accept a full charge but will lose voltage noticeably faster than expected. In severe cases, the cell warms up during rest and the voltage drops rapidly. Internal shorts are a safety concern and can escalate to thermal runaway."
+    checklist={[
+      "Charge the battery fully, then measure voltage every hour for 12 hours at rest",
+      "Compare the discharge rate against the manufacturer's self-discharge specification",
+      "Feel for localized warmth on the battery casing during rest — an internal short generates heat",
+      "Check if the cell voltage drops below 2.5V within days of a full charge",
+      "Inspect the battery for any signs of physical damage, dents, or punctures",
+    ]}
+    solutions={[
+      "If internal short is confirmed, retire the battery immediately — do not attempt to recharge",
+      "For minor self-discharge, attempt a full charge followed by a controlled deep discharge to recalibrate",
+      "Replace the affected cell(s) rather than the entire pack if individual access is possible",
+      "Document the failure for warranty claims with the manufacturer",
+    ]}
+  />
+
+  <TroubleshootingBlock
+    problem="High Self-Discharge Rate"
+    causes={[
+      "Electrolyte decomposition producing internal gas and resistive byproducts",
+      "Contamination on the electrode surface creating micro-current paths",
+      "Separator degradation allowing ion crossover between electrodes",
+      "Excessive temperature during storage accelerating chemical side reactions",
+    ]}
+    explanation="All batteries self-discharge to some degree. Lead-acid batteries lose 5–15% per month; LiFePO4 cells typically lose less than 3% per month. If a battery loses significantly more than its rated self-discharge rate, internal chemical degradation is accelerating. This is often irreversible and worsens over time."
+    checklist={[
+      "Fully charge the battery and record the exact voltage and date",
+      "Store at room temperature (20–25°C) for 30 days without connecting any load",
+      "Measure voltage again and calculate SOC loss using the voltage-SOC relationship",
+      "Compare the measured loss to the manufacturer's self-discharge specification",
+      "Repeat the test to confirm the rate is consistent — increasing self-discharge indicates progressive degradation",
+    ]}
+    solutions={[
+      "If self-discharge exceeds specification by less than 2×, monitor monthly — some cells stabilize",
+      "Store batteries at 50% SOC in a cool environment to minimize further degradation",
+      "Replace batteries where self-discharge exceeds 5% per month — this indicates internal damage",
+      "For lead-acid, perform an equalization charge to reduce sulfation-induced self-discharge",
+    ]}
+  />
+
+  <TroubleshootingBlock
+    problem="Temperature Exposure Damage"
+    causes={[
+      "Storage or operation above 45°C for extended periods",
+      "Charging a frozen battery below 0°C causing lithium plating",
+      "Repeated thermal cycling creating mechanical stress on electrodes",
+      "Direct sunlight exposure on batteries in outdoor installations",
+    ]}
+    explanation="High temperatures accelerate all degradation mechanisms in a battery. The electrolyte decomposes faster, the solid-electrolyte interphase (SEI) layer grows thicker, and active material is lost from the electrodes. Charging below 0°C is particularly dangerous because lithium ions cannot intercalate fast enough and deposit as metallic lithium on the anode — permanently reducing capacity and creating internal short-circuit risk."
+    checklist={[
+      "Check the maximum temperature the battery has experienced — most batteries have a data logger or temperature history",
+      "Inspect for any discoloration, warping, or swelling of the battery casing",
+      "Measure capacity using a controlled discharge test and compare to the rated capacity",
+      "Check if performance degrades more noticeably in cold or hot conditions",
+      "Review the installation environment for heat sources, poor ventilation, or direct sun exposure",
+    ]}
+    solutions={[
+      "Move the battery to a cooler location with good ventilation and away from heat sources",
+      "Install active cooling or heating to maintain the battery within its optimal temperature range (15–30°C)",
+      "Replace batteries that have lost more than 20% of rated capacity due to thermal damage",
+      "Never charge a lithium battery below 0°C — ensure the BMS has a low-temperature charge lockout",
+    ]}
+  />
+
+  <TroubleshootingBlock
+    problem="Calendar Aging"
+    causes={[
+      "Natural chemical degradation over time even without use",
+      "Storing at high SOC (100%) accelerating capacity fade",
+      "Storing in warm environments compounding calendar aging effects",
+      "Battery has reached or exceeded its expected service life",
+    ]}
+    explanation="Calendar aging is the unavoidable capacity loss that occurs simply from the passage of time. Even a battery sitting on a shelf degrades because the electrolyte slowly reacts with the electrode surfaces. This effect is accelerated by high SOC and high temperature. LiFePO4 chemistry has excellent calendar life (10+ years at 50% SOC, 25°C), while lead-acid batteries degrade significantly within 3–5 years."
+    checklist={[
+      "Determine the battery's age from the manufacture date label or purchase receipt",
+      "Perform a capacity test using a controlled discharge at 0.2C rate and compare to the rated capacity",
+      "Check the storage conditions — high SOC and high temperature dramatically shorten calendar life",
+      "Compare expected calendar life for your chemistry: LiFePO4 (10–15 years), lead-acid (3–5 years), NMC (5–8 years)",
+      "Note if the battery has been stored unused for extended periods — calendar aging continues without use",
+    ]}
+    solutions={[
+      "For batteries within 80% of rated capacity, continue use but plan for replacement",
+      "Store future batteries at 40–60% SOC in the coolest available location to extend calendar life",
+      "Replace batteries that have fallen below 70% of rated capacity — they will continue to degrade rapidly",
+      "Consider upgrading from lead-acid to LiFePO4 for applications requiring long calendar life",
+    ]}
+  />
+
+  <p class="text-caption text-muted border-t border-hairline pt-8 mt-12">
+    <strong>Disclaimer:</strong> This guide is for educational and diagnostic purposes only. Battery troubleshooting involves electrical hazards. Always follow the manufacturer's safety procedures, wear appropriate PPE, and consult a qualified technician before attempting repairs. Never attempt to open or disassemble a sealed battery cell.
+  </p>
+</ArticleLayout>

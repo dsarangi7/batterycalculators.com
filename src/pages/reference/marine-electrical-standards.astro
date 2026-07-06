@@ -1,0 +1,132 @@
+---
+import ArticleLayout from '../../layouts/ArticleLayout.astro';
+import ReferenceTable from '../../components/ReferenceTable.astro';
+import ComparisonTable from '../../components/ComparisonTable.astro';
+import FAQSection from '../../components/FAQSection.astro';
+
+const relatedCalculators = [
+  { title: 'Marine Battery Sizing Calculator', href: '/tools/marine-battery-sizing-calculator', type: 'calculator' as const },
+  { title: 'Voltage Drop Calculator', href: '/tools/voltage-drop-calculator', type: 'calculator' as const },
+  { title: 'DC Cable Loss Calculator', href: '/tools/dc-cable-loss-calculator', type: 'calculator' as const },
+  { title: 'Runtime Calculator', href: '/tools/runtime-calculator', type: 'calculator' as const },
+];
+
+const relatedGuides = [
+  { title: 'Marine Battery Sizing Guide', href: '/learn/marine-battery-sizing-guide', type: 'guide' as const },
+  { title: 'Best Battery Chemistry for Marine', href: '/learn/best-battery-chemistry-for-marine', type: 'guide' as const },
+  { title: 'Marine Hotel Load Guide', href: '/learn/marine-hotel-load-guide', type: 'guide' as const },
+];
+
+const faqItems = [
+  {
+    question: 'What cable type is required for marine DC systems?',
+    answer: 'ABYC E-11 requires tinned copper wire for all marine DC installations. Tinned copper resists corrosion from salt air and moisture. Standard automotive (bare copper) wire is not acceptable. All cables must be USCG Type S or equivalent rated for marine use. Use marine-grade heat-shrink and waterproof connectors throughout.',
+  },
+  {
+    question: 'What is the maximum voltage drop allowed for marine circuits?',
+    answer: 'ABYC E-11 specifies a maximum 10% voltage drop for non-critical branch circuits and 3% for critical circuits (navigation lights, bilge pumps, fire detection). For DC charging circuits, 3% is recommended. Calculate voltage drop using the formula: VD = (2 × L × I × R) / 1000, where L is one-way cable length in feet, I is current in amps, and R is resistance in ohms per 1000 feet.',
+  },
+  {
+    question: 'Are fuses required on marine battery circuits?',
+    answer: 'Yes. ABYC E-11 requires overcurrent protection on all ungrounded conductors. Fuses must be placed within 7 inches (178mm) of the battery positive terminal, or the cable between the battery and fuse must be in a fully enclosed raceway. Fuse rating must not exceed the cable\'s ampacity. ANL, MRBF, and Class T fuses are commonly used marine battery fuses.',
+  },
+  {
+    question: 'Do marine batteries need to be in a ventilated compartment?',
+    answer: 'Flooded lead-acid batteries require ventilation because they produce hydrogen gas during charging. The compartment must have at least 1 square inch of vent area per 30 amp-hours of battery capacity, located at the top of the compartment. Sealed AGM, gel, and lithium batteries do not require ventilation for gas, but temperature ventilation is still recommended.',
+  },
+  {
+    question: 'What grounding is required for marine battery systems?',
+    answer: 'ABYC E-11 requires a common DC ground bus connected to the engine block and DC negative bus. The negative battery terminal connects to this bus. Equipment grounding conductors connect all DC equipment to the ground bus. A bonding system connects all metallic through-hulls and underwater metals. The DC system should NOT be connected to the AC safety ground except at a single bonding point.',
+  },
+  {
+    question: 'Can I use lithium batteries on a boat?',
+    answer: 'Yes, lithium batteries (especially LiFePO4) are widely used in marine applications. They must meet USCG and ABYC requirements for overcurrent protection, ventilation (if required by local authority), and mounting. The BMS must be capable of disconnecting the battery in case of fault. Some marinas and harbors have specific lithium battery installation requirements — check local regulations.',
+  },
+];
+---
+
+<ArticleLayout
+  title="Marine Electrical Standards Reference | Battery Calculators"
+  description="Marine electrical standards reference: ISO 13297, ABYC E-11, and USCG 33 CFR 183 requirements for DC systems, cable sizing, fusing, grounding, and ventilation on boats and vessels."
+  category="REFERENCE"
+  categoryHref="/reference"
+  breadcrumbItems={[{ label: 'Marine Electrical Standards' }]}
+  relatedCalculators={relatedCalculators}
+  relatedGuides={relatedGuides}
+  faqItems={faqItems}
+>
+  <p class="text-body-md text-body font-light mb-8">
+    Marine electrical systems must comply with rigorous standards to prevent fires, corrosion, and electrical shock in the harsh marine environment. This reference covers the three primary standards governing marine DC electrical systems: ISO 13297 (international), ABYC E-11 (North American), and USCG 33 CFR 183 (federal regulations).
+  </p>
+
+  <ReferenceTable
+    title="Marine Electrical Standards Comparison"
+    description="Key requirements across the three primary marine electrical standards."
+    headers={['Requirement', 'ISO 13297', 'ABYC E-11', 'USCG 33 CFR 183']}
+    rows={[
+      ['Wire Type', 'Tinned copper', 'Tinned copper', 'Tinned copper (Type S)'],
+      ['Voltage Drop Limit (DC)', '≤ 3% (propulsion)', '≤ 3% critical, ≤ 10% non-critical', '≤ 3% (propulsion)'],
+      ['Overcurrent Protection', 'Required on ungrounded conductors', 'Required within 7" of battery', 'Required on ungrounded conductors'],
+      ['Fusing Location', 'Within 7" of battery', 'Within 7" of battery or in raceway', 'Within 7" of battery'],
+      ['Negative Return', 'Common negative bus', 'Common negative bus', 'Negative bus to engine block'],
+      ['Grounding', 'Equipment grounding required', 'Common ground bus required', 'Bonding to engine block'],
+      ['Ventilation (Flooded)', 'Required for flooded batteries', '1 sq in / 30Ah at top', 'Required for flooded batteries'],
+      ['Labeling', 'Circuit labels required', 'Circuit labels at panel', 'Circuit labels required'],
+      ['Connector Type', 'Marine-grade, waterproof', 'Marine-grade, heat-shrink', 'Marine-grade'],
+      ['Insulation Rating', '≥ 600V', '≥ 600V', '≥ 600V'],
+    ]}
+    source="ISO 13297:2014, ABYC E-11-2023, USCG 33 CFR Part 183"
+  />
+
+  <ComparisonTable
+    title="Cable Sizing Requirements by Marine Application"
+    headers={['Application', 'Max Voltage Drop', 'Typical Cable Size', 'Fuse/Breaker Rating', 'Notes']}
+    rows={[
+      ['Engine Starting', '10%', '2/0 – 4/0 AWG', '200–400A ANL', 'Short cable run, high current'],
+      ['Bow Thruster', '3%', '2/0 – 4/0 AWG', '150–300A ANL', 'High intermittent current'],
+      ['Navigation Lights', '3%', '14 – 12 AWG', '5–10A blade', 'Critical safety circuit'],
+      ['Bilge Pump', '10%', '14 – 12 AWG', '10–15A blade', 'Non-critical but must operate'],
+      ['Fish Finder / GPS', '3%', '14 – 10 AWG', '5–10A blade', 'Sensitive electronics'],
+      ['VHF Radio', '3%', '10 – 8 AWG', '15–25A blade', 'Emergency communication'],
+      ['Refrigerator', '5%', '10 – 8 AWG', '15–20A blade', 'Continuous load, efficiency matters'],
+      ['DC Battery Charger', '3%', 'Per charger rating', 'Per charger spec', 'Match cable to charger output'],
+      ['Windlass', '5%', '2/0 – 4/0 AWG', '150–300A ANL', 'Very high current, short duration'],
+      ['Inverter (≤ 3kW)', '3%', '4/0 AWG', '200–300A Class T', 'Continuous high current'],
+      ['Inverter (3–10kW)', '3%', 'Bus bars', '400–600A Class T', 'Consider 24V or 48V system'],
+    ]}
+    highlightCol={2}
+    caption="Cable sizes assume copper conductors at 75°C. Adjust for ambient temperature and bundling per ABYC E-11."
+  />
+
+  <ReferenceTable
+    title="Wire Ampacity Derating Factors"
+    description="Apply these derating factors to cable ampacity tables for marine conditions."
+    headers={['Condition', 'Derating Factor', 'Example', 'Notes']}
+    rows={[
+      ['Ambient 30°C (86°F)', '1.00', 'No adjustment', 'Base condition'],
+      ['Ambient 40°C (104°F)', '0.88', '100A cable → 88A', 'Reduce ampacity by 12%'],
+      ['Ambient 50°C (122°F)', '0.75', '100A cable → 75A', 'Reduce ampacity by 25%'],
+      ['3 conductors in bundle', '0.95', '100A cable → 95A', 'Minor derating'],
+      ['4–6 conductors in bundle', '0.85', '100A cable → 85A', 'Moderate derating'],
+      ['7–24 conductors in bundle', '0.70', '100A cable → 70A', 'Significant derating'],
+      ['Submerged (below waterline)', '0.85', '100A cable → 85A', 'Reduced heat dissipation'],
+    ]}
+    source="ABYC E-11 Table V, NEC Chapter 9 Table 310.15(B)(16)"
+  />
+
+  <ReferenceTable
+    title="Marine Battery Fuse Ratings"
+    description="Recommended fuse types and ratings for common marine battery configurations."
+    headers={['Battery Capacity', 'Typical Discharge Current', 'Recommended Fuse', 'Fuse Rating', 'Notes']}
+    rows={[
+      ['50Ah 12V', '25–50A', 'ANL', '60A', 'Small boats, day boats'],
+      ['100Ah 12V', '50–100A', 'ANL', '100–150A', 'Cruisers, fishing boats'],
+      ['200Ah 12V', '100–200A', 'ANL / MRBF', '150–200A', 'Larger cruisers, trawlers'],
+      ['300Ah 12V', '150–300A', 'MRBF / Class T', '200–300A', 'Large yachts, liveaboards'],
+      ['400Ah 12V', '200–400A', 'Class T', '300–400A', 'Megayachts, commercial'],
+      ['100Ah 24V', '50–100A', 'ANL', '80–120A', '24V systems half the current'],
+      ['200Ah 48V', '100–200A', 'Class T', '150–250A', '48V systems quarter the current'],
+    ]}
+    source="ABYC E-11, manufacturer fuse selection guides"
+  />
+</ArticleLayout>

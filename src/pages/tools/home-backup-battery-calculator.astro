@@ -6,6 +6,9 @@ import ResultBox from '../../components/ResultBox.astro';
 import FormulaBox from '../../components/FormulaBox.astro';
 import FAQSection from '../../components/FAQSection.astro';
 import MiniSimulationChart from '../../components/MiniSimulationChart.astro';
+import WorkedExample from '../../components/WorkedExample.astro';
+import ComparisonTable from '../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../components/EngineeringDiagram.astro';
 
 const whatIs = `A home backup battery calculator determines the battery bank capacity needed to power critical household loads during grid outages. It separates essential loads—refrigerator, lighting, medical devices, communication equipment—from non-essential loads like air conditioning and electric stoves. The calculator accounts for inverter efficiency losses, chemistry-specific depth-of-discharge limits, and runtime targets. Whether you're preparing for storm season or building a whole-home solar+storage system, this tool sizes the battery bank to maintain comfort and safety during extended outages.`;
 
@@ -257,26 +260,108 @@ const relatedCalculators = [
         </p>
       </FormulaBox>
 
-      <div>
-        <h2 class="text-title-lg text-primary uppercase mb-6 tracking-wider">Worked Example</h2>
-        <div class="text-body-sm text-muted flex flex-col gap-4">
-          <p>Given: 2,000W critical load, 12-hour backup, 48V LFP battery, 90% inverter efficiency</p>
+      <WorkedExample
+        number={1}
+        title="Essential Loads Backup"
+        scenario="Powering fridge, lights, and internet router during an 8-hour overnight outage"
+        inputs={[
+          { label: "Fridge", value: "150W" },
+          { label: "LED Lights (×4)", value: "200W" },
+          { label: "Internet Router", value: "20W" },
+          { label: "Phone Charging", value: "30W" },
+          { label: "Total Load", value: "400W" },
+          { label: "Backup Duration", value: "8 hours" },
+          { label: "Battery Voltage", value: "48V LFP" },
+          { label: "Inverter Efficiency", value: "90%" },
+        ]}
+        steps={[
+          "Raw energy needed: 400W × 8h = 3,200 Wh",
+          "Adjust for DoD (90%) and inverter (90%): 3,200 / (0.90 × 0.90) = 3,951 Wh",
+          "Convert to Ah: 3,951 Wh / 48V = 82.3 Ah",
+        ]}
+        answer="A 48V 85 Ah LFP battery (≈4.0 kWh) provides 8+ hours of backup for essential overnight loads."
+        interpretation="Fridge duty cycling means actual consumption is lower than continuous rating—compressor runs ~40% of the time. Real runtime may extend to 10–12 hours."
+        variant="home"
+      />
 
-          <p><strong>Step 1:</strong> Calculate raw energy needed:</p>
-          <div class="font-mono text-primary">Raw = 2,000W × 12h = 24,000 Wh</div>
+      <WorkedExample
+        number={2}
+        title="Full Home Backup — 24 Hours"
+        scenario="Moderate household loads including fridge, lighting, TV, internet, and laundry over a full day"
+        inputs={[
+          { label: "Fridge", value: "150W" },
+          { label: "Lights", value: "300W" },
+          { label: "TV", value: "120W" },
+          { label: "Internet + Router", value: "40W" },
+          { label: "Phone/Laptop Charging", value: "100W" },
+          { label: "Washing Machine", value: "500W (2h)" },
+          { label: "Average Total", value: "1,200W" },
+          { label: "Backup Duration", value: "24 hours" },
+          { label: "Battery Voltage", value: "48V LFP" },
+          { label: "Inverter Efficiency", value: "90%" },
+        ]}
+        steps={[
+          "Total daily energy: (150×24) + (300×10) + (120×6) + (40×24) + (100×4) + (500×2) = 3,600 + 3,000 + 720 + 960 + 400 + 1,000 = 9,680 Wh",
+          "Adjust for DoD and inverter losses: 9,680 / (0.90 × 0.90) = 11,951 Wh",
+          "Convert to Ah: 11,951 / 48 = 249.0 Ah",
+        ]}
+        answer="A 48V 250 Ah LFP battery bank (≈12.0 kWh) provides full 24-hour backup for a moderate household."
+        interpretation="Accounting for duty cycles and non-continuous loads, 12 kWh covers a typical day. For cloudy days without solar recharge, plan 15 kWh for margin."
+        variant="home"
+      />
 
-          <p><strong>Step 2:</strong> Adjust for DoD and inverter losses:</p>
-          <div class="font-mono text-primary">Required = 24,000 / (0.90 × 0.90) = 29,630 Wh</div>
-
-          <p><strong>Step 3:</strong> Convert to Amp-hours:</p>
-          <div class="font-mono text-primary">Ah = 29,630 Wh / 48V = 617.3 Ah</div>
-
-          <p><strong>Result:</strong> A 48V 620 Ah LFP battery bank provides 29.76 kWh, delivering 12+ hours of backup for your 2,000W critical loads.</p>
-        </div>
-      </div>
+      <WorkedExample
+        number={3}
+        title="Critical Medical Equipment — 48 Hours"
+        scenario="Oxygen concentrator, CPAP, security system, and communication devices for a 2-day outage"
+        inputs={[
+          { label: "Oxygen Concentrator", value: "350W" },
+          { label: "CPAP Machine", value: "100W" },
+          { label: "Security System", value: "50W" },
+          { label: "Router + Modem", value: "40W" },
+          { label: "Emergency Lighting", value: "100W" },
+          { label: "Phone Charging", value: "30W" },
+          { label: "Total Load", value: "670W" },
+          { label: "Backup Duration", value: "48 hours" },
+          { label: "Battery Voltage", value: "48V LFP" },
+          { label: "Inverter Efficiency", value: "90%" },
+        ]}
+        steps={[
+          "Raw energy: 670W × 48h = 32,160 Wh",
+          "Adjust for DoD (90%) and inverter (90%): 32,160 / (0.90 × 0.90) = 39,704 Wh",
+          "Convert to Ah: 39,704 / 48 = 827.2 Ah",
+        ]}
+        answer="A 48V 830 Ah LFP battery bank (≈39.8 kWh) provides 48-hour runtime for critical medical equipment."
+        interpretation="Medical loads are continuous and non-negotiable. A 40 kWh system (or two parallel Powerwalls) ensures life-sustaining equipment stays powered through extended outages."
+        variant="home"
+      />
 
     </div>
   </section>
+
+  <EngineeringDiagram
+    title="Home Battery Backup System"
+    description="Solar panels charge batteries which power essential home loads through an inverter"
+    variant="system"
+    steps={[
+      { label: "Solar Panels", icon: "solar" },
+      { label: "Charge Controller", icon: "charge" },
+      { label: "Battery Bank", icon: "battery" },
+      { label: "Inverter + Loads", icon: "inverter" },
+    ]}
+  />
+
+  <ComparisonTable
+    title="Home Backup — Load Priority Tiers"
+    headers={["Tier", "Loads", "Typical Power", "Runtime Target", "Battery Size"]}
+    rows={[
+      ["Critical", "Fridge, medical, security, comms", "500–800W", "24–72 hours", "5–15 kWh"],
+      ["Essential", "+ lights, internet, phone charging", "1,000–1,500W", "12–24 hours", "10–25 kWh"],
+      ["Comfort", "+ TV, washing machine, cooking", "2,000–4,000W", "8–12 hours", "20–40 kWh"],
+      ["Whole Home", "All circuits except heavy HVAC", "5,000–8,000W", "8–24 hours", "30–60 kWh"],
+    ]}
+    caption="Tiered approach to home battery backup sizing"
+  />
 
   <FAQSection items={faqItems} />
 

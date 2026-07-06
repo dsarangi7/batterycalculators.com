@@ -6,6 +6,9 @@ import ResultBox from '../../components/ResultBox.astro';
 import FormulaBox from '../../components/FormulaBox.astro';
 import FAQSection from '../../components/FAQSection.astro';
 import RelatedTools from '../../components/RelatedTools.astro';
+import WorkedExample from '../../components/WorkedExample.astro';
+import ComparisonTable from '../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../components/EngineeringDiagram.astro';
 
 const whatIs = `The Vessel Energy Storage Calculator estimates the required battery energy storage capacity for marine hybrid and electric propulsion systems. It accounts for hotel loads, propulsion power, peak demands, operating profiles, and battery chemistry to determine usable capacity, installed capacity, physical dimensions, and optimal DC system voltage. This tool bridges the gap between load profile analysis and practical battery system specification for vessel designers, marine engineers, and project managers evaluating electrification options.`;
 
@@ -297,35 +300,78 @@ const chemistryOptions = [
         </p>
       </FormulaBox>
 
-      <div>
-        <h2 class="text-title-lg text-primary uppercase mb-6 tracking-wider">Worked Engineering Example</h2>
-        <div class="text-body-sm text-muted flex flex-col gap-4">
-          <p>Given vessel parameters:</p>
-          <ul class="list-disc pl-6 flex flex-col gap-1">
-            <li><strong>Hotel load:</strong> 200 kW | <strong>Propulsion:</strong> 500 kW | <strong>Peak:</strong> 900 kW</li>
-            <li><strong>Operating time:</strong> 4 hours | <strong>Reserve:</strong> 20%</li>
-            <li><strong>Chemistry:</strong> LFP (90% DoD, 6.5 kg/kWh)</li>
-          </ul>
+      <div class="flex flex-col gap-8">
+        <WorkedExample
+          number={1}
+          title="Short-Route Ferry with Hotel Load"
+          scenario="A 120-passenger ferry operates an 8-hour round-trip crossing with a 2 MW continuous hotel load (HVAC, lighting, galley, passenger services). The vessel must operate entirely on battery power during crossing with 20% reserve margin."
+          inputs={[
+            { label: "Hotel load", value: "2,000 kW" },
+            { label: "Propulsion load", value: "0 kW (hotel-only mode)" },
+            { label: "Peak load", value: "2,400 kW" },
+            { label: "Operating time", value: "8 hours" },
+            { label: "Reserve margin", value: "20%" },
+            { label: "Chemistry", value: "LFP (90% DoD, 6.5 kg/kWh)" },
+          ]}
+          steps={[
+            { label: "Step 1: Daily energy demand", formula: "Daily = 2,000 × 8", result: "16,000 kWh" },
+            { label: "Step 2: Apply reserve margin", formula: "Usable = 16,000 × 1.20", result: "19,200 kWh" },
+            { label: "Step 3: Installed capacity (LFP 90% DoD)", formula: "Installed = 19,200 / 0.90", result: "21,333 kWh" },
+            { label: "Step 4: Battery weight", formula: "Weight = 21,333 × 6.5", result: "138,667 kg ≈ 139 tonnes" },
+            { label: "Step 5: DC voltage", formula: "Peak 2,400 kW → 600V → I = 4,000 A", result: "600 V DC" },
+          ]}
+          answer="21,333 kWh LFP system, ~139 tonnes, at 600V DC"
+          interpretation="A large ferry with 8-hour crossings requires substantial battery capacity. At 139 tonnes, battery weight is significant but manageable for a vessel of this class. Shore-side fast charging between voyages is typically required to recharge within turnaround time."
+          variant="marine"
+        />
 
-          <p><strong>Step 1:</strong> Calculate daily energy demand:</p>
-          <div class="font-mono text-primary">Daily = (200 + 500) × 4 = 2,800 kWh</div>
+        <WorkedExample
+          number={2}
+          title="Tugboat with Peak Maneuvering Loads"
+          scenario="A harbor tug with 500 kW peak bollard pull demand operates intermittently, averaging 200 kW over a typical work cycle. The battery must handle full peak loads during ship-handling maneuvers while recharging between operations."
+          inputs={[
+            { label: "Hotel load", value: "50 kW" },
+            { label: "Average propulsion load", value: "200 kW" },
+            { label: "Peak load", value: "500 kW" },
+            { label: "Operating time", value: "6 hours/day" },
+            { label: "Reserve margin", value: "25%" },
+            { label: "Chemistry", value: "LFP (90% DoD, 6.5 kg/kWh)" },
+          ]}
+          steps={[
+            { label: "Step 1: Daily energy demand", formula: "Daily = (50 + 200) × 6", result: "1,500 kWh" },
+            { label: "Step 2: Apply reserve margin", formula: "Usable = 1,500 × 1.25", result: "1,875 kWh" },
+            { label: "Step 3: Installed capacity (LFP 90% DoD)", formula: "Installed = 1,875 / 0.90", result: "2,083 kWh" },
+            { label: "Step 4: Battery weight", formula: "Weight = 2,083 × 6.5", result: "13,542 kg ≈ 13.5 tonnes" },
+            { label: "Step 5: DC voltage", formula: "Peak 500 kW → 600V → I = 833 A", result: "600 V DC" },
+          ]}
+          answer="2,083 kWh LFP system, ~13.5 tonnes, at 600V DC"
+          interpretation="Tugs require high power-to-energy ratios. The 500 kW peak drives voltage selection rather than energy capacity. Battery is sized for average load with reserve for peak maneuvering bursts. Opportunity charging between jobs keeps installed capacity manageable."
+          variant="marine"
+        />
 
-          <p><strong>Step 2:</strong> Apply reserve margin:</p>
-          <div class="font-mono text-primary">Usable = 2,800 × 1.20 = 3,360 kWh</div>
-
-          <p><strong>Step 3:</strong> Calculate installed capacity (LFP 90% DoD):</p>
-          <div class="font-mono text-primary">Installed = 3,360 / 0.90 = 3,733 kWh</div>
-
-          <p><strong>Step 4:</strong> Estimate physical parameters:</p>
-          <div class="font-mono text-primary">Weight = 3,733 × 6.5 = 24,267 kg</div>
-          <div class="font-mono text-primary">Volume = 3,733 × 6.8 = 25,382 L ≈ 25.4 m³</div>
-
-          <p><strong>Step 5:</strong> Determine DC system voltage:</p>
-          <div class="font-mono text-primary">Peak 900 kW → 400V recommended → I = 2,250 A</div>
-
-          <p><strong>Result:</strong> A 3,733 kWh LFP battery system weighing ~24.3 tonnes in ~25.4 m³ at 400V DC provides 4 hours of full hotel and propulsion power with 20% reserve margin.</p>
-        </div>
-      </div>
+        <WorkedExample
+          number={3}
+          title="Offshore Vessel with Dynamic Positioning"
+          scenario="An offshore supply vessel requires dynamic positioning (DP) capability with simultaneous hotel, propulsion, and thruster loads. DP operations demand high instantaneous power for station-keeping while hotel loads remain constant."
+          inputs={[
+            { label: "Hotel load", value: "400 kW" },
+            { label: "Propulsion load", value: "800 kW" },
+            { label: "Peak DP load (thrusters)", value: "3,200 kW" },
+            { label: "Operating time", value: "12 hours" },
+            { label: "Reserve margin", value: "25%" },
+            { label: "Chemistry", value: "NMC (80% DoD, 5.0 kg/kWh)" },
+          ]}
+          steps={[
+            { label: "Step 1: Daily energy demand", formula: "Daily = (400 + 800) × 12", result: "14,400 kWh" },
+            { label: "Step 2: Apply reserve margin", formula: "Usable = 14,400 × 1.25", result: "18,000 kWh" },
+            { label: "Step 3: Installed capacity (NMC 80% DoD)", formula: "Installed = 18,000 / 0.80", result: "22,500 kWh" },
+            { label: "Step 4: Battery weight", formula: "Weight = 22,500 × 5.0", result: "112,500 kg ≈ 112.5 tonnes" },
+            { label: "Step 5: DC voltage", formula: "Peak 3,200 kW → 1,000V → I = 3,200 A", result: "1,000 V DC" },
+          ]}
+          answer="22,500 kWh NMC system, ~112.5 tonnes, at 1,000 V DC"
+          interpretation="DP vessels have extreme peak-to-average power ratios. NMC chemistry is chosen here for its higher energy density to minimize weight on a vessel where stability margins are tight. The 1,000V DC system handles the 3.2 MW peak DP load. Generators supplement the battery during sustained DP operations."
+          variant="marine"
+        />
 
     </div>
   </section>
@@ -366,6 +412,31 @@ const chemistryOptions = [
       </CalculatorCard>
     </div>
   </section>
+
+  <EngineeringDiagram
+    title="Vessel Energy Storage Architecture"
+    description="High-voltage battery system integrated with vessel power distribution"
+    variant="system"
+    steps={[
+      { label: "Shore/Gen", icon: "charge" },
+      { label: "Battery ESS", icon: "battery" },
+      { label: "Power Conversion", icon: "inverter" },
+      { label: "Vessel Loads", icon: "load" },
+    ]}
+  />
+
+  <ComparisonTable
+    title="Marine Battery Technology Comparison"
+    headers={["Technology", "Energy Density", "Power Density", "Cycle Life", "Marine Certification"]}
+    rows={[
+      ["LFP (LiFePO4)", "90–120 Wh/kg", "200–400 W/kg", "5,000+", "DNV, Lloyd's, BV"],
+      ["NMC (Nickel Manganese)", "150–220 Wh/kg", "300–600 W/kg", "2,000", "DNV, Lloyd's"],
+      ["NCA (Nickel Cobalt)", "200–260 Wh/kg", "400–800 W/kg", "1,500", "Limited marine"],
+      ["Sodium-Ion", "100–140 Wh/kg", "150–300 W/kg", "3,000+", "Emerging"],
+      ["Solid-State (Future)", "300–500 Wh/kg", "500–1000 W/kg", "10,000+", "Under development"],
+    ]}
+    caption="Marine battery technology landscape — LFP dominates for safety and cycle life"
+  />
 
   <FAQSection items={faqItems} />
   <RelatedTools tools={relatedCalculators} />

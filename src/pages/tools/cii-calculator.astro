@@ -6,6 +6,9 @@ import ResultBox from '../../components/ResultBox.astro';
 import FormulaBox from '../../components/FormulaBox.astro';
 import FAQSection from '../../components/FAQSection.astro';
 import RelatedTools from '../../components/RelatedTools.astro';
+import WorkedExample from '../../components/WorkedExample.astro';
+import ComparisonTable from '../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../components/EngineeringDiagram.astro';
 
 const whatIs = `The CII Calculator provides an educational estimate of a vessel's Carbon Intensity Indicator rating based on the IMO's greenhouse gas emissions framework. It calculates estimated CO₂ emissions, transport work, attained CII value, and indicative rating band (A through E). This tool is designed for preliminary assessment and improvement scenario modeling — it is NOT an official IMO compliance calculator. Actual CII ratings depend on vessel-specific parameters, DCS data verification, and IMO-approved calculation methodologies.`;
 
@@ -300,37 +303,77 @@ const fuelOptions = [
         </p>
       </FormulaBox>
 
-      <div>
-        <h2 class="text-title-lg text-primary uppercase mb-6 tracking-wider">Worked Engineering Example</h2>
-        <div class="text-body-sm text-muted flex flex-col gap-4">
-          <p>Given vessel parameters:</p>
-          <ul class="list-disc pl-6 flex flex-col gap-1">
-            <li><strong>Fuel:</strong> 5,000 tonnes MGO/year (CO₂ factor: 3.206)</li>
-            <li><strong>Distance:</strong> 50,000 nm/year</li>
-            <li><strong>DWT:</strong> 50,000 tonnes</li>
-          </ul>
+      <div class="flex flex-col gap-8">
+        <WorkedExample
+          number={1}
+          title="Bulk Carrier — Annual CII Rating"
+          scenario="A bulk carrier operates year-round on Pacific routes carrying iron ore and coal. We need to determine its annual CII rating from fuel consumption, distance sailed, and deadweight tonnage."
+          inputs={[
+            { label: "Annual Fuel Consumption", value: "4,200 tonnes MGO" },
+            { label: "Distance Sailed", value: "55,000 nm" },
+            { label: "Deadweight Tonnage", value: "82,000 DWT" },
+            { label: "CO₂ Factor (MGO)", value: "3.206 t CO₂/t fuel" },
+          ]}
+          steps={[
+            "Calculate annual CO₂ emissions: 4,200 × 3.206 = 13,465 tonnes CO₂",
+            "Calculate transport work: 82,000 × 55,000 = 4.51 × 10⁹ DWT-nm",
+            "Calculate attained CII: (13,465 × 1,000,000) / 4,510,000,000 = 2.99 g CO₂/DWT-nm",
+            "Compare against reference line R = 5.0: ratio = 2.99 / 5.0 = 0.598",
+            "Ratio < 0.80 → Rating: A (Major Superior)",
+          ]}
+          answer="CII = 2.99 g CO₂/DWT-nm — Rating: A (Major Superior)"
+          interpretation="This bulk carrier's efficient operations — large cargo volumes over long distances — produce a low CII well below the reference line. An A rating places the vessel in the top 20% of its class, with no corrective action required and eligibility for green financing programs."
+          variant="marine"
+        />
 
-          <p><strong>Step 1:</strong> Calculate annual CO₂ emissions:</p>
-          <div class="font-mono text-primary">CO₂ = 5,000 × 3.206 = 16,030 tonnes</div>
+        <WorkedExample
+          number={2}
+          title="Container Ship — Rating Band Implications"
+          scenario="Two identical container ships (12,000 TEU, 85,000 DWT) operate different service speeds. Ship A cruises at 18 knots while Ship E operates at 24 knots year-round. Both burn the same fuel type but at different rates."
+          inputs={[
+            { label: "Ship A Fuel Consumption", value: "180 tonnes/day × 280 days = 50,400 tonnes HFO" },
+            { label: "Ship E Fuel Consumption", value: "260 tonnes/day × 280 days = 72,800 tonnes HFO" },
+            { label: "Annual Distance (both)", value: "65,000 nm" },
+            { label: "Deadweight Tonnage", value: "85,000 DWT" },
+            { label: "CO₂ Factor (HFO)", value: "3.114 t CO₂/t fuel" },
+          ]}
+          steps={[
+            "Ship A CO₂: 50,400 × 3.114 = 156,946 t | Ship E CO₂: 72,800 × 3.114 = 226,699 t",
+            "Transport work (both): 85,000 × 65,000 = 5.525 × 10⁹ DWT-nm",
+            "Ship A CII: 156,946 × 10⁶ / 5.525 × 10⁹ = 2.84 g CO₂/DWT-nm",
+            "Ship E CII: 226,699 × 10⁶ / 5.525 × 10⁹ = 4.10 g CO₂/DWT-nm",
+            "Ratio A = 2.84 / 5.0 = 0.568 → Rating: A | Ratio E = 4.10 / 5.0 = 0.820 → Rating: B",
+          ]}
+          answer="Ship A: 2.84 g CO₂/DWT-nm → Rating A | Ship E: 4.10 g CO₂/DWT-nm → Rating B"
+          interpretation="Despite identical vessels, the 33% speed difference produces a full rating band gap. Ship A qualifies for green financing; Ship B meets requirements but lacks the competitive advantage. Reducing Ship E's speed by just 2 knots would move it from B to A — a powerful demonstration that operational decisions directly determine CII outcomes."
+          variant="marine"
+        />
 
-          <p><strong>Step 2:</strong> Calculate transport work:</p>
-          <div class="font-mono text-primary">Transport Work = 50,000 × 50,000 = 2.5 × 10⁹ DWT-nm</div>
-
-          <p><strong>Step 3:</strong> Calculate attained CII:</p>
-          <div class="font-mono text-primary">CII = (16,030 × 1,000,000) / 2,500,000,000 = 6.41 g CO₂/DWT-nm</div>
-
-          <p><strong>Step 4:</strong> Determine rating band:</p>
-          <div class="font-mono text-primary">Reference R = 5.0 | Ratio = 6.41 / 5.0 = 1.282</div>
-          <div class="font-mono text-primary">Ratio ≥ 1.10 → Rating: E (Significantly Inferior)</div>
-
-          <p><strong>Step 5:</strong> Improvement scenario:</p>
-          <div class="font-mono text-primary">Hybridization (-15%): 6.41 × 0.85 = 5.45</div>
-          <div class="font-mono text-primary">Shore power (-5%): 5.45 × 0.95 = 5.18</div>
-          <div class="font-mono text-primary">Ops efficiency (-10%): 5.18 × 0.90 = 4.66</div>
-          <div class="font-mono text-primary">Improved ratio = 4.66 / 5.0 = 0.932 → Rating: C</div>
-
-          <p><strong>Result:</strong> Combined measures can improve CII from E to C, meeting IMO requirements and avoiding corrective action plan obligations.</p>
-        </div>
+        <WorkedExample
+          number={3}
+          title="Tanker — Slow Steaming Impact"
+          scenario="An MR product tanker currently operates at service speed. The operations team proposes reducing speed by 20% on ballast legs and 10% on laden legs. We model the CII improvement from this slow steaming strategy."
+          inputs={[
+            { label: "Current Fuel Consumption", value: "38 tonnes/day (average)" },
+            { label: "Operating Days", value: "320 days/year" },
+            { label: "Annual Distance", value: "48,000 nm" },
+            { label: "Deadweight Tonnage", value: "45,000 DWT" },
+            { label: "Speed Reduction", value: "~15% average across voyage profile" },
+            { label: "CO₂ Factor (MGO)", value: "3.206 t CO₂/t fuel" },
+          ]}
+          steps={[
+            "Current fuel: 38 × 320 = 12,160 tonnes → CO₂ = 12,160 × 3.206 = 38,985 t",
+            "Current transport work: 45,000 × 48,000 = 2.16 × 10⁹ DWT-nm",
+            "Current CII: 38,985 × 10⁶ / 2.16 × 10⁹ = 18.05 g CO₂/DWT-nm",
+            "Slow steaming fuel (15% reduction): 38 × 0.85 = 32.3 t/day → 32.3 × 320 = 10,336 t",
+            "Improved CO₂: 10,336 × 3.206 = 33,137 t → Improved CII: 15.34 g CO₂/DWT-nm",
+            "CII reduction: (18.05 - 15.34) / 18.05 = 15% improvement",
+            "Rating shift: E (18.05/5.0 = 3.61) → D (15.34/5.0 = 3.07)",
+          ]}
+          answer="CII reduced from 18.05 to 15.34 g CO₂/DWT-nm — Rating improves from E to D"
+          interpretation="Slow steaming alone delivers a 15% CII improvement, moving this tanker from E to D rating. While still requiring a corrective action plan under D, the vessel avoids the mandatory immediate improvement required for E-rated ships. Combining slow steaming with hull cleaning and weather routing could push the vessel to C, eliminating corrective action obligations entirely."
+          variant="marine"
+        />
       </div>
 
     </div>
@@ -383,6 +426,31 @@ const fuelOptions = [
       </CalculatorCard>
     </div>
   </section>
+
+  <EngineeringDiagram
+    title="CII Rating System"
+    description="Annual operational data feeds into the CII formula to produce an A–E rating"
+    variant="flow"
+    steps={[
+      { label: "Fuel Consumption", icon: "charge" },
+      { label: "Distance Sailed", icon: "cable" },
+      { label: "CII Formula", icon: "chart" },
+      { label: "A–E Rating", icon: "chart" },
+    ]}
+  />
+
+  <ComparisonTable
+    title="CII Rating Bands and Implications"
+    headers={["Rating", "CII Range", "Action Required", "Status", "Consequence"]}
+    rows={[
+      ["A", "Best 20%", "None — exemplary", "Green", "Green financing eligibility"],
+      ["B", "Next 20%", "None — good standing", "Green", "No corrective action"],
+      ["C", "Middle 40%", "None — average", "Yellow", "Monitor and improve"],
+      ["D", "Next 15%", "Corrective action plan", "Orange", "Must submit plan within 12 months"],
+      ["E", "Worst 5%", "Immediate improvement", "Red", "Mandatory corrective action"],
+    ]}
+    caption="CII rating thresholds based on IMO 2023 regulations"
+  />
 
   <FAQSection items={faqItems} />
   <RelatedTools tools={relatedCalculators} />

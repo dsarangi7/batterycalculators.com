@@ -3,6 +3,9 @@ import CalculatorLayout from '../layouts/CalculatorLayout.astro';
 import FormulaBox from '../components/FormulaBox.astro';
 import FAQSection from '../components/FAQSection.astro';
 import PowerOutageForm from '../components/PowerOutageForm.astro';
+import WorkedExample from '../components/WorkedExample.astro';
+import ComparisonTable from '../components/ComparisonTable.astro';
+import EngineeringDiagram from '../components/EngineeringDiagram.astro';
 
 const whatIs = `A fridge battery backup calculator determines the battery capacity, inverter size, and backup duration you need to keep your refrigerator running during a power outage. Refrigerators are among the most critical household loads to back up — a full fridge costs $300–$600 to restock if food spoils. This calculator sizes your battery bank based on your refrigerator's actual running wattage and compressor startup surge, accounting for inverter efficiency, depth-of-discharge limits, and a configurable safety margin.`;
 
@@ -118,32 +121,96 @@ const presetAppliances = [
         <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Battery Ah = Required Wh / (Battery Voltage × Depth of Discharge)</div>
       </FormulaBox>
       <div>
-        <h2 class="text-title-lg text-primary uppercase mb-6 tracking-wider">Worked Example</h2>
-        <div class="text-body-sm text-muted flex flex-col gap-4">
-          <p><strong>Scenario:</strong> Keep a refrigerator cold during a 12-hour hurricane power outage.</p>
-          <div class="border-l-2 border-m-blue-light pl-4">
-            <p class="font-bold text-primary mb-2">Step 1: Running load</p>
-            <div class="font-mono text-primary">Refrigerator: 150W × 1 = 150W</div>
-          </div>
-          <div class="border-l-2 border-m-blue-light pl-4">
-            <p class="font-bold text-primary mb-2">Step 2: Surge</p>
-            <div class="font-mono text-primary">Compressor startup: 600W (no other loads)</div>
-          </div>
-          <div class="border-l-2 border-m-blue-light pl-4">
-            <p class="font-bold text-primary mb-2">Step 3: Energy required</p>
-            <div class="font-mono text-primary">Raw: 150W × 12h = 1,800 Wh</div>
-            <div class="font-mono text-primary">After efficiency: 1,800 / 0.90 = 2,000 Wh</div>
-            <div class="font-mono text-primary">With 20% margin: 2,000 × 1.20 = 2,400 Wh</div>
-          </div>
-          <div class="border-l-2 border-m-blue-light pl-4">
-            <p class="font-bold text-primary mb-2">Step 4: Battery (24V LFP, 80% DoD)</p>
-            <div class="font-mono text-primary">Ah = 2,400 / (24 × 0.80) = 125 Ah</div>
-            <div class="font-mono text-primary font-bold mt-1">Result: 24V 130Ah LFP battery bank (≈3.1 kWh)</div>
-          </div>
+        <h2 class="text-title-lg text-primary uppercase mb-6 tracking-wider">Worked Examples</h2>
+        <div class="text-body-sm text-muted flex flex-col gap-6">
+          <WorkedExample
+            number={1}
+            title="Mini Fridge (Dorm / Office)"
+            scenario="Keep a compact mini fridge cold during an 8-hour workday outage."
+            inputs={[
+              { label: "Mini Fridge", value: "60W running / 180W surge" },
+              { label: "Backup Duration", value: "8 hours" },
+              { label: "Duty Cycle", value: "~35%" },
+            ]}
+            steps={[
+              { label: "Step 1: Average draw (35% duty cycle)", formula: "60W × 0.35", result: "21W average" },
+              { label: "Step 2: Energy for 8 hours", formula: "21W × 8h = 168 Wh", result: "168 Wh" },
+              { label: "Step 3: After inverter efficiency (90%)", formula: "168 / 0.90", result: "187 Wh" },
+              { label: "Step 4: With 20% margin", formula: "187 × 1.20", result: "224 Wh" },
+              { label: "Step 5: Battery (12V LFP, 80% DoD)", formula: "224 / (12 × 0.80)", result: "23.3 Ah → 12V 25Ah LFP" },
+            ]}
+            answer="A 12V 25Ah LiFePO4 battery (320 Wh) keeps a mini fridge running through an 8-hour workday."
+            interpretation="Mini fridges are efficient — small batteries handle them well. Duty cycling extends runtime significantly."
+          />
+          <WorkedExample
+            number={2}
+            title="Full-Size Fridge (Hurricane Backup)"
+            scenario="Keep a full-size refrigerator cold during a 24-hour hurricane power outage."
+            inputs={[
+              { label: "Full-Size Fridge", value: "150W running / 600W surge" },
+              { label: "Backup Duration", value: "24 hours" },
+              { label: "Duty Cycle", value: "~40%" },
+            ]}
+            steps={[
+              { label: "Step 1: Average draw (40% duty cycle)", formula: "150W × 0.40", result: "60W average" },
+              { label: "Step 2: Energy for 24 hours", formula: "60W × 24h = 1,440 Wh", result: "1,440 Wh" },
+              { label: "Step 3: After inverter efficiency (90%)", formula: "1,440 / 0.90", result: "1,600 Wh" },
+              { label: "Step 4: With 20% margin", formula: "1,600 × 1.20", result: "1,920 Wh" },
+              { label: "Step 5: Battery (24V LFP, 80% DoD)", formula: "1,920 / (24 × 0.80)", result: "100 Ah → 24V 100Ah LFP" },
+            ]}
+            answer="A 24V 100Ah LiFePO4 battery (2,560 Wh) keeps a full-size fridge cold for 24 hours including compressor cycling."
+            interpretation="Compressor cycling means the fridge doesn't run continuously — average draw is much lower than rated wattage."
+          />
+          <WorkedExample
+            number={3}
+            title="Chest Freezer (Extended Outage)"
+            scenario="Keep a chest freezer frozen during a 48-hour winter storm outage."
+            inputs={[
+              { label: "Chest Freezer", value: "120W running / 500W surge" },
+              { label: "Backup Duration", value: "48 hours" },
+              { label: "Duty Cycle", value: "~30%" },
+              { label: "Winter Bonus", value: "Cold ambient extends cycles" },
+            ]}
+            steps={[
+              { label: "Step 1: Average draw (30% duty cycle)", formula: "120W × 0.30", result: "36W average" },
+              { label: "Step 2: Energy for 48 hours", formula: "36W × 48h = 1,728 Wh", result: "1,728 Wh" },
+              { label: "Step 3: After inverter efficiency (90%)", formula: "1,728 / 0.90", result: "1,920 Wh" },
+              { label: "Step 4: With 20% margin", formula: "1,920 × 1.20", result: "2,304 Wh" },
+              { label: "Step 5: Battery (24V LFP, 80% DoD)", formula: "2,304 / (24 × 0.80)", result: "120 Ah → 24V 130Ah LFP" },
+            ]}
+            answer="A 24V 130Ah LiFePO4 battery (3.1 kWh) keeps a chest freezer frozen for 48 hours during a winter storm."
+            interpretation="Chest freezers are the most efficient fridge type — cold winter ambient further reduces compressor runtime."
+          />
         </div>
       </div>
     </div>
   </section>
+
+  <EngineeringDiagram
+    title="Fridge Backup Power Flow"
+    description="Battery DC power is converted to AC through the inverter, then powers the fridge compressor motor."
+    steps={[
+      { label: "Battery Bank", icon: "battery" },
+      { label: "Inverter", icon: "inverter" },
+      { label: "Surge Protection", icon: "cable" },
+      { label: "Fridge Compressor", icon: "load" },
+    ]}
+    variant="system"
+  />
+
+  <ComparisonTable
+    title="Fridge Battery Backup Comparison"
+    headers={["Fridge Type", "Running W", "Surge W", "Avg Draw (40% duty)", "12h Energy", "Battery Needed (24V LFP)"]}
+    rows={[
+      ["Mini Fridge (dorm)", "60 W", "180 W", "24 W", "288 Wh", "12V 25Ah (320 Wh)"],
+      ["Compact Fridge", "100 W", "350 W", "40 W", "480 Wh", "12V 50Ah (640 Wh)"],
+      ["Standard Top-Freezer", "150 W", "600 W", "60 W", "720 Wh", "24V 50Ah (1,280 Wh)"],
+      ["Side-by-Side Fridge", "200 W", "800 W", "80 W", "960 Wh", "24V 65Ah (1,560 Wh)"],
+      ["French Door (large)", "250 W", "1,000 W", "100 Wh", "1,200 Wh", "24V 80Ah (1,920 Wh)"],
+      ["Chest Freezer", "120 W", "500 W", "36 W", "432 Wh", "24V 30Ah (720 Wh)"],
+    ]}
+    caption="Average draw assumes 30–40% compressor duty cycle. Actual runtime varies with ambient temperature, door openings, and fridge insulation."
+  />
 
   <FAQSection items={faqItems} />
 </CalculatorLayout>

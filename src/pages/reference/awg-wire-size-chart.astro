@@ -1,0 +1,179 @@
+---
+import ArticleLayout from '../../layouts/ArticleLayout.astro';
+import ReferenceTable from '../../components/ReferenceTable.astro';
+import ComparisonTable from '../../components/ComparisonTable.astro';
+import FAQSection from '../../components/FAQSection.astro';
+
+const faqItems = [
+  {
+    question: "What AWG wire size do I need for a 30-amp RV service?",
+    answer: "Use 10 AWG wire for 30-amp RV service runs up to 50 feet. For runs longer than 50 feet, step up to 8 AWG to account for voltage drop. Always verify ampacity at the wire's insulation temperature rating. NM-B (Romex) and THHN/THWN are the most common insulation types for this application.",
+  },
+  {
+    question: "How do I calculate voltage drop for DC wiring?",
+    answer: "Voltage drop = (2 × Length × Current × Resistance) / 1000. For DC circuits, use the resistance per 1000 feet from the AWG chart. For a 50-foot run at 30A with 10 AWG (1.21 Ω/1000ft): Drop = (2 × 50 × 30 × 1.21) / 1000 = 3.63V. At 12V, this is a 30% drop — far too high. Use 8 AWG (0.764 Ω/1000ft) for 1.15V drop (9.5%).",
+  },
+  {
+    question: "What is the difference between THHN and THWN wire?",
+    answer: "THHN is rated for 90°C in dry locations only. THWN is rated for 75°C in wet or dry locations. THWN-2 is rated for 90°C in wet or dry locations. For marine and outdoor applications, use THWN-2 or marine-grade wire. In conduit exposed to moisture, THWN ratings apply even if the wire is marked THHN.",
+  },
+  {
+    question: "Can I use aluminum wire instead of copper?",
+    answer: "Yes, but with caveats. Aluminum wire is 60% the conductivity of copper, so you need one AWG size larger. A 10 AWG copper equivalent is 8 AWG aluminum. Aluminum is lighter and cheaper but requires anti-oxidant compound at connections, larger terminals, and careful torque. It is commonly used for service entrance (4/0 AWG) but not recommended for branch circuits in residential or marine use.",
+  },
+  {
+    question: "What wire size do I need for a 2000W inverter on 12V?",
+    answer: "A 2000W inverter at 12V draws approximately 167A at full load. Use 2/0 AWG copper wire for runs up to 5 feet, or 4/0 AWG for runs up to 10 feet. At 24V, the current drops to 83A, allowing 4 AWG for 5-foot runs. Always fuse or break per manufacturer specifications.",
+  },
+  {
+    question: "How does temperature affect wire ampacity?",
+    answer: "Ampacity ratings assume 30°C ambient temperature. For every 1°C above 30°C, derate the ampacity by approximately 0.5%. At 40°C, a wire rated 30A at 30°C is only safe for 28.5A. In engine rooms or attic spaces where temperatures exceed 50°C, use higher-rated wire (e.g., 105°C THHN) and apply derating factors per NEC Table 310.15(B)(2)(a).",
+  },
+];
+
+const relatedCalculators = [
+  { title: 'DC Cable Loss Calculator', href: '/tools/dc-cable-loss-calculator', type: 'calculator' },
+  { title: 'Voltage Drop Calculator', href: '/tools/voltage-drop-calculator', type: 'calculator' },
+  { title: 'Inverter Battery Calculator', href: '/tools/inverter-battery-calculator', type: 'calculator' },
+];
+
+const relatedGuides = [
+  { title: 'Battery Sizing Reference', href: '/learn/battery-sizing-reference', type: 'guide' },
+  { title: 'How to Size a Battery Bank', href: '/learn/how-to-size-a-battery-bank', type: 'guide' },
+];
+
+const tableOfContents = [
+  { id: 'awg-metric', label: 'AWG to Metric Conversion' },
+  { id: 'resistance-ampacity', label: 'Resistance & Ampacity' },
+  { id: 'fusing-current', label: 'Fusing Current' },
+  { id: 'application-wiring', label: 'Application Wiring Guide' },
+];
+---
+
+<ArticleLayout
+  title="AWG Wire Size Chart Reference | Battery Calculators"
+  description="Complete AWG wire size reference chart with mm² conversion, resistance, ampacity, fusing current, and application-specific wiring guides for marine, automotive, solar, and telecom."
+  category="REFERENCE"
+  categoryHref="/reference"
+  breadcrumbItems={[{ label: 'AWG Wire Size Chart' }]}
+  relatedCalculators={relatedCalculators}
+  relatedGuides={relatedGuides}
+  tableOfContents={tableOfContents}
+  faqItems={faqItems}
+>
+  <p class="text-body-md text-body font-light mb-8">
+    American Wire Gauge (AWG) is the standard for wire sizing in North America. This chart covers sizes from 4/0 (107 mm²) down to 30 AWG (0.0509 mm²), with resistance values for copper conductors at 20°C. Use these values for voltage drop calculations, ampacity derating, and cable selection.
+  </p>
+
+  <div id="awg-metric">
+    <ReferenceTable
+      title="AWG to Metric Conversion"
+      description="Standard AWG sizes with equivalent metric cross-sectional area and diameter."
+      headers={['AWG', 'Diameter (mm)', 'Cross-Section (mm²)', 'Circular Mils']}
+      rows={[
+        ['4/0', '11.68', '107.2', '211,600'],
+        ['3/0', '10.40', '85.01', '167,800'],
+        ['2/0', '9.266', '67.41', '133,100'],
+        ['1/0', '8.252', '53.49', '105,600'],
+        ['1', '7.348', '42.41', '83,690'],
+        ['2', '6.544', '33.63', '66,360'],
+        ['4', '5.189', '21.15', '41,740'],
+        ['6', '4.115', '13.30', '26,240'],
+        ['8', '3.264', '8.366', '16,510'],
+        ['10', '2.588', '5.261', '10,380'],
+        ['12', '2.053', '3.309', '6,530'],
+        ['14', '1.628', '2.081', '4,109'],
+        ['16', '1.291', '1.309', '2,583'],
+        ['18', '1.024', '0.8234', '1,624'],
+        ['20', '0.8118', '0.5189', '1,022'],
+        ['22', '0.6438', '0.3262', '642.4'],
+        ['24', '0.5106', '0.2047', '404.0'],
+        ['26', '0.4049', '0.1288', '253.9'],
+        ['28', '0.3211', '0.08098', '159.8'],
+        ['30', '0.2546', '0.05093', '100.5'],
+      ]}
+      source="NIST and International Electrotechnical Commission standard wire gauge tables"
+    />
+  </div>
+
+  <div id="resistance-ampacity">
+    <ReferenceTable
+      title="Resistance & Ampacity (Copper at 20°C)"
+      description="DC resistance per 1000 feet and ampacity for common insulation types in free air."
+      headers={['AWG', 'Resistance (Ω/1000ft)', 'Resistance (Ω/km)', 'Ampacity (THHN 90°C)', 'Ampacity (THWN 75°C)']}
+      rows={[
+        ['4/0', '0.0490', '0.161', '230A', '195A'],
+        ['3/0', '0.0618', '0.203', '200A', '170A'],
+        ['2/0', '0.0780', '0.256', '175A', '150A'],
+        ['1/0', '0.0983', '0.322', '150A', '130A'],
+        ['1', '0.1240', '0.407', '130A', '110A'],
+        ['2', '0.1563', '0.513', '115A', '95A'],
+        ['4', '0.2485', '0.815', '85A', '70A'],
+        ['6', '0.3951', '1.296', '65A', '55A'],
+        ['8', '0.6282', '2.061', '50A', '40A'],
+        ['10', '0.9989', '3.277', '40A', '30A'],
+        ['12', '1.588', '5.210', '30A', '25A'],
+        ['14', '2.525', '8.284', '25A', '20A'],
+        ['16', '4.016', '13.17', '18A', '15A'],
+        ['18', '6.385',  '20.95', '14A', '10A'],
+        ['20', '10.15', '33.30', '11A', '7.5A'],
+        ['22', '16.14', '52.95', '—', '5A'],
+        ['24', '25.67', '84.22', '—', '3.5A'],
+        ['26', '40.81', '133.9', '—', '2.5A'],
+        ['28', '64.90', '212.9', '—', '1.5A'],
+        ['30', '103.2', '338.6', '—', '1A'],
+      ]}
+      source="NEC Table 310.15(B)(16) and manufacturer datasheets"
+    />
+  </div>
+
+  <div id="fusing-current">
+    <ReferenceTable
+      title="Fusing Current (Copper Wire)"
+      description="Approximate current to blow a copper wire in 10 seconds (based on Onderdonk's equation). Use for short-circuit protection sizing only."
+      headers={['AWG', 'Fusing Current (10s)', 'Fusing Current (1s)', 'NEC Max Fuse Size (typical)']}
+      rows={[
+        ['4/0', '5,900A', '13,600A', '400A'],
+        ['2/0', '4,170A', '9,610A', '300A'],
+        ['1/0', '3,310A', '7,640A', '250A'],
+        ['2', '2,070A', '4,780A', '175A'],
+        ['4', '1,310A', '3,020A', '100A'],
+        ['6', '820A', '1,900A', '60A'],
+        ['8', '520A', '1,200A', '40A'],
+        ['10', '320A', '740A', '30A'],
+        ['12', '200A', '460A', '20A'],
+        ['14', '125A', '290A', '15A'],
+        ['16', '80A', '180A', '10A'],
+        ['18', '49A', '110A', '7A'],
+        ['20', '31A', '72A', '5A'],
+        ['24', '12A', '27A', '3A'],
+      ]}
+      source="Onderdonk's equation and UL 1987 reference values"
+    />
+  </div>
+
+  <div id="application-wiring">
+    <ComparisonTable
+      title="Wire Selection by Application"
+      headers={['Application', 'Min. Wire Size', 'Notes']}
+      rows={[
+        ['Marine House Battery (50A)', '6 AWG', 'Use tinned copper, ABYC compliant. Size for 50A continuous + voltage drop.'],
+        ['Automotive Audio (1000W)', '4 AWG', 'Short runs from battery to amplifier. Use OFC copper.'],
+        ['Solar Panel Array (30A)', '10 AWG', 'Use USE-2 or PV wire for outdoor runs. Check voltage drop at system voltage.'],
+        ['Telecom 48V DC (100A)', '2/0 AWG', 'NEC Class 2 circuits. Use stranded copper in cable tray.'],
+        ['RV 30A Service (50ft)', '10 AWG', 'NM-B (Romex) or SOOW cord. Max 3% voltage drop at 120V.'],
+        ['EV Charging (40A)', '8 AWG', 'Use THHN/THWN-2 in conduit. GFCI protected circuit required.'],
+        ['Battery to Inverter (200A)', '2/0 AWG', 'Short runs (<5ft). Use welding cable for flexibility. Fuse per inverter spec.'],
+        ['Trolling Motor (50A)', '6 AWG', 'Use marine-grade tinned wire with heat-shrink terminals.'],
+      ]}
+      caption="Always verify wire size for your specific amperage, run length, and voltage. Use NEC Table 310.15(B)(16) for ampacity and apply derating factors."
+    />
+  </div>
+
+  <div class="bg-surface-card border border-hairline p-6 mb-12">
+    <h3 class="text-title-lg text-primary uppercase tracking-wider mb-3">Disclaimer</h3>
+    <p class="text-body-sm text-muted font-light">
+      Wire sizing is critical for safety. Incorrect wire size can cause overheating, fire, or equipment damage. Always follow the National Electrical Code (NEC), ABYC standards for marine, and local electrical codes. This reference is for educational purposes only. Consult a licensed electrician for actual installations.
+    </p>
+  </div>
+</ArticleLayout>

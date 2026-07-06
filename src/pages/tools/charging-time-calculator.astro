@@ -7,6 +7,9 @@ import FormulaBox from '../../components/FormulaBox.astro';
 import FAQSection from '../../components/FAQSection.astro';
 import RelatedTools from '../../components/RelatedTools.astro';
 import MiniSimulationChart from '../../components/MiniSimulationChart.astro';
+import WorkedExample from '../../components/WorkedExample.astro';
+import ComparisonTable from '../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../components/EngineeringDiagram.astro';
 
 const whatIs = `Battery charging time is the duration required to restore a battery from a given state of charge to a target SOC using a specified charger current. Lithium-ion batteries charge in two distinct phases: <strong>Constant Current (CC)</strong>, where the charger delivers full current until the cell reaches its upper voltage limit (typically around 80% SOC), followed by <strong>Constant Voltage (CV)</strong>, where the charger holds voltage steady while current exponentially decays as the cell approaches 100% SOC. The CV phase can account for 20–30% of total charge time despite delivering only the final 20% of capacity. Understanding charge time is essential for scheduling EV charging, planning solar battery recharge windows, managing off-grid power budgets, and optimizing fleet vehicle turnaround times.`;
 
@@ -220,34 +223,104 @@ const relatedArticles = [
         </div>
       </FormulaBox>
 
-      <!-- Worked Example -->
-      <div>
-        <h2 class="text-title-lg text-primary uppercase mb-6 tracking-wider">Worked Engineering Example</h2>
-        <div class="text-body-sm text-muted flex flex-col gap-4">
-          <p>Given system parameters:</p>
-          <ul class="list-disc pl-6 flex flex-col gap-1">
-            <li><strong>Capacity:</strong> 100 Ah</li>
-            <li><strong>Voltage:</strong> 12.8 V</li>
-            <li><strong>Start SOC:</strong> 20% | <strong>Target SOC:</strong> 100%</li>
-            <li><strong>Charger Output:</strong> 20 A</li>
-            <li><strong>Efficiency:</strong> 95%</li>
-          </ul>
-          <p><strong>Step 1:</strong> Calculate Capacity needed:</p>
-          <div class="font-mono text-primary">Ah_needed = 100 Ah x (100 - 20)/100 = 80 Ah</div>
+      <!-- Worked Examples -->
+      <div class="flex flex-col gap-8">
+        <h2 class="text-title-lg text-primary uppercase mb-2 tracking-wider">Worked Engineering Examples</h2>
 
-          <p><strong>Step 2:</strong> Solve CC charging stage time:</p>
-          <div class="font-mono text-primary">T_CC = 80 Ah / (20 A x 0.95) = 4.21 hours</div>
+        <WorkedExample
+          number={1}
+          title="Charging a 100Ah LFP at 0.5C (50A) — CC/CV Phases"
+          scenario="A 12.8V LiFePO4 battery at 20% SOC is charged with a 50A charger (0.5C) to 100% SOC at 95% efficiency."
+          inputs={[
+            { label: "Capacity", value: "100 Ah" },
+            { label: "Voltage", value: "12.8 V" },
+            { label: "Charger Current", value: "50 A (0.5C)" },
+            { label: "Start SOC → Target SOC", value: "20% → 100%" },
+            { label: "Efficiency", value: "95%" },
+          ]}
+          steps={[
+            { label: "Step 1: Ah needed to charge", formula: "Ah = 100 × (100 − 20) / 100", result: "80 Ah" },
+            { label: "Step 2: CC phase time (0→80% SOC)", formula: "T_CC = 80 / (50 × 0.95)", result: "1.68 hours (≈ 1h 41m)" },
+            { label: "Step 3: CV phase overhead (80→100%)", formula: "T_CV = (100 − 80) × 0.04", result: "0.80 hours (≈ 48m)" },
+            { label: "Step 4: Total charge time", formula: "T_total = 1.68 + 0.80", result: "2.48 hours" },
+          ]}
+          answer="≈ 2 hours 29 minutes"
+          interpretation="At 0.5C, the CC phase delivers bulk energy in under 2 hours. The CV phase adds roughly 48 minutes to reach full 100% SOC. Charging to 80% instead saves nearly an hour."
+          variant="default"
+        />
 
-          <p><strong>Step 3:</strong> Calculate CV saturation overhead (for SOC > 80%):</p>
-          <div class="font-mono text-primary">T_CV = (100 - 80) x 0.04 = 20 x 0.04 = 0.80 hours</div>
+        <WorkedExample
+          number={2}
+          title="Charging a 200Ah Lead-Acid at 0.1C (20A) — Absorption Time"
+          scenario="A 12V lead-acid battery at 30% SOC is charged with a 20A charger (0.1C) to 100% SOC. Lead-acid requires extended absorption and float phases."
+          inputs={[
+            { label: "Capacity", value: "200 Ah" },
+            { label: "Voltage", value: "12 V" },
+            { label: "Charger Current", value: "20 A (0.1C)" },
+            { label: "Start SOC → Target SOC", value: "30% → 100%" },
+            { label: "Charge Efficiency", value: "85%" },
+          ]}
+          steps={[
+            { label: "Step 1: Ah needed to charge", formula: "Ah = 200 × (100 − 30) / 100", result: "140 Ah" },
+            { label: "Step 2: Bulk phase time", formula: "T_bulk = 140 / (20 × 0.85)", result: "8.24 hours" },
+            { label: "Step 3: Absorption phase (CV at 14.4V)", formula: "T_abs ≈ 3–5 hours (empirical for lead-acid)", result: "~4 hours" },
+            { label: "Step 4: Float phase", formula: "T_float ≈ 1–3 hours to stabilize cells", result: "~2 hours" },
+            { label: "Step 5: Total charge time", formula: "T_total = 8.24 + 4 + 2", result: "14.24 hours" },
+          ]}
+          answer="≈ 14 hours 15 minutes"
+          interpretation="Lead-acid absorption and float phases nearly double the total charge time compared to the bulk phase alone. This is why lead-acid systems require careful charge scheduling."
+          variant="marine"
+        />
 
-          <p><strong>Step 4:</strong> Total calculated time:</p>
-          <div class="font-mono text-primary">T_total = 4.21 + 0.80 = 5.01 hours ≈ 5 hours 1 minute</div>
-        </div>
+        <WorkedExample
+          number={3}
+          title="Fast Charging a 100Ah NMC at 1C (100A) — Time vs. Degradation"
+          scenario="A 36V NMC battery at 10% SOC is fast-charged to 90% SOC at 1C (100A). Compare fast charge time against the degradation cost."
+          inputs={[
+            { label: "Capacity", value: "100 Ah" },
+            { label: "Voltage", value: "36 V" },
+            { label: "Charger Current", value: "100 A (1C)" },
+            { label: "Start SOC → Target SOC", value: "10% → 90%" },
+            { label: "Efficiency", value: "93%" },
+          ]}
+          steps={[
+            { label: "Step 1: Ah needed to charge", formula: "Ah = 100 × (90 − 10) / 100", result: "80 Ah" },
+            { label: "Step 2: CC phase time (10→80%)", formula: "T_CC = 70 / (100 × 0.93)", result: "0.75 hours (45 min)" },
+            { label: "Step 3: CV phase overhead (80→90%)", formula: "T_CV = (90 − 80) × 0.04", result: "0.40 hours (24 min)" },
+            { label: "Step 4: Total charge time", formula: "T_total = 0.75 + 0.40", result: "1.15 hours" },
+          ]}
+          answer="≈ 1 hour 9 minutes"
+          interpretation="1C fast charging completes in just over 1 hour, but daily use accelerates capacity fade by 20–40% compared to 0.25C charging. Reserve 1C rates for occasional urgent top-ups."
+          variant="industrial"
+        />
       </div>
 
     </div>
   </section>
+
+  <EngineeringDiagram
+    title="CC-CV Charging Process"
+    description="Constant Current phase followed by Constant Voltage phase in lithium battery charging"
+    variant="flow"
+    steps={[
+      { label: "Charge Source", icon: "charge" },
+      { label: "CC Phase", icon: "battery" },
+      { label: "CV Phase", icon: "battery" },
+      { label: "Full Charge", icon: "chart" },
+    ]}
+  />
+
+  <ComparisonTable
+    title="Charging Time by Chemistry and C-Rate"
+    headers={["Chemistry", "0.1C", "0.25C", "0.5C", "1C", "Max Recommended"]}
+    rows={[
+      ["LiFePO4", "~11 hours", "~4.5 hours", "~2.5 hours", "~1.5 hours", "1C"],
+      ["NMC", "~11 hours", "~4.5 hours", "~2.5 hours", "~1.2 hours", "0.7C"],
+      ["Lead-Acid (Absorption)", "~14 hours", "~7 hours", "~4 hours", "Not recommended", "0.1C"],
+      ["Lead-Acid (Float)", "Bulk + 3h", "Bulk + 3h", "N/A", "N/A", "0.1C"],
+    ]}
+    caption="Approximate charging times including CC and CV phases"
+  />
 
   <FAQSection items={faqItems} />
 

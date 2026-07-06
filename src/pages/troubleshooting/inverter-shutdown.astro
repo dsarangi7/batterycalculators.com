@@ -1,0 +1,202 @@
+---
+import ArticleLayout from '../../layouts/ArticleLayout.astro';
+import TroubleshootingBlock from '../../components/TroubleshootingBlock.astro';
+
+const relatedCalculators = [
+  { title: 'Inverter Battery Calculator', href: '/tools/inverter-battery-calculator', type: 'calculator' as const },
+  { title: 'Runtime Calculator', href: '/tools/runtime-calculator', type: 'calculator' as const },
+  { title: 'Voltage Drop Calculator', href: '/tools/voltage-drop-calculator', type: 'calculator' as const },
+  { title: 'DC Cable Loss Calculator', href: '/tools/dc-cable-loss-calculator', type: 'calculator' as const },
+];
+
+const relatedGuides = [
+  { title: 'Inverter Battery Runtime Guide', href: '/learn/inverter-battery-runtime-guide', type: 'guide' as const },
+  { title: '12V vs 24V vs 48V Runtime', href: '/learn/12v-vs-24v-vs-48v-runtime', type: 'guide' as const },
+  { title: 'Voltage Drop Explained', href: '/learn/voltage-drop-explained', type: 'guide' as const },
+];
+
+const faqItems = [
+  {
+    question: 'Why does my inverter shut off when the AC starts?',
+    answer: 'Air conditioners and motors draw 3–5× their rated current during startup (locked rotor amperage). This surge can exceed the inverter\'s peak power rating, triggering overload protection. A 1500W AC unit may draw 4500–7500W momentarily. Size your inverter to handle startup surges, or use a soft-start device on the AC compressor to limit inrush current.',
+  },
+  {
+    question: 'How do I know if my battery cables are undersized?',
+    answer: 'Measure the voltage drop between battery terminals and inverter terminals under full load. A drop greater than 0.5V on a 12V system (4%) indicates undersized cables. For a 2000W load at 12V, the current is ~167A, requiring at minimum 2/0 AWG copper cables. Use the Voltage Drop Calculator to determine the correct gauge for your cable length and current.',
+  },
+  {
+    question: 'Can a ground fault cause my inverter to shut off?',
+    answer: 'Yes. Inverters have built-in ground fault protection (GFP) that disconnects output if current leakage to ground exceeds the threshold (typically 5–30mA for personnel protection). Common causes include wet cable connections, damaged insulation, or moisture inside the inverter enclosure. Test by disconnecting AC loads one at a time to identify the faulted circuit.',
+  },
+  {
+    question: 'What does low battery voltage cutoff mean?',
+    answer: 'The inverter has a minimum input voltage threshold (typically 10.5V for 12V systems, 21V for 24V, 42V for 48V). When battery voltage drops below this threshold under load, the inverter shuts down to prevent deep discharge damage to the battery. If the inverter shuts off prematurely, check battery charge level, cable connections, and battery health.',
+  },
+  {
+    question: 'Why does my inverter overheat and shut off?',
+    answer: 'Inverters convert DC to AC with 85–95% efficiency, meaning 5–15% of power is lost as heat. If ventilation is inadequate, ambient temperature is high, or the inverter is running near full capacity for extended periods, internal temperature exceeds the thermal cutoff (typically 70–85°C). Ensure at least 15cm clearance on all sides and operate in a well-ventilated area.',
+  },
+  {
+    question: 'How do I prevent inverter shutdown during extended use?',
+    answer: 'Three key strategies: (1) Size the inverter so your typical load is 50–75% of rated capacity for optimal efficiency, (2) ensure adequate ventilation and keep ambient temperature below 35°C, (3) use properly sized battery cables to minimize voltage drop. Additionally, avoid running the inverter at 100% capacity for extended periods — derate by 20% for continuous operation.',
+  },
+];
+---
+
+<ArticleLayout
+  title="Inverter Shutdown — Troubleshooting Guide | Battery Calculators"
+  description="Diagnose why your inverter keeps shutting off during use. Troubleshoot low battery voltage, overload, overheating, wiring issues, and ground faults with step-by-step checklists."
+  category="TROUBLESHOOTING"
+  categoryHref="/troubleshooting"
+  breadcrumbItems={[{ label: 'Inverter Shutdown' }]}
+  relatedCalculators={relatedCalculators}
+  relatedGuides={relatedGuides}
+  faqItems={faqItems}
+>
+  <p class="text-body-md text-body font-light mb-8">
+    An inverter that shuts off mid-operation can leave you without power at the worst possible moment. Shutdowns are the inverter's protective response to unsafe conditions — understanding which condition is triggering the cutoff is the first step to a permanent fix. This guide covers the five most common causes of inverter shutdown with diagnostic procedures.
+  </p>
+
+  <TroubleshootingBlock
+    problem="Low Battery Voltage — Inverter Cuts Off Below Voltage Threshold"
+    causes={[
+      'Battery SOC is genuinely depleted under load',
+      'Voltage sag from high internal resistance under heavy load',
+      'Undersized battery bank cannot sustain the load current',
+      'Loose or corroded battery connections causing voltage drop',
+      'BMS low-voltage disconnect activating before inverter cutoff',
+    ]}
+    explanation="When an inverter draws current from a battery, the terminal voltage drops proportionally to the load and internal resistance: V_load = V_oc - (I × R_internal). A battery at 12.6V resting may drop to 11.5V under a 100A load if internal resistance is 0.011Ω. If the inverter's low-voltage cutoff is set at 10.5V, the battery must maintain at least 10.5V at the expected load current. A battery with high internal resistance (from aging, cold temperature, or undersizing) will hit this threshold prematurely, causing the inverter to shut off even though the battery is not actually empty. This is the most common cause of inverter shutdown in solar and backup systems."
+    checklist={[
+      'Check battery SOC with a shunt monitor or voltmeter at rest',
+      'Measure battery voltage under load at the inverter input terminals',
+      'If loaded voltage drops below inverter cutoff, battery or cables are the issue',
+      'Compare loaded voltage at battery terminals vs inverter terminals',
+      'If voltage differs by >0.5V, cable resistance is too high',
+      'Check battery internal resistance if measurable',
+      'Verify BMS low-voltage disconnect threshold is below inverter cutoff',
+    ]}
+    solutions={[
+      'Add parallel batteries to increase total capacity and reduce per-cell current',
+      'Upgrade to lower internal resistance batteries (lithium vs lead-acid)',
+      'Shorten battery-to-inverter cable run or increase cable gauge',
+      'Clean and tighten all battery terminal connections',
+      'Set inverter low-voltage cutoff 0.5V above BMS low-voltage cutoff',
+      'Reduce load or run fewer appliances simultaneously',
+    ]}
+  />
+
+  <TroubleshootingBlock
+    problem="Overload — Connected Exceeds Inverter Rated Capacity"
+    causes={[
+      'Total continuous load exceeds inverter continuous wattage rating',
+      'Startup surge from motor-driven appliances exceeds peak rating',
+      'Multiple high-draw appliances running simultaneously',
+      'Appliance wattage specification is inaccurate or misleading',
+      'Inverter continuous rating is optimistic (not true RMS)',
+    ]}
+    explanation="Inverters are rated for both continuous and peak power. A 2000W inverter may only sustain 1600W continuously (80% duty cycle) and handle 4000W peak for <1 second. When the load exceeds the continuous rating, the inverter's thermal and current protection activates, shutting down the output. Motor-driven appliances (refrigerators, AC units, power tools) have locked-rotor amperage (LRA) that is 3–7× the running wattage during startup. A 500W refrigerator may draw 1500–3500W for 1–3 seconds on startup. If the inverter cannot handle this surge, it trips overload protection. Calculate total load by summing all simultaneously operating appliances plus a 20% safety margin."
+    checklist={[
+      'List all appliances connected to the inverter with their wattage ratings',
+      'Sum continuous wattage of all loads that run simultaneously',
+      'Check inverter continuous wattage rating (not peak)',
+      'Identify any motor-driven loads with high startup surge',
+      'Verify inverter overload threshold and alarm settings',
+      'Test with loads disconnected, adding one at a time to find the culprit',
+    ]}
+    solutions={[
+      'Reduce simultaneous load to below inverter continuous rating',
+      'Stagger startup of motor-driven appliances (don\'t start all at once)',
+      'Install soft-start devices on high-surge appliances',
+      'Upgrade to a higher-wattage inverter if load cannot be reduced',
+      'Use the Inverter Battery Calculator to verify inverter and battery sizing',
+    ]}
+  />
+
+  <TroubleshootingBlock
+    problem="Overheating — Thermal Protection Shuts Down Inverter"
+    causes={[
+      'Inadequate ventilation around inverter enclosure',
+      'Ambient temperature exceeds inverter operating range',
+      'Inverter running at or near full capacity for extended period',
+      'Dust or debris blocking cooling vents or fans',
+      'Inverter mounted in enclosed space without airflow',
+    ]}
+    explanation="Inverters dissipate significant heat during DC-to-AC conversion. A 2000W inverter at 90% efficiency generates approximately 200W of heat — equivalent to a light bulb running continuously inside the enclosure. Without adequate ventilation, this heat accumulates and raises internal component temperatures above the thermal shutdown threshold (typically 70–85°C for MOSFETs, 100–120°C for transformers). The thermal protection is a critical safety feature that prevents fire and component damage. Inverters are most efficient at 50–80% load; running at 90–100% capacity generates proportionally more heat and reduces headroom for thermal management."
+    checklist={[
+      'Check inverter surface temperature with infrared thermometer',
+      'Verify at least 15cm clearance on all sides for airflow',
+      'Inspect cooling fans for operation (should spin when inverter is warm)',
+      'Clean dust from ventilation openings and fan blades',
+      'Check ambient temperature — should be below 40°C for most inverters',
+      'Ensure inverter is not mounted near other heat sources',
+      'Monitor runtime before thermal shutdown to identify load threshold',
+    ]}
+    solutions={[
+      'Relocate inverter to a well-ventilated area with ambient airflow',
+      'Install additional cooling fans to force air through the enclosure',
+      'Reduce load to 70–80% of inverter rated capacity for continuous operation',
+      'Clean ventilation openings and fan filters regularly',
+      'Mount inverter vertically to improve natural convection',
+      'Use the Runtime Calculator to estimate safe operating duration at your load',
+    ]}
+  />
+
+  <TroubleshootingBlock
+    problem="Wiring Issues — Voltage Drop and High-Resistance Connections"
+    causes={[
+      'Battery-to-inverter cables too long or too thin for the current',
+      'Loose or corroded battery terminal connections',
+      'Poor quality connectors with high contact resistance',
+      'Undersized fuse or breaker adding resistance in the circuit',
+      'Multiple cable splices or junction points in the circuit',
+    ]}
+    explanation="The DC circuit between battery and inverter carries the full load current at low voltage, making it extremely sensitive to resistance. At 12V, a 2000W load draws 167A — even 0.01Ω of cable resistance causes 1.67V of drop (13.9% of system voltage). This voltage drop has two effects: (1) the inverter receives less voltage, triggering low-voltage cutoff, and (2) the resistance dissipates power as heat (I²R = 278W for 0.01Ω at 167A), which can melt insulation and start fires. The NEC recommends maximum 3% voltage drop for branch circuits. For a 12V system, this means the total resistance from battery to inverter should be less than 0.002Ω."
+    checklist={[
+      'Measure voltage at battery terminals under full load',
+      'Measure voltage at inverter input terminals under full load',
+      'Calculate voltage drop: V_battery - V_inverter = ΔV',
+      'Acceptable drop is <0.36V for 12V (3%) or <0.72V for 24V',
+      'Check all cable connections for tightness and corrosion',
+      'Inspect fuse/breaker connections and contact resistance',
+      'Verify cable gauge meets ampacity requirements for your current',
+    ]}
+    solutions={[
+      'Upgrade cable gauge: use the Voltage Drop Calculator for your length and current',
+      'Shorten cable run between battery and inverter if possible',
+      'Clean all terminal connections with wire brush and apply dielectric grease',
+      'Replace corroded fuse holders with heavy-duty bolt-down types',
+      'Eliminate unnecessary splices — use continuous cable runs where possible',
+      'Use copper lugs crimped with hydraulic crimper for reliable connections',
+    ]}
+  />
+
+  <TroubleshootingBlock
+    problem="Ground Fault — GFCI or Ground Fault Protection Tripping"
+    causes={[
+      'Moisture ingress in wiring connections or appliance plugs',
+      'Damaged cable insulation exposing live conductor to ground',
+      'Wet appliance or wet location causing leakage current',
+      'Inverter internal ground fault from component failure',
+      'Incorrect grounding wiring creating parallel ground paths',
+    ]}
+    explanation="Ground fault protection monitors the balance between hot and neutral conductors. If current leaks to ground (through damaged insulation, wet connections, or faulty appliances), the GFCI detects the imbalance and disconnects output. The threshold is typically 5–30mA for personnel protection. In solar/battery systems, ground faults can also occur on the DC side — a fault between the battery positive and the grounded chassis creates a dangerous high-current path. Inverter ground fault indicators may flash a specific error code. The fault must be identified and corrected before the inverter can safely restart — resetting without finding the fault creates shock and fire hazards."
+    checklist={[
+      'Check inverter GFCI indicator light or error code display',
+      'Disconnect all AC loads and reset GFCI — if it holds, a load is faulted',
+      'Test each load individually by reconnecting one at a time',
+      'Inspect AC wiring for damage, moisture, or worn insulation',
+      'Check DC side for ground faults: measure voltage between battery positive and ground',
+      'Verify proper grounding of inverter chassis and AC outlet',
+      'Use a megohmmeter to test insulation resistance of wiring',
+    ]}
+    solutions={[
+      'Dry all connections and enclosures before resetting GFCI',
+      'Replace damaged cables or appliance cords causing the ground fault',
+      'Ensure all connections are in weatherproof enclosures for outdoor installations',
+      'Have a qualified electrician verify grounding system per NEC/local code',
+      'If inverter GFCI trips with all loads disconnected, contact manufacturer',
+      'Install GFCI protection on individual circuits to isolate faults quickly',
+    ]}
+  />
+</ArticleLayout>

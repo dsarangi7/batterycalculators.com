@@ -1,0 +1,133 @@
+---
+import ArticleLayout from '../../layouts/ArticleLayout.astro';
+import ReferenceTable from '../../components/ReferenceTable.astro';
+import ComparisonTable from '../../components/ComparisonTable.astro';
+import FAQSection from '../../components/FAQSection.astro';
+
+const relatedCalculators = [
+  { title: 'Solar Battery Sizing Calculator', href: '/tools/solar-battery-sizing-calculator', type: 'calculator' as const },
+  { title: 'Home Backup Battery Calculator', href: '/tools/home-backup-battery-calculator', type: 'calculator' as const },
+  { title: 'Runtime Calculator', href: '/tools/runtime-calculator', type: 'calculator' as const },
+  { title: 'Battery Sizing Calculator', href: '/tools/battery-sizing-calculator', type: 'calculator' as const },
+];
+
+const relatedGuides = [
+  { title: 'Solar Battery Sizing Guide', href: '/learn/how-to-size-solar-battery-bank', type: 'guide' as const },
+  { title: 'Best Battery Chemistry for Solar', href: '/learn/best-battery-chemistry-for-solar', type: 'guide' as const },
+  { title: 'Solar Battery Storage Explained', href: '/learn/solar-battery-storage-explained', type: 'guide' as const },
+];
+
+const faqItems = [
+  {
+    question: 'How many peak sun hours do I need for solar sizing?',
+    answer: 'Peak sun hours (PSH) vary by location and season. In the continental US, annual averages range from 3.5 PSH in the Pacific Northwest to 6.5 PSH in the Southwest. For off-grid systems, size for the worst month (e.g., 2.5 PSH in December for northern locations). Use NREL PVWatts or local solar resource data for precise values.',
+  },
+  {
+    question: 'How do I size a solar array for my battery bank?',
+    answer: 'A common rule of thumb is to size the solar array at 1kW per 100Ah of battery capacity at 12V. For a 400Ah 12V battery bank (4.8kWh), a 4kW array provides roughly one full recharge per day in average sun conditions. For faster recharge or cloudy climates, oversize by 20–30%. The formula: Array Size (kW) = Daily Load (Wh) ÷ (PSH × System Efficiency).',
+  },
+  {
+    question: 'What battery capacity do I need for solar storage?',
+    answer: 'Size battery capacity to cover 1–3 days of autonomy (no sun). For a home with 10kWh daily load and 4 peak sun hours: 1 day autonomy = 10kWh ÷ 0.9 (efficiency) = 11.1kWh. At 48V, this equals approximately 232Ah. For critical loads requiring 2 days autonomy: 22.2kWh or 463Ah at 48V.',
+  },
+  {
+    question: 'What system voltage is best for solar?',
+    answer: '48V is recommended for solar systems above 2kW. It provides the best balance of efficiency, cable sizing, and component availability. 12V systems work for small portable setups under 500W. 24V is a middle ground for 500W–2kW systems. Always match the battery bank voltage to your inverter and charge controller input requirements.',
+  },
+  {
+    question: 'How many solar panels do I need?',
+    answer: 'Divide your daily energy requirement (Wh) by the panel wattage × peak sun hours × system efficiency (typically 0.85). Example: 5,000Wh daily load ÷ (400W panel × 5 PSH × 0.85) = 2.9 panels → 3 panels minimum. For reliability, oversize by 20–30% to account for cloudy days and system losses.',
+  },
+  {
+    question: 'Do I need a charge controller for solar?',
+    answer: 'Yes. PWM or MPPT charge controllers regulate voltage from the solar panels to the battery bank and prevent overcharging. MPPT controllers are more efficient (95–99%) and can accept higher panel voltages, making them the standard choice for systems above 200W. PWM controllers are cheaper but less efficient, suitable for small 12V systems with matched panel voltage.',
+  },
+];
+---
+
+<ArticleLayout
+  title="Solar Sizing Reference | Battery Calculators"
+  description="Quick reference for solar system sizing: peak sun hours by US location, array sizing formulas, system configurations for common applications, and battery-to-solar matching guidelines."
+  category="REFERENCE"
+  categoryHref="/reference"
+  breadcrumbItems={[{ label: 'Solar Sizing Reference' }]}
+  relatedCalculators={relatedCalculators}
+  relatedGuides={relatedGuides}
+  faqItems={faqItems}
+>
+  <p class="text-body-md text-body font-light mb-8">
+    Proper solar system sizing requires matching your solar array, battery bank, and load profile. This reference provides peak sun hours for US locations, array sizing for common loads, and system configurations to help you design a reliable solar power system.
+  </p>
+
+  <ReferenceTable
+    title="Average Peak Sun Hours by US Location"
+    description="Annual and seasonal average peak sun hours (PSH) for major US cities. Use the worst-month value for off-grid design."
+    headers={['Location', 'Annual PSH', 'Winter PSH (Dec)', 'Summer PSH (Jun)', 'Climate Zone']}
+    rows={[
+      ['Phoenix, AZ', '6.5', '5.0', '8.0', 'Hot-Dry'],
+      ['Las Vegas, NV', '6.3', '4.8', '7.8', 'Hot-Dry'],
+      ['Denver, CO', '5.5', '4.0', '7.0', 'Cold-Dry'],
+      ['Miami, FL', '5.0', '4.0', '5.5', 'Hot-Humid'],
+      ['Houston, TX', '4.8', '3.5', '6.0', 'Hot-Humid'],
+      ['Atlanta, GA', '4.5', '3.2', '5.5', 'Mixed-Humid'],
+      ['Los Angeles, CA', '5.5', '4.5', '7.0', 'Mild-Dry'],
+      ['San Francisco, CA', '5.0', '3.5', '6.5', 'Mild'],
+      ['New York, NY', '4.2', '2.8', '5.5', 'Mixed-Humid'],
+      ['Chicago, IL', '4.0', '2.5', '5.5', 'Cold-Humid'],
+      ['Seattle, WA', '3.5', '1.8', '5.0', 'Cold-Humid'],
+      ['Portland, OR', '3.8', '2.0', '5.5', 'Cold-Humid'],
+      ['Minneapolis, MN', '4.2', '2.3', '6.0', 'Cold'],
+      ['Boise, ID', '5.0', '3.0', '7.0', 'Cold-Dry'],
+    ]}
+    source="NREL PVWatts, Solar Energy Research Institute (SERI)"
+  />
+
+  <ComparisonTable
+    title="System Sizes for Common Applications"
+    headers={['Application', 'Daily Load', 'Recommended Array', 'Battery Capacity (48V)', 'Notes']}
+    rows={[
+      ['Phone + LED lights', '0.1–0.3 kWh', '100–200W', '100Ah (4.8kWh)', 'Portable, small off-grid'],
+      ['RV Weekend Trip', '1–2 kWh', '200–400W', '200Ah (9.6kWh)', 'RV battery calculator'],
+      ['Remote Cabin', '3–5 kWh', '800–1.2kW', '400Ah (19.2kWh)', '1–2 days autonomy'],
+      ['Small Home Backup', '5–10 kWh', '2–4kW', '400Ah (19.2kWh)', 'Critical loads only'],
+      ['Full Home Backup', '15–30 kWh', '6–12kW', '800Ah (38.4kWh)', 'Whole-house with solar'],
+      ['Off-Grid Home', '10–20 kWh', '5–10kW', '600–1000Ah', 'Requires daily solar input'],
+      ['Small Business', '20–50 kWh', '10–20kW', '1000+Ah', 'Commercial BESS'],
+      ['Marine (Cruiser)', '2–5 kWh', '400–800W', '200–400Ah', 'Marine battery sizing'],
+    ]}
+    highlightCol={2}
+    caption="Battery capacity at 48V. For 12V systems, divide Ah by 4 for equivalent energy."
+  />
+
+  <ReferenceTable
+    title="Solar Array Sizing Formula Reference"
+    description="Key formulas for sizing solar arrays, batteries, and charge controllers."
+    headers={['Calculation', 'Formula', 'Example', 'Notes']}
+    rows={[
+      ['Array Size (kW)', 'Daily Load (Wh) ÷ (PSH × 0.85)', '10,000 ÷ (5 × 0.85) = 2.35kW', '0.85 = system efficiency'],
+      ['Battery Capacity (Ah)', 'Daily Load (Wh) ÷ Voltage × Autonomy Days', '10,000 ÷ 48 × 2 = 417Ah', 'Add 20% buffer'],
+      ['Panel Count', 'Array Size (kW) ÷ Panel Wattage', '2.35kW ÷ 0.4kW = 6 panels', 'Round up'],
+      ['Charge Controller (A)', 'Array Wattage ÷ Battery Voltage', '2,400W ÷ 48V = 50A', 'Size at 1.25× for safety'],
+      ['Daily Solar Input (Wh)', 'Array Wattage × PSH × 0.85', '2,400 × 5 × 0.85 = 10,200Wh', 'Must exceed daily load'],
+      ['Autonomy (Days)', 'Battery Capacity (Wh) ÷ Daily Load (Wh)', '19,200 ÷ 10,000 = 1.92 days', 'For off-grid design'],
+    ]}
+    source="Standard solar sizing methodology, NREL PVWatts documentation"
+  />
+
+  <ReferenceTable
+    title="Charge Controller Sizing by System Voltage"
+    description="Minimum charge controller amperage for common solar array sizes at each battery voltage."
+    headers={['Array Size', '12V Controller (A)', '24V Controller (A)', '48V Controller (A)', 'Recommended Voltage']}
+    rows={[
+      ['100W', '10A', '5A', '3A', '12V'],
+      ['200W', '20A', '10A', '5A', '12V or 24V'],
+      ['400W', '40A', '20A', '10A', '24V'],
+      ['800W', '80A', '40A', '20A', '24V or 48V'],
+      ['1.2kW', '100A', '60A', '30A', '48V'],
+      ['2.4kW', '200A (2×100A)', '100A', '50A', '48V'],
+      ['4.8kW', '400A (4×100A)', '200A (2×100A)', '100A', '48V'],
+      ['9.6kW', 'Not practical', '400A (4×100A)', '200A (2×100A)', '48V'],
+    ]}
+    source="MPPT controller sizing: Array Watts ÷ Battery Voltage × 1.25 safety factor"
+  />
+</ArticleLayout>

@@ -1,0 +1,125 @@
+---
+import ArticleLayout from '../../layouts/ArticleLayout.astro';
+import ReferenceTable from '../../components/ReferenceTable.astro';
+import ComparisonTable from '../../components/ComparisonTable.astro';
+import FAQSection from '../../components/FAQSection.astro';
+
+const relatedCalculators = [
+  { title: 'Battery Sizing Calculator', href: '/tools/battery-sizing-calculator', type: 'calculator' as const },
+  { title: 'Voltage Drop Calculator', href: '/tools/voltage-drop-calculator', type: 'calculator' as const },
+  { title: 'DC Cable Loss Calculator', href: '/tools/dc-cable-loss-calculator', type: 'calculator' as const },
+  { title: 'Battery Pack Calculator', href: '/tools/battery-pack-calculator', type: 'calculator' as const },
+];
+
+const relatedGuides = [
+  { title: 'Battery Voltage Systems Guide', href: '/learn/battery-voltage-systems', type: 'guide' as const },
+  { title: '12V vs 24V vs 48V Runtime', href: '/learn/12v-vs-24v-vs-48v-runtime', type: 'guide' as const },
+  { title: 'Series vs Parallel Batteries', href: '/learn/series-vs-parallel-batteries', type: 'guide' as const },
+];
+
+const faqItems = [
+  {
+    question: 'What is the most common battery voltage for marine use?',
+    answer: '12V is the most common voltage for recreational boats and small vessels. It provides universal compatibility with marine accessories, fish finders, and navigation equipment. Larger cruising yachts and commercial vessels often use 24V or 48V systems to reduce current draw and cable sizing.',
+  },
+  {
+    question: 'When should I choose 48V over 12V?',
+    answer: 'Choose 48V when your load exceeds approximately 2kW, cable runs exceed 5 meters, or you need to minimize energy losses. A 5kW load at 48V draws 104A versus 417A at 12V — requiring much thinner cables and experiencing far less voltage drop. 48V is the standard for home energy storage and solar systems above 3kW.',
+  },
+  {
+    question: 'What cable size do I need for a 12V 200A system?',
+    answer: 'For a 12V system carrying 200A over a 3-meter round trip, you need 2/0 AWG (67mm²) copper cable to keep voltage drop below 3%. At 48V, the same power requires only 42A, which can be handled by 6 AWG (13mm²) cable. Always size cables for the actual current, not the power rating.',
+  },
+  {
+    question: 'Can I mix different voltage batteries in parallel?',
+    answer: 'Never connect batteries of different voltages in parallel. This creates circulating currents between the batteries that can damage both banks and pose a safety risk. You can parallel batteries of the same voltage but different capacities (Ah), though matching chemistry and age is recommended for balanced cycling.',
+  },
+  {
+    question: 'What voltage do solar charge controllers output?',
+    answer: 'MPPT charge controllers can output any voltage from battery voltage up to their rated maximum input voltage (typically 100V–250V DC). The controller converts the higher panel voltage to the battery bank voltage. PWM controllers require panel voltage to match battery voltage, making them less flexible.',
+  },
+  {
+    question: 'How does voltage affect battery capacity rating?',
+    answer: 'Battery capacity is rated in Amp-hours (Ah), which is independent of voltage. However, energy capacity (Wh) scales with voltage. A 100Ah 12V battery stores 1,200Wh, while a 100Ah 48V battery stores 4,800Wh. When comparing batteries, always compare both Ah and voltage to calculate total energy.',
+  },
+];
+---
+
+<ArticleLayout
+  title="Battery Voltage Reference | Battery Calculators"
+  description="Complete reference for all common battery voltages: 2V, 6V, 12V, 24V, 36V, 48V, 96V systems with typical configurations, applications, cable requirements, and voltage selection guide."
+  category="REFERENCE"
+  categoryHref="/reference"
+  breadcrumbItems={[{ label: 'Battery Voltage Reference' }]}
+  relatedCalculators={relatedCalculators}
+  relatedGuides={relatedGuides}
+  faqItems={faqItems}
+>
+  <p class="text-body-md text-body font-light mb-8">
+    Battery system voltage determines current draw, cable sizing, component selection, and overall efficiency. This reference covers all standard voltage levels from 2V single cells to 96V high-voltage systems, including typical configurations, load capacities, cable requirements, and common applications.
+  </p>
+
+  <ReferenceTable
+    title="Standard Battery System Voltages"
+    description="Nominal voltage, typical cell configurations, and common applications for each standard battery voltage level."
+    headers={['System Voltage', 'Nominal Voltage (LFP)', 'Nominal Voltage (NMC)', 'Cell Configuration (LFP)', 'Typical Applications', 'Max Practical Load']}
+    rows={[
+      ['2V', '2.0V', '—', '1S', 'Stationary UPS, telecom backup', '500W'],
+      ['6V', '6.4V', '—', '2S', 'Golf carts, floor scrubbers, vintage cars', '1kW'],
+      ['12V', '12.8V', '10.8V', '4S', 'Automotive, marine, RV, portable power', '2kW'],
+      ['24V', '25.6V', '25.2V', '8S', 'Larger marine, commercial vehicles, trucks', '5kW'],
+      ['36V', '38.4V', '36.0V', '12S', 'Electric bikes, trolling motors, golf carts', '3kW'],
+      ['48V', '51.2V', '48.0V', '16S', 'Home energy, solar, EVs, telecom, BESS', '20kW'],
+      ['96V', '102.4V', '96.0V', '32S', 'Large EVs, industrial, marine propulsion', '50kW'],
+    ]}
+    source="IEEE 1189, IEC 61960, Battery University"
+  />
+
+  <ReferenceTable
+    title="Voltage System Charge and Discharge Limits"
+    description="Safe operating voltage windows for LFP and NMC chemistries at each standard voltage level."
+    headers={['System', 'LFP Float Voltage', 'LFP Cutoff Voltage', 'NMC Float Voltage', 'NMC Cutoff Voltage']}
+    rows={[
+      ['2V', '2.10V', '1.60V', '—', '—'],
+      ['6V', '6.30V', '4.80V', '—', '—'],
+      ['12V', '14.4V', '10.0V', '12.6V', '7.5V'],
+      ['24V', '28.8V', '20.0V', '25.2V', '15.0V'],
+      ['36V', '43.2V', '30.0V', '37.8V', '22.5V'],
+      ['48V', '57.6V', '40.0V', '50.4V', '30.0V'],
+      ['96V', '115.2V', '80.0V', '100.8V', '60.0V'],
+    ]}
+    source="Battery manufacturer datasheets, BMS configuration guidelines"
+  />
+
+  <ComparisonTable
+    title="Voltage Selection Guide by Load Size"
+    headers={['Load Power', 'Recommended Voltage', 'Typical Current', 'Cable Size (AWG)', 'Notes']}
+    rows={[
+      ['< 200W', '12V', '< 17A', '10 AWG', 'Simple wiring, minimal losses'],
+      ['200W – 1kW', '12V or 24V', '8–83A', '8–4/0 AWG', '24V preferred for cable runs > 3m'],
+      ['1kW – 3kW', '24V or 48V', '21–125A', '6–2/0 AWG', '48V preferred for efficiency'],
+      ['3kW – 10kW', '48V', '63–208A', '4–3/0 AWG', 'Standard for home energy storage'],
+      ['10kW – 50kW', '48V or 96V', '104–521A', '2/0–4/0 AWG', '96V for industrial loads'],
+      ['> 50kW', '96V+', '521A+', 'Bus bars', 'Industrial, marine propulsion'],
+    ]}
+    highlightCol={1}
+    caption="Cable sizes are approximate for copper conductors at 3% voltage drop over a 5-meter round trip."
+  />
+
+  <ReferenceTable
+    title="Cable Sizing by Voltage and Current"
+    description="Minimum copper cable size for common current levels at each voltage, assuming 3% max voltage drop over a 5m round trip."
+    headers={['Current (A)', '12V Cable (AWG)', '24V Cable (AWG)', '48V Cable (AWG)', '96V Cable (AWG)']}
+    rows={[
+      ['10A', '10', '14', '16', '18'],
+      ['20A', '6', '10', '12', '14'],
+      ['50A', '2', '6', '8', '10'],
+      ['100A', '2/0', '2', '4', '6'],
+      ['150A', '4/0', '2/0', '2', '4'],
+      ['200A', '250 kcmil', '4/0', '2/0', '2'],
+      ['300A', '350 kcmil', '350 kcmil', '4/0', '2/0'],
+      ['500A', 'Bus bars', '500 kcmil', '350 kcmil', '4/0'],
+    ]}
+    source="NEC Chapter 9 Table 8, voltage drop calculation at 3% max, 75°C copper conductors"
+  />
+</ArticleLayout>

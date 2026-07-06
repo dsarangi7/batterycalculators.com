@@ -1,0 +1,110 @@
+---
+import ArticleLayout from '../../layouts/ArticleLayout.astro';
+import ReferenceTable from '../../components/ReferenceTable.astro';
+import ComparisonTable from '../../components/ComparisonTable.astro';
+import FAQSection from '../../components/FAQSection.astro';
+
+const faqItems = [
+  {
+    question: "What is the difference between Vmp, Imp, Voc, and Isc?",
+    answer: "Vmp (Voltage at Maximum Power) is the panel voltage at peak output. Imp (Current at Maximum Power) is the current at peak output. Voc (Open Circuit Voltage) is the maximum voltage with no load. Isc (Short Circuit Current) is the maximum current with zero resistance. Always use Vmp/Imp for system design and Voc/Isc for charge controller and fuse sizing.",
+  },
+  {
+    question: "How do I choose between 12V, 24V, and 48V solar panels?",
+    answer: "Match panel Vmp to battery bank voltage. For 12V systems, use panels with Vmp ~18–20V. For 24V systems, use Vmp ~36–40V. For 48V systems, use Vmp ~70–80V or connect panels in series. MPPT charge controllers can accept higher panel voltage and step down to battery voltage efficiently.",
+  },
+  {
+    question: "How many solar panels do I need for a 100Ah battery?",
+    answer: "A 100Ah 12V battery stores 1,280 Wh. For a 5-hour sun day, you need ~256W of panels. Two 150W panels (300W total) provides a comfortable margin. Account for charge controller efficiency (90–95%), temperature losses (5–10%), and shading. For faster charging, oversize by 20–30%.",
+  },
+  {
+    question: "What is the difference between monocrystalline and polycrystalline panels?",
+    answer: "Monocrystalline panels are 19–22% efficient, perform better in low light, and have a longer lifespan (25–30 years). Polycrystalline panels are 15–17% efficient, cost 10–20% less, but degrade faster and take more roof space. Monocrystalline is now the standard for residential and marine installations.",
+  },
+  {
+    question: "What size charge controller do I need for my solar panels?",
+    answer: "Divide total panel wattage by battery voltage and add 25% safety margin. For 600W of panels on a 12V system: 600W / 12V = 50A. Use a 60A MPPT controller. Always verify the controller can handle the panel Voc in cold weather, as voltage increases with decreasing temperature.",
+  },
+  {
+    question: "How does temperature affect solar panel output?",
+    answer: "Solar panels lose approximately 0.3–0.5% per degree Celsius above 25°C. At 45°C cell temperature, output drops 6–10%. Cold weather actually increases voltage (Voc rises ~0.3%/°C below 25°C). Always size for the coldest expected temperature to ensure Voc doesn't exceed controller limits.",
+  },
+];
+
+const relatedCalculators = [
+  { title: 'Solar Battery Sizing Calculator', href: '/tools/solar-battery-sizing-calculator', type: 'calculator' },
+  { title: 'Solar Generator Sizing Calculator', href: '/tools/solar-generator-sizing-calculator', type: 'calculator' },
+  { title: 'Charging Time Calculator', href: '/tools/charging-time-calculator', type: 'calculator' },
+];
+
+const relatedGuides = [
+  { title: 'Best Battery Chemistry for Solar', href: '/learn/best-battery-chemistry-for-solar', type: 'guide' },
+  { title: 'Solar Battery Backup Guide', href: '/learn/solar-battery-backup-guide', type: 'guide' },
+  { title: 'Charger Sizing Guide', href: '/learn/charger-sizing-guide', type: 'guide' },
+];
+
+const tableOfContents = [
+  { id: 'panel-specs', label: 'Panel Specifications' },
+  { id: 'system-voltage', label: 'System Voltage Selection' },
+];
+---
+
+<ArticleLayout
+  title="Solar Panel Specifications Reference | Battery Calculators"
+  description="Complete solar panel specification reference with Vmp, Imp, Voc, Isc, dimensions, and weight for 100W to 500W panels. Includes system voltage selection guide."
+  category="REFERENCE"
+  categoryHref="/reference"
+  breadcrumbItems={[{ label: 'Solar Panel Specs' }]}
+  relatedCalculators={relatedCalculators}
+  relatedGuides={relatedGuides}
+  tableOfContents={tableOfContents}
+  faqItems={faqItems}
+>
+  <p class="text-body-md text-body font-light mb-8">
+    This reference covers the most common monocrystalline solar panel sizes from 100W to 500W for residential, RV, marine, and off-grid installations. All values are STC (Standard Test Conditions: 1000 W/m², 25°C, AM 1.5).
+  </p>
+
+  <div id="panel-specs">
+    <ReferenceTable
+      title="Solar Panel Specifications (STC)"
+      description="Common monocrystalline panels with electrical and physical specifications."
+      headers={['Wattage', 'Vmp (V)', 'Imp (A)', 'Voc (V)', 'Isc (A)', 'Dimensions (mm)', 'Weight (kg)', 'Efficiency']}
+      rows={[
+        ['100W', '18.9', '5.29', '22.5', '5.75', '1060 × 508 × 35', '6.5', '19.1%'],
+        ['150W', '18.8', '7.98', '22.8', '8.58', '1485 × 668 × 35', '11.5', '20.2%'],
+        ['200W', '18.5', '10.81', '22.6', '11.56', '1580 × 808 × 35', '14.5', '20.7%'],
+        ['250W', '18.6', '13.44', '22.7', '14.38', '1640 × 990 × 35', '18.0', '21.0%'],
+        ['300W', '32.8', '9.15', '39.5', '9.85', '1640 × 990 × 35', '19.5', '21.3%'],
+        ['350W', '32.6', '10.74', '39.4', '11.46', '1688 × 1006 × 35', '20.5', '21.5%'],
+        ['400W', '32.4', '12.35', '39.3', '13.18', '1722 × 1050 × 35', '21.8', '21.8%'],
+        ['450W', '32.2', '13.98', '39.1', '14.92', '1755 × 1090 × 35', '22.5', '22.0%'],
+        ['500W', '34.5', '14.49', '41.5', '15.45', '1825 × 1134 × 35', '25.5', '22.4%'],
+      ]}
+      source="Typical values from mainstream manufacturers (LONGi, JinkoSolar, Canadian Solar, REC) at STC"
+    />
+  </div>
+
+  <div id="system-voltage">
+    <ComparisonTable
+      title="Panel Selection by System Voltage"
+      headers={['System Voltage', 'Recommended Panel', 'Panel Config', 'Notes']}
+      rows={[
+        ['12V Battery Bank', '100–200W (18V Vmp)', '1 panel parallel', 'Vmp 18–20V ideal for 12V charging. PWM or MPPT acceptable.'],
+        ['24V Battery Bank', '200–300W (32V Vmp)', '1 panel series or 2× parallel', 'Use 30V Vmp panels. MPPT recommended for efficiency.'],
+        ['48V Battery Bank', '350–500W (32V Vmp)', '2 panels series', 'Two 32V Vmp panels in series for 65–70V Vmp. MPPT required.'],
+        ['12V (PWM Controller)', '100–200W', '1 panel', 'PWM loses excess voltage. Match Vmp close to battery voltage.'],
+        ['12V (MPPT Controller)', '200–400W', '1 panel or series', 'MPPT accepts higher Voc and converts efficiently. More flexible.'],
+        ['24V (MPPT Controller)', '300–500W', '1–2 panels series', 'MPPT handles voltage conversion. Best efficiency for larger arrays.'],
+        ['48V (MPPT Controller)', '400–500W', '2–3 panels series', 'High-voltage arrays for utility-scale. MPPT required for voltage step-down.'],
+      ]}
+      caption="MPPT controllers are recommended for all installations above 200W. PWM controllers are acceptable for small 12V systems under 200W."
+    />
+  </div>
+
+  <div class="bg-surface-card border border-hairline p-6 mb-12">
+    <h3 class="text-title-lg text-primary uppercase tracking-wider mb-3">Disclaimer</h3>
+    <p class="text-body-sm text-muted font-light">
+      Solar panel specifications are at Standard Test Conditions (STC: 1000 W/m², 25°C, AM 1.5). Real-world output is typically 75–85% of rated STC values due to temperature, shading, orientation, and inverter losses. Always consult manufacturer datasheets for specific product specifications. This reference is for informational and educational purposes only.
+    </p>
+  </div>
+</ArticleLayout>

@@ -1,0 +1,445 @@
+---
+import CalculatorLayout from '../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../components/CalculatorCard.astro';
+import InputField from '../../components/InputField.astro';
+import ResultBox from '../../components/ResultBox.astro';
+import ComparisonTable from '../../components/ComparisonTable.astro';
+import FormulaBox from '../../components/FormulaBox.astro';
+import WorkedExample from '../../components/WorkedExample.astro';
+import FAQSection from '../../components/FAQSection.astro';
+import RelatedTools from '../../components/RelatedTools.astro';
+
+const whatIs = `System Voltage Selector determines the optimal DC system voltage — <strong>12V</strong>, <strong>24V</strong>, or <strong>48V</strong> — for your battery installation based on load power, cable run distance, and battery capacity requirements. Higher voltages reduce current for the same power, enabling thinner cables and lower resistive losses, but require more series cells and may limit equipment compatibility. The optimal voltage balances <strong>current draw</strong>, <strong>cable cost</strong>, <strong>efficiency</strong>, and <strong>equipment availability</strong>.`;
+
+const whyItMatters = [
+  "A 5kW load at 12V draws 417A — requiring 4/0 AWG cable that costs $8–12/ft and is difficult to route. At 48V, the same load draws 104A, using 4 AWG cable at $1–2/ft.",
+  "Voltage drop is proportional to current — doubling voltage halves current and cuts voltage drop by 75% for the same cable, directly improving system efficiency.",
+  "Equipment availability varies by voltage — 12V has the widest accessory market, 48V has the best inverter efficiency, and 24V sits in between.",
+  "Battery bank complexity increases with voltage — a 48V LFP bank needs 16 series cells vs. 4 for 12V, affecting BMS requirements and failure modes.",
+  "Safety regulations differ — voltages above 60V DC require special safety measures in many jurisdictions, making 48V the practical maximum for residential installations.",
+];
+
+const practicalApplications = [
+  { title: "Small Portable Systems", description: "12V for camping, marine electronics, and small solar setups under 500W." },
+  { title: "RV & Camper Systems", description: "24V for moderate loads (1–3kW) balancing equipment availability and efficiency." },
+  { title: "Residential Solar + Battery", description: "48V is the standard for home battery systems above 3kW with modern hybrid inverters." },
+  { title: "Telecom & Industrial", description: "48V standard for telecom towers and industrial backup with high-reliability requirements." },
+  { title: "EV & Golf Carts", description: "48V–96V for light EVs, with higher voltages for performance applications." },
+  { title: "Marine House Banks", description: "24V or 48V for vessels with significant hotel loads during extended cruising." },
+];
+
+const expertNotes = [
+  { title: '48V Is the Modern Standard', variant: 'engineering', content: 'For any system above 2kW, 48V is the recommended voltage. Modern hybrid inverters (Victron, Sol-Ark, Growatt) are optimized for 48V, battery manufacturers focus on 48V modules, and the reduced current enables standard 6 AWG wiring for most residential installations.' },
+  { title: '12V Legacy Systems', variant: 'info', content: '12V remains relevant for small portable systems, RV accessories, and marine electronics. The automotive aftermarket ecosystem is built around 12V, making it the default for mobile and portable applications under 1kW.' },
+];
+
+const trustSection = {
+  text: "This calculator uses standard electrical engineering formulas for current draw (P/V), voltage drop (2 × L × I × ρ/A), and power loss (I²R). Cable sizing follows NEC Chapter 9 Table 8 for copper conductors. All calculations use conservative assumptions and display intermediate values for verification.",
+  link: { label: "View our methodology", href: "/methodology" },
+};
+
+const references = [
+  { title: "NEC Chapter 9 — Table 8 (Conductor Properties)", url: "https://www.nfpa.org/codes-and-standards", source: "National Fire Protection Association" },
+  { title: "Victron Energy — 12V vs 24V vs 48V Systems", url: "https://www.victronenergy.com/help-center", source: "Victron Energy" },
+  { title: "Blue Sea Systems — Cable Sizing Calculator", url: "https://www.bluesea.com/resources", source: "Blue Sea Systems" },
+  { title: "DOE — DC Power Distribution for Data Centers", url: "https://www.energy.gov/eere/amo/dc-power-distribution", source: "U.S. Department of Energy" },
+];
+
+const faqItems = [
+  {
+    question: "What voltage should I choose for my solar battery system?",
+    answer: "For systems above 2kW, choose 48V — it reduces current, cable costs, and losses. For 500W–2kW, 24V is a good balance. For under 500W, 12V is simplest and cheapest. Most modern hybrid inverters are designed for 48V.",
+  },
+  {
+    question: "How does voltage affect cable size?",
+    answer: "Higher voltage means lower current for the same power. A 3kW load at 12V draws 250A (needs 4/0 AWG cable), at 24V draws 125A (needs 2/0 AWG), and at 48V draws 62.5A (needs 6 AWG). Thinner cables are cheaper, lighter, and easier to route.",
+  },
+  {
+    question: "Can I mix 12V and 24V equipment?",
+    answer: "No — you cannot connect 12V equipment directly to a 24V bank. Use a DC-DC converter to step down voltage. This adds cost and 5–10% efficiency loss. It's better to standardize on one voltage and select compatible equipment.",
+  },
+  {
+    question: "What is the minimum voltage for an inverter?",
+    answer: "Most pure sine wave inverters have a minimum operating voltage of 10.5V (12V models), 21V (24V models), or 42V (48V models). Below these thresholds, the inverter shuts down to protect the battery from over-discharge.",
+  },
+  {
+    question: "Is 48V safe for residential use?",
+    answer: "Yes — 48V DC is below the 60V DC safety threshold defined by NEC and IEC standards. It does not require special safety measures beyond proper fusing, disconnects, and wiring practices. Voltages above 60V require additional safety precautions.",
+  },
+  {
+    question: "How does voltage affect battery bank configuration?",
+    answer: "A 12V LFP bank needs 4 series cells (4S), 24V needs 8S, and 48V needs 16S. More series cells increase BMS complexity but reduce current. Parallel strings add capacity regardless of voltage — a 48V 2P bank is two 48V strings in parallel.",
+  },
+  {
+    question: "Can I upgrade from 24V to 48V later?",
+    answer: "Upgrading voltage requires replacing the entire battery bank, inverter, charge controller, and potentially wiring. It's more cost-effective to choose 48V from the start if you anticipate loads above 2kW or plan to expand.",
+  },
+  {
+    question: "What voltage do EVs use?",
+    answer: "Most modern EVs use 400V battery packs. Some newer designs use 800V for faster charging and higher efficiency. Golf carts and light EVs typically use 48V–96V. The voltage is determined by motor requirements and charging speed targets.",
+  },
+  {
+    question: "How does voltage affect charging efficiency?",
+    answer: "Higher voltage systems are generally more efficient because lower current reduces resistive losses in wiring (I²R). A 48V system typically has 2–4% lower transmission losses than a 12V system for the same power transfer.",
+  },
+  {
+    question: "What is the maximum practical DC voltage for homes?",
+    answer: "48V is the practical maximum for residential DC systems. It stays below the 60V DC safety threshold, has wide equipment availability, and supports loads up to 10+ kW with standard wiring. Higher voltages require commercial-grade safety measures.",
+  },
+];
+
+const relatedTools = [
+  { href: "/tools/voltage-drop-calculator", title: "Voltage Drop Calculator", description: "Calculate voltage drop for a given cable length and current." },
+  { href: "/tools/dc-cable-loss-calculator", title: "DC Cable Loss Calculator", description: "Estimate power losses in DC wiring at different voltages." },
+  { href: "/tools/battery-sizing-calculator", title: "Battery Sizing Calculator", description: "Size battery banks at your chosen system voltage." },
+  { href: "/tools/battery-pack-calculator", title: "Battery Pack Calculator", description: "Design series/parallel cell configurations for target voltage." },
+  { href: "/tools/inverter-battery-calculator", title: "Inverter Battery Calculator", description: "Match inverter and battery specifications." },
+  { href: "/tools/solar-battery-sizing-calculator", title: "Solar Battery Sizing", description: "Size solar battery banks with voltage selection." },
+];
+
+const commonMistakes = [
+  "Choosing 12V for loads above 1kW — a 2kW load at 12V draws 167A, requiring 4/0 AWG cable that costs more than the equipment savings.",
+  "Ignoring voltage drop over long cable runs — 10m of cable at 12V/100A loses 3.3% vs. 0.8% at 48V/25A for the same cable.",
+  "Mixing voltage equipment without DC-DC conversion — connecting 12V loads to a 24V bank will damage equipment instantly.",
+  "Selecting voltage based on inverter price alone — a cheaper 12V inverter may cost more in thicker cables and higher losses over time.",
+  "Not planning for expansion — a 24V system that needs to grow to 5kW will require a complete voltage upgrade to 48V.",
+  "Using automotive fuses in stationary DC systems — automotive fuses are designed for 12V vehicle environments, not continuous-duty DC applications.",
+  "Ignoring charge controller voltage compatibility — PWM controllers require battery voltage matching, while MPPT controllers accept higher input voltages.",
+  "Overlooking safety regulations — voltages above 60V DC require special disconnects, labeling, and installation practices in most jurisdictions.",
+];
+
+const relatedArticles = [
+  { href: "/learn/12v-vs-24v-vs-48v-battery-systems", title: "12V vs 24V vs 48V Battery Systems" },
+  { href: "/learn/dc-system-voltage-selection", title: "DC System Voltage Selection Guide" },
+  { href: "/learn/cable-sizing-for-battery-systems", title: "Cable Sizing for Battery Systems" },
+];
+---
+
+<CalculatorLayout
+  title="System Voltage Selector | Battery Calculators"
+  description="Choose the optimal DC system voltage — 12V, 24V, or 48V — based on load power, cable distance, and efficiency requirements."
+  faqItems={faqItems}
+  commonMistakes={commonMistakes}
+  relatedCalculators={relatedTools}
+  relatedArticles={relatedArticles}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+>
+
+  <!-- Main Calculator Grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+
+    <!-- Input Form -->
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">System Parameters</h3>
+      <div class="flex flex-col gap-6">
+        <InputField
+          id="total-load"
+          label="Total System Load"
+          value={3000}
+          min={10}
+          step={10}
+          unit="W"
+          helperText="Combined continuous power draw of all loads (Watts)."
+        />
+        <InputField
+          id="cable-distance"
+          label="Cable Run Distance (one-way)"
+          value={10}
+          min={0.5}
+          step={0.5}
+          unit="m"
+          helperText="Distance from battery bank to main load panel or inverter."
+        />
+        <InputField
+          id="battery-capacity"
+          label="Target Battery Capacity"
+          value={5000}
+          min={100}
+          step={100}
+          unit="Wh"
+          helperText="Total energy storage target in Watt-hours."
+        />
+        <InputField
+          id="ambient-temp"
+          label="Ambient Temperature"
+          value={25}
+          min={-30}
+          max={60}
+          step={1}
+          unit="°C"
+          helperText="Average operating temperature for cable resistance reference."
+        />
+      </div>
+    </CalculatorCard>
+
+    <!-- Voltage Comparison Results -->
+    <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Voltage Comparison</h3>
+
+        <div class="grid grid-cols-1 gap-4 mb-6">
+          <!-- 12V -->
+          <div class="bg-surface-soft border border-hairline p-4">
+            <div class="flex justify-between items-center mb-2">
+              <span class="text-label-uppercase text-muted text-[10px]">12V SYSTEM</span>
+              <span class="text-caption text-muted" id="v12-verdict">—</span>
+            </div>
+            <div class="grid grid-cols-3 gap-2">
+              <div>
+                <span class="text-caption text-muted block">Current</span>
+                <span class="text-title-lg text-primary" id="v12-current">—</span>
+              </div>
+              <div>
+                <span class="text-caption text-muted block">Cable Loss</span>
+                <span class="text-title-lg text-primary" id="v12-loss">—</span>
+              </div>
+              <div>
+                <span class="text-caption text-muted block">Min Cable</span>
+                <span class="text-title-lg text-primary" id="v12-cable">—</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 24V -->
+          <div class="bg-surface-soft border border-hairline p-4">
+            <div class="flex justify-between items-center mb-2">
+              <span class="text-label-uppercase text-muted text-[10px]">24V SYSTEM</span>
+              <span class="text-caption text-muted" id="v24-verdict">—</span>
+            </div>
+            <div class="grid grid-cols-3 gap-2">
+              <div>
+                <span class="text-caption text-muted block">Current</span>
+                <span class="text-title-lg text-primary" id="v24-current">—</span>
+              </div>
+              <div>
+                <span class="text-caption text-muted block">Cable Loss</span>
+                <span class="text-title-lg text-primary" id="v24-loss">—</span>
+              </div>
+              <div>
+                <span class="text-caption text-muted block">Min Cable</span>
+                <span class="text-title-lg text-primary" id="v24-cable">—</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 48V -->
+          <div class="bg-surface-soft border border-m-blue-light p-4">
+            <div class="flex justify-between items-center mb-2">
+              <span class="text-label-uppercase text-m-blue-light text-[10px]">48V SYSTEM</span>
+              <span class="text-caption text-m-blue-light font-bold" id="v48-verdict">—</span>
+            </div>
+            <div class="grid grid-cols-3 gap-2">
+              <div>
+                <span class="text-caption text-muted block">Current</span>
+                <span class="text-title-lg text-primary" id="v48-current">—</span>
+              </div>
+              <div>
+                <span class="text-caption text-muted block">Cable Loss</span>
+                <span class="text-title-lg text-primary" id="v48-loss">—</span>
+              </div>
+              <div>
+                <span class="text-caption text-muted block">Min Cable</span>
+                <span class="text-title-lg text-primary" id="v48-cable">—</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recommendation -->
+        <div class="border-t border-hairline pt-4">
+          <h4 class="text-label-uppercase text-primary text-xs mb-2">RECOMMENDATION</h4>
+          <p class="text-body-sm text-muted" id="voltage-recommendation">
+            Enter your system parameters to see voltage recommendations.
+          </p>
+        </div>
+      </div>
+    </CalculatorCard>
+
+  </div>
+
+  <!-- Detailed Results per Voltage -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-16">
+    <ResultBox label="12V Series Cells (LFP)" value="4 cells" suffix="4S configuration" id="r12-cells" />
+    <ResultBox label="24V Series Cells (LFP)" value="8 cells" suffix="8S configuration" id="r24-cells" />
+    <ResultBox label="48V Series Cells (LFP)" value="16 cells" suffix="16S configuration" id="r48-cells" />
+  </div>
+
+  <!-- Formula Section -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+
+      <FormulaBox title="Voltage Selection Formulas">
+        <p>
+          Current draw for each voltage option:
+        </p>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          I (Amps) = P (Watts) / V (Volts)
+        </div>
+        <p>
+          Voltage drop in the cable (round-trip):
+        </p>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          V_drop = 2 × L × I × ρ / A
+        </div>
+        <p>
+          Power loss in cable:
+        </p>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          P_loss (W) = I² × R_cable
+        </div>
+        <p class="text-xs text-muted mt-4">
+          <strong>Variables:</strong> P = total load power (W), V = system voltage (V), L = one-way cable length (m), I = current (A), ρ = copper resistivity (1.72×10⁻⁸ Ω·m), A = cable cross-section (m²).
+        </p>
+      </FormulaBox>
+
+      <WorkedExample
+        number={1}
+        title="3kW System — 10m Cable Run"
+        scenario="Compare 12V, 24V, and 48V for a 3,000W continuous load with 10-meter one-way cable distance."
+        inputs={[
+          { label: "Total Load", value: "3,000 W" },
+          { label: "Cable Distance", value: "10 m" },
+          { label: "Battery Capacity", value: "5,000 Wh" },
+          { label: "Ambient Temp", value: "25°C" },
+        ]}
+        steps={[
+          { label: "12V current", formula: "3000 / 12", result: "250 A" },
+          { label: "24V current", formula: "3000 / 24", result: "125 A" },
+          { label: "48V current", formula: "3000 / 48", result: "62.5 A" },
+          { label: "12V cable loss (4/0 AWG)", formula: "250² × 0.00005 Ω", result: "31.2 W (1.04%)" },
+          { label: "48V cable loss (6 AWG)", formula: "62.5² × 0.0033 Ω", result: "12.9 W (0.43%)" },
+        ]}
+        answer="48V is recommended — it draws 62.5A vs. 250A at 12V, using 6 AWG cable instead of 4/0 AWG, saving approximately $200+ in copper and reducing losses by 60%."
+        interpretation="At 12V, the 250A current demands extremely thick cable that is expensive, heavy, and difficult to install. 48V keeps current manageable with standard residential wiring."
+        variant="home"
+      />
+
+    </div>
+  </section>
+
+  <!-- Comparison Table -->
+  <ComparisonTable
+    title="12V vs 24V vs 48V System Comparison"
+    headers={["Parameter", "12V", "24V", "48V"]}
+    rows={[
+      ["Max Practical Load", "1 kW", "3 kW", "10+ kW"],
+      ["Current at 3kW", "250 A", "125 A", "62.5 A"],
+      ["Cable for 3kW (10m)", "4/0 AWG (107 mm²)", "2/0 AWG (67 mm²)", "6 AWG (13 mm²)"],
+      ["Cable Cost (10m run)", "$80–120", "$50–80", "$15–30"],
+      ["Voltage Drop (10m, 3kW)", "4.2% (4/0 AWG)", "2.1% (2/0 AWG)", "0.8% (6 AWG)"],
+      ["LFP Cells (Series)", "4S", "8S", "16S"],
+      ["Inverter Efficiency", "85–90%", "90–93%", "93–96%"],
+      ["Equipment Availability", "Widest", "Good", "Excellent (modern)"],
+      ["Safety Threshold", "Safe", "Safe", "Safe (<60V DC)"],
+      ["Best For", "Portable, Small RV", "Medium RV, Cabin", "Residential, Telecom"],
+    ]}
+    caption="Cable sizes are minimum recommended for continuous duty at 75°C conductor temperature"
+  />
+
+  <FAQSection items={faqItems} />
+  <RelatedTools tools={relatedTools} />
+
+  <!-- Calculation Script -->
+  <script>
+    const totalLoadInput = document.getElementById('total-load') as HTMLInputElement;
+    const cableDistanceInput = document.getElementById('cable-distance') as HTMLInputElement;
+    const batteryCapacityInput = document.getElementById('battery-capacity') as HTMLInputElement;
+    const ambientTempInput = document.getElementById('ambient-temp') as HTMLInputElement;
+
+    const copperResistivity = 1.72e-8;
+
+    const cableAWG: { gauge: string; areaM2: number; areaMM2: number }[] = [
+      { gauge: '18 AWG', areaM2: 0.823e-6, areaMM2: 0.823 },
+      { gauge: '16 AWG', areaM2: 1.31e-6, areaMM2: 1.31 },
+      { gauge: '14 AWG', areaM2: 2.08e-6, areaMM2: 2.08 },
+      { gauge: '12 AWG', areaM2: 3.31e-6, areaMM2: 3.31 },
+      { gauge: '10 AWG', areaM2: 5.26e-6, areaMM2: 5.26 },
+      { gauge: '8 AWG', areaM2: 8.37e-6, areaMM2: 8.37 },
+      { gauge: '6 AWG', areaM2: 13.3e-6, areaMM2: 13.3 },
+      { gauge: '4 AWG', areaM2: 21.2e-6, areaMM2: 21.2 },
+      { gauge: '2 AWG', areaM2: 33.6e-6, areaMM2: 33.6 },
+      { gauge: '1/0 AWG', areaM2: 53.5e-6, areaMM2: 53.5 },
+      { gauge: '2/0 AWG', areaM2: 67.4e-6, areaMM2: 67.4 },
+      { gauge: '4/0 AWG', areaM2: 107e-6, areaMM2: 107 },
+    ];
+
+    function findMinCable(currentA: number): { gauge: string; areaM2: number } {
+      const maxCurrentDensity = 4e6;
+      const requiredArea = currentA / maxCurrentDensity;
+      for (const c of cableAWG) {
+        if (c.areaM2 >= requiredArea) return c;
+      }
+      return cableAWG[cableAWG.length - 1];
+    }
+
+    function updateCalculations() {
+      const loadW = parseFloat(totalLoadInput.value) || 3000;
+      const distanceM = parseFloat(cableDistanceInput.value) || 10;
+      const batteryWh = parseFloat(batteryCapacityInput.value) || 5000;
+
+      const voltages = [12, 24, 48];
+      const results: Record<number, { current: number; lossW: number; lossPercent: number; cable: string }> = {};
+
+      for (const v of voltages) {
+        const current = loadW / v;
+        const cable = findMinCable(current);
+        const resistance = 2 * distanceM * copperResistivity / cable.areaM2;
+        const lossW = current * current * resistance;
+        const lossPercent = (lossW / loadW) * 100;
+
+        results[v] = { current, lossW, lossPercent, cable: cable.gauge };
+
+        const prefix = v === 12 ? 'v12' : v === 24 ? 'v24' : 'v48';
+        document.getElementById(`${prefix}-current`)!.textContent = `${current.toFixed(1)} A`;
+        document.getElementById(`${prefix}-loss`)!.textContent = `${lossW.toFixed(1)} W`;
+        document.getElementById(`${prefix}-cable`)!.textContent = cable.gauge;
+      }
+
+      const verdicts: Record<number, string> = {};
+      if (results[12].current > 150) verdicts[12] = '✗ Overcurrent risk';
+      else if (results[12].lossPercent > 3) verdicts[12] = '⚠ High loss';
+      else verdicts[12] = '✓ Acceptable';
+
+      if (results[24].current > 150) verdicts[24] = '✗ Overcurrent risk';
+      else if (results[24].lossPercent > 3) verdicts[24] = '⚠ High loss';
+      else verdicts[24] = '✓ Good';
+
+      verdicts[48] = results[48].lossPercent < 2 ? '✓ Best' : '✓ Good';
+
+      document.getElementById('v12-verdict')!.textContent = verdicts[12];
+      document.getElementById('v24-verdict')!.textContent = verdicts[24];
+      document.getElementById('v48-verdict')!.textContent = verdicts[48];
+
+      let recommended = 48;
+      if (loadW <= 500) recommended = 12;
+      else if (loadW <= 2000) recommended = 24;
+      else recommended = 48;
+
+      const recEl = document.getElementById('voltage-recommendation')!;
+      if (recommended === 48) {
+        recEl.textContent = `48V is recommended for your ${loadW.toLocaleString()}W system. At ${results[48].current.toFixed(1)}A, it enables ${results[48].cable} cable with only ${results[48].lossPercent.toFixed(2)}% loss over ${distanceM}m — the most efficient and cost-effective choice.`;
+      } else if (recommended === 24) {
+        recEl.textContent = `24V is recommended for your ${loadW.toLocaleString()}W system. At ${results[24].current.toFixed(1)}A, it uses ${results[24].cable} cable with ${results[24].lossPercent.toFixed(2)}% loss — good balance of efficiency and simplicity.`;
+      } else {
+        recEl.textContent = `12V is adequate for your ${loadW.toLocaleString()}W system. At ${results[12].current.toFixed(1)}A, it uses ${results[12].cable} cable with ${results[12].lossPercent.toFixed(2)}% loss — simple and cost-effective for small loads.`;
+      }
+
+      const lfpCellV = 3.2;
+      document.getElementById('r12-cells')!.querySelector('.text-title-lg')!.textContent = `${Math.round(12 / lfpCellV)} cells`;
+      document.getElementById('r24-cells')!.querySelector('.text-title-lg')!.textContent = `${Math.round(24 / lfpCellV)} cells`;
+      document.getElementById('r48-cells')!.querySelector('.text-title-lg')!.textContent = `${Math.round(48 / lfpCellV)} cells`;
+    }
+
+    [totalLoadInput, cableDistanceInput, batteryCapacityInput, ambientTempInput].forEach(el => {
+      el.addEventListener('input', updateCalculations);
+    });
+
+    updateCalculations();
+  </script>
+
+</CalculatorLayout>

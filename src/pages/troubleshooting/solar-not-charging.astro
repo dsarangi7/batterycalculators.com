@@ -1,0 +1,203 @@
+---
+import ArticleLayout from '../../layouts/ArticleLayout.astro';
+import TroubleshootingBlock from '../../components/TroubleshootingBlock.astro';
+
+const relatedCalculators = [
+  { title: 'Solar Battery Sizing Calculator', href: '/tools/solar-battery-sizing-calculator', type: 'calculator' as const },
+  { title: 'Charging Time Calculator', href: '/tools/charging-time-calculator', type: 'calculator' as const },
+  { title: 'C-Rate Calculator', href: '/tools/c-rate-calculator', type: 'calculator' as const },
+  { title: 'DC Voltage Drop Calculator', href: '/tools/dc-cable-loss-calculator', type: 'calculator' as const },
+];
+
+const relatedGuides = [
+  { title: 'How to Size a Solar Battery Bank', href: '/learn/how-to-size-solar-battery-bank', type: 'guide' as const },
+  { title: 'Solar Battery Backup Guide', href: '/learn/solar-battery-backup-guide', type: 'guide' as const },
+  { title: 'Off-Grid Battery Planning', href: '/learn/off-grid-battery-planning', type: 'guide' as const },
+];
+
+const faqItems = [
+  {
+    question: 'How do I test if my solar panels are producing power?',
+    answer: 'Use a multimeter to measure the open-circuit voltage (Voc) of each panel in direct sunlight. Compare to the panel\'s rated Voc (on the nameplate). Then measure short-circuit current (Isc) — compare to rated Isc. If voltage is normal but current is low, the panel may be dirty or degraded. If voltage is low, the panel may be damaged or overheating.',
+  },
+  {
+    question: 'What is MPPT and why does it matter?',
+    answer: 'MPPT (Maximum Power Point Tracking) is a charge controller algorithm that continuously adjusts the electrical operating point of the solar panel to extract maximum power. An MPPT controller can harvest 15–30% more energy than a PWM controller, especially when panel voltage is significantly higher than battery voltage. If your MPPT controller is malfunctioning, it may default to PWM mode, reducing charge current.',
+  },
+  {
+    question: 'Can partial shading completely stop solar charging?',
+    answer: 'Yes. Solar panels connected in series are limited by the weakest cell — shading even one cell can reduce the entire string\'s output by 50–80%. Bypass diodes help but only mitigate shading across entire substrings (typically 1/3 of the panel). For severe or variable shading, use micro-inverters, DC optimizers, or shade-tolerant wiring configurations.',
+  },
+  {
+    question: 'How do I check if my solar fuse is blown?',
+    answer: 'Use a multimeter in continuity mode across the fuse, or measure voltage on both sides of the fuse holder — if voltage is present on the panel side but not the battery side, the fuse is blown. Always replace fuses with the correct rating — an undersized fuse will blow repeatedly, while an oversized fuse may not protect against fault current.',
+  },
+  {
+    question: 'Why is my MPPT controller showing 0 amps?',
+    answer: 'Common causes include: (1) panel voltage below battery voltage (panels cannot charge a battery that is at higher voltage), (2) panel connected to wrong terminals, (3) MC4 connectors not fully seated, (4) blown fuse between panel and controller, (5) controller in nighttime mode (no PV voltage detected). Check panel Voc, verify wiring, and check controller LED indicators.',
+  },
+  {
+    question: 'How long should it take solar panels to charge my battery?',
+    answer: 'Charge time = Battery Ah ÷ (Panel watts × Peak sun hours × Controller efficiency ÷ System voltage). A 200Ah 12V battery with 400W of panels and 5 peak sun hours charges in approximately 200Ah ÷ (400W × 5h × 0.9 ÷ 12V) = 6.7 hours. In practice, charge time is longer due to panel derating, MPPT losses, and the CV phase slowdown above 80% SOC.',
+  },
+];
+---
+
+<ArticleLayout
+  title="Solar Not Charging — Troubleshooting Guide | Battery Calculators"
+  description="Diagnose why your solar panels are not charging your battery. Troubleshoot shading, MPPT issues, voltage mismatch, panel damage, and wiring problems with step-by-step checklists."
+  category="TROUBLESHOOTING"
+  categoryHref="/troubleshooting"
+  breadcrumbItems={[{ label: 'Solar Not Charging' }]}
+  relatedCalculators={relatedCalculators}
+  relatedGuides={relatedGuides}
+  faqItems={faqItems}
+>
+  <p class="text-body-md text-body font-light mb-8">
+    Solar charging systems have multiple failure points — from the panels themselves through the charge controller to the battery. A system that produced full power last week may produce nothing today due to shading, a blown fuse, or a controller fault. This guide walks through the five most common reasons solar panels fail to charge batteries, with practical diagnostic procedures.
+  </p>
+
+  <TroubleshootingBlock
+    problem="Shading — Partial Obstruction Killing Panel Output"
+    causes={[
+      'Tree growth casting shadows on one or more panels',
+      'Dirt, bird droppings, or debris blocking cells',
+      'Snow accumulation on panel surface',
+      'Nearby structures or equipment creating shade patterns',
+      'Panel orientation causing self-shading in array configurations',
+    ]}
+    explanation="Solar cells in a panel are wired in series strings, typically three substrings of 20–24 cells each with bypass diodes. When even one cell in a string is shaded, its resistance increases dramatically, bottlenecking the entire string. The bypass diode activates to route current around the shaded substring, but this still reduces the panel output by approximately one-third per shaded substring. If multiple substrings are affected, output drops to near zero. Partial shading is the number one cause of unexpected solar underperformance because the power loss is non-linear — 10% shading coverage can cause 30–50% power loss depending on the pattern. Even a small obstruction like a tree branch or antenna can cause disproportionate output loss."
+    checklist={[
+      'Visually inspect all panels for shading from trees, buildings, or debris',
+      'Check panel surface for dirt, bird droppings, or snow',
+      'Monitor panel output during different times of day to identify time-varying shade',
+      'Use an infrared camera or thermal image to identify hot spots from partial shading',
+      'Check if output improves after cleaning the panel surface',
+      'Review panel installation angle and orientation for self-shading in arrays',
+    ]}
+    solutions={[
+      'Trim trees or remove obstructions casting shadows on panels',
+      'Clean panel surface with water and soft brush (no abrasives)',
+      'Adjust panel mounting height or angle to clear seasonal shade paths',
+      'Reconfigure array wiring to put shaded panels on separate MPPT inputs',
+      'Install micro-inverters or DC optimizers to isolate shaded panel impact',
+      'Consider relocating panels to a shade-free area of the roof or ground',
+    ]}
+  />
+
+  <TroubleshootingBlock
+    problem="MPPT Controller Issues — Charge Controller Not Harvesting Power"
+    causes={[
+      'Controller not detecting PV voltage (nighttime mode or wiring fault)',
+      'MPPT algorithm stuck or firmware bug',
+      'Controller overloaded — panel array exceeds controller rating',
+      'Battery voltage higher than PV voltage (controller cannot boost down)',
+      'Controller display/LED fault masking actual charging operation',
+    ]}
+    explanation="Maximum Power Point Tracking controllers continuously adjust the electrical operating point of the solar array to extract maximum power. The MPPT algorithm sweeps the panel\'s voltage-current curve to find the knee point where power (V × I) is maximized. If the controller fails to detect PV input voltage, it enters standby mode. Common causes include open MC4 connectors, blown fuses, or panel voltage below the controller\'s minimum PV startup voltage (typically 12–16V for 12V systems). A less obvious failure mode occurs when the battery is fully charged — the controller reduces current to near zero to prevent overcharging, which can be mistaken for a fault. Additionally, if the panel array voltage is lower than battery voltage (e.g., a 12V panel trying to charge a 24V battery), the controller cannot boost voltage and produces no output."
+    checklist={[
+      'Check controller display for PV voltage, battery voltage, and charge current',
+      'Verify PV voltage at controller input terminals (should be >battery voltage + 2V)',
+      'If PV voltage reads 0V, check wiring from panels to controller',
+      'Check controller LED indicators for error codes or fault status',
+      'Verify panel array voltage matches controller input voltage range',
+      'Check controller rated input current vs actual panel current output',
+      'Restart controller by disconnecting battery and PV, then reconnecting battery first',
+    ]}
+    solutions={[
+      'Fix wiring connections to restore PV voltage at controller input',
+      'Ensure panel voltage exceeds battery voltage by at least 3–5V for MPPT startup',
+      'Update controller firmware if available from manufacturer',
+      'Replace controller if MPPT algorithm is non-functional after reset',
+      'Upgrade to a higher-rated controller if array exceeds current rating',
+      'Consult controller manual for specific error code resolution',
+    ]}
+  />
+
+  <TroubleshootingBlock
+    problem="Voltage Mismatch — Panel and Battery Voltage Incompatible"
+    causes={[
+      'Panel Voc too low to charge battery (12V panel on 24V battery)',
+      'Panel Voc too high for controller input rating',
+      'Temperature coefficient causing Voc to drop below threshold in heat',
+      'Incorrect panel series/parallel configuration',
+      'Mismatched panels in series string with different Voc values',
+    ]}
+    explanation="For a solar panel to charge a battery, its voltage at the maximum power point (Vmp) must exceed the battery voltage by a sufficient margin for the charge controller to operate. For MPPT controllers, the panel Vmp must exceed battery voltage by at least 3–5V. For PWM controllers, the panel Vmp must closely match battery charging voltage (14.4V for 12V LFP). Temperature significantly affects panel voltage — solar panels have a negative temperature coefficient of approximately -0.3%/°C for Voc. A panel with 21.5V Voc at 25°C drops to 18.6V at 60°C (common rooftop temperature). If the battery is at 14.6V charging voltage and the hot panel Vmp drops to 15V, an MPPT controller with a minimum 3V differential requirement will fail to track the maximum power point."
+    checklist={[
+      'Measure panel Voc with multimeter in direct sunlight',
+      'Compare measured Voc to nameplate specification',
+      'Check panel Vmp (maximum power voltage) from datasheet',
+      'Verify panel Voc exceeds battery charging voltage by at least 3V',
+      'Account for temperature: Voc drops ~0.3%/°C above 25°C',
+      'Verify series/parallel wiring matches controller input voltage range',
+      'Check if all panels in a series string have matching specifications',
+    ]}
+    solutions={[
+      'Add panels in series to increase string voltage above battery voltage threshold',
+      'Switch to a higher-voltage battery system (24V or 48V) for better panel matching',
+      'Use an MPPT controller rated for your panel Voc range and battery voltage',
+      'Ensure all panels in a series string are identical make and model',
+      'Account for hot-weather voltage drop when sizing panel string voltage',
+      'Consult the Solar Battery Sizing Calculator for proper voltage matching',
+    ]}
+  />
+
+  <TroubleshootingBlock
+    problem="Panel Damage — Physical or Electrical Failure of Solar Panels"
+    causes={[
+      'Micro-cracks from hail impact or mechanical stress',
+      'Hot spots from cell damage causing localized overheating',
+      'Delamination allowing moisture ingress and corrosion',
+      'Broken solder joints from thermal cycling',
+      'Bypass diode failure causing permanent substring loss',
+    ]}
+    explanation="Solar panels degrade over time (typically 0.5–0.7% per year), but physical damage can cause sudden and severe output loss. Hail impacts create micro-cracks in silicon cells that may not be visible but interrupt current flow. Hot spots occur when a damaged or shaded cell becomes reverse-biased, dissipating power as heat rather than generating it — this can burn the backsheet and create fire risk. Delamination allows moisture to corrode cell interconnects, progressively reducing output. Bypass diodes that fail short-circuit permanently disable a substring, while diodes that fail open-circuit allow substring hot spots to develop. Thermal cycling (daily heating and cooling) stresses solder joints and ribbon connections, eventually causing open circuits in affected cells."
+    checklist={[
+      'Visually inspect panel glass for cracks, chips, or impact damage',
+      'Check panel backsheet for burn marks, discoloration, or delamination',
+      'Use infrared camera to identify hot spots during peak sunlight',
+      'Measure panel Voc and Isc — compare to nameplate and neighboring panels',
+      'Check MC4 connectors for corrosion or moisture inside the connector housing',
+      'Compare output of suspect panel to identical adjacent panel',
+      'Review panel age and warranty terms (typically 25-year performance warranty)',
+    ]}
+    solutions={[
+      'Replace panels with visible physical damage or confirmed electrical failure',
+      'Replace MC4 connectors if moisture or corrosion is found inside',
+      'Contact manufacturer for warranty replacement of panels with hot spots',
+      'Improve mounting to reduce mechanical stress from wind and thermal cycling',
+      'Install panel-level monitoring (micro-inverters or optimizers) to detect failures early',
+      'Keep panel surfaces clean and inspect annually for signs of degradation',
+    ]}
+  />
+
+  <TroubleshootingBlock
+    problem="Wiring and Fuse Issues — Broken Path Between Panel and Battery"
+    causes={[
+      'Blown DC fuse or breaker between panels and controller',
+      'Loose MC4 connector not fully seated',
+      'Rodent damage chewing through solar cable',
+      'Corroded connection in outdoor junction box',
+      'Incorrect wiring polarity (positive and negative reversed)',
+    ]}
+    explanation="The DC circuit from solar panels to charge controller is a continuous path that must be unbroken for current to flow. A single failed connection point stops all charging. Fuses and breakers are the most common failure point — they protect against overcurrent but can also blow from nuisance trips caused by lightning-induced surges, loose connections creating arcing, or temporary panel overvoltage. MC4 connectors are designed for weather resistance but can work loose over time from thermal expansion/contraction cycles. Outdoor junction boxes are vulnerable to moisture ingress that corrodes terminals and creates high-resistance connections. Cable damage from rodents, UV exposure, or physical abrasion can create open circuits or intermittent connections that are difficult to diagnose."
+    checklist={[
+      'Check DC fuse or breaker — replace if blown, investigate why it blew',
+      'Disconnect and reconnect all MC4 connectors, ensuring positive click-lock',
+      'Measure voltage at panel output, at fuse/breaker, and at controller input',
+      'If voltage is present before fuse but not after, fuse is blown or holder is corroded',
+      'Trace entire cable path for physical damage, UV degradation, or rodent chew marks',
+      'Verify correct polarity at all connection points',
+      'Inspect outdoor junction boxes for moisture or corrosion',
+    ]}
+    solutions={[
+      'Replace blown fuses with correct rating (match panel Isc × 1.56 per NEC)',
+      'Replace corroded fuse holders with IP67-rated weatherproof units',
+      'Re-seat or replace loose MC4 connectors (use genuine MC4 replacement parts)',
+      'Replace damaged cable with outdoor-rated USE-2 or PV wire',
+      'Seal all outdoor junction boxes with silicone and install drip loops',
+      'Use the DC Cable Loss Calculator to verify cable gauge is adequate',
+    ]}
+  />
+</ArticleLayout>

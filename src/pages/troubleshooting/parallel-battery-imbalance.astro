@@ -1,0 +1,181 @@
+---
+import ArticleLayout from '../../layouts/ArticleLayout.astro';
+import TroubleshootingBlock from '../../components/TroubleshootingBlock.astro';
+import FAQSection from '../../components/FAQSection.astro';
+
+const description = "Diagnose why batteries in parallel are not sharing load equally. Covers different SOC, age, internal resistance, wiring asymmetry, and connection resistance with step-by-step checklists.";
+
+const faqItems = [
+  {
+    question: "How do I check if parallel batteries are sharing load equally?",
+    answer: "Use a clamp meter on each battery's positive and negative cables while the system is under load. Compare the current readings — each battery should carry approximately the same current. A difference greater than 10% indicates an imbalance that should be investigated.",
+  },
+  {
+    question: "Can I parallel batteries of different capacities?",
+    answer: "You can, but they will not share load proportionally. The battery with lower internal resistance (usually the larger capacity battery) will carry more current. Ideally, parallel batteries should be the same chemistry, capacity, age, and manufacturer for best results.",
+  },
+  {
+    question: "How do I fix parallel battery imbalance?",
+    answer: "First, fully charge all batteries individually before paralleling. Then ensure all connections are clean, tight, and identical in length and gauge. If imbalance persists, check for differences in internal resistance using an AC impedance meter. Replace any battery with significantly higher resistance.",
+  },
+  {
+    question: "Should I fuse each battery in a parallel bank?",
+    answer: "Yes. Each battery in a parallel bank should have its own fuse rated at the battery's maximum continuous current. This protects against a single battery failure causing all other batteries to discharge into the fault. Fuses also make it easier to isolate individual batteries for maintenance.",
+  },
+  {
+    question: "How often should I check parallel battery balance?",
+    answer: "Check current sharing monthly during the first six months of operation. After the system stabilizes, quarterly checks are sufficient. Monitor battery voltages daily using the BMS or a battery monitor. Any sudden change in balance indicates a developing problem.",
+  },
+];
+
+const relatedCalculators = [
+  { title: "Parallel String Calculator", href: "/tools/parallel-string-calculator", type: "calculator" as const },
+  { title: "Battery Sizing Calculator", href: "/tools/battery-sizing-calculator", type: "calculator" as const },
+  { title: "Voltage Drop Calculator", href: "/tools/voltage-drop-calculator", type: "calculator" as const },
+];
+
+const relatedGuides = [
+  { title: "How to Size a Battery Bank", href: "/learn/how-to-size-a-battery-bank", type: "guide" as const },
+  { title: "LiFePO4 Pack Design", href: "/learn/lifepo4-pack-design", type: "guide" as const },
+];
+---
+
+<ArticleLayout
+  title="Parallel Battery Imbalance — Troubleshooting Guide | Battery Calculators"
+  description={description}
+  category="TROUBLESHOOTING"
+  categoryHref="/troubleshooting"
+  breadcrumbItems={[{ label: "Parallel Battery Imbalance" }]}
+  relatedCalculators={relatedCalculators}
+  relatedGuides={relatedGuides}
+  faqItems={faqItems}
+>
+  <p class="text-body-md text-body font-light mb-8">
+    When batteries connected in parallel do not share load equally, one battery works harder than the others — leading to faster degradation, premature failure, and reduced overall system capacity. This guide covers the five common causes and how to restore balanced operation in your parallel battery bank.
+  </p>
+
+  <TroubleshootingBlock
+    problem="Different State of Charge (SOC)"
+    causes={[
+      "Batteries were not fully charged to the same voltage before paralleling",
+      "Different self-discharge rates caused SOC drift over time",
+      "One battery was charged separately while others were not",
+      "BMS balancing on individual batteries resulted in different final voltages",
+    ]}
+    explanation="When batteries at different SOC levels are connected in parallel, current flows from the higher-voltage battery to the lower-voltage one until voltages equalize. This balancing current can be very high — potentially hundreds of amps for lithium batteries — and can damage connections and fuses. Even after equalization, if the batteries have different capacities, the SOC at equal voltage will differ."
+    checklist={[
+      "Measure the open-circuit voltage of each battery before paralleling — they should be within 0.1V",
+      "Check if one battery feels warmer than others — heat indicates current flowing into or out of it",
+      "Measure current on each battery cable with a clamp meter while the system is at rest (no load, no charge)",
+      "Record voltages over several days to see if balance is stable or drifting",
+      "Verify all battery BMS units are set to the same charge parameters",
+    ]}
+    solutions={[
+      "Charge all batteries individually to 100% SOC before connecting them in parallel",
+      "Use a common busbar design with equal cable lengths to minimize voltage differences",
+      "Install a battery isolator to prevent cross-charging when batteries are at different voltages",
+      "For lithium batteries, use active balancing between parallel strings to maintain equilibrium",
+    ]}
+  />
+
+  <TroubleshootingBlock
+    problem="Different Battery Age or Condition"
+    causes={[
+      "Banks mixing new and old batteries — older batteries have higher internal resistance",
+      "One battery has experienced more cycles than the others",
+      "Different batch batteries with slight manufacturing variations",
+      "One battery was stored or used in harsher conditions",
+    ]}
+    explanation="As batteries age, their internal resistance increases and their capacity decreases. In a parallel bank, the battery with lower internal resistance (the newer or less-used one) naturally carries more current. This creates a feedback loop: the healthier battery works harder and ages faster, while the weaker battery carries less current and degrades more slowly. The net effect is reduced total capacity compared to a matched bank."
+    checklist={[
+      "Record the manufacture date and cycle count of each battery in the parallel bank",
+      "Measure the internal resistance of each battery using an AC impedance meter",
+      "Perform capacity tests on each battery individually by discharging at 0.2C",
+      "Compare current draw on each battery under identical load conditions",
+      "Check if any battery shows signs of swelling, corrosion, or physical damage",
+    ]}
+    solutions={[
+      "Replace any battery that has significantly degraded (below 80% of original capacity)",
+      "Do not mix new and old batteries in the same parallel bank — replace in matched sets",
+      "If mixing is unavoidable, use a battery with a DC-DC converter to equalize current sharing",
+      "Document the age and condition of each battery for future maintenance planning",
+    ]}
+  />
+
+  <TroubleshootingBlock
+    problem="Different Internal Resistance"
+    causes={[
+      "Manufacturing variation between cells or batteries",
+      "One battery has corroded terminals or loose internal connections",
+      "Different cable lengths or gauges connecting each battery to the busbar",
+      "One battery has been subjected to higher temperatures, increasing its resistance",
+    ]}
+    explanation="Internal resistance determines how current is shared in a parallel bank. Batteries with lower resistance naturally carry more current. Even identical batteries can have 5-10% variation in internal resistance from the factory. Over time, corrosion, loose connections, and thermal aging increase resistance unevenly. A 20% difference in resistance between parallel batteries can cause a 20% difference in current sharing."
+    checklist={[
+      "Measure the AC internal resistance of each battery at 1kHz using an impedance meter",
+      "Compare resistance values — any battery more than 15% higher than the average is problematic",
+      "Check all cable connections for tightness and corrosion — re-torque all terminals",
+      "Measure cable resistance from each battery to the common busbar — they should be identical",
+      "Inspect internal busbar connections for signs of overheating or discoloration",
+    ]}
+    solutions={[
+      "Replace any battery with significantly higher internal resistance than the others",
+      "Ensure all parallel cables are the same length, gauge, and material",
+      "Clean and re-torque all terminal connections — apply anti-corrosion compound",
+      "Use a busbar design that provides equal path resistance from each battery to the load",
+    ]}
+  />
+
+  <TroubleshootingBlock
+    problem="Wiring Asymmetry"
+    causes={[
+      "Different cable lengths from each battery to the busbar",
+      "Different cable gauges used for different batteries in the bank",
+      "Asymmetric busbar layout creating unequal path resistances",
+      "One battery connected through a fuse or switch with higher resistance than others",
+    ]}
+    explanation="In a parallel battery bank, the resistance of the wiring from each battery to the common busbar determines current sharing. Even small differences in cable length, gauge, or connection quality create unequal resistance paths. The battery connected through the shortest, lowest-resistance path carries more current. This is a common design flaw in DIY battery banks."
+    checklist={[
+      "Measure the resistance from each battery's positive terminal to the busbar using a milliohm meter",
+      "Measure the resistance from each battery's negative terminal to the busbar",
+      "Verify all cables are the same length, gauge, and type (same brand and construction)",
+      "Check that all fuses and switches in the parallel paths have the same resistance rating",
+      "Draw a diagram of the physical wiring layout to identify path length differences",
+    ]}
+    solutions={[
+      "Rewire the parallel bank using identical cables of the same length for each battery",
+      "Use a star topology where each battery has its own cable to a central busbar",
+      "Replace any fuse or switch that has significantly higher resistance than others in the bank",
+      "Consider using a busbar design that provides geometrically equal paths from each battery",
+    ]}
+  />
+
+  <TroubleshootingBlock
+    problem="Connection Resistance"
+    causes={[
+      "Loose or corroded terminal connections on one or more batteries",
+      "Mixed metals at the connection point creating galvanic corrosion",
+      "Undersized busbars or cables that cannot carry the shared current",
+      "Terminal bolts torqued to different values across the bank",
+    ]}
+    explanation="Connection resistance at the battery terminals and busbars is often the largest variable in a parallel bank. Corroded or loose connections add milliohms of resistance that directly affect current sharing. A single loose connection can cause the affected battery to carry 30-50% less current than its neighbors. Terminal torque, surface cleanliness, and anti-oxidation treatment all matter."
+    checklist={[
+      "Check the tightness of every terminal connection using a torque wrench",
+      "Inspect all terminals for corrosion, oxidation, or discoloration",
+      "Clean all terminal surfaces with a wire brush and apply anti-oxidation compound",
+      "Measure the voltage drop across each connection under load — should be less than 50mV",
+      "Verify all busbars are adequately sized for the total current of the parallel bank",
+    ]}
+    solutions={[
+      "Re-torque all terminal connections to the manufacturer's specified value",
+      "Clean all terminals and busbars — remove corrosion with a wire brush and contact cleaner",
+      "Apply anti-oxidation compound (Noalox or equivalent) to all aluminum connections",
+      "Replace undersized busbars or cables that cannot carry the total parallel current",
+      "Use lock washers or thread-locking compound to prevent connections from loosening over time",
+    ]}
+  />
+
+  <p class="text-caption text-muted border-t border-hairline pt-8 mt-12">
+    <strong>Disclaimer:</strong> This guide is for educational and diagnostic purposes only. Working with parallel battery banks involves high currents and electrical hazards. Always disconnect all power sources before working on battery connections. Follow the manufacturer's safety procedures and consult a qualified technician for large battery installations.
+  </p>
+</ArticleLayout>

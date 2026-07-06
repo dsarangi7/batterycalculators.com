@@ -1,0 +1,180 @@
+---
+import ArticleLayout from '../../layouts/ArticleLayout.astro';
+import TroubleshootingBlock from '../../components/TroubleshootingBlock.astro';
+import FAQSection from '../../components/FAQSection.astro';
+
+const description = "Diagnose why your battery is physically swelling or bulging. Covers overcharging, internal gas generation, manufacturing defects, excessive heat, and deep discharge with safety checklists.";
+
+const faqItems = [
+  {
+    question: "Is a swollen battery dangerous?",
+    answer: "Yes. A swollen battery contains trapped gas from internal chemical reactions. The casing is under pressure and may rupture, releasing flammable electrolyte. In extreme cases, swelling precedes thermal runaway. Retire any swollen battery immediately and handle with care during disposal.",
+  },
+  {
+    question: "Can I flatten a swollen battery by pressing on it?",
+    answer: "Never attempt to flatten, puncture, or compress a swollen battery. The internal layers may be damaged, and applying pressure can cause an internal short circuit leading to fire or explosion. The battery must be safely retired and recycled.",
+  },
+  {
+    question: "Does swelling always mean the battery is done?",
+    answer: "In nearly all cases, yes. Swelling indicates irreversible internal damage — gas generation from electrolyte decomposition, internal shorts, or separator failure. The battery cannot be restored. Do not attempt to recharge a swollen battery.",
+  },
+  {
+    question: "How should I dispose of a swollen battery?",
+    answer: "Do not throw swollen batteries in household trash. Place them in a fireproof container and take them to a battery recycling facility or a retailer that accepts lithium batteries. Some fire departments also accept batteries for safe disposal.",
+  },
+  {
+    question: "Can swelling happen to any battery chemistry?",
+    answer: "Swelling is most common in lithium-ion and lithium-polymer batteries, which generate gas when the electrolyte decomposes. Lead-acid batteries can also swell from hydrogen gas buildup during overcharging, but this is less common with modern sealed designs. NiMH batteries rarely swell.",
+  },
+];
+
+const relatedCalculators = [
+  { title: "Battery Degradation Estimator", href: "/tools/battery-degradation-estimator", type: "calculator" as const },
+  { title: "Charging Time Calculator", href: "/tools/charging-time-calculator", type: "calculator" as const },
+  { title: "SOC Estimator", href: "/tools/soc-estimator", type: "calculator" as const },
+];
+
+const relatedGuides = [
+  { title: "LiFePO4 Pack Design", href: "/learn/lifepo4-pack-design", type: "guide" as const },
+  { title: "How to Build a Battery Pack", href: "/learn/how-to-build-a-battery-pack", type: "guide" as const },
+];
+---
+
+<ArticleLayout
+  title="Battery Swelling — Troubleshooting Guide | Battery Calculators"
+  description={description}
+  category="TROUBLESHOOTING"
+  categoryHref="/troubleshooting"
+  breadcrumbItems={[{ label: "Battery Swelling" }]}
+  relatedCalculators={relatedCalculators}
+  relatedGuides={relatedGuides}
+  faqItems={faqItems}
+>
+  <p class="text-body-md text-body font-light mb-8">
+    Battery swelling — visible bulging or deformation of the battery casing — is a serious safety warning sign. It indicates gas buildup from internal chemical reactions that should not be occurring. This guide covers the five root causes and the safety procedures for handling a swollen battery.
+  </p>
+
+  <TroubleshootingBlock
+    problem="Overcharging"
+    causes={[
+      "Charger voltage exceeds the battery's maximum rated voltage",
+      "Charge controller is misconfigured or has failed in the on position",
+      "BMS over-voltage protection failed to disconnect the charger",
+      "Trickle charging a fully charged LiFePO4 battery at high voltage",
+    ]}
+    explanation="Overcharging forces excess lithium ions into the anode beyond its capacity. The anode becomes saturated and lithium metal plates on the surface. This plated lithium reacts with the electrolyte, generating gas (primarily CO2 and ethylene). The gas has nowhere to escape in a sealed cell, causing the casing to swell. Overcharging is the most common cause of battery swelling and a leading cause of thermal runaway events."
+    checklist={[
+      "Check the charger output voltage against the battery's maximum charge voltage specification",
+      "Verify the BMS over-voltage protection is functional by testing with an adjustable power supply",
+      "Inspect the charge controller for correct chemistry settings (LiFePO4, lead-acid, NMC)",
+      "Check if the battery was left on a charger designed for a different chemistry",
+      "Look for evidence of swelling before and after recent charging sessions",
+    ]}
+    solutions={[
+      "Retire the swollen battery immediately — do not attempt to recharge it",
+      "Replace the charger or charge controller if it failed to limit voltage correctly",
+      "Install a secondary over-voltage protection device as a backup to the BMS",
+      "Always match charger settings to the specific battery chemistry and configuration",
+    ]}
+  />
+
+  <TroubleshootingBlock
+    problem="Internal Gas Generation"
+    causes={[
+      "Electrolyte decomposition at high temperatures or high voltages",
+      "Electrolyte reacting with electrode material at abnormal conditions",
+      "Water contamination in the electrolyte producing hydrogen gas",
+      "Chemical decomposition of the solid-electrolyte interphase (SEI) layer",
+    ]}
+    explanation="Inside a lithium cell, the electrolyte is an organic solvent that can decompose under stress. High voltage, high temperature, and contamination all accelerate decomposition. The decomposition products include gases like CO2, CO, and H2. These gases accumulate inside the sealed cell, increasing internal pressure and causing the casing to bulge outward. Even small amounts of gas indicate that irreversible chemical damage has occurred."
+    checklist={[
+      "Check if the battery has been exposed to temperatures above 60C during operation or storage",
+      "Verify the battery has not been charged above its rated voltage",
+      "Look for signs of water ingress if the battery was used in marine or outdoor environments",
+      "Check the battery's age — older cells are more prone to electrolyte decomposition",
+      "Measure cell impedance — a significant increase suggests internal chemical degradation",
+    ]}
+    solutions={[
+      "Retire the battery — internal gas generation indicates irreversible electrolyte damage",
+      "Investigate and eliminate the root cause (overvoltage, overheating, or contamination)",
+      "Improve environmental controls — temperature, humidity, and voltage regulation",
+      "For marine applications, ensure battery enclosures are properly sealed and ventilated",
+    ]}
+  />
+
+  <TroubleshootingBlock
+    problem="Manufacturing Defect"
+    causes={[
+      "Metal particle contamination during electrode manufacturing",
+      "Inadequate separator allowing internal electrical contact between electrodes",
+      "Poor weld quality on internal connections creating hot spots",
+      "Inconsistent electrode coating causing localized high-current areas",
+    ]}
+    explanation="Manufacturing defects can cause swelling even under normal operating conditions. A microscopic metal particle embedded during electrode fabrication can slowly grow through the separator, creating a micro-short that generates heat and gas. Poor quality control in electrode coating creates uneven current distribution, leading to localized overcharge and gas generation. These defects may not manifest immediately."
+    checklist={[
+      "Check if the swelling occurred early in the battery's life — early failure suggests a manufacturing issue",
+      "Review the batch number and check if other units from the same batch have similar failures",
+      "Inspect the battery for any visible signs of uneven swelling or localized bulging",
+      "Check the warranty status — manufacturing defects are typically covered",
+      "Report the failure to the manufacturer with batch and serial information",
+    ]}
+    solutions={[
+      "Retire the battery and contact the manufacturer for a warranty replacement",
+      "Report the failure to help the manufacturer identify and recall defective batches",
+      "Purchase batteries from reputable manufacturers with proven quality control processes",
+      "Consider batteries with additional safety features like ceramic-coated separators",
+    ]}
+  />
+
+  <TroubleshootingBlock
+    problem="Excessive Heat Exposure"
+    causes={[
+      "Battery installed in an uninsulated compartment exposed to direct sunlight",
+      "Proximity to heat sources — engines, exhaust systems, inverters",
+      "High ambient temperature environment without adequate cooling",
+      "Heat generated by the battery itself during high-rate discharge not being dissipated",
+    ]}
+    explanation="Heat accelerates every degradation mechanism in a battery. At elevated temperatures, the electrolyte decomposes faster, the SEI layer thickens, and gas generation increases. The Arrhenius equation describes this relationship — for every 10C increase in temperature, the rate of degradation roughly doubles. A battery operated at 50C ages approximately four times faster than one at 25C."
+    checklist={[
+      "Measure the temperature inside the battery enclosure during peak operation",
+      "Check for heat sources within 30cm of the battery — engines, exhaust, inverters, transformers",
+      "Verify that ventilation openings are unobstructed and fans are operational",
+      "Check if swelling occurred during summer months or in a hot climate",
+      "Feel the battery casing for hot spots that might indicate localized overheating",
+    ]}
+    solutions={[
+      "Relocate the battery away from all heat sources and improve ventilation",
+      "Install active cooling — forced air fans or liquid cooling for high-power applications",
+      "Use insulated enclosures in extreme climates to buffer temperature swings",
+      "Retire any battery that has swelled due to heat exposure — the damage is permanent",
+    ]}
+  />
+
+  <TroubleshootingBlock
+    problem="Deep Discharge Damage"
+    causes={[
+      "Battery was discharged below its minimum safe voltage cutoff",
+      "BMS under-voltage protection failed or was bypassed",
+      "Battery was stored in a discharged state for an extended period",
+      "Deep discharge caused copper dissolution from the anode current collector",
+    ]}
+    explanation="Deep discharge below the minimum voltage can cause copper current collector dissolution in lithium cells. When the cell is subsequently recharged, the dissolved copper deposits on the electrode surface, potentially creating internal short circuits. The copper deposits can puncture the separator, causing localized heating and gas generation. Even if the battery survives the deep discharge, the internal damage may cause delayed swelling."
+    checklist={[
+      "Check if the battery was ever discharged below its rated minimum voltage",
+      "Verify the BMS under-voltage protection was active and correctly configured",
+      "Look for signs that the battery was stored in a deeply discharged state",
+      "Check if swelling appeared days or weeks after a deep discharge event",
+      "Measure cell impedance — copper dissolution increases internal resistance",
+    ]}
+    solutions={[
+      "Retire any battery that has been deeply discharged and subsequently swelled",
+      "Ensure the BMS under-voltage protection is active and set to the correct threshold",
+      "Never store batteries in a fully discharged state — store at 40-60% SOC",
+      "Add a low-voltage alarm to alert before the battery reaches dangerous discharge levels",
+    ]}
+  />
+
+  <p class="text-caption text-muted border-t border-hairline pt-8 mt-12">
+    <strong>Disclaimer:</strong> This guide is for educational and diagnostic purposes only. Battery swelling is a serious safety concern. Never attempt to charge, use, or repair a swollen battery. Retire it immediately and dispose of it at a certified battery recycling facility. Do not puncture, crush, or incinerate swollen batteries.
+  </p>
+</ArticleLayout>

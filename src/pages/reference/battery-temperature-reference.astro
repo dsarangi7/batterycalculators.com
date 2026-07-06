@@ -1,0 +1,122 @@
+---
+import ArticleLayout from '../../layouts/ArticleLayout.astro';
+import ReferenceTable from '../../components/ReferenceTable.astro';
+import ComparisonTable from '../../components/ComparisonTable.astro';
+import FAQSection from '../../components/FAQSection.astro';
+
+const relatedCalculators = [
+  { title: 'Runtime Calculator', href: '/tools/runtime-calculator', type: 'calculator' as const },
+  { title: 'Battery Sizing Calculator', href: '/tools/battery-sizing-calculator', type: 'calculator' as const },
+  { title: 'Battery Degradation Estimator', href: '/tools/battery-degradation-estimator', type: 'calculator' as const },
+  { title: 'C-Rate Calculator', href: '/tools/c-rate-calculator', type: 'calculator' as const },
+];
+
+const relatedGuides = [
+  { title: 'Battery Temperature Correction Chart', href: '/learn/battery-temperature-correction-chart', type: 'guide' as const },
+  { title: 'Battery Degradation Explained', href: '/learn/battery-degradation-explained', type: 'guide' as const },
+  { title: 'LiFePO4 Pack Design', href: '/learn/lifepo4-pack-design', type: 'guide' as const },
+];
+
+const faqItems = [
+  {
+    question: 'How does cold weather affect battery capacity?',
+    answer: 'At 0°C (32°F), most lithium batteries retain 90–95% of rated capacity. At -10°C (14°F), capacity drops to 80–90%. At -20°C (-4°F), capacity may fall to 70–80% for LFP and 60–70% for NMC. Lead-acid batteries lose roughly 20% capacity at 0°C and 50% at -20°C. Cold also increases internal resistance, reducing maximum discharge current.',
+  },
+  {
+    question: 'Can I charge a lithium battery below freezing?',
+    answer: 'Charging lithium batteries below 0°C (32°F) is dangerous and should be avoided. Lithium plating on the anode during low-temperature charging causes irreversible capacity loss and can create internal short circuits. Most BMS units include low-temperature charge protection that disconnects the charger below 0–5°C. Use self-heating batteries or temperature-controlled charging in cold climates.',
+  },
+  {
+    question: 'What is the ideal operating temperature for batteries?',
+    answer: 'The ideal temperature range for most lithium batteries is 20–25°C (68–77°F). This provides maximum capacity and cycle life. Lead-acid batteries perform best at 25°C (77°F). Every 8°C rise above 25°C approximately halves the cycle life of a lead-acid battery. For lithium, operation above 45°C accelerates SEI growth and capacity fade.',
+  },
+  {
+    question: 'How do I apply temperature derating to my battery sizing?',
+    answer: 'Multiply the required capacity by the inverse of the temperature derating factor. For example, if you need 100Ah at -10°C and the derating factor is 0.85, size for 100/0.85 = 118Ah. Apply the derating factor for the coldest expected temperature during discharge. For charging, ensure the BMS or heater prevents charging below 0°C.',
+  },
+  {
+    question: 'Do lithium batteries need thermal management?',
+    answer: 'Lithium batteries benefit from thermal management in extreme environments. In hot climates (>40°C ambient), active cooling or shaded/insulated enclosures help maintain performance. In cold climates (<0°C), battery heaters or self-heating cells are essential. For most moderate-climate installations (10–35°C), passive ventilation is sufficient.',
+  },
+  {
+    question: 'How does temperature affect battery cycle life?',
+    answer: 'Temperature significantly impacts cycle life. LFP batteries at 25°C may achieve 3,000–5,000 cycles to 80% capacity. At 35°C, this drops to 2,000–3,000 cycles. At 45°C, expect 1,000–1,500 cycles. Lead-acid batteries are even more sensitive: every 8°C above 25°C halves the cycle life. Operating within the recommended temperature range is the single most impactful factor for battery longevity.',
+  },
+];
+---
+
+<ArticleLayout
+  title="Battery Temperature Reference | Battery Calculators"
+  description="Temperature effects on battery capacity, charge limits, and cycle life for LiFePO4, NMC, and Lead-Acid chemistries. Derating tables from -20°C to 60°C with operating temperature ranges."
+  category="REFERENCE"
+  categoryHref="/reference"
+  breadcrumbItems={[{ label: 'Battery Temperature Reference' }]}
+  relatedCalculators={relatedCalculators}
+  relatedGuides={relatedGuides}
+  faqItems={faqItems}
+>
+  <p class="text-body-md text-body font-light mb-8">
+    Temperature is the most critical environmental factor affecting battery performance, capacity, and longevity. This reference provides capacity derating factors across the full operating range for LiFePO4, NMC, and Lead-Acid chemistries, along with charge temperature limits and thermal management guidelines.
+  </p>
+
+  <ReferenceTable
+    title="Capacity Derating by Temperature"
+    description="Percentage of rated capacity available at each temperature for three common battery chemistries."
+    headers={['Temperature', 'LiFePO4 (LFP)', 'NMC (Li-ion)', 'Lead-Acid (Flooded)', 'Lead-Acid (AGM)']}
+    rows={[
+      ['-20°C (-4°F)', '70–75%', '55–65%', '40–50%', '45–55%'],
+      ['-10°C (14°F)', '80–85%', '70–80%', '60–70%', '65–75%'],
+      ['0°C (32°F)', '90–95%', '85–90%', '75–85%', '80–88%'],
+      ['10°C (50°F)', '95–98%', '93–97%', '88–93%', '90–95%'],
+      ['25°C (77°F)', '100%', '100%', '100%', '100%'],
+      ['35°C (95°F)', '100%', '99–100%', '98–100%', '99–100%'],
+      ['45°C (113°F)', '99–100%', '97–99%', '95–98%', '96–99%'],
+      ['55°C (131°F)', '98–99%', '94–97%', '90–95%', '92–96%'],
+      ['60°C (140°F)', '97–98%', '90–94%', '85–92%', '88–94%'],
+    ]}
+    source="Typical values from manufacturer datasheets. Actual derating varies by cell grade and design."
+  />
+
+  <ComparisonTable
+    title="Operating Temperature Ranges by Chemistry"
+    headers={['Parameter', 'LiFePO4 (LFP)', 'NMC (Li-ion)', 'Lead-Acid (Flooded)', 'Lead-Acid (AGM/Gel)']}
+    rows={[
+      ['Discharge Temperature', '-20°C to 60°C', '-20°C to 55°C', '-20°C to 50°C', '-20°C to 50°C'],
+      ['Charge Temperature', '0°C to 45°C', '0°C to 45°C', '-10°C to 50°C', '-10°C to 45°C'],
+      ['Storage Temperature', '-20°C to 35°C', '-20°C to 35°C', '-20°C to 40°C', '-20°C to 40°C'],
+      ['Optimal Operating Temp', '15°C – 30°C', '15°C – 30°C', '20°C – 30°C', '20°C – 28°C'],
+      ['Self-Discharge at 25°C', '1–3% / month', '2–5% / month', '3–5% / week', '1–3% / month'],
+      ['Thermal Runaway Onset', '>270°C', '~150°C', 'N/A', 'N/A'],
+    ]}
+    highlightCol={1}
+    caption="Always verify with manufacturer specifications. Limits may vary by cell design and BMS configuration."
+  />
+
+  <ReferenceTable
+    title="Charge Voltage Derating by Temperature"
+    description="Recommended float charge voltage adjustments per cell for temperature compensation."
+    headers={['Temperature', 'LFP Cell Voltage', 'NMC Cell Voltage', 'Lead-Acid Cell Voltage', 'Adjustment']}
+    rows={[
+      ['-10°C (14°F)', '3.55V', '4.22V', '2.38V', '+40mV per 10°C below 25°C'],
+      ['0°C (32°F)', '3.50V', '4.20V', '2.35V', '+30mV per 10°C below 25°C'],
+      ['10°C (50°F)', '3.45V', '4.18V', '2.32V', '+15mV per 10°C below 25°C'],
+      ['25°C (77°F)', '3.40V', '4.15V', '2.27V', 'Nominal (no adjustment)'],
+      ['35°C (95°F)', '3.35V', '4.12V', '2.22V', '-15mV per 10°C above 25°C'],
+      ['45°C (113°F)', '3.30V', '4.10V', '2.18V', '-30mV per 10°C above 25°C'],
+    ]}
+    source="Standard temperature compensation formulas. Lead-acid: -3 to -5mV/°C/cell. Lithium: manufacturer-specific."
+  />
+
+  <ReferenceTable
+    title="Cycle Life vs. Temperature"
+    description="Estimated cycle life to 80% capacity at various operating temperatures for common chemistries."
+    headers={['Temperature', 'LFP Cycles', 'NMC Cycles', 'Lead-Acid Cycles', 'Notes']}
+    rows={[
+      ['15°C (59°F)', '5,000–7,000', '2,500–3,500', '800–1,200', 'Cool operation extends life'],
+      ['25°C (77°F)', '3,500–5,000', '1,500–2,500', '500–800', 'Nominal rating condition'],
+      ['35°C (95°F)', '2,000–3,000', '800–1,500', '250–400', 'Heat accelerates degradation'],
+      ['45°C (113°F)', '1,000–1,500', '400–800', '125–200', 'Significant life reduction'],
+    ]}
+    source="Typical values at 80% DoD. Actual cycle life depends on DOD, C-rate, and cell quality."
+  />
+</ArticleLayout>

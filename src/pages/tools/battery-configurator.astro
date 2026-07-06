@@ -1,0 +1,405 @@
+---
+import CalculatorLayout from '../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../components/CalculatorCard.astro';
+import InputField from '../../components/InputField.astro';
+import ResultBox from '../../components/ResultBox.astro';
+import ComparisonTable from '../../components/ComparisonTable.astro';
+import FormulaBox from '../../components/FormulaBox.astro';
+import WorkedExample from '../../components/WorkedExample.astro';
+import FAQSection from '../../components/FAQSection.astro';
+import RelatedTools from '../../components/RelatedTools.astro';
+
+const whatIs = `The Battery Configurator calculates the optimal <strong>series and parallel cell arrangement</strong> to achieve a target pack voltage and capacity. It takes your target specifications and available cell parameters, then determines the number of <strong>series connections</strong> (S) for voltage and <strong>parallel strings</strong> (P) for capacity. The tool also generates a text-based configuration diagram showing the physical layout and calculates total pack specifications including energy, weight, and cell count.`;
+
+const whyItMatters = [
+  "Incorrect series count produces wrong voltage — a 48V system needs exactly 16 LFP cells in series (16S × 3.2V = 51.2V). One extra or missing cell creates a voltage mismatch.",
+  "Parallel string balancing requires identical strings — each parallel string must have the same cell count, capacity, and internal resistance to prevent uneven loading.",
+  "Total cell count determines BMS requirements — a 16S2P pack needs 32 cells and a 16-series BMS. Knowing the exact count helps spec the right BMS.",
+  "Physical layout affects thermal management — cells in the center of a large pack run hotter than edge cells. Configuration planning enables proper cooling design.",
+  "Cost estimation depends on exact cell count — knowing you need 32 cells (not 'about 30') enables accurate procurement and avoids shortages.",
+];
+
+const practicalApplications = [
+  { title: "DIY Powerwall", description: "Configure LFP cells for home energy storage with target voltage and capacity matching your inverter." },
+  { title: "EV Battery Pack", description: "Design series/parallel arrangement for EV traction batteries with specific voltage and range requirements." },
+  { title: "Marine House Bank", description: "Configure cells for 24V or 48V marine battery banks with required amp-hour capacity." },
+  { title: "Telecom Backup", description: "Design 48V battery configurations meeting specific autonomy and discharge rate requirements." },
+  { title: "Golf Cart / LSV", description: "Configure 48V–72V packs for golf carts and low-speed vehicles using common cell formats." },
+  { title: "Portable Power Station", description: "Design compact battery packs with optimized cell arrangement for portable energy storage." },
+];
+
+const expertNotes = [
+  { title: 'String Matching Critical', variant: 'warning', content: 'When using multiple parallel strings, every string must use cells from the same manufacturing batch with matched capacity and internal resistance. Mismatched strings cause uneven loading — the strongest string works harder and degrades faster while the weakest string is underutilized.' },
+  { title: 'BMS Compatibility', variant: 'engineering', content: 'The BMS must match your series count. A 16S BMS cannot manage a 15S or 17S pack. Common LFP configurations are 4S (12V), 8S (24V), and 16S (48V). Always verify BMS cell count compatibility before purchasing.' },
+];
+
+const trustSection = {
+  text: "This configurator uses standard series/parallel electrical formulas. Series voltage is additive (V_total = n × V_cell), parallel capacity is additive (Ah_total = n × Ah_cell), and total energy is voltage × capacity. All calculations are transparent and displayed step-by-step.",
+  link: { label: "View our methodology", href: "/methodology" },
+};
+
+const references = [
+  { title: "Battery University — Series and Parallel Configurations", url: "https://batteryuniversity.com/article/bu-302-series-and-parallel-batteries", source: "Battery University / Cadex Electronics" },
+  { title: "NREL — Battery Pack Design Guidelines", url: "https://www.nrel.gov/storage-battery-pack-design.html", source: "National Renewable Energy Laboratory" },
+  { title: "US DOE — Battery Pack Architecture", url: "https://www.energy.gov/eere/vehiclebatteries/battery-pack-architecture", source: "U.S. Department of Energy" },
+];
+
+const faqItems = [
+  {
+    question: "What does 16S2P mean?",
+    answer: "16S2P means 16 cells in series (S) and 2 parallel strings (P). The 16 series cells set the voltage (16 × 3.2V = 51.2V for LFP). The 2 parallel strings double the capacity (2 × 280Ah = 560Ah). Total cells: 16 × 2 = 32.",
+  },
+  {
+    question: "How do I calculate series cells needed for a target voltage?",
+    answer: "Divide the target voltage by the cell nominal voltage. For LFP (3.2V): 48V ÷ 3.2V = 15, round up to 16 cells (16S). For NMC (3.6V): 48V ÷ 3.6V = 13.3, round to 14 cells (14S). Always round up to achieve at least the target voltage.",
+  },
+  {
+    question: "How do I calculate parallel strings for target capacity?",
+    answer: "Divide the target amp-hours by the individual cell capacity. For 560Ah with 280Ah cells: 560 ÷ 280 = 2 parallel strings. Each string must have the same number of series cells.",
+  },
+  {
+    question: "Can I mix cells of different capacities in parallel?",
+    answer: "Never mix different capacities in parallel. The weaker cell limits the entire string's usable capacity and experiences higher stress, causing premature failure. All cells in a parallel group must have identical capacity and internal resistance.",
+  },
+  {
+    question: "What is the total cell count formula?",
+    answer: "Total cells = Series count × Parallel count. A 16S4P configuration uses 16 × 4 = 64 cells. For LFP at 280Ah per cell, this yields 51.2V × 1,120Ah = 57.3 kWh.",
+  },
+  {
+    question: "How does configuration affect BMS selection?",
+    answer: "The BMS must match your series count exactly. A 16S BMS monitors 16 cells in series. Some BMS units support multiple parallel strings by monitoring one string and assuming balanced parallel groups. Verify compatibility with your specific configuration.",
+  },
+  {
+    question: "What is the difference between series and parallel?",
+    answer: "Series connections increase voltage — cells connected positive-to-negative add their voltages. Parallel connections increase capacity — cells connected positive-to-positive and negative-to-negative add their amp-hours while voltage stays the same.",
+  },
+  {
+    question: "How does cell count affect pack weight?",
+    answer: "Pack weight = total cells × cell weight. A 16S2P LFP pack with 32 cells at 2.8kg each weighs 89.6kg. NMC cells are lighter (1.8kg each) so the same configuration weighs 57.6kg. Always factor weight into mechanical design.",
+  },
+  {
+    question: "Can I use different cell formats in the same pack?",
+    answer: "Never mix cell formats (e.g., prismatic and cylindrical) in the same pack. Different formats have different internal resistance, capacity, and thermal characteristics. Even same-format cells from different manufacturers should not be mixed.",
+  },
+  {
+    question: "What is the minimum practical cell count?",
+    answer: "The minimum is determined by your voltage requirement: 4S for 12V LFP, 8S for 24V LFP, 16S for 48V LFP. Below these counts, voltage is too low for practical inverter operation. Some applications accept 3S (9.6V) for low-voltage DC loads.",
+  },
+];
+
+const relatedTools = [
+  { href: "/tools/battery-pack-calculator", title: "Battery Pack Calculator", description: "Calculate pack voltage, capacity, and energy from cell specifications." },
+  { href: "/tools/parallel-string-calculator", title: "Parallel String Calculator", description: "Design parallel string configurations for capacity expansion." },
+  { href: "/tools/battery-sizing-calculator", title: "Battery Sizing Calculator", description: "Determine total capacity needed before configuring cells." },
+  { href: "/tools/system-voltage-selector", title: "System Voltage Selector", description: "Choose between 12V, 24V, and 48V systems." },
+  { href: "/tools/battery-chemistry-selector", title: "Battery Chemistry Selector", description: "Choose the right chemistry for your application." },
+  { href: "/tools/charging-time-calculator", title: "Charging Time Calculator", description: "Calculate charge time for your configured pack." },
+];
+
+const commonMistakes = [
+  "Rounding series count incorrectly — 48V ÷ 3.2V = 15, but 15 × 3.2V = 48V exactly. However, LFP cells range 2.8–3.6V, so 16S provides a safer voltage range for inverter operation.",
+  "Assuming parallel strings are automatically balanced — new strings must be individually charged to the same voltage before paralleling to prevent massive equalization currents.",
+  "Ignoring BMS series count limits — a 16S BMS cannot manage a 17S pack. Always verify BMS compatibility with your exact series count before purchasing.",
+  "Mixing cell ages in parallel — even identical cells from different production batches have slight capacity variations. Mixing old and new cells accelerates degradation of the newer cells.",
+  "Not accounting for cell weight in mechanical design — a 64-cell LFP pack weighs 180+ kg. Structural support and mounting must be designed for the actual pack weight.",
+  "Using different cell capacities in parallel — a 100Ah cell in parallel with a 280Ah cell wastes 180Ah of the larger cell's capacity and overstresses the smaller cell.",
+  "Forgetting terminal connections — parallel strings need bus bars connecting all positive terminals together and all negative terminals together. Poor connections create hot spots and failure points.",
+  "Overlooking thermal expansion — cells expand slightly during charging. Mechanical design must accommodate 2–5% volume expansion without excessive compression.",
+];
+
+const commonConfigs = [
+  { config: "4S1P", voltage: "12.8V", capacity: "280Ah", energy: "3.58 kWh", cells: 4, weight: "11.2 kg", use: "12V portable, small RV" },
+  { config: "8S1P", voltage: "25.6V", capacity: "280Ah", energy: "7.17 kWh", cells: 8, weight: "22.4 kg", use: "24V RV, small solar" },
+  { config: "16S1P", voltage: "51.2V", capacity: "280Ah", energy: "14.34 kWh", cells: 16, weight: "44.8 kg", use: "48V home, telecom" },
+  { config: "16S2P", voltage: "51.2V", capacity: "560Ah", energy: "28.67 kWh", cells: 32, weight: "89.6 kg", use: "48V home, large solar" },
+  { config: "16S4P", voltage: "51.2V", capacity: "1,120Ah", energy: "57.34 kWh", cells: 64, weight: "179.2 kg", use: "48V whole-home, commercial" },
+  { config: "7S1P (NMC)", voltage: "25.2V", capacity: "280Ah", energy: "7.06 kWh", cells: 7, weight: "12.6 kg", use: "24V RV (NMC)" },
+  { config: "14S1P (NMC)", voltage: "50.4V", capacity: "280Ah", energy: "14.11 kWh", cells: 14, weight: "25.2 kg", use: "48V home (NMC)" },
+];
+
+const relatedArticles = [
+  { href: "/learn/battery-series-parallel-configuration", title: "Series and Parallel Battery Configuration" },
+  { href: "/learn/diy-battery-pack-design", title: "DIY Battery Pack Design Guide" },
+  { href: "/learn/battery-bms-selection", title: "BMS Selection Guide" },
+];
+---
+
+<CalculatorLayout
+  title="Battery Configurator | Battery Calculators"
+  description="Design series/parallel cell configurations to match target voltage and capacity. Calculate cell count, pack specs, and view configuration diagrams."
+  faqItems={faqItems}
+  commonMistakes={commonMistakes}
+  relatedCalculators={relatedTools}
+  relatedArticles={relatedArticles}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+>
+
+  <!-- Main Calculator Grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+
+    <!-- Input Form -->
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Configuration Parameters</h3>
+      <div class="flex flex-col gap-6">
+
+        <div class="flex flex-col gap-2 w-full">
+          <label class="text-label-uppercase text-xs text-primary">Chemistry Preset</label>
+          <div class="grid grid-cols-3 gap-2">
+            <button class="chem-btn selected" data-chem="lfp" data-cellv="3.2" data-cellah="280" data-cellkg="2.8">LFP (LiFePO4)</button>
+            <button class="chem-btn" data-chem="nmc" data-cellv="3.6" data-cellah="280" data-cellkg="1.8">NMC</button>
+            <button class="chem-btn" data-chem="nca" data-cellv="3.6" data-cellah="300" data-cellkg="1.6">NCA</button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <InputField id="target-voltage" label="Target Pack Voltage" value={48} min={1} step={1} unit="V" helperText="Desired nominal pack voltage." />
+          <InputField id="target-capacity" label="Target Capacity" value={560} min={1} step={1} unit="Ah" helperText="Desired total amp-hour capacity." />
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <InputField id="cell-voltage" label="Cell Nominal Voltage" value={3.2} min={1} max={5} step={0.1} unit="V" helperText="Nominal voltage per cell." />
+          <InputField id="cell-capacity" label="Cell Capacity" value={280} min={1} step={1} unit="Ah" helperText="Capacity of each individual cell." />
+        </div>
+
+        <InputField id="cell-weight" label="Cell Weight" value={2.8} min={0.1} step={0.1} unit="kg" helperText="Weight of each cell in kilograms." />
+
+      </div>
+    </CalculatorCard>
+
+    <!-- Configuration Results -->
+    <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Configuration Result</h3>
+
+        <div class="grid grid-cols-2 gap-4 mb-6">
+          <ResultBox label="Series Cells (S)" value="16" id="result-series" variant="primary" />
+          <ResultBox label="Parallel Strings (P)" value="2" id="result-parallel" variant="primary" />
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 mb-6">
+          <ResultBox label="Configuration" value="16S2P" id="result-config" />
+          <ResultBox label="Total Cells" value="32" id="result-total-cells" />
+          <ResultBox label="Pack Voltage" value="51.2 V" id="result-pack-voltage" />
+          <ResultBox label="Pack Capacity" value="560 Ah" id="result-pack-capacity" />
+          <ResultBox label="Total Energy" value="28.67 kWh" id="result-pack-energy" />
+          <ResultBox label="Pack Weight" value="89.6 kg" id="result-pack-weight" />
+        </div>
+      </div>
+
+      <!-- Configuration Diagram -->
+      <div class="border-t border-hairline pt-4">
+        <h4 class="text-label-uppercase text-primary text-xs mb-3">CONFIGURATION DIAGRAM</h4>
+        <pre class="bg-surface-soft border border-hairline p-4 text-caption text-body font-mono overflow-x-auto whitespace-pre" id="config-diagram">
+String 1: [C]─[C]─[C]─[C]─[C]─[C]─[C]─[C]─[C]─[C]─[C]─[C]─[C]─[C]─[C]─[C] → 51.2V
+String 2: [C]─[C]─[C]─[C]─[C]─[C]─[C]─[C]─[C]─[C]─[C]─[C]─[C]─[C]─[C]─[C] → 51.2V
+                                                                                     ‖
+                                                                              Bus Bars (+) (−)
+                                                                                     ‖
+                                                                              Total: 51.2V / 560Ah</pre>
+      </div>
+    </CalculatorCard>
+
+  </div>
+
+  <!-- Formula Section -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+
+      <FormulaBox title="Configuration Formulas">
+        <p>
+          Series cells needed for target voltage:
+        </p>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          S = ⌈Target Voltage / Cell Voltage⌉
+        </div>
+        <p>
+          Parallel strings needed for target capacity:
+        </p>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          P = ⌈Target Capacity / Cell Capacity⌉
+        </div>
+        <p>
+          Pack specifications:
+        </p>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          V_pack = S × V_cell
+          Ah_pack = P × Ah_cell
+          Wh_pack = V_pack × Ah_pack
+          Weight = S × P × W_cell
+        </div>
+        <p class="text-xs text-muted mt-4">
+          <strong>Variables:</strong> S = series count, P = parallel count, V_cell = cell nominal voltage, Ah_cell = cell capacity, W_cell = cell weight. ⌈ ⌉ = ceiling function (round up to next integer).
+        </p>
+      </FormulaBox>
+
+      <WorkedExample
+        number={1}
+        title="48V Home Battery — 16S2P LFP"
+        scenario="Design a 48V LFP battery pack with 560Ah capacity using 280Ah prismatic cells."
+        inputs={[
+          { label: "Target Voltage", value: "48 V" },
+          { label: "Target Capacity", value: "560 Ah" },
+          { label: "Cell Voltage", value: "3.2 V (LFP)" },
+          { label: "Cell Capacity", value: "280 Ah" },
+          { label: "Cell Weight", value: "2.8 kg" },
+        ]}
+        steps={[
+          { label: "Step 1: Series cells", formula: "⌈48 / 3.2⌉", result: "16 cells (16S)" },
+          { label: "Step 2: Parallel strings", formula: "⌈560 / 280⌉", result: "2 strings (2P)" },
+          { label: "Step 3: Pack voltage", formula: "16 × 3.2V", result: "51.2V nominal" },
+          { label: "Step 4: Pack capacity", formula: "2 × 280Ah", result: "560Ah" },
+          { label: "Step 5: Total energy", formula: "51.2V × 560Ah", result: "28,672 Wh (28.67 kWh)" },
+          { label: "Step 6: Total weight", formula: "16 × 2 × 2.8kg", result: "89.6 kg" },
+        ]}
+        answer="16S2P configuration: 32 cells total, 51.2V nominal, 560Ah capacity, 28.67 kWh energy, 89.6 kg total weight."
+        interpretation="This is a standard residential 48V LFP configuration. The 51.2V nominal voltage is compatible with most 48V hybrid inverters (Victron, Sol-Ark, Growatt). Two parallel strings provide 560Ah — enough for a typical home with 8–12 hours of autonomy."
+        variant="home"
+      />
+
+    </div>
+  </section>
+
+  <!-- Common Configurations Table -->
+  <ComparisonTable
+    title="Common LFP Cell Configurations (280Ah Prismatic)"
+    headers={["Config", "Voltage", "Capacity", "Energy", "Cells", "Weight", "Typical Use"]}
+    rows={commonConfigs.map(c => [c.config, c.voltage, c.capacity, c.energy, String(c.cells), c.weight, c.use])}
+    caption="Based on standard 280Ah LFP prismatic cells at 3.2V nominal, 2.8kg each"
+  />
+
+  <FAQSection items={faqItems} />
+  <RelatedTools tools={relatedTools} />
+
+  <style>
+    .chem-btn {
+      padding: 12px 8px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      border: 1px solid var(--color-hairline);
+      background: var(--color-surface-card);
+      color: var(--color-muted);
+      cursor: pointer;
+      transition: all 0.15s;
+      text-align: center;
+    }
+    .chem-btn:hover {
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+    }
+    .chem-btn.selected {
+      border-color: var(--color-m-blue-light);
+      color: var(--color-primary);
+      background: var(--color-surface-soft);
+    }
+  </style>
+
+  <!-- Calculation Script -->
+  <script>
+    const targetVoltageInput = document.getElementById('target-voltage') as HTMLInputElement;
+    const targetCapacityInput = document.getElementById('target-capacity') as HTMLInputElement;
+    const cellVoltageInput = document.getElementById('cell-voltage') as HTMLInputElement;
+    const cellCapacityInput = document.getElementById('cell-capacity') as HTMLInputElement;
+    const cellWeightInput = document.getElementById('cell-weight') as HTMLInputElement;
+    const chemBtns = document.querySelectorAll('.chem-btn');
+
+    let selectedCellV = 3.2;
+    let selectedCellAh = 280;
+    let selectedCellKg = 2.8;
+
+    chemBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        chemBtns.forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        selectedCellV = parseFloat((btn as HTMLElement).dataset.cellv!);
+        selectedCellAh = parseFloat((btn as HTMLElement).dataset.cellah!);
+        selectedCellKg = parseFloat((btn as HTMLElement).dataset.cellkg!);
+        cellVoltageInput.value = String(selectedCellV);
+        cellCapacityInput.value = String(selectedCellAh);
+        cellWeightInput.value = String(selectedCellKg);
+        updateCalculations();
+      });
+    });
+
+    function generateDiagram(s: number, p: number, vPack: number, ahPack: number): string {
+      const lines: string[] = [];
+      const maxDisplay = Math.min(s, 12);
+      const truncated = s > maxDisplay;
+
+      for (let i = 0; i < p; i++) {
+        let cells = '';
+        for (let j = 0; j < maxDisplay; j++) {
+          cells += '[C]';
+          if (j < maxDisplay - 1) cells += '─';
+        }
+        if (truncated) cells += `─...─[C]×${s}`;
+        lines.push(`String ${i + 1}: ${cells} → ${vPack.toFixed(1)}V`);
+      }
+
+      const dashLen = lines[0].length - 2;
+      lines.push(' '.repeat(dashLen - 20) + '‖');
+      lines.push(' '.repeat(dashLen - 24) + 'Bus Bars (+) (−)');
+      lines.push(' '.repeat(dashLen - 20) + '‖');
+      lines.push(' '.repeat(dashLen - 26) + `Total: ${vPack.toFixed(1)}V / ${ahPack.toFixed(0)}Ah`);
+
+      return lines.join('\n');
+    }
+
+    function updateCalculations() {
+      const targetV = parseFloat(targetVoltageInput.value) || 48;
+      const targetAh = parseFloat(targetCapacityInput.value) || 560;
+      const cellV = parseFloat(cellVoltageInput.value) || 3.2;
+      const cellAh = parseFloat(cellCapacityInput.value) || 280;
+      const cellKg = parseFloat(cellWeightInput.value) || 2.8;
+
+      const series = Math.ceil(targetV / cellV);
+      const parallel = Math.ceil(targetAh / cellAh);
+
+      const packV = series * cellV;
+      const packAh = parallel * cellAh;
+      const packWh = packV * packAh;
+      const totalCells = series * parallel;
+      const packWeight = totalCells * cellKg;
+
+      const resultSeries = document.getElementById('result-series')!;
+      const resultParallel = document.getElementById('result-parallel')!;
+      const resultConfig = document.getElementById('result-config')!;
+      const resultTotalCells = document.getElementById('result-total-cells')!;
+      const resultPackVoltage = document.getElementById('result-pack-voltage')!;
+      const resultPackCapacity = document.getElementById('result-pack-capacity')!;
+      const resultPackEnergy = document.getElementById('result-pack-energy')!;
+      const resultPackWeight = document.getElementById('result-pack-weight')!;
+
+      resultSeries.querySelector('.text-display-md')!.textContent = String(series);
+      resultParallel.querySelector('.text-display-md')!.textContent = String(parallel);
+      resultConfig.querySelector('.text-title-lg')!.textContent = `${series}S${parallel}P`;
+      resultTotalCells.querySelector('.text-title-lg')!.textContent = String(totalCells);
+      resultPackVoltage.querySelector('.text-title-lg')!.textContent = `${packV.toFixed(1)} V`;
+      resultPackCapacity.querySelector('.text-title-lg')!.textContent = `${packAh.toLocaleString()} Ah`;
+
+      if (packWh >= 1000) {
+        resultPackEnergy.querySelector('.text-title-lg')!.textContent = `${(packWh / 1000).toFixed(2)} kWh`;
+      } else {
+        resultPackEnergy.querySelector('.text-title-lg')!.textContent = `${packWh.toFixed(0)} Wh`;
+      }
+
+      resultPackWeight.querySelector('.text-title-lg')!.textContent = `${packWeight.toFixed(1)} kg`;
+
+      const diagram = document.getElementById('config-diagram')!;
+      diagram.textContent = generateDiagram(series, parallel, packV, packAh);
+    }
+
+    [targetVoltageInput, targetCapacityInput, cellVoltageInput, cellCapacityInput, cellWeightInput].forEach(el => {
+      el.addEventListener('input', updateCalculations);
+    });
+
+    updateCalculations();
+  </script>
+
+</CalculatorLayout>

@@ -1,0 +1,443 @@
+---
+import CalculatorLayout from '../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../components/CalculatorCard.astro';
+import InputField from '../../components/InputField.astro';
+import ResultBox from '../../components/ResultBox.astro';
+import FormulaBox from '../../components/FormulaBox.astro';
+import FAQSection from '../../components/FAQSection.astro';
+import WorkedExample from '../../components/WorkedExample.astro';
+import ComparisonTable from '../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../components/EngineeringDiagram.astro';
+
+const whatIs = `Charger size selection determines the optimal charger current and power rating for a given battery bank, balancing <strong>charge time</strong>, <strong>battery lifespan</strong>, and <strong>system cost</strong>. The key parameter is the <strong>C-rate</strong> — the ratio of charge current to battery capacity. A 0.2C rate charges a 100Ah battery at 20A, while a 1C rate charges it at 100A. Higher C-rates deliver faster charging but generate more heat, accelerate cell degradation, and require larger, more expensive charger hardware. The optimal C-rate depends on battery chemistry (LFP tolerates higher rates than NMC), application urgency (EV fast-charge vs. overnight solar), and thermal management capability.`;
+
+const whyItMatters = [
+  "An undersized charger may take 12+ hours to fully charge, missing critical charge windows like overnight solar or fleet turnaround.",
+  "An oversized charger wastes money on capacity rarely used and may exceed the battery's recommended charge rate, reducing lifespan.",
+  "LFP batteries tolerate 0.5C–1C charging; NMC should stay below 0.7C for daily use to prevent accelerated degradation.",
+  "Charger type matters — SMPS chargers are 85–95% efficient, while linear chargers waste 30–50% as heat.",
+  "MPPT solar charge controllers dynamically adjust current based on panel output, delivering optimal charge rates from variable sources.",
+];
+
+const practicalApplications = [
+  { title: "Solar Battery Charging", description: "Select the right MPPT charge controller size for your solar array and battery bank." },
+  { title: "EV / Fleet Charging", description: "Choose charger power levels for commercial fleet vehicles with defined turnaround times." },
+  { title: "Marine Shore Power", description: "Size shore power chargers for marine house banks based on available dock time." },
+  { title: "RV / Off-Grid Systems", description: "Select alternator and solar chargers for mobile battery systems." },
+  { title: "UPS / Backup Systems", description: "Ensure backup batteries can recharge within required recovery windows." },
+];
+
+const expertNotes = [
+  { title: 'C-Rate vs. Lifespan', variant: 'engineering', content: 'Charging at 0.2C delivers 2–3× more charge cycles than charging at 1C for most lithium chemistries. If daily charging is required, 0.25C–0.5C is the sweet spot balancing time and longevity. Reserve 1C rates for occasional fast top-ups.' },
+  { title: 'Charger Efficiency Impact', variant: 'info', content: 'A 90% efficient charger must draw 111W to deliver 100W to the battery. This inefficiency extends wall-outlet charge time and increases heat. SMPS (switch-mode) chargers are 85–95% efficient; linear chargers are only 50–70% efficient.' },
+];
+
+const trustSection = {
+  text: "This calculator models charger sizing using standard C-rate methodology. The model calculates required charger current from desired charge time and battery capacity, then recommends appropriate charger types. All intermediate values are displayed for verification.",
+  link: { label: "View our full methodology", href: "/methodology" },
+};
+
+const references = [
+  { title: "Battery University — Charging Lithium-Ion", url: "https://batteryuniversity.com/article/bu-409-charging-lithium-ion-batteries", source: "Battery University / Cadex Electronics" },
+  { title: "TI — Battery Charger Selection Guide", url: "https://www.ti.com/lit/an/slyt185/slyt185.pdf", source: "Texas Instruments" },
+  { title: "Victron Energy — MPPT Charge Controller Sizing", url: "https://www.victronenergy.com/help-center", source: "Victron Energy" },
+];
+
+const faqItems = [
+  {
+    question: "What C-rate should I charge my LiFePO4 battery at?",
+    answer: "For daily charging, 0.2C–0.5C is recommended for optimal lifespan. A 100Ah LFP battery should be charged at 20A–50A. Occasional 1C charging (100A) is acceptable but reduces cycle life by 20–40% over time.",
+  },
+  {
+    question: "How do I choose between a linear and SMPS charger?",
+    answer: "SMPS (switch-mode) chargers are 85–95% efficient, compact, and lighter. Linear chargers are simpler but only 50–70% efficient and generate significant heat. Always choose SMPS for applications above 50W.",
+  },
+  {
+    question: "What size MPPT charge controller do I need?",
+    answer: "Size the MPPT controller for your solar array's maximum output current at battery voltage. A 400W array at 48V produces ~8.3A. Add 25% headroom for cold-weather voltage boost: choose a 10A or 15A controller.",
+  },
+  {
+    question: "Can I use a bigger charger than recommended?",
+    answer: "Yes, but the charger should have adjustable current limits. Running a 50A charger at 20A (0.2C) is fine and provides headroom for future battery expansion. Never charge beyond the battery manufacturer's maximum C-rate.",
+  },
+  {
+    question: "How does charger type affect charge time?",
+    answer: "Charge time is primarily determined by charger current (C-rate), not charger type. However, charger efficiency affects wall-outlet energy draw: a 95% efficient charger delivers 95% of input power to the battery, while a 70% efficient charger wastes 30% as heat.",
+  },
+  {
+    question: "Should I oversize my charger?",
+    answer: "A 15–25% oversize provides headroom for battery aging (which increases internal resistance) and occasional fast charges. However, oversized chargers cost more and may encourage frequent fast charging that reduces battery life.",
+  },
+  {
+    question: "How do I charge two batteries with one charger?",
+    answer: "Connect batteries of the same chemistry, voltage, and capacity in parallel to a single charger. Never mix old and new batteries or different chemistries. The BMS on each battery manages individual cell balancing.",
+  },
+  {
+    question: "What happens if I charge too slowly?",
+    answer: "Very slow charging (below 0.05C) is safe but may not fully replenish the battery before the next discharge cycle. For solar systems, this means the battery may not reach full SOC before evening loads begin.",
+  },
+  {
+    question: "Does temperature affect charger sizing?",
+    answer: "Yes. Cold temperatures reduce the battery's safe charge rate. Below 0°C, many BMS units limit charge current to 0.1C or lower to prevent lithium plating. In cold climates, oversize the charger less but plan for reduced winter charge rates.",
+  },
+  {
+    question: "What is the difference between charge rate and charge time?",
+    answer: "Charge rate (C-rate) is the current delivered relative to battery capacity (e.g., 0.5C = 50A for 100Ah). Charge time is the total duration to reach target SOC, including the CV saturation phase. Higher C-rate means shorter charge time.",
+  },
+];
+
+const commonMistakes = [
+  "Oversizing the charger without adjustable current limits — a 100A charger on a 50Ah battery will overcharge if the BMS fails to limit current.",
+  "Ignoring the CV phase — the last 20% of charging takes disproportionately longer, so charge time estimates based only on Ah/current are 20–40% too low.",
+  "Mixing charger and battery chemistries — NMC chargers have different voltage profiles than LFP chargers. Using the wrong chemistry can cause overcharging or undercharging.",
+  "Not accounting for charger efficiency — a 90% efficient charger must draw more power from the wall outlet, affecting circuit breaker sizing and charge time.",
+  "Using a linear charger for high-power applications — linear chargers waste 30–50% as heat, requiring large heatsinks and reducing available charge current.",
+  "Ignoring temperature derating — cold temperatures reduce safe charge rates. A charger sized for summer may be inadequate in winter when the BMS limits current.",
+  "Sizing for peak rather than average charge — if batteries rarely need full charges, a smaller charger that runs longer is more efficient and cost-effective.",
+  "Not planning for battery expansion — if you may add batteries later, size the charger for the future bank, not just the current one.",
+];
+
+const relatedArticles = [
+  { href: "/learn/charger-sizing-guide", title: "Charger Sizing Guide" },
+  { href: "/learn/mppt-vs-pwm-charge-controllers", title: "MPPT vs PWM Controllers" },
+  { href: "/learn/lifepo4-charge-voltage-table", title: "LiFePO4 Charge Voltage Table" },
+  { href: "/learn/battery-charging-best-practices", title: "Battery Charging Best Practices" },
+];
+---
+
+<CalculatorLayout
+  title="Charger Size Selector | Battery Calculators"
+  description="Select the right charger size for your battery bank based on chemistry, desired charge time, and C-rate guidelines."
+  faqItems={faqItems}
+  commonMistakes={commonMistakes}
+  relatedArticles={relatedArticles}
+  relatedCalculators={[
+    { href: "/tools/charging-time-calculator", title: "Charging Time Calculator", description: "Estimate CC-CV charge durations." },
+    { href: "/tools/c-rate-calculator", title: "C-Rate Calculator", description: "Convert between Amps and C-rate values." },
+    { href: "/tools/battery-sizing-calculator", title: "Battery Sizing Tool", description: "Determine daily consumption sizing requirements." },
+    { href: "/tools/solar-battery-sizing-calculator", title: "Solar Battery Sizing", description: "Size solar battery banks from daily consumption." },
+    { href: "/tools/runtime-calculator", title: "Runtime Calculator", description: "Compute runtime from load wattage profiles." },
+    { href: "/tools/energy-conversion-calculator", title: "Energy Conversion", description: "Convert between capacity Ah and energy Wh." },
+  ]}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+>
+
+  <!-- Main Calculator Grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+
+    <!-- Input Form -->
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Charger Parameters</h3>
+      <div class="flex flex-col gap-6">
+        <InputField id="capacity" label="Battery Capacity (Ah)" value={100} min={0.1} step="any" helperText="Total capacity of the battery bank in Amp-hours." />
+        <InputField id="voltage" label="System Voltage (V)" value={48} min={1} step="any" helperText="Nominal voltage of the battery bank. Common: 12V, 24V, 48V." />
+        <InputField
+          id="chemistry"
+          label="Battery Chemistry"
+          type="select"
+          value="lfp"
+          helperText="Chemistry determines safe maximum C-rate."
+          options={[
+            { label: "LFP (LiFePO4) — Max 1C daily", value: "lfp" },
+            { label: "NMC (Lithium Nickel Manganese Cobalt) — Max 0.7C daily", value: "nmc" },
+            { label: "Lead-Acid (AGM/Gel) — Max 0.1C", value: "lead-acid" },
+          ]}
+        />
+        <InputField id="charge-time" label="Desired Charge Time (hours)" value={4} min={0.5} step="any" helperText="Target time to charge from 20% to 100% SOC." />
+        <InputField id="charge-efficiency" label="Charger Efficiency (%)" value={92} min={50} max={100} step={1} helperText="SMPS: 85–95%, Linear: 50–70%. Default 92% for quality SMPS." />
+      </div>
+    </CalculatorCard>
+
+    <!-- Calculation Results -->
+    <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Recommended Charger</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <ResultBox
+            label="Required Charger Current"
+            value="20 A"
+            suffix="At battery voltage"
+            variant="primary"
+            id="result-current"
+          />
+          <ResultBox
+            label="Charging C-Rate"
+            value="0.20 C"
+            suffix="Optimal slow charge"
+            id="result-crate"
+          />
+          <ResultBox
+            label="Charger Power Rating"
+            value="960 W"
+            suffix="DC output power"
+            id="result-power"
+          />
+          <ResultBox
+            label="Wall-Draw Power"
+            value="1,043 W"
+            suffix="At 92% efficiency"
+            id="result-wall"
+          />
+        </div>
+      </div>
+
+      <!-- Action Area -->
+      <div class="border-t border-hairline pt-6">
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">Charger Selection Guide</h4>
+        <p class="text-body-sm text-muted" id="charger-guide">
+          At 0.2C, this is a slow-charge configuration ideal for overnight charging. An SMPS charger rated at 20A / 48V or higher is recommended.
+        </p>
+      </div>
+    </CalculatorCard>
+
+  </div>
+
+  <!-- Technical Explanation and Equations -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+
+      <FormulaBox title="Mathematical Formulas">
+        <p>
+          The required charger current is derived from desired charge time, battery capacity, and charger efficiency:
+        </p>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          C-Rate = Desired Charge Time (hours) / 1.25
+        </div>
+        <p>
+          The 1.25 factor accounts for the CV saturation phase overhead (approximately 20% of total time).
+        </p>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Charger Current (A) = Capacity (Ah) × C-Rate
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Charger Power (W) = Charger Current (A) × System Voltage (V)
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Wall-Draw Power (W) = Charger Power (W) / Charger Efficiency
+        </div>
+      </FormulaBox>
+
+      <div class="flex flex-col gap-8">
+        <h2 class="text-title-lg text-primary uppercase mb-2 tracking-wider">Worked Engineering Examples</h2>
+
+        <WorkedExample
+          number={1}
+          title="100Ah LFP — 4-Hour Charge"
+          scenario="A 48V 100Ah LiFePO4 battery needs to be charged from 20% to 100% in 4 hours using a 92% efficient SMPS charger."
+          inputs={[
+            { label: "Capacity", value: "100 Ah" },
+            { label: "Voltage", value: "48 V" },
+            { label: "Chemistry", value: "LFP (LiFePO4)" },
+            { label: "Desired Time", value: "4 hours" },
+            { label: "Charger Efficiency", value: "92%" },
+          ]}
+          steps={[
+            { label: "Step 1: Target C-rate", formula: "C-rate = 4 / 1.25", result: "0.32C" },
+            { label: "Step 2: Charger current", formula: "I = 100 × 0.32", result: "32A" },
+            { label: "Step 3: DC charger power", formula: "P_dc = 32 × 48", result: "1,536W" },
+            { label: "Step 4: Wall-draw power", formula: "P_wall = 1,536 / 0.92", result: "1,670W" },
+          ]}
+          answer="32A charger at 48V, rated 1,536W DC output. Wall circuit must handle 1,670W."
+          interpretation="A 32A MPPT charge controller or SMPS charger is appropriate. The 0.32C rate is well within LFP's safe daily charge limits and provides good battery longevity."
+          variant="default"
+        />
+
+        <WorkedExample
+          number={2}
+          title="200Ah NMC — 2-Hour Fast Charge"
+          scenario="A 36V 200Ah NMC battery needs a 2-hour charge time. NMC should not exceed 0.7C for daily use."
+          inputs={[
+            { label: "Capacity", value: "200 Ah" },
+            { label: "Voltage", value: "36 V" },
+            { label: "Chemistry", value: "NMC" },
+            { label: "Desired Time", value: "2 hours" },
+            { label: "Charger Efficiency", value: "90%" },
+          ]}
+          steps={[
+            { label: "Step 1: Target C-rate", formula: "C-rate = 2 / 1.25", result: "0.60C" },
+            { label: "Step 2: Charger current", formula: "I = 200 × 0.60", result: "120A" },
+            { label: "Step 3: DC charger power", formula: "P_dc = 120 × 36", result: "4,320W" },
+            { label: "Step 4: Wall-draw power", formula: "P_wall = 4,320 / 0.90", result: "4,800W" },
+          ]}
+          answer="120A charger at 36V, rated 4,320W DC output."
+          interpretation="0.60C is near the NMC daily limit. This charge rate reduces cycle life by ~20% compared to 0.25C. Reserve this rate for occasional fast charges, not daily use."
+          variant="default"
+        />
+
+        <WorkedExample
+          number={3}
+          title="Solar MPPT Controller — 400W Array, 48V LFP"
+          scenario="A 400W solar array charges a 48V 200Ah LFP bank. Select the appropriate MPPT charge controller."
+          inputs={[
+            { label: "Solar Array", value: "400W" },
+            { label: "Battery Voltage", value: "48V" },
+            { label: "Battery Capacity", value: "200 Ah" },
+            { label: "Chemistry", value: "LFP (LiFePO4)" },
+            { label: "Peak Sun Hours", value: "5 hours" },
+          ]}
+          steps={[
+            { label: "Step 1: Max array current", formula: "I_max = 400 / (48 × 0.92)", result: "9.06A" },
+            { label: "Step 2: Cold-weather boost", formula: "I_cold = 9.06 × 1.25", result: "11.3A" },
+            { label: "Step 3: Controller rating", formula: "Select ≥ 15A MPPT controller", result: "15A recommended" },
+            { label: "Step 4: Daily charge", formula: "400W × 5h × 0.92 = 1,840Wh", result: "1,840 Wh/day" },
+          ]}
+          answer="15A or 20A MPPT charge controller rated for 48V battery systems."
+          interpretation="Always oversize the MPPT controller by 25–50% above array max current. Cold weather increases panel voltage and current. A 15A controller handles this 400W array with margin."
+          variant="solar"
+        />
+      </div>
+
+    </div>
+  </section>
+
+  <EngineeringDiagram
+    title="Charger Selection System"
+    description="From power source through charger to battery, with key sizing parameters at each stage"
+    variant="flow"
+    steps={[
+      { label: "Power Source", icon: "charge" },
+      { label: "Charger (SMPS)", icon: "charge" },
+      { label: "Battery Bank", icon: "battery" },
+      { label: "BMS Protection", icon: "battery" },
+    ]}
+  />
+
+  <ComparisonTable
+    title="Charger Types Comparison"
+    headers={["Type", "Efficiency", "Size", "Cost", "Best For", "Drawback"]}
+    rows={[
+      ["Linear", "50–70%", "Large (heatsink)", "Low", "Very low power (<20W)", "Wastes 30–50% as heat"],
+      ["SMPS", "85–95%", "Compact", "Medium", "General purpose charging", "Complex circuitry"],
+      ["MPPT (Solar)", "95–99%", "Medium", "High", "Solar array to battery", "Higher upfront cost"],
+      ["PFM", "80–90%", "Small", "Low", "Battery-powered devices", "Lower current capability"],
+    ]}
+    caption="Charger technology comparison for battery charging applications"
+  />
+
+  <ComparisonTable
+    title="C-Rate Guidelines by Chemistry"
+    headers={["Chemistry", "Optimal Daily", "Max Occasional", "Charge Time (Optimal)", "Charge Time (Max)", "Lifespan Impact"]}
+    rows={[
+      ["LFP (LiFePO4)", "0.2C–0.5C", "1C", "2.5–5 hours", "~1.5 hours", "0.5C loses ~10% vs 0.2C"],
+      ["NMC", "0.2C–0.5C", "0.7C", "2.5–5 hours", "~2 hours", "0.7C loses ~20% vs 0.2C"],
+      ["Lead-Acid", "0.05C–0.1C", "0.15C", "12–24 hours", "~8 hours", "Above 0.1C causes sulfation"],
+    ]}
+    caption="Recommended charge rates for common battery chemistries"
+  />
+
+  <FAQSection items={faqItems} />
+
+  <!-- Calculation Script -->
+  <script>
+    const capacityInput = document.getElementById('capacity') as HTMLInputElement;
+    const voltageInput = document.getElementById('voltage') as HTMLInputElement;
+    const chemistrySelect = document.getElementById('chemistry') as HTMLSelectElement;
+    const chargeTimeInput = document.getElementById('charge-time') as HTMLInputElement;
+    const chargeEfficiencyInput = document.getElementById('charge-efficiency') as HTMLInputElement;
+
+    // Result elements
+    const resultCurrentBox = document.getElementById('result-current');
+    const resultCurrentValue = resultCurrentBox?.querySelector('.text-display-md') as HTMLElement;
+    const resultCurrentNote = resultCurrentBox?.querySelector('.text-caption') as HTMLElement;
+
+    const resultCrateBox = document.getElementById('result-crate');
+    const resultCrateValue = resultCrateBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultCrateDesc = resultCrateBox?.querySelector('.text-caption') as HTMLElement;
+
+    const resultPowerBox = document.getElementById('result-power');
+    const resultPowerValue = resultPowerBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultPowerNote = resultPowerBox?.querySelector('.text-caption') as HTMLElement;
+
+    const resultWallBox = document.getElementById('result-wall');
+    const resultWallValue = resultWallBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultWallNote = resultWallBox?.querySelector('.text-caption') as HTMLElement;
+
+    const chargerGuide = document.getElementById('charger-guide');
+
+    function getChemistryLimits(chemistry: string): { maxDaily: number; maxOccasional: number } {
+      switch (chemistry) {
+        case 'lfp': return { maxDaily: 1.0, maxOccasional: 1.5 };
+        case 'nmc': return { maxDaily: 0.7, maxOccasional: 1.0 };
+        case 'lead-acid': return { maxDaily: 0.1, maxOccasional: 0.15 };
+        default: return { maxDaily: 0.5, maxOccasional: 1.0 };
+      }
+    }
+
+    function updateCalculations() {
+      const capacity = parseFloat(capacityInput.value) || 100;
+      const voltage = parseFloat(voltageInput.value) || 48;
+      const chemistry = chemistrySelect.value;
+      const desiredTime = parseFloat(chargeTimeInput.value) || 4;
+      const efficiency = parseFloat(chargeEfficiencyInput.value) || 92;
+
+      // Calculate C-rate from desired time
+      // T_total ≈ T_CC + T_CV. T_CC = capacity / (I * eff). T_CV ≈ 0.25 * T_CC for 80-100%.
+      // Simplified: total time ≈ 1.25 * capacity / (I * eff)
+      // Solving for I: I = 1.25 * capacity / (T_total * eff/100)
+      const cRate = desiredTime > 0 ? 1.25 / (desiredTime * (efficiency / 100)) : 0;
+      const chargerCurrent = capacity * cRate;
+      const chargerPower = chargerCurrent * voltage;
+      const wallPower = chargerPower / (efficiency / 100);
+
+      // Render current
+      if (resultCurrentValue) resultCurrentValue.textContent = `${chargerCurrent.toFixed(1)} A`;
+      if (resultCurrentNote) resultCurrentNote.textContent = `At ${voltage}V nominal`;
+
+      // Render C-rate
+      if (resultCrateValue) resultCrateValue.textContent = `${cRate.toFixed(2)} C`;
+      let cRateDesc = '';
+      const limits = getChemistryLimits(chemistry);
+      if (cRate > limits.maxOccasional) {
+        cRateDesc = 'Exceeds recommended maximum — risk of cell damage';
+      } else if (cRate > limits.maxDaily) {
+        cRateDesc = 'Acceptable for occasional fast charge only';
+      } else if (cRate >= 0.2) {
+        cRateDesc = 'Optimal daily charge rate';
+      } else if (cRate >= 0.05) {
+        cRateDesc = 'Slow charge — good for battery longevity';
+      } else {
+        cRateDesc = 'Very slow — may not replenish daily consumption';
+      }
+      if (resultCrateDesc) resultCrateDesc.textContent = cRateDesc;
+
+      // Render power
+      if (resultPowerValue) resultPowerValue.textContent = `${Math.round(chargerPower).toLocaleString()} W`;
+      if (resultPowerNote) resultPowerNote.textContent = 'DC output power';
+
+      // Render wall draw
+      if (resultWallValue) resultWallValue.textContent = `${Math.round(wallPower).toLocaleString()} W`;
+      if (resultWallNote) resultWallNote.textContent = `At ${efficiency}% efficiency`;
+
+      // Render guide
+      if (chargerGuide) {
+        const chemistryName = chemistry === 'lfp' ? 'LFP' : chemistry === 'nmc' ? 'NMC' : 'Lead-Acid';
+        if (cRate > limits.maxOccasional) {
+          chargerGuide.textContent = `Warning: ${cRate.toFixed(2)}C exceeds the ${chemistryName} maximum of ${limits.maxOccasional}C. Reduce desired charge time or accept slower charging to protect battery lifespan.`;
+        } else if (cRate > limits.maxDaily) {
+          chargerGuide.textContent = `At ${cRate.toFixed(2)}C, this is a fast-charge configuration. Suitable for occasional use on ${chemistryName}, but daily use will accelerate degradation. Consider a slower charge for routine cycling.`;
+        } else {
+          chargerGuide.textContent = `At ${cRate.toFixed(2)}C, this is a ${cRate <= 0.3 ? 'slow' : 'standard'} charge configuration ideal for ${cRate <= 0.3 ? 'overnight' : 'daily'} charging. An SMPS charger rated at ${chargerCurrent.toFixed(0)}A / ${voltage}V or higher is recommended.`;
+        }
+      }
+
+      // Update border color based on safety
+      if (resultCurrentBox) {
+        resultCurrentBox.className = "bg-surface-soft p-6 border col-span-1 md:col-span-2 " +
+          (cRate > limits.maxOccasional ? "border-red-600" :
+           cRate > limits.maxDaily ? "border-yellow-500" : "border-hairline");
+      }
+    }
+
+    [capacityInput, voltageInput, chemistrySelect, chargeTimeInput, chargeEfficiencyInput].forEach(el => {
+      el.addEventListener('input', updateCalculations);
+    });
+
+    updateCalculations();
+  </script>
+</CalculatorLayout>

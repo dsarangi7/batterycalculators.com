@@ -1,0 +1,180 @@
+---
+import ArticleLayout from '../../layouts/ArticleLayout.astro';
+import TroubleshootingBlock from '../../components/TroubleshootingBlock.astro';
+import FAQSection from '../../components/FAQSection.astro';
+
+const description = "Diagnose why your BMS keeps disconnecting the battery. Covers over-voltage, under-voltage, over-current, over-temperature, and cell imbalance protection triggers with diagnostic checklists.";
+
+const faqItems = [
+  {
+    question: "How do I know which BMS protection triggered the disconnect?",
+    answer: "Most BMS units have LED indicators or Bluetooth apps that log the last fault code. Check the BMS manual for fault code definitions. Common codes: OV (over-voltage), UV (under-voltage), OC (over-current), OT (over-temperature). If no logging is available, timing and conditions when the disconnect occurred provide clues.",
+  },
+  {
+    question: "Can a BMS be too sensitive and trip falsely?",
+    answer: "Yes. A poorly calibrated BMS may trip on normal voltage sag during high-current loads, or its temperature sensor may be mounted in a hot spot that does not represent cell temperature. Check the trip thresholds against the battery manufacturer's specifications and ensure sensors are properly placed.",
+  },
+  {
+    question: "Will a BMS protect against a dead short?",
+    answer: "A properly functioning BMS should detect over-current and disconnect within milliseconds. However, extremely fast short-circuit currents can damage the BMS MOSFETs before they fully turn off. Always use a fuse as a secondary protection layer.",
+  },
+  {
+    question: "How do I reset a tripped BMS?",
+    answer: "Most BMS units reset automatically once the fault condition is removed. If the BMS latches off, disconnect the load and charger, wait 30 seconds, and reconnect. Some BMS units require a momentary button press. If the BMS immediately re-trips, the underlying fault condition persists.",
+  },
+  {
+    question: "Can temperature cause false BMS trips?",
+    answer: "Yes. If the temperature sensor is mounted near a heat source, it may read higher than the actual cell temperature. Relocate the sensor to the center of the battery pack, away from heat sources. Also ensure adequate ventilation around the battery enclosure.",
+  },
+];
+
+const relatedCalculators = [
+  { title: "Battery Sizing Calculator", href: "/tools/battery-sizing-calculator", type: "calculator" as const },
+  { title: "C-Rate Calculator", href: "/tools/c-rate-calculator", type: "calculator" as const },
+  { title: "SOC Estimator", href: "/tools/soc-estimator", type: "calculator" as const },
+];
+
+const relatedGuides = [
+  { title: "How to Build a Battery Pack", href: "/learn/how-to-build-a-battery-pack", type: "guide" as const },
+  { title: "LiFePO4 Pack Design", href: "/learn/lifepo4-pack-design", type: "guide" as const },
+];
+---
+
+<ArticleLayout
+  title="BMS Keeps Tripping — Troubleshooting Guide | Battery Calculators"
+  description={description}
+  category="TROUBLESHOOTING"
+  categoryHref="/troubleshooting"
+  breadcrumbItems={[{ label: "BMS Keeps Tripping" }]}
+  relatedCalculators={relatedCalculators}
+  relatedGuides={relatedGuides}
+  faqItems={faqItems}
+>
+  <p class="text-body-md text-body font-light mb-8">
+    When a Battery Management System repeatedly disconnects the battery, it is doing its job — protecting cells from damage. But persistent tripping indicates a real problem that must be identified and resolved. This guide covers the five most common BMS trip causes and how to diagnose each one.
+  </p>
+
+  <TroubleshootingBlock
+    problem="Over-Voltage Protection"
+    causes={[
+      "Charger voltage exceeds the battery's maximum charge voltage",
+      "Charge controller or inverter settings are incorrectly configured",
+      "Cell imbalance causes one cell to reach over-voltage before the pack is fully charged",
+      "BMS over-voltage threshold is set too low for the chemistry",
+    ]}
+    explanation="Over-voltage occurs when the charger applies a voltage that pushes individual cells above their safe maximum. For LiFePO4, this is 3.65V per cell (14.6V for a 12V 4S pack). The BMS monitors each cell and disconnects the charger when any cell exceeds the threshold. Persistent tripping during charging usually means the charger voltage is too high or one cell is higher than the others."
+    checklist={[
+      "Measure the charger output voltage with a multimeter at the battery terminals under charge",
+      "Compare to the battery manufacturer's maximum charge voltage specification",
+      "Check individual cell voltages during charging to identify which cell triggers the trip",
+      "Verify the charge controller settings match the battery chemistry (LiFePO4 vs lead-acid vs NMC)",
+      "Inspect wiring for excessive resistance that could cause voltage drop differences",
+    ]}
+    solutions={[
+      "Adjust the charger or charge controller voltage to match the battery manufacturer's specification",
+      "If one cell is consistently higher, perform a full charge cycle with BMS balancing enabled",
+      "Recalibrate the BMS cell voltage sensing — some BMS units drift over time",
+      "Replace the BMS if it trips at voltages below the manufacturer's specified threshold",
+    ]}
+  />
+
+  <TroubleshootingBlock
+    problem="Under-Voltage Protection"
+    causes={[
+      "Load is draining the battery faster than expected",
+      "Charger is not providing sufficient current to keep up with the load",
+      "One cell is weak and reaching low-voltage cutoff before the rest of the pack",
+      "BMS under-voltage threshold is set higher than necessary",
+    ]}
+    explanation="Under-voltage protection triggers when any cell drops below the minimum safe voltage — typically 2.5V for LiFePO4 or 1.75V for lead-acid per cell. The BMS disconnects the load to prevent permanent cell damage. Frequent under-voltage trips during normal use suggest the battery is undersized for the load, a cell is weak, or the discharge rate is too high."
+    checklist={[
+      "Measure individual cell voltages during discharge — identify which cell reaches low-voltage cutoff first",
+      "Calculate the total load current and compare to the battery's rated continuous discharge current",
+      "Check if the issue occurs at a specific SOC level — this points to a weak cell",
+      "Verify the BMS under-voltage threshold matches the manufacturer's recommended cutoff",
+      "Review the load profile — inrush currents from motors or compressors can cause brief voltage dips",
+    ]}
+    solutions={[
+      "Reduce the load or add parallel battery capacity to increase runtime",
+      "Replace any individual cell that consistently reaches cutoff before others",
+      "Adjust the BMS low-voltage cutoff only if the current setting is too conservative",
+      "Add a pre-charge circuit for loads with high inrush current to prevent momentary voltage sags",
+    ]}
+  />
+
+  <TroubleshootingBlock
+    problem="Over-Current Protection"
+    causes={[
+      "Load current exceeds the BMS rated discharge current",
+      "Inrush current from motors, compressors, or pumps exceeds the BMS trip threshold",
+      "Short circuit in the wiring or connected equipment",
+      "Multiple high-draw loads operating simultaneously",
+    ]}
+    explanation="The BMS monitors current flowing through the pack and disconnects if it exceeds the rated limit. Over-current protection prevents wiring damage, MOSFET overheating, and cell degradation from excessive discharge rates. The trip can be instantaneous for short circuits or delayed for sustained over-current."
+    checklist={[
+      "Check the BMS rated continuous and peak discharge current — compare to the actual load",
+      "Use a clamp meter to measure the actual current draw during normal operation and startup",
+      "Identify if the trip occurs during specific events — motor startup, compressor cycling, inverter surge",
+      "Check for wiring faults or partial shorts that could cause current spikes",
+      "Review the total simultaneous load — add up all connected devices' current requirements",
+    ]}
+    solutions={[
+      "Upgrade to a BMS with a higher current rating if the load legitimately requires it",
+      "Stagger high-draw loads to avoid simultaneous startup surges",
+      "Add an inrush current limiter or soft-start circuit for motors and compressors",
+      "Repair or replace any damaged wiring causing intermittent shorts",
+    ]}
+  />
+
+  <TroubleshootingBlock
+    problem="Over-Temperature Protection"
+    causes={[
+      "Battery is operating in an environment exceeding its rated temperature range",
+      "High discharge rate is generating excessive internal heat",
+      "Temperature sensor is incorrectly placed near a heat source",
+      "Poor ventilation in the battery enclosure traps heat",
+    ]}
+    explanation="The BMS monitors cell temperature via thermistors attached to the cell surfaces. If temperature exceeds the safe operating limit (typically 60C for LiFePO4 discharge, 45C for charging), the BMS disconnects to prevent thermal damage. Persistent temperature trips indicate either an environmental problem or an electrical problem."
+    checklist={[
+      "Check the ambient temperature inside the battery enclosure using an independent thermometer",
+      "Measure the actual cell temperature with a thermocouple — compare to the BMS reading",
+      "Verify the temperature sensor is mounted directly on the cell surface, not floating in air",
+      "Calculate the heat generation at the operating current using P = I-squared times R_internal",
+      "Inspect ventilation openings for blockages, dust, or fan failures",
+    ]}
+    solutions={[
+      "Improve ventilation — add fans, increase vent openings, or relocate the battery to a cooler area",
+      "Reduce the continuous discharge current to keep heat generation within the thermal budget",
+      "Relocate temperature sensors to the center of the cell pack away from heat sources",
+      "Add active cooling (forced air or liquid) for high-power applications",
+    ]}
+  />
+
+  <TroubleshootingBlock
+    problem="Cell Imbalance Triggering BMS"
+    causes={[
+      "Cells in the pack have different capacities due to manufacturing variation or aging",
+      "One cell has higher self-discharge than the others",
+      "Passive balancing cannot keep up with the imbalance rate",
+      "Temperature gradients across the pack cause cells to behave differently",
+    ]}
+    explanation="Cell imbalance causes one cell to reach voltage limits before the others. During charging, the high cell triggers over-voltage. During discharge, the low cell triggers under-voltage. The BMS sees the pack as outside safe limits even though the average cell voltage is fine. This reduces usable capacity and causes nuisance tripping."
+    checklist={[
+      "Measure all individual cell voltages at full charge and at 50% SOC — note the spread",
+      "A spread greater than 0.1V between any two cells indicates significant imbalance",
+      "Check if the BMS balancing function is active during the final stage of charging",
+      "Record cell voltages over multiple charge cycles to see if imbalance is stable or growing",
+      "Check for temperature differences across the pack that could cause uneven cell behavior",
+    ]}
+    solutions={[
+      "Perform a full charge with BMS balancing enabled — allow 24-48 hours for passive balancing to equalize cells",
+      "Use an external active balancer for faster equalization of large imbalances",
+      "Replace any cell that cannot be balanced within 0.03V of the others after a full cycle",
+      "Ensure all cells in the pack are from the same manufacturer, batch, and capacity rating",
+    ]}
+  />
+
+  <p class="text-caption text-muted border-t border-hairline pt-8 mt-12">
+    <strong>Disclaimer:</strong> This guide is for educational and diagnostic purposes only. Battery troubleshooting involves electrical hazards. Always follow the manufacturer's safety procedures, wear appropriate PPE, and consult a qualified technician before attempting repairs. Never bypass BMS protections.
+  </p>
+</ArticleLayout>

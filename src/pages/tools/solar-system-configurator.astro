@@ -1,0 +1,535 @@
+---
+import CalculatorLayout from '../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../components/CalculatorCard.astro';
+import InputField from '../../components/InputField.astro';
+import ResultBox from '../../components/ResultBox.astro';
+import FormulaBox from '../../components/FormulaBox.astro';
+import FAQSection from '../../components/FAQSection.astro';
+import WorkedExample from '../../components/WorkedExample.astro';
+import ComparisonTable from '../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../components/EngineeringDiagram.astro';
+
+const whatIs = `Solar system configuration determines the complete component sizing for a solar-plus-storage installation: the <strong>solar array size</strong> (in watts) to meet daily energy demands, the <strong>battery bank capacity</strong> (in Wh and Ah) to store energy for nighttime and cloudy periods, and the <strong>charge controller rating</strong> (in amps) to safely regulate charging. The three components are interdependent — array size determines recharge rate, battery size determines autonomy, and charge controller must handle the array's maximum current at battery voltage. Proper sizing accounts for <strong>peak sun hours</strong> (location-dependent solar resource), <strong>system losses</strong> (inverter efficiency, wiring losses, temperature derating), and <strong>depth of discharge</strong> limits (chemistry-dependent).`;
+
+const whyItMatters = [
+  "Undersized solar arrays cannot recharge the battery bank during short winter days, causing progressive SOC decline.",
+  "Oversized arrays waste capital on panels that produce excess energy dumped as heat or exported at low feed-in rates.",
+  "Battery bank undersized for the array leads to frequent deep discharges during cloudy periods, accelerating degradation.",
+  "Undersized charge controllers clip solar production, wasting available energy during peak sun hours.",
+  "Not accounting for system losses (15–25%) leads to systems that consistently underperform expectations.",
+];
+
+const practicalApplications = [
+  { title: "Off-Grid Home Systems", description: "Design complete solar+battery systems for homes disconnected from the utility grid." },
+  { title: "Grid-Tied with Backup", description: "Size solar+battery for grid-tied homes seeking backup power during outages." },
+  { title: "RV & Mobile Solar", description: "Configure portable solar systems for RVs, boats, and overland vehicles." },
+  { title: "Remote Cabin & Telecomm", description: "Design autonomous power systems for remote cabins, towers, and IoT installations." },
+  { title: "Commercial Solar Storage", description: "Size commercial solar+battery systems for demand charge reduction and self-consumption." },
+];
+
+const expertNotes = [
+  { title: 'System Losses Matter', variant: 'engineering', content: 'Real-world solar systems deliver only 75–85% of rated panel output due to inverter efficiency (92–96%), wiring losses (2–5%), temperature derating (5–15%), and soiling (2–5%). Always size arrays for actual delivery, not nameplate rating.' },
+  { title: 'Charge Controller Sizing', variant: 'warning', content: 'MPPT controllers must handle the array\'s maximum open-circuit voltage (Voc) and maximum output current at battery voltage. Cold weather increases panel voltage — always check Voc at the lowest expected temperature, not just at STC (25°C).' },
+];
+
+const trustSection = {
+  text: "This calculator models complete solar-plus-storage system sizing using standard industry methodology. The model accounts for energy balance, solar resource, system losses, autonomy requirements, and component interdependencies. All intermediate values are displayed for verification.",
+  link: { label: "View our full methodology", href: "/methodology" },
+};
+
+const references = [
+  { title: "NREL — Solar Plus Storage Sizing Guide", url: "https://www.nrel.gov/solar/solar-plus-storage-sizing.html", source: "National Renewable Energy Laboratory" },
+  { title: "US DOE — Solar Battery Storage Overview", url: "https://www.energy.gov/eere/solar/solar-plus-storage", source: "U.S. Department of Energy" },
+  { title: "Victron Energy — Solar System Design", url: "https://www.victronenergy.com/help-center", source: "Victron Energy" },
+  { title: "Morningstar — MPPT Sizing Guide", url: "https://www.morningstarcorp.com/products/mppt-charge-controllers", source: "Morningstar Corporation" },
+];
+
+const faqItems = [
+  {
+    question: "How do I estimate my daily energy consumption?",
+    answer: "Add up wattage of every appliance multiplied by hours of daily use. Example: 5 LED lights (10W × 6h) = 300Wh, refrigerator (150W × 8h) = 1,200Wh, TV (100W × 4h) = 400Wh. Total: 1,900Wh or 1.9kWh. Check your utility bill for actual daily average.",
+  },
+  {
+    question: "How do I determine peak sun hours for my location?",
+    answer: "Peak sun hours (PSH) represent equivalent hours of 1,000W/m² solar irradiance. Use NREL's PVWatts tool or search for 'peak sun hours [your city]'. Typical values: Arizona 6.5h, London 2.5h, Mumbai 5h, Sydney 5.5h.",
+  },
+  {
+    question: "What solar array size do I need for my daily consumption?",
+    answer: "Array size (W) = Daily consumption (Wh) / (PSH × system efficiency). System efficiency is typically 0.75–0.85. For 5kWh/day with 4 PSH and 80% efficiency: 5,000 / (4 × 0.80) = 1,563W.",
+  },
+  {
+    question: "How many batteries do I need?",
+    answer: "Battery capacity (Wh) = Daily consumption × Autonomy days / DoD. For 5kWh/day, 2 days autonomy, 80% DoD: 5,000 × 2 / 0.80 = 12,500Wh (12.5kWh). At 48V, that's 260Ah.",
+  },
+  {
+    question: "What size charge controller do I need?",
+    answer: "Size for the array's maximum output current at battery voltage. A 1,500W array at 48V produces ~31A. Add 25% headroom: choose a 40A MPPT controller. Also verify the controller can handle the array's open-circuit voltage.",
+  },
+  {
+    question: "Should I use 12V, 24V, or 48V system voltage?",
+    answer: "48V for systems above 1kW (reduces current and cable requirements). 24V for 500W–1kW systems. 12V only for small systems under 500W. Higher voltage = thinner cables, less loss, lower cost.",
+  },
+  {
+    question: "What battery chemistry is best for solar?",
+    answer: "LFP (LiFePO4) is recommended: 5,000+ cycle life, 80–90% DoD, thermal stability, no maintenance. NMC offers higher density but shorter life. Lead-acid is cheapest upfront but requires 50% DoD limiting and frequent replacement.",
+  },
+  {
+    question: "How do I account for cloudy days?",
+    answer: "Increase autonomy days to cover consecutive cloudy periods. Off-grid systems typically need 2–4 days. Winter production can be 50–70% lower than summer — size for the worst-case month.",
+  },
+  {
+    question: "Can I expand the system later?",
+    answer: "Most lithium battery systems support modular expansion. Plan for expansion from the start by choosing a scalable platform. All battery strings should match chemistry, age, and capacity.",
+  },
+  {
+    question: "What is the total system cost estimate?",
+    answer: "Rough rule of thumb: $1.50–$2.50 per Wh of battery capacity, $0.70–$1.00 per W of solar panels, $0.30–$0.50 per W for charge controllers and inverters. A 10kWh system typically costs $15,000–$25,000 installed.",
+  },
+];
+
+const commonMistakes = [
+  "Sizing only for sunny days — off-grid systems must account for consecutive cloudy days. Size autonomy for the worst-case month, not the annual average.",
+  "Ignoring system losses — a 1,000W array does not produce 1,000Wh per hour. Inverter efficiency, wiring losses, and temperature reduce actual output by 15–25%.",
+  "Not matching charge controller to array — an undersized MPPT controller clips peak production, wasting available solar energy during midday.",
+  "Choosing wrong system voltage — 12V systems require extremely thick cables for loads above 1kW. Use 48V for residential systems.",
+  "Ignoring seasonal variation — winter solar production can be 50–70% lower than summer. Systems sized for summer may fail in winter.",
+  "Mixing old and new batteries — never add new batteries to an existing degraded bank. Mismatched resistance causes uneven loading.",
+  "Oversizing the array without battery capacity — excess solar energy has nowhere to go without adequate battery storage, leading to clipped production.",
+  "Forgetting inverter efficiency — the battery must supply more energy than loads consume. An 92% efficient inverter wastes 8% of energy.",
+];
+
+const relatedArticles = [
+  { href: "/learn/how-to-size-solar-battery-bank", title: "How to Size a Solar Battery Bank" },
+  { href: "/learn/solar-system-sizing-guide", title: "Solar System Sizing Guide" },
+  { href: "/learn/mppt-vs-pwm-charge-controllers", title: "MPPT vs PWM Controllers" },
+  { href: "/learn/peak-sun-hours-explained", title: "Peak Sun Hours Explained" },
+];
+---
+
+<CalculatorLayout
+  title="Solar System Configurator | Battery Calculators"
+  description="Design a complete solar-plus-storage system with array, battery bank, and charge controller sizing for your energy needs."
+  faqItems={faqItems}
+  commonMistakes={commonMistakes}
+  relatedArticles={relatedArticles}
+  relatedCalculators={[
+    { href: "/tools/solar-battery-sizing-calculator", title: "Solar Battery Sizing", description: "Size battery bank from daily consumption." },
+    { href: "/tools/battery-sizing-calculator", title: "Battery Sizing Tool", description: "General battery sizing from consumption." },
+    { href: "/tools/charging-time-calculator", title: "Charging Time Calculator", description: "Estimate CC-CV charge durations." },
+    { href: "/tools/energy-conversion-calculator", title: "Energy Conversion", description: "Convert between capacity Ah and energy Wh." },
+    { href: "/tools/runtime-calculator", title: "Runtime Calculator", description: "Compute runtime from load wattage profiles." },
+    { href: "/tools/parallel-string-calculator", title: "Parallel String Tool", description: "Configure series/parallel packs to match target." },
+  ]}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+>
+
+  <!-- Main Calculator Grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+
+    <!-- Input Form -->
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">System Requirements</h3>
+      <div class="flex flex-col gap-6">
+        <InputField id="daily-consumption" label="Daily Energy Consumption (kWh)" value={5} min={0.1} step="any" helperText="Total household energy use per day. Check your utility bill." />
+        <InputField id="peak-sun-hours" label="Peak Sun Hours (hours)" value={4} min={0.5} step="any" helperText="Average equivalent full-sun hours for your location. Search 'peak sun hours [city]'." />
+        <InputField id="autonomy" label="Days of Autonomy" value={2} min={1} max={7} step={1} helperText="Days battery must power loads without solar input." />
+        <InputField id="voltage" label="System Voltage (V)" value={48} min={12} step={1} helperText="48V recommended for systems above 1kW. 24V for 500W–1kW. 12V for <500W." />
+        <InputField
+          id="chemistry"
+          label="Battery Chemistry"
+          type="select"
+          value="lfp"
+          helperText="LFP recommended for solar: longest life and safest."
+          options={[
+            { label: "LFP (LiFePO4) — 90% DoD", value: "lfp" },
+            { label: "NMC — 80% DoD", value: "nmc" },
+            { label: "Lead-Acid (AGM/Gel) — 50% DoD", value: "lead-acid" },
+          ]}
+        />
+        <InputField id="dod" label="Depth of Discharge (%)" value={80} min={10} max={100} step={1} helperText="LFP: 90%, NMC: 80%, Lead-Acid: 50%. Adjusted automatically by chemistry selection." />
+        <InputField id="system-efficiency" label="System Efficiency (%)" value={82} min={60} max={95} step={1} helperText="Accounts for inverter, wiring, and temperature losses. 80–85% typical." />
+      </div>
+    </CalculatorCard>
+
+    <!-- Results -->
+    <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">System Design</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <ResultBox
+            label="Solar Array Size"
+            value="1,524 W"
+            suffix="1.5 kW recommended"
+            variant="primary"
+            id="result-array"
+          />
+          <ResultBox
+            label="Battery Bank Capacity"
+            value="12,500 Wh"
+            suffix="12.5 kWh at 48V"
+            id="result-battery"
+          />
+          <ResultBox
+            label="Charge Controller"
+            value="40 A"
+            suffix="MPPT, 150V input max"
+            id="result-controller"
+          />
+          <ResultBox
+            label="Battery Capacity"
+            value="260.4 Ah"
+            suffix="At 48V nominal"
+            id="result-ah"
+          />
+        </div>
+      </div>
+
+      <!-- Action Area -->
+      <div class="border-t border-hairline pt-6">
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">Component List</h4>
+        <div class="text-body-sm text-muted" id="component-list">
+          <p class="mb-1">Solar Panels: 4 × 400W panels (1,600W total)</p>
+          <p class="mb-1">Battery Bank: 48V 260Ah LFP (e.g., 2 × 280Ah in parallel)</p>
+          <p class="mb-1">Charge Controller: 40A MPPT (e.g., Victron 150/35 or 150/45)</p>
+          <p class="mb-1">Inverter: 3,000W–5,000W pure sine wave, 48V input</p>
+        </div>
+      </div>
+    </CalculatorCard>
+
+  </div>
+
+  <!-- System Size Comparison -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-title-lg text-primary uppercase mb-6 tracking-wider">System Sizes for Different Applications</h2>
+    <p class="text-body-sm text-muted mb-8">Reference sizing for common solar+battery applications at your specified location and efficiency settings.</p>
+
+    <div class="overflow-x-auto">
+      <table class="w-full border-collapse">
+        <thead>
+          <tr class="border-b border-hairline">
+            <th class="text-label-uppercase text-xs text-primary p-3 text-left">Application</th>
+            <th class="text-label-uppercase text-xs text-primary p-3 text-left">Daily Use</th>
+            <th class="text-label-uppercase text-xs text-primary p-3 text-left">Solar Array</th>
+            <th class="text-label-uppercase text-xs text-primary p-3 text-left">Battery Bank</th>
+            <th class="text-label-uppercase text-xs text-primary p-3 text-left">Controller</th>
+            <th class="text-label-uppercase text-xs text-primary p-3 text-left">Est. Cost</th>
+          </tr>
+        </thead>
+        <tbody id="comparison-table-body">
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Technical Explanation and Equations -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+
+      <FormulaBox title="Mathematical Formulas">
+        <p>
+          The solar array is sized to deliver daily consumption within available peak sun hours, accounting for system losses:
+        </p>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Array Size (W) = Daily Consumption (Wh) / (PSH × Efficiency)
+        </div>
+        <p>
+          The battery bank is sized for autonomy and depth of discharge limits:
+        </p>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Battery Capacity (Wh) = (Daily Consumption × Autonomy) / DoD
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Battery Capacity (Ah) = Battery Capacity (Wh) / System Voltage
+        </div>
+        <p>
+          The charge controller must handle the array's maximum output current:
+        </p>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Controller Current (A) = Array Size (W) / Battery Voltage × 1.25
+        </div>
+        <p class="text-xs text-muted mt-4">
+          <strong>Variables:</strong> PSH = Peak Sun Hours, Efficiency = system derate factor (typically 0.75–0.85), DoD = depth of discharge as decimal. The 1.25× factor on controller sizing provides headroom for cold-weather voltage boost.
+        </p>
+      </FormulaBox>
+
+      <div class="flex flex-col gap-8">
+        <h2 class="text-title-lg text-primary uppercase mb-2 tracking-wider">Worked Engineering Examples</h2>
+
+        <WorkedExample
+          number={1}
+          title="Small Cabin — 3 kWh/day, 4 Peak Sun Hours"
+          scenario="An off-grid cabin consumes 3kWh/day with 4 peak sun hours. Size a complete 48V LFP system with 2 days autonomy."
+          inputs={[
+            { label: "Daily Consumption", value: "3 kWh/day" },
+            { label: "Peak Sun Hours", value: "4 hours" },
+            { label: "Autonomy", value: "2 days" },
+            { label: "System Voltage", value: "48V" },
+            { label: "Chemistry", value: "LFP (LiFePO4)" },
+            { label: "System Efficiency", value: "82%" },
+          ]}
+          steps={[
+            { label: "Solar array", formula: "3,000 / (4 × 0.82)", result: "915W → 1,000W recommended" },
+            { label: "Battery capacity", formula: "(3,000 × 2) / 0.90", result: "6,667 Wh (6.7 kWh)" },
+            { label: "Battery Ah", formula: "6,667 / 48", result: "138.9 Ah" },
+            { label: "Charge controller", formula: "1,000 / 48 × 1.25", result: "26A → 30A MPPT" },
+          ]}
+          answer="1kW solar array, 6.7kWh (139Ah at 48V) LFP battery bank, 30A MPPT controller."
+          interpretation="A compact, affordable system. With 4 peak sun hours, the array produces ~3.3kWh/day — enough to charge the battery in one day and power daily loads."
+          variant="solar"
+        />
+
+        <WorkedExample
+          number={2}
+          title="Off-Grid Home — 10 kWh/day, 3.5 Peak Sun Hours"
+          scenario="An off-grid home uses 10kWh/day with 3.5 peak sun hours in winter. Size a 48V LFP system with 3 days autonomy for cloudy periods."
+          inputs={[
+            { label: "Daily Consumption", value: "10 kWh/day" },
+            { label: "Peak Sun Hours", value: "3.5 hours" },
+            { label: "Autonomy", value: "3 days" },
+            { label: "System Voltage", value: "48V" },
+            { label: "Chemistry", value: "LFP (LiFePO4)" },
+            { label: "System Efficiency", value: "80%" },
+          ]}
+          steps={[
+            { label: "Solar array", formula: "10,000 / (3.5 × 0.80)", result: "3,571W → 3,600W" },
+            { label: "Battery capacity", formula: "(10,000 × 3) / 0.90", result: "33,333 Wh (33.3 kWh)" },
+            { label: "Battery Ah", formula: "33,333 / 48", result: "694.4 Ah" },
+            { label: "Charge controller", formula: "3,600 / 48 × 1.25", result: "93.75A → 100A MPPT" },
+          ]}
+          answer="3.6kW solar array, 33.3kWh (694Ah at 48V) LFP battery bank, 100A MPPT controller."
+          interpretation="A substantial off-grid system. The 3-day autonomy buffer handles consecutive cloudy days. The large array ensures full recharge even during short winter days."
+          variant="solar"
+        />
+
+        <WorkedExample
+          number={3}
+          title="RV Mobile System — 2 kWh/day, Variable Solar"
+          scenario="An RV consumes 2kWh/day with variable solar input. Peak sun hours range from 2h (forested) to 6h (desert). Size a 12V LFP system with 2 days autonomy."
+          inputs={[
+            { label: "Daily Consumption", value: "2 kWh/day" },
+            { label: "Peak Sun Hours", value: "2–6 hours (worst: 2h)" },
+            { label: "Autonomy", value: "2 days" },
+            { label: "System Voltage", value: "12V" },
+            { label: "Chemistry", value: "LFP (LiFePO4)" },
+            { label: "System Efficiency", value: "78%" },
+          ]}
+          steps={[
+            { label: "Solar array (worst case)", formula: "2,000 / (2 × 0.78)", result: "1,282W → 1,400W" },
+            { label: "Battery capacity", formula: "(2,000 × 2) / 0.90", result: "4,444 Wh (4.4 kWh)" },
+            { label: "Battery Ah", formula: "4,444 / 12.8", result: "347.2 Ah" },
+            { label: "Charge controller", formula: "1,400 / 12.8 × 1.25", result: "136.7A → 150A MPPT" },
+          ]}
+          answer="1.4kW solar array (portable), 4.4kWh (347Ah at 12V) LFP battery bank, 150A MPPT controller."
+          interpretation="Mobile systems must plan for worst-case solar. A 1.4kW portable array ensures charging even in forested areas. At 12V, the high current demands thick cables — consider 24V if load allows."
+          variant="solar"
+        />
+
+      </div>
+    </div>
+  </section>
+
+  <EngineeringDiagram
+    title="Solar-Plus-Storage System"
+    description="Complete energy flow from solar panels through controller, battery, and inverter to loads"
+    variant="system"
+    steps={[
+      { label: "Solar Panels", icon: "solar" },
+      { label: "MPPT Controller", icon: "charge" },
+      { label: "Battery Bank", icon: "battery" },
+      { label: "Inverter + Loads", icon: "inverter" },
+    ]}
+  />
+
+  <ComparisonTable
+    title="System Sizing by Application"
+    headers={["Application", "Daily Use", "Solar Array", "Battery Bank", "Controller", "Inverter"]}
+    rows={[
+      ["Phone Charging", "0.05 kWh", "50W", "100Wh (12V)", "5A PWM", "100W"],
+      ["RV / Camper", "2 kWh", "400–800W", "200–400Ah (12V)", "20–40A MPPT", "1,000–2,000W"],
+      ["Tiny Cabin", "3–5 kWh", "1–2kW", "100–200Ah (48V)", "30–60A MPPT", "3,000W"],
+      ["Small Home", "5–10 kWh", "3–5kW", "200–400Ah (48V)", "60–100A MPPT", "5,000–8,000W"],
+      ["Full Home", "15–30 kWh", "8–15kW", "400–800Ah (48V)", "100–200A MPPT", "10,000–15,000W"],
+      ["Commercial", "50+ kWh", "20–100kW", "Multiple 48V banks", "Multiple MPPT", "50–200kW"],
+    ]}
+    caption="Reference sizing for common solar+battery applications"
+  />
+
+  <ComparisonTable
+    title="Battery Chemistry Comparison for Solar"
+    headers={["Chemistry", "Cycle Life", "DoD Limit", "Energy Density", "Cost/Wh", "Best For"]}
+    rows={[
+      ["LFP (LiFePO4)", "5,000+ cycles", "90%", "Medium", "$0.25–$0.40", "Solar, stationary storage"],
+      ["NMC", "2,000–3,000", "80%", "High", "$0.30–$0.50", "EVs, space-constrained"],
+      ["Lead-Acid (AGM)", "500–1,000", "50%", "Low", "$0.10–$0.20", "Budget, backup only"],
+      ["LTO", "10,000+ cycles", "90%", "Low", "$0.50–$1.00", "Extreme environments"],
+    ]}
+    caption="Battery technology comparison for solar energy storage"
+  />
+
+  <FAQSection items={faqItems} />
+
+  <!-- Calculation Script -->
+  <script>
+    const consumptionInput = document.getElementById('daily-consumption') as HTMLInputElement;
+    const pshInput = document.getElementById('peak-sun-hours') as HTMLInputElement;
+    const autonomyInput = document.getElementById('autonomy') as HTMLInputElement;
+    const voltageInput = document.getElementById('voltage') as HTMLInputElement;
+    const chemistrySelect = document.getElementById('chemistry') as HTMLSelectElement;
+    const dodInput = document.getElementById('dod') as HTMLInputElement;
+    const efficiencyInput = document.getElementById('system-efficiency') as HTMLInputElement;
+
+    // Result elements
+    const resultArrayBox = document.getElementById('result-array');
+    const resultArrayValue = resultArrayBox?.querySelector('.text-display-md') as HTMLElement;
+    const resultArrayNote = resultArrayBox?.querySelector('.text-caption') as HTMLElement;
+
+    const resultBatteryBox = document.getElementById('result-battery');
+    const resultBatteryValue = resultBatteryBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultBatteryNote = resultBatteryBox?.querySelector('.text-caption') as HTMLElement;
+
+    const resultControllerBox = document.getElementById('result-controller');
+    const resultControllerValue = resultControllerBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultControllerNote = resultControllerBox?.querySelector('.text-caption') as HTMLElement;
+
+    const resultAhBox = document.getElementById('result-ah');
+    const resultAhValue = resultAhBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultAhNote = resultAhBox?.querySelector('.text-caption') as HTMLElement;
+
+    const componentList = document.getElementById('component-list');
+    const comparisonTableBody = document.getElementById('comparison-table-body');
+
+    const CHEMISTRY_DOD: Record<string, number> = {
+      lfp: 90,
+      nmc: 80,
+      'lead-acid': 50,
+    };
+
+    function getChemistryName(chem: string): string {
+      return chem === 'lfp' ? 'LFP' : chem === 'nmc' ? 'NMC' : 'Lead-Acid';
+    }
+
+    function calculateSystem(
+      dailyKwh: number, psh: number, autonomy: number,
+      voltage: number, _chemistry: string, dod: number, efficiency: number
+    ) {
+      const dailyWh = dailyKwh * 1000;
+      const effDecimal = efficiency / 100;
+      const dodDecimal = dod / 100;
+
+      // Solar array
+      const arrayW = dailyWh / (psh * effDecimal);
+
+      // Battery
+      const batteryWh = (dailyWh * autonomy) / dodDecimal;
+      const batteryAh = batteryWh / voltage;
+
+      // Charge controller
+      const controllerA = (arrayW / voltage) * 1.25;
+
+      // Round to nice numbers
+      const arrayWRounded = Math.ceil(arrayW / 100) * 100;
+      const controllerARounded = Math.ceil(controllerA / 10) * 10;
+      const batteryAhRounded = Math.round(batteryAh * 10) / 10;
+      const batteryWhRounded = Math.round(batteryWh);
+
+      return { arrayW, arrayWRounded, batteryWh, batteryWhRounded, batteryAh, batteryAhRounded, controllerA, controllerARounded };
+    }
+
+    function updateCalculations() {
+      const dailyKwh = parseFloat(consumptionInput.value) || 5;
+      const psh = parseFloat(pshInput.value) || 4;
+      const autonomy = parseFloat(autonomyInput.value) || 2;
+      const voltage = parseFloat(voltageInput.value) || 48;
+      const chemistry = chemistrySelect.value;
+      const dod = parseFloat(dodInput.value) || 80;
+      const efficiency = parseFloat(efficiencyInput.value) || 82;
+
+      const r = calculateSystem(dailyKwh, psh, autonomy, voltage, chemistry, dod, efficiency);
+
+      // Render array
+      if (resultArrayValue) resultArrayValue.textContent = `${r.arrayWRounded.toLocaleString()} W`;
+      if (resultArrayNote) resultArrayNote.textContent = `${(r.arrayWRounded / 1000).toFixed(1)} kW recommended`;
+
+      // Render battery
+      if (resultBatteryValue) resultBatteryValue.textContent = `${r.batteryWhRounded.toLocaleString()} Wh`;
+      if (resultBatteryNote) resultBatteryNote.textContent = `${(r.batteryWhRounded / 1000).toFixed(1)} kWh at ${voltage}V`;
+
+      // Render controller
+      if (resultControllerValue) resultControllerValue.textContent = `${r.controllerARounded} A`;
+      if (resultControllerNote) resultControllerNote.textContent = `MPPT, 150V input max`;
+
+      // Render Ah
+      if (resultAhValue) resultAhValue.textContent = `${r.batteryAhRounded} Ah`;
+      if (resultAhNote) resultAhNote.textContent = `At ${voltage}V nominal`;
+
+      // Render component list
+      if (componentList) {
+        const panelCount = Math.ceil(r.arrayWRounded / 400);
+        const panelWattage = Math.round(r.arrayWRounded / panelCount);
+        const batteryModules = voltage >= 48
+          ? Math.max(2, Math.ceil(r.batteryAhRounded / 280))
+          : Math.max(1, Math.ceil(r.batteryAhRounded / 200));
+        const ahPerModule = Math.round(r.batteryAhRounded / batteryModules);
+        const inverterW = Math.max(2000, Math.ceil((dailyKwh * 1000 / 8) / 500) * 500);
+
+        componentList.innerHTML = `
+          <p class="mb-1">Solar Panels: ${panelCount} × ${panelWattage}W panels (${r.arrayWRounded.toLocaleString()}W total)</p>
+          <p class="mb-1">Battery Bank: ${voltage}V ${r.batteryAhRounded}Ah ${getChemistryName(chemistry)} (${batteryModules} × ${ahPerModule}Ah in ${batteryModules > 1 ? 'parallel' : 'series'})</p>
+          <p class="mb-1">Charge Controller: ${r.controllerARounded}A MPPT (e.g., Victron 150/${Math.min(r.controllerARounded, 45)} or ${r.controllerARounded}A unit)</p>
+          <p class="mb-1">Inverter: ${inverterW.toLocaleString()}W pure sine wave, ${voltage}V input</p>
+        `;
+      }
+
+      // Render comparison table
+      if (comparisonTableBody) {
+        const applications = [
+          { name: 'Phone Charging', dailyKwh: 0.05, psh: psh, autonomy: 1, voltage: 12, chem: 'lfp', dod: 90, eff: 75 },
+          { name: 'RV / Camper', dailyKwh: 2, psh: psh, autonomy: 2, voltage: 12, chem: 'lfp', dod: 90, eff: 78 },
+          { name: 'Tiny Cabin', dailyKwh: Math.min(dailyKwh, 5), psh: psh, autonomy: autonomy, voltage: 48, chem: 'lfp', dod: 90, eff: 82 },
+          { name: 'Your System', dailyKwh: dailyKwh, psh: psh, autonomy: autonomy, voltage: voltage, chem: chemistry, dod: dod, eff: efficiency },
+          { name: 'Full Home', dailyKwh: Math.max(dailyKwh, 20), psh: psh, autonomy: Math.max(autonomy, 2), voltage: 48, chem: 'lfp', dod: 90, eff: 85 },
+          { name: 'Commercial', dailyKwh: 50, psh: psh, autonomy: 1, voltage: 48, chem: 'lfp', dod: 90, eff: 85 },
+        ];
+
+        comparisonTableBody.innerHTML = '';
+        for (const app of applications) {
+          const s = calculateSystem(app.dailyKwh, app.psh, app.autonomy, app.voltage, app.chem, app.dod, app.eff);
+          const isCurrent = app.name === 'Your System';
+          const row = document.createElement('tr');
+          row.className = `border-b border-hairline ${isCurrent ? 'bg-surface-elevated' : ''}`;
+          row.innerHTML = `
+            <td class="p-3 text-body-sm text-primary ${isCurrent ? 'font-bold' : ''}">${isCurrent ? '→ ' : ''}${app.name}</td>
+            <td class="p-3 text-body-sm text-muted">${app.dailyKwh} kWh</td>
+            <td class="p-3 text-body-sm text-muted">${(s.arrayWRounded / 1000).toFixed(1)} kW</td>
+            <td class="p-3 text-body-sm text-muted">${(s.batteryWhRounded / 1000).toFixed(1)} kWh</td>
+            <td class="p-3 text-body-sm text-muted">${s.controllerARounded}A</td>
+            <td class="p-3 text-body-sm text-muted">${s.arrayWRounded > 5000 ? '$' + ((s.batteryWhRounded * 0.35 + s.arrayWRounded * 0.85 + s.controllerARounded * 50 + 3000) / 1000).toFixed(1) + 'k' : '$' + ((s.batteryWhRounded * 0.35 + s.arrayWRounded * 0.85 + s.controllerARounded * 50 + 1000) / 1000).toFixed(1) + 'k'}</td>
+          `;
+          comparisonTableBody.appendChild(row);
+        }
+      }
+    }
+
+    // Sync DoD with chemistry selection
+    chemistrySelect.addEventListener('change', () => {
+      const chem = chemistrySelect.value;
+      if (CHEMISTRY_DOD[chem]) {
+        dodInput.value = String(CHEMISTRY_DOD[chem]);
+      }
+      updateCalculations();
+    });
+
+    [consumptionInput, pshInput, autonomyInput, voltageInput, dodInput, efficiencyInput].forEach(el => {
+      el.addEventListener('input', updateCalculations);
+    });
+
+    updateCalculations();
+  </script>
+
+</CalculatorLayout>

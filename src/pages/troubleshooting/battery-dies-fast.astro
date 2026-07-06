@@ -1,0 +1,199 @@
+---
+import ArticleLayout from '../../layouts/ArticleLayout.astro';
+import TroubleshootingBlock from '../../components/TroubleshootingBlock.astro';
+
+const relatedCalculators = [
+  { title: 'Runtime Calculator', href: '/tools/runtime-calculator', type: 'calculator' as const },
+  { title: 'Battery Degradation Estimator', href: '/tools/battery-degradation-estimator', type: 'calculator' as const },
+  { title: 'SOC Estimator', href: '/tools/soc-estimator', type: 'calculator' as const },
+  { title: 'C-Rate Calculator', href: '/tools/c-rate-calculator', type: 'calculator' as const },
+];
+
+const relatedGuides = [
+  { title: 'Battery Degradation Explained', href: '/learn/battery-degradation-explained', type: 'guide' as const },
+  { title: 'Understanding State of Charge', href: '/learn/understanding-state-of-charge', type: 'guide' as const },
+  { title: 'Battery Efficiency Reference', href: '/learn/battery-efficiency-reference', type: 'guide' as const },
+];
+
+const faqItems = [
+  {
+    question: 'How do I test my battery\'s actual capacity?',
+    answer: 'Perform a capacity test: fully charge the battery, then discharge at a constant rate (typically 0.2C) while measuring amp-hours delivered. A 100Ah battery that delivers 85Ah has lost 15% capacity. Use a battery analyzer or shunt-based monitor for accurate measurements. Compare the result to the rated capacity at the same C-rate and temperature.',
+  },
+  {
+    question: 'Why does my battery voltage drop so quickly under load?',
+    answer: 'A rapid voltage drop under load typically indicates high internal resistance, which increases with age, cold temperature, or poor connections. LiFePO4 batteries maintain a flat voltage curve until nearly empty, so a steep drop suggests the battery is either deeply discharged already or has significant internal resistance. Check connections first, then test internal resistance with an LCR meter.',
+  },
+  {
+    question: 'How much self-discharge is normal for lithium batteries?',
+    answer: 'LiFePO4 batteries self-discharge at approximately 1–3% per month at 25°C. NMC lithium-ion batteries lose about 2–5% per month. Lead-acid batteries lose 5–15% per month depending on type. If your battery loses more than 5% per month (lithium) or 20% per month (lead-acid), a cell may have excessive self-discharge indicating impending failure.',
+  },
+  {
+    question: 'Can temperature affect battery runtime?',
+    answer: 'Yes, significantly. At 0°C, a lithium battery may deliver only 70–80% of its rated capacity. At -20°C, capacity can drop to 50–60%. High temperatures (above 40°C) accelerate self-discharge and can temporarily increase available capacity but permanently reduce cycle life. Always derate battery capacity by 10–20% for cold-weather applications.',
+  },
+  {
+    question: 'At what point should I replace a degrading battery?',
+    answer: 'Replace a battery when its capacity drops below 70–80% of rated capacity for most applications. For critical backup power, replace at 80%. A battery at 60% capacity delivers half the runtime of a new battery and may not support its rated load. Check the manufacturer\'s warranty terms — most lithium batteries are warrantied to 70% capacity at a specified cycle count.',
+  },
+  {
+    question: 'What is parasitic drain and how do I find it?',
+    answer: 'Parasitic drain is any electrical load that draws current when the system is nominally off. Common culprits include inverter standby current, charge controllers, Bluetooth modules, displays, and alarms. Measure current draw with a clamp meter or shunt when all loads are off. Anything above 50mA should be investigated. A 100mA parasitic drain will empty a 100Ah battery in about 42 days.',
+  },
+];
+---
+
+<ArticleLayout
+  title="Battery Dies Fast — Troubleshooting Guide | Battery Calculators"
+  description="Diagnose why your battery drains quickly or has poor runtime. Troubleshoot actual vs rated capacity, self-discharge, parasitic loads, temperature effects, and cell degradation."
+  category="TROUBLESHOOTING"
+  categoryHref="/troubleshooting"
+  breadcrumbItems={[{ label: 'Battery Dies Fast' }]}
+  relatedCalculators={relatedCalculators}
+  relatedGuides={relatedGuides}
+  faqItems={faqItems}
+>
+  <p class="text-body-md text-body font-light mb-8">
+    When a battery drains faster than expected, the problem can be the battery itself, hidden loads consuming power, environmental conditions, or simply a mismatch between rated capacity and real-world performance. This guide covers the five most common causes of unexpectedly short battery runtime.
+  </p>
+
+  <TroubleshootingBlock
+    problem="Actual Capacity vs Rated Capacity — The Numbers Don't Match"
+    causes={[
+      'Battery rated capacity measured at different C-rate than your load',
+      'Temperature derating not accounted for in runtime estimate',
+      'Depth of discharge limit reduces usable capacity below rated spec',
+      'New battery out of spec due to manufacturing variation',
+      'Marketing capacity inflated beyond true cell capacity',
+    ]}
+    explanation="Battery capacity ratings are measured under specific conditions that rarely match your real-world application. A 100Ah battery rated at 0.2C (20A discharge) may only deliver 85Ah at 1C (100A discharge) due to the Peukert effect (lead-acid) or internal resistance losses (lithium). Additionally, LiFePO4 batteries are typically rated at 100% DoD, but many applications limit discharge to 80% to extend cycle life — immediately reducing usable capacity to 80Ah. Temperature further derates capacity: at 0°C, a lithium battery delivers roughly 80% of its 25°C capacity. Always calculate usable capacity as: Rated Ah × DoD% × Temperature Factor × C-rate Factor."
+    checklist={[
+      'Verify the C-rate at which your battery capacity was rated',
+      'Calculate usable capacity: Ah × DoD limit × temperature derating factor',
+      'Perform a controlled capacity test at your typical load current',
+      'Compare tested capacity to rated capacity at the same conditions',
+      'Check if battery is operating within manufacturer temperature range',
+      'Review manufacturer specifications for capacity vs discharge rate curves',
+    ]}
+    solutions={[
+      'Use the Runtime Calculator with your actual load current and DoD limit',
+      'Derate capacity by 10–20% for cold environments below 10°C',
+      'Select a battery with higher rated capacity to compensate for real-world losses',
+      'Limit discharge depth to 80% for lithium to balance capacity and cycle life',
+      'If capacity test shows <80% of rated capacity, contact manufacturer',
+    ]}
+  />
+
+  <TroubleshootingBlock
+    problem="High Self-Discharge — Battery Loses Charge While Sitting Idle"
+    causes={[
+      'One or more cells have excessive self-discharge rate',
+      'BMS or battery electronics drawing continuous standby current',
+      'Moisture ingress causing micro-shorts between cells',
+      'Chemical contamination in electrolyte from manufacturing defect',
+      'Battery stored at high state of charge accelerates degradation',
+    ]}
+    explanation="All batteries lose charge over time through internal chemical reactions — this is normal self-discharge. For LiFePO4, expect 1–3% per month at 25°C. Lead-acid loses 5–15% per month. However, if a battery loses charge significantly faster than these rates, one or more cells may have elevated self-discharge caused by internal micro-shorts, contamination, or mechanical damage. A single bad cell in a series string will drag down the entire pack. The BMS balancing circuit tries to compensate but has limited current capacity (typically 50–200mA for passive balancing). If self-discharge exceeds the balancing current, the pack will progressively lose capacity over weeks."
+    checklist={[
+      'Fully charge battery and record voltage',
+      'Store at room temperature (20–25°C) with no loads connected',
+      'Measure voltage weekly for 4 weeks',
+      'Calculate monthly self-discharge rate: (V_drop / V_total) × 100%',
+      'Compare to manufacturer specification (typically 1–3%/month for LFP)',
+      'If self-discharge >5%/month, individual cell testing is needed',
+    ]}
+    solutions={[
+      'If self-discharge is moderate (3–5%/month), periodic recharging may suffice',
+      'Perform a full charge-discharge-charge cycle to recondition cells',
+      'For high self-discharge (>5%/month), identify and replace the bad cell group',
+      'Store batteries at 50–60% SOC to minimize self-discharge and degradation',
+      'Ensure storage environment is dry and temperature-controlled',
+      'Contact manufacturer if high self-discharge occurs within warranty period',
+    ]}
+  />
+
+  <TroubleshootingBlock
+    problem="Parasitic Loads — Hidden Power Drains Emptying the Battery"
+    causes={[
+      'Inverter standby consumption (50–500W for large inverters)',
+      'Charge controller quiescent current draw',
+      'Bluetooth, Wi-Fi, or display modules consuming power continuously',
+      'Undersized solar input not replacing daily parasitic drain',
+      'Ground fault or short circuit creating phantom load',
+    ]}
+    explanation="Parasitic loads are electrical draws that operate continuously, often unnoticed, draining the battery even when no active loads are running. A 1000W inverter with 3–5% standby consumption draws 30–50W continuously — that is 24–40Ah per day from a 12V battery, enough to empty a 200Ah bank in 5–8 days with zero active usage. Battery monitors, shunt resistors, BMS electronics, and solar charge controllers each add 5–50mA. While individually small, the cumulative effect of multiple parasitic loads can be significant. The most effective diagnostic method is measuring total current draw with all active loads disconnected using a clamp meter on the main battery cable."
+    checklist={[
+      'Disconnect all active loads from the battery',
+      'Measure current draw with a clamp meter on the main positive cable',
+      'Compare measured standby current to expected parasitic load budget',
+      'Turn off inverter and measure again to isolate inverter standby draw',
+      'Disconnect solar charge controller and measure to isolate controller draw',
+      'Check for warm wires or components indicating unexpected current flow',
+      'Use a shunt-based battery monitor to log overnight drain rate',
+    ]}
+    solutions={[
+      'Turn off or disconnect inverters when not in use to eliminate standby drain',
+      'Select low-quiescent-current charge controllers for off-grid systems',
+      'Use a battery disconnect switch to fully isolate battery during long-term storage',
+      'Install a larger solar array to offset daily parasitic consumption',
+      'Add a low-voltage disconnect to prevent parasitic loads from deep-discharging battery',
+      'Audit all connected devices and remove unnecessary always-on electronics',
+    ]}
+  />
+
+  <TroubleshootingBlock
+    problem="Temperature Effects — Cold or Heat Reducing Available Capacity"
+    causes={[
+      'Cold electrolyte increases internal resistance, reducing delivered capacity',
+      'Heat accelerates self-discharge and chemical degradation',
+      'Temperature sensor inaccurate, causing BMS to miscalculate SOC',
+      'Battery installed in uninsulated compartment exposed to extremes',
+      'Seasonal temperature swings causing condensation inside battery',
+    ]}
+    explanation="Temperature has a profound effect on battery capacity and runtime. At 0°C, lithium-ion batteries typically deliver 70–80% of their 25°C capacity. At -20°C, this drops to 50–60%. The mechanism is kinetic: ion mobility in the electrolyte decreases as temperature drops, increasing internal resistance and reducing the voltage sag margin. For lead-acid, cold temperatures reduce capacity while simultaneously increasing the energy needed to recharge — a double penalty. High temperatures (above 40°C) temporarily increase available capacity by reducing internal resistance, but this comes at the cost of accelerated calendar aging. Every 10°C rise above 25°C roughly doubles the degradation rate. The BMS temperature sensor may also read ambient temperature rather than core cell temperature, leading to inaccurate SOC estimates."
+    checklist={[
+      'Record ambient temperature at battery location during discharge',
+      'Compare battery runtime in different seasons or temperature conditions',
+      'Check BMS temperature reading against ambient thermometer',
+      'Verify battery is not in a location with extreme temperature swings',
+      'Calculate expected capacity derating for your temperature range',
+      'Monitor battery surface temperature during heavy discharge',
+    ]}
+    solutions={[
+      'Relocate battery to a temperature-stable environment (10–30°C ideal)',
+      'Insulate battery enclosure in cold climates to retain heat from discharge',
+      'Add ventilation or shade for batteries in hot climates',
+      'Derate battery capacity by 15–20% for cold-weather runtime calculations',
+      'Use a battery with built-in heating pad for sub-zero environments',
+      'Account for temperature in your runtime estimates using the Runtime Calculator',
+    ]}
+  />
+
+  <TroubleshootingBlock
+    problem="Aging and Degradation — Battery Capacity Lost Over Time"
+    causes={[
+      'Calendar aging degrades capacity even without cycling',
+      'Cycle aging from repeated charge-discharge reduces active material',
+      'High temperature exposure accelerates SEI layer growth',
+      'Frequent deep discharges shorten cycle life exponentially',
+      'Charging above recommended voltage accelerates degradation',
+    ]}
+    explanation="All batteries lose capacity over time through two mechanisms: calendar aging and cycle aging. Calendar aging occurs regardless of use — the electrolyte slowly decomposes and the solid electrolyte interphase (SEI) layer grows on the anode, consuming active lithium. Cycle aging occurs during charge-discharge as mechanical stress from lithium intercalation/deintercalation causes particle cracking and loss of electrical contact. LiFePO4 typically retains 80% capacity after 3,000–5,000 cycles (at 80% DoD, 25°C). NMC retains 80% after 1,000–2,000 cycles. Lead-acid retains 80% after 300–500 cycles. Operating at high temperatures or deep DoD dramatically accelerates both aging mechanisms. A battery that has lost 30% capacity will deliver 30% less runtime — this is not a fault but end-of-life degradation."
+    checklist={[
+      'Determine battery age (months since manufacture)',
+      'Calculate approximate cycle count from usage history',
+      'Perform a capacity test and compare to rated capacity',
+      'Check if battery has been operated at high temperatures',
+      'Review discharge depth history — frequent deep cycling accelerates aging',
+      'Compare current performance to when the battery was new',
+    ]}
+    solutions={[
+      'If capacity is >80% of rated, degradation is normal — adjust expectations',
+      'If capacity is 60–80%, reduce loads or add parallel batteries to compensate',
+      'If capacity is <60%, plan for battery replacement',
+      'Reduce DoD to 50–70% to extend remaining cycle life',
+      'Lower operating temperature to slow further degradation',
+      'Use the Battery Degradation Estimator to predict remaining useful life',
+    ]}
+  />
+</ArticleLayout>

@@ -4,6 +4,9 @@ import CalculatorCard from '../../components/CalculatorCard.astro';
 import InputField from '../../components/InputField.astro';
 import ResultBox from '../../components/ResultBox.astro';
 import FormulaBox from '../../components/FormulaBox.astro';
+import WorkedExample from '../../components/WorkedExample.astro';
+import ComparisonTable from '../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../components/EngineeringDiagram.astro';
 import FAQSection from '../../components/FAQSection.astro';
 import RelatedTools from '../../components/RelatedTools.astro';
 
@@ -233,34 +236,114 @@ const faqItems = [
         </div>
       </FormulaBox>
 
-      <!-- Worked Example -->
-      <div>
-        <h2 class="text-title-lg text-primary uppercase mb-6 tracking-wider">Worked Engineering Example</h2>
-        <div class="text-body-sm text-muted flex flex-col gap-4">
-          <p>Given system parameters:</p>
-          <ul class="list-disc pl-6 flex flex-col gap-1">
-            <li><strong>Conductor:</strong> Copper, 10 mm² (~8 AWG)</li>
-            <li><strong>One-Way Distance:</strong> 5 meters (10m loop)</li>
-            <li><strong>Current:</strong> 30 Amperes | <strong>Source Voltage:</strong> 12.8 V</li>
-            <li><strong>Temperature:</strong> 20°C</li>
-          </ul>
-          <p><strong>Step 1:</strong> Identify resistivity at 20°C (copper):</p>
-          <div class="font-mono text-primary">p = 1.72 x 10^-8 ohm.m</div>
+      <!-- Worked Examples -->
+      <WorkedExample
+        number={1}
+        title="12V Marine Navigation Circuit"
+        scenario="Size a copper cable for a 30A navigation light circuit with a 5m one-way run on a 12.8V system at 25°C."
+        inputs={[
+          { label: "Source Voltage", value: "12.8 V" },
+          { label: "Load Current", value: "30 A" },
+          { label: "One-Way Distance", value: "5 m (10 m loop)" },
+          { label: "Conductor", value: "Copper, 10 mm² (~8 AWG)" },
+          { label: "Temperature", value: "25°C" },
+        ]}
+        steps={[
+          { label: "Step 1: Loop resistance", formula: "R = ρ × (2 × L) / A = 1.72×10⁻⁸ × 10 / 10×10⁻⁶", result: "0.0172 Ω" },
+          { label: "Step 2: Voltage drop", formula: "V_drop = I × R = 30 × 0.0172", result: "0.516 V" },
+          { label: "Step 3: Drop percentage", formula: "% = (0.516 / 12.8) × 100", result: "4.03%" },
+          { label: "Step 4: Load terminal voltage", formula: "V_end = 12.8 - 0.516", result: "12.28 V" },
+        ]}
+        answer="4.03% voltage drop — exceeds the 3% marine critical threshold. Consider upgrading to 6 AWG (13.3 mm²)."
+        interpretation="At 4.03%, this cable is marginal for critical navigation equipment. For non-critical lighting (10% limit), it is acceptable. Upgrading to 6 AWG reduces drop to ~2.5%."
+        variant="marine"
+      />
 
-          <p><strong>Step 2:</strong> Solve Loop resistance:</p>
-          <div class="font-mono text-primary">R_loop = 1.72 x 10^-8 x (2 x 5 m) / (10 x 10^-6 m^2) = 0.0172 ohm</div>
+      <WorkedExample
+        number={2}
+        title="48V Solar Battery Cable"
+        scenario="Calculate voltage drop for a 48V solar system with 20A charge controller output over a 15m cable run at 35°C."
+        inputs={[
+          { label: "Source Voltage", value: "51.2 V" },
+          { label: "Charge Current", value: "20 A" },
+          { label: "One-Way Distance", value: "15 m (30 m loop)" },
+          { label: "Conductor", value: "Copper, 6 mm² (~10 AWG)" },
+          { label: "Temperature", value: "35°C" },
+        ]}
+        steps={[
+          { label: "Step 1: Temp-corrected resistivity", formula: "ρ(35°C) = 1.72×10⁻⁸ × [1 + 0.00393 × 15]", result: "1.82×10⁻⁸ Ω·m" },
+          { label: "Step 2: Loop resistance", formula: "R = 1.82×10⁻⁸ × 30 / 6×10⁻⁶", result: "0.091 Ω" },
+          { label: "Step 3: Voltage drop", formula: "V_drop = 20 × 0.091", result: "1.82 V" },
+          { label: "Step 4: Drop percentage", formula: "% = (1.82 / 51.2) × 100", result: "3.55%" },
+        ]}
+        answer="3.55% drop — above the 2% solar DC target. Upgrade to 4 AWG (21.15 mm²) to achieve ~2.1%."
+        interpretation="Higher system voltage (48V vs 12V) keeps current low, but long cable runs still accumulate significant drop. For solar DC wiring, NEC recommends ≤2% for charge controller to battery."
+        variant="solar"
+      />
 
-          <p><strong>Step 3:</strong> Calculate voltage drop:</p>
-          <div class="font-mono text-primary">V_drop = 30 A x 0.0172 ohm = 0.516 V</div>
-
-          <p><strong>Step 4:</strong> Find drop percentage and end voltage:</p>
-          <div class="font-mono text-primary">% V_drop = (0.516 V / 12.8 V) x 100% = 4.03%</div>
-          <div class="font-mono text-primary">V_end = 12.8 V - 0.516 V = 12.284 V</div>
-        </div>
-      </div>
+      <WorkedExample
+        number={3}
+        title="12V RV Inverter Cable"
+        scenario="A 2000W inverter draws 167A from a 12V battery. Calculate cable requirements for a 1m run."
+        inputs={[
+          { label: "Inverter Power", value: "2000 W" },
+          { label: "System Voltage", value: "12.8 V" },
+          { label: "Load Current", value: "167 A (2000W / 12V)" },
+          { label: "One-Way Distance", value: "1 m (2 m loop)" },
+          { label: "Target Drop", value: "≤3%" },
+        ]}
+        steps={[
+          { label: "Step 1: Max allowed resistance", formula: "R_max = (V × 0.03) / I = (12.8 × 0.03) / 167", result: "0.0023 Ω" },
+          { label: "Step 2: Required cable area", formula: "A = ρ × 2L / R = 1.72×10⁻⁸ × 2 / 0.0023", result: "14.96 mm²" },
+          { label: "Step 3: Select AWG", formula: "14.96 mm² → 6 AWG (13.3 mm²) or 4 AWG (21.15 mm²)", result: "4 AWG recommended" },
+        ]}
+        answer="4 AWG (21.15 mm²) copper cable for ≤3% drop at 167A"
+        interpretation="High-current 12V systems demand very thick cables. This is why 24V or 48V systems are preferred for loads above 2kW — they reduce current and cable requirements dramatically."
+        variant="rv"
+      />
 
     </div>
   </section>
+
+  <EngineeringDiagram
+    title="DC Voltage Drop System"
+    description="Complete circuit from battery source through cable to load, showing where voltage is lost"
+    variant="circuit"
+    steps={[
+      { label: "Battery Source", icon: "battery" },
+      { label: "Positive Cable", icon: "cable" },
+      { label: "Connected Load", icon: "load" },
+      { label: "Return Cable", icon: "cable" },
+    ]}
+  />
+
+  <ComparisonTable
+    title="Acceptable Voltage Drop by Application"
+    headers={["Application", "Max Drop %", "Standard", "Critical Threshold", "Notes"]}
+    rows={[
+      ["Marine Navigation", "3%", "ISO 13297", "1% preferred", "Safety-critical equipment"],
+      ["Marine Non-Critical", "10%", "ISO 13297", "5%", "Lighting, domestic loads"],
+      ["Solar DC Wiring", "2%", "NEC 690", "1%", "Charge controller to battery"],
+      ["Automotive", "2%", "SAE J1127", "1%", "Battery to starter, ignition"],
+      ["Telecom 48V", "1%", "ITU-T", "0.5%", "DC power distribution"],
+      ["General DC", "3%", "IEEE", "1%", "Battery to load systems"],
+    ]}
+    caption="Industry standards for maximum allowable voltage drop in DC systems"
+  />
+
+  <ComparisonTable
+    title="Copper vs Aluminum — Cable Sizing for Equivalent Voltage Drop"
+    headers={["Parameter", "Copper", "Aluminum", "Ratio"]}
+    rows={[
+      ["Resistivity (Ω·m)", "1.72×10⁻⁸", "2.82×10⁻⁸", "1.64×"],
+      ["Area for same drop", "1.0×", "1.6×", "Al needs 60% more"],
+      ["Weight per meter", "1.0×", "0.5×", "Al is 50% lighter"],
+      ["Cost per ampacity", "1.0×", "0.6×", "Al is 40% cheaper"],
+      ["Oxidation risk", "Low", "High", "Al needs anti-oxidant"],
+      ["Flexibility", "High", "Low", "Cu preferred for tight runs"],
+    ]}
+    caption="Material comparison for DC power conductors"
+  />
 
   <FAQSection items={faqItems} />
 

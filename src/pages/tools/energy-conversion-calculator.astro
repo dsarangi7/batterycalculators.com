@@ -5,6 +5,8 @@ import InputField from '../../components/InputField.astro';
 import FormulaBox from '../../components/FormulaBox.astro';
 import FAQSection from '../../components/FAQSection.astro';
 import RelatedTools from '../../components/RelatedTools.astro';
+import WorkedExample from '../../components/WorkedExample.astro';
+import ComparisonTable from '../../components/ComparisonTable.astro';
 
 const directionOptions = [
   { label: "Amp-hours (Ah) to Watt-hours (Wh)", value: "ahToWh" },
@@ -211,23 +213,78 @@ const relatedArticles = [
         </div>
       </FormulaBox>
 
-      <!-- Worked Example -->
-      <div>
-        <h2 class="text-title-lg text-primary uppercase mb-6 tracking-wider">Worked Engineering Example</h2>
-        <div class="text-body-sm text-muted flex flex-col gap-4">
-          <p>Consider converting a deep-cycle marine battery rated at 100 Ah with 12.8V nominal voltage:</p>
-          <p><strong>Step 1:</strong> Apply the Ah-to-Wh formula:</p>
-          <div class="font-mono text-primary">Wh = 100 Ah x 12.8 V = 1280 Wh</div>
+      <!-- Worked Examples -->
+      <div class="flex flex-col gap-8">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider">Worked Engineering Examples</h2>
 
-          <p><strong>Step 2:</strong> Convert Wh to kWh:</p>
-          <div class="font-mono text-primary">kWh = 1280 Wh / 1000 = 1.28 kWh</div>
+        <WorkedExample
+          number={1}
+          title="Convert 200Ah at 12.8V to Wh"
+          scenario="You have a 200Ah LiFePO4 battery at 12.8V nominal and need to find the total energy in Watt-hours."
+          inputs={[
+            { label: "Capacity", value: "200 Ah" },
+            { label: "Nominal Voltage", value: "12.8 V" },
+          ]}
+          steps={[
+            "Wh = Ah × V",
+            "Wh = 200 Ah × 12.8 V",
+            "Wh = 2,560 Wh",
+          ]}
+          answer="2,560 Wh"
+          interpretation="A 200Ah battery at 12.8V stores 2,560 Wh (2.56 kWh) of total energy — enough to power a 256W load for 10 hours."
+        />
 
-          <p>This means a 12.8V 100 Ah battery stores 1,280 Wh of total chemical energy.</p>
-        </div>
+        <WorkedExample
+          number={2}
+          title="Convert 5kWh to Ah at 48V"
+          scenario="You're designing a 48V battery bank and need to determine the Amp-hour capacity required for 5 kWh of usable energy."
+          inputs={[
+            { label: "Energy", value: "5 kWh (5,000 Wh)" },
+            { label: "Nominal Voltage", value: "48 V" },
+          ]}
+          steps={[
+            "Ah = Wh / V",
+            "Ah = 5,000 Wh / 48 V",
+            "Ah ≈ 104.17 Ah",
+          ]}
+          answer="≈ 104.17 Ah"
+          interpretation="At 48V, a 5 kWh battery bank requires approximately 104.17 Ah of capacity. This is equivalent to about 3.3 cells in a 16S LFP 48V configuration at 105Ah each."
+        />
+
+        <WorkedExample
+          number={3}
+          title="Convert 500Wh to Joules and kWh"
+          scenario="You have a portable power station rated at 500Wh and need to express its capacity in both Joules (SI unit) and kWh for comparison."
+          inputs={[
+            { label: "Energy", value: "500 Wh" },
+          ]}
+          steps={[
+            "Joules: J = Wh × 3,600",
+            "J = 500 × 3,600 = 1,800,000 J",
+            "kWh: kWh = Wh / 1,000",
+            "kWh = 500 / 1,000 = 0.5 kWh",
+          ]}
+          answer="1,800,000 J (1.8 MJ) or 0.5 kWh"
+          interpretation="500 Wh equals 1.8 million Joules or 0.5 kWh. For context, 0.5 kWh can run a 50W refrigerator for 10 hours or charge a smartphone approximately 40 times."
+        />
       </div>
 
     </div>
   </section>
+
+  <ComparisonTable
+    title="Energy Unit Conversion Reference"
+    headers={["From", "To", "Formula", "Example"]}
+    rows={[
+      ["Ah → Wh", "Multiply by voltage", "Wh = Ah × V", "100Ah × 12.8V = 1,280 Wh"],
+      ["Wh → Ah", "Divide by voltage", "Ah = Wh / V", "1,280 Wh / 12.8V = 100 Ah"],
+      ["Wh → kWh", "Divide by 1000", "kWh = Wh / 1000", "1,280 Wh = 1.28 kWh"],
+      ["kWh → Wh", "Multiply by 1000", "Wh = kWh × 1000", "1.28 kWh = 1,280 Wh"],
+      ["Wh → Joules", "Multiply by 3600", "J = Wh × 3600", "1,280 Wh = 4,608,000 J"],
+      ["Wh → BTU", "Multiply by 3.412", "BTU = Wh × 3.412", "1,280 Wh = 4,367 BTU"],
+    ]}
+    caption="Common energy unit conversions for battery calculations"
+  />
 
   <FAQSection items={faqItems} />
 

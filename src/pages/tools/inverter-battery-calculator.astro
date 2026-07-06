@@ -5,6 +5,9 @@ import InputField from '../../components/InputField.astro';
 import ResultBox from '../../components/ResultBox.astro';
 import FormulaBox from '../../components/FormulaBox.astro';
 import FAQSection from '../../components/FAQSection.astro';
+import WorkedExample from '../../components/WorkedExample.astro';
+import ComparisonTable from '../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../components/EngineeringDiagram.astro';
 
 const whatIs = `An inverter battery calculator determines the DC battery bank capacity required to power AC loads through a DC-to-AC inverter. Inverters convert 12V, 24V, or 48V battery power into 120V/240V household AC power—but this conversion is not 100% efficient. The calculator accounts for inverter efficiency losses (typically 8–15%), depth-of-discharge limits, and surge current demands. Whether you're sizing a backup system for home appliances or an off-grid solar setup, this tool ensures your battery bank can sustain the required AC load for the desired runtime without premature battery failure.`;
 
@@ -232,34 +235,100 @@ const relatedCalculators = [
         </p>
       </FormulaBox>
 
-      <div>
-        <h2 class="text-title-lg text-primary uppercase mb-6 tracking-wider">Worked Engineering Example</h2>
-        <div class="text-body-sm text-muted flex flex-col gap-4">
-          <p>Given system parameters:</p>
-          <ul class="list-disc pl-6 flex flex-col gap-1">
-            <li><strong>AC load:</strong> 2,000W | <strong>Runtime:</strong> 2 hours</li>
-            <li><strong>Inverter efficiency:</strong> 90% | <strong>Battery voltage:</strong> 48V</li>
-            <li><strong>Usable DoD:</strong> 80%</li>
-          </ul>
+      <div class="flex flex-col gap-8">
+        <WorkedExample
+          number={1}
+          title="Size Battery for 2000W Inverter — 12V System"
+          scenario="Designing a 12V battery backup to run a 2000W AC load for 4 hours during grid outages."
+          inputs={[
+            "AC Load: 2,000W",
+            "Required Runtime: 4 hours",
+            "Inverter Efficiency: 90%",
+            "Battery Voltage: 12V",
+            "Usable DoD: 80% (LFP)",
+          ]}
+          steps={[
+            "AC Energy = 2,000W × 4h = 8,000 Wh",
+            "DC Energy = 8,000 / 0.90 = 8,889 Wh",
+            "Battery Energy = 8,889 / 0.80 = 11,111 Wh",
+            "Required Ah = 11,111 / 12 = 925.9 Ah",
+          ]}
+          answer="A 12V 950Ah LFP battery bank (11.4 kWh) is required."
+          interpretation="At 12V, the DC current draw is ~185A—thick 4/0 AWG cables are mandatory. Consider upgrading to 24V or 48V for this load level to reduce cable size and resistive losses."
+        />
 
-          <p><strong>Step 1:</strong> Calculate AC energy required:</p>
-          <div class="font-mono text-primary">AC Energy = 2,000W × 2h = 4,000 Wh</div>
+        <WorkedExample
+          number={2}
+          title="Size Battery for 5000W Inverter — 48V System"
+          scenario="Sizing a 48V battery bank for a 5000W workshop load that needs 2 hours of runtime."
+          inputs={[
+            "AC Load: 5,000W",
+            "Required Runtime: 2 hours",
+            "Inverter Efficiency: 90%",
+            "Battery Voltage: 48V",
+            "Usable DoD: 80% (LFP)",
+          ]}
+          steps={[
+            "AC Energy = 5,000W × 2h = 10,000 Wh",
+            "DC Energy = 10,000 / 0.90 = 11,111 Wh",
+            "Battery Energy = 11,111 / 0.80 = 13,889 Wh",
+            "Required Ah = 13,889 / 48 = 289.4 Ah",
+          ]}
+          answer="A 48V 300Ah LFP battery bank (14.4 kWh) is required."
+          interpretation="At 48V, the DC current is ~115A—manageable with 2 AWG cables. This 5kW system benefits significantly from the higher voltage, with roughly half the DC current of a 12V equivalent."
+        />
 
-          <p><strong>Step 2:</strong> Calculate DC battery energy (account for inverter losses):</p>
-          <div class="font-mono text-primary">DC Energy = 4,000 / 0.90 = 4,444 Wh</div>
-
-          <p><strong>Step 3:</strong> Adjust for depth of discharge:</p>
-          <div class="font-mono text-primary">Battery Energy = 4,444 / 0.80 = 5,556 Wh</div>
-
-          <p><strong>Step 4:</strong> Convert to Amp-hours:</p>
-          <div class="font-mono text-primary">Ah = 5,556 Wh / 48V = 115.7 Ah</div>
-
-          <p><strong>Result:</strong> A 48V 120Ah LFP battery (5.76 kWh) provides sufficient energy to run a 2,000W AC load for 2 hours through a 90% efficient inverter.</p>
-        </div>
+        <WorkedExample
+          number={3}
+          title="Compare 12V vs 48V for Same 3000W Load"
+          scenario="Comparing two voltage configurations for a 3000W load with 2-hour runtime to understand efficiency trade-offs."
+          inputs={[
+            "AC Load: 3,000W",
+            "Required Runtime: 2 hours",
+            "Inverter Efficiency: 90%",
+            "Option A: 12V system",
+            "Option B: 48V system",
+            "Usable DoD: 80% (LFP)",
+          ]}
+          steps={[
+            "AC Energy = 3,000W × 2h = 6,000 Wh",
+            "DC Energy = 6,000 / 0.90 = 6,667 Wh",
+            "Battery Energy = 6,667 / 0.80 = 8,333 Wh",
+            "12V: Ah = 8,333 / 12 = 694.4 Ah | DC current ~278A",
+            "48V: Ah = 8,333 / 48 = 173.6 Ah | DC current ~69A",
+          ]}
+          answer="Both need 8.33 kWh of battery. 12V requires 694Ah with ~278A draw; 48V requires 174Ah with ~69A draw."
+          interpretation="The 48V system uses 4× less current, enabling thinner cables (6 AWG vs 4/0 AWG), lower resistive losses, and more efficient power delivery. For any load above 1500W, 48V is strongly preferred."
+        />
       </div>
 
     </div>
   </section>
+
+  <EngineeringDiagram
+    title="Inverter-Battery System"
+    description="DC battery power converted to AC through inverter with losses at each stage"
+    variant="system"
+    steps={[
+      { label: "Battery Bank", icon: "battery" },
+      { label: "DC Cables", icon: "cable" },
+      { label: "Inverter", icon: "inverter" },
+      { label: "AC Loads", icon: "load" },
+    ]}
+  />
+
+  <ComparisonTable
+    title="Inverter Efficiency by Load Level"
+    headers={["Load Level", "Typical Efficiency", "Power Loss", "Heat Generated", "Notes"]}
+    rows={[
+      ["10% (200W)", "82–85%", "30–35W", "Moderate", "Standby losses dominant"],
+      ["25% (500W)", "88–90%", "60–70W", "Moderate", "Good efficiency range"],
+      ["50% (1kW)", "90–93%", "70–100W", "Normal", "Optimal operating point"],
+      ["75% (1.5kW)", "91–93%", "110–140W", "Normal", "Near peak efficiency"],
+      ["100% (2kW)", "89–92%", "160–220W", "High", "Thermal throttling possible"],
+    ]}
+    caption="Inverter efficiency varies significantly with load — oversizing reduces efficiency at light loads"
+  />
 
   <FAQSection items={faqItems} />
 

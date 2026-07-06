@@ -1,0 +1,200 @@
+---
+import ArticleLayout from '../../layouts/ArticleLayout.astro';
+import TroubleshootingBlock from '../../components/TroubleshootingBlock.astro';
+
+const relatedCalculators = [
+  { title: 'Charging Time Calculator', href: '/tools/charging-time-calculator', type: 'calculator' as const },
+  { title: 'C-Rate Calculator', href: '/tools/c-rate-calculator', type: 'calculator' as const },
+  { title: 'SOC Estimator', href: '/tools/soc-estimator', type: 'calculator' as const },
+  { title: 'Battery Sizing Calculator', href: '/tools/battery-sizing-calculator', type: 'calculator' as const },
+];
+
+const relatedGuides = [
+  { title: 'Charger Sizing Guide', href: '/learn/charger-sizing-guide', type: 'guide' as const },
+  { title: 'LiFePO4 Charge Voltage Table', href: '/learn/lifepo4-charge-voltage-table', type: 'guide' as const },
+  { title: 'Battery Charging Formula', href: '/learn/battery-charging-formula', type: 'guide' as const },
+];
+
+const faqItems = [
+  {
+    question: 'Why does my battery stop charging at 80%?',
+    answer: 'Most lithium batteries stop fast-charging at 80% SOC to protect cell health. The BMS reduces current during the CV (constant voltage) phase. If your battery permanently stops at 80%, the BMS may be locked due to a cell imbalance or overvoltage event — try a full reset cycle or contact the manufacturer.',
+  },
+  {
+    question: 'How do I know if my charger is compatible with my battery?',
+    answer: 'Match the charger voltage to the battery nominal voltage (e.g., 12.8V charger for a 12.8V LFP battery). The charger chemistry setting must match: LFP chargers charge to 14.4–14.6V, while NMC chargers charge to 16.8V. Using the wrong chemistry profile can cause undercharging or dangerous overcharging.',
+  },
+  {
+    question: 'Can cold weather prevent my battery from charging?',
+    answer: 'Yes. LiFePO4 batteries have a low-temperature charging protection that disables charging below 0°C (32°F). Lead-acid batteries can also be damaged by charging below freezing. Always charge batteries in a temperature-controlled environment or use a charger with built-in temperature compensation.',
+  },
+  {
+    question: 'What does BMS lockout mean?',
+    answer: 'A BMS lockout occurs when the battery management system disconnects the charge MOSFET to protect cells from overvoltage, overcurrent, or temperature extremes. The battery appears dead to the charger. A proper reset procedure — usually involving a brief load discharge followed by charger reconnection — will clear most lockouts.',
+  },
+  {
+    question: 'How can I tell if my battery has a cell imbalance?',
+    answer: 'Use a multimeter to measure individual cell voltages if accessible. A difference greater than 0.05V between cells indicates imbalance. Some BMS units report cell voltages via Bluetooth. Imbalanced cells cause the BMS to cut charging early because the highest cell reaches the overvoltage threshold before the pack is full.',
+  },
+  {
+    question: 'Is slow charging normal for lithium batteries?',
+    answer: 'Lithium batteries charge quickly at low SOC (0–80%) during the CC phase, then slow dramatically during the CV phase from 80–100%. A 100Ah LFP battery at 0.5C charges to 80% in about 1.5 hours but takes another 1–2 hours to reach 100%. This tapering is normal and protects cell longevity.',
+  },
+];
+---
+
+<ArticleLayout
+  title="Battery Not Charging — Troubleshooting Guide | Battery Calculators"
+  description="Diagnose why your battery won't charge, charges slowly, or stops at 80%. Step-by-step troubleshooting for BMS lockout, charger incompatibility, temperature limits, connection issues, and cell imbalance."
+  category="TROUBLESHOOTING"
+  categoryHref="/troubleshooting"
+  breadcrumbItems={[{ label: 'Battery Not Charging' }]}
+  relatedCalculators={relatedCalculators}
+  relatedGuides={relatedGuides}
+  faqItems={faqItems}
+>
+  <p class="text-body-md text-body font-light mb-8">
+    A battery that refuses to charge — or charges painfully slowly — can stem from dozens of root causes across the battery, charger, wiring, and environment. This guide walks through the five most common failure modes with diagnostic checklists so you can isolate and resolve the issue systematically.
+  </p>
+
+  <TroubleshootingBlock
+    problem="BMS Lockout — Battery Completely Refuses Charge"
+    causes={[
+      'Overvoltage event triggered BMS charge disconnect',
+      'Overcurrent protection activated from a fault or short',
+      'Cell overvoltage threshold exceeded due to imbalance',
+      'BMS firmware glitch after power interruption',
+      'Under-voltage lockout from deep discharge',
+    ]}
+    explanation="The Battery Management System is the gatekeeper between the charger and cells. When any protection threshold is crossed — overvoltage, undervoltage, overcurrent, or over-temperature — the BMS opens the charge MOSFET, physically disconnecting the充电 circuit. The battery will appear completely dead to the charger. Many BMS units require a specific reset sequence: applying a brief load (5–10A for 5–10 seconds) to reset the under-voltage latch, or disconnecting the charger and reconnecting to clear an overvoltage latch. Some BMS designs auto-reset when voltage returns to safe range, while others require a full power cycle."
+    checklist={[
+      'Measure battery terminal voltage with a multimeter',
+      'If voltage is near 0V, the BMS is in under-voltage lockout',
+      'If voltage reads normal but charger shows no current, BMS is in overvoltage lockout',
+      'Disconnect all loads and charger for 60 seconds',
+      'Apply a small load (light bulb or resistor) for 10 seconds to reset',
+      'Reconnect charger and check for charging current',
+      'Check BMS Bluetooth app for fault codes if available',
+      'If lockout persists, the BMS may need replacement or factory reset',
+    ]}
+    solutions={[
+      'Perform a full power cycle: disconnect charger and loads for 5 minutes',
+      'Apply a small resistive load for 10 seconds to reset under-voltage latch',
+      'Check BMS app or indicator for specific fault codes',
+      'Contact manufacturer for BMS reset procedure specific to your model',
+      'If BMS is faulty, replace the BMS unit (matching cell count and chemistry)',
+    ]}
+  />
+
+  <TroubleshootingBlock
+    problem="Charger Incompatibility — Wrong Voltage or Chemistry"
+    causes={[
+      'Charger voltage does not match battery nominal voltage',
+      'Chemistry profile mismatch (LFP charger on NMC battery or vice versa)',
+      'Charger current rating too low to overcome BMS minimum charge threshold',
+      'Charger output polarity reversed',
+      'Charger designed for lead-acid used on lithium battery',
+    ]}
+    explanation="Chargers are designed for specific battery voltages and chemistries. A 12V lead-acid charger outputs 13.8–14.4V in bulk mode, which is insufficient to fully charge a 12.8V LiFePO4 battery that requires 14.4–14.6V. Conversely, charging an LFP battery with an NMC charger (16.8V) will trigger overvoltage protection. Some chargers have selectable chemistry modes — verify the correct profile is active. Additionally, if the charger's maximum current is below the BMS minimum charge threshold (typically 0.05C), the BMS may reject the charge entirely."
+    checklist={[
+      'Verify charger output voltage with a multimeter under load',
+      'Confirm charger chemistry setting matches battery type (LFP, NMC, lead-acid)',
+      'Check charger current rating against battery capacity (should be ≥0.1C)',
+      'Inspect charger connector for correct polarity',
+      'Test with a known-compatible charger to isolate battery vs charger fault',
+      'Check charger LED indicators for error codes',
+    ]}
+    solutions={[
+      'Use a charger matched to your battery voltage and chemistry',
+      'Select the correct chemistry profile on multi-mode chargers',
+      'Upgrade to a charger with adequate current rating (≥0.1C recommended)',
+      'Replace damaged connector or correct wiring polarity',
+      'For lead-acid batteries, use a charger with lithium-compatible mode',
+    ]}
+  />
+
+  <TroubleshootingBlock
+    problem="Temperature Limits — Charging Disabled in Extreme Conditions"
+    causes={[
+      'Ambient temperature below 0°C (32°F) triggers low-temp protection',
+      'Battery core temperature above 45°C (113°F) triggers high-temp cutoff',
+      'Charger has internal over-temperature shutdown',
+      'Direct sunlight or proximity to heat source overheating battery',
+      'Rapid temperature change causing condensation inside battery',
+    ]}
+    explanation="Lithium batteries have strict temperature windows for safe charging. LiFePO4 cells must not be charged below 0°C because lithium ions cannot intercalate into the graphite anode at low temperatures, causing lithium plating that permanently damages the cell and creates a safety hazard. Above 45°C, electrolyte decomposition accelerates and the BMS disconnects charging to prevent thermal runaway. Lead-acid batteries also suffer from charging below freezing — the electrolyte can freeze if the battery is deeply discharged. Most quality chargers and BMS units have built-in temperature sensors, but external temperature probes may be needed for accurate cell-level monitoring."
+    checklist={[
+      'Measure ambient temperature near the battery installation',
+      'Check battery surface temperature with an infrared thermometer',
+      'Verify BMS temperature sensor readings via Bluetooth app if available',
+      'Ensure battery is not in direct sunlight or near a heat source',
+      'Allow battery to acclimate to room temperature before charging if cold-soaked',
+      'Check charger ventilation and internal temperature',
+    ]}
+    solutions={[
+      'Move battery to a temperature-controlled environment (10–30°C ideal)',
+      'Allow cold battery to warm to above 5°C before connecting charger',
+      'Provide shade or insulation for batteries exposed to direct sunlight',
+      'Ensure adequate ventilation around battery and charger (at least 10cm clearance)',
+      'Use a charger with integrated temperature compensation',
+      'Install battery in a ventilated enclosure with passive or active cooling',
+    ]}
+  />
+
+  <TroubleshootingBlock
+    problem="Connection Issues — Poor Contact Between Charger and Battery"
+    causes={[
+      'Corroded or oxidized terminal connectors',
+      'Loose cable clamps or ring terminals',
+      'Damaged or frayed charging cable',
+      'Incorrect cable gauge causing excessive voltage drop',
+      'Loose or corroded inline fuse or breaker',
+    ]}
+    explanation="High-resistance connections cause voltage drop between the charger and battery terminals. A charger outputting 14.4V may only deliver 13.2V at the battery terminals if there is significant resistance in the wiring, connectors, or fuse. This voltage drop can prevent the battery from reaching its full charge voltage. For example, 0.5V of drop across a connection means the charger thinks it is outputting 14.4V while the battery only receives 13.9V — insufficient for full charge in LFP chemistry. Corrosion on terminals creates a thin oxide layer that dramatically increases resistance, especially in marine or humid environments."
+    checklist={[
+      'Measure charger output voltage at charger terminals',
+      'Measure voltage at battery terminals while charging',
+      'Calculate voltage difference (should be <0.2V for short cable runs)',
+      'Inspect all connectors for green/white corrosion buildup',
+      'Check cable clamps are tight and ring terminals are secure',
+      'Verify inline fuse or breaker is not corroded or loose',
+      'Inspect cable insulation for damage or melting',
+    ]}
+    solutions={[
+      'Clean corroded terminals with baking soda solution and wire brush',
+      'Apply dielectric grease or terminal protector after cleaning',
+      'Tighten all cable clamps and ring terminals to specified torque',
+      'Replace damaged cables with appropriate gauge (minimum 10AWG for most 12V systems)',
+      'Replace corroded fuse holders or circuit breakers',
+      'Use star washers under ring terminals for gas-tight connection',
+    ]}
+  />
+
+  <TroubleshootingBlock
+    problem="Cell Imbalance — Pack Stops Charging Before Full"
+    causes={[
+      'Individual cells drifted apart in capacity due to aging',
+      'One cell group has higher self-discharge rate',
+      'BMS balancing circuit is not functioning or inadequate',
+      'Manufacturing variation in cell capacity',
+      'Partial short in one cell causing accelerated discharge',
+    ]}
+    explanation="In a series-connected battery pack, all cells share the same charge current. If one cell group has lower capacity or higher self-discharge, it reaches the overvoltage cutoff before the rest of the pack. The BMS must then stop charging to protect that cell, even though other cells are not full. This manifests as the battery charging to only 70–90% SOC. A well-functioning BMS with active balancing can compensate for small imbalances (up to 0.05V), but passive balancing only bleeds off excess energy as heat and cannot add charge to weaker cells. Severe imbalance (>0.1V) usually indicates a failing cell that needs replacement."
+    checklist={[
+      'Check individual cell voltages via BMS Bluetooth app or multimeter',
+      'Identify the weakest cell group (highest voltage at end of charge)',
+      'Compare cell voltage spread (should be <0.05V at full charge)',
+      'Monitor if imbalance grows over multiple charge cycles',
+      'Check BMS balancing status and current',
+      'Perform a full charge-discharge-charge cycle to recondition',
+    ]}
+    solutions={[
+      'Perform a full charge cycle to allow BMS balancing to work',
+      'If BMS has forced balancing mode, enable it for extended period',
+      'For severe imbalance (>0.1V), manually top-balance individual cells',
+      'Replace the weakest cell group if capacity has significantly degraded',
+      'Upgrade to a BMS with active cell balancing for large packs',
+      'Contact manufacturer if imbalance occurs within warranty period',
+    ]}
+  />
+</ArticleLayout>
