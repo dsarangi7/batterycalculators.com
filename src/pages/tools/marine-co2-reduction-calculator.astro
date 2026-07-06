@@ -284,108 +284,103 @@ const fuelOptions = [
     </CalculatorCard>
   </section>
 
-  <!-- Formulas -->
+  <!-- Formulas and Worked Examples -->
   <section class="mb-16 border-t border-hairline pt-12">
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
-
-      <FormulaBox title="Mathematical Formulas">
-        <p>
-          Emission reductions are calculated using industry-standard fuel-specific emission factors:
-        </p>
-        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
-          Fuel Saved = Annual Fuel × [(Hybrid% × (1 - ShorePower%)) + ShorePower%]
-        </div>
-        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
-          CO₂ Reduction (t) = Fuel Saved × CO₂ Factor / 1000
-        </div>
-        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
-          NOx Reduction (kg) = Fuel Saved × NOx Factor
-        </div>
-        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
-          SOx Reduction (kg) = Fuel Saved × SOx Factor
-        </div>
-        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
-          Cars Equivalent = CO₂ Reduction / 4.6
-        </div>
-        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
-          Trees Equivalent = CO₂ Reduction (kg) / 21
-        </div>
-        <p class="mt-4">
-          CO₂ factors (kg/liter): MGO 3.206, MDO 3.206, HFO 3.114, LNG 2.750<br/>
-          Equivalencies: 4.6 t CO₂/car/year (EPA), 21 kg CO₂/tree/year (EPA)
-        </p>
-      </FormulaBox>
-
-      <div class="flex flex-col gap-8">
-        <h2 class="text-title-lg text-primary uppercase mb-2 tracking-wider">Worked Engineering Examples</h2>
-
-        <WorkedExample
-          number={1}
-          title="Ferry Converting 30% of Fuel to Electric"
-          scenario="A car ferry operates 280 days per year on a fixed route, consuming 800,000 liters of MGO annually. The operator plans to convert 30% of propulsion to battery-electric using a 6 MWh onboard battery system charged via shore-side renewables during overnight berthing."
-          inputs={[
-            { label: "Fuel Type", value: "MGO (3.206 kg CO₂/L)" },
-            { label: "Annual Fuel Consumption", value: "800,000 L/yr" },
-            { label: "Hybridization Percentage", value: "30%" },
-            { label: "Shore Power Usage", value: "15%" },
-          ]}
-          steps={[
-            { label: "Step 1: Fuel saved from hybridization", formula: "800,000 × 0.30 × (1 - 0.15) = 204,000 L", result: "204,000 liters saved via electric propulsion" },
-            { label: "Step 2: Fuel saved from shore power", formula: "800,000 × 0.15 = 120,000 L", result: "120,000 liters saved during port stays" },
-            { label: "Step 3: Total fuel saved", formula: "204,000 + 120,000 = 324,000 L", result: "324,000 L total (40.5% reduction)" },
-            { label: "Step 4: CO₂ reduction", formula: "324,000 × 3.206 / 1000 = 1,038.7 t", result: "1,038.7 tonnes CO₂ eliminated" },
-            { label: "Step 5: Equivalent impact", formula: "1,038.7 / 4.6 = 226 cars | 1,038,700 / 21 = 49,462 trees", result: "226 cars removed or 49,462 trees for one year" },
-          ]}
-          answer="Converting a ferry to 30% electric propulsion eliminates 1,038.7 tonnes of CO₂ annually — equivalent to removing 226 passenger cars from the road."
-          interpretation="The combination of battery-electric propulsion and overnight shore power charging yields a 40.5% total emission reduction. The ferry's predictable route and scheduled overnight berthing make it ideal for overnight charging with renewable grid electricity."
-          variant="marine"
-        />
-
-        <WorkedExample
-          number={2}
-          title="Tugboat with Shore Power Connection"
-          scenario="An harbor tugboat spends 40% of its annual operating hours at berth between assignments. The operator installs shore power (cold ironing) to eliminate generator run time during idle periods, connecting to a grid powered by 60% renewable energy."
-          inputs={[
-            { label: "Fuel Type", value: "MGO (3.206 kg CO₂/L)" },
-            { label: "Annual Fuel Consumption", value: "350,000 L/yr" },
-            { label: "Hybridization Percentage", value: "10% (load leveling)" },
-            { label: "Shore Power Usage", value: "40%" },
-          ]}
-          steps={[
-            { label: "Step 1: Fuel saved from hybridization", formula: "350,000 × 0.10 × (1 - 0.40) = 21,000 L", result: "21,000 liters saved via load leveling" },
-            { label: "Step 2: Fuel saved from shore power", formula: "350,000 × 0.40 = 140,000 L", result: "140,000 liters saved during port idle time" },
-            { label: "Step 3: Total fuel saved", formula: "21,000 + 140,000 = 161,000 L", result: "161,000 L total (46.0% reduction)" },
-            { label: "Step 4: CO₂ reduction", formula: "161,000 × 3.206 / 1000 = 516.2 t", result: "516.2 tonnes CO₂ eliminated" },
-            { label: "Step 5: Grid-adjusted net reduction", formula: "516.2 × 0.60 (renewable share) + 516.2 × 0.40 × (1 - 0.4) = 432.0 t", result: "432.0 tonnes net CO₂ reduction accounting for grid mix" },
-          ]}
-          answer="Shore power plus load leveling eliminates 432.0 tonnes of net CO₂ annually after accounting for grid carbon intensity."
-          interpretation="Tugboats are ideal candidates for shore power because they spend long periods at berth between assignments. The 40% idle-time shore connection eliminates the most inefficient generator operation — low-load running. Grid carbon intensity significantly affects the net benefit."
-          variant="marine"
-        />
-
-        <WorkedExample
-          number={3}
-          title="Yacht with Solar Panels — Annual CO₂ Offset"
-          scenario="A 25-meter motor yacht installs 8 kW of deck-mounted solar panels, generating an average of 32 kWh per day over 300 cruising days. The solar energy offsets hotel load demand that would otherwise be met by the onboard diesel generator."
-          inputs={[
-            { label: "Fuel Type", value: "MGO (3.206 kg CO₂/L)" },
-            { label: "Generator Fuel Consumption", value: "8 L/hr" },
-            { label: "Solar Output", value: "32 kWh/day" },
-            { label: "Generator Load Offset", value: "4 hours/day equivalent" },
-            { label: "Operating Days", value: "300 days/yr" },
-          ]}
-          steps={[
-            { label: "Step 1: Daily fuel offset from solar", formula: "32 kWh / (8 L/hr × 5.0 kWh/L) = 0.8 hr equiv → 8 × 0.8 = 6.4 L/day", result: "6.4 liters of diesel offset per day" },
-            { label: "Step 2: Annual fuel offset", formula: "6.4 × 300 = 1,920 L/yr", result: "1,920 liters of diesel offset per year" },
-            { label: "Step 3: CO₂ reduction", formula: "1,920 × 3.206 / 1000 = 6.2 t", result: "6.16 tonnes CO₂ eliminated per year" },
-            { label: "Step 4: Equivalent impact", formula: "6.16 / 4.6 = 1.3 cars | 6,160 / 21 = 293 trees", result: "Equivalent to removing 1 car or planting 293 trees for one year" },
-          ]}
-          answer="Solar panels on a 25m yacht offset 6.2 tonnes of CO₂ annually — equivalent to removing 1.3 passenger cars from the road."
-          interpretation="Solar panels on yachts provide a meaningful but modest CO₂ offset compared to the vessel's total fuel consumption. The primary value lies in silent, emission-free hotel load generation at anchor, improving guest experience while reducing generator run hours and fuel costs."
-          variant="marine"
-        />
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">Formulas & Worked Examples</h2>
+    <FormulaBox title="Mathematical Formulas">
+      <p>
+        Emission reductions are calculated using industry-standard fuel-specific emission factors:
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Fuel Saved = Annual Fuel × [(Hybrid% × (1 - ShorePower%)) + ShorePower%]
       </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        CO₂ Reduction (t) = Fuel Saved × CO₂ Factor / 1000
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        NOx Reduction (kg) = Fuel Saved × NOx Factor
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        SOx Reduction (kg) = Fuel Saved × SOx Factor
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Cars Equivalent = CO₂ Reduction / 4.6
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Trees Equivalent = CO₂ Reduction (kg) / 21
+      </div>
+      <p class="mt-4">
+        CO₂ factors (kg/liter): MGO 3.206, MDO 3.206, HFO 3.114, LNG 2.750<br/>
+        Equivalencies: 4.6 t CO₂/car/year (EPA), 21 kg CO₂/tree/year (EPA)
+      </p>
+    </FormulaBox>
 
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample
+        number={1}
+        title="Ferry Converting 30% of Fuel to Electric"
+        scenario="A car ferry operates 280 days per year on a fixed route, consuming 800,000 liters of MGO annually. The operator plans to convert 30% of propulsion to battery-electric using a 6 MWh onboard battery system charged via shore-side renewables during overnight berthing."
+        inputs={[
+          { label: "Fuel Type", value: "MGO (3.206 kg CO₂/L)" },
+          { label: "Annual Fuel Consumption", value: "800,000 L/yr" },
+          { label: "Hybridization Percentage", value: "30%" },
+          { label: "Shore Power Usage", value: "15%" },
+        ]}
+        steps={[
+          { label: "Step 1: Fuel saved from hybridization", formula: "800,000 × 0.30 × (1 - 0.15) = 204,000 L", result: "204,000 liters saved via electric propulsion" },
+          { label: "Step 2: Fuel saved from shore power", formula: "800,000 × 0.15 = 120,000 L", result: "120,000 liters saved during port stays" },
+          { label: "Step 3: Total fuel saved", formula: "204,000 + 120,000 = 324,000 L", result: "324,000 L total (40.5% reduction)" },
+          { label: "Step 4: CO₂ reduction", formula: "324,000 × 3.206 / 1000 = 1,038.7 t", result: "1,038.7 tonnes CO₂ eliminated" },
+          { label: "Step 5: Equivalent impact", formula: "1,038.7 / 4.6 = 226 cars | 1,038,700 / 21 = 49,462 trees", result: "226 cars removed or 49,462 trees for one year" },
+        ]}
+        answer="Converting a ferry to 30% electric propulsion eliminates 1,038.7 tonnes of CO₂ annually — equivalent to removing 226 passenger cars from the road."
+        interpretation="The combination of battery-electric propulsion and overnight shore power charging yields a 40.5% total emission reduction. The ferry's predictable route and scheduled overnight berthing make it ideal for overnight charging with renewable grid electricity."
+        variant="marine"
+      />
+
+      <WorkedExample
+        number={2}
+        title="Tugboat with Shore Power Connection"
+        scenario="An harbor tugboat spends 40% of its annual operating hours at berth between assignments. The operator installs shore power (cold ironing) to eliminate generator run time during idle periods, connecting to a grid powered by 60% renewable energy."
+        inputs={[
+          { label: "Fuel Type", value: "MGO (3.206 kg CO₂/L)" },
+          { label: "Annual Fuel Consumption", value: "350,000 L/yr" },
+          { label: "Hybridization Percentage", value: "10% (load leveling)" },
+          { label: "Shore Power Usage", value: "40%" },
+        ]}
+        steps={[
+          { label: "Step 1: Fuel saved from hybridization", formula: "350,000 × 0.10 × (1 - 0.40) = 21,000 L", result: "21,000 liters saved via load leveling" },
+          { label: "Step 2: Fuel saved from shore power", formula: "350,000 × 0.40 = 140,000 L", result: "140,000 liters saved during port idle time" },
+          { label: "Step 3: Total fuel saved", formula: "21,000 + 140,000 = 161,000 L", result: "161,000 L total (46.0% reduction)" },
+          { label: "Step 4: CO₂ reduction", formula: "161,000 × 3.206 / 1000 = 516.2 t", result: "516.2 tonnes CO₂ eliminated" },
+          { label: "Step 5: Grid-adjusted net reduction", formula: "516.2 × 0.60 (renewable share) + 516.2 × 0.40 × (1 - 0.4) = 432.0 t", result: "432.0 tonnes net CO₂ reduction accounting for grid mix" },
+        ]}
+        answer="Shore power plus load leveling eliminates 432.0 tonnes of net CO₂ annually after accounting for grid carbon intensity."
+        interpretation="Tugboats are ideal candidates for shore power because they spend long periods at berth between assignments. The 40% idle-time shore connection eliminates the most inefficient generator operation — low-load running. Grid carbon intensity significantly affects the net benefit."
+        variant="marine"
+      />
+
+      <WorkedExample
+        number={3}
+        title="Yacht with Solar Panels — Annual CO₂ Offset"
+        scenario="A 25-meter motor yacht installs 8 kW of deck-mounted solar panels, generating an average of 32 kWh per day over 300 cruising days. The solar energy offsets hotel load demand that would otherwise be met by the onboard diesel generator."
+        inputs={[
+          { label: "Fuel Type", value: "MGO (3.206 kg CO₂/L)" },
+          { label: "Generator Fuel Consumption", value: "8 L/hr" },
+          { label: "Solar Output", value: "32 kWh/day" },
+          { label: "Generator Load Offset", value: "4 hours/day equivalent" },
+          { label: "Operating Days", value: "300 days/yr" },
+        ]}
+        steps={[
+          { label: "Step 1: Daily fuel offset from solar", formula: "32 kWh / (8 L/hr × 5.0 kWh/L) = 0.8 hr equiv → 8 × 0.8 = 6.4 L/day", result: "6.4 liters of diesel offset per day" },
+          { label: "Step 2: Annual fuel offset", formula: "6.4 × 300 = 1,920 L/yr", result: "1,920 liters of diesel offset per year" },
+          { label: "Step 3: CO₂ reduction", formula: "1,920 × 3.206 / 1000 = 6.2 t", result: "6.16 tonnes CO₂ eliminated per year" },
+          { label: "Step 4: Equivalent impact", formula: "6.16 / 4.6 = 1.3 cars | 6,160 / 21 = 293 trees", result: "Equivalent to removing 1 car or planting 293 trees for one year" },
+        ]}
+        answer="Solar panels on a 25m yacht offset 6.2 tonnes of CO₂ annually — equivalent to removing 1.3 passenger cars from the road."
+        interpretation="Solar panels on yachts provide a meaningful but modest CO₂ offset compared to the vessel's total fuel consumption. The primary value lies in silent, emission-free hotel load generation at anchor, improving guest experience while reducing generator run hours and fuel costs."
+        variant="marine"
+      />
     </div>
   </section>
 

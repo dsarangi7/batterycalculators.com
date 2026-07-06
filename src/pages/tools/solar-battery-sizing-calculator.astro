@@ -227,107 +227,100 @@ const relatedArticles = [
 
   </div>
 
-  <!-- Formulas -->
+  <!-- Formulas and Worked Examples -->
   <section class="mb-16 border-t border-hairline pt-12">
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">Formulas & Worked Examples</h2>
 
-      <FormulaBox title="Mathematical Formulas">
-        <p>
-          The required battery energy capacity is calculated by scaling daily consumption by autonomy days and dividing by DoD:
-        </p>
-        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
-          Required Energy (Wh) = (Daily Consumption × Autonomy Days) / DoD%
-        </div>
-        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
-          Capacity (Ah) = Required Energy (Wh) / System Voltage (V)
-        </div>
-        <p>
-          The usable capacity is the energy you can actually draw:
-        </p>
-        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
-          Usable Energy = Daily Consumption × Autonomy Days
-        </div>
-        <p class="text-xs text-muted mt-4">
-          <strong>Variables:</strong> Daily Consumption in kWh or Wh, Autonomy in days, DoD as percentage, Voltage in V. Assumptions: constant daily load, standard discharge curves, no seasonal adjustment (apply manually for off-grid).
-        </p>
-      </FormulaBox>
-
-      <div>
-        <h2 class="text-title-lg text-primary uppercase mb-6 tracking-wider">Worked Examples</h2>
-        <div class="text-body-sm text-muted flex flex-col gap-6">
-
-          <WorkedExample
-            number={1}
-            title="Small Cabin — 3 kWh/day, 4 Peak Sun Hours"
-            scenario="A small off-grid cabin consumes 3 kWh/day and receives an average of 4 peak sun hours daily. Size a 48V LFP battery bank with 2 days of autonomy at 80% DoD."
-            inputs={[
-              { label: "Daily Consumption", value: "3 kWh/day" },
-              { label: "Peak Sun Hours", value: "4 hours" },
-              { label: "Autonomy", value: "2 days" },
-              { label: "System Voltage", value: "48V" },
-              { label: "Chemistry", value: "LFP (LiFePO4)" },
-              { label: "Max DoD", value: "80%" },
-            ]}
-            steps={[
-              { label: "Usable energy", formula: "3,000 × 2", result: "6,000 Wh" },
-              { label: "Total capacity", formula: "6,000 / 0.80", result: "7,500 Wh (7.5 kWh)" },
-              { label: "Amp-hours", formula: "7,500 / 48", result: "156.3 Ah" },
-              { label: "Solar array needed", formula: "3,000 / (4 × 0.80)", result: "938 W" },
-            ]}
-            answer="7,500 Wh (156.3 Ah at 48V) — a 1,000W solar array is recommended"
-            interpretation="With 4 peak sun hours, the cabin needs roughly 938W of solar panels to recharge the battery bank in one day. A 1kW array provides comfortable margin for cloudy days."
-            variant="solar"
-          />
-
-          <WorkedExample
-            number={2}
-            title="Off-Grid Home — 10 kWh/day, Cloudy Day Buffer"
-            scenario="An off-grid home uses 10 kWh/day. The area averages 3.5 peak sun hours in winter. Account for 3 consecutive cloudy days by sizing for 4 days of autonomy with 85% DoD on 48V LFP."
-            inputs={[
-              { label: "Daily Consumption", value: "10 kWh/day" },
-              { label: "Peak Sun Hours (winter)", value: "3.5 hours" },
-              { label: "Autonomy (cloudy buffer)", value: "4 days" },
-              { label: "System Voltage", value: "48V" },
-              { label: "Chemistry", value: "LFP (LiFePO4)" },
-              { label: "Max DoD", value: "85%" },
-            ]}
-            steps={[
-              { label: "Usable energy", formula: "10,000 × 4", result: "40,000 Wh" },
-              { label: "Total capacity", formula: "40,000 / 0.85", result: "47,059 Wh (47.1 kWh)" },
-              { label: "Amp-hours", formula: "47,059 / 48", result: "980.4 Ah" },
-              { label: "Solar array needed", formula: "10,000 / (3.5 × 0.80)", result: "3,571 W" },
-            ]}
-            answer="47,059 Wh (980.4 Ah at 48V) — a 3,600W solar array is recommended"
-            interpretation="Winter production is the bottleneck. With only 3.5 peak sun hours, you need a large array to recharge 47 kWh in a single day. Consider reducing loads or accepting 2-day recharge cycles."
-            variant="solar"
-          />
-
-          <WorkedExample
-            number={3}
-            title="RV with Variable Solar — 2 kWh/day"
-            scenario="An RV consumes 2 kWh/day with variable solar input while driving and parked. Use a 12V LFP system with 2 days autonomy at 80% DoD. Peak sun hours vary from 2h (forested stops) to 6h (open desert)."
-            inputs={[
-              { label: "Daily Consumption", value: "2 kWh/day" },
-              { label: "Peak Sun Hours (range)", value: "2–6 hours" },
-              { label: "Autonomy", value: "2 days" },
-              { label: "System Voltage", value: "12V" },
-              { label: "Chemistry", value: "LFP (LiFePO4)" },
-              { label: "Max DoD", value: "80%" },
-            ]}
-            steps={[
-              { label: "Usable energy", formula: "2,000 × 2", result: "4,000 Wh" },
-              { label: "Total capacity", formula: "4,000 / 0.80", result: "5,000 Wh (5.0 kWh)" },
-              { label: "Amp-hours", formula: "5,000 / 12.8", result: "390.6 Ah" },
-              { label: "Solar (worst case, 2h)", formula: "2,000 / (2 × 0.80)", result: "1,250 W" },
-            ]}
-            answer="5,000 Wh (390.6 Ah at 12V) — requires 2 parallel 200Ah LFP batteries"
-            interpretation="Variable solar input means you must plan for the worst case. In forested areas with only 2 peak sun hours, a 1,250W portable panel or roof array keeps the batteries topped up."
-            variant="solar"
-          />
-
-        </div>
+    <FormulaBox title="Mathematical Formulas">
+      <p>
+        The required battery energy capacity is calculated by scaling daily consumption by autonomy days and dividing by DoD:
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Required Energy (Wh) = (Daily Consumption × Autonomy Days) / DoD%
       </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Capacity (Ah) = Required Energy (Wh) / System Voltage (V)
+      </div>
+      <p>
+        The usable capacity is the energy you can actually draw:
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Usable Energy = Daily Consumption × Autonomy Days
+      </div>
+      <p class="text-xs text-muted mt-4">
+        <strong>Variables:</strong> Daily Consumption in kWh or Wh, Autonomy in days, DoD as percentage, Voltage in V. Assumptions: constant daily load, standard discharge curves, no seasonal adjustment (apply manually for off-grid).
+      </p>
+    </FormulaBox>
 
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample
+        number={1}
+        title="Small Cabin — 3 kWh/day, 4 Peak Sun Hours"
+        scenario="A small off-grid cabin consumes 3 kWh/day and receives an average of 4 peak sun hours daily. Size a 48V LFP battery bank with 2 days of autonomy at 80% DoD."
+        inputs={[
+          { label: "Daily Consumption", value: "3 kWh/day" },
+          { label: "Peak Sun Hours", value: "4 hours" },
+          { label: "Autonomy", value: "2 days" },
+          { label: "System Voltage", value: "48V" },
+          { label: "Chemistry", value: "LFP (LiFePO4)" },
+          { label: "Max DoD", value: "80%" },
+        ]}
+        steps={[
+          { label: "Usable energy", formula: "3,000 × 2", result: "6,000 Wh" },
+          { label: "Total capacity", formula: "6,000 / 0.80", result: "7,500 Wh (7.5 kWh)" },
+          { label: "Amp-hours", formula: "7,500 / 48", result: "156.3 Ah" },
+          { label: "Solar array needed", formula: "3,000 / (4 × 0.80)", result: "938 W" },
+        ]}
+        answer="7,500 Wh (156.3 Ah at 48V) — a 1,000W solar array is recommended"
+        interpretation="With 4 peak sun hours, the cabin needs roughly 938W of solar panels to recharge the battery bank in one day. A 1kW array provides comfortable margin for cloudy days."
+        variant="solar"
+      />
+
+      <WorkedExample
+        number={2}
+        title="Off-Grid Home — 10 kWh/day, Cloudy Day Buffer"
+        scenario="An off-grid home uses 10 kWh/day. The area averages 3.5 peak sun hours in winter. Account for 3 consecutive cloudy days by sizing for 4 days of autonomy with 85% DoD on 48V LFP."
+        inputs={[
+          { label: "Daily Consumption", value: "10 kWh/day" },
+          { label: "Peak Sun Hours (winter)", value: "3.5 hours" },
+          { label: "Autonomy (cloudy buffer)", value: "4 days" },
+          { label: "System Voltage", value: "48V" },
+          { label: "Chemistry", value: "LFP (LiFePO4)" },
+          { label: "Max DoD", value: "85%" },
+        ]}
+        steps={[
+          { label: "Usable energy", formula: "10,000 × 4", result: "40,000 Wh" },
+          { label: "Total capacity", formula: "40,000 / 0.85", result: "47,059 Wh (47.1 kWh)" },
+          { label: "Amp-hours", formula: "47,059 / 48", result: "980.4 Ah" },
+          { label: "Solar array needed", formula: "10,000 / (3.5 × 0.80)", result: "3,571 W" },
+        ]}
+        answer="47,059 Wh (980.4 Ah at 48V) — a 3,600W solar array is recommended"
+        interpretation="Winter production is the bottleneck. With only 3.5 peak sun hours, you need a large array to recharge 47 kWh in a single day. Consider reducing loads or accepting 2-day recharge cycles."
+        variant="solar"
+      />
+
+      <WorkedExample
+        number={3}
+        title="RV with Variable Solar — 2 kWh/day"
+        scenario="An RV consumes 2 kWh/day with variable solar input while driving and parked. Use a 12V LFP system with 2 days autonomy at 80% DoD. Peak sun hours vary from 2h (forested stops) to 6h (open desert)."
+        inputs={[
+          { label: "Daily Consumption", value: "2 kWh/day" },
+          { label: "Peak Sun Hours (range)", value: "2–6 hours" },
+          { label: "Autonomy", value: "2 days" },
+          { label: "System Voltage", value: "12V" },
+          { label: "Chemistry", value: "LFP (LiFePO4)" },
+          { label: "Max DoD", value: "80%" },
+        ]}
+        steps={[
+          { label: "Usable energy", formula: "2,000 × 2", result: "4,000 Wh" },
+          { label: "Total capacity", formula: "4,000 / 0.80", result: "5,000 Wh (5.0 kWh)" },
+          { label: "Amp-hours", formula: "5,000 / 12.8", result: "390.6 Ah" },
+          { label: "Solar (worst case, 2h)", formula: "2,000 / (2 × 0.80)", result: "1,250 W" },
+        ]}
+        answer="5,000 Wh (390.6 Ah at 12V) — requires 2 parallel 200Ah LFP batteries"
+        interpretation="Variable solar input means you must plan for the worst case. In forested areas with only 2 peak sun hours, a 1,250W portable panel or roof array keeps the batteries topped up."
+        variant="solar"
+      />
     </div>
   </section>
 

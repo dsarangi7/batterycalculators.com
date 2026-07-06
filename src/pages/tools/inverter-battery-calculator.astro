@@ -210,98 +210,96 @@ const relatedCalculators = [
 
   </div>
 
-  <!-- Formulas -->
+  <!-- Formulas and Worked Examples -->
   <section class="mb-16 border-t border-hairline pt-12">
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">Formulas & Worked Examples</h2>
 
-      <FormulaBox title="Mathematical Formulas">
-        <p>
-          Inverter battery sizing converts AC load requirements back to DC battery capacity, accounting for conversion losses:
-        </p>
-        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
-          AC Energy = Load Power × Runtime
-        </div>
-        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
-          DC Energy = AC Energy / Inverter Efficiency
-        </div>
-        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
-          Adjusted Battery Energy = DC Energy / DoD%
-        </div>
-        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
-          Required Ah = Adjusted Battery Energy / Battery Voltage
-        </div>
-        <p>
-          The inverter efficiency factor (typically 90%) accounts for DC-to-AC conversion losses. The DoD factor ensures you do not over-discharge the battery.
-        </p>
-      </FormulaBox>
-
-      <div class="flex flex-col gap-8">
-        <WorkedExample
-          number={1}
-          title="Size Battery for 2000W Inverter — 12V System"
-          scenario="Designing a 12V battery backup to run a 2000W AC load for 4 hours during grid outages."
-          inputs={[
-            "AC Load: 2,000W",
-            "Required Runtime: 4 hours",
-            "Inverter Efficiency: 90%",
-            "Battery Voltage: 12V",
-            "Usable DoD: 80% (LFP)",
-          ]}
-          steps={[
-            "AC Energy = 2,000W × 4h = 8,000 Wh",
-            "DC Energy = 8,000 / 0.90 = 8,889 Wh",
-            "Battery Energy = 8,889 / 0.80 = 11,111 Wh",
-            "Required Ah = 11,111 / 12 = 925.9 Ah",
-          ]}
-          answer="A 12V 950Ah LFP battery bank (11.4 kWh) is required."
-          interpretation="At 12V, the DC current draw is ~185A—thick 4/0 AWG cables are mandatory. Consider upgrading to 24V or 48V for this load level to reduce cable size and resistive losses."
-        />
-
-        <WorkedExample
-          number={2}
-          title="Size Battery for 5000W Inverter — 48V System"
-          scenario="Sizing a 48V battery bank for a 5000W workshop load that needs 2 hours of runtime."
-          inputs={[
-            "AC Load: 5,000W",
-            "Required Runtime: 2 hours",
-            "Inverter Efficiency: 90%",
-            "Battery Voltage: 48V",
-            "Usable DoD: 80% (LFP)",
-          ]}
-          steps={[
-            "AC Energy = 5,000W × 2h = 10,000 Wh",
-            "DC Energy = 10,000 / 0.90 = 11,111 Wh",
-            "Battery Energy = 11,111 / 0.80 = 13,889 Wh",
-            "Required Ah = 13,889 / 48 = 289.4 Ah",
-          ]}
-          answer="A 48V 300Ah LFP battery bank (14.4 kWh) is required."
-          interpretation="At 48V, the DC current is ~115A—manageable with 2 AWG cables. This 5kW system benefits significantly from the higher voltage, with roughly half the DC current of a 12V equivalent."
-        />
-
-        <WorkedExample
-          number={3}
-          title="Compare 12V vs 48V for Same 3000W Load"
-          scenario="Comparing two voltage configurations for a 3000W load with 2-hour runtime to understand efficiency trade-offs."
-          inputs={[
-            "AC Load: 3,000W",
-            "Required Runtime: 2 hours",
-            "Inverter Efficiency: 90%",
-            "Option A: 12V system",
-            "Option B: 48V system",
-            "Usable DoD: 80% (LFP)",
-          ]}
-          steps={[
-            "AC Energy = 3,000W × 2h = 6,000 Wh",
-            "DC Energy = 6,000 / 0.90 = 6,667 Wh",
-            "Battery Energy = 6,667 / 0.80 = 8,333 Wh",
-            "12V: Ah = 8,333 / 12 = 694.4 Ah | DC current ~278A",
-            "48V: Ah = 8,333 / 48 = 173.6 Ah | DC current ~69A",
-          ]}
-          answer="Both need 8.33 kWh of battery. 12V requires 694Ah with ~278A draw; 48V requires 174Ah with ~69A draw."
-          interpretation="The 48V system uses 4× less current, enabling thinner cables (6 AWG vs 4/0 AWG), lower resistive losses, and more efficient power delivery. For any load above 1500W, 48V is strongly preferred."
-        />
+    <FormulaBox title="Mathematical Formulas">
+      <p>
+        Inverter battery sizing converts AC load requirements back to DC battery capacity, accounting for conversion losses:
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        AC Energy = Load Power × Runtime
       </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        DC Energy = AC Energy / Inverter Efficiency
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Adjusted Battery Energy = DC Energy / DoD%
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Required Ah = Adjusted Battery Energy / Battery Voltage
+      </div>
+      <p>
+        The inverter efficiency factor (typically 90%) accounts for DC-to-AC conversion losses. The DoD factor ensures you do not over-discharge the battery.
+      </p>
+    </FormulaBox>
 
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample
+        number={1}
+        title="Size Battery for 2000W Inverter — 12V System"
+        scenario="Designing a 12V battery backup to run a 2000W AC load for 4 hours during grid outages."
+        inputs={[
+          "AC Load: 2,000W",
+          "Required Runtime: 4 hours",
+          "Inverter Efficiency: 90%",
+          "Battery Voltage: 12V",
+          "Usable DoD: 80% (LFP)",
+        ]}
+        steps={[
+          "AC Energy = 2,000W × 4h = 8,000 Wh",
+          "DC Energy = 8,000 / 0.90 = 8,889 Wh",
+          "Battery Energy = 8,889 / 0.80 = 11,111 Wh",
+          "Required Ah = 11,111 / 12 = 925.9 Ah",
+        ]}
+        answer="A 12V 950Ah LFP battery bank (11.4 kWh) is required."
+        interpretation="At 12V, the DC current draw is ~185A—thick 4/0 AWG cables are mandatory. Consider upgrading to 24V or 48V for this load level to reduce cable size and resistive losses."
+      />
+
+      <WorkedExample
+        number={2}
+        title="Size Battery for 5000W Inverter — 48V System"
+        scenario="Sizing a 48V battery bank for a 5000W workshop load that needs 2 hours of runtime."
+        inputs={[
+          "AC Load: 5,000W",
+          "Required Runtime: 2 hours",
+          "Inverter Efficiency: 90%",
+          "Battery Voltage: 48V",
+          "Usable DoD: 80% (LFP)",
+        ]}
+        steps={[
+          "AC Energy = 5,000W × 2h = 10,000 Wh",
+          "DC Energy = 10,000 / 0.90 = 11,111 Wh",
+          "Battery Energy = 11,111 / 0.80 = 13,889 Wh",
+          "Required Ah = 13,889 / 48 = 289.4 Ah",
+        ]}
+        answer="A 48V 300Ah LFP battery bank (14.4 kWh) is required."
+        interpretation="At 48V, the DC current is ~115A—manageable with 2 AWG cables. This 5kW system benefits significantly from the higher voltage, with roughly half the DC current of a 12V equivalent."
+      />
+
+      <WorkedExample
+        number={3}
+        title="Compare 12V vs 48V for Same 3000W Load"
+        scenario="Comparing two voltage configurations for a 3000W load with 2-hour runtime to understand efficiency trade-offs."
+        inputs={[
+          "AC Load: 3,000W",
+          "Required Runtime: 2 hours",
+          "Inverter Efficiency: 90%",
+          "Option A: 12V system",
+          "Option B: 48V system",
+          "Usable DoD: 80% (LFP)",
+        ]}
+        steps={[
+          "AC Energy = 3,000W × 2h = 6,000 Wh",
+          "DC Energy = 6,000 / 0.90 = 6,667 Wh",
+          "Battery Energy = 6,667 / 0.80 = 8,333 Wh",
+          "12V: Ah = 8,333 / 12 = 694.4 Ah | DC current ~278A",
+          "48V: Ah = 8,333 / 48 = 173.6 Ah | DC current ~69A",
+        ]}
+        answer="Both need 8.33 kWh of battery. 12V requires 694Ah with ~278A draw; 48V requires 174Ah with ~69A draw."
+        interpretation="The 48V system uses 4× less current, enabling thinner cables (6 AWG vs 4/0 AWG), lower resistive losses, and more efficient power delivery. For any load above 1500W, 48V is strongly preferred."
+      />
     </div>
   </section>
 

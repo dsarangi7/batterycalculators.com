@@ -227,110 +227,105 @@ const relatedArticles = [
     </div>
   </section>
 
-  <!-- Technical Explanation and Equations -->
+  <!-- Formulas and Worked Examples -->
   <section class="mb-16 border-t border-hairline pt-12">
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
-
-      <FormulaBox title="Mathematical Formulas">
-        <p>
-          The solar array is sized to deliver daily consumption within available peak sun hours, accounting for system losses:
-        </p>
-        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
-          Array Size (W) = Daily Consumption (Wh) / (PSH × Efficiency)
-        </div>
-        <p>
-          The battery bank is sized for autonomy and depth of discharge limits:
-        </p>
-        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
-          Battery Capacity (Wh) = (Daily Consumption × Autonomy) / DoD
-        </div>
-        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
-          Battery Capacity (Ah) = Battery Capacity (Wh) / System Voltage
-        </div>
-        <p>
-          The charge controller must handle the array's maximum output current:
-        </p>
-        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
-          Controller Current (A) = Array Size (W) / Battery Voltage × 1.25
-        </div>
-        <p class="text-xs text-muted mt-4">
-          <strong>Variables:</strong> PSH = Peak Sun Hours, Efficiency = system derate factor (typically 0.75–0.85), DoD = depth of discharge as decimal. The 1.25× factor on controller sizing provides headroom for cold-weather voltage boost.
-        </p>
-      </FormulaBox>
-
-      <div class="flex flex-col gap-8">
-        <h2 class="text-title-lg text-primary uppercase mb-2 tracking-wider">Worked Engineering Examples</h2>
-
-        <WorkedExample
-          number={1}
-          title="Small Cabin — 3 kWh/day, 4 Peak Sun Hours"
-          scenario="An off-grid cabin consumes 3kWh/day with 4 peak sun hours. Size a complete 48V LFP system with 2 days autonomy."
-          inputs={[
-            { label: "Daily Consumption", value: "3 kWh/day" },
-            { label: "Peak Sun Hours", value: "4 hours" },
-            { label: "Autonomy", value: "2 days" },
-            { label: "System Voltage", value: "48V" },
-            { label: "Chemistry", value: "LFP (LiFePO4)" },
-            { label: "System Efficiency", value: "82%" },
-          ]}
-          steps={[
-            { label: "Solar array", formula: "3,000 / (4 × 0.82)", result: "915W → 1,000W recommended" },
-            { label: "Battery capacity", formula: "(3,000 × 2) / 0.90", result: "6,667 Wh (6.7 kWh)" },
-            { label: "Battery Ah", formula: "6,667 / 48", result: "138.9 Ah" },
-            { label: "Charge controller", formula: "1,000 / 48 × 1.25", result: "26A → 30A MPPT" },
-          ]}
-          answer="1kW solar array, 6.7kWh (139Ah at 48V) LFP battery bank, 30A MPPT controller."
-          interpretation="A compact, affordable system. With 4 peak sun hours, the array produces ~3.3kWh/day — enough to charge the battery in one day and power daily loads."
-          variant="solar"
-        />
-
-        <WorkedExample
-          number={2}
-          title="Off-Grid Home — 10 kWh/day, 3.5 Peak Sun Hours"
-          scenario="An off-grid home uses 10kWh/day with 3.5 peak sun hours in winter. Size a 48V LFP system with 3 days autonomy for cloudy periods."
-          inputs={[
-            { label: "Daily Consumption", value: "10 kWh/day" },
-            { label: "Peak Sun Hours", value: "3.5 hours" },
-            { label: "Autonomy", value: "3 days" },
-            { label: "System Voltage", value: "48V" },
-            { label: "Chemistry", value: "LFP (LiFePO4)" },
-            { label: "System Efficiency", value: "80%" },
-          ]}
-          steps={[
-            { label: "Solar array", formula: "10,000 / (3.5 × 0.80)", result: "3,571W → 3,600W" },
-            { label: "Battery capacity", formula: "(10,000 × 3) / 0.90", result: "33,333 Wh (33.3 kWh)" },
-            { label: "Battery Ah", formula: "33,333 / 48", result: "694.4 Ah" },
-            { label: "Charge controller", formula: "3,600 / 48 × 1.25", result: "93.75A → 100A MPPT" },
-          ]}
-          answer="3.6kW solar array, 33.3kWh (694Ah at 48V) LFP battery bank, 100A MPPT controller."
-          interpretation="A substantial off-grid system. The 3-day autonomy buffer handles consecutive cloudy days. The large array ensures full recharge even during short winter days."
-          variant="solar"
-        />
-
-        <WorkedExample
-          number={3}
-          title="RV Mobile System — 2 kWh/day, Variable Solar"
-          scenario="An RV consumes 2kWh/day with variable solar input. Peak sun hours range from 2h (forested) to 6h (desert). Size a 12V LFP system with 2 days autonomy."
-          inputs={[
-            { label: "Daily Consumption", value: "2 kWh/day" },
-            { label: "Peak Sun Hours", value: "2–6 hours (worst: 2h)" },
-            { label: "Autonomy", value: "2 days" },
-            { label: "System Voltage", value: "12V" },
-            { label: "Chemistry", value: "LFP (LiFePO4)" },
-            { label: "System Efficiency", value: "78%" },
-          ]}
-          steps={[
-            { label: "Solar array (worst case)", formula: "2,000 / (2 × 0.78)", result: "1,282W → 1,400W" },
-            { label: "Battery capacity", formula: "(2,000 × 2) / 0.90", result: "4,444 Wh (4.4 kWh)" },
-            { label: "Battery Ah", formula: "4,444 / 12.8", result: "347.2 Ah" },
-            { label: "Charge controller", formula: "1,400 / 12.8 × 1.25", result: "136.7A → 150A MPPT" },
-          ]}
-          answer="1.4kW solar array (portable), 4.4kWh (347Ah at 12V) LFP battery bank, 150A MPPT controller."
-          interpretation="Mobile systems must plan for worst-case solar. A 1.4kW portable array ensures charging even in forested areas. At 12V, the high current demands thick cables — consider 24V if load allows."
-          variant="solar"
-        />
-
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">Formulas & Worked Examples</h2>
+    <FormulaBox title="Mathematical Formulas">
+      <p>
+        The solar array is sized to deliver daily consumption within available peak sun hours, accounting for system losses:
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Array Size (W) = Daily Consumption (Wh) / (PSH × Efficiency)
       </div>
+      <p>
+        The battery bank is sized for autonomy and depth of discharge limits:
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Battery Capacity (Wh) = (Daily Consumption × Autonomy) / DoD
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Battery Capacity (Ah) = Battery Capacity (Wh) / System Voltage
+      </div>
+      <p>
+        The charge controller must handle the array's maximum output current:
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Controller Current (A) = Array Size (W) / Battery Voltage × 1.25
+      </div>
+      <p class="text-xs text-muted mt-4">
+        <strong>Variables:</strong> PSH = Peak Sun Hours, Efficiency = system derate factor (typically 0.75–0.85), DoD = depth of discharge as decimal. The 1.25× factor on controller sizing provides headroom for cold-weather voltage boost.
+      </p>
+    </FormulaBox>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample
+        number={1}
+        title="Small Cabin — 3 kWh/day, 4 Peak Sun Hours"
+        scenario="An off-grid cabin consumes 3kWh/day with 4 peak sun hours. Size a complete 48V LFP system with 2 days autonomy."
+        inputs={[
+          { label: "Daily Consumption", value: "3 kWh/day" },
+          { label: "Peak Sun Hours", value: "4 hours" },
+          { label: "Autonomy", value: "2 days" },
+          { label: "System Voltage", value: "48V" },
+          { label: "Chemistry", value: "LFP (LiFePO4)" },
+          { label: "System Efficiency", value: "82%" },
+        ]}
+        steps={[
+          { label: "Solar array", formula: "3,000 / (4 × 0.82)", result: "915W → 1,000W recommended" },
+          { label: "Battery capacity", formula: "(3,000 × 2) / 0.90", result: "6,667 Wh (6.7 kWh)" },
+          { label: "Battery Ah", formula: "6,667 / 48", result: "138.9 Ah" },
+          { label: "Charge controller", formula: "1,000 / 48 × 1.25", result: "26A → 30A MPPT" },
+        ]}
+        answer="1kW solar array, 6.7kWh (139Ah at 48V) LFP battery bank, 30A MPPT controller."
+        interpretation="A compact, affordable system. With 4 peak sun hours, the array produces ~3.3kWh/day — enough to charge the battery in one day and power daily loads."
+        variant="solar"
+      />
+
+      <WorkedExample
+        number={2}
+        title="Off-Grid Home — 10 kWh/day, 3.5 Peak Sun Hours"
+        scenario="An off-grid home uses 10kWh/day with 3.5 peak sun hours in winter. Size a 48V LFP system with 3 days autonomy for cloudy periods."
+        inputs={[
+          { label: "Daily Consumption", value: "10 kWh/day" },
+          { label: "Peak Sun Hours", value: "3.5 hours" },
+          { label: "Autonomy", value: "3 days" },
+          { label: "System Voltage", value: "48V" },
+          { label: "Chemistry", value: "LFP (LiFePO4)" },
+          { label: "System Efficiency", value: "80%" },
+        ]}
+        steps={[
+          { label: "Solar array", formula: "10,000 / (3.5 × 0.80)", result: "3,571W → 3,600W" },
+          { label: "Battery capacity", formula: "(10,000 × 3) / 0.90", result: "33,333 Wh (33.3 kWh)" },
+          { label: "Battery Ah", formula: "33,333 / 48", result: "694.4 Ah" },
+          { label: "Charge controller", formula: "3,600 / 48 × 1.25", result: "93.75A → 100A MPPT" },
+        ]}
+        answer="3.6kW solar array, 33.3kWh (694Ah at 48V) LFP battery bank, 100A MPPT controller."
+        interpretation="A substantial off-grid system. The 3-day autonomy buffer handles consecutive cloudy days. The large array ensures full recharge even during short winter days."
+        variant="solar"
+      />
+
+      <WorkedExample
+        number={3}
+        title="RV Mobile System — 2 kWh/day, Variable Solar"
+        scenario="An RV consumes 2kWh/day with variable solar input. Peak sun hours range from 2h (forested) to 6h (desert). Size a 12V LFP system with 2 days autonomy."
+        inputs={[
+          { label: "Daily Consumption", value: "2 kWh/day" },
+          { label: "Peak Sun Hours", value: "2–6 hours (worst: 2h)" },
+          { label: "Autonomy", value: "2 days" },
+          { label: "System Voltage", value: "12V" },
+          { label: "Chemistry", value: "LFP (LiFePO4)" },
+          { label: "System Efficiency", value: "78%" },
+        ]}
+        steps={[
+          { label: "Solar array (worst case)", formula: "2,000 / (2 × 0.78)", result: "1,282W → 1,400W" },
+          { label: "Battery capacity", formula: "(2,000 × 2) / 0.90", result: "4,444 Wh (4.4 kWh)" },
+          { label: "Battery Ah", formula: "4,444 / 12.8", result: "347.2 Ah" },
+          { label: "Charge controller", formula: "1,400 / 12.8 × 1.25", result: "136.7A → 150A MPPT" },
+        ]}
+        answer="1.4kW solar array (portable), 4.4kWh (347Ah at 12V) LFP battery bank, 150A MPPT controller."
+        interpretation="Mobile systems must plan for worst-case solar. A 1.4kW portable array ensures charging even in forested areas. At 12V, the high current demands thick cables — consider 24V if load allows."
+        variant="solar"
+      />
     </div>
   </section>
 

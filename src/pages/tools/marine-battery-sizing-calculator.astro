@@ -221,112 +221,110 @@ const relatedCalculators = [
 
   </div>
 
-  <!-- Formulas -->
+  <!-- Formulas and Worked Examples -->
   <section class="mb-16 border-t border-hairline pt-12">
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">Formulas & Worked Examples</h2>
 
-      <FormulaBox title="Mathematical Formulas">
-        <p>
-          Marine battery sizing sums all hotel loads, multiplies by usage time, and adjusts for depth of discharge and system losses:
-        </p>
-        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
-          Total Load = Nav + Lighting + Refrigeration + Pumps + Other
-        </div>
-        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
-          Daily Energy = Total Load × Usage Hours
-        </div>
-        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
-          Required Energy = Daily Energy / (DoD% × Efficiency%)
-        </div>
-        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
-          Required Ah = Required Energy / Battery Voltage
-        </div>
-        <p>
-          The DoD and efficiency factors ensure the battery bank is sized conservatively for real-world conditions.
-        </p>
-      </FormulaBox>
-
-      <div class="flex flex-col gap-6">
-        <WorkedExample
-          number={1}
-          title="Day Cruiser — Overnight Anchoring"
-          scenario="A 28ft day cruiser is anchored overnight. The owner needs navigation lights, a fish finder, VHF radio, cabin lighting, and a small fridge running for 8 hours before the engine is started at dawn."
-          inputs={[
-            { label: "Navigation lights", value: "20W" },
-            { label: "Fish finder", value: "15W" },
-            { label: "VHF radio (standby)", value: "5W" },
-            { label: "Cabin lights", value: "30W" },
-            { label: "Compact fridge", value: "45W" },
-            { label: "Usage duration", value: "8 hours" },
-            { label: "System voltage", value: "12V" },
-            { label: "DoD limit", value: "80% (LFP)" },
-            { label: "System efficiency", value: "90%" },
-          ]}
-          steps={[
-            "Sum all loads: 20 + 15 + 5 + 30 + 45 = 115W",
-            "Daily energy demand: 115W × 8h = 920 Wh",
-            "Adjust for DoD and efficiency: 920 / (0.80 × 0.90) = 1,278 Wh",
-            "Convert to Amp-hours: 1,278 Wh / 12V = 106.5 Ah",
-          ]}
-          answer="A 12V 120Ah LFP battery bank (1.44 kWh) is recommended."
-          interpretation="This provides 8 hours of overnight hotel loads with a 13% safety margin above the calculated minimum. The bank weighs approximately 14 kg—manageable for a small cruiser. Starting the engine at dawn for 1–2 hours will replenish the bank via alternator."
-          variant="marine"
-        />
-
-        <WorkedExample
-          number={2}
-          title="Cruising Yacht — 24-Hour Hotel Loads"
-          scenario="A 45ft cruising yacht at anchor runs extensive hotel loads: chartplotter, radar overlay, LED lighting throughout, refrigeration, watermaker, and entertainment systems. The owner wants full 24-hour autonomy without engine charging."
-          inputs={[
-            { label: "Chartplotter + radar", value: "120W" },
-            { label: "AIS transponder", value: "30W" },
-            { label: "LED lighting (all zones)", value: "90W" },
-            { label: "Refrigeration + freezer", value: "180W" },
-            { label: "Watermaker", value: "250W" },
-            { label: "Entertainment + USB", value: "60W" },
-            { label: "Pumps + auxiliaries", value: "50W" },
-            { label: "Usage duration", value: "24 hours" },
-            { label: "System voltage", value: "24V" },
-            { label: "DoD limit", value: "80% (LFP)" },
-            { label: "System efficiency", value: "92%" },
-          ]}
-          steps={[
-            "Sum all loads: 120 + 30 + 90 + 180 + 250 + 60 + 50 = 780W",
-            "Daily energy demand: 780W × 24h = 18,720 Wh",
-            "Adjust for DoD and efficiency: 18,720 / (0.80 × 0.92) = 25,435 Wh",
-            "Convert to Amp-hours: 25,435 Wh / 24V = 1,059.8 Ah",
-          ]}
-          answer="A 24V 1,100Ah LFP battery bank (26.4 kWh) is recommended."
-          interpretation="This meets 24-hour autonomy for a full hotel load profile. The bank weighs approximately 195 kg, requiring proper structural mounting below the waterline. Solar panels (300W+) on the bimini could offset 2–3 kWh daily, reducing bank size requirements."
-          variant="marine"
-        />
-
-        <WorkedExample
-          number={3}
-          title="Trolling Motor — High Discharge Analysis"
-          scenario="A 20ft bass boat uses an 80lb-thrust trolling motor drawing 46A at 12V. The angler wants to fish for 6 hours continuously, running the motor at medium speed (60% throttle) with intermittent fish finder and navigation lights."
-          inputs={[
-            { label: "Trolling motor (60% throttle)", value: "27.6A × 12V = 331W" },
-            { label: "Fish finder", value: "15W" },
-            { label: "Navigation lights", value: "20W" },
-            { label: "Usage duration", value: "6 hours" },
-            { label: "System voltage", value: "12V" },
-            { label: "DoD limit", value: "80% (LFP)" },
-            { label: "System efficiency", value: "88%" },
-          ]}
-          steps={[
-            "Sum all loads: 331 + 15 + 20 = 366W",
-            "Current draw at 12V: 366W / 12V = 30.5A",
-            "Daily energy demand: 366W × 6h = 2,196 Wh",
-            "Adjust for DoD and efficiency: 2,196 / (0.80 × 0.88) = 3,120 Wh",
-            "Convert to Amp-hours: 3,120 Wh / 12V = 260 Ah",
-          ]}
-          answer="A 12V 260Ah LFP battery bank (3.12 kWh) is recommended."
-          interpretation="At 30.5A continuous draw, a 260Ah bank provides 6 hours with a small safety margin. Note: at high discharge rates, battery voltage sag becomes significant—LFP maintains voltage better than lead-acid under this load. A 300Ah bank provides comfortable margin for longer fishing days."
-          variant="marine"
-        />
+    <FormulaBox title="Mathematical Formulas">
+      <p>
+        Marine battery sizing sums all hotel loads, multiplies by usage time, and adjusts for depth of discharge and system losses:
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Total Load = Nav + Lighting + Refrigeration + Pumps + Other
       </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Daily Energy = Total Load × Usage Hours
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Required Energy = Daily Energy / (DoD% × Efficiency%)
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Required Ah = Required Energy / Battery Voltage
+      </div>
+      <p>
+        The DoD and efficiency factors ensure the battery bank is sized conservatively for real-world conditions.
+      </p>
+    </FormulaBox>
 
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample
+        number={1}
+        title="Day Cruiser — Overnight Anchoring"
+        scenario="A 28ft day cruiser is anchored overnight. The owner needs navigation lights, a fish finder, VHF radio, cabin lighting, and a small fridge running for 8 hours before the engine is started at dawn."
+        inputs={[
+          { label: "Navigation lights", value: "20W" },
+          { label: "Fish finder", value: "15W" },
+          { label: "VHF radio (standby)", value: "5W" },
+          { label: "Cabin lights", value: "30W" },
+          { label: "Compact fridge", value: "45W" },
+          { label: "Usage duration", value: "8 hours" },
+          { label: "System voltage", value: "12V" },
+          { label: "DoD limit", value: "80% (LFP)" },
+          { label: "System efficiency", value: "90%" },
+        ]}
+        steps={[
+          "Sum all loads: 20 + 15 + 5 + 30 + 45 = 115W",
+          "Daily energy demand: 115W × 8h = 920 Wh",
+          "Adjust for DoD and efficiency: 920 / (0.80 × 0.90) = 1,278 Wh",
+          "Convert to Amp-hours: 1,278 Wh / 12V = 106.5 Ah",
+        ]}
+        answer="A 12V 120Ah LFP battery bank (1.44 kWh) is recommended."
+        interpretation="This provides 8 hours of overnight hotel loads with a 13% safety margin above the calculated minimum. The bank weighs approximately 14 kg—manageable for a small cruiser. Starting the engine at dawn for 1–2 hours will replenish the bank via alternator."
+        variant="marine"
+      />
+
+      <WorkedExample
+        number={2}
+        title="Cruising Yacht — 24-Hour Hotel Loads"
+        scenario="A 45ft cruising yacht at anchor runs extensive hotel loads: chartplotter, radar overlay, LED lighting throughout, refrigeration, watermaker, and entertainment systems. The owner wants full 24-hour autonomy without engine charging."
+        inputs={[
+          { label: "Chartplotter + radar", value: "120W" },
+          { label: "AIS transponder", value: "30W" },
+          { label: "LED lighting (all zones)", value: "90W" },
+          { label: "Refrigeration + freezer", value: "180W" },
+          { label: "Watermaker", value: "250W" },
+          { label: "Entertainment + USB", value: "60W" },
+          { label: "Pumps + auxiliaries", value: "50W" },
+          { label: "Usage duration", value: "24 hours" },
+          { label: "System voltage", value: "24V" },
+          { label: "DoD limit", value: "80% (LFP)" },
+          { label: "System efficiency", value: "92%" },
+        ]}
+        steps={[
+          "Sum all loads: 120 + 30 + 90 + 180 + 250 + 60 + 50 = 780W",
+          "Daily energy demand: 780W × 24h = 18,720 Wh",
+          "Adjust for DoD and efficiency: 18,720 / (0.80 × 0.92) = 25,435 Wh",
+          "Convert to Amp-hours: 25,435 Wh / 24V = 1,059.8 Ah",
+        ]}
+        answer="A 24V 1,100Ah LFP battery bank (26.4 kWh) is recommended."
+        interpretation="This meets 24-hour autonomy for a full hotel load profile. The bank weighs approximately 195 kg, requiring proper structural mounting below the waterline. Solar panels (300W+) on the bimini could offset 2–3 kWh daily, reducing bank size requirements."
+        variant="marine"
+      />
+
+      <WorkedExample
+        number={3}
+        title="Trolling Motor — High Discharge Analysis"
+        scenario="A 20ft bass boat uses an 80lb-thrust trolling motor drawing 46A at 12V. The angler wants to fish for 6 hours continuously, running the motor at medium speed (60% throttle) with intermittent fish finder and navigation lights."
+        inputs={[
+          { label: "Trolling motor (60% throttle)", value: "27.6A × 12V = 331W" },
+          { label: "Fish finder", value: "15W" },
+          { label: "Navigation lights", value: "20W" },
+          { label: "Usage duration", value: "6 hours" },
+          { label: "System voltage", value: "12V" },
+          { label: "DoD limit", value: "80% (LFP)" },
+          { label: "System efficiency", value: "88%" },
+        ]}
+        steps={[
+          "Sum all loads: 331 + 15 + 20 = 366W",
+          "Current draw at 12V: 366W / 12V = 30.5A",
+          "Daily energy demand: 366W × 6h = 2,196 Wh",
+          "Adjust for DoD and efficiency: 2,196 / (0.80 × 0.88) = 3,120 Wh",
+          "Convert to Amp-hours: 3,120 Wh / 12V = 260 Ah",
+        ]}
+        answer="A 12V 260Ah LFP battery bank (3.12 kWh) is recommended."
+        interpretation="At 30.5A continuous draw, a 260Ah bank provides 6 hours with a small safety margin. Note: at high discharge rates, battery voltage sag becomes significant—LFP maintains voltage better than lead-acid under this load. A 300Ah bank provides comfortable margin for longer fishing days."
+        variant="marine"
+      />
     </div>
   </section>
 

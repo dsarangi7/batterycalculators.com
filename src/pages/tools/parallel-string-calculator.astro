@@ -216,89 +216,86 @@ const relatedCalculators = [
 
   </div>
 
-  <!-- Technical Explanation and Equations -->
+  <!-- Formulas and Worked Examples -->
   <section class="mb-16 border-t border-hairline pt-12">
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">Formulas & Worked Examples</h2>
 
-      <FormulaBox title="Mathematical Formulas">
-        <p>
-          To configure a pack, series cells increase the voltage potential, and parallel cells or strings scale the available current capacity:
-        </p>
-        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
-          Series Cells (S) = ⌈Target Voltage / Block Voltage⌉
-        </div>
-        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
-          Parallel Strings (P) = ⌈Target Capacity (Ah) / Block Capacity (Ah)⌉
-        </div>
-        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
-          Total Blocks (N) = Series Cells (S) × Parallel Strings (P)
-        </div>
-        <p>
-          Actual system capabilities are computed from these integer counts:
-        </p>
-        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
-          Actual System Voltage = S × Block Voltage
-        </div>
-        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
-          Actual System Capacity = P × Block Capacity
-        </div>
-      </FormulaBox>
-
-      <!-- Worked Examples -->
-      <div class="flex flex-col gap-8">
-        <WorkedExample
-          number={1}
-          title="Series Cells for 48V from 3.2V LFP Cells"
-          scenario="Design a 48V nominal battery string using standard 3.2V LiFePO4 cells arranged in series."
-          inputs={[
-            { label: "Target Voltage", value: "48 V" },
-            { label: "Cell Voltage", value: "3.2 V (LFP)" },
-          ]}
-          steps={[
-            { label: "Calculate series count", detail: "S = ⌈48 V / 3.2 V⌉ = 15 cells" },
-            { label: "Compute actual voltage", detail: "V_actual = 15 × 3.2 V = 48.0 V" },
-          ]}
-          answer="15S configuration — 15 cells in series produces exactly 48.0 V nominal."
-          interpretation="This is the most common 48V LFP configuration used in telecom and solar storage. A 16S option (51.2V) is preferred when inverter headroom is needed."
-        />
-
-        <WorkedExample
-          number={2}
-          title="Parallel Strings for 400Ah from 100Ah Cells"
-          scenario="Scale capacity to 400Ah by connecting identical 100Ah LFP cells in parallel."
-          inputs={[
-            { label: "Target Capacity", value: "400 Ah" },
-            { label: "Cell Capacity", value: "100 Ah" },
-          ]}
-          steps={[
-            { label: "Calculate parallel count", detail: "P = ⌈400 Ah / 100 Ah⌉ = 4 strings" },
-            { label: "Compute actual capacity", detail: "Ah_actual = 4 × 100 Ah = 400 Ah" },
-          ]}
-          answer="4P configuration — 4 parallel strings yield 400 Ah total."
-          interpretation="Each parallel group must use matched cells (same batch, capacity within 2%). Add inline fuses on each string to prevent cross-current faults."
-        />
-
-        <WorkedExample
-          number={3}
-          title="Combined 16S4P for 48V 400Ah Pack"
-          scenario="Build a complete 48V 400Ah battery pack using 3.2V 100Ah LFP cells in a 16S4P topology."
-          inputs={[
-            { label: "Target Voltage", value: "48 V" },
-            { label: "Target Capacity", value: "400 Ah" },
-            { label: "Cell Voltage", value: "3.2 V (LFP)" },
-            { label: "Cell Capacity", value: "100 Ah" },
-          ]}
-          steps={[
-            { label: "Calculate series count", detail: "S = ⌈48 V / 3.2 V⌉ = 16 cells (rounds up to 51.2V nominal)" },
-            { label: "Calculate parallel count", detail: "P = ⌈400 Ah / 100 Ah⌉ = 4 strings" },
-            { label: "Total cells required", detail: "N = 16 × 4 = 64 cells" },
-            { label: "Actual specifications", detail: "V = 51.2 V, Ah = 400 Ah, E = 20,480 Wh (20.48 kWh)" },
-          ]}
-          answer="16S4P — 64 cells total, delivering 51.2V at 400Ah (20.48 kWh)."
-          interpretation="This pack exceeds the 48V target slightly (51.2V nominal) which provides better performance with 48V inverters. A 16-channel BMS is required for series monitoring."
-        />
+    <FormulaBox title="Mathematical Formulas">
+      <p>
+        To configure a pack, series cells increase the voltage potential, and parallel cells or strings scale the available current capacity:
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Series Cells (S) = ⌈Target Voltage / Block Voltage⌉
       </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Parallel Strings (P) = ⌈Target Capacity (Ah) / Block Capacity (Ah)⌉
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Total Blocks (N) = Series Cells (S) × Parallel Strings (P)
+      </div>
+      <p>
+        Actual system capabilities are computed from these integer counts:
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Actual System Voltage = S × Block Voltage
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Actual System Capacity = P × Block Capacity
+      </div>
+    </FormulaBox>
 
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample
+        number={1}
+        title="Series Cells for 48V from 3.2V LFP Cells"
+        scenario="Design a 48V nominal battery string using standard 3.2V LiFePO4 cells arranged in series."
+        inputs={[
+          { label: "Target Voltage", value: "48 V" },
+          { label: "Cell Voltage", value: "3.2 V (LFP)" },
+        ]}
+        steps={[
+          { label: "Calculate series count", detail: "S = ⌈48 V / 3.2 V⌉ = 15 cells" },
+          { label: "Compute actual voltage", detail: "V_actual = 15 × 3.2 V = 48.0 V" },
+        ]}
+        answer="15S configuration — 15 cells in series produces exactly 48.0 V nominal."
+        interpretation="This is the most common 48V LFP configuration used in telecom and solar storage. A 16S option (51.2V) is preferred when inverter headroom is needed."
+      />
+
+      <WorkedExample
+        number={2}
+        title="Parallel Strings for 400Ah from 100Ah Cells"
+        scenario="Scale capacity to 400Ah by connecting identical 100Ah LFP cells in parallel."
+        inputs={[
+          { label: "Target Capacity", value: "400 Ah" },
+          { label: "Cell Capacity", value: "100 Ah" },
+        ]}
+        steps={[
+          { label: "Calculate parallel count", detail: "P = ⌈400 Ah / 100 Ah⌉ = 4 strings" },
+          { label: "Compute actual capacity", detail: "Ah_actual = 4 × 100 Ah = 400 Ah" },
+        ]}
+        answer="4P configuration — 4 parallel strings yield 400 Ah total."
+        interpretation="Each parallel group must use matched cells (same batch, capacity within 2%). Add inline fuses on each string to prevent cross-current faults."
+      />
+
+      <WorkedExample
+        number={3}
+        title="Combined 16S4P for 48V 400Ah Pack"
+        scenario="Build a complete 48V 400Ah battery pack using 3.2V 100Ah LFP cells in a 16S4P topology."
+        inputs={[
+          { label: "Target Voltage", value: "48 V" },
+          { label: "Target Capacity", value: "400 Ah" },
+          { label: "Cell Voltage", value: "3.2 V (LFP)" },
+          { label: "Cell Capacity", value: "100 Ah" },
+        ]}
+        steps={[
+          { label: "Calculate series count", detail: "S = ⌈48 V / 3.2 V⌉ = 16 cells (rounds up to 51.2V nominal)" },
+          { label: "Calculate parallel count", detail: "P = ⌈400 Ah / 100 Ah⌉ = 4 strings" },
+          { label: "Total cells required", detail: "N = 16 × 4 = 64 cells" },
+          { label: "Actual specifications", detail: "V = 51.2 V, Ah = 400 Ah, E = 20,480 Wh (20.48 kWh)" },
+        ]}
+        answer="16S4P — 64 cells total, delivering 51.2V at 400Ah (20.48 kWh)."
+        interpretation="This pack exceeds the 48V target slightly (51.2V nominal) which provides better performance with 48V inverters. A 16-channel BMS is required for series monitoring."
+      />
     </div>
   </section>
 

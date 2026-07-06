@@ -317,133 +317,128 @@ const chemistryOptions = [
     </CalculatorCard>
   </section>
 
-  <!-- Formulas -->
+  <!-- Formulas and Worked Examples -->
   <section class="mb-16 border-t border-hairline pt-12">
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
-
-      <FormulaBox title="Mathematical Formulas">
-        <p>
-          Battery sizing is derived from the ferry's energy demand per trip and charging strategy:
-        </p>
-        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
-          Trip Time = Distance / Speed
-        </div>
-        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
-          Propulsion Energy = Power × Trip Time × 0.85
-        </div>
-        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
-          Hotel Energy = Hotel Load × Trip Time
-        </div>
-        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
-          Energy Per Trip = Propulsion + Hotel
-        </div>
-        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
-          Usable Capacity = Energy Per Trip × (1 + Reserve%)
-        </div>
-        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
-          Installed Capacity = Usable / DoD
-        </div>
-        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
-          Battery Weight = Installed × Energy Density
-        </div>
-        <p class="mt-4">
-          Drivetrain efficiency: 85% (motor + inverter + propeller)<br/>
-          LFP: 6.5 kg/kWh installed, 90% DoD, 5000+ cycles<br/>
-          NMC: 5.0 kg/kWh installed, 80% DoD, 2000 cycles
-        </p>
-      </FormulaBox>
-
-      <div class="flex flex-col gap-8">
-        <h2 class="text-title-lg text-primary uppercase mb-0 tracking-wider">Worked Engineering Examples</h2>
-
-        <WorkedExample
-          number={1}
-          title="50-Passenger Commuter Ferry"
-          scenario="Short commuter crossing with high daily trip count, terminal charging between voyages."
-          inputs={[
-            { label: "Route Distance", value: "8 km" },
-            { label: "Crossing Time", value: "30 min (0.5 h)" },
-            { label: "Propulsion Power", value: "2,000 kW" },
-            { label: "Hotel Load", value: "150 kW" },
-            { label: "Trips Per Day", value: "24" },
-            { label: "Charging", value: "Terminal (30 min turnaround)" },
-            { label: "Chemistry", value: "LFP" },
-          ]}
-          steps={[
-            { label: "Crossing time", formula: "8 km / 16 km/h = 0.5 h", result: "30 minutes" },
-            { label: "Propulsion energy", formula: "2,000 × 0.5 × 0.85", result: "850.0 kWh" },
-            { label: "Hotel energy", formula: "150 × 0.5", result: "75.0 kWh" },
-            { label: "Energy per trip", formula: "850.0 + 75.0", result: "925.0 kWh" },
-            { label: "Daily energy", formula: "925.0 × 24", result: "22,200 kWh" },
-            { label: "Usable capacity (20% reserve)", formula: "925.0 × 1.20", result: "1,110.0 kWh" },
-            { label: "Installed capacity (LFP 90% DoD)", formula: "1,110.0 / 0.90", result: "1,233.3 kWh" },
-            { label: "Battery weight", formula: "1,233.3 × 6.5", result: "8,017 kg" },
-            { label: "Charging power (30-min)", formula: "1,110.0 / 0.5 × 1.2", result: "2,664 kW" },
-          ]}
-          answer="A 50-passenger commuter ferry needs a 1,233 kWh LFP battery (8,017 kg) with 2,664 kW shore charging for 30-minute terminal turnarounds."
-          interpretation="High trip counts compound energy demand quickly. Terminal charging keeps the battery sized for a single trip rather than all daily trips, but requires very high charging power."
-          variant="marine"
-        />
-
-        <WorkedExample
-          number={2}
-          title="200-Passenger Car Ferry"
-          scenario="Larger car-carrying ferry on a medium-distance route with a 1-hour crossing and terminal charging."
-          inputs={[
-            { label: "Route Distance", value: "18 km" },
-            { label: "Crossing Time", value: "1 hour" },
-            { label: "Propulsion Power", value: "5,000 kW" },
-            { label: "Hotel Load", value: "400 kW" },
-            { label: "Trips Per Day", value: "12" },
-            { label: "Charging", value: "Terminal (30 min turnaround)" },
-            { label: "Chemistry", value: "LFP" },
-          ]}
-          steps={[
-            { label: "Crossing time", formula: "18 km / 18 km/h = 1.0 h", result: "60 minutes" },
-            { label: "Propulsion energy", formula: "5,000 × 1.0 × 0.85", result: "4,250.0 kWh" },
-            { label: "Hotel energy", formula: "400 × 1.0", result: "400.0 kWh" },
-            { label: "Energy per trip", formula: "4,250.0 + 400.0", result: "4,650.0 kWh" },
-            { label: "Daily energy", formula: "4,650.0 × 12", result: "55,800 kWh" },
-            { label: "Usable capacity (20% reserve)", formula: "4,650.0 × 1.20", result: "5,580.0 kWh" },
-            { label: "Installed capacity (LFP 90% DoD)", formula: "5,580.0 / 0.90", result: "6,200.0 kWh" },
-            { label: "Battery weight", formula: "6,200.0 × 6.5", result: "40,300 kg" },
-            { label: "Charging power (30-min)", formula: "5,580.0 / 0.5 × 1.2", result: "13,392 kW" },
-          ]}
-          answer="A 200-passenger car ferry requires a 6,200 kWh LFP battery (40,300 kg) with approximately 13.4 MW shore charging for 30-minute turnarounds."
-          interpretation="Car ferries have large propulsion loads and hotel demands. At this scale, opportunity charging at both terminals becomes attractive to reduce battery size. A hybrid diesel-electric approach may also be warranted for longer crossings."
-          variant="marine"
-        />
-
-        <WorkedExample
-          number={3}
-          title="Short-Hop Electric Ferry"
-          scenario="Very short urban crossing with rapid charging at the dock — minimizes battery size while maximizing trip frequency."
-          inputs={[
-            { label: "Route Distance", value: "2 km" },
-            { label: "Crossing Time", value: "15 min (0.25 h)" },
-            { label: "Propulsion Power", value: "500 kW" },
-            { label: "Hotel Load", value: "80 kW" },
-            { label: "Trips Per Day", value: "40" },
-            { label: "Charging", value: "Opportunity (5 min rapid charge)" },
-            { label: "Chemistry", value: "LFP" },
-          ]}
-          steps={[
-            { label: "Crossing time", formula: "2 km / 8 km/h = 0.25 h", result: "15 minutes" },
-            { label: "Propulsion energy", formula: "500 × 0.25 × 0.85", result: "106.3 kWh" },
-            { label: "Hotel energy", formula: "80 × 0.25", result: "20.0 kWh" },
-            { label: "Energy per trip", formula: "106.3 + 20.0", result: "126.3 kWh" },
-            { label: "Daily energy", formula: "126.3 × 40", result: "5,050 kWh" },
-            { label: "Usable capacity (30% reserve for rapid cycling)", formula: "126.3 × 1.30", result: "164.1 kWh" },
-            { label: "Installed capacity (LFP 90% DoD)", formula: "164.1 / 0.90", result: "182.4 kWh" },
-            { label: "Battery weight", formula: "182.4 × 6.5", result: "1,185 kg" },
-            { label: "Rapid charging power (5-min)", formula: "164.1 / 0.083 × 1.2", result: "2,367 kW" },
-          ]}
-          answer="A short-hop ferry needs only 182 kWh LFP battery (1,185 kg) with a 2.4 MW rapid charger for 5-minute dock turns."
-          interpretation="Opportunity charging with very short turns dramatically reduces battery size and weight — ideal for urban water taxis and shuttle services. The trade-off is higher charging infrastructure cost per vessel."
-          variant="marine"
-        />
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">Formulas & Worked Examples</h2>
+    <FormulaBox title="Mathematical Formulas">
+      <p>
+        Battery sizing is derived from the ferry's energy demand per trip and charging strategy:
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Trip Time = Distance / Speed
       </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Propulsion Energy = Power × Trip Time × 0.85
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Hotel Energy = Hotel Load × Trip Time
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Energy Per Trip = Propulsion + Hotel
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Usable Capacity = Energy Per Trip × (1 + Reserve%)
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Installed Capacity = Usable / DoD
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Battery Weight = Installed × Energy Density
+      </div>
+      <p class="mt-4">
+        Drivetrain efficiency: 85% (motor + inverter + propeller)<br/>
+        LFP: 6.5 kg/kWh installed, 90% DoD, 5000+ cycles<br/>
+        NMC: 5.0 kg/kWh installed, 80% DoD, 2000 cycles
+      </p>
+    </FormulaBox>
 
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample
+        number={1}
+        title="50-Passenger Commuter Ferry"
+        scenario="Short commuter crossing with high daily trip count, terminal charging between voyages."
+        inputs={[
+          { label: "Route Distance", value: "8 km" },
+          { label: "Crossing Time", value: "30 min (0.5 h)" },
+          { label: "Propulsion Power", value: "2,000 kW" },
+          { label: "Hotel Load", value: "150 kW" },
+          { label: "Trips Per Day", value: "24" },
+          { label: "Charging", value: "Terminal (30 min turnaround)" },
+          { label: "Chemistry", value: "LFP" },
+        ]}
+        steps={[
+          { label: "Crossing time", formula: "8 km / 16 km/h = 0.5 h", result: "30 minutes" },
+          { label: "Propulsion energy", formula: "2,000 × 0.5 × 0.85", result: "850.0 kWh" },
+          { label: "Hotel energy", formula: "150 × 0.5", result: "75.0 kWh" },
+          { label: "Energy per trip", formula: "850.0 + 75.0", result: "925.0 kWh" },
+          { label: "Daily energy", formula: "925.0 × 24", result: "22,200 kWh" },
+          { label: "Usable capacity (20% reserve)", formula: "925.0 × 1.20", result: "1,110.0 kWh" },
+          { label: "Installed capacity (LFP 90% DoD)", formula: "1,110.0 / 0.90", result: "1,233.3 kWh" },
+          { label: "Battery weight", formula: "1,233.3 × 6.5", result: "8,017 kg" },
+          { label: "Charging power (30-min)", formula: "1,110.0 / 0.5 × 1.2", result: "2,664 kW" },
+        ]}
+        answer="A 50-passenger commuter ferry needs a 1,233 kWh LFP battery (8,017 kg) with 2,664 kW shore charging for 30-minute terminal turnarounds."
+        interpretation="High trip counts compound energy demand quickly. Terminal charging keeps the battery sized for a single trip rather than all daily trips, but requires very high charging power."
+        variant="marine"
+      />
+
+      <WorkedExample
+        number={2}
+        title="200-Passenger Car Ferry"
+        scenario="Larger car-carrying ferry on a medium-distance route with a 1-hour crossing and terminal charging."
+        inputs={[
+          { label: "Route Distance", value: "18 km" },
+          { label: "Crossing Time", value: "1 hour" },
+          { label: "Propulsion Power", value: "5,000 kW" },
+          { label: "Hotel Load", value: "400 kW" },
+          { label: "Trips Per Day", value: "12" },
+          { label: "Charging", value: "Terminal (30 min turnaround)" },
+          { label: "Chemistry", value: "LFP" },
+        ]}
+        steps={[
+          { label: "Crossing time", formula: "18 km / 18 km/h = 1.0 h", result: "60 minutes" },
+          { label: "Propulsion energy", formula: "5,000 × 1.0 × 0.85", result: "4,250.0 kWh" },
+          { label: "Hotel energy", formula: "400 × 1.0", result: "400.0 kWh" },
+          { label: "Energy per trip", formula: "4,250.0 + 400.0", result: "4,650.0 kWh" },
+          { label: "Daily energy", formula: "4,650.0 × 12", result: "55,800 kWh" },
+          { label: "Usable capacity (20% reserve)", formula: "4,650.0 × 1.20", result: "5,580.0 kWh" },
+          { label: "Installed capacity (LFP 90% DoD)", formula: "5,580.0 / 0.90", result: "6,200.0 kWh" },
+          { label: "Battery weight", formula: "6,200.0 × 6.5", result: "40,300 kg" },
+          { label: "Charging power (30-min)", formula: "5,580.0 / 0.5 × 1.2", result: "13,392 kW" },
+        ]}
+        answer="A 200-passenger car ferry requires a 6,200 kWh LFP battery (40,300 kg) with approximately 13.4 MW shore charging for 30-minute turnarounds."
+        interpretation="Car ferries have large propulsion loads and hotel demands. At this scale, opportunity charging at both terminals becomes attractive to reduce battery size. A hybrid diesel-electric approach may also be warranted for longer crossings."
+        variant="marine"
+      />
+
+      <WorkedExample
+        number={3}
+        title="Short-Hop Electric Ferry"
+        scenario="Very short urban crossing with rapid charging at the dock — minimizes battery size while maximizing trip frequency."
+        inputs={[
+          { label: "Route Distance", value: "2 km" },
+          { label: "Crossing Time", value: "15 min (0.25 h)" },
+          { label: "Propulsion Power", value: "500 kW" },
+          { label: "Hotel Load", value: "80 kW" },
+          { label: "Trips Per Day", value: "40" },
+          { label: "Charging", value: "Opportunity (5 min rapid charge)" },
+          { label: "Chemistry", value: "LFP" },
+        ]}
+        steps={[
+          { label: "Crossing time", formula: "2 km / 8 km/h = 0.25 h", result: "15 minutes" },
+          { label: "Propulsion energy", formula: "500 × 0.25 × 0.85", result: "106.3 kWh" },
+          { label: "Hotel energy", formula: "80 × 0.25", result: "20.0 kWh" },
+          { label: "Energy per trip", formula: "106.3 + 20.0", result: "126.3 kWh" },
+          { label: "Daily energy", formula: "126.3 × 40", result: "5,050 kWh" },
+          { label: "Usable capacity (30% reserve for rapid cycling)", formula: "126.3 × 1.30", result: "164.1 kWh" },
+          { label: "Installed capacity (LFP 90% DoD)", formula: "164.1 / 0.90", result: "182.4 kWh" },
+          { label: "Battery weight", formula: "182.4 × 6.5", result: "1,185 kg" },
+          { label: "Rapid charging power (5-min)", formula: "164.1 / 0.083 × 1.2", result: "2,367 kW" },
+        ]}
+        answer="A short-hop ferry needs only 182 kWh LFP battery (1,185 kg) with a 2.4 MW rapid charger for 5-minute dock turns."
+        interpretation="Opportunity charging with very short turns dramatically reduces battery size and weight — ideal for urban water taxis and shuttle services. The trade-off is higher charging infrastructure cost per vessel."
+        variant="marine"
+      />
     </div>
   </section>
 

@@ -198,101 +198,96 @@ const relatedArticles = [
 
   </div>
 
-  <!-- Technical Explanation and Equations -->
+  <!-- Formulas and Worked Examples -->
   <section class="mb-16 border-t border-hairline pt-12">
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
-
-      <FormulaBox title="Mathematical Formulas">
-        <p>
-          The required charger current is derived from desired charge time, battery capacity, and charger efficiency:
-        </p>
-        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
-          C-Rate = Desired Charge Time (hours) / 1.25
-        </div>
-        <p>
-          The 1.25 factor accounts for the CV saturation phase overhead (approximately 20% of total time).
-        </p>
-        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
-          Charger Current (A) = Capacity (Ah) × C-Rate
-        </div>
-        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
-          Charger Power (W) = Charger Current (A) × System Voltage (V)
-        </div>
-        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
-          Wall-Draw Power (W) = Charger Power (W) / Charger Efficiency
-        </div>
-      </FormulaBox>
-
-      <div class="flex flex-col gap-8">
-        <h2 class="text-title-lg text-primary uppercase mb-2 tracking-wider">Worked Engineering Examples</h2>
-
-        <WorkedExample
-          number={1}
-          title="100Ah LFP — 4-Hour Charge"
-          scenario="A 48V 100Ah LiFePO4 battery needs to be charged from 20% to 100% in 4 hours using a 92% efficient SMPS charger."
-          inputs={[
-            { label: "Capacity", value: "100 Ah" },
-            { label: "Voltage", value: "48 V" },
-            { label: "Chemistry", value: "LFP (LiFePO4)" },
-            { label: "Desired Time", value: "4 hours" },
-            { label: "Charger Efficiency", value: "92%" },
-          ]}
-          steps={[
-            { label: "Step 1: Target C-rate", formula: "C-rate = 4 / 1.25", result: "0.32C" },
-            { label: "Step 2: Charger current", formula: "I = 100 × 0.32", result: "32A" },
-            { label: "Step 3: DC charger power", formula: "P_dc = 32 × 48", result: "1,536W" },
-            { label: "Step 4: Wall-draw power", formula: "P_wall = 1,536 / 0.92", result: "1,670W" },
-          ]}
-          answer="32A charger at 48V, rated 1,536W DC output. Wall circuit must handle 1,670W."
-          interpretation="A 32A MPPT charge controller or SMPS charger is appropriate. The 0.32C rate is well within LFP's safe daily charge limits and provides good battery longevity."
-          variant="default"
-        />
-
-        <WorkedExample
-          number={2}
-          title="200Ah NMC — 2-Hour Fast Charge"
-          scenario="A 36V 200Ah NMC battery needs a 2-hour charge time. NMC should not exceed 0.7C for daily use."
-          inputs={[
-            { label: "Capacity", value: "200 Ah" },
-            { label: "Voltage", value: "36 V" },
-            { label: "Chemistry", value: "NMC" },
-            { label: "Desired Time", value: "2 hours" },
-            { label: "Charger Efficiency", value: "90%" },
-          ]}
-          steps={[
-            { label: "Step 1: Target C-rate", formula: "C-rate = 2 / 1.25", result: "0.60C" },
-            { label: "Step 2: Charger current", formula: "I = 200 × 0.60", result: "120A" },
-            { label: "Step 3: DC charger power", formula: "P_dc = 120 × 36", result: "4,320W" },
-            { label: "Step 4: Wall-draw power", formula: "P_wall = 4,320 / 0.90", result: "4,800W" },
-          ]}
-          answer="120A charger at 36V, rated 4,320W DC output."
-          interpretation="0.60C is near the NMC daily limit. This charge rate reduces cycle life by ~20% compared to 0.25C. Reserve this rate for occasional fast charges, not daily use."
-          variant="default"
-        />
-
-        <WorkedExample
-          number={3}
-          title="Solar MPPT Controller — 400W Array, 48V LFP"
-          scenario="A 400W solar array charges a 48V 200Ah LFP bank. Select the appropriate MPPT charge controller."
-          inputs={[
-            { label: "Solar Array", value: "400W" },
-            { label: "Battery Voltage", value: "48V" },
-            { label: "Battery Capacity", value: "200 Ah" },
-            { label: "Chemistry", value: "LFP (LiFePO4)" },
-            { label: "Peak Sun Hours", value: "5 hours" },
-          ]}
-          steps={[
-            { label: "Step 1: Max array current", formula: "I_max = 400 / (48 × 0.92)", result: "9.06A" },
-            { label: "Step 2: Cold-weather boost", formula: "I_cold = 9.06 × 1.25", result: "11.3A" },
-            { label: "Step 3: Controller rating", formula: "Select ≥ 15A MPPT controller", result: "15A recommended" },
-            { label: "Step 4: Daily charge", formula: "400W × 5h × 0.92 = 1,840Wh", result: "1,840 Wh/day" },
-          ]}
-          answer="15A or 20A MPPT charge controller rated for 48V battery systems."
-          interpretation="Always oversize the MPPT controller by 25–50% above array max current. Cold weather increases panel voltage and current. A 15A controller handles this 400W array with margin."
-          variant="solar"
-        />
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">Formulas & Worked Examples</h2>
+    <FormulaBox title="Mathematical Formulas">
+      <p>
+        The required charger current is derived from desired charge time, battery capacity, and charger efficiency:
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        C-Rate = Desired Charge Time (hours) / 1.25
       </div>
+      <p>
+        The 1.25 factor accounts for the CV saturation phase overhead (approximately 20% of total time).
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Charger Current (A) = Capacity (Ah) × C-Rate
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Charger Power (W) = Charger Current (A) × System Voltage (V)
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Wall-Draw Power (W) = Charger Power (W) / Charger Efficiency
+      </div>
+    </FormulaBox>
 
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample
+        number={1}
+        title="100Ah LFP — 4-Hour Charge"
+        scenario="A 48V 100Ah LiFePO4 battery needs to be charged from 20% to 100% in 4 hours using a 92% efficient SMPS charger."
+        inputs={[
+          { label: "Capacity", value: "100 Ah" },
+          { label: "Voltage", value: "48 V" },
+          { label: "Chemistry", value: "LFP (LiFePO4)" },
+          { label: "Desired Time", value: "4 hours" },
+          { label: "Charger Efficiency", value: "92%" },
+        ]}
+        steps={[
+          { label: "Step 1: Target C-rate", formula: "C-rate = 4 / 1.25", result: "0.32C" },
+          { label: "Step 2: Charger current", formula: "I = 100 × 0.32", result: "32A" },
+          { label: "Step 3: DC charger power", formula: "P_dc = 32 × 48", result: "1,536W" },
+          { label: "Step 4: Wall-draw power", formula: "P_wall = 1,536 / 0.92", result: "1,670W" },
+        ]}
+        answer="32A charger at 48V, rated 1,536W DC output. Wall circuit must handle 1,670W."
+        interpretation="A 32A MPPT charge controller or SMPS charger is appropriate. The 0.32C rate is well within LFP's safe daily charge limits and provides good battery longevity."
+        variant="default"
+      />
+
+      <WorkedExample
+        number={2}
+        title="200Ah NMC — 2-Hour Fast Charge"
+        scenario="A 36V 200Ah NMC battery needs a 2-hour charge time. NMC should not exceed 0.7C for daily use."
+        inputs={[
+          { label: "Capacity", value: "200 Ah" },
+          { label: "Voltage", value: "36 V" },
+          { label: "Chemistry", value: "NMC" },
+          { label: "Desired Time", value: "2 hours" },
+          { label: "Charger Efficiency", value: "90%" },
+        ]}
+        steps={[
+          { label: "Step 1: Target C-rate", formula: "C-rate = 2 / 1.25", result: "0.60C" },
+          { label: "Step 2: Charger current", formula: "I = 200 × 0.60", result: "120A" },
+          { label: "Step 3: DC charger power", formula: "P_dc = 120 × 36", result: "4,320W" },
+          { label: "Step 4: Wall-draw power", formula: "P_wall = 4,320 / 0.90", result: "4,800W" },
+        ]}
+        answer="120A charger at 36V, rated 4,320W DC output."
+        interpretation="0.60C is near the NMC daily limit. This charge rate reduces cycle life by ~20% compared to 0.25C. Reserve this rate for occasional fast charges, not daily use."
+        variant="default"
+      />
+
+      <WorkedExample
+        number={3}
+        title="Solar MPPT Controller — 400W Array, 48V LFP"
+        scenario="A 400W solar array charges a 48V 200Ah LFP bank. Select the appropriate MPPT charge controller."
+        inputs={[
+          { label: "Solar Array", value: "400W" },
+          { label: "Battery Voltage", value: "48V" },
+          { label: "Battery Capacity", value: "200 Ah" },
+          { label: "Chemistry", value: "LFP (LiFePO4)" },
+          { label: "Peak Sun Hours", value: "5 hours" },
+        ]}
+        steps={[
+          { label: "Step 1: Max array current", formula: "I_max = 400 / (48 × 0.92)", result: "9.06A" },
+          { label: "Step 2: Cold-weather boost", formula: "I_cold = 9.06 × 1.25", result: "11.3A" },
+          { label: "Step 3: Controller rating", formula: "Select ≥ 15A MPPT controller", result: "15A recommended" },
+          { label: "Step 4: Daily charge", formula: "400W × 5h × 0.92 = 1,840Wh", result: "1,840 Wh/day" },
+        ]}
+        answer="15A or 20A MPPT charge controller rated for 48V battery systems."
+        interpretation="Always oversize the MPPT controller by 25–50% above array max current. Cold weather increases panel voltage and current. A 15A controller handles this 400W array with margin."
+        variant="solar"
+      />
     </div>
   </section>
 

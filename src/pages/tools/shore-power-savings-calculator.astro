@@ -323,194 +323,186 @@ const relatedCalculators = [
     </CalculatorCard>
   </section>
 
-  <!-- Formulas -->
+  <!-- Formulas and Worked Examples -->
   <section class="mb-16 border-t border-hairline pt-12">
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
-
-      <FormulaBox title="Mathematical Formulas">
-        <p>
-          Shore power savings are calculated by comparing generator fuel consumption against grid electricity cost:
-        </p>
-        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
-          Generator Hours = Port Calls × Hours At Berth
-        </div>
-        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
-          Fuel Avoided = Generator Hours × Fuel Rate (L/hr)
-        </div>
-        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
-          Fuel Cost Avoided = Fuel Avoided × Fuel Cost ($/L)
-        </div>
-        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
-          Shore Power Cost = Generator Hours × Aux Load (kW) × Elec Rate ($/kWh)
-        </div>
-        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
-          Net Savings = Fuel Cost Avoided − Shore Power Cost
-        </div>
-        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
-          CO₂ Reduction = (Fuel Avoided × 3.206) − (Shore kWh × Grid CI) / 1000
-        </div>
-        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
-          Cars Removed = CO₂ Reduction (t) / 4.6
-        </div>
-        <p class="mt-4">
-          MGO CO₂ factor: 3.206 kg/liter (Fourth IMO GHG Study 2020)<br/>
-          NOx factor: 0.059 kg/liter | SOx factor: 0.002 kg/liter<br/>
-          EPA equivalencies: 4.6 t CO₂/car/year
-        </p>
-      </FormulaBox>
-
-      <div>
-        <h2 class="text-title-lg text-primary uppercase mb-6 tracking-wider">Worked Engineering Examples</h2>
-        <div class="text-body-sm text-muted flex flex-col gap-8">
-
-          <WorkedExample
-            number={1}
-            title="Small Yacht — Shore Power vs Diesel Generator"
-            scenario="A 20m cruising yacht typically runs its 2 kW onboard generator for 10 hours each night at the marina to power lights, refrigeration, and air conditioning. Shore power eliminates generator noise, fuel consumption, and exhaust emissions."
-            inputs={[
-              { label: "Hotel Load", value: "2 kW" },
-              { label: "Hours Docked Per Day", value: "10 hrs" },
-              { label: "Grid Electricity Cost", value: "$0.30/kWh" },
-              { label: "Diesel Cost", value: "$2/L" },
-            ]}
-            steps={[
-              {
-                label: "Daily Generator Hours",
-                formula: "10 hours/day",
-                result: "10 hrs/day",
-              },
-              {
-                label: "Diesel Consumption at 2 kW",
-                formula: "2 kW × 10 hrs ÷ 10 kWh/L ÷ 0.35 efficiency ≈ 5.71 L/day",
-                result: "5.71 L/day",
-              },
-              {
-                label: "Daily Diesel Cost",
-                formula: "5.71 L × $2/L",
-                result: "$11.43/day",
-              },
-              {
-                label: "Daily Shore Power Cost",
-                formula: "2 kW × 10 hrs × $0.30/kWh",
-                result: "$6.00/day",
-              },
-              {
-                label: "Daily Savings",
-                formula: "$11.43 − $6.00",
-                result: "$5.43/day",
-              },
-              {
-                label: "Annual Savings (365 days)",
-                formula: "$5.43 × 365",
-                result: "$1,982/year",
-              },
-            ]}
-            answer="Shore power saves approximately $1,982 per year on a small yacht with a 2 kW hotel load, while eliminating ~2,083 L of diesel consumption annually."
-            interpretation="Even modest yacht hotel loads benefit from shore power. The savings are small in absolute terms but meaningful for operating budgets, and the elimination of generator noise improves marina experience."
-            variant="marine"
-          />
-
-          <WorkedExample
-            number={2}
-            title="Commercial Vessel — Shore Power at Port"
-            scenario="A commercial cargo vessel with a 500 kW hotel load stays 12 hours per port call, 150 times per year. The vessel runs auxiliary generators continuously to power crew accommodations, cargo pumps, and navigation systems."
-            inputs={[
-              { label: "Hotel Load", value: "500 kW" },
-              { label: "Port Hours Per Stay", value: "12 hrs" },
-              { label: "Port Calls Per Year", value: "150" },
-              { label: "Grid Electricity Cost", value: "$0.15/kWh" },
-              { label: "MGO Fuel Cost", value: "$0.75/L" },
-              { label: "Generator Fuel Rate", value: "130 L/hr at 500 kW" },
-            ]}
-            steps={[
-              {
-                label: "Total Annual Port Hours",
-                formula: "150 calls × 12 hrs",
-                result: "1,800 hrs/year",
-              },
-              {
-                label: "Annual Fuel Avoided",
-                formula: "1,800 hrs × 130 L/hr",
-                result: "234,000 L/year",
-              },
-              {
-                label: "Annual Fuel Cost Avoided",
-                formula: "234,000 L × $0.75/L",
-                result: "$175,500/year",
-              },
-              {
-                label: "Annual Shore Power Cost",
-                formula: "1,800 hrs × 500 kW × $0.15/kWh",
-                result: "$135,000/year",
-              },
-              {
-                label: "Annual Net Savings",
-                formula: "$175,500 − $135,000",
-                result: "$40,500/year",
-              },
-              {
-                label: "CO₂ Reduction",
-                formula: "(234,000 × 3.206 − 1,800 × 500 × 0.400) ÷ 1000",
-                result: "389.8 tonnes CO₂/year",
-              },
-            ]}
-            answer="Shore power saves $40,500 annually while reducing CO₂ by 390 tonnes — equivalent to removing 85 passenger cars from the road."
-            interpretation="Commercial vessels with high hotel loads and frequent port calls represent the sweet spot for shore power economics. The CO₂ reduction also improves the vessel's CII rating."
-            variant="marine"
-          />
-
-          <WorkedExample
-            number={3}
-            title="Cruise Ship — Shore Power vs LNG at Port"
-            scenario="A large cruise ship with a 10 MW hotel load compares shore power against continuing to run LNG generators while at berth. LNG is cleaner than diesel but still produces local emissions. The ship makes 250 port calls per year at 10 hours each."
-            inputs={[
-              { label: "Hotel Load", value: "10 MW (10,000 kW)" },
-              { label: "Port Hours Per Stay", value: "10 hrs" },
-              { label: "Port Calls Per Year", value: "250" },
-              { label: "Grid Electricity Cost", value: "$0.12/kWh" },
-              { label: "LNG Cost", value: "$0.60/kWh equivalent" },
-              { label: "Grid Carbon Intensity", value: "200 g CO₂/kWh (Nordic grid)" },
-            ]}
-            steps={[
-              {
-                label: "Total Annual Port Hours",
-                formula: "250 calls × 10 hrs",
-                result: "2,500 hrs/year",
-              },
-              {
-                label: "Total Shore Power Consumption",
-                formula: "2,500 hrs × 10,000 kW",
-                result: "25,000 MWh/year",
-              },
-              {
-                label: "LNG Generator Cost",
-                formula: "25,000,000 kWh × $0.60/kWh",
-                result: "$15,000,000/year",
-              },
-              {
-                label: "Shore Power Cost",
-                formula: "25,000,000 kWh × $0.12/kWh",
-                result: "$3,000,000/year",
-              },
-              {
-                label: "Annual Net Savings",
-                formula: "$15,000,000 − $3,000,000",
-                result: "$12,000,000/year",
-              },
-              {
-                label: "CO₂ Reduction",
-                formula: "LNG CI ≈ 500 g/kWh → 25,000 t vs Shore = 200 g/kWh → 5,000 t",
-                result: "20,000 tonnes CO₂/year",
-              },
-            ]}
-            answer="Shore power saves $12 million annually compared to LNG generators while eliminating 20,000 tonnes of CO₂ — a transformative impact for a cruise line's carbon footprint."
-            interpretation="Cruise ships represent the highest absolute savings from shore power due to their massive hotel loads. Nordic ports with low-carbon grids deliver the greatest CO₂ reduction, making shore power a cornerstone of cruise industry decarbonization."
-            variant="marine"
-          />
-
-        </div>
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">Formulas & Worked Examples</h2>
+    <FormulaBox title="Mathematical Formulas">
+      <p>
+        Shore power savings are calculated by comparing generator fuel consumption against grid electricity cost:
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Generator Hours = Port Calls × Hours At Berth
       </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Fuel Avoided = Generator Hours × Fuel Rate (L/hr)
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Fuel Cost Avoided = Fuel Avoided × Fuel Cost ($/L)
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Shore Power Cost = Generator Hours × Aux Load (kW) × Elec Rate ($/kWh)
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Net Savings = Fuel Cost Avoided − Shore Power Cost
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        CO₂ Reduction = (Fuel Avoided × 3.206) − (Shore kWh × Grid CI) / 1000
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Cars Removed = CO₂ Reduction (t) / 4.6
+      </div>
+      <p class="mt-4">
+        MGO CO₂ factor: 3.206 kg/liter (Fourth IMO GHG Study 2020)<br/>
+        NOx factor: 0.059 kg/liter | SOx factor: 0.002 kg/liter<br/>
+        EPA equivalencies: 4.6 t CO₂/car/year
+      </p>
+    </FormulaBox>
 
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample
+        number={1}
+        title="Small Yacht — Shore Power vs Diesel Generator"
+        scenario="A 20m cruising yacht typically runs its 2 kW onboard generator for 10 hours each night at the marina to power lights, refrigeration, and air conditioning. Shore power eliminates generator noise, fuel consumption, and exhaust emissions."
+        inputs={[
+          { label: "Hotel Load", value: "2 kW" },
+          { label: "Hours Docked Per Day", value: "10 hrs" },
+          { label: "Grid Electricity Cost", value: "$0.30/kWh" },
+          { label: "Diesel Cost", value: "$2/L" },
+        ]}
+        steps={[
+          {
+            label: "Daily Generator Hours",
+            formula: "10 hours/day",
+            result: "10 hrs/day",
+          },
+          {
+            label: "Diesel Consumption at 2 kW",
+            formula: "2 kW × 10 hrs ÷ 10 kWh/L ÷ 0.35 efficiency ≈ 5.71 L/day",
+            result: "5.71 L/day",
+          },
+          {
+            label: "Daily Diesel Cost",
+            formula: "5.71 L × $2/L",
+            result: "$11.43/day",
+          },
+          {
+            label: "Daily Shore Power Cost",
+            formula: "2 kW × 10 hrs × $0.30/kWh",
+            result: "$6.00/day",
+          },
+          {
+            label: "Daily Savings",
+            formula: "$11.43 − $6.00",
+            result: "$5.43/day",
+          },
+          {
+            label: "Annual Savings (365 days)",
+            formula: "$5.43 × 365",
+            result: "$1,982/year",
+          },
+        ]}
+        answer="Shore power saves approximately $1,982 per year on a small yacht with a 2 kW hotel load, while eliminating ~2,083 L of diesel consumption annually."
+        interpretation="Even modest yacht hotel loads benefit from shore power. The savings are small in absolute terms but meaningful for operating budgets, and the elimination of generator noise improves marina experience."
+        variant="marine"
+      />
+
+      <WorkedExample
+        number={2}
+        title="Commercial Vessel — Shore Power at Port"
+        scenario="A commercial cargo vessel with a 500 kW hotel load stays 12 hours per port call, 150 times per year. The vessel runs auxiliary generators continuously to power crew accommodations, cargo pumps, and navigation systems."
+        inputs={[
+          { label: "Hotel Load", value: "500 kW" },
+          { label: "Port Hours Per Stay", value: "12 hrs" },
+          { label: "Port Calls Per Year", value: "150" },
+          { label: "Grid Electricity Cost", value: "$0.15/kWh" },
+          { label: "MGO Fuel Cost", value: "$0.75/L" },
+          { label: "Generator Fuel Rate", value: "130 L/hr at 500 kW" },
+        ]}
+        steps={[
+          {
+            label: "Total Annual Port Hours",
+            formula: "150 calls × 12 hrs",
+            result: "1,800 hrs/year",
+          },
+          {
+            label: "Annual Fuel Avoided",
+            formula: "1,800 hrs × 130 L/hr",
+            result: "234,000 L/year",
+          },
+          {
+            label: "Annual Fuel Cost Avoided",
+            formula: "234,000 L × $0.75/L",
+            result: "$175,500/year",
+          },
+          {
+            label: "Annual Shore Power Cost",
+            formula: "1,800 hrs × 500 kW × $0.15/kWh",
+            result: "$135,000/year",
+          },
+          {
+            label: "Annual Net Savings",
+            formula: "$175,500 − $135,000",
+            result: "$40,500/year",
+          },
+          {
+            label: "CO₂ Reduction",
+            formula: "(234,000 × 3.206 − 1,800 × 500 × 0.400) ÷ 1000",
+            result: "389.8 tonnes CO₂/year",
+          },
+        ]}
+        answer="Shore power saves $40,500 annually while reducing CO₂ by 390 tonnes — equivalent to removing 85 passenger cars from the road."
+        interpretation="Commercial vessels with high hotel loads and frequent port calls represent the sweet spot for shore power economics. The CO₂ reduction also improves the vessel's CII rating."
+        variant="marine"
+      />
+
+      <WorkedExample
+        number={3}
+        title="Cruise Ship — Shore Power vs LNG at Port"
+        scenario="A large cruise ship with a 10 MW hotel load compares shore power against continuing to run LNG generators while at berth. LNG is cleaner than diesel but still produces local emissions. The ship makes 250 port calls per year at 10 hours each."
+        inputs={[
+          { label: "Hotel Load", value: "10 MW (10,000 kW)" },
+          { label: "Port Hours Per Stay", value: "10 hrs" },
+          { label: "Port Calls Per Year", value: "250" },
+          { label: "Grid Electricity Cost", value: "$0.12/kWh" },
+          { label: "LNG Cost", value: "$0.60/kWh equivalent" },
+          { label: "Grid Carbon Intensity", value: "200 g CO₂/kWh (Nordic grid)" },
+        ]}
+        steps={[
+          {
+            label: "Total Annual Port Hours",
+            formula: "250 calls × 10 hrs",
+            result: "2,500 hrs/year",
+          },
+          {
+            label: "Total Shore Power Consumption",
+            formula: "2,500 hrs × 10,000 kW",
+            result: "25,000 MWh/year",
+          },
+          {
+            label: "LNG Generator Cost",
+            formula: "25,000,000 kWh × $0.60/kWh",
+            result: "$15,000,000/year",
+          },
+          {
+            label: "Shore Power Cost",
+            formula: "25,000,000 kWh × $0.12/kWh",
+            result: "$3,000,000/year",
+          },
+          {
+            label: "Annual Net Savings",
+            formula: "$15,000,000 − $3,000,000",
+            result: "$12,000,000/year",
+          },
+          {
+            label: "CO₂ Reduction",
+            formula: "LNG CI ≈ 500 g/kWh → 25,000 t vs Shore = 200 g/kWh → 5,000 t",
+            result: "20,000 tonnes CO₂/year",
+          },
+        ]}
+        answer="Shore power saves $12 million annually compared to LNG generators while eliminating 20,000 tonnes of CO₂ — a transformative impact for a cruise line's carbon footprint."
+        interpretation="Cruise ships represent the highest absolute savings from shore power due to their massive hotel loads. Nordic ports with low-carbon grids deliver the greatest CO₂ reduction, making shore power a cornerstone of cruise industry decarbonization."
+        variant="marine"
+      />
     </div>
   </section>
 

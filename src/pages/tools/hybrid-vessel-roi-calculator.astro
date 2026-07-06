@@ -285,121 +285,116 @@ const relatedCalculators = [
     </CalculatorCard>
   </section>
 
-  <!-- Formulas -->
+  <!-- Formulas and Worked Examples -->
   <section class="mb-16 border-t border-hairline pt-12">
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">Formulas & Worked Examples</h2>
 
-      <FormulaBox title="Mathematical Formulas">
-        <p>
-          Financial analysis uses standard discounted cash flow methodology:
-        </p>
-        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
-          Fuel Savings = Annual Fuel × Reduction% × Fuel Cost
-        </div>
-        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
-          Electricity Cost = (Fuel Saved × 10 kWh/L) / 0.9 × Elec Rate
-        </div>
-        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
-          Net Savings = Fuel Savings - Electricity Cost Increase
-        </div>
-        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
-          Payback = Battery Cost / Net Savings
-        </div>
-        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
-          NPV = -Cost + Σ(Net Savings / (1 + r)^t) for t = 1 to N
-        </div>
-        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
-          ROI = (Lifetime Savings / Battery Cost) × 100%
-        </div>
-        <p class="mt-4">
-          MGO energy density: 10.0 kWh/liter. Battery round-trip efficiency: 90%.<br/>
-          NPV uses end-of-year cash flow convention.
-        </p>
-      </FormulaBox>
-
-      <div>
-        <h2 class="text-title-lg text-primary uppercase mb-6 tracking-wider">Worked Engineering Examples</h2>
-        <div class="flex flex-col gap-8">
-          <WorkedExample
-            number={1}
-            title="Ferry Hybridization — Diesel-Electric with 500 kWh Battery"
-            scenario="A 100-passenger ferry operates on a short route with frequent port calls, making it ideal for hybridization. The battery handles low-load maneuvering and provides peak-shaving during acceleration, reducing diesel consumption significantly."
-            inputs={[
-              { label: "Fuel cost", value: "$0.75/L (MGO)" },
-              { label: "Annual fuel consumption", value: "150,000 L" },
-              { label: "Battery system cost", value: "$1,500,000 (500 kWh LFP)" },
-              { label: "Electricity cost", value: "$0.12/kWh (shore power)" },
-              { label: "Expected fuel reduction", value: "35%" },
-              { label: "Project lifetime", value: "15 years" },
-              { label: "Discount rate", value: "8%" },
-            ]}
-            steps={[
-              { label: "Step 1: Baseline annual fuel cost", formula: "150,000 × $0.75", result: "$112,500/year" },
-              { label: "Step 2: Annual fuel savings", formula: "150,000 × 0.35 × $0.75", result: "$39,375/year" },
-              { label: "Step 3: Electricity cost increase", formula: "(52,500 L × 10 kWh/L) / 0.9 × $0.12", result: "$70,000/year" },
-              { label: "Step 4: Net operating savings", formula: "$39,375 − $70,000", result: "−$30,625/year" },
-              { label: "Step 5: Adjusted scenario — 50 kWh battery for peak-shaving only", formula: "Savings: $39,375 − $11,667 (10,000 kWh × $0.12 / 0.9)", result: "$27,708/year net" },
-              { label: "Step 6: Payback period", formula: "$1,500,000 / $27,708", result: "~5.8 years" },
-            ]}
-            answer="Payback in approximately 5.8 years with a focused peak-shaving strategy, lifetime savings of ~$415,600 (undiscounted), NPV of $108,200 at 8% discount rate."
-            interpretation="Ferry hybridization is economically viable when the battery is sized for the actual duty cycle rather than maximum capacity. Focusing on peak-shaving and port maneuvering rather than full route electrification dramatically improves the financial case."
-            variant="marine"
-          />
-
-          <WorkedExample
-            number={2}
-            title="Tugboat — 200 kWh Battery for Harbor Operations"
-            scenario="A harbor tugboat performs short, high-power bursts during ship handling followed by idle or low-power transit. A 200 kWh battery captures regenerative energy and powers electric harbor maneuvering, reducing diesel consumption in variable-load operations."
-            inputs={[
-              { label: "Fuel cost", value: "$0.70/L (HFO, scrubber-fitted)" },
-              { label: "Annual fuel consumption", value: "200,000 L" },
-              { label: "Battery system cost", value: "$800,000 (200 kWh NMC)" },
-              { label: "Electricity cost", value: "$0.10/kWh (port rate)" },
-              { label: "Expected fuel reduction", value: "25%" },
-              { label: "Project lifetime", value: "12 years" },
-              { label: "Discount rate", value: "10%" },
-            ]}
-            steps={[
-              { label: "Step 1: Baseline annual fuel cost", formula: "200,000 × $0.70", result: "$140,000/year" },
-              { label: "Step 2: Annual fuel savings", formula: "200,000 × 0.25 × $0.70", result: "$35,000/year" },
-              { label: "Step 3: Electricity cost increase", formula: "(50,000 L × 10 kWh/L) / 0.9 × $0.10", result: "$55,556/year" },
-              { label: "Step 4: Net operating savings", formula: "$35,000 − $55,556", result: "−$20,556/year" },
-              { label: "Step 5: Focused harbor-maneuver strategy — 15% reduction, 200 kWh used for idling", formula: "Savings: $28,000 − $33,333 + $18,000 port-fee discount", result: "$12,667/year net" },
-              { label: "Step 6: Payback period", formula: "$800,000 / $12,667", result: "~6.3 years" },
-            ]}
-            answer="Payback in approximately 6.3 years with harbor-maneuver optimization, lifetime savings of ~$152,000 (undiscounted), NPV of −$44,700 at 10% discount rate — requires additional carbon credit or port-fee incentives for positive NPV."
-            interpretation="Tugboat hybridization has a tighter economic case due to high fuel consumption and variable load profiles. The financial case improves significantly when port-fee discounts and carbon credits from EU ETS are included. Battery replacement at year 8 should be budgeted for NMC chemistry."
-            variant="marine"
-          />
-
-          <WorkedExample
-            number={3}
-            title="Yacht — 100 kWh Battery for Silent Anchoring"
-            scenario="A 20m luxury yacht uses a 100 kWh battery for silent anchoring (hotel load without generators), low-speed coastal cruising, and peak-shaving during motoring. Owners value quiet operation and reduced emissions in marine protected areas."
-            inputs={[
-              { label: "Fuel cost", value: "$0.85/L (premium MGO)" },
-              { label: "Annual fuel consumption", value: "20,000 L" },
-              { label: "Battery system cost", value: "$450,000 (100 kWh LFP)" },
-              { label: "Electricity cost", value: "$0.18/kWh (marina shore power)" },
-              { label: "Expected fuel reduction", value: "30%" },
-              { label: "Project lifetime", value: "15 years" },
-              { label: "Discount rate", value: "6%" },
-            ]}
-            steps={[
-              { label: "Step 1: Baseline annual fuel cost", formula: "20,000 × $0.85", result: "$17,000/year" },
-              { label: "Step 2: Annual fuel savings", formula: "20,000 × 0.30 × $0.85", result: "$5,100/year" },
-              { label: "Step 3: Electricity cost increase", formula: "(6,000 L × 10 kWh/L) / 0.9 × $0.18", result: "$12,000/year" },
-              { label: "Step 4: Net operating savings", formula: "$5,100 − $12,000", result: "−$6,900/year" },
-              { label: "Step 5: Silent-anchor-only strategy — 20% reduction, 50 kWh used for anchoring", formula: "Savings: $3,400 − $2,000 + $1,200 marina discount", result: "$2,600/year net" },
-              { label: "Step 6: Payback period", formula: "$450,000 / $2,600", result: "~17.3 years (beyond lifetime)" },
-            ]}
-            answer="Simple payback of ~17.3 years exceeds the 15-year project lifetime. NPV at 6% is −$145,200. Yacht hybridization is not economically justified on fuel savings alone."
-            interpretation="Yacht battery systems are driven by lifestyle and regulatory preferences rather than pure economics. Silent anchoring, emissions-free coastal zones, and marina prestige provide intangible value. For purely financial analysis, smaller battery systems (30–50 kWh) focused on hotel-load substitution during anchoring may improve the case."
-            variant="marine"
-          />
-        </div>
+    <FormulaBox title="Mathematical Formulas">
+      <p>
+        Financial analysis uses standard discounted cash flow methodology:
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Fuel Savings = Annual Fuel × Reduction% × Fuel Cost
       </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Electricity Cost = (Fuel Saved × 10 kWh/L) / 0.9 × Elec Rate
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Net Savings = Fuel Savings - Electricity Cost Increase
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Payback = Battery Cost / Net Savings
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        NPV = -Cost + Σ(Net Savings / (1 + r)^t) for t = 1 to N
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        ROI = (Lifetime Savings / Battery Cost) × 100%
+      </div>
+      <p class="mt-4">
+        MGO energy density: 10.0 kWh/liter. Battery round-trip efficiency: 90%.<br/>
+        NPV uses end-of-year cash flow convention.
+      </p>
+    </FormulaBox>
 
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample
+        number={1}
+        title="Ferry Hybridization — Diesel-Electric with 500 kWh Battery"
+        scenario="A 100-passenger ferry operates on a short route with frequent port calls, making it ideal for hybridization. The battery handles low-load maneuvering and provides peak-shaving during acceleration, reducing diesel consumption significantly."
+        inputs={[
+          { label: "Fuel cost", value: "$0.75/L (MGO)" },
+          { label: "Annual fuel consumption", value: "150,000 L" },
+          { label: "Battery system cost", value: "$1,500,000 (500 kWh LFP)" },
+          { label: "Electricity cost", value: "$0.12/kWh (shore power)" },
+          { label: "Expected fuel reduction", value: "35%" },
+          { label: "Project lifetime", value: "15 years" },
+          { label: "Discount rate", value: "8%" },
+        ]}
+        steps={[
+          { label: "Step 1: Baseline annual fuel cost", formula: "150,000 × $0.75", result: "$112,500/year" },
+          { label: "Step 2: Annual fuel savings", formula: "150,000 × 0.35 × $0.75", result: "$39,375/year" },
+          { label: "Step 3: Electricity cost increase", formula: "(52,500 L × 10 kWh/L) / 0.9 × $0.12", result: "$70,000/year" },
+          { label: "Step 4: Net operating savings", formula: "$39,375 − $70,000", result: "−$30,625/year" },
+          { label: "Step 5: Adjusted scenario — 50 kWh battery for peak-shaving only", formula: "Savings: $39,375 − $11,667 (10,000 kWh × $0.12 / 0.9)", result: "$27,708/year net" },
+          { label: "Step 6: Payback period", formula: "$1,500,000 / $27,708", result: "~5.8 years" },
+        ]}
+        answer="Payback in approximately 5.8 years with a focused peak-shaving strategy, lifetime savings of ~$415,600 (undiscounted), NPV of $108,200 at 8% discount rate."
+        interpretation="Ferry hybridization is economically viable when the battery is sized for the actual duty cycle rather than maximum capacity. Focusing on peak-shaving and port maneuvering rather than full route electrification dramatically improves the financial case."
+        variant="marine"
+      />
+
+      <WorkedExample
+        number={2}
+        title="Tugboat — 200 kWh Battery for Harbor Operations"
+        scenario="A harbor tugboat performs short, high-power bursts during ship handling followed by idle or low-power transit. A 200 kWh battery captures regenerative energy and powers electric harbor maneuvering, reducing diesel consumption in variable-load operations."
+        inputs={[
+          { label: "Fuel cost", value: "$0.70/L (HFO, scrubber-fitted)" },
+          { label: "Annual fuel consumption", value: "200,000 L" },
+          { label: "Battery system cost", value: "$800,000 (200 kWh NMC)" },
+          { label: "Electricity cost", value: "$0.10/kWh (port rate)" },
+          { label: "Expected fuel reduction", value: "25%" },
+          { label: "Project lifetime", value: "12 years" },
+          { label: "Discount rate", value: "10%" },
+        ]}
+        steps={[
+          { label: "Step 1: Baseline annual fuel cost", formula: "200,000 × $0.70", result: "$140,000/year" },
+          { label: "Step 2: Annual fuel savings", formula: "200,000 × 0.25 × $0.70", result: "$35,000/year" },
+          { label: "Step 3: Electricity cost increase", formula: "(50,000 L × 10 kWh/L) / 0.9 × $0.10", result: "$55,556/year" },
+          { label: "Step 4: Net operating savings", formula: "$35,000 − $55,556", result: "−$20,556/year" },
+          { label: "Step 5: Focused harbor-maneuver strategy — 15% reduction, 200 kWh used for idling", formula: "Savings: $28,000 − $33,333 + $18,000 port-fee discount", result: "$12,667/year net" },
+          { label: "Step 6: Payback period", formula: "$800,000 / $12,667", result: "~6.3 years" },
+        ]}
+        answer="Payback in approximately 6.3 years with harbor-maneuver optimization, lifetime savings of ~$152,000 (undiscounted), NPV of −$44,700 at 10% discount rate — requires additional carbon credit or port-fee incentives for positive NPV."
+        interpretation="Tugboat hybridization has a tighter economic case due to high fuel consumption and variable load profiles. The financial case improves significantly when port-fee discounts and carbon credits from EU ETS are included. Battery replacement at year 8 should be budgeted for NMC chemistry."
+        variant="marine"
+      />
+
+      <WorkedExample
+        number={3}
+        title="Yacht — 100 kWh Battery for Silent Anchoring"
+        scenario="A 20m luxury yacht uses a 100 kWh battery for silent anchoring (hotel load without generators), low-speed coastal cruising, and peak-shaving during motoring. Owners value quiet operation and reduced emissions in marine protected areas."
+        inputs={[
+          { label: "Fuel cost", value: "$0.85/L (premium MGO)" },
+          { label: "Annual fuel consumption", value: "20,000 L" },
+          { label: "Battery system cost", value: "$450,000 (100 kWh LFP)" },
+          { label: "Electricity cost", value: "$0.18/kWh (marina shore power)" },
+          { label: "Expected fuel reduction", value: "30%" },
+          { label: "Project lifetime", value: "15 years" },
+          { label: "Discount rate", value: "6%" },
+        ]}
+        steps={[
+          { label: "Step 1: Baseline annual fuel cost", formula: "20,000 × $0.85", result: "$17,000/year" },
+          { label: "Step 2: Annual fuel savings", formula: "20,000 × 0.30 × $0.85", result: "$5,100/year" },
+          { label: "Step 3: Electricity cost increase", formula: "(6,000 L × 10 kWh/L) / 0.9 × $0.18", result: "$12,000/year" },
+          { label: "Step 4: Net operating savings", formula: "$5,100 − $12,000", result: "−$6,900/year" },
+          { label: "Step 5: Silent-anchor-only strategy — 20% reduction, 50 kWh used for anchoring", formula: "Savings: $3,400 − $2,000 + $1,200 marina discount", result: "$2,600/year net" },
+          { label: "Step 6: Payback period", formula: "$450,000 / $2,600", result: "~17.3 years (beyond lifetime)" },
+        ]}
+        answer="Simple payback of ~17.3 years exceeds the 15-year project lifetime. NPV at 6% is −$145,200. Yacht hybridization is not economically justified on fuel savings alone."
+        interpretation="Yacht battery systems are driven by lifestyle and regulatory preferences rather than pure economics. Silent anchoring, emissions-free coastal zones, and marina prestige provide intangible value. For purely financial analysis, smaller battery systems (30–50 kWh) focused on hotel-load substitution during anchoring may improve the case."
+        variant="marine"
+      />
     </div>
   </section>
 

@@ -269,113 +269,110 @@ const fuelOptions = [
     </CalculatorCard>
   </section>
 
-  <!-- Formulas -->
+  <!-- Formulas and Worked Examples -->
   <section class="mb-16 border-t border-hairline pt-12">
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
-
-      <FormulaBox title="Mathematical Formulas">
-        <p>
-          CII is calculated as the ratio of annual CO₂ emissions to transport work:
-        </p>
-        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
-          CO₂ Emissions = Fuel Consumed × CO₂ Factor
-        </div>
-        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
-          Transport Work = DWT × Distance (nm)
-        </div>
-        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
-          Attained CII = CO₂ (tonnes) × 1,000,000 / Transport Work
-        </div>
-        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
-          CII Rating Bands (vs reference line R):
-        </div>
-        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2 text-[12px] leading-relaxed">
-          A: &lt; 0.80 × R<br/>
-          B: 0.80 × R to &lt; 0.90 × R<br/>
-          C: 0.90 × R to &lt; 1.00 × R<br/>
-          D: 1.00 × R to &lt; 1.10 × R<br/>
-          E: ≥ 1.10 × R
-        </div>
-        <p class="mt-4">
-          CO₂ factors (tonnes CO₂/tonne fuel): MGO 3.206, MDO 3.206, HFO 3.114, LNG 2.750<br/>
-          Reference line R = 5.0 g CO₂/DWT-nm (educational simplified benchmark)<br/>
-          IMO DCS data shows typical reference lines vary by ship type and DWT
-        </p>
-      </FormulaBox>
-
-      <div class="flex flex-col gap-8">
-        <WorkedExample
-          number={1}
-          title="Bulk Carrier — Annual CII Rating"
-          scenario="A bulk carrier operates year-round on Pacific routes carrying iron ore and coal. We need to determine its annual CII rating from fuel consumption, distance sailed, and deadweight tonnage."
-          inputs={[
-            { label: "Annual Fuel Consumption", value: "4,200 tonnes MGO" },
-            { label: "Distance Sailed", value: "55,000 nm" },
-            { label: "Deadweight Tonnage", value: "82,000 DWT" },
-            { label: "CO₂ Factor (MGO)", value: "3.206 t CO₂/t fuel" },
-          ]}
-          steps={[
-            "Calculate annual CO₂ emissions: 4,200 × 3.206 = 13,465 tonnes CO₂",
-            "Calculate transport work: 82,000 × 55,000 = 4.51 × 10⁹ DWT-nm",
-            "Calculate attained CII: (13,465 × 1,000,000) / 4,510,000,000 = 2.99 g CO₂/DWT-nm",
-            "Compare against reference line R = 5.0: ratio = 2.99 / 5.0 = 0.598",
-            "Ratio < 0.80 → Rating: A (Major Superior)",
-          ]}
-          answer="CII = 2.99 g CO₂/DWT-nm — Rating: A (Major Superior)"
-          interpretation="This bulk carrier's efficient operations — large cargo volumes over long distances — produce a low CII well below the reference line. An A rating places the vessel in the top 20% of its class, with no corrective action required and eligibility for green financing programs."
-          variant="marine"
-        />
-
-        <WorkedExample
-          number={2}
-          title="Container Ship — Rating Band Implications"
-          scenario="Two identical container ships (12,000 TEU, 85,000 DWT) operate different service speeds. Ship A cruises at 18 knots while Ship E operates at 24 knots year-round. Both burn the same fuel type but at different rates."
-          inputs={[
-            { label: "Ship A Fuel Consumption", value: "180 tonnes/day × 280 days = 50,400 tonnes HFO" },
-            { label: "Ship E Fuel Consumption", value: "260 tonnes/day × 280 days = 72,800 tonnes HFO" },
-            { label: "Annual Distance (both)", value: "65,000 nm" },
-            { label: "Deadweight Tonnage", value: "85,000 DWT" },
-            { label: "CO₂ Factor (HFO)", value: "3.114 t CO₂/t fuel" },
-          ]}
-          steps={[
-            "Ship A CO₂: 50,400 × 3.114 = 156,946 t | Ship E CO₂: 72,800 × 3.114 = 226,699 t",
-            "Transport work (both): 85,000 × 65,000 = 5.525 × 10⁹ DWT-nm",
-            "Ship A CII: 156,946 × 10⁶ / 5.525 × 10⁹ = 2.84 g CO₂/DWT-nm",
-            "Ship E CII: 226,699 × 10⁶ / 5.525 × 10⁹ = 4.10 g CO₂/DWT-nm",
-            "Ratio A = 2.84 / 5.0 = 0.568 → Rating: A | Ratio E = 4.10 / 5.0 = 0.820 → Rating: B",
-          ]}
-          answer="Ship A: 2.84 g CO₂/DWT-nm → Rating A | Ship E: 4.10 g CO₂/DWT-nm → Rating B"
-          interpretation="Despite identical vessels, the 33% speed difference produces a full rating band gap. Ship A qualifies for green financing; Ship B meets requirements but lacks the competitive advantage. Reducing Ship E's speed by just 2 knots would move it from B to A — a powerful demonstration that operational decisions directly determine CII outcomes."
-          variant="marine"
-        />
-
-        <WorkedExample
-          number={3}
-          title="Tanker — Slow Steaming Impact"
-          scenario="An MR product tanker currently operates at service speed. The operations team proposes reducing speed by 20% on ballast legs and 10% on laden legs. We model the CII improvement from this slow steaming strategy."
-          inputs={[
-            { label: "Current Fuel Consumption", value: "38 tonnes/day (average)" },
-            { label: "Operating Days", value: "320 days/year" },
-            { label: "Annual Distance", value: "48,000 nm" },
-            { label: "Deadweight Tonnage", value: "45,000 DWT" },
-            { label: "Speed Reduction", value: "~15% average across voyage profile" },
-            { label: "CO₂ Factor (MGO)", value: "3.206 t CO₂/t fuel" },
-          ]}
-          steps={[
-            "Current fuel: 38 × 320 = 12,160 tonnes → CO₂ = 12,160 × 3.206 = 38,985 t",
-            "Current transport work: 45,000 × 48,000 = 2.16 × 10⁹ DWT-nm",
-            "Current CII: 38,985 × 10⁶ / 2.16 × 10⁹ = 18.05 g CO₂/DWT-nm",
-            "Slow steaming fuel (15% reduction): 38 × 0.85 = 32.3 t/day → 32.3 × 320 = 10,336 t",
-            "Improved CO₂: 10,336 × 3.206 = 33,137 t → Improved CII: 15.34 g CO₂/DWT-nm",
-            "CII reduction: (18.05 - 15.34) / 18.05 = 15% improvement",
-            "Rating shift: E (18.05/5.0 = 3.61) → D (15.34/5.0 = 3.07)",
-          ]}
-          answer="CII reduced from 18.05 to 15.34 g CO₂/DWT-nm — Rating improves from E to D"
-          interpretation="Slow steaming alone delivers a 15% CII improvement, moving this tanker from E to D rating. While still requiring a corrective action plan under D, the vessel avoids the mandatory immediate improvement required for E-rated ships. Combining slow steaming with hull cleaning and weather routing could push the vessel to C, eliminating corrective action obligations entirely."
-          variant="marine"
-        />
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">Formulas & Worked Examples</h2>
+    <FormulaBox title="Mathematical Formulas">
+      <p>
+        CII is calculated as the ratio of annual CO₂ emissions to transport work:
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        CO₂ Emissions = Fuel Consumed × CO₂ Factor
       </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Transport Work = DWT × Distance (nm)
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Attained CII = CO₂ (tonnes) × 1,000,000 / Transport Work
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        CII Rating Bands (vs reference line R):
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2 text-[12px] leading-relaxed">
+        A: &lt; 0.80 × R<br/>
+        B: 0.80 × R to &lt; 0.90 × R<br/>
+        C: 0.90 × R to &lt; 1.00 × R<br/>
+        D: 1.00 × R to &lt; 1.10 × R<br/>
+        E: ≥ 1.10 × R
+      </div>
+      <p class="mt-4">
+        CO₂ factors (tonnes CO₂/tonne fuel): MGO 3.206, MDO 3.206, HFO 3.114, LNG 2.750<br/>
+        Reference line R = 5.0 g CO₂/DWT-nm (educational simplified benchmark)<br/>
+        IMO DCS data shows typical reference lines vary by ship type and DWT
+      </p>
+    </FormulaBox>
 
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample
+        number={1}
+        title="Bulk Carrier — Annual CII Rating"
+        scenario="A bulk carrier operates year-round on Pacific routes carrying iron ore and coal. We need to determine its annual CII rating from fuel consumption, distance sailed, and deadweight tonnage."
+        inputs={[
+          { label: "Annual Fuel Consumption", value: "4,200 tonnes MGO" },
+          { label: "Distance Sailed", value: "55,000 nm" },
+          { label: "Deadweight Tonnage", value: "82,000 DWT" },
+          { label: "CO₂ Factor (MGO)", value: "3.206 t CO₂/t fuel" },
+        ]}
+        steps={[
+          "Calculate annual CO₂ emissions: 4,200 × 3.206 = 13,465 tonnes CO₂",
+          "Calculate transport work: 82,000 × 55,000 = 4.51 × 10⁹ DWT-nm",
+          "Calculate attained CII: (13,465 × 1,000,000) / 4,510,000,000 = 2.99 g CO₂/DWT-nm",
+          "Compare against reference line R = 5.0: ratio = 2.99 / 5.0 = 0.598",
+          "Ratio < 0.80 → Rating: A (Major Superior)",
+        ]}
+        answer="CII = 2.99 g CO₂/DWT-nm — Rating: A (Major Superior)"
+        interpretation="This bulk carrier's efficient operations — large cargo volumes over long distances — produce a low CII well below the reference line. An A rating places the vessel in the top 20% of its class, with no corrective action required and eligibility for green financing programs."
+        variant="marine"
+      />
+
+      <WorkedExample
+        number={2}
+        title="Container Ship — Rating Band Implications"
+        scenario="Two identical container ships (12,000 TEU, 85,000 DWT) operate different service speeds. Ship A cruises at 18 knots while Ship E operates at 24 knots year-round. Both burn the same fuel type but at different rates."
+        inputs={[
+          { label: "Ship A Fuel Consumption", value: "180 tonnes/day × 280 days = 50,400 tonnes HFO" },
+          { label: "Ship E Fuel Consumption", value: "260 tonnes/day × 280 days = 72,800 tonnes HFO" },
+          { label: "Annual Distance (both)", value: "65,000 nm" },
+          { label: "Deadweight Tonnage", value: "85,000 DWT" },
+          { label: "CO₂ Factor (HFO)", value: "3.114 t CO₂/t fuel" },
+        ]}
+        steps={[
+          "Ship A CO₂: 50,400 × 3.114 = 156,946 t | Ship E CO₂: 72,800 × 3.114 = 226,699 t",
+          "Transport work (both): 85,000 × 65,000 = 5.525 × 10⁹ DWT-nm",
+          "Ship A CII: 156,946 × 10⁶ / 5.525 × 10⁹ = 2.84 g CO₂/DWT-nm",
+          "Ship E CII: 226,699 × 10⁶ / 5.525 × 10⁹ = 4.10 g CO₂/DWT-nm",
+          "Ratio A = 2.84 / 5.0 = 0.568 → Rating: A | Ratio E = 4.10 / 5.0 = 0.820 → Rating: B",
+        ]}
+        answer="Ship A: 2.84 g CO₂/DWT-nm → Rating A | Ship E: 4.10 g CO₂/DWT-nm → Rating B"
+        interpretation="Despite identical vessels, the 33% speed difference produces a full rating band gap. Ship A qualifies for green financing; Ship B meets requirements but lacks the competitive advantage. Reducing Ship E's speed by just 2 knots would move it from B to A — a powerful demonstration that operational decisions directly determine CII outcomes."
+        variant="marine"
+      />
+
+      <WorkedExample
+        number={3}
+        title="Tanker — Slow Steaming Impact"
+        scenario="An MR product tanker currently operates at service speed. The operations team proposes reducing speed by 20% on ballast legs and 10% on laden legs. We model the CII improvement from this slow steaming strategy."
+        inputs={[
+          { label: "Current Fuel Consumption", value: "38 tonnes/day (average)" },
+          { label: "Operating Days", value: "320 days/year" },
+          { label: "Annual Distance", value: "48,000 nm" },
+          { label: "Deadweight Tonnage", value: "45,000 DWT" },
+          { label: "Speed Reduction", value: "~15% average across voyage profile" },
+          { label: "CO₂ Factor (MGO)", value: "3.206 t CO₂/t fuel" },
+        ]}
+        steps={[
+          "Current fuel: 38 × 320 = 12,160 tonnes → CO₂ = 12,160 × 3.206 = 38,985 t",
+          "Current transport work: 45,000 × 48,000 = 2.16 × 10⁹ DWT-nm",
+          "Current CII: 38,985 × 10⁶ / 2.16 × 10⁹ = 18.05 g CO₂/DWT-nm",
+          "Reduced fuel (15% savings): 12,160 × 0.85 = 10,336 tonnes → CO₂ = 33,137 t",
+          "Improved CO₂: 10,336 × 3.206 = 33,137 t → Improved CII: 15.34 g CO₂/DWT-nm",
+          "CII reduction: (18.05 - 15.34) / 18.05 = 15% improvement",
+          "Rating shift: E (18.05/5.0 = 3.61) → D (15.34/5.0 = 3.07)",
+        ]}
+        answer="CII reduced from 18.05 to 15.34 g CO₂/DWT-nm — Rating improves from E to D"
+        interpretation="Slow steaming alone delivers a 15% CII improvement, moving this tanker from E to D rating. While still requiring a corrective action plan under D, the vessel avoids the mandatory immediate improvement required for E-rated ships. Combining slow steaming with hull cleaning and weather routing could push the vessel to C, eliminating corrective action obligations entirely."
+        variant="marine"
+      />
     </div>
   </section>
 

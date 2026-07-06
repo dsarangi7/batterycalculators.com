@@ -196,114 +196,105 @@ const relatedArticles = [
 
   </div>
 
-  <!-- Technical Explanation and Equations -->
+  <!-- Formulas and Worked Examples -->
   <section class="mb-16 border-t border-hairline pt-12">
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">Formulas & Worked Examples</h2>
 
-      <!-- Formulas -->
-      <FormulaBox title="Mathematical Formulas">
-        <p>
-          The degradation model calculates capacity fade as a sum of cycle aging and calendar aging (Arrhenius temperature-dependence):
-        </p>
-        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
-          TempFactor = 2^((Temperature - 25) / 10) (for T > 25°C)
-        </div>
-        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
-          DoDFactor = (DoD / NomDoD)^1.7
-        </div>
-        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
-          Cycle Loss (%) = (Cycles / RatedCycles) × 20 × DoDFactor × TempFactor
-        </div>
-        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
-          Calendar Loss (%) = Age (Years) × BaseRate × TempFactor
-        </div>
-        <p>
-          Standard rating assumptions (at 25°C):
-        </p>
-        <ul class="list-disc pl-6 flex flex-col gap-1 text-xs">
-          <li><strong>LFP:</strong> 5000 cycles to 80% SOH. Base calendar rate = 1.5% SOH / year.</li>
-          <li><strong>NMC:</strong> 2000 cycles to 80% SOH. Base calendar rate = 2.0% SOH / year.</li>
-          <li><strong>LTO:</strong> 15000 cycles to 80% SOH. Base calendar rate = 0.8% SOH / year.</li>
-          <li><strong>Lead-Acid:</strong> 500 cycles to 80% SOH at 50% DoD. Base calendar rate = 3.0% SOH / year.</li>
-        </ul>
-      </FormulaBox>
-
-      <!-- Worked Examples -->
-      <div>
-        <h2 class="text-title-lg text-primary uppercase mb-6 tracking-wider">Worked Examples</h2>
-        <div class="text-body-sm text-muted flex flex-col gap-8">
-
-          <WorkedExample
-            number={1}
-            title="LFP at 80% DoD, 25°C — Predict Capacity After 2000 Cycles"
-            scenario="An LFP battery pack in a solar BESS system is cycled daily at 80% DoD in a climate-controlled enclosure maintaining 25°C. After 2000 cycles, what remaining capacity can we expect?"
-            inputs={[
-              "Chemistry: LiFePO4 (LFP)",
-              "Rated cycles to 80% SOH: 5,000",
-              "Cycles completed: 2,000",
-              "DoD: 80%",
-              "Temperature: 25°C",
-              "Calendar age: 3 years",
-            ]}
-            steps={[
-              "TempFactor = 2^((25 − 25) / 10) = 2^0 = 1.0",
-              "DoDFactor = (80 / 80)^1.7 = 1.0",
-              "Cycle Loss = (2000 / 5000) × 20 × 1.0 × 1.0 = 8.0%",
-              "Calendar Loss = 3 × 1.5 × 1.0 = 4.5%",
-              "SOH = 100 − 8.0 − 4.5 = 87.5%",
-            ]}
-            answer="SOH = 87.5%"
-            interpretation="The LFP battery retains 87.5% of its original capacity — well above the 80% end-of-life threshold. Cool operation at 25°C with moderate cycling preserves significant headroom. At this rate, the pack has roughly 1,000+ cycles remaining before reaching EOL."
-          />
-
-          <WorkedExample
-            number={2}
-            title="NMC at 70% DoD, 35°C — Predict Capacity After 500 Cycles"
-            scenario="An NMC battery in an EV is charged to 100% daily and regularly discharged to 30% (70% DoD) in warm ambient conditions averaging 35°C. After 500 cycles and 2 years of use, what is the estimated SOH?"
-            inputs={[
-              "Chemistry: NMC",
-              "Rated cycles to 80% SOH: 2,000",
-              "Cycles completed: 500",
-              "DoD: 70%",
-              "Temperature: 35°C",
-              "Calendar age: 2 years",
-            ]}
-            steps={[
-              "TempFactor = 2^((35 − 25) / 10) = 2^1 = 2.0",
-              "DoDFactor = (70 / 80)^1.7 = 0.798",
-              "Cycle Loss = (500 / 2000) × 20 × 0.798 × 2.0 = 7.98%",
-              "Calendar Loss = 2 × 2.0 × 2.0 = 8.0%",
-              "SOH = 100 − 7.98 − 8.0 = 84.0%",
-            ]}
-            answer="SOH = 84.0%"
-            interpretation="Despite only 500 cycles, the NMC pack has already lost 16% capacity. The elevated temperature (35°C) doubles calendar aging, and NMC's higher base calendar rate (2.0%/year vs 1.5% for LFP) compounds the loss. Continued operation at this temperature will push the pack to EOL within 3–4 years."
-          />
-
-          <WorkedExample
-            number={3}
-            title="Lead-Acid at 50% DoD vs. LFP — Degradation Curve Comparison"
-            scenario="Compare the degradation trajectory of a flooded lead-acid battery at 50% DoD against an LFP battery at 80% DoD, both operating at 25°C and 3 years of age. This illustrates why chemistry selection matters for lifecycle planning."
-            inputs={[
-              "Lead-Acid: Rated 500 cycles at 50% DoD, base calendar rate 3.0%/year",
-              "LFP: Rated 5,000 cycles at 80% DoD, base calendar rate 1.5%/year",
-              "Both at 25°C, 3 years calendar age",
-            ]}
-            steps={[
-              "Lead-Acid TempFactor = 1.0 (at 25°C)",
-              "Lead-Acid Cycle Loss = (500 / 5000) × 20 × 1.0 × 1.0 = 2.0%",
-              "Lead-Acid Calendar Loss = 3 × 3.0 × 1.0 = 9.0%",
-              "Lead-Acid SOH = 100 − 2.0 − 9.0 = 89.0%",
-              "LFP Cycle Loss = (500 / 5000) × 20 × 1.0 × 1.0 = 2.0%",
-              "LFP Calendar Loss = 3 × 1.5 × 1.0 = 4.5%",
-              "LFP SOH = 100 − 2.0 − 4.5 = 93.5%",
-            ]}
-            answer="Lead-Acid SOH = 89.0% | LFP SOH = 93.5%"
-            interpretation="After 500 cycles and 3 years, both chemistries are still above EOL. However, the lead-acid calendar aging rate is 2× higher (3.0% vs 1.5%/year). Over a 10-year horizon, lead-acid will reach EOL at approximately year 3–5, while LFP operates well beyond 10 years. The upfront cost premium of LFP is offset by lower replacement frequency and higher round-trip efficiency."
-          />
-
-        </div>
+    <FormulaBox title="Mathematical Formulas">
+      <p>
+        The degradation model calculates capacity fade as a sum of cycle aging and calendar aging (Arrhenius temperature-dependence):
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        TempFactor = 2^((Temperature - 25) / 10) (for T > 25°C)
       </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        DoDFactor = (DoD / NomDoD)^1.7
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Cycle Loss (%) = (Cycles / RatedCycles) × 20 × DoDFactor × TempFactor
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Calendar Loss (%) = Age (Years) × BaseRate × TempFactor
+      </div>
+      <p>
+        Standard rating assumptions (at 25°C):
+      </p>
+      <ul class="list-disc pl-6 flex flex-col gap-1 text-xs">
+        <li><strong>LFP:</strong> 5000 cycles to 80% SOH. Base calendar rate = 1.5% SOH / year.</li>
+        <li><strong>NMC:</strong> 2000 cycles to 80% SOH. Base calendar rate = 2.0% SOH / year.</li>
+        <li><strong>LTO:</strong> 15000 cycles to 80% SOH. Base calendar rate = 0.8% SOH / year.</li>
+        <li><strong>Lead-Acid:</strong> 500 cycles to 80% SOH at 50% DoD. Base calendar rate = 3.0% SOH / year.</li>
+      </ul>
+    </FormulaBox>
 
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample
+        number={1}
+        title="LFP at 80% DoD, 25°C — Predict Capacity After 2000 Cycles"
+        scenario="An LFP battery pack in a solar BESS system is cycled daily at 80% DoD in a climate-controlled enclosure maintaining 25°C. After 2000 cycles, what remaining capacity can we expect?"
+        inputs={[
+          "Chemistry: LiFePO4 (LFP)",
+          "Rated cycles to 80% SOH: 5,000",
+          "Cycles completed: 2,000",
+          "DoD: 80%",
+          "Temperature: 25°C",
+          "Calendar age: 3 years",
+        ]}
+        steps={[
+          "TempFactor = 2^((25 − 25) / 10) = 2^0 = 1.0",
+          "DoDFactor = (80 / 80)^1.7 = 1.0",
+          "Cycle Loss = (2000 / 5000) × 20 × 1.0 × 1.0 = 8.0%",
+          "Calendar Loss = 3 × 1.5 × 1.0 = 4.5%",
+          "SOH = 100 − 8.0 − 4.5 = 87.5%",
+        ]}
+        answer="SOH = 87.5%"
+        interpretation="The LFP battery retains 87.5% of its original capacity — well above the 80% end-of-life threshold. Cool operation at 25°C with moderate cycling preserves significant headroom. At this rate, the pack has roughly 1,000+ cycles remaining before reaching EOL."
+      />
+
+      <WorkedExample
+        number={2}
+        title="NMC at 70% DoD, 35°C — Predict Capacity After 500 Cycles"
+        scenario="An NMC battery in an EV is charged to 100% daily and regularly discharged to 30% (70% DoD) in warm ambient conditions averaging 35°C. After 500 cycles and 2 years of use, what is the estimated SOH?"
+        inputs={[
+          "Chemistry: NMC",
+          "Rated cycles to 80% SOH: 2,000",
+          "Cycles completed: 500",
+          "DoD: 70%",
+          "Temperature: 35°C",
+          "Calendar age: 2 years",
+        ]}
+        steps={[
+          "TempFactor = 2^((35 − 25) / 10) = 2^1 = 2.0",
+          "DoDFactor = (70 / 80)^1.7 = 0.798",
+          "Cycle Loss = (500 / 2000) × 20 × 0.798 × 2.0 = 7.98%",
+          "Calendar Loss = 2 × 2.0 × 2.0 = 8.0%",
+          "SOH = 100 − 7.98 − 8.0 = 84.0%",
+        ]}
+        answer="SOH = 84.0%"
+        interpretation="Despite only 500 cycles, the NMC pack has already lost 16% capacity. The elevated temperature (35°C) doubles calendar aging, and NMC's higher base calendar rate (2.0%/year vs 1.5% for LFP) compounds the loss. Continued operation at this temperature will push the pack to EOL within 3–4 years."
+      />
+
+      <WorkedExample
+        number={3}
+        title="Lead-Acid at 50% DoD vs. LFP — Degradation Curve Comparison"
+        scenario="Compare the degradation trajectory of a flooded lead-acid battery at 50% DoD against an LFP battery at 80% DoD, both operating at 25°C and 3 years of age. This illustrates why chemistry selection matters for lifecycle planning."
+        inputs={[
+          "Lead-Acid: Rated 500 cycles at 50% DoD, base calendar rate 3.0%/year",
+          "LFP: Rated 5,000 cycles at 80% DoD, base calendar rate 1.5%/year",
+          "Both at 25°C, 3 years calendar age",
+        ]}
+        steps={[
+          "Lead-Acid TempFactor = 1.0 (at 25°C)",
+          "Lead-Acid Cycle Loss = (500 / 5000) × 20 × 1.0 × 1.0 = 2.0%",
+          "Lead-Acid Calendar Loss = 3 × 3.0 × 1.0 = 9.0%",
+          "Lead-Acid SOH = 100 − 2.0 − 9.0 = 89.0%",
+          "LFP Cycle Loss = (500 / 5000) × 20 × 1.0 × 1.0 = 2.0%",
+          "LFP Calendar Loss = 3 × 1.5 × 1.0 = 4.5%",
+          "LFP SOH = 100 − 2.0 − 4.5 = 93.5%",
+        ]}
+        answer="Lead-Acid SOH = 89.0% | LFP SOH = 93.5%"
+        interpretation="After 500 cycles and 3 years, both chemistries are still above EOL. However, the lead-acid calendar aging rate is 2× higher (3.0% vs 1.5%/year). Over a 10-year horizon, lead-acid will reach EOL at approximately year 3–5, while LFP operates well beyond 10 years. The upfront cost premium of LFP is offset by lower replacement frequency and higher round-trip efficiency."
+      />
     </div>
   </section>
 

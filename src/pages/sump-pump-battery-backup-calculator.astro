@@ -112,80 +112,77 @@ const presetAppliances = [
   />
 
   <section class="mb-16 border-t border-hairline pt-12">
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
-      <FormulaBox title="Mathematical Formulas">
-        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Total Running W = Σ (Appliance Running W × Quantity)</div>
-        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Surge W = Highest Single Appliance Surge + Other Running W</div>
-        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Energy Required (Wh) = (Running W × Hours) / Inverter Efficiency × (1 + Safety Margin)</div>
-        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Battery Ah = Required Wh / (Battery Voltage × Depth of Discharge)</div>
-        <p class="text-xs text-muted mt-4">Note: Sump pumps cycle intermittently — actual runtime may be 2–4× longer than continuous running estimates suggest.</p>
-      </FormulaBox>
-      <div>
-        <h2 class="text-title-lg text-primary uppercase mb-6 tracking-wider">Worked Examples</h2>
-        <div class="text-body-sm text-muted flex flex-col gap-6">
-          <WorkedExample
-            number={1}
-            title="1/3 HP Sump Pump (Storm Backup)"
-            scenario="Keep a 1/3 HP sump pump running during a 4-hour severe storm power outage with frequent cycling."
-            inputs={[
-              { label: "1/3 HP Sump Pump", value: "800W running / 2,000W surge" },
-              { label: "Backup Duration", value: "4 hours" },
-              { label: "Cycle Pattern", value: "30 sec on / 8 min off" },
-            ]}
-            steps={[
-              { label: "Step 1: Effective duty cycle", formula: "30s / (30s + 480s) ≈ 6.3%", result: "~6.3% duty cycle" },
-              { label: "Step 2: Average draw", formula: "800W × 0.063", result: "~50W average" },
-              { label: "Step 3: Energy for 4 hours", formula: "50W × 4h = 200 Wh", result: "200 Wh" },
-              { label: "Step 4: After inverter efficiency (90%)", formula: "200 / 0.90", result: "222 Wh" },
-              { label: "Step 5: With 20% margin", formula: "222 × 1.20", result: "267 Wh" },
-              { label: "Step 6: Battery (24V LFP, 80% DoD)", formula: "267 / (24 × 0.80)", result: "13.9 Ah → 12V 20Ah LFP" },
-            ]}
-            answer="A 12V 20Ah LFP battery handles a 1/3 HP sump pump for 4+ hours of intermittent storm cycling."
-            interpretation="Sump pumps have very low duty cycles during moderate rain — battery lasts far longer than continuous running estimates suggest."
-          />
-          <WorkedExample
-            number={2}
-            title="1/2 HP Sump Pump (Heavy Rain)"
-            scenario="Power a larger 1/2 HP sump pump during heavy rain causing frequent cycling for 6 hours."
-            inputs={[
-              { label: "1/2 HP Sump Pump", value: "1,000W running / 2,500W surge" },
-              { label: "Backup Duration", value: "6 hours" },
-              { label: "Cycle Pattern", value: "45 sec on / 3 min off" },
-            ]}
-            steps={[
-              { label: "Step 1: Effective duty cycle", formula: "45s / (45s + 180s) = 20%", result: "20% duty cycle" },
-              { label: "Step 2: Average draw", formula: "1,000W × 0.20", result: "200W average" },
-              { label: "Step 3: Energy for 6 hours", formula: "200W × 6h = 1,200 Wh", result: "1,200 Wh" },
-              { label: "Step 4: After inverter efficiency (90%)", formula: "1,200 / 0.90", result: "1,333 Wh" },
-              { label: "Step 5: With 20% margin", formula: "1,333 × 1.20", result: "1,600 Wh" },
-              { label: "Step 6: Battery (24V LFP, 80% DoD)", formula: "1,600 / (24 × 0.80)", result: "83.3 Ah → 24V 100Ah LFP" },
-            ]}
-            answer="A 24V 100Ah LFP battery (2,560 Wh) handles a 1/2 HP sump pump for 6 hours of heavy-rain cycling."
-            interpretation="Heavy rain increases pump cycling frequency — plan for 20–30% duty cycle during severe storms."
-          />
-          <WorkedExample
-            number={3}
-            title="Sump Pump + Water Alarm (Combo)"
-            scenario="Power a sump pump plus a battery-powered water alarm sensor during an overnight storm outage (10 hours)."
-            inputs={[
-              { label: "Sump Pump (1/3 HP)", value: "800W running / 2,000W surge" },
-              { label: "Water Alarm Sensor", value: "5W continuous" },
-              { label: "Backup Duration", value: "10 hours" },
-              { label: "Pump Cycle Pattern", value: "30 sec / 10 min" },
-            ]}
-            steps={[
-              { label: "Step 1: Pump average draw (5% duty)", formula: "800W × 0.05", result: "40W average" },
-              { label: "Step 2: Combined average draw", formula: "40W + 5W = 45W", result: "45W" },
-              { label: "Step 3: Energy for 10 hours", formula: "45W × 10h = 450 Wh", result: "450 Wh" },
-              { label: "Step 4: After inverter efficiency (90%)", formula: "450 / 0.90", result: "500 Wh" },
-              { label: "Step 5: With 20% margin", formula: "500 × 1.20", result: "600 Wh" },
-              { label: "Step 6: Battery (24V LFP, 80% DoD)", formula: "600 / (24 × 0.80)", result: "31.3 Ah → 12V 35Ah LFP" },
-            ]}
-            answer="A 12V 35Ah LFP battery runs a sump pump plus water alarm for 10 hours of overnight storm protection."
-            interpretation="Adding a water alarm draws negligible power but provides critical early warning — always include one in your backup plan."
-          />
-        </div>
-      </div>
+    <FormulaBox title="Mathematical Formulas">
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Total Running W = Σ (Appliance Running W × Quantity)</div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Surge W = Highest Single Appliance Surge + Other Running W</div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Energy Required (Wh) = (Running W × Hours) / Inverter Efficiency × (1 + Safety Margin)</div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Battery Ah = Required Wh / (Battery Voltage × Depth of Discharge)</div>
+      <p class="text-xs text-muted mt-4">Note: Sump pumps cycle intermittently — actual runtime may be 2–4× longer than continuous running estimates suggest.</p>
+    </FormulaBox>
+
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">Formulas & Worked Examples</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample
+        number={1}
+        title="1/3 HP Sump Pump (Storm Backup)"
+        scenario="Keep a 1/3 HP sump pump running during a 4-hour severe storm power outage with frequent cycling."
+        inputs={[
+          { label: "1/3 HP Sump Pump", value: "800W running / 2,000W surge" },
+          { label: "Backup Duration", value: "4 hours" },
+          { label: "Cycle Pattern", value: "30 sec on / 8 min off" },
+        ]}
+        steps={[
+          { label: "Step 1: Effective duty cycle", formula: "30s / (30s + 480s) ≈ 6.3%", result: "~6.3% duty cycle" },
+          { label: "Step 2: Average draw", formula: "800W × 0.063", result: "~50W average" },
+          { label: "Step 3: Energy for 4 hours", formula: "50W × 4h = 200 Wh", result: "200 Wh" },
+          { label: "Step 4: After inverter efficiency (90%)", formula: "200 / 0.90", result: "222 Wh" },
+          { label: "Step 5: With 20% margin", formula: "222 × 1.20", result: "267 Wh" },
+          { label: "Step 6: Battery (24V LFP, 80% DoD)", formula: "267 / (24 × 0.80)", result: "13.9 Ah → 12V 20Ah LFP" },
+        ]}
+        answer="A 12V 20Ah LFP battery handles a 1/3 HP sump pump for 4+ hours of intermittent storm cycling."
+        interpretation="Sump pumps have very low duty cycles during moderate rain — battery lasts far longer than continuous running estimates suggest."
+      />
+      <WorkedExample
+        number={2}
+        title="1/2 HP Sump Pump (Heavy Rain)"
+        scenario="Power a larger 1/2 HP sump pump during heavy rain causing frequent cycling for 6 hours."
+        inputs={[
+          { label: "1/2 HP Sump Pump", value: "1,000W running / 2,500W surge" },
+          { label: "Backup Duration", value: "6 hours" },
+          { label: "Cycle Pattern", value: "45 sec on / 3 min off" },
+        ]}
+        steps={[
+          { label: "Step 1: Effective duty cycle", formula: "45s / (45s + 180s) = 20%", result: "20% duty cycle" },
+          { label: "Step 2: Average draw", formula: "1,000W × 0.20", result: "200W average" },
+          { label: "Step 3: Energy for 6 hours", formula: "200W × 6h = 1,200 Wh", result: "1,200 Wh" },
+          { label: "Step 4: After inverter efficiency (90%)", formula: "1,200 / 0.90", result: "1,333 Wh" },
+          { label: "Step 5: With 20% margin", formula: "1,333 × 1.20", result: "1,600 Wh" },
+          { label: "Step 6: Battery (24V LFP, 80% DoD)", formula: "1,600 / (24 × 0.80)", result: "83.3 Ah → 24V 100Ah LFP" },
+        ]}
+        answer="A 24V 100Ah LFP battery (2,560 Wh) handles a 1/2 HP sump pump for 6 hours of heavy-rain cycling."
+        interpretation="Heavy rain increases pump cycling frequency — plan for 20–30% duty cycle during severe storms."
+      />
+      <WorkedExample
+        number={3}
+        title="Sump Pump + Water Alarm (Combo)"
+        scenario="Power a sump pump plus a battery-powered water alarm sensor during an overnight storm outage (10 hours)."
+        inputs={[
+          { label: "Sump Pump (1/3 HP)", value: "800W running / 2,000W surge" },
+          { label: "Water Alarm Sensor", value: "5W continuous" },
+          { label: "Backup Duration", value: "10 hours" },
+          { label: "Pump Cycle Pattern", value: "30 sec / 10 min" },
+        ]}
+        steps={[
+          { label: "Step 1: Pump average draw (5% duty)", formula: "800W × 0.05", result: "40W average" },
+          { label: "Step 2: Combined average draw", formula: "40W + 5W = 45W", result: "45W" },
+          { label: "Step 3: Energy for 10 hours", formula: "45W × 10h = 450 Wh", result: "450 Wh" },
+          { label: "Step 4: After inverter efficiency (90%)", formula: "450 / 0.90", result: "500 Wh" },
+          { label: "Step 5: With 20% margin", formula: "500 × 1.20", result: "600 Wh" },
+          { label: "Step 6: Battery (24V LFP, 80% DoD)", formula: "600 / (24 × 0.80)", result: "31.3 Ah → 12V 35Ah LFP" },
+        ]}
+        answer="A 12V 35Ah LFP battery runs a sump pump plus water alarm for 10 hours of overnight storm protection."
+        interpretation="Adding a water alarm draws negligible power but provides critical early warning — always include one in your backup plan."
+      />
     </div>
   </section>
 
