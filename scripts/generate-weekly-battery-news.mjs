@@ -138,6 +138,8 @@ function cleanHTML(str) {
     .replace(/&quot;/g, '"')
     .replace(/&#039;/g, "'")
     .replace(/&apos;/g, "'")
+    .replace(/&#(\d+);/g, (_, code) => String.fromCharCode(parseInt(code, 10)))
+    .replace(/&#x([0-9a-f]+);/gi, (_, code) => String.fromCharCode(parseInt(code, 16)))
     .replace(/\s+/g, ' ')
     .trim();
 }
@@ -290,66 +292,50 @@ function generateArticlePage(data) {
   } = data;
 
   const weekLabel = `Week ${week}`;
-  const dateLabel = `${dateRange.start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}–${dateRange.end.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
-  const title = `Battery Industry Weekly Intelligence — ${weekLabel}, ${year}`;
-  const metaTitle = `Battery Industry Weekly Intelligence — ${weekLabel} ${year} | Battery Calculators`;
-  const metaDescription = `Weekly battery industry intelligence: top stories in EV batteries, marine electrification, grid-scale BESS, battery passport regulation, and research updates for ${dateLabel}.`;
+  const dateLabel = `${dateRange.start.toLocaleDateString('en-US', { month: 'long', day: 'numeric' })} – ${dateRange.end.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}`;
+  const shortDateLabel = `${dateRange.start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} – ${dateRange.end.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
+  const title = `Battery Industry Weekly — ${weekLabel}, ${year}`;
+  const metaTitle = `Battery Industry Weekly — ${weekLabel}, ${year} | Battery Calculators`;
+  const metaDescription = `This week in batteries: ${topStories.slice(0, 3).map(s => escapeJSX(s.title).toLowerCase()).join(', ')}.`;
   const canonical = `https://batterycalculators.com/news/battery-industry-weekly-${year}-week-${week}`;
-  const slug = `battery-industry-weekly-${year}-week-${week}`;
 
-  const readingTime = Math.max(8, Math.round(topStories.length * 1.5 + 5));
+  const readingTime = Math.max(10, Math.round(topStories.length * 2 + 4));
 
   const faqItems = [
     {
-      question: 'What is the Battery Industry Weekly Intelligence?',
-      answer: 'It is a curated weekly digest of the most important battery industry news, covering EV batteries, marine electrification, grid-scale energy storage, battery passport regulation, safety, manufacturing, and research breakthroughs. Each edition includes engineering analysis from the BatteryCalculators.com team.',
+      question: 'What is the Battery Industry Weekly?',
+      answer: 'A short editorial digest covering the most important battery industry news each week — EV batteries, grid-scale storage, regulation, manufacturing, and research.',
     },
     {
-      question: 'How are stories selected for the weekly digest?',
-      answer: 'Stories are sourced from trusted RSS feeds including PV Magazine, Energy Storage News, Electrek, CleanTechnica, Maritime Executive, DNV, IMO, US DOE, and Google News curated searches. The generator deduplicates similar stories, scores them by relevance, and selects the top 10 most impactful stories each week.',
+      question: 'How are stories selected?',
+      answer: 'The generator fetches RSS feeds from trusted sources, deduplicates similar stories, scores them by relevance, and selects the top stories for the week.',
     },
     {
-      question: 'Can I use these articles for my own reporting?',
-      answer: 'The articles reference publicly available news with source attribution and links. You may reference and quote factual summaries with proper attribution. BatteryCalculators engineering analysis is original content. Always verify facts with primary sources before publishing.',
-    },
-    {
-      question: 'How does this relate to BatteryCalculators tools?',
-      answer: 'Each weekly digest links to relevant calculators and learning guides so you can apply engineering formulas to the real-world developments covered in the news. For example, EV battery stories link to our battery sizing and C-rate calculators.',
-    },
-    {
-      question: 'When is the weekly digest published?',
-      answer: 'The digest is generated every Friday covering the current week. Run the generator script with the desired year and week number to produce a new edition.',
+      question: 'When is the digest published?',
+      answer: 'A new edition is generated every Friday covering the current week.',
     },
   ];
 
-  const topStoriesBlock = topStories.map((s, i) => {
+  const storySections = topStories.map((s, i) => {
     const cat = categorized[s.title] || s.category;
-    const catLabel = cat.toUpperCase();
-    return `      <div class="bg-surface-card border border-hairline p-6">
-        <div class="flex items-start justify-between gap-4 mb-3">
-          <span class="text-label-uppercase text-m-blue-light text-[10px] shrink-0">${catLabel}</span>
-          <span class="text-caption text-muted shrink-0">${s.source}</span>
-        </div>
-        <h3 class="text-title-lg text-primary mb-2">${escapeJSX(s.title)}</h3>
-        <p class="text-body-sm text-muted mb-3">${escapeJSX(s.summary || 'Details limited from source; verify before publishing.')}</p>
-        <div class="flex items-center gap-3 text-caption text-muted">
-          ${s.pubDate ? `<span>${escapeJSX(s.pubDate)}</span>` : ''}
-          ${s.link ? `<a href="${escapeJSX(s.link)}" class="text-m-blue-light hover:text-primary transition-colors" target="_blank" rel="noopener noreferrer">Source →</a>` : ''}
-        </div>
-      </div>`;
-  }).join('\n');
+    const catLabel = cat.toUpperCase().replace('BEV', 'EV BATTERIES').replace('PASSPORT', 'REGULATION');
+    const borderClass = i > 0 ? ' border-t border-hairline pt-12' : '';
+    const summary = escapeJSX(s.summary || 'Details limited from source; verify before publishing.');
+    const paragraphs = summary.split(/(?<=[.!?])\s+/).filter(Boolean);
+    const p1 = paragraphs[0] || summary;
+    const p2 = paragraphs.slice(1, 3).join(' ');
+    const p3 = paragraphs.slice(3).join(' ');
 
-  const evStories = topStories.filter(s => (categorized[s.title] || s.category) === 'ev');
-  const marineStories = topStories.filter(s => (categorized[s.title] || s.category) === 'marine');
-  const bessStories = topStories.filter(s => (categorized[s.title] || s.category) === 'bess');
-  const passportStories = topStories.filter(s => (categorized[s.title] || s.category) === 'passport');
-  const researchStories = topStories.filter(s => (categorized[s.title] || s.category) === 'research');
-  const recyclingStories = topStories.filter(s => (categorized[s.title] || s.category) === 'recycling');
-  const safetyStories = topStories.filter(s => (categorized[s.title] || s.category) === 'safety');
-  const mfgStories = topStories.filter(s => (categorized[s.title] || s.category) === 'manufacturing');
+    return `    <!-- Story ${i + 1} -->
+    <section class="mb-12${borderClass}">
+      <span class="text-label-uppercase text-m-blue-light text-[10px] block mb-2">${catLabel}</span>
+      <h2 class="text-title-xl text-primary mb-4">${escapeJSX(s.title)}</h2>
+      <p class="text-body-md text-body font-light mb-4">${p1}</p>${p2 ? `\n      <p class="text-body-md text-body font-light">${p2}</p>` : ''}
+    </section>`;
+  }).join('\n\n');
 
   const sourcesList = topStories.filter(s => s.link).map(s =>
-    `        <li><a href="${escapeJSX(s.link)}" class="hover:text-primary transition-colors underline underline-offset-2" target="_blank" rel="noopener noreferrer">${escapeJSX(s.title)} — ${escapeJSX(s.source)}</a></li>`
+    `        <li><a href="${escapeJSX(s.link)}" class="text-m-blue-light hover:text-primary transition-colors" target="_blank" rel="noopener noreferrer">${escapeJSX(s.title)} — ${escapeJSX(s.source)}</a></li>`
   ).join('\n');
 
   const page = `---
@@ -368,7 +354,7 @@ const faqItems = ${JSON.stringify(faqItems, null, 2)};
 
 const breadcrumbs = [
   { label: 'News', href: '/news' },
-  { label: '${escapeJSX(title)}' },
+  { label: '${weekLabel}, ${year}' },
 ];
 ---
 
@@ -383,287 +369,77 @@ const breadcrumbs = [
   faqItems={faqItems}
   breadcrumbs={breadcrumbs}
 >
-  <article class="max-w-4xl mx-auto">
+  <article class="max-w-3xl mx-auto">
 
-    <!-- Draft Notice -->
-    <div class="bg-surface-elevated border border-hairline p-4 mb-8">
-      <p class="text-body-sm text-muted">
-        <strong class="text-primary">Editorial status:</strong> AI-generated draft. Verify sources before relying on this article.
-      </p>
-    </div>
-
-    <!-- Article Header -->
+    <!-- Header -->
     <div class="mb-12 border-b border-hairline pb-8">
       <a href="/news" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">&larr; Back to News</a>
       <Breadcrumb items={breadcrumbs} />
-      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">WEEKLY INTELLIGENCE</span>
-      <h1 class="text-display-md text-primary mb-4">${escapeJSX(title)}</h1>
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">WEEKLY EDITION</span>
+      <h1 class="text-display-md text-primary mb-4">Battery Industry Weekly — ${weekLabel}</h1>
       <div class="flex flex-wrap items-center gap-4 text-caption text-muted mb-6">
-        <span>Published: ${dateLabel}</span>
-        <span>Last Updated: ${todayStr}</span>
-        <span>${readingTime} min read</span>
+        <span>${shortDateLabel}</span>
+        <span>{readingTime} min read</span>
       </div>
       <p class="text-body-md text-body font-light">
         ${escapeJSX(metaDescription)}
       </p>
     </div>
 
-    <!-- Executive Summary -->
-    <section class="mb-16">
-      <h2 class="text-display-sm text-primary mb-6">Executive Summary</h2>
+${storySections}
+
+    <!-- Analysis -->
+    <section class="mb-12 border-t border-hairline pt-12">
+      <h2 class="text-display-sm text-primary mb-6">The Week in Context</h2>
       <div class="bg-surface-card border border-hairline p-6">
         <p class="text-body-md text-body font-light mb-4">
-          This week's battery industry intelligence covers ${topStories.length} major developments across EV batteries, marine electrification, grid-scale energy storage, battery passport regulation, and research breakthroughs. The following analysis highlights the engineering implications of each story for system designers, integrators, and policy stakeholders.
+          Three themes worth tracking from this week's news:
         </p>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
-          <div class="bg-surface-soft border border-hairline p-4 text-center">
-            <span class="text-label-uppercase text-m-blue-light text-[10px] block mb-1">EV</span>
-            <span class="text-lg font-bold text-primary">${evStories.length}</span>
-          </div>
-          <div class="bg-surface-soft border border-hairline p-4 text-center">
-            <span class="text-label-uppercase text-m-blue-light text-[10px] block mb-1">MARINE</span>
-            <span class="text-lg font-bold text-primary">${marineStories.length}</span>
-          </div>
-          <div class="bg-surface-soft border border-hairline p-4 text-center">
-            <span class="text-label-uppercase text-m-blue-light text-[10px] block mb-1">BESS</span>
-            <span class="text-lg font-bold text-primary">${bessStories.length}</span>
-          </div>
-          <div class="bg-surface-soft border border-hairline p-4 text-center">
-            <span class="text-label-uppercase text-m-blue-light text-[10px] block mb-1">RESEARCH</span>
-            <span class="text-lg font-bold text-primary">${researchStories.length}</span>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Top 10 Stories -->
-    <section class="mb-16">
-      <h2 class="text-display-sm text-primary mb-6">Top ${topStories.length} Stories This Week</h2>
-      <div class="flex flex-col gap-4">
-${topStoriesBlock}
-      </div>
-    </section>
-
-    <!-- Engineering Trends -->
-    <section class="mb-16 border-t border-hairline pt-12">
-      <h2 class="text-display-sm text-primary mb-6">Engineering Trends of the Week</h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="bg-surface-card border border-hairline p-6">
-          <h3 class="text-title-lg text-primary mb-3">Cell Chemistry Evolution</h3>
-          <p class="text-body-sm text-muted">
-            The push toward higher energy density continues with solid-state and sodium-ion chemistries gaining momentum. LFP remains dominant for stationary storage due to safety and cycle life advantages. Use our <a href="/tools/c-rate-calculator" class="text-m-blue-light hover:text-primary transition-colors">C-Rate Calculator</a> to compare discharge characteristics across chemistries.
-          </p>
-        </div>
-        <div class="bg-surface-card border border-hairline p-6">
-          <h3 class="text-title-lg text-primary mb-3">System Integration Complexity</h3>
-          <p class="text-body-sm text-muted">
-            As battery systems scale from residential to grid-level, integration challenges around thermal management, BMS communication, and safety systems intensify. Our <a href="/tools/battery-sizing-calculator" class="text-m-blue-light hover:text-primary transition-colors">Battery Sizing Calculator</a> helps engineers right-size systems for their specific application constraints.
-          </p>
-        </div>
-        <div class="bg-surface-card border border-hairline p-6">
-          <h3 class="text-title-lg text-primary mb-3">Regulatory Acceleration</h3>
-          <p class="text-body-sm text-muted">
-            EU battery passport requirements and IMO decarbonization targets are creating compliance deadlines that drive procurement decisions. Review our <a href="/learn/eu-battery-passport-requirements-2026" class="text-m-blue-light hover:text-primary transition-colors">EU Battery Passport Requirements 2026</a> guide for detailed compliance pathways.
-          </p>
-        </div>
-        <div class="bg-surface-card border border-hairline p-6">
-          <h3 class="text-title-lg text-primary mb-3">Supply Chain Dynamics</h3>
-          <p class="text-body-sm text-muted">
-            Raw material pricing and availability continue to shape battery economics. Lithium, cobalt, and nickel supply constraints affect pack-level costs across all segments. Check our <a href="/learn/solar-battery-cost-breakdown-2026" class="text-m-blue-light hover:text-primary transition-colors">Solar Battery Cost Breakdown 2026</a> for current pricing analysis.
-          </p>
-        </div>
-      </div>
-    </section>
-
-    <!-- EV Battery Impact -->
-    <section class="mb-16 border-t border-hairline pt-12">
-      <h2 class="text-display-sm text-primary mb-6">EV Battery Impact</h2>
-      <p class="text-body-md text-body font-light mb-6">
-        Electric vehicle battery developments this week have implications for pack sizing, charging infrastructure, and cell supply. Engineers designing EV battery packs should evaluate how new cell chemistries affect energy density and thermal management requirements.
-      </p>
-      ${evStories.length > 0 ? `
-      <div class="flex flex-col gap-4">
-${evStories.map(s => `        <div class="bg-surface-card border border-hairline p-4">
-          <span class="text-label-uppercase text-m-blue-light text-[10px] block mb-1">${s.source}</span>
-          <h4 class="text-title-md text-primary mb-1">${escapeJSX(s.title)}</h4>
-          <p class="text-body-sm text-muted">${escapeJSX(s.summary || 'Details limited from source; verify before publishing.')}</p>
-        </div>`).join('\n')}
-      </div>` : `<p class="text-body-sm text-muted">No major EV battery stories this week.</p>`}
-      <p class="text-body-sm text-muted mt-4">
-        Calculate pack configurations with our <a href="/tools/battery-pack-calculator" class="text-m-blue-light hover:text-primary transition-colors">Battery Pack Calculator</a> and estimate charging timelines with the <a href="/tools/charging-time-calculator" class="text-m-blue-light hover:text-primary transition-colors">Charging Time Calculator</a>.
-      </p>
-    </section>
-
-    <!-- Marine Battery Impact -->
-    <section class="mb-16 border-t border-hairline pt-12">
-      <h2 class="text-display-sm text-primary mb-6">Marine Battery Impact</h2>
-      <p class="text-body-md text-body font-light mb-6">
-        Marine electrification continues to accelerate with new ferry projects, hybrid vessel orders, and shore power installations. IMO Carbon Intensity Indicator ratings are driving adoption across commercial fleets.
-      </p>
-      ${marineStories.length > 0 ? `
-      <div class="flex flex-col gap-4">
-${marineStories.map(s => `        <div class="bg-surface-card border border-hairline p-4">
-          <span class="text-label-uppercase text-m-blue-light text-[10px] block mb-1">${s.source}</span>
-          <h4 class="text-title-md text-primary mb-1">${escapeJSX(s.title)}</h4>
-          <p class="text-body-sm text-muted">${escapeJSX(s.summary || 'Details limited from source; verify before publishing.')}</p>
-        </div>`).join('\n')}
-      </div>` : `<p class="text-body-sm text-muted">No major marine battery stories this week.</p>`}
-      <p class="text-body-sm text-muted mt-4">
-        Size marine battery banks with our <a href="/tools/marine-battery-sizing-calculator" class="text-m-blue-light hover:text-primary transition-colors">Marine Battery Sizing Calculator</a> and evaluate hybrid vessel ROI with the <a href="/tools/hybrid-vessel-roi-calculator" class="text-m-blue-light hover:text-primary transition-colors">Hybrid Vessel ROI Calculator</a>. Learn more at our <a href="/marine" class="text-m-blue-light hover:text-primary transition-colors">Marine hub</a>.
-      </p>
-    </section>
-
-    <!-- Grid BESS Impact -->
-    <section class="mb-16 border-t border-hairline pt-12">
-      <h2 class="text-display-sm text-primary mb-6">Grid-Scale BESS Impact</h2>
-      <p class="text-body-md text-body font-light mb-6">
-        Utility-scale battery energy storage continues to see record deployment volumes. Projects are getting larger, with multi-hundred-MWh systems becoming standard. Battery system sizing and ROI analysis are critical for project viability.
-      </p>
-      ${bessStories.length > 0 ? `
-      <div class="flex flex-col gap-4">
-${bessStories.map(s => `        <div class="bg-surface-card border border-hairline p-4">
-          <span class="text-label-uppercase text-m-blue-light text-[10px] block mb-1">${s.source}</span>
-          <h4 class="text-title-md text-primary mb-1">${escapeJSX(s.title)}</h4>
-          <p class="text-body-sm text-muted">${escapeJSX(s.summary || 'Details limited from source; verify before publishing.')}</p>
-        </div>`).join('\n')}
-      </div>` : `<p class="text-body-sm text-muted">No major BESS stories this week.</p>`}
-      <p class="text-body-sm text-muted mt-4">
-        Model BESS economics with our <a href="/tools/bess-roi-calculator" class="text-m-blue-light hover:text-primary transition-colors">BESS ROI Calculator</a> and size systems with the <a href="/tools/battery-sizing-calculator" class="text-m-blue-light hover:text-primary transition-colors">Battery Sizing Calculator</a>.
-      </p>
-    </section>
-
-    <!-- Battery Passport / Regulation Impact -->
-    <section class="mb-16 border-t border-hairline pt-12">
-      <h2 class="text-display-sm text-primary mb-6">Battery Passport &amp; Regulation Impact</h2>
-      <p class="text-body-md text-body font-light mb-6">
-        EU Battery Regulation compliance deadlines are approaching. Battery passport requirements, carbon footprint declarations, and due diligence obligations are reshaping how batteries are documented and traded.
-      </p>
-      ${passportStories.length > 0 ? `
-      <div class="flex flex-col gap-4">
-${passportStories.map(s => `        <div class="bg-surface-card border border-hairline p-4">
-          <span class="text-label-uppercase text-m-blue-light text-[10px] block mb-1">${s.source}</span>
-          <h4 class="text-title-md text-primary mb-1">${escapeJSX(s.title)}</h4>
-          <p class="text-body-sm text-muted">${escapeJSX(s.summary || 'Details limited from source; verify before publishing.')}</p>
-        </div>`).join('\n')}
-      </div>` : `<p class="text-body-sm text-muted">No major battery passport stories this week.</p>`}
-      <p class="text-body-sm text-muted mt-4">
-        Generate compliant battery passports with our <a href="/battery-passport-generator" class="text-m-blue-light hover:text-primary transition-colors">Battery Passport Generator</a> and review requirements in our <a href="/learn/eu-battery-passport-requirements-2026" class="text-m-blue-light hover:text-primary transition-colors">EU Battery Passport Requirements 2026</a> guide.
-      </p>
-    </section>
-
-    <!-- BatteryCalculators Engineering Analysis -->
-    <section class="mb-16 border-t border-hairline pt-12">
-      <h2 class="text-display-sm text-primary mb-6">BatteryCalculators Engineering Analysis</h2>
-      <div class="bg-surface-card border border-hairline p-6">
-        <p class="text-body-md text-body font-light mb-4">
-          This week's developments reinforce several key engineering trends that system designers should monitor:
-        </p>
-        <ul class="flex flex-col gap-3 text-body-sm text-muted list-disc pl-5">
-          <li><strong class="text-primary">Pack voltage architecture:</strong> Higher voltage systems (800V+ in EVs, 1500V in BESS) are becoming standard. Use our <a href="/tools/voltage-drop-calculator" class="text-m-blue-light hover:text-primary transition-colors">Voltage Drop Calculator</a> to optimize cable runs at these voltages.</li>
-          <li><strong class="text-primary">Cell balancing:</strong> As pack sizes increase, active balancing becomes critical. Our <a href="/tools/parallel-string-calculator" class="text-m-blue-light hover:text-primary transition-colors">Parallel String Calculator</a> helps model string-level behavior.</li>
-          <li><strong class="text-primary">Depth of discharge optimization:</strong> New chemistries enable deeper cycling without proportional degradation. Calculate usable capacity with our <a href="/tools/runtime-calculator" class="text-m-blue-light hover:text-primary transition-colors">Runtime Calculator</a>.</li>
-          <li><strong class="text-primary">Inverter-battery matching:</strong> As systems grow, inverter selection and battery bank sizing must be tightly coordinated. Use the <a href="/tools/inverter-battery-calculator" class="text-m-blue-light hover:text-primary transition-colors">Inverter Battery Calculator</a> for proper matching.</li>
+        <ul class="flex flex-col gap-4 text-body-sm text-muted">
+          <li>
+            <strong class="text-primary">Scale is the new normal.</strong> Battery deployment continues to grow across every segment — EVs, grid storage, and marine — making batteries a core infrastructure technology rather than a niche market.
+          </li>
+          <li>
+            <strong class="text-primary">Chemistry diversity is accelerating.</strong> LFP, solid-state, sodium-ion, and silicon-anode chemistries are all progressing simultaneously, each targeting different cost and performance tradeoffs.
+          </li>
+          <li>
+            <strong class="text-primary">Regulation is reshaping supply chains.</strong> EU battery passport requirements and domestic manufacturing incentives are forcing companies to rethink sourcing, documentation, and compliance timelines.
+          </li>
         </ul>
       </div>
     </section>
 
-    <!-- What to Watch Next Week -->
-    <section class="mb-16 border-t border-hairline pt-12">
+    <!-- What to Watch -->
+    <section class="mb-12 border-t border-hairline pt-12">
       <h2 class="text-display-sm text-primary mb-6">What to Watch Next Week</h2>
       <div class="bg-surface-card border border-hairline p-6">
         <ul class="flex flex-col gap-3 text-body-sm text-muted list-disc pl-5">
           <li>Continued updates on solid-state battery commercialization timelines</li>
           <li>EU Battery Regulation implementation guidance from the European Commission</li>
-          <li>New vessel battery system orders and ferry electrification announcements</li>
-          <li>Grid-scale BESS project commissioning and capacity milestone reports</li>
+          <li>New grid-scale BESS project commissioning and capacity milestone reports</li>
           <li>Lithium and critical mineral pricing trends affecting battery economics</li>
-          <li>Sodium-ion battery production scaling announcements</li>
+          <li>Sodium-ion and next-generation chemistry production scaling announcements</li>
         </ul>
       </div>
     </section>
 
-    <!-- Related Calculators -->
-    <section class="mb-16 border-t border-hairline pt-12">
-      <span class="text-label-uppercase text-muted text-[10px] block mb-4">RELATED CALCULATORS</span>
-      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-        <a href="/tools/runtime-calculator" class="bg-surface-card border border-hairline p-4 hover:border-primary transition-colors block">
-          <h4 class="text-primary font-bold mb-1 text-sm">Runtime Calculator</h4>
-          <p class="text-xs text-muted">Calculate battery discharge duration</p>
-        </a>
-        <a href="/tools/battery-sizing-calculator" class="bg-surface-card border border-hairline p-4 hover:border-primary transition-colors block">
-          <h4 class="text-primary font-bold mb-1 text-sm">Battery Sizing Calculator</h4>
-          <p class="text-xs text-muted">Right-size battery capacity</p>
-        </a>
-        <a href="/tools/c-rate-calculator" class="bg-surface-card border border-hairline p-4 hover:border-primary transition-colors block">
-          <h4 class="text-primary font-bold mb-1 text-sm">C-Rate Calculator</h4>
-          <p class="text-xs text-muted">Calculate charge/discharge rates</p>
-        </a>
-        <a href="/tools/charging-time-calculator" class="bg-surface-card border border-hairline p-4 hover:border-primary transition-colors block">
-          <h4 class="text-primary font-bold mb-1 text-sm">Charging Time Calculator</h4>
-          <p class="text-xs text-muted">Estimate charge duration</p>
-        </a>
-        <a href="/tools/inverter-battery-calculator" class="bg-surface-card border border-hairline p-4 hover:border-primary transition-colors block">
-          <h4 class="text-primary font-bold mb-1 text-sm">Inverter Battery Calculator</h4>
-          <p class="text-xs text-muted">Match inverter and battery sizing</p>
-        </a>
-        <a href="/tools/parallel-string-calculator" class="bg-surface-card border border-hairline p-4 hover:border-primary transition-colors block">
-          <h4 class="text-primary font-bold mb-1 text-sm">Parallel String Calculator</h4>
-          <p class="text-xs text-muted">Model parallel string behavior</p>
-        </a>
-      </div>
-    </section>
-
-    <!-- Related Learning Guides -->
-    <section class="mb-16 border-t border-hairline pt-12">
-      <span class="text-label-uppercase text-muted text-[10px] block mb-4">RELATED LEARNING GUIDES</span>
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <a href="/learn/lifepo4-voltage-chart" class="bg-surface-card border border-hairline p-4 hover:border-primary transition-colors block">
-          <h4 class="text-primary font-bold mb-1 text-sm">LiFePO4 Voltage Chart</h4>
-          <p class="text-xs text-muted">Voltage reference by SOC</p>
-        </a>
-        <a href="/learn/lead-acid-voltage-chart" class="bg-surface-card border border-hairline p-4 hover:border-primary transition-colors block">
-          <h4 class="text-primary font-bold mb-1 text-sm">Lead-Acid Voltage Chart</h4>
-          <p class="text-xs text-muted">Lead-acid voltage by SOC</p>
-        </a>
-        <a href="/learn/battery-runtime-formula" class="bg-surface-card border border-hairline p-4 hover:border-primary transition-colors block">
-          <h4 class="text-primary font-bold mb-1 text-sm">Battery Runtime Formula</h4>
-          <p class="text-xs text-muted">Complete runtime calculation reference</p>
-        </a>
-        <a href="/learn/battery-sizing-formula" class="bg-surface-card border border-hairline p-4 hover:border-primary transition-colors block">
-          <h4 class="text-primary font-bold mb-1 text-sm">Battery Sizing Formula</h4>
-          <p class="text-xs text-muted">Complete sizing calculation reference</p>
-        </a>
-        <a href="/learn/eu-battery-passport-requirements-2026" class="bg-surface-card border border-hairline p-4 hover:border-primary transition-colors block">
-          <h4 class="text-primary font-bold mb-1 text-sm">EU Battery Passport Requirements 2026</h4>
-          <p class="text-xs text-muted">Compliance guide for EU regulation</p>
-        </a>
-        <a href="/learn/solar-battery-cost-breakdown-2026" class="bg-surface-card border border-hairline p-4 hover:border-primary transition-colors block">
-          <h4 class="text-primary font-bold mb-1 text-sm">Solar Battery Cost Breakdown 2026</h4>
-          <p class="text-xs text-muted">Current pricing analysis</p>
-        </a>
-      </div>
-    </section>
-
     <!-- Sources -->
-    <section class="mb-16 border-t border-hairline pt-12">
-      <h2 class="text-display-sm text-primary mb-6">Sources</h2>
+    <section class="mb-12 border-t border-hairline pt-12">
+      <h2 class="text-display-sm text-primary mb-4">Sources</h2>
       <ul class="flex flex-col gap-2 text-body-sm text-muted list-disc pl-5">
 ${sourcesList || '        <li>Sources could not be fetched for this edition. Verify manually before publishing.</li>'}
       </ul>
-      <p class="text-caption text-muted mt-4">
-        Stories sourced from RSS feeds including PV Magazine, Energy Storage News, Electrek, CleanTechnica, Maritime Executive, MarineLink, DNV, IMO, US DOE, European Commission, and curated Google News searches.
-      </p>
     </section>
 
     <!-- FAQ -->
     <FAQSection items={faqItems} />
 
-    <!-- Engineering Disclaimer -->
+    <!-- Disclaimer -->
     <section class="mb-16 border-t border-hairline pt-12">
       <div class="bg-surface-elevated border border-hairline p-6">
-        <h3 class="text-title-lg text-primary mb-3">Engineering Disclaimer</h3>
+        <h3 class="text-title-lg text-primary mb-3">Disclaimer</h3>
         <p class="text-body-sm text-muted">
-          This article is an AI-generated draft compiled from publicly available RSS feeds and news sources. BatteryCalculators.com does not guarantee the accuracy of third-party information. Always verify facts with primary sources before making engineering or procurement decisions. The BatteryCalculators engineering analysis section represents original analysis based on publicly available information and general engineering principles. This content is provided for informational purposes only and does not constitute professional engineering advice.
+          This article summarizes publicly available news and analysis. BatteryCalculators.com does not guarantee the accuracy of third-party information. Always verify facts with primary sources before making engineering or procurement decisions. This content is provided for informational purposes only and does not constitute professional engineering advice.
         </p>
       </div>
     </section>
@@ -695,7 +471,7 @@ async function main() {
   const today = new Date();
   const todayStr = today.toISOString().split('T')[0];
 
-  console.log(`\n🔋 Battery Industry Weekly Intelligence Generator`);
+  console.log(`\n🔋 Battery Industry Weekly Generator`);
   console.log(`   Year: ${year}, Week: ${week}`);
   console.log(`   Date Range: ${dateRange.start.toISOString().split('T')[0]} to ${dateRange.end.toISOString().split('T')[0]}`);
   console.log('');

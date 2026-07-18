@@ -1,0 +1,67 @@
+name: Weekly Battery News
+
+on:
+  schedule:
+    - cron: '0 10 * * 5' # Every Friday at 10:00 UTC
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  generate-and-deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Determine week number
+        id: week
+        run: |
+          YEAR=$(date -u +%Y)
+          WEEK=$(date -u +%V)
+          echo "year=$YEAR" >> "$GITHUB_OUTPUT"
+          echo "week=$WEEK" >> "$GITHUB_OUTPUT"
+          echo "Generating news for Year=$YEAR Week=$WEEK"
+
+      - name: Generate weekly article
+        run: node scripts/generate-weekly-battery-news.mjs --year ${{ steps.week.outputs.year }} --week ${{ steps.week.outputs.week }}
+
+      - name: Check for new file
+        id: changes
+        run: |
+          FILE="src/pages/news/battery-industry-weekly-${{ steps.week.outputs.year }}-week-${{ steps.week.outputs.week }}.astro"
+          if [ -f "$FILE" ]; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Commit new article
+        if: steps.changes.outputs.exists == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add "src/pages/news/battery-industry-weekly-${{ steps.week.outputs.year }}-week-${{ steps.week.outputs.week }}.astro"
+          git commit -m "news: add battery industry weekly ${{ steps.week.outputs.year }} week ${{ steps.week.outputs.week }}" || echo "No changes to commit"
+          git push
+
+      - name: Build site
+        run: npm run build
+
+      - name: Deploy to Cloudflare
+        run: npm run deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
