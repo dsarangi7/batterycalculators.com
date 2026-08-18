@@ -13,7 +13,7 @@ export const searchData: SearchItem[] = [
     title: "Battery Runtime Calculator",
     description:
       "Estimate lithium battery runtime and marine battery runtime. Enter Ah/Wh, voltage, load watts, DoD %, and efficiency %.",
-    url: "/tools/runtime-calculator",
+    url: "/tools/runtime-calculator/",
     type: "calculator",
     category: "Calculator",
     keywords: [
@@ -33,7 +33,7 @@ export const searchData: SearchItem[] = [
     title: "Battery C-Rate Calculator",
     description:
       "Convert between discharge current, battery capacity, and C-rate. Estimate charge/discharge times with transparent formulas.",
-    url: "/tools/c-rate-calculator",
+    url: "/tools/c-rate-calculator/",
     type: "calculator",
     category: "Calculator",
     keywords: [
@@ -52,7 +52,7 @@ export const searchData: SearchItem[] = [
     title: "Battery Charging Time Calculator",
     description:
       "Estimate CC-CV charging times for lithium-ion and LFP batteries based on capacity, charger current, and target SOC.",
-    url: "/tools/charging-time-calculator",
+    url: "/tools/charging-time-calculator/",
     type: "calculator",
     category: "Calculator",
     keywords: [
@@ -71,7 +71,7 @@ export const searchData: SearchItem[] = [
     title: "Battery Pack Calculator",
     description:
       "Design battery packs from individual cells. Calculate pack voltage, capacity, energy, and maximum current.",
-    url: "/tools/battery-pack-calculator",
+    url: "/tools/battery-pack-calculator/",
     type: "calculator",
     category: "Calculator",
     keywords: [
@@ -89,7 +89,7 @@ export const searchData: SearchItem[] = [
     title: "Energy Conversion Calculator",
     description:
       "Convert battery capacity metrics between Amp-hours (Ah) and Watt-hours (Wh) using nominal pack voltage.",
-    url: "/tools/energy-conversion-calculator",
+    url: "/tools/energy-conversion-calculator/",
     type: "calculator",
     category: "Calculator",
     keywords: [
@@ -107,7 +107,7 @@ export const searchData: SearchItem[] = [
     title: "DC Voltage Drop Calculator",
     description:
       "Calculate voltage drop along DC battery cables based on current load, cable length, conductor material, and gauge size.",
-    url: "/tools/voltage-drop-calculator",
+    url: "/tools/voltage-drop-calculator/",
     type: "calculator",
     category: "Calculator",
     keywords: [
@@ -125,7 +125,7 @@ export const searchData: SearchItem[] = [
     title: "DC Cable Power Loss Calculator",
     description:
       "Estimate electrical power wattage loss (I²R) and daily thermal energy loss in DC battery transmission cables.",
-    url: "/tools/dc-cable-loss-calculator",
+    url: "/tools/dc-cable-loss-calculator/",
     type: "calculator",
     category: "Calculator",
     keywords: [
@@ -142,7 +142,7 @@ export const searchData: SearchItem[] = [
     title: "Battery Sizing Calculator",
     description:
       "Size battery storage packs based on daily consumption Wh, autonomy days, nominal voltage, and temperature derating.",
-    url: "/tools/battery-sizing-calculator",
+    url: "/tools/battery-sizing-calculator/",
     type: "calculator",
     category: "Calculator",
     keywords: [
@@ -160,7 +160,7 @@ export const searchData: SearchItem[] = [
     title: "Parallel String Calculator",
     description:
       "Determine the series and parallel configuration of cell stacks or battery modules to meet target voltage and capacity.",
-    url: "/tools/parallel-string-calculator",
+    url: "/tools/parallel-string-calculator/",
     type: "calculator",
     category: "Calculator",
     keywords: [
@@ -179,7 +179,7 @@ export const searchData: SearchItem[] = [
     title: "Marine Battery Sizing Calculator",
     description:
       "Size your marine house battery bank based on hotel loads, usage hours, battery voltage, and depth of discharge.",
-    url: "/tools/marine-battery-sizing-calculator",
+    url: "/tools/marine-battery-sizing-calculator/",
     type: "calculator",
     category: "Calculator",
     keywords: [
@@ -197,7 +197,7 @@ export const searchData: SearchItem[] = [
     title: "Inverter Battery Calculator",
     description:
       "Calculate the battery capacity you need for your inverter load. Determine required Ah and kWh for AC loads.",
-    url: "/tools/inverter-battery-calculator",
+    url: "/tools/inverter-battery-calculator/",
     type: "calculator",
     category: "Calculator",
     keywords: [
@@ -214,7 +214,7 @@ export const searchData: SearchItem[] = [
     title: "BESS ROI Calculator",
     description:
       "Evaluate payback period, net present value (NPV), and peak shaving savings of commercial Battery Energy Storage Systems.",
-    url: "/tools/bess-roi-calculator",
+    url: "/tools/bess-roi-calculator/",
     type: "calculator",
     category: "Calculator",
     keywords: [
@@ -233,7 +233,7 @@ export const searchData: SearchItem[] = [
     title: "Battery Degradation Estimator",
     description:
       "Estimate capacity fade and remaining State of Health (SOH) for LFP, NMC, LTO, or Lead-Acid batteries.",
-    url: "/tools/battery-degradation-estimator",
+    url: "/tools/battery-degradation-estimator/",
     type: "calculator",
     category: "Calculator",
     keywords: [
@@ -253,7 +253,7 @@ export const searchData: SearchItem[] = [
     title: "Battery SOC Estimator",
     description:
       "Estimate battery remaining capacity using Open Circuit Voltage (OCV) interpolation or Coulomb Counting simulators.",
-    url: "/tools/soc-estimator",
+    url: "/tools/soc-estimator/",
     type: "calculator",
     category: "Calculator",
     keywords: [
@@ -291,7 +291,7 @@ export const searchData: SearchItem[] = [
     title: "Solar Battery Sizing Calculator",
     description:
       "Size your solar battery bank based on daily energy consumption, autonomy days, battery chemistry, and depth of discharge.",
-    url: "/tools/solar-battery-sizing-calculator",
+    url: "/tools/solar-battery-sizing-calculator/",
     type: "calculator",
     category: "Calculator",
     keywords: [
@@ -308,7 +308,7 @@ export const searchData: SearchItem[] = [
     title: "Home Backup Battery Calculator",
     description:
       "Calculate the battery size you need for home backup power during outages. Size critical load coverage for 8–48 hours.",
-    url: "/tools/home-backup-battery-calculator",
+    url: "/tools/home-backup-battery-calculator/",
     type: "calculator",
     category: "Calculator",
     keywords: [
@@ -326,7 +326,7 @@ export const searchData: SearchItem[] = [
     title: "Home Power Outage Battery Backup Calculator",
     description:
       "Calculate what battery size, inverter size, and backup power system you need for essential appliances during a power outage, storm, hurricane, wildfire outage, or emergency grid failure.",
-    url: "/home-power-outage-battery-backup-calculator",
+    url: "/home-power-outage-battery-backup-calculator/",
     type: "calculator",
     category: "Calculator",
     keywords: [
@@ -351,7 +351,7 @@ export const searchData: SearchItem[] = [
     title: "Fridge Battery Backup Calculator",
     description:
       "Calculate the battery size, inverter capacity, and backup runtime needed to keep your refrigerator running during a power outage. Prevent food spoilage with properly sized emergency backup power.",
-    url: "/fridge-battery-backup-calculator",
+    url: "/fridge-battery-backup-calculator/",
     type: "calculator",
     category: "Calculator",
     keywords: [
@@ -369,7 +369,7 @@ export const searchData: SearchItem[] = [
     title: "CPAP Battery Backup Calculator",
     description:
       "Calculate the battery size and backup runtime needed to power your CPAP machine overnight during a power outage. Ensure uninterrupted sleep apnea therapy with properly sized emergency battery backup.",
-    url: "/cpap-battery-backup-calculator",
+    url: "/cpap-battery-backup-calculator/",
     type: "calculator",
     category: "Calculator",
     keywords: [
@@ -386,7 +386,7 @@ export const searchData: SearchItem[] = [
     title: "Sump Pump Battery Backup Calculator",
     description:
       "Calculate the battery size, inverter capacity, and backup runtime needed to keep your sump pump running during a power outage. Prevent basement flooding with properly sized emergency backup power.",
-    url: "/sump-pump-battery-backup-calculator",
+    url: "/sump-pump-battery-backup-calculator/",
     type: "calculator",
     category: "Calculator",
     keywords: [
@@ -403,7 +403,7 @@ export const searchData: SearchItem[] = [
     title: "Portable Power Station Runtime Calculator",
     description:
       "Calculate how long a portable power station will run your appliances during a power outage. Estimate runtime, compare station sizes, and plan backup power for camping, emergencies, and off-grid use.",
-    url: "/portable-power-station-runtime-calculator",
+    url: "/portable-power-station-runtime-calculator/",
     type: "calculator",
     category: "Calculator",
     keywords: [
@@ -420,7 +420,7 @@ export const searchData: SearchItem[] = [
     title: "Solar Generator Sizing Calculator",
     description:
       "Calculate the battery capacity, solar panel wattage, and system components needed for a complete solar generator. Size your solar backup system for off-grid living, emergency preparedness, or camping.",
-    url: "/solar-generator-sizing-calculator",
+    url: "/solar-generator-sizing-calculator/",
     type: "calculator",
     category: "Calculator",
     keywords: [
@@ -437,7 +437,7 @@ export const searchData: SearchItem[] = [
     title: "RV Battery Calculator",
     description:
       "Calculate the battery bank size you need for your RV or camper. Estimate daily consumption and required capacity.",
-    url: "/tools/rv-battery-calculator",
+    url: "/tools/rv-battery-calculator/",
     type: "calculator",
     category: "Calculator",
     keywords: [
@@ -456,7 +456,7 @@ export const searchData: SearchItem[] = [
     title: "What Is Battery C-Rate?",
     description:
       "A practical guide to battery C-rate: what it means, how to calculate charge and discharge currents, and how C-rate affects longevity.",
-    url: "/learn/what-is-battery-c-rate",
+    url: "/learn/what-is-battery-c-rate/",
     type: "guide",
     category: "Learn",
     keywords: [
@@ -478,7 +478,7 @@ export const searchData: SearchItem[] = [
     title: "How to Calculate Battery Runtime",
     description:
       "Step-by-step guide to calculating battery discharge runtime from capacity, load power, efficiency, and depth of discharge.",
-    url: "/learn/how-to-calculate-battery-runtime",
+    url: "/learn/how-to-calculate-battery-runtime/",
     type: "guide",
     category: "Learn",
     keywords: [
@@ -498,7 +498,7 @@ export const searchData: SearchItem[] = [
     title: "How to Size a Battery Bank",
     description:
       "Learn how to calculate the required battery bank capacity from daily energy consumption, autonomy days, voltage, and derating.",
-    url: "/learn/how-to-size-a-battery-bank",
+    url: "/learn/how-to-size-a-battery-bank/",
     type: "guide",
     category: "Learn",
     keywords: [
@@ -518,7 +518,7 @@ export const searchData: SearchItem[] = [
     title: "Voltage Drop Explained",
     description:
       "Understand why DC voltage drop occurs, how to calculate it, and how to select the right wire size.",
-    url: "/learn/voltage-drop-explained",
+    url: "/learn/voltage-drop-explained/",
     type: "guide",
     category: "Learn",
     keywords: [
@@ -537,7 +537,7 @@ export const searchData: SearchItem[] = [
     title: "Understanding State of Charge (SOC)",
     description:
       "A clear guide to battery State of Charge: what SOC means, how it relates to DoD, how it is measured, and why managing SOC is critical.",
-    url: "/learn/understanding-state-of-charge",
+    url: "/learn/understanding-state-of-charge/",
     type: "guide",
     category: "Learn",
     keywords: [
@@ -556,7 +556,7 @@ export const searchData: SearchItem[] = [
     title: "Battery Degradation Explained",
     description:
       "Understand why batteries lose capacity over time and cycles. Learn the two types of degradation and key factors that accelerate aging.",
-    url: "/learn/battery-degradation-explained",
+    url: "/learn/battery-degradation-explained/",
     type: "guide",
     category: "Learn",
     keywords: [
@@ -575,7 +575,7 @@ export const searchData: SearchItem[] = [
     title: "How to Size a Solar Battery Bank",
     description:
       "Step-by-step guide to sizing a solar battery bank from daily energy consumption, autonomy days, depth of discharge, and efficiency.",
-    url: "/learn/how-to-size-solar-battery-bank",
+    url: "/learn/how-to-size-solar-battery-bank/",
     type: "guide",
     category: "Learn",
     keywords: [
@@ -594,7 +594,7 @@ export const searchData: SearchItem[] = [
     title: "Home Battery Backup Planning Guide",
     description:
       "Step-by-step guide to sizing a home battery backup system: identify critical loads, determine backup duration, and size the battery.",
-    url: "/learn/home-battery-backup-planning",
+    url: "/learn/home-battery-backup-planning/",
     type: "guide",
     category: "Learn",
     keywords: [
@@ -613,7 +613,7 @@ export const searchData: SearchItem[] = [
     title: "RV Battery Sizing Guide",
     description:
       "Complete guide to sizing RV house batteries: inventory your loads, calculate daily consumption, choose system voltage, and select chemistry.",
-    url: "/learn/rv-battery-sizing-guide",
+    url: "/learn/rv-battery-sizing-guide/",
     type: "guide",
     category: "Learn",
     keywords: [
@@ -632,7 +632,7 @@ export const searchData: SearchItem[] = [
     title: "Marine Battery Sizing Guide",
     description:
       "Learn how to size a marine battery bank by calculating hotel loads, accounting for anchored vs cruising loads, and selecting chemistry.",
-    url: "/learn/marine-battery-sizing-guide",
+    url: "/learn/marine-battery-sizing-guide/",
     type: "guide",
     category: "Learn",
     keywords: [
@@ -652,7 +652,7 @@ export const searchData: SearchItem[] = [
     title: "Battery Pack Design Basics",
     description:
       "Learn the fundamentals of battery pack design: series and parallel connections, voltage and capacity calculations, and design guidelines.",
-    url: "/learn/battery-pack-design-basics",
+    url: "/learn/battery-pack-design-basics/",
     type: "guide",
     category: "Learn",
     keywords: [
@@ -671,7 +671,7 @@ export const searchData: SearchItem[] = [
     title: "BESS ROI Explained",
     description:
       "Learn how to evaluate the financial return of commercial battery energy storage systems. Understand ROI metrics, revenue streams, and cost factors.",
-    url: "/learn/bess-roi-explained",
+    url: "/learn/bess-roi-explained/",
     type: "guide",
     category: "Learn",
     keywords: [
@@ -691,7 +691,7 @@ export const searchData: SearchItem[] = [
     title: "How Long Will a Battery Last?",
     description:
       "Calculate battery runtime from capacity, load, efficiency, and depth of discharge. Includes worked examples and practical reference tables.",
-    url: "/learn/how-long-will-a-battery-last",
+    url: "/learn/how-long-will-a-battery-last/",
     type: "guide",
     category: "Learn",
     keywords: [
@@ -714,7 +714,7 @@ export const searchData: SearchItem[] = [
     title: "How Long to Charge a Battery",
     description:
       "Estimate battery charging time using C-rate, charger current, and the CC-CV charging profile. Includes worked examples and reference tables.",
-    url: "/learn/how-long-to-charge-a-battery",
+    url: "/learn/how-long-to-charge-a-battery/",
     type: "guide",
     category: "Learn",
     keywords: [
@@ -735,7 +735,7 @@ export const searchData: SearchItem[] = [
     title: "How Long Will a 200Ah Battery Last?",
     description:
       "Practical runtime examples for 200Ah batteries powering RV, marine, solar, and home backup loads. Includes worked calculations.",
-    url: "/learn/how-long-will-a-200ah-battery-last",
+    url: "/learn/how-long-will-a-200ah-battery-last/",
     type: "guide",
     category: "Learn",
     keywords: [
@@ -757,7 +757,7 @@ export const searchData: SearchItem[] = [
     title: "How Long Will My Solar Battery Last?",
     description:
       "Estimate solar battery runtime at night and during cloudy periods. Includes worked examples for off-grid and hybrid solar systems.",
-    url: "/learn/how-long-will-my-solar-battery-last",
+    url: "/learn/how-long-will-my-solar-battery-last/",
     type: "guide",
     category: "Learn",
     keywords: [
@@ -780,7 +780,7 @@ export const searchData: SearchItem[] = [
   {
     title: "How to Calculate Runtime of a Battery",
     description: "Complete engineering method for calculating battery runtime with accuracy and worked examples.",
-    url: "/learn/how-to-calculate-runtime-of-a-battery",
+    url: "/learn/how-to-calculate-runtime-of-a-battery/",
     type: "guide",
     category: "Learn",
     keywords: ["calculate runtime", "runtime calculation", "battery runtime method", "how to calculate runtime", "discharge calculation"],
@@ -788,7 +788,7 @@ export const searchData: SearchItem[] = [
   {
     title: "How Long Will a 100Ah Battery Last?",
     description: "Detailed runtime examples for 100Ah batteries at 12V, 24V, and 48V across common loads.",
-    url: "/learn/how-long-will-a-100ah-battery-last",
+    url: "/learn/how-long-will-a-100ah-battery-last/",
     type: "guide",
     category: "Learn",
     keywords: ["100ah", "100 ah", "100ah battery last", "how long 100ah", "100ah runtime"],
@@ -796,7 +796,7 @@ export const searchData: SearchItem[] = [
   {
     title: "How Long Will a 300Ah Battery Last?",
     description: "Runtime examples for 300Ah batteries in home backup, RV, and off-grid solar applications.",
-    url: "/learn/how-long-will-a-300ah-battery-last",
+    url: "/learn/how-long-will-a-300ah-battery-last/",
     type: "guide",
     category: "Learn",
     keywords: ["300ah", "300 ah", "300ah battery last", "how long 300ah", "300ah runtime"],
@@ -804,7 +804,7 @@ export const searchData: SearchItem[] = [
   {
     title: "LiFePO4 Battery Runtime Guide",
     description: "Deep dive into LiFePO4 runtime characteristics, discharge curves, and temperature effects.",
-    url: "/learn/lifepo4-battery-runtime-guide",
+    url: "/learn/lifepo4-battery-runtime-guide/",
     type: "guide",
     category: "Learn",
     keywords: ["lifepo4", "lfp", "lifepo4 runtime", "lfp battery", "磷酸铁锂", "lfp runtime"],
@@ -812,7 +812,7 @@ export const searchData: SearchItem[] = [
   {
     title: "Lithium Battery Runtime Guide",
     description: "Lithium battery runtime characteristics across LFP, NMC, and NCA chemistries.",
-    url: "/learn/lithium-battery-runtime-guide",
+    url: "/learn/lithium-battery-runtime-guide/",
     type: "guide",
     category: "Learn",
     keywords: ["lithium", "lithium battery", "lithium runtime", "nmc", "nca", "lithium ion"],
@@ -820,7 +820,7 @@ export const searchData: SearchItem[] = [
   {
     title: "UPS Battery Runtime Guide",
     description: "How to estimate and extend UPS battery runtime for computers, servers, and critical equipment.",
-    url: "/learn/ups-battery-runtime-guide",
+    url: "/learn/ups-battery-runtime-guide/",
     type: "guide",
     category: "Learn",
     keywords: ["ups", "ups battery", "ups runtime", "uninterruptible power", "ups backup"],
@@ -828,7 +828,7 @@ export const searchData: SearchItem[] = [
   {
     title: "Inverter Battery Runtime Guide",
     description: "How inverter efficiency affects battery runtime with practical calculations for AC loads.",
-    url: "/learn/inverter-battery-runtime-guide",
+    url: "/learn/inverter-battery-runtime-guide/",
     type: "guide",
     category: "Learn",
     keywords: ["inverter", "inverter battery", "inverter runtime", "inverter efficiency", "ac load"],
@@ -836,7 +836,7 @@ export const searchData: SearchItem[] = [
   {
     title: "Battery Runtime Formula",
     description: "Complete formula reference for all battery runtime calculations including temperature and efficiency.",
-    url: "/learn/battery-runtime-formula",
+    url: "/learn/battery-runtime-formula/",
     type: "guide",
     category: "Learn",
     keywords: ["runtime formula", "battery formula", "runtime equation", "capacity formula", "wh formula"],
@@ -844,7 +844,7 @@ export const searchData: SearchItem[] = [
   {
     title: "12V vs 24V vs 48V Runtime",
     description: "How system voltage affects runtime, efficiency, and cable sizing for battery systems.",
-    url: "/learn/12v-vs-24v-vs-48v-runtime",
+    url: "/learn/12v-vs-24v-vs-48v-runtime/",
     type: "guide",
     category: "Learn",
     keywords: ["12v", "24v", "48v", "voltage comparison", "system voltage", "12v vs 24v vs 48v"],
@@ -854,7 +854,7 @@ export const searchData: SearchItem[] = [
   {
     title: "What Is Battery Sizing?",
     description: "Introduction to battery sizing: what it means, why it matters, and the engineering process.",
-    url: "/learn/what-is-battery-sizing",
+    url: "/learn/what-is-battery-sizing/",
     type: "guide",
     category: "Learn",
     keywords: ["battery sizing", "what is sizing", "battery size", "sizing guide", "capacity sizing"],
@@ -862,7 +862,7 @@ export const searchData: SearchItem[] = [
   {
     title: "Battery Sizing Formula",
     description: "Complete formula reference for battery sizing across all applications and chemistries.",
-    url: "/learn/battery-sizing-formula",
+    url: "/learn/battery-sizing-formula/",
     type: "guide",
     category: "Learn",
     keywords: ["sizing formula", "battery sizing formula", "capacity formula", "sizing equation"],
@@ -870,7 +870,7 @@ export const searchData: SearchItem[] = [
   {
     title: "Battery Sizing Chart Guide",
     description: "Visual reference charts showing battery sizes for common load profiles and applications.",
-    url: "/learn/battery-sizing-chart-guide",
+    url: "/learn/battery-sizing-chart-guide/",
     type: "guide",
     category: "Learn",
     keywords: ["sizing chart", "battery chart", "capacity chart", "sizing table", "battery reference"],
@@ -878,7 +878,7 @@ export const searchData: SearchItem[] = [
   {
     title: "UPS Battery Sizing Guide",
     description: "How to size UPS batteries for computers, servers, medical equipment, and critical loads.",
-    url: "/learn/ups-battery-sizing-guide",
+    url: "/learn/ups-battery-sizing-guide/",
     type: "guide",
     category: "Learn",
     keywords: ["ups sizing", "ups battery sizing", "ups size", "uninterruptible power sizing"],
@@ -886,7 +886,7 @@ export const searchData: SearchItem[] = [
   {
     title: "Home Battery Sizing Guide",
     description: "How to size a battery for home backup: critical loads, duration, and voltage selection.",
-    url: "/learn/home-battery-sizing-guide",
+    url: "/learn/home-battery-sizing-guide/",
     type: "guide",
     category: "Learn",
     keywords: ["home battery sizing", "house battery", "residential battery", "home sizing"],
@@ -896,7 +896,7 @@ export const searchData: SearchItem[] = [
   {
     title: "How Many Batteries for Solar?",
     description: "How to determine the number of batteries needed for a solar energy storage system.",
-    url: "/learn/how-many-batteries-for-solar",
+    url: "/learn/how-many-batteries-for-solar/",
     type: "guide",
     category: "Learn",
     keywords: ["batteries for solar", "solar batteries", "how many batteries solar", "solar count"],
@@ -904,7 +904,7 @@ export const searchData: SearchItem[] = [
   {
     title: "How Much Battery Storage Do I Need?",
     description: "Calculate total battery storage from daily consumption and autonomy requirements.",
-    url: "/learn/how-much-battery-storage-do-i-need",
+    url: "/learn/how-much-battery-storage-do-i-need/",
     type: "guide",
     category: "Learn",
     keywords: ["battery storage", "how much storage", "storage needed", "kwh storage", "solar storage"],
@@ -912,7 +912,7 @@ export const searchData: SearchItem[] = [
   {
     title: "Solar Battery Backup Guide",
     description: "How solar batteries provide backup during grid outages in hybrid and off-grid systems.",
-    url: "/learn/solar-battery-backup-guide",
+    url: "/learn/solar-battery-backup-guide/",
     type: "guide",
     category: "Learn",
     keywords: ["solar backup", "solar battery backup", "solar outage", "hybrid backup"],
@@ -920,7 +920,7 @@ export const searchData: SearchItem[] = [
   {
     title: "Off-Grid Battery Planning",
     description: "Complete guide to planning battery systems for off-grid solar installations.",
-    url: "/learn/off-grid-battery-planning",
+    url: "/learn/off-grid-battery-planning/",
     type: "guide",
     category: "Learn",
     keywords: ["off-grid", "off grid", "off grid battery", "off grid planning", "standalone"],
@@ -928,7 +928,7 @@ export const searchData: SearchItem[] = [
   {
     title: "Solar Storage Sizing Guide",
     description: "End-to-end guide to sizing solar storage from consumption analysis to battery selection.",
-    url: "/learn/solar-storage-sizing-guide",
+    url: "/learn/solar-storage-sizing-guide/",
     type: "guide",
     category: "Learn",
     keywords: ["solar storage sizing", "solar sizing", "storage sizing", "solar battery sizing guide"],
@@ -938,7 +938,7 @@ export const searchData: SearchItem[] = [
   {
     title: "How Many kWh Do I Need for My House?",
     description: "Calculate household kWh needs for battery backup with consumption tables by home size.",
-    url: "/learn/how-many-kwh-do-i-need-for-my-house",
+    url: "/learn/how-many-kwh-do-i-need-for-my-house/",
     type: "guide",
     category: "Learn",
     keywords: ["kwh", "kwh house", "household kwh", "home consumption", "kwh needed", "energy usage"],
@@ -946,7 +946,7 @@ export const searchData: SearchItem[] = [
   {
     title: "Power Outage Battery Guide",
     description: "How to prepare a battery system for power outages with critical load planning.",
-    url: "/learn/power-outage-battery-guide",
+    url: "/learn/power-outage-battery-guide/",
     type: "guide",
     category: "Learn",
     keywords: ["power outage", "outage battery", "blackout", "emergency power", "backup outage"],
@@ -954,7 +954,7 @@ export const searchData: SearchItem[] = [
   {
     title: "Whole House Battery Backup",
     description: "Sizing a battery system to back up an entire house during extended outages.",
-    url: "/learn/whole-house-battery-backup",
+    url: "/learn/whole-house-battery-backup/",
     type: "guide",
     category: "Learn",
     keywords: ["whole house", "whole home", "full house backup", "whole house battery"],
@@ -962,7 +962,7 @@ export const searchData: SearchItem[] = [
   {
     title: "Generator vs Battery Backup",
     description: "Comparison of generators and batteries for backup power: costs, runtime, and hybrid approaches.",
-    url: "/learn/generator-vs-battery-backup",
+    url: "/learn/generator-vs-battery-backup/",
     type: "guide",
     category: "Learn",
     keywords: ["generator vs battery", "generator backup", "battery vs generator", "backup comparison"],
@@ -970,7 +970,7 @@ export const searchData: SearchItem[] = [
   {
     title: "Home Backup Runtime Guide",
     description: "How long different battery sizes last for home backup at various load levels.",
-    url: "/learn/home-backup-runtime-guide",
+    url: "/learn/home-backup-runtime-guide/",
     type: "guide",
     category: "Learn",
     keywords: ["home backup runtime", "backup runtime", "home battery runtime", "backup duration"],
@@ -980,7 +980,7 @@ export const searchData: SearchItem[] = [
   {
     title: "Camper Battery Runtime Guide",
     description: "Battery runtime for camper vans with common load tables and weekend trip examples.",
-    url: "/learn/camper-battery-runtime-guide",
+    url: "/learn/camper-battery-runtime-guide/",
     type: "guide",
     category: "Learn",
     keywords: ["camper", "camper battery", "camper runtime", "camper van battery", "camper power"],
@@ -988,7 +988,7 @@ export const searchData: SearchItem[] = [
   {
     title: "Van Life Battery Planning",
     description: "Complete battery planning guide for van life: loads, consumption, solar, and sizing.",
-    url: "/learn/van-life-battery-planning",
+    url: "/learn/van-life-battery-planning/",
     type: "guide",
     category: "Learn",
     keywords: ["van life", "van battery", "van power", "vanlife", "camper van"],
@@ -996,7 +996,7 @@ export const searchData: SearchItem[] = [
   {
     title: "How Many Batteries for RV?",
     description: "How to determine the number of batteries for weekend camping vs full-time RV living.",
-    url: "/learn/how-many-batteries-for-rv",
+    url: "/learn/how-many-batteries-for-rv/",
     type: "guide",
     category: "Learn",
     keywords: ["rv batteries", "how many batteries rv", "rv battery count", "rv battery number"],
@@ -1004,7 +1004,7 @@ export const searchData: SearchItem[] = [
   {
     title: "RV Lithium Battery Guide",
     description: "Why lithium LFP is the best battery chemistry for RV applications with cost analysis.",
-    url: "/learn/rv-lithium-battery-guide",
+    url: "/learn/rv-lithium-battery-guide/",
     type: "guide",
     category: "Learn",
     keywords: ["rv lithium", "rv lfp", "rv battery chemistry", "lithium rv", "rv battery type"],
@@ -1014,7 +1014,7 @@ export const searchData: SearchItem[] = [
   {
     title: "Boat Battery Runtime Guide",
     description: "Battery runtime for boats: trolling motors, fish finders, navigation, and marine loads.",
-    url: "/learn/boat-battery-runtime-guide",
+    url: "/learn/boat-battery-runtime-guide/",
     type: "guide",
     category: "Learn",
     keywords: ["boat battery", "boat runtime", "trolling motor", "boat power", "marine runtime"],
@@ -1022,7 +1022,7 @@ export const searchData: SearchItem[] = [
   {
     title: "Yacht Battery Planning",
     description: "Complete battery planning for yachts: hotel loads, anchoring vs cruising, and sizing.",
-    url: "/learn/yacht-battery-planning",
+    url: "/learn/yacht-battery-planning/",
     type: "guide",
     category: "Learn",
     keywords: ["yacht battery", "yacht power", "yacht planning", "yacht electrical", "sailing battery"],
@@ -1030,7 +1030,7 @@ export const searchData: SearchItem[] = [
   {
     title: "Marine Hotel Load Guide",
     description: "How to inventory and calculate marine hotel loads for battery system sizing.",
-    url: "/learn/marine-hotel-load-guide",
+    url: "/learn/marine-hotel-load-guide/",
     type: "guide",
     category: "Learn",
     keywords: ["hotel load", "marine load", "boat load", "yacht load", "marine electrical"],
@@ -1038,7 +1038,7 @@ export const searchData: SearchItem[] = [
   {
     title: "Lithium Marine Batteries",
     description: "Why lithium LFP is replacing lead-acid in marine applications with comparison data.",
-    url: "/learn/lithium-marine-batteries",
+    url: "/learn/lithium-marine-batteries/",
     type: "guide",
     category: "Learn",
     keywords: ["lithium marine", "marine lithium", "lfp marine", "marine battery chemistry"],
@@ -1048,7 +1048,7 @@ export const searchData: SearchItem[] = [
   {
     title: "How Long to Charge a Lithium Battery",
     description: "Charging times for LFP and NMC lithium batteries at different C-rates and charger sizes.",
-    url: "/learn/how-long-to-charge-a-lithium-battery",
+    url: "/learn/how-long-to-charge-a-lithium-battery/",
     type: "guide",
     category: "Learn",
     keywords: ["charge lithium", "lithium charge time", "lfp charge", "nmc charge", "lithium charging"],
@@ -1056,7 +1056,7 @@ export const searchData: SearchItem[] = [
   {
     title: "How Long to Charge a 100Ah Battery",
     description: "Specific charging times for 100Ah batteries at 0.1C, 0.2C, 0.5C, and 1C rates.",
-    url: "/learn/how-long-to-charge-a-100ah-battery",
+    url: "/learn/how-long-to-charge-a-100ah-battery/",
     type: "guide",
     category: "Learn",
     keywords: ["charge 100ah", "100ah charge time", "100ah charging", "charge 100 ah"],
@@ -1064,7 +1064,7 @@ export const searchData: SearchItem[] = [
   {
     title: "Battery Charging Formula",
     description: "Complete formula reference for battery charging calculations: CC phase, CV phase, and total time.",
-    url: "/learn/battery-charging-formula",
+    url: "/learn/battery-charging-formula/",
     type: "guide",
     category: "Learn",
     keywords: ["charging formula", "charge formula", "cc cv", "charge time formula", "charging equation"],
@@ -1072,7 +1072,7 @@ export const searchData: SearchItem[] = [
   {
     title: "Charger Sizing Guide",
     description: "How to select the right charger size for your battery based on chemistry and desired charge time.",
-    url: "/learn/charger-sizing-guide",
+    url: "/learn/charger-sizing-guide/",
     type: "guide",
     category: "Learn",
     keywords: ["charger sizing", "charger size", "select charger", "charger guide", "charger amp"],
@@ -1082,7 +1082,7 @@ export const searchData: SearchItem[] = [
   {
     title: "Series vs Parallel Batteries",
     description: "Series vs parallel connections: how each affects voltage, capacity, and pack configuration.",
-    url: "/learn/series-vs-parallel-batteries",
+    url: "/learn/series-vs-parallel-batteries/",
     type: "guide",
     category: "Learn",
     keywords: ["series parallel", "series vs parallel", "battery connection", "series parallel battery"],
@@ -1090,7 +1090,7 @@ export const searchData: SearchItem[] = [
   {
     title: "Battery Voltage Systems",
     description: "Common battery voltage systems: 12V, 24V, 36V, 48V and how they are built from cells.",
-    url: "/learn/battery-voltage-systems",
+    url: "/learn/battery-voltage-systems/",
     type: "guide",
     category: "Learn",
     keywords: ["voltage system", "battery voltage", "12v 24v 48v", "cell configuration", "voltage config"],
@@ -1098,7 +1098,7 @@ export const searchData: SearchItem[] = [
   {
     title: "How to Build a Battery Pack",
     description: "Step-by-step guide to building a battery pack from individual cells with BMS and safety.",
-    url: "/learn/how-to-build-a-battery-pack",
+    url: "/learn/how-to-build-a-battery-pack/",
     type: "guide",
     category: "Learn",
     keywords: ["build battery", "battery pack build", "diy battery", "build pack", "battery assembly"],
@@ -1106,7 +1106,7 @@ export const searchData: SearchItem[] = [
   {
     title: "LiFePO4 Pack Design",
     description: "LFP-specific pack design: cell matching, balancing, thermal management, and configurations.",
-    url: "/learn/lifepo4-pack-design",
+    url: "/learn/lifepo4-pack-design/",
     type: "guide",
     category: "Learn",
     keywords: ["lfp pack", "lifepo4 pack", "lfp design", "lifepo4 design", "lfp battery pack"],
@@ -1117,7 +1117,7 @@ export const searchData: SearchItem[] = [
     title: "Solar & Home Battery Calculators",
     description:
       "Free solar battery sizing calculators, off-grid battery tools, and energy conversion calculators for homeowners and solar installers.",
-    url: "/solar",
+    url: "/solar/",
     type: "category",
     category: "Solar",
     keywords: [
@@ -1134,7 +1134,7 @@ export const searchData: SearchItem[] = [
     title: "RV & Camper Battery Calculators",
     description:
       "Free RV battery calculators for camper battery sizing, van life runtime planning, and inverter battery matching.",
-    url: "/rv",
+    url: "/rv/",
     type: "category",
     category: "RV",
     keywords: [
@@ -1150,7 +1150,7 @@ export const searchData: SearchItem[] = [
     title: "Marine Battery Calculators",
     description:
       "Free marine battery calculators for yacht battery sizing, boat runtime estimation, and hotel load calculation.",
-    url: "/marine",
+    url: "/marine/",
     type: "category",
     category: "Marine",
     keywords: [
@@ -1167,7 +1167,7 @@ export const searchData: SearchItem[] = [
     title: "Engineering Battery Calculators",
     description:
       "Professional battery engineering calculators for C-rate analysis, SOC estimation, SOH degradation, voltage drop, and cable loss.",
-    url: "/engineering",
+    url: "/engineering/",
     type: "category",
     category: "Engineering",
     keywords: [
@@ -1185,7 +1185,7 @@ export const searchData: SearchItem[] = [
     title: "Home Backup Battery Calculators",
     description:
       "Free home backup battery calculators for power outage planning, essential load sizing, and battery runtime estimation.",
-    url: "/home-backup",
+    url: "/home-backup/",
     type: "category",
     category: "Home Backup",
     keywords: [
@@ -1202,7 +1202,7 @@ export const searchData: SearchItem[] = [
     title: "BESS & Commercial Battery Calculators",
     description:
       "Free BESS ROI calculators for commercial battery energy storage, peak shaving analysis, and demand charge savings estimation.",
-    url: "/bess",
+    url: "/bess/",
     type: "category",
     category: "BESS",
     keywords: [
@@ -1218,7 +1218,7 @@ export const searchData: SearchItem[] = [
     title: "EV & Battery Pack Calculators",
     description:
       "Free EV battery calculators for pack design, series-parallel configuration, voltage calculation, and C-rate analysis.",
-    url: "/ev",
+    url: "/ev/",
     type: "category",
     category: "EV",
     keywords: [
@@ -1237,7 +1237,7 @@ export const searchData: SearchItem[] = [
     title: "LiFePO4 Voltage Chart",
     description:
       "Approximate resting voltage table for LiFePO4 batteries at 12V, 24V, and 48V by SOC level.",
-    url: "/learn/lifepo4-voltage-chart",
+    url: "/learn/lifepo4-voltage-chart/",
     type: "guide",
     category: "Reference",
     keywords: [
@@ -1255,7 +1255,7 @@ export const searchData: SearchItem[] = [
     title: "LiFePO4 SOC Chart",
     description:
       "Why LiFePO4 voltage is flat in the middle SOC range, and why coulomb counting is often better for SOC estimation.",
-    url: "/learn/lifepo4-soc-chart",
+    url: "/learn/lifepo4-soc-chart/",
     type: "guide",
     category: "Reference",
     keywords: [
@@ -1272,7 +1272,7 @@ export const searchData: SearchItem[] = [
     title: "Lead-Acid Voltage Chart",
     description:
       "Voltage reference tables for flooded, AGM, and gel lead-acid batteries at 12V, 24V, and 48V by SOC.",
-    url: "/learn/lead-acid-voltage-chart",
+    url: "/learn/lead-acid-voltage-chart/",
     type: "guide",
     category: "Reference",
     keywords: [
@@ -1289,7 +1289,7 @@ export const searchData: SearchItem[] = [
     title: "Battery Depth of Discharge Chart",
     description:
       "DoD limits by battery chemistry with usable capacity from 100Ah and cycle life implications.",
-    url: "/learn/battery-depth-of-discharge-chart",
+    url: "/learn/battery-depth-of-discharge-chart/",
     type: "guide",
     category: "Reference",
     keywords: [
@@ -1306,7 +1306,7 @@ export const searchData: SearchItem[] = [
     title: "Battery Temperature Correction Chart",
     description:
       "How temperature affects battery capacity, charging safety, and degradation risk with correction factors.",
-    url: "/learn/battery-temperature-correction-chart",
+    url: "/learn/battery-temperature-correction-chart/",
     type: "guide",
     category: "Reference",
     keywords: [
@@ -1322,7 +1322,7 @@ export const searchData: SearchItem[] = [
     title: "Battery C-Rate Reference",
     description:
       "C-rate to current conversion table for 50Ah, 100Ah, 200Ah, and 300Ah batteries at 0.2C, 0.5C, 1C, 2C.",
-    url: "/learn/battery-c-rate-reference",
+    url: "/learn/battery-c-rate-reference/",
     type: "guide",
     category: "Reference",
     keywords: [
@@ -1341,7 +1341,7 @@ export const searchData: SearchItem[] = [
     title: "Battery Sizing Reference",
     description:
       "Practical battery sizing tables for RV, solar, marine, home backup, and commercial BESS applications.",
-    url: "/learn/battery-sizing-reference",
+    url: "/learn/battery-sizing-reference/",
     type: "guide",
     category: "Reference",
     keywords: [
@@ -1359,7 +1359,7 @@ export const searchData: SearchItem[] = [
   {
     title: "How Long Will a 50Ah Battery Last?",
     description: "Runtime examples for 50Ah batteries powering small electronics, emergency kits, and minimal loads.",
-    url: "/learn/how-long-will-a-50ah-battery-last",
+    url: "/learn/how-long-will-a-50ah-battery-last/",
     type: "guide",
     category: "Practical Examples",
     keywords: ["50ah battery runtime", "50ah last long", "50ah battery life", "small battery runtime"],
@@ -1367,7 +1367,7 @@ export const searchData: SearchItem[] = [
   {
     title: "How Long Will a 400Ah Battery Last?",
     description: "Runtime examples for 400Ah batteries in full-time RV, home backup, and extended off-grid applications.",
-    url: "/learn/how-long-will-a-400ah-battery-last",
+    url: "/learn/how-long-will-a-400ah-battery-last/",
     type: "guide",
     category: "Practical Examples",
     keywords: ["400ah battery runtime", "400ah last long", "large battery runtime", "whole house battery"],
@@ -1376,7 +1376,7 @@ export const searchData: SearchItem[] = [
   {
     title: "12V vs 24V vs 48V Batteries",
     description: "Complete comparison of 12V, 24V, and 48V battery systems with trade-offs for capacity, efficiency, and wiring.",
-    url: "/learn/12v-vs-24v-vs-48v-batteries",
+    url: "/learn/12v-vs-24v-vs-48v-batteries/",
     type: "guide",
     category: "Electrical",
     keywords: ["12v vs 24v", "24v vs 48v", "battery voltage comparison", "which voltage battery", "12v 24v 48v"],
@@ -1384,7 +1384,7 @@ export const searchData: SearchItem[] = [
   {
     title: "24V vs 48V Solar Systems",
     description: "Compare 24V and 48V solar battery systems for cost, efficiency, and scalability.",
-    url: "/learn/24v-vs-48v-solar-systems",
+    url: "/learn/24v-vs-48v-solar-systems/",
     type: "guide",
     category: "Solar",
     keywords: ["24v vs 48v solar", "solar system voltage", "solar battery voltage", "48v solar advantage"],
@@ -1392,7 +1392,7 @@ export const searchData: SearchItem[] = [
   {
     title: "12V vs 24V RV Batteries",
     description: "Compare 12V and 24V battery systems for RV and camper applications.",
-    url: "/learn/12v-vs-24v-rv-batteries",
+    url: "/learn/12v-vs-24v-rv-batteries/",
     type: "guide",
     category: "RV & Camper",
     keywords: ["12v vs 24v rv", "rv battery voltage", "camper battery voltage", "rv 24v upgrade"],
@@ -1400,7 +1400,7 @@ export const searchData: SearchItem[] = [
   {
     title: "Marine Battery Voltage Selection",
     description: "How to choose between 12V, 24V, and 36V for marine house banks and engine starting.",
-    url: "/learn/marine-battery-voltage-selection",
+    url: "/learn/marine-battery-voltage-selection/",
     type: "guide",
     category: "Marine",
     keywords: ["marine battery voltage", "boat battery 12v 24v", "marine house bank voltage", "trolling motor voltage"],
@@ -1409,7 +1409,7 @@ export const searchData: SearchItem[] = [
   {
     title: "LiFePO4 vs Lead-Acid",
     description: "Head-to-head comparison of LiFePO4 and flooded lead-acid batteries across all key metrics.",
-    url: "/learn/lifepo4-vs-lead-acid",
+    url: "/learn/lifepo4-vs-lead-acid/",
     type: "guide",
     category: "Chemistry",
     keywords: ["lifepo4 vs lead acid", "lithium vs lead acid", "lfp vs lead", "battery chemistry comparison"],
@@ -1417,7 +1417,7 @@ export const searchData: SearchItem[] = [
   {
     title: "LiFePO4 vs AGM",
     description: "Compare LiFePO4 and AGM sealed lead-acid batteries for deep-cycle applications.",
-    url: "/learn/lifepo4-vs-agm",
+    url: "/learn/lifepo4-vs-agm/",
     type: "guide",
     category: "Chemistry",
     keywords: ["lifepo4 vs agm", "lithium vs agm", "agm vs lithium", "agm battery comparison"],
@@ -1425,7 +1425,7 @@ export const searchData: SearchItem[] = [
   {
     title: "LiFePO4 vs Gel",
     description: "Compare LiFePO4 and gel cell batteries for solar, marine, and backup applications.",
-    url: "/learn/lifepo4-vs-gel",
+    url: "/learn/lifepo4-vs-gel/",
     type: "guide",
     category: "Chemistry",
     keywords: ["lifepo4 vs gel", "lithium vs gel", "gel battery comparison", "gel vs lithium"],
@@ -1433,7 +1433,7 @@ export const searchData: SearchItem[] = [
   {
     title: "LiFePO4 vs NMC",
     description: "Compare LiFePO4 and NMC lithium-ion chemistries for safety, energy density, and cycle life.",
-    url: "/learn/lifepo4-vs-nmc",
+    url: "/learn/lifepo4-vs-nmc/",
     type: "guide",
     category: "Chemistry",
     keywords: ["lifepo4 vs nmc", "lfp vs nmc", "lithium battery chemistry", "nmc vs lfp safety"],
@@ -1441,7 +1441,7 @@ export const searchData: SearchItem[] = [
   {
     title: "Best Battery Chemistry for Solar",
     description: "Ranking of battery chemistries for solar storage with cost, cycle life, and safety analysis.",
-    url: "/learn/best-battery-chemistry-for-solar",
+    url: "/learn/best-battery-chemistry-for-solar/",
     type: "guide",
     category: "Chemistry",
     keywords: ["best battery solar", "solar battery chemistry", "lifepo4 solar", "best lithium for solar"],
@@ -1449,7 +1449,7 @@ export const searchData: SearchItem[] = [
   {
     title: "Best Battery Chemistry for RV",
     description: "Ranking of battery chemistries for RV applications with weight, DoD, and vibration analysis.",
-    url: "/learn/best-battery-chemistry-for-rv",
+    url: "/learn/best-battery-chemistry-for-rv/",
     type: "guide",
     category: "Chemistry",
     keywords: ["best battery rv", "rv battery chemistry", "lifepo4 rv", "best lithium for rv"],
@@ -1457,7 +1457,7 @@ export const searchData: SearchItem[] = [
   {
     title: "Best Battery Chemistry for Marine",
     description: "Ranking of battery chemistries for marine house banks and engine starting.",
-    url: "/learn/best-battery-chemistry-for-marine",
+    url: "/learn/best-battery-chemistry-for-marine/",
     type: "guide",
     category: "Chemistry",
     keywords: ["best battery marine", "marine battery chemistry", "boat battery type", "lifepo4 marine"],
@@ -1466,7 +1466,7 @@ export const searchData: SearchItem[] = [
   {
     title: "LiFePO4 Charge Voltage Table",
     description: "Complete charge voltage reference for LiFePO4 cells and packs at 12V, 24V, and 48V.",
-    url: "/learn/lifepo4-charge-voltage-table",
+    url: "/learn/lifepo4-charge-voltage-table/",
     type: "guide",
     category: "Reference",
     keywords: ["lifepo4 charge voltage", "lfp charging voltage", "lithium charge voltage", "3.65v cell", "14.6v 12v charge"],
@@ -1474,7 +1474,7 @@ export const searchData: SearchItem[] = [
   {
     title: "Battery Efficiency Reference",
     description: "Round-trip efficiency by chemistry, inverter efficiency ratings, and total system loss calculations.",
-    url: "/learn/battery-efficiency-reference",
+    url: "/learn/battery-efficiency-reference/",
     type: "guide",
     category: "Reference",
     keywords: ["battery efficiency", "round trip efficiency", "inverter efficiency", "system efficiency loss"],
@@ -1482,7 +1482,7 @@ export const searchData: SearchItem[] = [
   {
     title: "Common Battery Sizes Reference",
     description: "Standard battery capacities from 7Ah to 400Ah with energy ratings and typical applications.",
-    url: "/learn/common-battery-sizes-reference",
+    url: "/learn/common-battery-sizes-reference/",
     type: "guide",
     category: "Reference",
     keywords: ["battery sizes", "common battery ah", "battery capacity chart", "100ah 200ah sizes", "battery group size"],
@@ -1490,7 +1490,7 @@ export const searchData: SearchItem[] = [
   {
     title: "Battery Energy Density Chart",
     description: "Compare gravimetric and volumetric energy density across LiFePO4, NMC, and lead-acid chemistries.",
-    url: "/learn/battery-energy-density-chart",
+    url: "/learn/battery-energy-density-chart/",
     type: "guide",
     category: "Reference",
     keywords: ["battery energy density", "wh per kg", "battery weight comparison", "lithium vs lead weight"],
@@ -1498,7 +1498,7 @@ export const searchData: SearchItem[] = [
   {
     title: "How Long Will a Battery Run a 12V Fridge?",
     description: "Calculate exact battery runtime for 12V camping fridges with worked examples for LFP and lead-acid batteries.",
-    url: "/learn/how-long-will-a-battery-run-a-12v-fridge",
+    url: "/learn/how-long-will-a-battery-run-a-12v-fridge/",
     type: "guide",
     category: "RV & Camper",
     keywords: ["12v fridge battery runtime", "camping fridge battery", "12v refrigerator battery life", "battery for 12v fridge"],
@@ -1506,7 +1506,7 @@ export const searchData: SearchItem[] = [
   {
     title: "How Long Will a Battery Backup Sump Pump Run?",
     description: "Calculate battery backup runtime for sump pumps during power outages with sizing recommendations.",
-    url: "/learn/how-long-will-a-battery-backup-sump-pump-run",
+    url: "/learn/how-long-will-a-battery-backup-sump-pump-run/",
     type: "guide",
     category: "Home Backup",
     keywords: ["sump pump battery backup runtime", "battery backup for sump pump", "sump pump battery sizing", "flood protection battery"],
@@ -1514,7 +1514,7 @@ export const searchData: SearchItem[] = [
   {
     title: "How Long Will a Battery Run a Diesel Heater?",
     description: "Calculate battery runtime for 12V diesel heaters with power consumption breakdowns for RV and camper heating.",
-    url: "/learn/how-long-will-a-battery-run-a-diesel-heater",
+    url: "/learn/how-long-will-a-battery-run-a-diesel-heater/",
     type: "guide",
     category: "RV & Camper",
     keywords: ["diesel heater battery runtime", "12v diesel heater battery", "diesel heater power usage", "camper diesel heater battery"],
@@ -1522,7 +1522,7 @@ export const searchData: SearchItem[] = [
   {
     title: "What Size Battery for a Trolling Motor?",
     description: "Complete trolling motor battery sizing guide for 12V, 24V, and 36V systems with runtime calculations.",
-    url: "/learn/what-size-battery-for-trolling-motor",
+    url: "/learn/what-size-battery-for-trolling-motor/",
     type: "guide",
     category: "Marine",
     keywords: ["trolling motor battery size", "best battery for trolling motor", "24v trolling motor battery", "marine battery sizing"],
@@ -1530,7 +1530,7 @@ export const searchData: SearchItem[] = [
   {
     title: "Solar Battery Storage Explained",
     description: "Comprehensive guide to solar battery storage systems with sizing calculations and chemistry comparisons.",
-    url: "/learn/solar-battery-storage-explained",
+    url: "/learn/solar-battery-storage-explained/",
     type: "guide",
     category: "Solar",
     keywords: ["solar battery storage", "solar battery sizing", "home solar battery storage", "lifepo4 solar battery"],
@@ -1539,7 +1539,7 @@ export const searchData: SearchItem[] = [
   {
     title: "Is a Home Battery Worth It in 2026?",
     description: "Honest analysis of whether a home battery is worth the cost: savings, payback periods, backup value, and sizing guidance.",
-    url: "/learn/is-home-battery-worth-it-2026",
+    url: "/learn/is-home-battery-worth-it-2026/",
     type: "guide",
     category: "Home Backup",
     keywords: ["home battery worth it", "is a home battery worth it", "home battery ROI", "home battery savings", "battery backup for home", "home battery payback period", "home energy storage benefits"],
@@ -1547,7 +1547,7 @@ export const searchData: SearchItem[] = [
   {
     title: "Solar Battery Cost Breakdown 2026",
     description: "Complete breakdown of solar battery costs in 2026: battery pricing, installation costs, cost per kWh, payback periods, and ROI analysis.",
-    url: "/learn/solar-battery-cost-breakdown-2026",
+    url: "/learn/solar-battery-cost-breakdown-2026/",
     type: "guide",
     category: "Solar",
     keywords: ["solar battery cost", "solar battery price 2026", "battery cost per kwh", "solar battery payback", "solar storage cost", "lifepo4 vs lead acid cost"],
@@ -1555,7 +1555,7 @@ export const searchData: SearchItem[] = [
   {
     title: "EU Battery Passport Requirements 2026",
     description: "Complete guide to EU battery passport requirements under Regulation (EU) 2023/1542. Compliance timelines, required data, and preparation for the 2027 deadline.",
-    url: "/learn/eu-battery-passport-requirements-2026",
+    url: "/learn/eu-battery-passport-requirements-2026/",
     type: "guide",
     category: "Regulatory Compliance",
     keywords: ["eu battery passport", "battery regulation 2023/1542", "battery passport requirements", "digital battery passport", "eu battery compliance", "battery traceability"],
@@ -1563,7 +1563,7 @@ export const searchData: SearchItem[] = [
   {
     title: "Battery Electric Ferries Explained",
     description: "Design considerations, benefits and challenges of battery-electric ferries covering charging strategies, route planning, battery sizing, and economics.",
-    url: "/learn/battery-electric-ferries-explained",
+    url: "/learn/battery-electric-ferries-explained/",
     type: "guide",
     category: "Marine",
     keywords: ["battery electric ferry", "electric ferry battery", "ferry battery sizing", "electric ferry range", "ferry electrification"],
@@ -1571,7 +1571,7 @@ export const searchData: SearchItem[] = [
   {
     title: "How Hybrid Vessels Reduce Emissions",
     description: "Detailed analysis of how hybrid propulsion reduces fuel consumption and emissions through load optimization, peak shaving, and regenerative energy capture.",
-    url: "/learn/how-hybrid-vessels-reduce-emissions",
+    url: "/learn/how-hybrid-vessels-reduce-emissions/",
     type: "guide",
     category: "Marine",
     keywords: ["hybrid vessel emissions", "hybrid propulsion fuel savings", "marine hybrid emissions reduction", "peak shaving vessel", "hybrid marine fuel consumption"],
@@ -1579,7 +1579,7 @@ export const searchData: SearchItem[] = [
   {
     title: "Hybrid Propulsion Systems Explained",
     description: "Technical guide to hybrid marine propulsion covering series hybrid, parallel hybrid, battery-assisted propulsion, operational modes, and fuel savings.",
-    url: "/learn/hybrid-propulsion-systems-explained",
+    url: "/learn/hybrid-propulsion-systems-explained/",
     type: "guide",
     category: "Marine",
     keywords: ["hybrid propulsion system", "series hybrid marine", "parallel hybrid vessel", "battery assisted propulsion", "marine hybrid modes"],
@@ -1587,7 +1587,7 @@ export const searchData: SearchItem[] = [
   {
     title: "Maritime Decarbonization Roadmap",
     description: "IMO targets, technology pathways, regulatory timeline, and commercial opportunities for maritime decarbonization through 2050.",
-    url: "/learn/maritime-decarbonization-roadmap",
+    url: "/learn/maritime-decarbonization-roadmap/",
     type: "guide",
     category: "Marine",
     keywords: ["maritime decarbonization", "imo 2050", "shipping emissions targets", "marine fuel transition", "green shipping"],
@@ -1595,7 +1595,7 @@ export const searchData: SearchItem[] = [
   {
     title: "Shore Power vs Diesel Generators",
     description: "Cost, emissions, and operational comparison of shore power versus onboard diesel generator operation at berth for commercial vessels.",
-    url: "/learn/shore-power-vs-diesel-generators",
+    url: "/learn/shore-power-vs-diesel-generators/",
     type: "guide",
     category: "Marine",
     keywords: ["shore power vs generator", "cold ironing", "shore power cost", "diesel generator berth", "marine shore connection"],
@@ -1603,7 +1603,7 @@ export const searchData: SearchItem[] = [
   {
     title: "Understanding CII Ratings",
     description: "Complete guide to IMO Carbon Intensity Indicator ratings covering A-E thresholds, improvement strategies, and how battery systems improve vessel CII.",
-    url: "/learn/understanding-cii-ratings",
+    url: "/learn/understanding-cii-ratings/",
     type: "guide",
     category: "Marine",
     keywords: ["cii rating", "carbon intensity indicator", "imo cii", "vessel cii score", "cii improvement", "marine carbon intensity"],
@@ -1611,7 +1611,7 @@ export const searchData: SearchItem[] = [
   {
     title: "Vessel Energy Storage Systems Explained",
     description: "Technical guide to marine battery architecture, LFP vs NMC chemistry, marine integration, safety systems, and battery management for vessel energy storage.",
-    url: "/learn/vessel-energy-storage-systems-explained",
+    url: "/learn/vessel-energy-storage-systems-explained/",
     type: "guide",
     category: "Marine",
     keywords: ["vessel energy storage", "marine battery system", "ship battery architecture", "marine battery safety", "marine bess"],
@@ -1619,7 +1619,7 @@ export const searchData: SearchItem[] = [
   {
     title: "What Is Marine Electrification?",
     description: "Comprehensive guide to marine electrification covering battery-electric vessels, hybrid propulsion, shore power, and the economic drivers transforming shipping.",
-    url: "/learn/what-is-marine-electrification",
+    url: "/learn/what-is-marine-electrification/",
     type: "guide",
     category: "Marine",
     keywords: ["marine electrification", "electric ship", "battery electric vessel", "shipping electrification", "maritime battery"],
@@ -1629,7 +1629,7 @@ export const searchData: SearchItem[] = [
   {
     title: "Battery Engineering Resources",
     description: "Download free battery engineering cheat sheets, voltage charts, sizing worksheets, and planning checklists.",
-    url: "/resources",
+    url: "/resources/",
     type: "page",
     category: "Resources",
     keywords: ["resources", "download", "cheat sheet", "worksheet", "checklist", "pdf", "free"],
@@ -1637,7 +1637,7 @@ export const searchData: SearchItem[] = [
   {
     title: "Calculator Directory",
     description: "Browse all battery engineering calculators organized by category. Find the right tool for your sizing, runtime, and analysis needs.",
-    url: "/tools",
+    url: "/tools/",
     type: "page",
     category: "Tools",
     keywords: ["calculators", "tools", "directory", "index", "all tools", "browse"],
@@ -1645,7 +1645,7 @@ export const searchData: SearchItem[] = [
   {
     title: "Methodology & Engineering Transparency",
     description: "Learn about the formulas, assumptions, and engineering principles behind BatteryCalculators.com calculators.",
-    url: "/methodology",
+    url: "/methodology/",
     type: "page",
     category: "About",
     keywords: ["methodology", "formulas", "transparency", "engineering", "how calculated", "assumptions"],
@@ -1653,7 +1653,7 @@ export const searchData: SearchItem[] = [
   {
     title: "About Battery Calculators",
     description: "Learn about Battery Calculators: transparent formulas, open-source calculations, engineering education, and the author behind the platform.",
-    url: "/about",
+    url: "/about/",
     type: "page",
     category: "About",
     keywords: ["about", "who", "author", "platform", "background", "mission"],
@@ -1661,7 +1661,7 @@ export const searchData: SearchItem[] = [
   {
     title: "Engineering Disclaimer",
     description: "Technical and legal disclaimer for calculators on the Battery Calculators. Read before using any calculations.",
-    url: "/disclaimer",
+    url: "/disclaimer/",
     type: "page",
     category: "Legal",
     keywords: ["disclaimer", "legal", "safety", "liability", "verification"],

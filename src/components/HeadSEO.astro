@@ -38,8 +38,23 @@ const {
 } = Astro.props;
 
 const siteUrl = 'https://batterycalculators.com';
-const pathname = Astro.url.pathname.replace(/\/+$/, '') || '/';
-const currentUrl = canonical || `${siteUrl}${pathname}`;
+
+// Normalize a URL to the site's single public convention:
+// https://batterycalculators.com/<path>/ (query strings are preserved).
+// Also rewrites path-only URLs to the preferred host.
+const toPreferredUrl = (url: string): string => {
+  if (!url) return `${siteUrl}/`;
+  const qIndex = url.indexOf('?');
+  const base = qIndex === -1 ? url : url.slice(0, qIndex);
+  const query = qIndex === -1 ? '' : url.slice(qIndex);
+  const trimmed = base.replace(/\/+$/, '');
+  const withSlash = trimmed === '' ? '/' : `${trimmed}/`;
+  const anchored = withSlash.startsWith('http') ? withSlash : `${siteUrl}${withSlash}`;
+  return `${anchored}${query}`;
+};
+
+const pathname = Astro.url.pathname;
+const currentUrl = toPreferredUrl(canonical || `${siteUrl}${pathname}`);
 const imageUrl = ogImage.startsWith('http') ? ogImage : `${siteUrl}${ogImage}`;
 
 let schemaData: Record<string, unknown> = {};
@@ -52,10 +67,10 @@ if (schema === 'website') {
     '@type': 'WebSite',
     name: schemaName || 'Battery Calculators',
     description: schemaDescription || description,
-    url: siteUrl,
+    url: toPreferredUrl(siteUrl),
     potentialAction: {
       '@type': 'SearchAction',
-      target: `${siteUrl}/tools?q={search_term_string}`,
+      target: toPreferredUrl(`${siteUrl}/tools?q={search_term_string}`),
       'query-input': 'required name=search_term_string',
     },
   };
@@ -65,7 +80,7 @@ if (schema === 'website') {
     '@type': 'WebApplication',
     name: schemaName || title.split('|')[0].trim(),
     description: schemaDescription || description,
-    url: schemaUrl || currentUrl,
+    url: toPreferredUrl(schemaUrl || currentUrl),
     applicationCategory: 'EngineeringApplication',
     operatingSystem: 'Web Browser',
     offers: {
@@ -80,18 +95,18 @@ if (schema === 'website') {
     '@type': 'CollectionPage',
     name: schemaName || title.split('|')[0].trim(),
     description: schemaDescription || description,
-    url: schemaUrl || currentUrl,
+    url: toPreferredUrl(schemaUrl || currentUrl),
   };
 }
 
 if (breadcrumbs.length > 0) {
   const itemListElement = [
-    { '@type': 'ListItem', position: 1, name: 'Home', item: siteUrl },
+    { '@type': 'ListItem', position: 1, name: 'Home', item: toPreferredUrl(siteUrl) },
     ...breadcrumbs.map((b, i) => ({
       '@type': 'ListItem',
       position: i + 2,
       name: b.label,
-      ...(b.href ? { item: `${siteUrl}${b.href}` } : {}),
+      ...(b.href ? { item: toPreferredUrl(`${siteUrl}${b.href}`) } : {}),
     })),
   ];
   breadcrumbSchemaData = {
