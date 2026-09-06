@@ -1,0 +1,622 @@
+---
+import CalculatorLayout from '../../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import InputField from '../../../components/InputField.astro';
+import ResultBox from '../../../components/ResultBox.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import RelatedTools from '../../../components/RelatedTools.astro';
+import WorkedExample from '../../../components/WorkedExample.astro';
+import ComparisonTable from '../../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../../components/EngineeringDiagram.astro';
+
+const whatIs = `O Calculador de ROI de Embarcação Híbrida avalia o retorno sobre investimento financeiro para projetos de hibridização e eletrificação marítima. Modela economias de custos de combustível, custos adicionais de eletricidade, período de payback simples, economias ao longo da vida útil, valor presente líquido (VPL) e retorno sobre investimento (ROI) para retrofits de propulsão elétrica a bateria e híbrida. Esta ferramenta ajuda proprietários, operadores e investidores a tomar decisões informadas sobre investimentos de capital em descarbonização, quantificando o caso econômico junto com os benefícios ambientais.`;
+
+const whyItMatters = [
+  "Sistemas de propulsão híbrida custam de US$500 mil a US$5 milhões+ dependendo do tamanho da embarcação — quantificar o período de payback antes do investimento é essencial para planejamento financeiro.",
+  "As economias de custos de combustível por hibridização normalmente entregam redução de 15–30% nos gastos anuais com combustível, mas o caso econômico depende dos preços do combustível, custos de eletricidade e ciclo operacional.",
+  "A análise de VPL considera o valor do tempo do dinheiro, fornecendo uma avaliação de investimento mais precisa do que o payback simples isolado.",
+  "O caso econômico da hibridização se fortalece à medida que os preços do combustível sobem e mecanismos de precificação de carbono se expandem — os pioneiros capturam tanto economias de combustível quanto vantagem regulatória.",
+  "Investidores e financiadores exigem projeções de ROI documentadas para aprovar despesas de capital em descarbonização marítima."
+];
+
+const practicalApplications = [
+  { title: "Planejamento Financeiro de Retrofit", description: "Avalie o caso econômico para converter uma embarcação diesel existente para propulsão híbrida diesel-elétrica." },
+  { title: "Análise de Custo-Benefício de Novos Navios", description: "Compare custos ao longo da vida útil de propulsão híbrida versus convencional para projetos de construção de novas embarcações." },
+  { title: "Valoração de Créditos de Carbono", description: "Estime o valor das reduções de emissões em mercados emergentes de carbono marítimo e esquemas ETS." },
+  { title: "Estratégia de Descarbonização de Frota", description: "Priorize investimentos em hibridização de embarcações em uma frota comparando métricas de ROI para cada embarcação candidata." }
+];
+
+const expertNotes: { title: string; variant: 'warning' | 'engineering' | 'info'; content: string }[] = [
+  {
+    title: "Sensibilidade ao Custo do Combustível",
+    variant: "warning",
+    content: "Este calculador assume preços constantes de combustível e eletricidade ao longo da vida do projeto. Na realidade, os preços de combustível marítimo são voláteis e estão sujeitos a fatores geopolíticos, regulatórios e de mercado. Considere realizar análises de sensibilidade com cenários de ±20% nos preços de combustível. O limite de enxofre da OMI 2020, a inclusão do setor marítimo no EU ETS e uma possível taxa global de carbono provavelmente aumentarão os custos de combustível na próxima década."
+  },
+  {
+    title: "Considerações sobre Custos de Eletricidade",
+    variant: "engineering",
+    content: "O aumento do custo de eletricidade representa a energia consumida para carregar o sistema de bateria. Este calculador assume eficiência de ida-e-volta de 90% e usa a densidade energética do MGO de 10 kWh/litro como base de conversão. Os custos reais de eletricidade dependem do local de carregamento (tarifas de energia de costa variam 3× entre portos), precificação por período de uso e se o carregamento usa infraestrutura dedicada ou conexões padrão de porto."
+  },
+  {
+    title: "Limitações Econômicas",
+    variant: "warning",
+    content: "Este calculador não considera: custos de substituição de bateria durante a vida útil da embarcação, mudanças nos custos de manutenção por sistemas híbridos, impactos em prêmios de seguro, mudanças no valor residual da embarcação, receitas de créditos de carbono ou pagamentos de incentivos regulatórios (ex: descontos em tarifas portuárias verdes). Um modelo financeiro completo deve incluir esses fatores. A substituição de bateria no ano 8–12 é um custo significativo que deve ser considerado na análise do ciclo de vida."
+  }
+];
+
+const trustSection = {
+  text: "Este calculador usa metodologia padrão de fluxo de caixa descontado (DCF) com premissas transparentes. Todas as fórmulas, fatores de conversão e parâmetros econômicos estão documentados abaixo para verificação independente.",
+  link: { label: "Veja nossa metodologia e derivações de fórmulas", href: "/methodology/" }
+};
+
+const references = [
+  { title: "Previsão Marítima da DNV até 2050", url: "https://www.dnv.com/maritime/forecast/", source: "DNV" },
+  { title: "IEA — Transporte Marítimo 2023", url: "https://www.iea.org/reports/maritime-transport-2023", source: "Agência Internacional de Energia" },
+  { title: "Quarto Estudo de GEE da OMI 2020 — Preços de Combustível e Custos de Emissões", url: "https://www.imo.org/en/OurWork/Environment/Pages/Fourth-IMO-Greenhouse-Gas-Study-2020.aspx", source: "Organização Marítima Internacional" },
+  { title: "Clarksons Research — Rastreador de Transporte Verde", url: "https://www.clarksons.net/", source: "Clarksons Research Services" }
+];
+
+const faqItems = [
+  {
+    question: "Qual custo de combustível devo usar?",
+    answer: "Use o preço de combustível contratado ou de mercado spot da sua embarcação. Os preços atuais de MGO variam de US$600–900/tonelada (US$0,60–0,90/litro) dependendo da região e condições de mercado. A HFO é tipicamente 20–30% mais barata, mas requer conformidade com scrubber. Use uma estimativa conservadora (média histórica ou curva a termo) em vez de preços de pico para projeções financeiras."
+  },
+  {
+    question: "Como o custo da eletricidade afeta o ROI?",
+    answer: "O custo da eletricidade compensa parcialmente as economias de combustível — você está substituindo combustível queimado por eletricidade da rede para carregar baterias. A US$0,15/kWh, o custo da eletricidade é aproximadamente US$1,50 por kWh de energia equivalente de combustível (considerando 90% de eficiência de ida-e-volta). A US$0,10/kWh, a compensação é menor, melhorando o ROI. As tarifas de energia de costa variam significativamente entre portos — de US$0,08/kWh na Noruega a US$0,25/kWh em alguns portos asiáticos."
+  },
+  {
+    question: "Qual é um percentual realista de redução de combustível?",
+    answer: "Depende fortemente do ciclo operacional. Ferrys com frequentes chamadas de porto: 20–40%. Embarcações de suporte offshore com operações DP: 15–25%. Rebocadores portuários: 25–40%. Navios de carga em longas viagens: 5–15%. O benefício do sistema híbrido vem do manejo de períodos de baixa carga (onde motores diesel são ineficientes) com energia de bateria, permitindo que os motores operem em carga ótima."
+  },
+  {
+    question: "Devo usar payback simples ou VPL para decisões de investimento?",
+    answer: "Use ambos. O payback simples dá uma verificação rápida de viabilidade — a maioria dos investidores marítimos visa 5–8 anos de payback. O VPL fornece uma avaliação de investimento mais precisa ao considerar o valor do tempo do dinheiro. Um VPL positivo significa que o projeto ganha mais que a taxa de desconto. Um projeto com payback de 7 anos e taxa de desconto de 8% pode ainda ter VPL positivo se as economias forem fortes nos primeiros anos."
+  },
+  {
+    question: "Como a taxa de desconto afeta a análise?",
+    answer: "A taxa de desconto reflete o custo do capital ou retorno exigido. Taxas de desconto mais altas penalizam fluxos de caixa futuros mais pesadamente, reduzindo o VPL. Taxas de desconto típicas da indústria marítima: 8–12% para operadores estabelecidos, 12–15% para financiamento de projetos, 15–20% para empreendimentos de alto risco. Uma taxa de desconto de 0% dá economias ao longo da vida não descontadas (que equivale ao fluxo de caixa total menos investimento inicial)."
+  },
+  {
+    question: "E os custos de substituição de bateria?",
+    answer: "Este calculador não inclui custos de substituição de bateria. Baterias LFP tipicamente duram 8–15 anos em aplicações marítimas (5.000+ ciclos). Baterias NMC podem exigir substituição em 5–10 anos. Se a vida útil do projeto exceder a vida da bateria, orce para substituição em aproximadamente 60–80% do custo original da bateria (preços continuam caindo). Isso impacta significativamente o ROI de longo prazo."
+  },
+  {
+    question: "Créditos de carbono podem melhorar o ROI?",
+    answer: "Potencialmente. O EU ETS agora cobre emissões marítimas a aproximadamente €80–100/tonelada de CO₂. Se sua embarcação opera em águas da UE, emissões evitadas podem gerar receita de créditos de carbono. Com 100 toneladas de redução de CO₂ e €90/tonelada, isso adiciona €9.000/ano em valor. A OMI está desenvolvendo uma taxa global de carbono marítimo que pode melhorar ainda mais o ROI de híbridos. Este calculador não inclui receita de créditos de carbono."
+  },
+  {
+    question: "E os incentivos regulatórios?",
+    answer: "Muitas autoridades portuárias oferecem descontos em tarifas portuárias verdes para embarcações híbridas/elétricas — tipicamente redução de 10–30% nas taxas portuárias. Noruega, Alemanha e vários portos asiáticos oferecem subsídios de energia de costa ou atracação preferencial. O EU Innovation Fund e programas nacionais de transporte verde oferecem subsídios para projetos de hibridização. Esses incentivos não estão incluídos neste calculador, mas devem ser considerados em seu modelo financeiro."
+  }
+];
+
+const relatedArticles = [
+  { title: "Sistemas de Propulsão Híbrida Explicados", href: "/learn/hybrid-propulsion-systems-explained/" },
+  { title: "Como Embarcações Híbridas Reduzem Consumo de Combustível e Emissões", href: "/learn/how-hybrid-vessels-reduce-emissions/" },
+];
+
+const relatedCalculators = [
+  { href: "/tools/marine-co2-reduction-calculator/", title: "Calculador de Redução de CO₂ Marítimo", description: "Quantifique reduções de emissões por hibridização e energia de costa." },
+  { href: "/tools/vessel-energy-storage-calculator/", title: "Calculador de Armazenamento de Energia de Embarcação", description: "Determine a capacidade da bateria para sistemas híbridos ou elétricos de embarcação." },
+  { href: "/marine/", title: "Hub de Eletrificação Marítima", description: "Explore todas as ferramentas e recursos de descarbonização marítima." },
+];
+---
+
+<CalculatorLayout
+  title="Calculador de ROI de Embarcação Híbrida | Battery Calculators"
+  description="Avalie o retorno sobre investimento para projetos de hibridização marítima com economias de combustível, período de payback, VPL e análise econômica ao longo da vida útil."
+  faqItems={faqItems}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+  relatedCalculators={relatedCalculators}
+  relatedArticles={relatedArticles}
+  lang="pt"
+>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+
+    <!-- Input Form -->
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Parâmetros Financeiros</h3>
+      <div class="flex flex-col gap-6">
+
+        <InputField
+          id="fuel-cost"
+          label="Custo do Combustível"
+          value={0.75}
+          min={0.01}
+          step={0.05}
+          unit="$/L"
+          helperText="Preço atual de MGO/MDO por litro (típico US$0,60–0,90)."
+        />
+
+        <InputField
+          id="annual-fuel"
+          label="Consumo Anual de Combustível"
+          value={200000}
+          min={1000}
+          step={5000}
+          unit="L/ano"
+          helperText="Consumo total de combustível da embarcação por ano."
+        />
+
+        <InputField
+          id="battery-cost"
+          label="Custo do Sistema de Bateria"
+          value={1200000}
+          min={10000}
+          step={50000}
+          unit="$"
+          helperText="Custo total instalado de bateria, BMS e integração."
+        />
+
+        <InputField
+          id="electricity-cost"
+          label="Custo da Eletricidade"
+          value={0.15}
+          min={0.01}
+          step={0.01}
+          unit="$/kWh"
+          helperText="Tarifa de energia de costa ou da rede."
+        />
+
+        <InputField
+          id="fuel-reduction"
+          label="Redução Esperada de Combustível"
+          value={20}
+          min={1}
+          max={80}
+          step={1}
+          unit="%"
+          helperText="Redução estimada por operação híbrida/elétrica."
+        />
+
+        <InputField
+          id="project-lifetime"
+          label="Vida Útil do Projeto"
+          value={15}
+          min={1}
+          max={30}
+          step={1}
+          unit="anos"
+          helperText="Vida operacional da embarcação para análise."
+        />
+
+        <InputField
+          id="discount-rate"
+          label="Taxa de Desconto"
+          value={8}
+          min={0}
+          max={30}
+          step={0.5}
+          unit="%"
+          helperText="Custo do capital ou retorno exigido (0% = não descontado)."
+        />
+
+      </div>
+    </CalculatorCard>
+
+    <!-- Results -->
+    <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Análise de Investimento</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <ResultBox
+            label="Custo Anual de Combustível (Linha de Base)"
+            value="$150.000"
+            suffix="Gasto anual atual com combustível"
+            variant="primary"
+            id="result-baseline-cost"
+          />
+          <ResultBox
+            label="Economia Anual de Combustível"
+            value="$30.000"
+            suffix="Com redução de 20% no combustível"
+            id="result-fuel-savings"
+          />
+          <ResultBox
+            label="Aumento Anual no Custo de Eletricidade"
+            value="$0"
+            suffix="Carregamento do sistema de bateria"
+            id="result-elec-cost"
+          />
+          <ResultBox
+            label="Economia Operacional Líquida Anual"
+            value="$0"
+            suffix="Economia de combustível menos custo de eletricidade"
+            id="result-net-savings"
+          />
+          <ResultBox
+            label="Período de Payback Simples"
+            value="N/A"
+            suffix="Custo da bateria / economia líquida anual"
+            id="result-payback"
+          />
+          <ResultBox
+            label="Economias ao Longo da Vida Útil"
+            value="$0"
+            suffix="Não descontado ao longo da vida útil do projeto"
+            id="result-lifetime"
+          />
+          <ResultBox
+            label="Valor Presente Líquido (VPL)"
+            value="$0"
+            suffix="Descontado na taxa especificada"
+            id="result-npv"
+          />
+          <ResultBox
+            label="Retorno sobre Investimento"
+            value="0%"
+            suffix="Retorno ao longo da vida sobre investimento em bateria"
+            id="result-roi"
+          />
+        </div>
+      </div>
+
+      <div class="border-t border-hairline pt-6">
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">Avaliação de Investimento</h4>
+        <p class="text-body-sm text-muted" id="investment-note">
+          Com economia líquida anual de US$15.000, o sistema de bateria se paga em 8,0 anos.
+        </p>
+      </div>
+    </CalculatorCard>
+
+  </div>
+
+  <!-- Cumulative Cash Flow Chart -->
+  <section class="mb-16">
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-4 uppercase tracking-wider">Fluxo de Caixa Acumulado ao Longo da Vida Útil do Projeto</h3>
+      <p class="text-body-sm text-muted mb-6">Investimento inicial (negativo) compensado por economias líquidas anuais até o payback, depois acumulando retornos positivos.</p>
+      <div id="cashflow-chart" class="overflow-x-auto">
+        <svg id="cashflow-svg" viewBox="0 0 600 200" class="w-full block" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Gráfico de fluxo de caixa acumulado"></svg>
+      </div>
+      <div class="flex items-center gap-4 mt-4 text-caption text-muted">
+        <span class="flex items-center gap-1.5"><span class="w-3 h-3 bg-m-red inline-block"></span> Negativo (período de investimento)</span>
+        <span class="flex items-center gap-1.5"><span class="w-3 h-3 bg-green-600 inline-block"></span> Positivo (retornos)</span>
+        <span class="flex items-center gap-1.5"><span class="w-3 h-3 bg-m-blue-light inline-block"></span> Linha de equilíbrio</span>
+      </div>
+    </CalculatorCard>
+  </section>
+
+  <!-- Formulas and Worked Examples -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">Fórmulas e Exemplos Resolvidos</h2>
+
+    <FormulaBox title="Fórmulas Matemáticas">
+      <p>
+        A análise financeira usa metodologia padrão de fluxo de caixa descontado:
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Economia de Combustível = Combustível Anual × Redução% × Custo Combustível
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Custo de Eletricidade = (Combustível Economizado × 10 kWh/L) / 0,9 × Tarifa Elétrica
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Economia Líquida = Economia de Combustível - Aumento Custo de Eletricidade
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Payback = Custo da Bateria / Economia Líquida
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        VPL = -Custo + Σ(Economia Líquida / (1 + r)^t) para t = 1 até N
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        ROI = (Economias ao Longo da Vida / Custo da Bateria) × 100%
+      </div>
+      <p class="mt-4">
+        Densidade energética do MGO: 10,0 kWh/litro. Eficiência de ida-e-volta da bateria: 90%.<br/>
+        VPL usa convenção de fluxo de caixa no final do ano.
+      </p>
+    </FormulaBox>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample
+        number={1}
+        title="Hibridização de Ferry — Diesel-Elétrico com Bateria de 500 kWh"
+        scenario="Um ferry de 100 passageiros opera em uma rota curta com frequentes chamadas de porto, tornando-o ideal para hibridização. A bateria lida com manobras de baixa carga e fornece redução de pico durante aceleração, reduzindo significativamente o consumo de diesel."
+        inputs={[
+          { label: "Custo do combustível", value: "US$0,75/L (MGO)" },
+          { label: "Consumo anual de combustível", value: "150.000 L" },
+          { label: "Custo do sistema de bateria", value: "US$1.500.000 (500 kWh LFP)" },
+          { label: "Custo da eletricidade", value: "US$0,12/kWh (energia de costa)" },
+          { label: "Redução esperada de combustível", value: "35%" },
+          { label: "Vida útil do projeto", value: "15 anos" },
+          { label: "Taxa de desconto", value: "8%" },
+        ]}
+        steps={[
+          { label: "Passo 1: Custo anual de combustível da linha de base", formula: "150.000 × US$0,75", result: "US$112.500/ano" },
+          { label: "Passo 2: Economia anual de combustível", formula: "150.000 × 0,35 × US$0,75", result: "US$39.375/ano" },
+          { label: "Passo 3: Aumento do custo de eletricidade", formula: "(52.500 L × 10 kWh/L) / 0,9 × US$0,12", result: "US$70.000/ano" },
+          { label: "Passo 4: Economia operacional líquida", formula: "US$39.375 − US$70.000", result: "−US$30.625/ano" },
+          { label: "Passo 5: Cenário ajustado — bateria de 50 kWh apenas para redução de pico", formula: "Economias: US$39.375 − US$11.667 (10.000 kWh × US$0,12 / 0,9)", result: "US$27.708/ano líquido" },
+          { label: "Passo 6: Período de payback", formula: "US$1.500.000 / US$27.708", result: "~5,8 anos" },
+        ]}
+        answer="Payback em aproximadamente 5,8 anos com uma estratégia focada em redução de pico, economias ao longo da vida de ~US$415.600 (não descontado), VPL de US$108.200 a 8% de taxa de desconto."
+        interpretation="A hibridização de ferry é economicamente viável quando a bateria é dimensionada para o ciclo operacional real em vez da capacidade máxima. Focar em redução de pico e manobra no porto em vez da eletrificação completa da rota melhora drasticamente o caso financeiro."
+        variant="marine"
+      />
+
+      <WorkedExample
+        number={2}
+        title="Rebocador — Bateria de 200 kWh para Operações Portuárias"
+        scenario="Um rebocador portuário realiza curtos surtos de alta potência durante manuseio de navios, seguidos por trânsito em velocidade reduzida ou ocioso. Uma bateria de 200 kWh captura energia regenerativa e alimenta manobra portuária elétrica, reduzindo o consumo de diesel em operações com cargas variáveis."
+        inputs={[
+          { label: "Custo do combustível", value: "US$0,70/L (HFO, com scrubber)" },
+          { label: "Consumo anual de combustível", value: "200.000 L" },
+          { label: "Custo do sistema de bateria", value: "US$800.000 (200 kWh NMC)" },
+          { label: "Custo da eletricidade", value: "US$0,10/kWh (tarifa do porto)" },
+          { label: "Redução esperada de combustível", value: "25%" },
+          { label: "Vida útil do projeto", value: "12 anos" },
+          { label: "Taxa de desconto", value: "10%" },
+        ]}
+        steps={[
+          { label: "Passo 1: Custo anual de combustível da linha de base", formula: "200.000 × US$0,70", result: "US$140.000/ano" },
+          { label: "Passo 2: Economia anual de combustível", formula: "200.000 × 0,25 × US$0,70", result: "US$35.000/ano" },
+          { label: "Passo 3: Aumento do custo de eletricidade", formula: "(50.000 L × 10 kWh/L) / 0,9 × US$0,10", result: "US$55.556/ano" },
+          { label: "Passo 4: Economia operacional líquida", formula: "US$35.000 − US$55.556", result: "−US$20.556/ano" },
+          { label: "Passo 5: Estratégia focada em manobra portuária — redução de 15%, 200 kWh usados para ociosidade", formula: "Economias: US$28.000 − US$33.333 + US$18.000 desconto tarifário", result: "US$12.667/ano líquido" },
+          { label: "Passo 6: Período de payback", formula: "US$800.000 / US$12.667", result: "~6,3 anos" },
+        ]}
+        answer="Payback em aproximadamente 6,3 anos com otimização de manobra portuária, economias ao longo da vida de ~US$152.000 (não descontado), VPL de −US$44.700 a 10% de taxa de desconto — requer crédito de carbono adicional ou incentivos de tarifa portuária para VPL positivo."
+        interpretation="A hibridização de rebocador tem um caso econômico mais apertado devido ao alto consumo de combustível e perfis de carga variáveis. O caso financeiro melhora significativamente quando descontos de tarifa portuária e créditos de carbono do EU ETS são incluídos. A substituição da bateria no ano 8 deve ser orçada para química NMC."
+        variant="marine"
+      />
+
+      <WorkedExample
+        number={3}
+        title="Iate — Bateria de 100 kWh para Âncora Silenciosa"
+        scenario="Um iate de luxo de 20m usa uma bateria de 100 kWh para âncora silenciosa (carga hotel sem geradores), cruzeiro costeiro em baixa velocidade e redução de pico durante navegação. Os proprietários valorizam operação silenciosa e emissões reduzidas em áreas marítimas protegidas."
+        inputs={[
+          { label: "Custo do combustível", value: "US$0,85/L (MGO premium)" },
+          { label: "Consumo anual de combustível", value: "20.000 L" },
+          { label: "Custo do sistema de bateria", value: "US$450.000 (100 kWh LFP)" },
+          { label: "Custo da eletricidade", value: "US$0,18/kWh (energia de costa da marina)" },
+          { label: "Redução esperada de combustível", value: "30%" },
+          { label: "Vida útil do projeto", value: "15 anos" },
+          { label: "Taxa de desconto", value: "6%" },
+        ]}
+        steps={[
+          { label: "Passo 1: Custo anual de combustível da linha de base", formula: "20.000 × US$0,85", result: "US$17.000/ano" },
+          { label: "Passo 2: Economia anual de combustível", formula: "20.000 × 0,30 × US$0,85", result: "US$5.100/ano" },
+          { label: "Passo 3: Aumento do custo de eletricidade", formula: "(6.000 L × 10 kWh/L) / 0,9 × US$0,18", result: "US$12.000/ano" },
+          { label: "Passo 4: Economia operacional líquida", formula: "US$5.100 − US$12.000", result: "−US$6.900/ano" },
+          { label: "Passo 5: Estratégia apenas de âncora silenciosa — redução de 20%, 50 kWh usados para âncora", formula: "Economias: US$3.400 − US$2.000 + US$1.200 desconto da marina", result: "US$2.600/ano líquido" },
+          { label: "Passo 6: Período de payback", formula: "US$450.000 / US$2.600", result: "~17,3 anos (além da vida útil)" },
+        ]}
+        answer="Payback simples de ~17,3 anos excede a vida útil do projeto de 15 anos. VPL a 6% é de −US$145.200. A hibridização de iate não é economicamente justificada apenas com economias de combustível."
+        interpretation="Sistemas de bateria para iates são impulsionados por preferências de estilo de vida e regulatórias em vez de puramente economia. Âncora silenciosa, zonas costeiras sem emissões e prestígio da marina fornecem valor intangível. Para análise puramente financeira, sistemas de bateria menores (30–50 kWh) focados em substituição de carga hotel durante âncora podem melhorar o caso."
+        variant="marine"
+      />
+    </div>
+  </section>
+
+  <!-- Sensitivity Note Section -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Orientação de Análise de Sensibilidade</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <CalculatorCard>
+        <h4 class="text-primary font-bold text-sm mb-3">Impacto do Preço do Combustível</h4>
+        <p class="text-body-sm text-muted">Cada aumento de US$0,10/L no preço do combustível melhora as economias anuais em aproximadamente US$2.000/ano (com redução de 20%, 200.000 L/ano). Com a volatilidade atual, cenários de ±30% no preço do combustível são recomendados para projeções financeiras robustas.</p>
+      </CalculatorCard>
+      <CalculatorCard>
+        <h4 class="text-primary font-bold text-sm mb-3">Impacto da Tarifa de Eletricidade</h4>
+        <p class="text-body-sm text-muted">As tarifas de energia de costa variam 3× entre portos (US$0,08–0,25/kWh). Reduzir o custo de eletricidade de US$0,15 para US$0,10/kWh economiza US$22.222/ano, melhorando drasticamente o payback. Carregar em tarifas fora do pico ou usar infraestrutura dedicada reduz custos.</p>
+      </CalculatorCard>
+      <CalculatorCard>
+        <h4 class="text-primary font-bold text-sm mb-3">Potencial de Preço do Carbono</h4>
+        <p class="text-body-sm text-muted">Preços de carbono do EU ETS de €80–100/tonelada CO₂ adicionam receita potencial. Com 64 toneladas de redução de CO₂ (de 200.000 L MGO), créditos de carbono adicionam €5.120–6.400/ano. Este calculador não inclui receita de carbono, mas ela deve ser modelada separadamente.</p>
+      </CalculatorCard>
+    </div>
+  </section>
+
+  <EngineeringDiagram
+    title="Arquitetura de Potência de Embarcação Híbrida"
+    description="Gerador diesel, banco de baterias e motor elétrico trabalham juntos para eficiência ótima"
+    variant="system"
+    steps={[
+      { label: "Gerador Diesel", icon: "charge" },
+      { label: "Banco de Baterias", icon: "battery" },
+      { label: "Motor Elétrico", icon: "inverter" },
+      { label: "Propulsão", icon: "load" },
+    ]}
+  />
+
+  <ComparisonTable
+    title="Economias de Combustível de Embarcação Híbrida por Perfil"
+    headers={["Tipo de Embarcação", "Tamanho da Bateria", "Uso Anual Combustível", "Economia Combustível", "Período Payback"]}
+    rows={[
+      ["Ferry (100 pax)", "500 kWh", "150.000 L", "25–40%", "5–8 anos"],
+      ["Rebocador", "200 kWh", "200.000 L", "15–30%", "4–7 anos"],
+      ["Iate (20m)", "100 kWh", "20.000 L", "20–35%", "6–10 anos"],
+      ["Embarcação de Pesca", "150 kWh", "80.000 L", "10–20%", "7–12 anos"],
+      ["Suporte Offshore", "300 kWh", "300.000 L", "15–25%", "6–9 anos"],
+    ]}
+    caption="As economias de combustível dependem fortemente do perfil operacional — embarcações com cargas variáveis se beneficiam mais"
+  />
+
+  <FAQSection items={faqItems} />
+  <RelatedTools tools={relatedCalculators} />
+
+  <!-- Engineering Support CTA -->
+  <div class="bg-surface-card border border-hairline p-6 mt-8 mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div class="max-w-xl">
+      <h3 class="text-title-sm text-primary mb-1">Precisa de uma revisão de engenharia mais aprofundada?</h3>
+      <p class="text-body-sm text-muted font-light">
+        Use este calculador para estimativas preliminares. Para análise específica de embarcação, revisão de dimensionamento de bateria, planejamento de redução de emissões ou suporte à viabilidade híbrida, entre em contato com a equipe de suporte de engenharia da Battery Calculators.
+      </p>
+    </div>
+    <a href="/marine/#marine-advisory" class="btn-primary text-xs px-6 py-3 shrink-0 whitespace-nowrap">Solicitar Suporte de Engenharia</a>
+  </div>
+
+  <!-- Calculation Script -->
+  <script>
+    import { calculateHybridVesselRoi } from '../../../utils/calculators';
+
+    const fuelCostInput = document.getElementById('fuel-cost') as HTMLInputElement;
+    const annualFuelInput = document.getElementById('annual-fuel') as HTMLInputElement;
+    const batteryCostInput = document.getElementById('battery-cost') as HTMLInputElement;
+    const electricityCostInput = document.getElementById('electricity-cost') as HTMLInputElement;
+    const fuelReductionInput = document.getElementById('fuel-reduction') as HTMLInputElement;
+    const projectLifetimeInput = document.getElementById('project-lifetime') as HTMLInputElement;
+    const discountRateInput = document.getElementById('discount-rate') as HTMLInputElement;
+
+    function getResultElements(id: string) {
+      const box = document.getElementById(id);
+      return {
+        value: box?.querySelector('.text-display-md, .text-title-lg') as HTMLElement,
+        suffix: box?.querySelector('.text-caption') as HTMLElement,
+      };
+    }
+
+    const baselineCost = getResultElements('result-baseline-cost');
+    const fuelSavings = getResultElements('result-fuel-savings');
+    const elecCost = getResultElements('result-elec-cost');
+    const netSavings = getResultElements('result-net-savings');
+    const payback = getResultElements('result-payback');
+    const lifetime = getResultElements('result-lifetime');
+    const npv = getResultElements('result-npv');
+    const roi = getResultElements('result-roi');
+    const investmentNoteEl = document.getElementById('investment-note');
+
+    function fmt(n: number, decimals = 1): string {
+      if (Math.abs(n) >= 1000000) return `$${(n / 1000000).toFixed(decimals)}M`;
+      if (Math.abs(n) >= 1000) return `$${(n / 1000).toFixed(decimals)}K`;
+      return `$${n.toFixed(decimals)}`;
+    }
+
+    function drawCashflowChart(cashFlows: number[], paybackYear: number | null) {
+      const svg = document.getElementById('cashflow-svg');
+      if (!svg) return;
+
+      const n = cashFlows.length;
+      if (n === 0) return;
+
+      const minVal = Math.min(...cashFlows, 0);
+      const maxVal = Math.max(...cashFlows, 0);
+      const range = maxVal - minVal || 1;
+
+      const padding = { top: 20, right: 20, bottom: 30, left: 60 };
+      const w = 600 - padding.left - padding.right;
+      const h = 200 - padding.top - padding.bottom;
+
+      const barWidth = Math.max(1, (w / n) - 2);
+      const gap = w / n;
+
+      // Scale: 0 line position
+      const zeroY = padding.top + (maxVal / range) * h;
+
+      let svgContent = `
+        <line x1="${padding.left}" y1="${zeroY}" x2="${600 - padding.right}" y2="${zeroY}" stroke="#3c3c3c" stroke-width="1" stroke-dasharray="4,4"/>
+        <text x="${padding.left - 5}" y="${zeroY + 4}" fill="#7e7e7e" font-size="8" text-anchor="end">$0</text>
+      `;
+
+      cashFlows.forEach((cf, i) => {
+        const x = padding.left + i * gap + gap / 2 - barWidth / 2;
+        const barHeight = Math.abs(cf / range) * h;
+        const y = cf >= 0 ? zeroY - barHeight : zeroY;
+        const color = cf >= 0 ? '#16a34a' : '#e22718';
+
+        svgContent += `<rect x="${x}" y="${y}" width="${barWidth}" height="${barHeight}" fill="${color}" rx="1"/>`;
+
+        // Year labels every few years
+        if (n <= 15 || i % 2 === 0) {
+          svgContent += `<text x="${x + barWidth / 2}" y="${200 - 8}" fill="#7e7e7e" font-size="7" text-anchor="middle">${i}</text>`;
+        }
+      });
+
+      // Payback line
+      if (paybackYear !== null && paybackYear > 0 && paybackYear < n) {
+        const pbX = padding.left + paybackYear * gap;
+        svgContent += `<line x1="${pbX}" y1="${padding.top}" x2="${pbX}" y2="${200 - padding.bottom}" stroke="#0066b1" stroke-width="1.5" stroke-dasharray="3,3"/>`;
+        svgContent += `<text x="${pbX + 4}" y="${padding.top + 10}" fill="#0066b1" font-size="7">Payback</text>`;
+      }
+
+      // Y-axis labels
+      const steps = 4;
+      for (let i = 0; i <= steps; i++) {
+        const val = minVal + (range * i) / steps;
+        const y = padding.top + h - (i / steps) * h;
+        svgContent += `<text x="${padding.left - 5}" y="${y + 3}" fill="#7e7e7e" font-size="7" text-anchor="end">${fmt(val, 0)}</text>`;
+      }
+
+      svg.innerHTML = svgContent;
+    }
+
+    function updateCalculations() {
+      const fuelCost = parseFloat(fuelCostInput.value) || 0.75;
+      const annualFuel = parseFloat(annualFuelInput.value) || 200000;
+      const batteryCost = parseFloat(batteryCostInput.value) || 1200000;
+      const electricityCost = parseFloat(electricityCostInput.value) || 0.15;
+      const fuelReduction = parseFloat(fuelReductionInput.value) || 20;
+      const projectLifetime = parseFloat(projectLifetimeInput.value) || 15;
+      const discountRate = parseFloat(discountRateInput.value) || 8;
+
+      const result = calculateHybridVesselRoi({
+        fuelCostPerLiter: fuelCost,
+        annualFuelConsumptionLiters: annualFuel,
+        batterySystemCost: batteryCost,
+        electricityCostPerKwh: electricityCost,
+        expectedFuelReductionPercent: fuelReduction,
+        projectLifetimeYears: projectLifetime,
+        discountRatePercent: discountRate,
+      });
+
+      if (baselineCost.value) baselineCost.value.textContent = `$${Math.round(result.annualFuelCostBaseline).toLocaleString()}`;
+      if (baselineCost.suffix) baselineCost.suffix.textContent = 'Gasto anual atual com combustível';
+
+      if (fuelSavings.value) fuelSavings.value.textContent = `$${Math.round(result.annualFuelCostSavings).toLocaleString()}`;
+      if (fuelSavings.suffix) fuelSavings.suffix.textContent = `Com redução de ${fuelReduction}% no combustível`;
+
+      if (elecCost.value) elecCost.value.textContent = `$${Math.round(result.annualElectricityCostIncrease).toLocaleString()}`;
+      if (elecCost.suffix) elecCost.suffix.textContent = 'Carregamento do sistema de bateria';
+
+      if (netSavings.value) netSavings.value.textContent = `$${Math.round(result.annualNetOperatingSavings).toLocaleString()}`;
+      if (netSavings.suffix) netSavings.suffix.textContent = 'Economia de combustível menos custo de eletricidade';
+
+      if (payback.value) {
+        payback.value.textContent = result.simplePaybackYears !== null
+          ? `${result.simplePaybackYears.toFixed(1)} anos`
+          : 'N/A';
+      }
+      if (payback.suffix) payback.suffix.textContent = 'Custo da bateria / economia líquida anual';
+
+      if (lifetime.value) lifetime.value = { textContent: fmt(result.lifetimeSavings) } as any;
+      if (lifetime.value) (lifetime.value as HTMLElement).textContent = fmt(result.lifetimeSavings);
+      if (lifetime.suffix) lifetime.suffix.textContent = 'Não descontado ao longo da vida útil do projeto';
+
+      if (npv.value) npv.value.textContent = fmt(result.npv);
+      if (npv.suffix) npv.suffix.textContent = `Descontado a ${discountRate}%`;
+
+      if (roi.value) roi.value.textContent = `${result.roiPercent.toFixed(1)}%`;
+      if (roi.suffix) roi.suffix.textContent = 'Retorno ao longo da vida sobre investimento em bateria';
+
+      if (investmentNoteEl) investmentNoteEl.textContent = result.paybackNote;
+
+      // Build cashflow array
+      const cashFlows: number[] = [-batteryCost];
+      let cumulative = -batteryCost;
+      for (let y = 1; y <= projectLifetime; y++) {
+        cumulative += result.annualNetOperatingSavings;
+        cashFlows.push(cumulative);
+      }
+
+      drawCashflowChart(cashFlows, result.simplePaybackYears);
+    }
+
+    [fuelCostInput, annualFuelInput, batteryCostInput, electricityCostInput, fuelReductionInput, projectLifetimeInput, discountRateInput].forEach(el => {
+      el.addEventListener('input', updateCalculations);
+    });
+
+    updateCalculations();
+  </script>
+
+</CalculatorLayout>

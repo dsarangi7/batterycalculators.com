@@ -1,0 +1,176 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import CategoryToolGrid from '../../components/CategoryToolGrid.astro';
+import FAQSection from '../../components/FAQSection.astro';
+
+const tools = [
+  {
+    name: "Calculadora de Dimensionamento de Bateria Solar",
+    href: "/pt/tools/solar-battery-sizing-calculator/",
+    description: "Dimensione seu banco de baterias solar com base no consumo diário de energia, dias de autonomia, química da bateria e profundidade de descarga.",
+    available: true,
+  },
+  {
+    name: "Autonomia de Bateria Off-Grid",
+    href: "/pt/tools/runtime-calculator/",
+    description: "Estime quanto tempo seu banco de baterias alimentará sua carga off-grid com base na capacidade, tensão e limites de descarga.",
+    available: true,
+  },
+  {
+    name: "Conversão de Energia (Ah ↔ Wh)",
+    href: "/pt/tools/energy-conversion-calculator/",
+    description: "Converta entre Ampere-hora e Watt-hora para qualquer tensão nominal. Essencial para combinar a saída do painel solar com a capacidade da bateria.",
+    available: true,
+  },
+  {
+    name: "Calculadora de Dimensionamento de Gerador Solar",
+    href: "/pt/solar-generator-sizing-calculator/",
+    description: "Dimensione um sistema completo de backup solar: capacidade da bateria, potência dos painéis e requisitos do inversor.",
+    available: true,
+  },
+  {
+    name: "Calculadora de Autonomia de Estação de Energia Portátil",
+    href: "/pt/portable-power-station-runtime-calculator/",
+    description: "Estime a autonomia de estações de energia portáteis carregadas por solar para uso off-grid e emergencial.",
+    available: true,
+  },
+];
+
+const learnArticles = [
+  { title: "Como Dimensionar um Banco de Baterias Solar", href: "/pt/learn/how-to-size-solar-battery-bank/" },
+  { title: "Quantas Baterias para Solar?", href: "/pt/learn/how-many-batteries-for-solar/" },
+  { title: "Quanta Armazenamento de Bateria Preciso?", href: "/pt/learn/how-much-battery-storage-do-i-need/" },
+  { title: "Guia de Backup Solar com Bateria", href: "/pt/learn/solar-battery-backup-guide/" },
+  { title: "Planejamento de Bateria Off-Grid", href: "/pt/learn/off-grid-battery-planning/" },
+  { title: "Guia de Dimensionamento de Armazenamento Solar", href: "/pt/learn/solar-storage-sizing-guide/" },
+  { title: "Quanto Tempo Minha Bateria Solar Durará?", href: "/pt/learn/how-long-will-my-solar-battery-last/" },
+  { title: "Como Dimensionar um Banco de Baterias", href: "/pt/learn/how-to-size-a-battery-bank/" },
+  { title: "Como Calcular a Autonomia da Bateria", href: "/pt/learn/how-to-calculate-battery-runtime/" },
+  { title: "Referência de Dimensionamento de Bateria", href: "/pt/learn/battery-sizing-reference/" },
+  { title: "Gráfico de Profundidade de Descarga de Bateria", href: "/pt/learn/battery-depth-of-discharge-chart/" },
+  { title: "Melhor Química de Bateria para Solar", href: "/pt/learn/best-battery-chemistry-for-solar/" },
+  { title: "24V vs 48V para Sistemas Solares", href: "/pt/learn/24v-vs-48v-solar-systems/" },
+];
+
+const faqItems = [
+  {
+    question: "Como dimensionar um banco de baterias solar?",
+    answer: "Calcule seu consumo diário de energia em Watt-hora, determine quantos dias de autonomia você precisa (tipicamente 1–3 dias para sistemas conectados à rede, 2–5 dias para off-grid), considere os limites de profundidade de descarga com base na química da bateria e aplique a redução por temperatura. Nossa Calculadora de Dimensionamento de Bateria Solar realiza todos esses cálculos automaticamente.",
+  },
+  {
+    question: "Quantas baterias preciso para solar?",
+    answer: "O número de baterias depende do seu consumo total de energia diária, autonomia desejada, tensão do sistema e capacidade da bateria. Uma residência típica consumindo 30 kWh por dia com 2 dias de autonomia precisaria de aproximadamente 60 kWh de armazenamento utilizável de bateria. A 48V com baterias de 200Ah (10,24 kWh cada), você precisaria de aproximadamente 6 baterias.",
+  },
+  {
+    question: "Qual a melhor química de bateria para armazenamento solar?",
+    answer: "Lithium Iron Phosphate (LiFePO4) é a química recomendada para armazenamento solar devido à sua profundidade de descarga de 80–90%, vida útil de 3000–5000 ciclos, estabilidade térmica e baixa manutenção. Baterias de chumbo-ácido são mais baratas na compra inicial, mas têm capacidade utilizável menor (50% DoD), vida útil mais curta e exigem manutenção regular.",
+  },
+  {
+    question: "Quanto tempo minha bateria solar durará à noite?",
+    answer: "A autonomia à noite depende da capacidade da bateria, da carga que você está usando e da eficiência do sistema. Uma bateria LFP de 100Ah 12.8V (1.280 Wh) alimentando uma carga de 200W com 90% de eficiência do inversor durará aproximadamente 5,7 horas. Nossa Calculadora de Autonomia fornece estimativas precisas para sua configuração específica.",
+  },
+  {
+    question: "Posso usar baterias solares para backup residencial?",
+    answer: "Sim. Baterias solares combinadas com um inversor híbrido podem fornecer energia de backup durante apagões na rede. A bateria carrega dos painéis solares durante o dia e pode alimentar cargas essenciais quando a rede falha. Dimensione a bateria para cobrir suas cargas essenciais desejadas para a duração do backup usando nossa Calculadora de Backup Residencial.",
+  },
+  {
+    question: "Qual a diferença entre sistemas solares off-grid e híbridos?",
+    answer: "Sistemas off-grid são completamente independentes da rede elétrica e exigem bancos de baterias maiores para lidar com períodos de vários dias sem produção solar. Sistemas híbridos permanecem conectados à rede, mas usam baterias para otimização de autoconsumo, arbitragem tarifária e backup durante apagões. Sistemas híbridos podem usar bancos de baterias menores, pois a rede serve como backup.",
+  },
+];
+
+const relatedCategories = [
+  { href: "/pt/home-backup/", title: "Residencial", description: "Backup de bateria para apagões e cargas essenciais" },
+  { href: "/pt/engineering/", title: "Engenharia", description: "Ferramentas de C-rate, SOC, queda de tensão e perda em cabos" },
+  { href: "/pt/bess/", title: "BESS e Comercial", description: "Análise de ROI de armazenamento de energia comercial" },
+];
+
+const breadcrumbItems = [
+  { label: "Solar e Energia Residencial" },
+];
+---
+
+<Layout
+  title="Calculadoras de Bateria Solar e Residencial | Calculadoras de Bateria"
+  description="Calculadoras gratuitas de dimensionamento de bateria solar, ferramentas off-grid e conversão de energia para proprietários e instaladores solares."
+  schema="website"
+  schemaName="Calculadoras de Bateria Solar e Residencial"
+  schemaDescription="Calculadoras de bateria de nível de engenharia para armazenamento de energia solar, sistemas off-grid e backup residencial."
+  breadcrumbs={[{ label: 'Solar e Energia Residencial' }]}
+  lang="pt"
+>
+  <Breadcrumb items={breadcrumbItems} />
+
+  <section class="mb-12 md:mb-16 border-b border-hairline pb-12">
+    <div class="max-w-4xl">
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">SOLAR E ENERGIA RESIDENCIAL</span>
+      <h1 class="text-display-md text-primary mb-6">Calculadoras de Bateria Solar e Residencial</h1>
+      <p class="text-body-md text-body max-w-2xl font-light">
+        Calculadoras de bateria de nível de engenharia para armazenamento de energia solar, sistemas off-grid e backup residencial. Dimensione seu banco de baterias, estime a autonomia e converta unidades de energia com fórmulas transparentes.
+      </p>
+    </div>
+  </section>
+
+  <section class="mb-16">
+    <div class="max-w-4xl text-body-md text-body font-light flex flex-col gap-6">
+      <p>
+        O armazenamento de energia solar é a espinha dorsal dos sistemas residenciais modernos. Seja projetando uma cabana off-grid, adicionando backup de bateria a uma instalação solar conectada à rede ou otimizando o autoconsumo para reduzir contas de eletricidade, o dimensionamento correto da bateria determina se seu sistema atende às suas necessidades de energia ou fica aquém.
+      </p>
+      <p>
+        O principal desafio no design de baterias solares é equilibrar três fatores concorrentes: capacidade de armazenamento suficiente para cobrir seu consumo durante períodos sem luz solar, limites de profundidade de descarga que preservem a vida útil da bateria e compatibilidade de tensão do sistema com seu inversor e controlador de carga. Errar em qualquer um desses leva a gastar desnecessariamente ou experimentar falhas de energia inesperadas.
+      </p>
+      <p>
+        Nossas calculadoras solares aplicam fórmulas padrão de engenharia elétrica para ajudá-lo a navegar esses trade-offs. A Calculadora de Dimensionamento de Bateria Solar usa seu consumo diário de energia, dias de autonomia desejados, química da bateria e condições de temperatura para determinar a capacidade exata do banco de baterias que você precisa.
+      </p>
+      <p>
+        Para instalações solares off-grid, o dimensionamento da bateria é especialmente crítico. Sem uma conexão de rede para recorrer, seu banco de baterias deve armazenar energia suficiente para alimentar suas cargas através de vários dias consecutivos de nublado. A abordagem padrão é dimensionar para 2–5 dias de autonomia dependendo do recurso solar e variabilidade climática da sua localização.
+      </p>
+      <p>
+        Sistemas solares conectados à rede com backup de bateria seguem uma filosofia de design diferente. Aqui, a bateria armazena principalmente energia solar excedente para uso durante horas de pico da noite ou fornece backup durante apagões na rede. O banco de baterias pode ser menor, pois a rede serve como fonte de energia secundária.
+      </p>
+    </div>
+  </section>
+
+  <section class="mb-16">
+    <h2 class="text-title-lg text-primary mb-6">Calculadoras Disponíveis</h2>
+    <CategoryToolGrid tools={tools} />
+  </section>
+
+  {learnArticles.length > 0 && (
+    <section class="mb-16 border-t border-hairline pt-12">
+      <h2 class="text-title-lg text-primary mb-6">Guias de Bateria Solar</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {learnArticles.map((article) => (
+          <a href={article.href} class="bg-surface-card border border-hairline p-4 hover:border-primary transition-colors">
+            <span class="text-label-uppercase text-muted text-[10px] block mb-2">CENTRO DE APRENDIZAGEM</span>
+            <h3 class="text-title-sm text-primary">{article.title}</h3>
+          </a>
+        ))}
+      </div>
+    </section>
+  )}
+
+  <FAQSection items={faqItems} />
+
+  {relatedCategories.length > 0 && (
+    <section class="mb-16 border-t border-hairline pt-12">
+      <h2 class="text-title-lg text-primary mb-6">Categorias Relacionadas</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {relatedCategories.map((cat) => (
+          <a href={cat.href} class="bg-surface-card border border-hairline p-6 hover:border-primary transition-colors block">
+            <h3 class="text-title-md text-primary mb-2">{cat.title}</h3>
+            <p class="text-body-sm text-muted">{cat.description}</p>
+          </a>
+        ))}
+      </div>
+    </section>
+  )}
+
+  <section class="bg-surface-soft border border-hairline p-6 text-caption text-muted mb-8">
+    <span class="text-primary font-bold text-[10px] tracking-wider uppercase border border-hairline px-1.5 py-0.5 mr-2 inline-block mb-3">
+      Aviso de Engenharia
+    </span>
+    Todas as calculadoras fornecem apenas estimativas de dimensionamento. O desempenho real depende da temperatura, química da bateria, fiação e características da carga. Consulte um instalador certificado para o projeto final do sistema.
+  </section>
+</Layout>

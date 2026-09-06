@@ -1,0 +1,445 @@
+---
+import CalculatorLayout from '../../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import InputField from '../../../components/InputField.astro';
+import ResultBox from '../../../components/ResultBox.astro';
+import ComparisonTable from '../../../components/ComparisonTable.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import WorkedExample from '../../../components/WorkedExample.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import RelatedTools from '../../../components/RelatedTools.astro';
+
+const whatIs = `O Seletor de Tensão do Sistema determina a tensão DC ideal — <strong>12V</strong>, <strong>24V</strong> ou <strong>48V</strong> — para sua instalação de baterias com base na potência da carga, distância do cabeamento e requisitos de capacidade da bateria. Tensões mais altas reduzem a corrente para a mesma potência, permitindo cabos mais finos e menores perdas resistivas, mas exigem mais células em série e podem limitar a compatibilidade dos equipamentos. A tensão ideal equilibra <strong>corrente</strong>, <strong>custo do cabo</strong>, <strong>eficiência</strong> e <strong>disponibilidade de equipamentos</strong>.`;
+
+const whyItMatters = [
+  "Uma carga de 5kW a 12V consome 417A — exigindo cabo 4/0 AWG que custa $8–12/pé e é difícil de instalar. A 48V, a mesma carga consome 104A, usando cabo 4 AWG a $1–2/pé.",
+  "A queda de tensão é proporcional à corrente — dobrar a tensão reduz a corrente pela metade e corta a queda de tensão em 75% para o mesmo cabo, melhorando diretamente a eficiência do sistema.",
+  "A disponibilidade de equipamentos varia por tensão — 12V tem o maior mercado de acessórios, 48V tem a melhor eficiência de inversores, e 24V fica no meio.",
+  "A complexidade do banco de baterias aumenta com a tensão — um banco LFP de 48V precisa de 16 células em série vs. 4 para 12V, afetando os requisitos do BMS e modos de falha.",
+  "As regulamentações de segurança diferem — tensões acima de 60V DC exigem medidas de segurança especiais em muitas jurisdições, tornando 48V o máximo prático para instalações residenciais.",
+];
+
+const practicalApplications = [
+  { title: "Sistemas Portáteis Pequenos", description: "12V para acampamento, eletrônicos marinhos e pequenas configurações solares abaixo de 500W." },
+  { title: "Sistemas de RV e Camping", description: "24V para cargas moderadas (1–3kW) equilibrando disponibilidade de equipamentos e eficiência." },
+  { title: "Solar Residencial + Bateria", description: "48V é o padrão para sistemas de bateria domésticos acima de 3kW com inversores híbridos modernos." },
+  { title: "Telecom e Industrial", description: "48V padrão para torres de telecomunicações e backup industrial com alta confiabilidade." },
+  { title: "VE e Carrinhos de Golfe", description: "48V–96V para veículos elétricos leves, com tensões mais altas para aplicações de alto desempenho." },
+  { title: "Bancos de Bateria Marinhos", description: "24V ou 48V para embarcações com cargas significativas durante cruzeiros prolongados." },
+];
+
+const expertNotes = [
+  { title: '48V É o Padrão Moderno', variant: 'engineering', content: 'Para qualquer sistema acima de 2kW, 48V é a tensão recomendada. Inversores híbridos modernos (Victron, Sol-Ark, Growatt) são otimizados para 48V, fabricantes de baterias focam em módulos de 48V, e a corrente reduzida permite fiação padrão de 6 AWG para a maioria das instalações residenciais.' },
+  { title: 'Sistemas Legados 12V', variant: 'info', content: '12V continua relevante para sistemas portáteis pequenos, acessórios de RV e eletrônicos marinhos. O ecossistema de pós-venda automotivo é construído em torno de 12V, tornando-o o padrão para aplicações móveis e portáteis abaixo de 1kW.' },
+];
+
+const trustSection = {
+  text: "Esta calculadora usa fórmulas padrão de engenharia elétrica para consumo de corrente (P/V), queda de tensão (2 × L × I × ρ/A) e perda de potência (I²R). O dimensionamento de cabos segue o Capítulo 9, Tabela 8 da NEC para condutores de cobre. Todos os cálculos usam premissas conservadoras e exibem valores intermediários para verificação.",
+  link: { label: "Ver nossa metodologia", href: "/methodology/" },
+};
+
+const references = [
+  { title: "NEC Capítulo 9 — Tabela 8 (Propriedades dos Condutores)", url: "https://www.nfpa.org/codes-and-standards", source: "National Fire Protection Association" },
+  { title: "Victron Energy — Sistemas 12V vs 24V vs 48V", url: "https://www.victronenergy.com/help-center", source: "Victron Energy" },
+  { title: "Blue Sea Systems — Calculadora de Dimensionamento de Cabos", url: "https://www.bluesea.com/resources", source: "Blue Sea Systems" },
+  { title: "DOE — Distribuição de Energia DC para Data Centers", url: "https://www.energy.gov/eere/amo/dc-power-distribution", source: "U.S. Department of Energy" },
+];
+
+const faqItems = [
+  {
+    question: "Qual tensão devo escolher para meu sistema de bateria solar?",
+    answer: "Para sistemas acima de 2kW, escolha 48V — reduz corrente, custos de cabos e perdas. Para 500W–2kW, 24V é um bom equilíbrio. Para menos de 500W, 12V é o mais simples e barato. A maioria dos inversores híbridos modernos é projetada para 48V.",
+  },
+  {
+    question: "Como a tensão afeta o tamanho do cabo?",
+    answer: "Tensão mais alta significa corrente menor para a mesma potência. Uma carga de 3kW a 12V consome 250A (precisa de cabo 4/0 AWG), a 24V consome 125A (precisa de 2/0 AWG), e a 48V consome 62,5A (precisa de 6 AWG). Cabos mais finos são mais baratos, leves e fáceis de instalar.",
+  },
+  {
+    question: "Posso misturar equipamentos de 12V e 24V?",
+    answer: "Não — você não pode conectar equipamentos de 12V diretamente a um banco de 24V. Use um conversor DC-DC para reduzir a tensão. Isso adiciona custo e 5–10% de perda de eficiência. É melhor padronizar uma tensão e selecionar equipamentos compatíveis.",
+  },
+  {
+    question: "Qual é a tensão mínima para um inversor?",
+    answer: "A maioria dos inversores de onda senoidal pura tem uma tensão mínima de operação de 10,5V (modelos 12V), 21V (modelos 24V) ou 42V (modelos 48V). Abaixo desses limiares, o inversor é desligado para proteger a bateria de descarga excessiva.",
+  },
+  {
+    question: "48V é seguro para uso residencial?",
+    answer: "Sim — 48V DC está abaixo do limiar de segurança de 60V DC definido pelos padrões NEC e IEC. Não exige medidas de segurança especiais além de fusíveis adequados, desconectores e práticas de fiação. Tensões acima de 60V exigem precauções de segurança adicionais.",
+  },
+  {
+    question: "Como a tensão afeta a configuração do banco de baterias?",
+    answer: "Um banco LFP de 12V precisa de 4 células em série (4S), 24V precisa de 8S e 48V precisa de 16S. Mais células em série aumentam a complexidade do BMS, mas reduzem a corrente. Strings em paralelo adicionam capacidade independentemente da tensão — um banco 48V 2P são duas strings de 48V em paralelo.",
+  },
+  {
+    question: "Posso fazer upgrade de 24V para 48V depois?",
+    answer: "Fazer upgrade de tensão requer substituir todo o banco de baterias, inversor, controlador de carga e possivelmente a fiação. É mais econômico escolher 48V desde o início se você antecipar cargas acima de 2kW ou planejar expansão.",
+  },
+  {
+    question: "Qual tensão os VE usam?",
+    answer: "A maioria dos VE modernos usa pacotes de bateria de 400V. Alguns projetos mais recentes usam 800V para carregamento mais rápido e maior eficiência. Carrinhos de golfe e VE leves tipicamente usam 48V–96V. A tensão é determinada pelos requisitos do motor e velocidade de carregamento.",
+  },
+  {
+    question: "Como a tensão afeta a eficiência do carregamento?",
+    answer: "Sistemas de tensão mais alta são geralmente mais eficientes porque a menor corrente reduz as perdas resistivas na fiação (I²R). Um sistema de 48V tipicamente tem 2–4% menos perdas de transmissão que um sistema de 12V para a mesma transferência de energia.",
+  },
+  {
+    question: "Qual é a tensão DC máxima prática para residências?",
+    answer: "48V é o máximo prático para sistemas DC residenciais. Fica abaixo do limiar de segurança de 60V DC, tem ampla disponibilidade de equipamentos e suporta cargas até 10+ kW com fiação padrão. Tensões mais altas exigem medidas de segurança de nível comercial.",
+  },
+];
+
+const relatedTools = [
+  { href: "/tools/voltage-drop-calculator/", title: "Calculadora de Queda de Tensão", description: "Calcule a queda de tensão para um dado comprimento de cabo e corrente." },
+  { href: "/tools/dc-cable-loss-calculator/", title: "Calculadora de Perda DC", description: "Estime perdas de potência na fiação DC em diferentes tensões." },
+  { href: "/tools/battery-sizing-calculator/", title: "Calculadora de Dimensionamento de Bateria", description: "Dimensione bancos de baterias na tensão do sistema escolhida." },
+  { href: "/tools/battery-pack-calculator/", title: "Calculadora de Pacote de Bateria", description: "Projete configurações de células série/paralelo para tensão alvo." },
+  { href: "/tools/inverter-battery-calculator/", title: "Calculadora Inversor-Bateria", description: "Combine especificações de inversor e bateria." },
+  { href: "/tools/solar-battery-sizing-calculator/", title: "Dimensionamento Solar", description: "Dimensione bancos de bateria solar com seleção de tensão." },
+];
+
+const commonMistakes = [
+  "Escolher 12V para cargas acima de 1kW — uma carga de 2kW a 12V consome 167A, exigindo cabo 4/0 AWG que custa mais que a economia nos equipamentos.",
+  "Ignorar queda de tensão em longos trechos de cabo — 10m de cabo a 12V/100A perde 3,3% vs. 0,8% a 48V/25A para o mesmo cabo.",
+  "Misturar equipamentos de tensões diferentes sem conversão DC-DC — conectar cargas de 12V a um banco de 24V danificará os equipamentos instantaneamente.",
+  "Selecionar tensão apenas com base no preço do inversor — um inversor 12V mais barato pode custar mais em cabos mais grossos e maiores perdas ao longo do tempo.",
+  "Não planejar expansão — um sistema de 24V que precisa crescer para 5kW exigirá uma atualização completa de tensão para 48V.",
+  "Usar fusíveis automotivos em sistemas DC estacionários — fusíveis automotivos são projetados para ambientes veiculares de 12V, não para aplicações DC de serviço contínuo.",
+  "Ignorar compatibilidade de tensão do controlador de carga — controladores PWM exigem correspondência de tensão da bateria, enquanto controladores MPPT aceitam tensões de entrada mais altas.",
+  "Esquecer regulamentações de segurança — tensões acima de 60V DC exigem desconectores especiais, sinalização e práticas de instalação na maioria das jurisdições.",
+];
+
+const relatedArticles = [
+  { href: "/learn/12v-vs-24v-vs-48v-batteries/", title: "Sistemas de Bateria 12V vs 24V vs 48V" },
+  { href: "/learn/battery-voltage-systems/", title: "Guia de Seleção de Tensão do Sistema DC" },
+  { href: "/learn/voltage-drop-explained/", title: "Dimensionamento de Cabos para Sistemas de Bateria" },
+];
+---
+
+<CalculatorLayout
+  title="Seletor de Tensão do Sistema | Calculadoras de Bateria"
+  description="Escolha a tensão DC ideal do sistema — 12V, 24V ou 48V — com base na potência da carga, distância do cabo e requisitos de eficiência."
+  faqItems={faqItems}
+  commonMistakes={commonMistakes}
+  relatedCalculators={relatedTools}
+  relatedArticles={relatedArticles}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+  lang="pt"
+>
+
+  <!-- Main Calculator Grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+
+    <!-- Input Form -->
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Parâmetros do Sistema</h3>
+      <div class="flex flex-col gap-6">
+        <InputField
+          id="total-load"
+          label="Carga Total do Sistema"
+          value={3000}
+          min={10}
+          step={10}
+          unit="W"
+          helperText="Potência contínua combinada de todas as cargas (Watts)."
+        />
+        <InputField
+          id="cable-distance"
+          label="Distância do Cabo (ida)"
+          value={10}
+          min={0.5}
+          step={0.5}
+          unit="m"
+          helperText="Distância do banco de baterias ao painel principal de cargas ou inversor."
+        />
+        <InputField
+          id="battery-capacity"
+          label="Capacidade Alvo da Bateria"
+          value={5000}
+          min={100}
+          step={100}
+          unit="Wh"
+          helperText="Meta total de armazenamento de energia em Watt-horas."
+        />
+        <InputField
+          id="ambient-temp"
+          label="Temperatura Ambiente"
+          value={25}
+          min={-30}
+          max={60}
+          step={1}
+          unit="°C"
+          helperText="Temperatura média de operação para referência de resistência do cabo."
+        />
+      </div>
+    </CalculatorCard>
+
+    <!-- Voltage Comparison Results -->
+    <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Comparação de Tensões</h3>
+
+        <div class="grid grid-cols-1 gap-4 mb-6">
+          <!-- 12V -->
+          <div class="bg-surface-soft border border-hairline p-4">
+            <div class="flex justify-between items-center mb-2">
+              <span class="text-label-uppercase text-muted text-[10px]">SISTEMA 12V</span>
+              <span class="text-caption text-muted" id="v12-verdict">—</span>
+            </div>
+            <div class="grid grid-cols-3 gap-2">
+              <div>
+                <span class="text-caption text-muted block">Corrente</span>
+                <span class="text-title-lg text-primary" id="v12-current">—</span>
+              </div>
+              <div>
+                <span class="text-caption text-muted block">Perda no Cabo</span>
+                <span class="text-title-lg text-primary" id="v12-loss">—</span>
+              </div>
+              <div>
+                <span class="text-caption text-muted block">Cabo Mín.</span>
+                <span class="text-title-lg text-primary" id="v12-cable">—</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 24V -->
+          <div class="bg-surface-soft border border-hairline p-4">
+            <div class="flex justify-between items-center mb-2">
+              <span class="text-label-uppercase text-muted text-[10px]">SISTEMA 24V</span>
+              <span class="text-caption text-muted" id="v24-verdict">—</span>
+            </div>
+            <div class="grid grid-cols-3 gap-2">
+              <div>
+                <span class="text-caption text-muted block">Corrente</span>
+                <span class="text-title-lg text-primary" id="v24-current">—</span>
+              </div>
+              <div>
+                <span class="text-caption text-muted block">Perda no Cabo</span>
+                <span class="text-title-lg text-primary" id="v24-loss">—</span>
+              </div>
+              <div>
+                <span class="text-caption text-muted block">Cabo Mín.</span>
+                <span class="text-title-lg text-primary" id="v24-cable">—</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 48V -->
+          <div class="bg-surface-soft border border-m-blue-light p-4">
+            <div class="flex justify-between items-center mb-2">
+              <span class="text-label-uppercase text-m-blue-light text-[10px]">SISTEMA 48V</span>
+              <span class="text-caption text-m-blue-light font-bold" id="v48-verdict">—</span>
+            </div>
+            <div class="grid grid-cols-3 gap-2">
+              <div>
+                <span class="text-caption text-muted block">Corrente</span>
+                <span class="text-title-lg text-primary" id="v48-current">—</span>
+              </div>
+              <div>
+                <span class="text-caption text-muted block">Perda no Cabo</span>
+                <span class="text-title-lg text-primary" id="v48-loss">—</span>
+              </div>
+              <div>
+                <span class="text-caption text-muted block">Cabo Mín.</span>
+                <span class="text-title-lg text-primary" id="v48-cable">—</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recommendation -->
+        <div class="border-t border-hairline pt-4">
+          <h4 class="text-label-uppercase text-primary text-xs mb-2">RECOMENDAÇÃO</h4>
+          <p class="text-body-sm text-muted" id="voltage-recommendation">
+            Insira os parâmetros do seu sistema para ver recomendações de tensão.
+          </p>
+        </div>
+      </div>
+    </CalculatorCard>
+
+  </div>
+
+  <!-- Detailed Results per Voltage -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-16">
+    <ResultBox label="Células em Série 12V (LFP)" value="4 células" suffix="configuração 4S" id="r12-cells" />
+    <ResultBox label="Células em Série 24V (LFP)" value="8 células" suffix="configuração 8S" id="r24-cells" />
+    <ResultBox label="Células em Série 48V (LFP)" value="16 células" suffix="configuração 16S" id="r48-cells" />
+  </div>
+
+  <!-- Formula Section -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <FormulaBox title="Fórmulas de Seleção de Tensão">
+      <p>
+        Consumo de corrente para cada opção de tensão:
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        I (Amperes) = P (Watts) / V (Volts)
+      </div>
+      <p>
+        Queda de tensão no cabo (ida e volta):
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        V_queda = 2 × L × I × ρ / A
+      </div>
+      <p>
+        Perda de potência no cabo:
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        P_perda (W) = I² × R_cabo
+      </div>
+      <p class="text-xs text-muted mt-4">
+        <strong>Variáveis:</strong> P = potência total da carga (W), V = tensão do sistema (V), L = comprimento unidirecional do cabo (m), I = corrente (A), ρ = resistividade do cobre (1,72×10⁻⁸ Ω·m), A = seção transversal do cabo (m²).
+      </p>
+    </FormulaBox>
+
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">Fórmulas e Exemplos Práticos</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample
+        number={1}
+        title="Sistema 3kW — Cabo 10m"
+        scenario="Compare 12V, 24V e 48V para uma carga contínua de 3.000W com distância unidirecional de cabo de 10 metros."
+        inputs={[
+          { label: "Carga Total", value: "3.000 W" },
+          { label: "Distância do Cabo", value: "10 m" },
+          { label: "Capacidade da Bateria", value: "5.000 Wh" },
+          { label: "Temperatura Ambiente", value: "25°C" },
+        ]}
+        steps={[
+          { label: "Corrente 12V", formula: "3000 / 12", result: "250 A" },
+          { label: "Corrente 24V", formula: "3000 / 24", result: "125 A" },
+          { label: "Corrente 48V", formula: "3000 / 48", result: "62,5 A" },
+          { label: "Perda no cabo 12V (4/0 AWG)", formula: "250² × 0,00005 Ω", result: "31,2 W (1,04%)" },
+          { label: "Perda no cabo 48V (6 AWG)", formula: "62,5² × 0,0033 Ω", result: "12,9 W (0,43%)" },
+        ]}
+        answer="48V é recomendado — consome 62,5A vs. 250A a 12V, usando cabo 6 AWG ao invés de 4/0 AWG, economizando aproximadamente $200+ em cobre e reduzindo perdas em 60%."
+        interpretation="A 12V, a corrente de 250A exige cabo extremamente grosso que é caro, pesado e difícil de instalar. 48V mantém a corrente controlável com fiação residencial padrão."
+        variant="home"
+      />
+    </div>
+  </section>
+
+  <!-- Comparison Table -->
+  <ComparisonTable
+    title="Comparação de Sistemas 12V vs 24V vs 48V"
+    headers={["Parâmetro", "12V", "24V", "48V"]}
+    rows={[
+      ["Carga Máx. Prática", "1 kW", "3 kW", "10+ kW"],
+      ["Corrente a 3kW", "250 A", "125 A", "62,5 A"],
+      ["Cabo para 3kW (10m)", "4/0 AWG (107 mm²)", "2/0 AWG (67 mm²)", "6 AWG (13 mm²)"],
+      ["Custo do Cabo (10m)", "$80–120", "$50–80", "$15–30"],
+      ["Queda de Tensão (10m, 3kW)", "4,2% (4/0 AWG)", "2,1% (2/0 AWG)", "0,8% (6 AWG)"],
+      ["Células LFP (Série)", "4S", "8S", "16S"],
+      ["Eficiência do Inversor", "85–90%", "90–93%", "93–96%"],
+      ["Disponibilidade", "Maior", "Boa", "Excelente (moderno)"],
+      ["Limiar de Segurança", "Seguro", "Seguro", "Seguro (<60V DC)"],
+      ["Melhor Para", "Portátil, RV Pequeno", "RV Médio, Cabana", "Residencial, Telecom"],
+    ]}
+    caption="Tamanhos de cabo são os mínimos recomendados para serviço contínuo a 75°C de temperatura do condutor"
+  />
+
+  <FAQSection items={faqItems} />
+  <RelatedTools tools={relatedTools} />
+
+  <!-- Calculation Script -->
+  <script>
+    const totalLoadInput = document.getElementById('total-load') as HTMLInputElement;
+    const cableDistanceInput = document.getElementById('cable-distance') as HTMLInputElement;
+    const batteryCapacityInput = document.getElementById('battery-capacity') as HTMLInputElement;
+    const ambientTempInput = document.getElementById('ambient-temp') as HTMLInputElement;
+
+    const copperResistivity = 1.72e-8;
+
+    const cableAWG: { gauge: string; areaM2: number; areaMM2: number }[] = [
+      { gauge: '18 AWG', areaM2: 0.823e-6, areaMM2: 0.823 },
+      { gauge: '16 AWG', areaM2: 1.31e-6, areaMM2: 1.31 },
+      { gauge: '14 AWG', areaM2: 2.08e-6, areaMM2: 2.08 },
+      { gauge: '12 AWG', areaM2: 3.31e-6, areaMM2: 3.31 },
+      { gauge: '10 AWG', areaM2: 5.26e-6, areaMM2: 5.26 },
+      { gauge: '8 AWG', areaM2: 8.37e-6, areaMM2: 8.37 },
+      { gauge: '6 AWG', areaM2: 13.3e-6, areaMM2: 13.3 },
+      { gauge: '4 AWG', areaM2: 21.2e-6, areaMM2: 21.2 },
+      { gauge: '2 AWG', areaM2: 33.6e-6, areaMM2: 33.6 },
+      { gauge: '1/0 AWG', areaM2: 53.5e-6, areaMM2: 53.5 },
+      { gauge: '2/0 AWG', areaM2: 67.4e-6, areaMM2: 67.4 },
+      { gauge: '4/0 AWG', areaM2: 107e-6, areaMM2: 107 },
+    ];
+
+    function findMinCable(currentA: number): { gauge: string; areaM2: number } {
+      const maxCurrentDensity = 4e6;
+      const requiredArea = currentA / maxCurrentDensity;
+      for (const c of cableAWG) {
+        if (c.areaM2 >= requiredArea) return c;
+      }
+      return cableAWG[cableAWG.length - 1];
+    }
+
+    function updateCalculations() {
+      const loadW = parseFloat(totalLoadInput.value) || 3000;
+      const distanceM = parseFloat(cableDistanceInput.value) || 10;
+      const batteryWh = parseFloat(batteryCapacityInput.value) || 5000;
+
+      const voltages = [12, 24, 48];
+      const results: Record<number, { current: number; lossW: number; lossPercent: number; cable: string }> = {};
+
+      for (const v of voltages) {
+        const current = loadW / v;
+        const cable = findMinCable(current);
+        const resistance = 2 * distanceM * copperResistivity / cable.areaM2;
+        const lossW = current * current * resistance;
+        const lossPercent = (lossW / loadW) * 100;
+
+        results[v] = { current, lossW, lossPercent, cable: cable.gauge };
+
+        const prefix = v === 12 ? 'v12' : v === 24 ? 'v24' : 'v48';
+        document.getElementById(`${prefix}-current`)!.textContent = `${current.toFixed(1)} A`;
+        document.getElementById(`${prefix}-loss`)!.textContent = `${lossW.toFixed(1)} W`;
+        document.getElementById(`${prefix}-cable`)!.textContent = cable.gauge;
+      }
+
+      const verdicts: Record<number, string> = {};
+      if (results[12].current > 150) verdicts[12] = '✗ Risco de sobrecarga';
+      else if (results[12].lossPercent > 3) verdicts[12] = '⚠ Alta perda';
+      else verdicts[12] = '✓ Aceitável';
+
+      if (results[24].current > 150) verdicts[24] = '✗ Risco de sobrecarga';
+      else if (results[24].lossPercent > 3) verdicts[24] = '⚠ Alta perda';
+      else verdicts[24] = '✓ Bom';
+
+      verdicts[48] = results[48].lossPercent < 2 ? '✓ Melhor' : '✓ Bom';
+
+      document.getElementById('v12-verdict')!.textContent = verdicts[12];
+      document.getElementById('v24-verdict')!.textContent = verdicts[24];
+      document.getElementById('v48-verdict')!.textContent = verdicts[48];
+
+      let recommended = 48;
+      if (loadW <= 500) recommended = 12;
+      else if (loadW <= 2000) recommended = 24;
+      else recommended = 48;
+
+      const recEl = document.getElementById('voltage-recommendation')!;
+      if (recommended === 48) {
+        recEl.textContent = `48V é recomendado para seu sistema de ${loadW.toLocaleString()}W. A ${results[48].current.toFixed(1)}A, permite cabo ${results[48].cable} com apenas ${results[48].lossPercent.toFixed(2)}% de perda em ${distanceM}m — a escolha mais eficiente e econômica.`;
+      } else if (recommended === 24) {
+        recEl.textContent = `24V é recomendado para seu sistema de ${loadW.toLocaleString()}W. A ${results[24].current.toFixed(1)}A, usa cabo ${results[24].cable} com ${results[24].lossPercent.toFixed(2)}% de perda — bom equilíbrio entre eficiência e simplicidade.`;
+      } else {
+        recEl.textContent = `12V é adequado para seu sistema de ${loadW.toLocaleString()}W. A ${results[12].current.toFixed(1)}A, usa cabo ${results[12].cable} com ${results[12].lossPercent.toFixed(2)}% de perda — simples e econômico para cargas pequenas.`;
+      }
+
+      const lfpCellV = 3.2;
+      document.getElementById('r12-cells')!.querySelector('.text-title-lg')!.textContent = `${Math.round(12 / lfpCellV)} células`;
+      document.getElementById('r24-cells')!.querySelector('.text-title-lg')!.textContent = `${Math.round(24 / lfpCellV)} células`;
+      document.getElementById('r48-cells')!.querySelector('.text-title-lg')!.textContent = `${Math.round(48 / lfpCellV)} células`;
+    }
+
+    [totalLoadInput, cableDistanceInput, batteryCapacityInput, ambientTempInput].forEach(el => {
+      el.addEventListener('input', updateCalculations);
+    });
+
+    updateCalculations();
+  </script>
+
+</CalculatorLayout>

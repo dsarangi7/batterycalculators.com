@@ -1,0 +1,419 @@
+---
+import CalculatorLayout from '../../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import InputField from '../../../components/InputField.astro';
+import ResultBox from '../../../components/ResultBox.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import WorkedExample from '../../../components/WorkedExample.astro';
+import ComparisonTable from '../../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../../components/EngineeringDiagram.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import RelatedTools from '../../../components/RelatedTools.astro';
+
+const whatIs = `O dimensionamento de baterias é o processo de determinar a capacidade total de energia (em watt-horas ou ampères-horas) que um banco de baterias deve armazenar para atender às cargas elétricas definidas ao longo de um período especificado sem recarga externa. O cálculo integra <strong>consumo diário de energia</strong>, <strong>dias de autonomia</strong> (quanto tempo o sistema deve operar sem entrada de rede ou solar), <strong>limites de profundidade de descarga</strong> (para preservar a vida útil dos ciclos), <strong>eficiência de ida e volta do sistema</strong> (perdas no inversor, fiação e BMS) e <strong>redução por temperatura</strong> (o frio reduz a capacidade disponível). O dimensionamento correto da bateria é a base de toda instalação solar fora da rede, sistema de armazenamento de energia residencial, backup de telecomunicações, sistema de energia marinha e projeto de extensão de autonomia de veículos elétricos.`;
+
+const whyItMatters = [
+  "Bancos de baterias superdimensionados desperdiçam capital — um banco 30% maior que o necessário pode custar milhares em células de lítio desnecessárias que ficam sem uso.",
+  "Bancos subdimensionados causam perdas inesperadas de energia, forçando as cargas a desligarem antes do período de autonomia pretendido.",
+  "Ignorar a redução por temperatura pode deixar os sistemas com 10–30% menos capacidade esperada em climas frios.",
+  "Confundir capacidade nominal e utilizável leva a bancos que parecem suficientes no papel, mas falham sob restreiz de DoD reais.",
+  "Ignorar a eficiência de ida e volta significa que a bateria deve fornecer mais energia do que as cargas consomem, criando um déficit oculto.",
+];
+
+const practicalApplications = [
+  { title: "Armazenamento de Energia Residencial", description: "Dimensionar sistemas de baterias domésticas para autoconsumo solar, energia de backup e otimização por faixa de preço." },
+  { title: "Solar Fora da Rede", description: "Determinar a capacidade do banco de baterias para casas e chalés completamente desconectados da rede elétrica." },
+  { title: "Backup de Telecomunicações", description: "Garantir que as baterias de torres de telecom atendam aos requisitos mínimos de autonomia durante apagões prolongados." },
+  { title: "Sistemas de Energia Marinha", description: "Dimensionar bancos residenciais para embarcações com cargas significativas durante navegação prolongada." },
+  { title: "RV e Vida Móvel", description: "Calcular a capacidade de baterias para vida full-time em RV com infraestrutura de carga solar." },
+  { title: "UPS Industrial", description: "Dimensionar bancos de baterias para processos industriais críticos que exigem duração garantida de backup." },
+];
+
+const expertNotes = [
+  { title: 'Projeto para Clima Frio', variant: 'warning', content: 'As baterias de lítio não podem ser carregadas abaixo de 0°C sem causar degradação permanente das células devido à deposição de lítio. Se sua temperatura de projeto cair abaixo de zero, inclua um sistema de aquecimento da bateria no dimensionamento ou aplique uma margem significativa de capacidade.' },
+  { title: 'Planejamento de Autonomia', variant: 'engineering', content: 'Para sistemas solares fora da rede, 2–3 dias de autonomia é padrão. Em regiões com cobertura de nuvens frequente por vários dias (Noroeste do Pacífico, Norte da Europa), 4 dias podem ser necessários. Mais autonomia significa bancos de baterias maiores e mais caros.' },
+];
+
+const trustSection = {
+  text: "Esta calculadora utiliza fórmulas de engenharia de baterias documentadas publicamente. O modelo de dimensionamento considera a escalação de energia por autonomia, redução por profundidade de descarga, perdas de eficiência de ida e volta e redução de capacidade dependente da temperatura. Todos os valores intermediários são exibidos para verificação independente. Nossa metodologia segue IEEE 1188 e notas de aplicação de fabricantes.",
+  link: { label: "Ver nossa metodologia completa", href: "/methodology/" },
+};
+
+const references = [
+  { title: "Battery University — Dimensionamento de Baterias", url: "https://batteryuniversity.com/article/bu-403-positive-kinetics", source: "Battery University / Cadex Electronics" },
+  { title: "IEEE Std 1188-1996 — Manutenção de Baterias para Aplicações Estacionárias", url: "https://standards.ieoe.org/ieee/1188/1076/", source: "IEEE Standards Association" },
+  { title: "NREL — Métodos de Dimensionamento de Armazenamento em Bateria", url: "https://www.nrel.gov/storage-battery-sizing.html", source: "National Renewable Energy Laboratory" },
+  { title: "US DOE — Visão Geral da Tecnologia de Armazenamento em Bateria", url: "https://www.energy.gov/eere/storage/battery-storage-technology", source: "U.S. Department of Energy" },
+  { title: "Victron Energy — Guia de Dimensionamento de Banco de Baterias", url: "https://www.victronenergy.com/help-center", source: "Victron Energy" },
+];
+
+const faqItems = [
+  {
+    question: 'O que significa "Dias de Autonomia"?',
+    answer: "A autonomia é o número de dias que um banco de baterias pode suportar as cargas do sistema sem receber qualquer carga de entrada (por exemplo, durante dias nublados para solar, ou períodos sem vento para turbinas). Sistemas solares fora da rede normalmente usam 2 a 3 dias de autonomia para prevenir apagões totais.",
+  },
+  {
+    question: "Como as características de temperatura do Chumbo-Ácido e Lítio diferem?",
+    answer: "As químicas de lítio funcionam ligeiramente melhor que chumbo-ácido em temperaturas baixas até -10°C. No entanto, as baterias de lítio sofrem uma restrição crítica: não podem ser carregadas abaixo de 0°C sem causar degradação permanente das células devido à deposição de lítio, a menos que possuam circuitos de pré-aquecimento.",
+  },
+  {
+    question: "Como estimar meu consumo diário de energia?",
+    answer: "Multiplique a potência de cada carga elétrica pelo número de horas em que funciona por dia. Some todos os resultados. Exemplo: Uma TV de 100W funcionando por 3 horas = 300 Wh. Uma geladeira de 50W ligando por 10 horas = 500 Wh. Total diário é 800 Wh.",
+  },
+  {
+    question: "Por que a eficiência de ida e volta do sistema é menor que a eficiência das células?",
+    answer: "Embora as células de lítio tenham 98% de eficiência, o sistema inclui perdas resistivas na fiação, consumo em espera do sistema de gerenciamento de bateria (BMS), contatos de fusível e perdas do inversor DC-CA. A eficiência geral do sistema representa a perda térmica líquida da terminal da bateria até a carga final.",
+  },
+  {
+    question: "Quantas baterias preciso para uma carga de 5kW?",
+    answer: "Depende da autonomia e da tensão. Para uma carga de 5kW funcionando 8 horas/dia a 48V com 2 dias de autonomia e 80% DoD: Energia necessária = (5.000W × 8h × 2) / (0,80 × 0,90) = 111.111 Wh = 111,1 kWh. A 48V, são 2.314 Ah — equivalente a cerca de 8 grandes baterias LFP de 280Ah em configuração 48V.",
+  },
+  {
+    question: "Qual é a diferença entre capacidade da bateria e capacidade utilizável?",
+    answer: "A capacidade nominal é a energia total armazenada a 100% de carga. A capacidade utilizável é o que pode ser extraído com segurança antes de atingir os limites de DoD. Uma bateria LFP de 100Ah a 80% DoD fornece 80Ah utilizáveis. Uma bateria de chumbo-ácido de 100Ah a 50% DoD fornece apenas 50Ah utilizáveis. Sempre dimensione com base na capacidade utilizável.",
+  },
+  {
+    question: "Como a química da bateria afeta o dimensionamento?",
+    answer: "LFP permite 80–90% DoD com 5.000+ ciclos, NMC permite 70–80% DoD com 2.000 ciclos, e chumbo-ácido é limitado a 50% DoD com 500–1.000 ciclos. LFP requer menos capacidade total para a mesma energia utilizável, mas custa mais por kWh no início.",
+  },
+  {
+    question: "Devo superdimensionar meu banco de baterias?",
+    answer: "Um superdimensionamento moderado (10–20%) fornece margem de segurança para redução por temperatura, envelhecimento e crescimento de cargas. Superdimensionamento excessivo (50%+) desperdiça capital e pode causar problemas de subcarga. Uma margem de 15–20% acima do mínimo calculado é geralmente apropriada.",
+  },
+  {
+    question: "Qual tensão devo escolher para meu banco de baterias?",
+    answer: "Tensões mais altas reduzem a corrente para a mesma potência, significando cabos mais finos e menores perdas. 12V é adequado para sistemas pequenos (<1kW), 24V para sistemas médios (1–5kW), e 48V é padrão para sistemas residenciais e comerciais (>5kW). A maioria dos inversores modernos é projetada para 48V.",
+  },
+  {
+    question: "Como levar em conta o crescimento futuro de cargas?",
+    answer: "Adicione 15–25% de margem de capacidade para considerar eletrodomésticos adicionais, aumento de uso ou crescimento familiar. Alternativamente, projete para expansão modular — use um sistema de baterias que permita adicionar strings paralelas posteriormente sem substituir todo o banco.",
+  },
+  {
+    question: "Posso misturar baterias antigas e novas?",
+    answer: "Nunca misture baterias de diferentes idades, químicas ou capacidades no mesmo banco. Baterias mais antigas têm maior resistência interna e menor capacidade, forçando as mais novas a trabalharem mais e degradarem mais rápido. Sempre substitua strings ou bancos inteiros de uma vez.",
+  },
+  {
+    question: "O que acontece se eu subdimensionar meu banco de baterias?",
+    answer: "Bancos subdimensionados causam ciclos de descarga profunda que aceleram a degradação, queda de tensão sob carga acionando desconexões de baixa tensão prematuras, e autonomia insuficiente durante períodos prolongados de nublamento. O custo da substituição prematura de baterias frequentemente excede as economias do subdimensionamento.",
+  },
+];
+
+const relatedTools = [
+  { href: "/tools/parallel-string-calculator/", title: "Ferramenta de String Paralela", description: "Organizar pacotes série/paralelo para corresponder a essa capacidade de saída." },
+  { href: "/tools/runtime-calculator/", title: "Calculadora de Autonomia", description: "Verificar horas de funcionamento sob uma carga contínua específica em Watts." },
+  { href: "/tools/energy-conversion-calculator/", title: "Conversão de Energia", description: "Converter capacidades de baterias entre Ah e Wh." },
+  { href: "/tools/solar-battery-sizing-calculator/", title: "Dimensionamento Solar", description: "Dimensionar bancos de baterias solares a partir de dados de consumo diário." },
+  { href: "/tools/home-backup-battery-calculator/", title: "Calculadora de Backup Residencial", description: "Dimensionar backup residencial para cargas críticas." },
+  { href: "/home-power-outage-battery-backup-calculator/", title: "Calculadora de Backup para Apagões", description: "Dimensionar bateria e inversor para apagões de tempestade e emergência." },
+  { href: "/tools/battery-pack-calculator/", title: "Calculadora de Pacote de Bateria", description: "Projetar configurações de células série/paralelo para especificações alvo." },
+  { href: "/tools/marine-battery-sizing-calculator/", title: "Dimensionamento Marinho", description: "Dimensionar bancos residenciais marinhos para cargas de hotel." },
+  { href: "/tools/rv-battery-calculator/", title: "Calculadora de Bateria RV", description: "Planejar orçamentos de energia RV para viagens fora da rede." },
+];
+
+const commonMistakes = [
+  "Esquecer a redução por temperatura — baterias de lítio não podem ser carregadas abaixo de 0°C sem dano permanente. A capacidade de chumbo-ácido cai significativamente em condições frias. Sempre aplique fatores de correção de temperatura.",
+  "Confundir capacidade nominal e utilizável — uma bateria de chumbo-ácido de 100Ah a 50% DoD fornece apenas 50Ah utilizáveis. Uma bateria LFP de 100Ah a 80% DoD fornece 80Ah. Dimensione com base na capacidade utilizável.",
+  "Ignorar a eficiência de ida e volta do sistema — a carga e descarga de baterias perde 5–15% da energia. Seu requisito de carga deve ser dividido pela eficiência do sistema para obter a verdadeira capacidade da bateria necessária.",
+  "Usar média em vez de carga de pico — sua bateria deve suportar cargas de pico, não apenas médias. Uma bomba de poço pode consumir 1.000W por 5 minutos, mesmo que o consumo médio seja 50W.",
+  "Misturar idades ou químicas de baterias — nunca combine baterias antigas e novas, ou diferentes químicas, no mesmo banco. Resistência interna incompatível causa carregamento desigual e degradação acelerada.",
+  "Ignorar perdas de autor descarga — em períodos de autonomia de vários dias, a autor descarga (1–5%/mês para lítio, maior para chumbo-ácido) reduz a energia disponível. Considere isso em cálculos de autonomia longa.",
+  "Dimensionar apenas para as cargas atuais — o crescimento futuro de cargas com novos eletrodomésticos, mudanças familiares ou aumento de uso pode rapidamente superar um banco subdimensionado. Inclua margem de 15–20% de crescimento.",
+  "Escolher tensão de sistema errada — um sistema de 12V para uma carga de 5kW requer 400+ amperes, exigindo cabos extremamente grossos. Use 48V para cargas acima de 2kW para manter a corrente gerenciável.",
+];
+
+const relatedArticles = [
+  { href: "/learn/how-to-size-a-battery-bank/", title: "Como Dimensionar um Banco de Baterias" },
+  { href: "/learn/what-is-battery-sizing/", title: "O Que é Dimensionamento de Bateria?" },
+  { href: "/learn/battery-sizing-formula/", title: "Fórmula de Dimensionamento de Bateria" },
+  { href: "/learn/battery-sizing-chart-guide/", title: "Guia de Tabela de Dimensionamento de Bateria" },
+];
+---
+
+<CalculatorLayout
+  title="Calculadora de Dimensionamento de Bateria | Calculadoras de Bateria"
+  description="Dimensione pacotes de armazenamento de baterias com base em consumo diário em Wh, dias de autonomia, tensão nominal e redução de capacidade por baixa temperatura."
+  faqItems={faqItems}
+  commonMistakes={commonMistakes}
+  relatedCalculators={relatedTools}
+  relatedArticles={relatedArticles}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+  lang="pt"
+>
+
+  <!-- Main Calculator Grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+
+    <!-- Input Form -->
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Critérios de Dimensionamento</h3>
+      <div class="flex flex-col gap-6">
+
+        <!-- Daily load (paired input + select) -->
+        <div class="flex flex-col gap-2 w-full">
+          <label for="daily-energy" class="text-label-uppercase text-xs text-primary">Consumo Diário de Energia</label>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            <input type="number" id="daily-energy" value="1200" class="text-input col-span-2" min="1" step="any" />
+            <select id="energy-unit" class="select-input">
+              <option value="wh">Wh</option>
+              <option value="kwh">kWh</option>
+            </select>
+          </div>
+        </div>
+
+        <InputField id="autonomy" label="Dias de Autonomia" value={2} min={1} step={1} helperText="Número de dias que o sistema de baterias deve suportar a carga sem recarga." />
+        <InputField id="dod" label="Profundidade Máxima de Descarga (DoD %)" value={80} min={10} max={100} helperText="Limite contínuo seguro. Recomendado: 80% para Lítio, 50% para Chumbo-Ácido." />
+        <InputField id="voltage" label="Tensão Nominal do Sistema (V)" value={25.6} min={1} step="any" helperText="Tensão nominal do pacote (ex: 12,8V, 25,6V, 51,2V)" />
+        <InputField id="efficiency" label="Eficiência de Ida e Volta do Sistema (%)" value={90} min={50} max={100} helperText="Perda no inversor, queda de tensão na fiação e eficiência de aceitação de carga da bateria." />
+        <InputField id="temperature" label="Temperatura Mínima de Projeto (°C)" value={10} min={-40} max={50} helperText="Temperaturas baixas reduzem a capacidade de armazenamento de energia química." />
+
+      </div>
+    </CalculatorCard>
+
+    <!-- Calculation Results -->
+    <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Saídas Estimadas</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <ResultBox
+            label="Energia Necessária do Banco"
+            value="3.546 Wh"
+            suffix="3,55 kWh de armazenamento recomendado"
+            variant="primary"
+            id="result-energy"
+          />
+          <ResultBox
+            label="Capacidade de Carga Necessária"
+            value="138,5 Ah"
+            suffix="A 25,6V nominal"
+            id="result-capacity-box"
+          />
+          <ResultBox
+            label="Multiplicador de Redução por Temp."
+            value="0,94"
+            suffix="6,00% de perda de capacidade no frio"
+            id="result-temp-box"
+          />
+        </div>
+      </div>
+
+      <!-- Action Area -->
+      <div class="border-t border-hairline pt-6">
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">Sugestão de Layout do Projeto</h4>
+        <p class="text-body-sm text-muted" id="sizing-layout-suggestion">
+          Para atingir 138,5 Ah de capacidade a 25,6V, você poderia usar uma configuração de string série/paralelo com 8 células em série com múltiplas strings paralelas.
+        </p>
+      </div>
+    </CalculatorCard>
+
+  </div>
+
+  <!-- Formulas and Worked Examples -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">Fórmulas e Exemplos Práticos</h2>
+
+    <FormulaBox title="Fórmulas Matemáticas">
+      <p>
+        A capacidade de energia da bateria necessária E_req é calculada escalando a demanda diária de energia pela autonomia e dividindo pelas perdas:
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        E_req (Wh) = (Energia Diária x Dias de Autonomia) / (DoD% x Eficiência% x MultiplicadorTemp)
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Capacidade_req (Ah) = E_req (Wh) / Tensão Nominal (V)
+      </div>
+      <p>
+        O multiplicador de temperatura reduz a capacidade da bateria em baixas temperaturas:
+      </p>
+      <ul class="list-disc pl-6 flex flex-col gap-1 text-xs">
+        <li>T >= 25°C: Multiplicador = 1,00</li>
+        <li>0°C &lt;= T &lt; 25°C: Multiplicador = 0,90 + 0,10 x (T/25)</li>
+        <li>-20°C &lt;= T &lt; 0°C: Multiplicador = 0,70 + 0,20 x ((T+20)/20)</li>
+      </ul>
+      <p class="text-xs text-muted mt-4">
+        <strong>Variáveis:</strong> Energia Diária em Wh, Autonomia em dias, DoD como porcentagem, Eficiência como porcentagem, Temperatura em °C. Premissas: carga diária constante, curvas de descarga padrão, temperatura de referência de 25°C.
+      </p>
+    </FormulaBox>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample
+        number={1}
+        title="Pequeno Chalé — 1,5 kWh/dia, 25,6V"
+        scenario="Dimensionar um banco de baterias para um pequeno chalé fora da rede com consumo diário de 1.500 Wh, 2 dias de autonomia, 80% DoD, a 10°C."
+        inputs={[
+          { label: "Carga Diária", value: "1.500 Wh" },
+          { label: "Autonomia", value: "2 dias" },
+          { label: "Limite DoD", value: "80%" },
+          { label: "Tensão do Sistema", value: "25,6 V" },
+          { label: "Eficiência", value: "90%" },
+          { label: "Temperatura", value: "10°C" },
+        ]}
+        steps={[
+          { label: "Passo 1: Multiplicador de temperatura", formula: "0,90 + 0,10 × (10/25)", result: "0,94" },
+          { label: "Passo 2: Energia necessária", formula: "(1500 × 2) / (0,80 × 0,90 × 0,94)", result: "4.433 Wh (4,43 kWh)" },
+          { label: "Passo 3: Capacidade necessária", formula: "4433 / 25,6", result: "173,2 Ah" },
+        ]}
+        answer="Banco de baterias de 4,43 kWh, 173,2 Ah a 25,6V — aproximadamente 8× células LFP de 280Ah em configuração 8S"
+        interpretation="A temperatura de 10°C reduz a capacidade disponível em 6%. Para este chalé, uma única bateria LFP de 280Ah 25,6V seria insuficiente — você precisa de aproximadamente 173Ah a 25,6V."
+        variant="home"
+      />
+
+      <WorkedExample
+        number={2}
+        title="Casa Fora da Rede — 8 kWh/dia, 48V"
+        scenario="Projetar um sistema de baterias para uma residência familiar consumindo 8 kWh diários com 3 dias de autonomia a 20°C."
+        inputs={[
+          { label: "Carga Diária", value: "8.000 Wh" },
+          { label: "Autonomia", value: "3 dias" },
+          { label: "Limite DoD", value: "85%" },
+          { label: "Tensão do Sistema", value: "48 V" },
+          { label: "Eficiência", value: "92%" },
+          { label: "Temperatura", value: "20°C" },
+        ]}
+        steps={[
+          { label: "Passo 1: Multiplicador de temperatura", formula: "0,90 + 0,10 × (20/25)", result: "0,98" },
+          { label: "Passo 2: Energia necessária", formula: "(8000 × 3) / (0,85 × 0,92 × 0,98)", result: "31.358 Wh (31,36 kWh)" },
+          { label: "Passo 3: Capacidade necessária", formula: "31358 / 48", result: "653,3 Ah" },
+        ]}
+        answer="Banco de baterias de 31,36 kWh, 653,3 Ah a 48V — equivalente a 8× baterias LFP de 280Ah em configuração 16S2P"
+        interpretation="Três dias de autonomia fornecem boa resiliência contra cobertura de nuvens por vários dias. O sistema de 48V mantém as correntes gerenciáveis para fiação residencial."
+        variant="home"
+      />
+
+      <WorkedExample
+        number={3}
+        title="Torre de Telecom — Clima Frio"
+        scenario="Dimensionar uma bateria de backup 48V para telecomunicações para carga de 5 kWh/dia com 4 dias de autonomia a -10°C."
+        inputs={[
+          { label: "Carga Diária", value: "5.000 Wh" },
+          { label: "Autonomia", value: "4 dias" },
+          { label: "Limite DoD", value: "80%" },
+          { label: "Tensão do Sistema", value: "48 V" },
+          { label: "Eficiência", value: "90%" },
+          { label: "Temperatura", value: "-10°C" },
+        ]}
+        steps={[
+          { label: "Passo 1: Multiplicador de temperatura", formula: "0,70 + 0,20 × ((-10+20)/20)", result: "0,80" },
+          { label: "Passo 2: Energia necessária", formula: "(5000 × 4) / (0,80 × 0,90 × 0,80)", result: "34.722 Wh (34,72 kWh)" },
+          { label: "Passo 3: Capacidade necessária", formula: "34722 / 48", result: "723,4 Ah" },
+        ]}
+        answer="Banco de baterias de 34,72 kWh, 723,4 Ah a 48V — a redução de 20% por frio aumenta significativamente os requisitos de dimensionamento"
+        interpretation="Instalações de telecomunicações em climas frios requerem 25-40% mais capacidade que projetos temperados. Sistemas de aquecimento de baterias podem restaurar a capacidade total, mas adicionam custo e carga parasita."
+        variant="industrial"
+      />
+    </div>
+  </section>
+
+  <EngineeringDiagram
+    title="Visão Geral do Sistema de Dimensionamento de Bateria"
+    description="Fluxo de energia do consumo diário através dos cálculos de dimensionamento até a configuração final do banco de baterias"
+    variant="system"
+    steps={[
+      { label: "Cargas Diárias", icon: "load" },
+      { label: "Fórmula de Dimensionamento", icon: "chart" },
+      { label: "Banco de Baterias", icon: "battery" },
+      { label: "Saída do Inversor", icon: "inverter" },
+    ]}
+  />
+
+  <ComparisonTable
+    title="Impacto da Química no Dimensionamento"
+    headers={["Parâmetro", "LiFePO4 (LFP)", "NMC", "Chumbo-Ácido (AGM)"]}
+    rows={[
+      ["DoD Recomendado", "80–90%", "70–80%", "50%"],
+      ["Vida Útil em Ciclos no DoD", "5.000+", "2.000", "500–1.000"],
+      ["Ah Utilizáveis por 100Ah", "80–90 Ah", "70–80 Ah", "50 Ah"],
+      ["Redução por Temp. (0°C)", "~10%", "~15%", "~20%"],
+      ["Limite de Temp. de Carga", "0°C (crítico)", "-10°C", "-20°C"],
+      ["Eficiência de Ida e Volta", "95–98%", "92–95%", "80–85%"],
+      ["Autor Descarga/Mês", "1–3%", "1–3%", "3–5%"],
+    ]}
+    caption="Como a escolha da química afeta os requisitos de dimensionamento do banco de baterias"
+  />
+
+  <ComparisonTable
+    title="Guia de Seleção de Tensão do Sistema"
+    headers={["Tensão do Sistema", "Carga Máx. Recomendada", "Corrente a 2kW", "Tamanho do Cabo", "Melhor Para"]}
+    rows={[
+      ["12V", "1 kW", "167 A", "4/0 AWG (107 mm²)", "Sistemas portáteis pequenos"],
+      ["24V", "3 kW", "83 A", "2/0 AWG (67 mm²)", "RV médio, pequeno chalé"],
+      ["48V", "10+ kW", "42 A", "4 AWG (21 mm²)", "Residencial, telecom, marinho"],
+      ["96V", "20+ kW", "21 A", "8 AWG (8,4 mm²)", "BESS comercial/industrial"],
+    ]}
+    caption="Tensão mais alta = corrente menor = cabos mais finos e menores perdas"
+  />
+
+  <FAQSection items={faqItems} />
+  <RelatedTools tools={relatedTools} />
+
+  <!-- Calculation Script -->
+  <script>
+    import { calculateBatterySizing } from '../../../../utils/calculators';
+
+    const dailyEnergyInput = document.getElementById('daily-energy') as HTMLInputElement;
+    const energyUnitSelect = document.getElementById('energy-unit') as HTMLSelectElement;
+    const autonomyInput = document.getElementById('autonomy') as HTMLInputElement;
+    const dodInput = document.getElementById('dod') as HTMLInputElement;
+    const voltageInput = document.getElementById('voltage') as HTMLInputElement;
+    const efficiencyInput = document.getElementById('efficiency') as HTMLInputElement;
+    const temperatureInput = document.getElementById('temperature') as HTMLInputElement;
+
+    // Outputs — adapted for ResultBox DOM structure
+    const resultEnergyContainer = document.getElementById('result-energy');
+    const resultEnergyValue = resultEnergyContainer?.querySelector('.text-display-md') as HTMLElement;
+    const resultKwh = resultEnergyContainer?.querySelector('.text-caption') as HTMLElement;
+
+    const resultCapacityContainer = document.getElementById('result-capacity-box');
+    const resultCapacity = resultCapacityContainer?.querySelector('.text-title-lg') as HTMLElement;
+    const resultVoltageRef = resultCapacityContainer?.querySelector('.text-caption') as HTMLElement;
+
+    const resultTempContainer = document.getElementById('result-temp-box');
+    const resultTempMultiplier = resultTempContainer?.querySelector('.text-title-lg') as HTMLElement;
+    const resultTempDesc = resultTempContainer?.querySelector('.text-caption') as HTMLElement;
+
+    const sizingLayoutSuggestion = document.getElementById('sizing-layout-suggestion');
+
+    function updateCalculations() {
+      const dailyVal = parseFloat(dailyEnergyInput.value) || 0;
+      const isKwh = energyUnitSelect.value === 'kwh';
+      const dailyEnergyWh = isKwh ? dailyVal * 1000 : dailyVal;
+      const autonomy = parseFloat(autonomyInput.value) || 1;
+      const dod = parseFloat(dodInput.value) || 80;
+      const voltage = parseFloat(voltageInput.value) || 25.6;
+      const efficiency = parseFloat(efficiencyInput.value) || 90;
+      const temperature = parseFloat(temperatureInput.value) || 25;
+
+      const results = calculateBatterySizing(dailyEnergyWh, autonomy, dod, voltage, efficiency, temperature);
+
+      // Render Outputs
+      if (resultEnergyValue) resultEnergyValue.textContent = `${Math.round(results.requiredEnergyWh).toLocaleString()} Wh`;
+      if (resultKwh) resultKwh.textContent = `${(results.requiredEnergyWh / 1000).toFixed(2)} kWh storage recommended`;
+      if (resultCapacity) resultCapacity.textContent = `${results.requiredCapacityAh.toFixed(1)} Ah`;
+      if (resultVoltageRef) resultVoltageRef.textContent = `At ${voltage.toFixed(1)}V nominal`;
+      if (resultTempMultiplier) resultTempMultiplier.textContent = results.temperatureMultiplier.toFixed(2);
+
+      const percentLoss = (1 - results.temperatureMultiplier) * 100;
+      if (resultTempDesc) resultTempDesc.textContent = `${percentLoss.toFixed(1)}% capacity loss in cold`;
+
+      // Suggest Series cell layout
+      const cellV = 3.2;
+      const seriesCells = Math.round(voltage / cellV);
+      if (sizingLayoutSuggestion) {
+        sizingLayoutSuggestion.textContent = `To achieve ${results.requiredCapacityAh.toFixed(1)} Ah capacity at ${voltage.toFixed(1)}V nominal, you could configure a pack with ${seriesCells} series cells (approx. ${cellV}V per cell) and parallel strings to match the targeted capacity.`;
+      }
+    }
+
+    [dailyEnergyInput, energyUnitSelect, autonomyInput, dodInput, voltageInput, efficiencyInput, temperatureInput].forEach(el => {
+      el.addEventListener('input', updateCalculations);
+    });
+
+    // Run on load
+    updateCalculations();
+  </script>
+
+</CalculatorLayout>

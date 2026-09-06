@@ -1,0 +1,393 @@
+---
+import CalculatorLayout from '../../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import InputField from '../../../components/InputField.astro';
+import ResultBox from '../../../components/ResultBox.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import RelatedTools from '../../../components/RelatedTools.astro';
+import WorkedExample from '../../../components/WorkedExample.astro';
+import ComparisonTable from '../../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../../components/EngineeringDiagram.astro';
+
+const wireSizes = [
+  { label: "16 AWG (1,31 mm\u00B2)", value: 1.31 },
+  { label: "14 AWG (2,08 mm\u00B2)", value: 2.08 },
+  { label: "12 AWG (3,31 mm\u00B2)", value: 3.31 },
+  { label: "10 AWG (5,26 mm\u00B2)", value: 5.26 },
+  { label: "8 AWG (8,37 mm\u00B2)", value: 8.37 },
+  { label: "6 AWG (13,3 mm\u00B2)", value: 13.3 },
+  { label: "4 AWG (21,15 mm\u00B2)", value: 21.15 },
+  { label: "2 AWG (33,6 mm\u00B2)", value: 33.6 },
+  { label: "1/0 AWG (53,5 mm\u00B2)", value: 53.5 },
+  { label: "2/0 AWG (67,4 mm\u00B2)", value: 67.4 },
+  { label: "4/0 AWG (107 mm\u00B2)", value: 107 },
+  { label: "Tamanho M\u00E9trico Personalizado (mm\u00B2)", value: "-1" },
+];
+
+const materialOptions = [
+  { label: "Cobre", value: "copper" },
+  { label: "Alum\u00EDnio", value: "aluminum" },
+];
+
+const whatIs = `A perda de pot\u00EAncia em cabos DC \u00E9 a energia el\u00E9trica dissipada como calor quando a corrente flui atrav\u00E9s da resist\u00EAncia inerente de um condutor. \u00C9 calculada usando a <strong>f\u00F3rmula I\u00B2R</strong> \u2014 a perda de pot\u00EAncia \u00E9 igual ao quadrado da corrente vezes a resist\u00EAncia. Diferente da queda de tens\u00E3o (que afeta o funcionamento do dispositivo), a perda de pot\u00EAncia no cabo representa <strong>desperd\u00EDcio direto de energia</strong> \u2014 energia que \u00E9 paga, mas nunca chega \u00E0 carga. Em sistemas de baterias, as perdas nos cabos reduzem a autonomia efetiva, diminuem a efici\u00EAncia de ida-e-volta e geram calor que pode degradar a isola\u00E7\u00E3o dos fios ao longo do tempo. Para um sistema de 50A com resist\u00EAncia de la\u00E7o de 0,008\u03A9, as perdas nos cabos desperdi\u00E7am 20W continuamente \u2014 suficiente para drenar 480 Wh por dia.`;
+
+const whyItMatters = [
+  "As perdas nos cabos reduzem diretamente a autonomia da bateria \u2014 uma perda de 5% nos cabos significa 5% menos energia chegando \u00E0s suas cargas.",
+  "As perdas I\u00B2R escalam com o quadrado da corrente \u2014 dobrar a corrente quadruplica a perda de pot\u00EAncia para o mesmo cabo.",
+  "O calor gerado pelas perdas nos cabos pode exceder as classifica\u00E7\u00F5es de isola\u00E7\u00E3o dos fios em espa\u00E7os confinados, criando riscos de inc\u00EAndio.",
+  "Em sistemas solares, as perdas nos cabos reduzem a energia efetiva entregue dos pain\u00E9is \u00E0s baterias.",
+  "Trajetos longos de cabos entre bateria e inversor s\u00E3o a fonte mais comum de perdas inesperadas de efici\u00EAncia.",
+];
+
+const practicalApplications = [
+  { title: "Sistemas de Energia Solar PV", description: "Calcule perdas de pot\u00EAncia na fia\u00E7\u00E3o DC desde os pain\u00E9is solares at\u00E9 controladores de carga e baterias." },
+  { title: "Cabeamento Bateria-Inversor", description: "Dimensione cabos entre bancos de bateria e inversores para minimizar perdas I\u00B2R." },
+  { title: "Distribui\u00E7\u00E3o de Energia Marinha", description: "Avalie perdas nos cabos em sistemas de energia DC marinha com trajetos longos." },
+  { title: "Infraestrutura de Carregamento EV", description: "Calcule perdas nos cabos em conex\u00F5es de carregamento DC de alta corrente." },
+  { title: "Energia DC Telecom", description: "Avalie perdas em cabos de distribui\u00E7\u00E3o DC 48V para equipamentos de telecom." },
+];
+
+const expertNotes = [
+  { title: 'Ciclo de Retroalimenta\u00E7\u00E3o T\u00E9rmica', variant: 'warning', content: 'Alta corrente aquece o fio, o que eleva sua temperatura. Temperatura mais alta eleva a resist\u00EAncia, o que aumenta a perda de pot\u00EAncia (I\u00B2R) e causa aquecimento adicional. Este ciclo de retroalimenta\u00E7\u00E3o positivo pode levar a fuga t\u00E9rmica se os cabos estiverem subdimensionados. Garanta que o dimensionamento correto mantenha a dissipa\u00E7\u00E3o t\u00E9rmica baixa.' },
+  { title: 'Impacto Di\u00E1rio de Energia', variant: 'engineering', content: 'Uma perda de 20W no cabo funcionando 8 horas/dia desperdi\u00E7a 160 Wh diariamente \u2014 equivalente a um pequeno eletrodom\u00E9stico funcionando o dia todo. Ao longo de um ano, isso totaliza 58,4 kWh de energia desperdi\u00E7ada, no valor de R$25\u2013R$75 em tarifas el\u00E9tricas t\u00EDpicas.' },
+];
+
+const commonMistakes = [
+  "Ignorar completamente as perdas nos cabos \u2014 uma perda de 5% nos cabos significa 5% menos energia chegando \u00E0s suas cargas, reduzindo diretamente a autonomia da bateria e a efici\u00EAncia do sistema.",
+  "Usar queda de tens\u00E3o em vez de perda de pot\u00EAncia \u2014 queda de tens\u00E3o afeta o funcionamento do dispositivo, mas a perda de pot\u00EAncia (I\u00B2R) representa desperd\u00EDcio direto de energia como calor. Ambas devem ser verificadas.",
+  "N\u00E3o considerar efeitos de temperatura \u2014 a resist\u00EAncia do fio aumenta com a temperatura. Um cabo dimensionado para 25\u00B0C pode exceder limites seguros a 60\u00B0C em uma caixa quente.",
+  "Usar capacidade classificada em vez da corrente real \u2014 sempre use a corrente real da carga, n\u00E3o a classifica\u00E7\u00E3o m\u00E1xima de descarga da bateria, para c\u00E1lculos de perda nos cabos.",
+  "Ignorar o caminho de retorno \u2014 a resist\u00EAncia do cabo se aplica tanto ao condutor de fornecimento quanto ao de retorno. Sempre dobre a dist\u00E2ncia de ida para c\u00E1lculos de resist\u00EAncia de la\u00E7o.",
+  "Subdimensionar cabos para trajetos longos \u2014 a perda nos cabos aumenta linearmente com a dist\u00E2ncia. Um trajeto de 10m tem o dobro da perda de um trajeto de 5m com o mesmo calibre de fio.",
+  "N\u00E3o considerar o impacto di\u00E1rio de energia \u2014 uma perda de 20W nos cabos funcionando 8 horas/dia desperdi\u00E7a 160 Wh diariamente, equivalente a 58,4 kWh por ano em tarifas el\u00E9tricas t\u00EDpicas.",
+  "Ignorar a maior resist\u00EAncia do alum\u00EDnio \u2014 o alum\u00EDnio tem 60% mais resist\u00EAncia que o cobre para a mesma se\u00E7\u00E3o transversal. Use cabos de alum\u00EDnio 1,6\u00D7 maiores para desempenho equivalente.",
+  "Usar corrente m\u00E9dia em vez de corrente de pico \u2014 as perdas nos cabos escalam com I\u00B2, ent\u00E3o correntes de pico causam desproporcionalmente mais perdas. Dimensione para cen\u00E1rios de corrente de pior caso.",
+  "Esquecer perdas nos cabos na efici\u00EAncia de ida-e-volta \u2014 perdas nos cabos durante carga e descarga reduzem a efici\u00EAncia total de ida-e-volta do sistema pela soma de ambas as perdas.",
+];
+
+const relatedArticles = [
+  { href: "/learn/voltage-drop-explained/", title: "Queda de Tens\u00E3o Explicada" },
+  { href: "/learn/battery-voltage-systems/", title: "Sistemas de Tens\u00E3o de Bateria" },
+];
+
+const trustSection = {
+  text: "Esta calculadora usa o modelo padr\u00E3o de perda de pot\u00EAncia I\u00B2R com resistividade corrigida por temperatura para condutores de cobre e alum\u00EDnio. Todas as f\u00F3rmulas seguem padr\u00F5es IEEE de dimensionamento de condutores e s\u00E3o exibidas passo a passo para verifica\u00E7\u00E3o.",
+  link: { label: "Veja nossa metodologia completa", href: "/methodology/" },
+};
+
+const references = [
+  { title: "NEC Cap\u00EDtulo 9 \u2014 Tabelas para Resist\u00EAncia de Condutores", url: "https://www.nfpa.org/codes-and-standards/nfpa-70-standard-for-electrical-safety-in-the-workplace", source: "NFPA / National Electrical Code" },
+  { title: "Copper Development Association \u2014 Tabelas de Resist\u00EAncia", url: "https://www.copper.org/", source: "Copper Development Association" },
+  { title: "IEEE 141 \u2014 Projeto de Sistemas de Energia DC", url: "https://standards.ieee.org/", source: "IEEE Standards Association" },
+];
+
+const faqItems = [
+  {
+    question: "Como as perdas resistivas diferem da queda de tens\u00E3o?",
+    answer: "A queda de tens\u00E3o representa a diminui\u00E7\u00E3o de energia potencial (volts) no terminal da carga, que pode fazer eletr\u00F4nicos funcionarem incorretamente. A perda resistiva do cabo representa pot\u00EAncia real (watts) convertida em calor, que representa perda direta de efici\u00EAncia e estresse t\u00E9rmico na instala\u00E7\u00E3o.",
+  },
+  {
+    question: "Qual \u00E9 o limite seguro m\u00E1ximo para perda de pot\u00EAncia cont\u00EDnua no cabo?",
+    answer: "N\u00E3o h\u00E1 um limite \u00FAnico, mas uma regra geral \u00E9 manter as perdas abaixo de 2% a 3% da pot\u00EAncia total do sistema. Se a perda nos cabos exceder 5%, a fia\u00E7\u00E3o est\u00E1 subdimensionada para efici\u00EAncia energ\u00E9tica, e o aquecimento do fio deve ser analisado para seguran\u00E7a.",
+  },
+  {
+    question: "Como o material do fio afeta o aquecimento?",
+    answer: "O alum\u00EDnio tem cerca de 60% mais resist\u00EAncia que o cobre para a mesma \u00E1rea transversal. Isso significa que um fio de alum\u00EDnio dissipar\u00E1 60% mais calor que um fio de cobre da mesma espessura transportando corrente id\u00EAntica. O alum\u00EDnio requer calibres de fio mais grossos para controlar o calor.",
+  },
+  {
+    question: "O aquecimento cont\u00EDnuo aumenta a resist\u00EAncia?",
+    answer: "Sim, este \u00E9 um ciclo perigoso de retroalimenta\u00E7\u00E3o positiva. Alta corrente aquece o fio, o que eleva sua temperatura. Temperatura mais alta eleva a resist\u00EAncia, o que aumenta a perda de pot\u00EAncia (I\u00B2R) e causa aquecimento adicional. Garantir o dimensionamento correto mant\u00E9m a dissipa\u00E7\u00E3o t\u00E9rmica baixa.",
+  },
+  {
+    question: "Como calculo as perdas nos cabos no meu sistema?",
+    answer: "Me\u00E7a ou calcule a resist\u00EAncia do la\u00E7o (R = \u03C1 \u00D7 2L / A), depois use P_perda = I\u00B2 \u00D7 R. Por exemplo, 50A atrav\u00E9s de 0,008\u03A9 de resist\u00EAncia de la\u00E7o = 50\u00B2 \u00D7 0,008 = 20W de perda cont\u00EDnua.",
+  },
+  {
+    question: "Que porcentagem de perda nos cabos \u00E9 aceit\u00E1vel?",
+    answer: "Para sistemas de baterias: <2% \u00E9 excelente, 2\u20133% \u00E9 aceit\u00E1vel, 3\u20135% \u00E9 marginal, e >5% indica fia\u00E7\u00E3o subdimensionada. Para sistemas cr\u00EDticos ou de alta pot\u00EAncia, almeje <1,5% de perda nos cabos.",
+  },
+  {
+    question: "Como a perda nos cabos afeta a autonomia da bateria?",
+    answer: "As perdas nos cabos reduzem a energia efetiva chegando \u00E0 carga. Uma perda de 5% nos cabos significa que apenas 95% da energia da bateria chega \u00E0 carga, reduzindo diretamente a autonomia em 5%. Para uma bateria que fornece 4 horas de autonomia, 5% de perda nos cabos a reduz para 3,84 horas.",
+  },
+  {
+    question: "Posso reduzir as perdas nos cabos colocando fios em paralelo?",
+    answer: "Sim. Colocar dois cabos id\u00EAnticos em paralelo reduz pela metade a resist\u00EAncia efetiva e reduz a perda I\u00B2R em um quarto (j\u00E1 que a resist\u00EAncia cai 2\u00D7 enquanto a corrente por cabo tamb\u00E9m cai 2\u00D7). Esta \u00E9 uma maneira eficaz de reduzir perdas sem substituir por cabos \u00FAnicos mais grossos.",
+  },
+  {
+    question: "Como as perdas nos cabos se comparam entre sistemas 12V e 48V?",
+    answer: "Uma carga de 480W puxa 40A a 12V, mas apenas 10A a 48V. Como as perdas I\u00B2R escalam com o quadrado da corrente, o sistema 12V tem 16\u00D7 mais perda nos cabos que o sistema 48V para o mesmo cabo. Tens\u00E3o mais alta reduz drasticamente as perdas nos cabos.",
+  },
+  {
+    question: "Qual \u00E9 o custo anual das perdas nos cabos?",
+    answer: "Para uma perda de 20W nos cabos funcionando 8 horas/dia a R$0,50/kWh: 20W \u00D7 8h \u00D7 365 dias = 58,4 kWh/ano = R$29,20/ano. Para sistemas maiores com perdas de 100W+, os custos anuais podem alcan\u00E7ar R$200\u2013R$800.",
+  },
+  {
+    question: "As perdas nos cabos afetam a efici\u00EAncia de ida-e-volta?",
+    answer: "Sim. As perdas nos cabos durante carga e descarga reduzem a efici\u00EAncia de ida-e-volta. Se os cabos perdem 3% durante a carga e 3% durante a descarga, a perda total nos cabos de ida-e-volta \u00E9 de aproximadamente 6%, que deve ser inclu\u00EDda nos c\u00E1lculos de efici\u00EAncia do sistema.",
+  },
+];
+
+---
+
+<CalculatorLayout
+  title="Calculadora de Perda de Pot\u00EAncia em Cabos DC | Calculadoras de Bateria"
+  description="Estime a perda de pot\u00EAncia el\u00E9trica (I\u00B2R) e a perda di\u00E1ria de energia t\u00E9rmica em cabos de transmiss\u00E3o DC de baterias. Ex\u00F5e f\u00F3rmula padr\u00E3o."
+  faqItems={faqItems}
+  commonMistakes={commonMistakes}
+  relatedArticles={relatedArticles}
+  relatedCalculators={[
+    { href: "/tools/voltage-drop-calculator/", title: "Queda de Tens\u00E3o DC", description: "Calcule quedas de tens\u00E3o nos terminais ao longo das linhas." },
+    { href: "/tools/battery-sizing-calculator/", title: "Ferramenta de Dimensionamento", description: "Estime requisitos de dimensionamento de consumo di\u00E1rio." },
+    { href: "/tools/energy-conversion-calculator/", title: "Convers\u00E3o de Energia", description: "Converta valores de capacidade Ah/Wh de baterias." },
+    { href: "/tools/runtime-calculator/", title: "Calculadora de Autonomia", description: "Calcule a autonomia a partir de perfis de pot\u00EAncia." },
+    { href: "/tools/battery-pack-calculator/", title: "Calculadora de Pacote", description: "Projete configura\u00E7\u00F5es de c\u00E9lulas s\u00E9rie/paralelo." },
+  ]}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+  lang="pt"
+>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Par\u00E2metros do Cabo</h3>
+      <div class="flex flex-col gap-6">
+        <InputField id="current" label="Corrente Cont\u00EDnua (Amperes)" value={50} min={0.1} step="any" />
+        <InputField id="length" label="Dist\u00E2ncia de Trajeto de Ida (Metros)" value={3} min={0.1} step="any" helperText="O la\u00E7o \u00E9 dobrado para cobrir caminhos de ida e retorno." />
+        <InputField id="wire-dropdown" label="Tamanho do Condutor" type="select" options={wireSizes} value="13.3" />
+        <InputField id="custom-area" label="\u00C1rea Personalizada (mm\u00B2)" value={13.3} min={0.01} step="any" wrapperId="custom-area-wrapper" />
+        <InputField id="material" label="Material do Condutor" type="select" options={materialOptions} value="copper" />
+        <InputField id="temperature" label="Temp de Opera\u00E7\u00E3o (\u00B0C)" value={25} min={-40} max={200} />
+        <InputField id="runtime" label="Dura\u00E7\u00E3o Di\u00E1ria da Carga (Horas/Dia)" value={4} min={0.1} max={24} step="any" />
+        <InputField id="total-power" label="Pot\u00EAncia Total da Carga (Watts)" value={600} min={1} step="any" helperText="Usado para calcular a perda percentual de efici\u00EAncia." />
+      </div>
+    </CalculatorCard>
+
+    <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Sa\u00EDdas Estimadas</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8" id="results-grid">
+          <ResultBox
+            label="Perda Cont\u00EDnua de Pot\u00EAncia no Cabo"
+            value="19,78 W"
+            suffix="3,30% da pot\u00EAncia total da carga perdida como calor"
+            variant="primary"
+            id="result-status-card"
+          />
+          <ResultBox
+            label="Perda Di\u00E1ria de Energia"
+            value="79,1 Wh"
+            suffix="Dissipada a cada 24h"
+            id="result-energy-loss-box"
+          />
+          <ResultBox
+            label="Resist\u00EAncia do La\u00E7o"
+            value="0,0079 \u03A9"
+            suffix="Resist\u00EAncia de duas vias"
+            id="result-resistance-box"
+          />
+        </div>
+      </div>
+
+      <div class="border-t border-hairline pt-6">
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">Nota de Risco de Aquecimento do Condutor</h4>
+        <p class="text-body-sm text-muted">
+          Toda a energia el\u00E9trica perdida dentro dos cabos de transmiss\u00E3o \u00E9 convertida em calor. Perdas altas em espa\u00E7os confinados (como caixas de bateria ou conduletes) elevar\u00E3o as temperaturas dos fios, degradar\u00E3o a isola\u00E7\u00E3o e criar riscos graves de inc\u00EAndio.
+        </p>
+      </div>
+    </CalculatorCard>
+
+  </div>
+
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">F\u00F3rmulas & Exemplos Resolvidos</h2>
+
+    <FormulaBox title="F\u00F3rmulas Matem\u00E1ticas">
+      <p>A perda de pot\u00EAncia P_perda \u00E9 determinada pelo quadrado da corrente que flui pelo la\u00E7o do fio (I\u00B2R):</p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Resist\u00EAncia do Cabo (R) = \u03C1(T) \u00D7 (2 \u00D7 Dist\u00E2ncia) / \u00C1rea
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Perda de Pot\u00EAncia (W) = Corrente\u00B2 (A) \u00D7 Resist\u00EAncia do Cabo (\u03A9)
+      </div>
+      <p>A perda de energia E_perda e a perda percentual de efici\u00EAncia s\u00E3o calculadas como:</p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Perda de Energia (Wh) = Perda de Pot\u00EAncia (W) \u00D7 Tempo de Funcionamento (Horas)
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Perda de Efici\u00EAncia (%) = (Perda de Pot\u00EAncia (W) / Pot\u00EAncia da Carga (W)) \u00D7 100
+      </div>
+    </FormulaBox>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample
+        number={1}
+        title="Perda I\u00B2R para 30A, 5m, 10mm\u00B2 de Cabo de Cobre"
+        scenario="Uma carga de 30A puxa energia de uma bateria atrav\u00E9s de 5 metros de cabo de cobre 10mm\u00B2 a 25\u00B0C. Calcule a perda cont\u00EDnua de pot\u00EAncia I\u00B2R."
+        inputs={[
+          "Corrente (I) = 30 A",
+          "Dist\u00E2ncia de ida = 5 m (la\u00E7o de 10 m)",
+          "\u00C1rea do condutor = 10 mm\u00B2",
+          "Material = Cobre",
+          "Temperatura = 25\u00B0C",
+        ]}
+        steps={[
+          "Resistividade corrigida por temperatura: \u03C1 = 1,72 \u00D7 10\u207B\u2078 \u00D7 (1 + 0,00393 \u00D7 (25 \u2212 20)) = 1,7538 \u00D7 10\u207B\u2078 \u03A9\u00B7m",
+          "Resist\u00EAncia do la\u00E7o: R = \u03C1 \u00D7 2L / A = 1,7538 \u00D7 10\u207B\u2078 \u00D7 10 / (10 \u00D7 10\u207B\u2076) = 0,01754 \u03A9",
+          "Perda de pot\u00EAncia: P_perda = I\u00B2 \u00D7 R = 30\u00B2 \u00D7 0,01754 = 900 \u00D7 0,01754 = 15,79 W",
+        ]}
+        answer="15,79 W de pot\u00EAncia cont\u00EDnua dissipada como calor no cabo"
+        interpretation="Isso representa energia desperdi\u00E7ada como calor. Para uma carga de 2kW, isso \u00E9 cerca de 0,79% de perda \u2014 aceit\u00E1vel para trechos curtos, mas significativo ao longo de um dia inteiro."
+      />
+
+      <WorkedExample
+        number={2}
+        title="Comparativo de Perda 12V vs 48V com Carga de 2kW"
+        scenario="Compare perdas nos cabos I\u00B2R ao fornecer 2kW atrav\u00E9s de 5m de cabo de cobre 10mm\u00B2 em sistemas 12V e 48V."
+        inputs={[
+          "Pot\u00EAncia da carga = 2.000 W",
+          "Cabo = 5m ida, 10mm\u00B2 cobre",
+          "Resist\u00EAncia do la\u00E7o (calculada) = 0,01754 \u03A9",
+          "Corrente do sistema 12V = 2.000 / 12 = 166,7 A",
+          "Corrente do sistema 48V = 2.000 / 48 = 41,7 A",
+        ]}
+        steps={[
+          "Perda 12V: P = 166,7\u00B2 \u00D7 0,01754 = 27.789 \u00D7 0,01754 = 487,5 W",
+          "Perda 48V: P = 41,7\u00B2 \u00D7 0,01754 = 1.739 \u00D7 0,01754 = 30,5 W",
+          "Raz\u00E3o: 487,5 / 30,5 = 16\u00D7 menos perda a 48V",
+          "Perda de efici\u00EAncia 12V: 487,5 / 2.000 \u00D7 100 = 24,4% (inaceit\u00E1vel)",
+          "Perda de efici\u00EAncia 48V: 30,5 / 2.000 \u00D7 100 = 1,53% (aceit\u00E1vel)",
+        ]}
+        answer="12V: 487,5 W (24,4%) vs 48V: 30,5 W (1,5%) \u2014 o sistema 48V tem 16\u00D7 menos perda nos cabos"
+        interpretation="Sistemas de tens\u00E3o mais alta reduzem drasticamente as perdas nos cabos. O sistema 12V \u00E9 completamente impratic\u00E1vel para este n\u00EDvel de pot\u00EAncia, desperdi\u00E7ando quase um quarto de toda a energia como calor."
+      />
+
+      <WorkedExample
+        number={3}
+        title="Efeito da Temperatura nas Perdas nos Cabos a 60\u00B0C"
+        scenario="Como as perdas nos cabos mudam quando o mesmo cabo de 30A, 5m, 10mm\u00B2 de cobre opera a 60\u00B0C em vez de 25\u00B0C?"
+        inputs={[
+          "Corrente (I) = 30 A",
+          "Dist\u00E2ncia de ida = 5 m (la\u00E7o de 10 m)",
+          "\u00C1rea do condutor = 10 mm\u00B2",
+          "Material = Cobre",
+          "Temperatura de refer\u00EAncia = 25\u00B0C",
+          "Temperatura de opera\u00E7\u00E3o = 60\u00B0C",
+        ]}
+        steps={[
+          "Resistividade a 25\u00B0C: \u03C1\u2082\u2085 = 1,72 \u00D7 10\u207B\u2078 \u00D7 (1 + 0,00393 \u00D7 5) = 1,7538 \u00D7 10\u207B\u2078 \u03A9\u00B7m",
+          "Resistividade a 60\u00B0C: \u03C1\u2086\u2080 = 1,72 \u00D7 10\u207B\u2078 \u00D7 (1 + 0,00393 \u00D7 40) = 1,9878 \u00D7 10\u207B\u2078 \u03A9\u00B7m",
+          "Resist\u00EAncia do la\u00E7o a 25\u00B0C: R\u2082\u2085 = 1,7538 \u00D7 10\u207B\u2078 \u00D7 10 / 10\u207B\u2075 = 0,01754 \u03A9",
+          "Resist\u00EAncia do la\u00E7o a 60\u00B0C: R\u2086\u2080 = 1,9878 \u00D7 10\u207B\u2078 \u00D7 10 / 10\u207B\u2075 = 0,01988 \u03A9",
+          "Perda a 25\u00B0C: P = 900 \u00D7 0,01754 = 15,79 W",
+          "Perda a 60\u00B0C: P = 900 \u00D7 0,01988 = 17,89 W",
+          "Aumento: (17,89 \u2212 15,79) / 15,79 \u00D7 100 = 13,3% mais perda",
+        ]}
+        answer="Perdas nos cabos aumentam de 15,79 W para 17,89 W \u2014 um aumento de 13,3% devido \u00E0 temperatura"
+        interpretation="Temperaturas de opera\u00E7\u00E3o mais altas elevam a resistividade do cobre, o que aumenta as perdas I\u00B2R e gera ainda mais calor. Este ciclo de retroalimenta\u00E7\u00E3o positivo deve ser considerado em instala\u00E7\u00F5es confinadas."
+      />
+    </div>
+  </section>
+
+  <EngineeringDiagram
+    title="Fluxo de Perda em Cabos DC"
+    description="Perda de pot\u00EAncia em cabos DC segue a Lei de Ohm \u2014 perdas I\u00B2R aumentam com o quadrado da corrente"
+    variant="flow"
+    steps={[
+      { label: "Sa\u00EDda da Bateria", icon: "battery" },
+      { label: "Resist\u00EAncia do Cabo", icon: "cable" },
+      { label: "Perda por Calor (I\u00B2R)", icon: "chart" },
+      { label: "Carga recebe menos", icon: "load" },
+    ]}
+  />
+
+  <ComparisonTable
+    title="Perda de Pot\u00EAncia por Sistema de Tens\u00E3o"
+    headers={["Sistema", "Corrente a 2kW", "Perda em 5m 10mm\u00B2 Cu", "Perda %", "Cabo Necess\u00E1rio"]}
+    rows={[
+      ["12V", "167 A", "48,6 W", "2,43%", "2/0 AWG (67 mm\u00B2)"],
+      ["24V", "83 A", "12,1 W", "0,61%", "6 AWG (13,3 mm\u00B2)"],
+      ["48V", "42 A", "3,0 W", "0,15%", "10 AWG (5,3 mm\u00B2)"],
+      ["96V", "21 A", "0,75 W", "0,04%", "14 AWG (2,1 mm\u00B2)"],
+    ]}
+    caption="Sistemas de tens\u00E3o mais alta reduzem drasticamente as perdas nos cabos para a mesma pot\u00EAncia"
+  />
+
+  <FAQSection items={faqItems} />
+
+  <script>
+    import { calculateDcCableLoss } from '../../../utils/calculators';
+
+    const currentInput = document.getElementById('current') as HTMLInputElement;
+    const lengthInput = document.getElementById('length') as HTMLInputElement;
+    const wireDropdown = document.getElementById('wire-dropdown') as HTMLSelectElement;
+    const customAreaWrapper = document.getElementById('custom-area-wrapper');
+    const customAreaInput = document.getElementById('custom-area') as HTMLInputElement;
+    const materialSelect = document.getElementById('material') as HTMLSelectElement;
+    const temperatureInput = document.getElementById('temperature') as HTMLInputElement;
+    const runtimeInput = document.getElementById('runtime') as HTMLInputElement;
+    const totalPowerInput = document.getElementById('total-power') as HTMLInputElement;
+
+    const resultStatusCard = document.getElementById('result-status-card');
+    const resultPowerLoss = resultStatusCard?.querySelector('.text-display-md') as HTMLElement;
+    const resultLossPercent = resultStatusCard?.querySelector('.text-caption') as HTMLElement;
+    const resultEnergyLoss = document.getElementById('result-energy-loss-box')?.querySelector('.text-title-lg') as HTMLElement;
+    const resultResistance = document.getElementById('result-resistance-box')?.querySelector('.text-title-lg') as HTMLElement;
+
+    function toggleCustomArea() {
+      const isCustom = wireDropdown.value === "-1";
+      if (isCustom) {
+        customAreaWrapper?.classList.remove('hidden');
+      } else {
+        customAreaWrapper?.classList.add('hidden');
+      }
+      updateCalculations();
+    }
+
+    function updateCalculations() {
+      const current = parseFloat(currentInput.value) || 0;
+      const length = parseFloat(lengthInput.value) || 0;
+      const material = materialSelect.value as "copper" | "aluminum";
+      const temperature = parseFloat(temperatureInput.value) || 25;
+      const runtime = parseFloat(runtimeInput.value) || 0;
+      const totalPower = parseFloat(totalPowerInput.value) || 1;
+
+      const dropdownArea = parseFloat(wireDropdown.value);
+      const wireSize = dropdownArea === -1 ? (parseFloat(customAreaInput.value) || 0.1) : dropdownArea;
+
+      const results = calculateDcCableLoss(current, length, wireSize, material, temperature, runtime, totalPower);
+
+      if (resultPowerLoss) resultPowerLoss.textContent = `${results.powerLossW.toFixed(2)} W`;
+      if (resultLossPercent) resultLossPercent.textContent = `${results.lossPercent.toFixed(2)}% da pot\u00EAncia total da carga perdida como calor`;
+
+      if (resultEnergyLoss) {
+        if (results.energyLossWh >= 1000) {
+          resultEnergyLoss.textContent = `${(results.energyLossWh / 1000).toFixed(2)} kWh`;
+        } else {
+          resultEnergyLoss.textContent = `${results.energyLossWh.toFixed(1)} Wh`;
+        }
+      }
+
+      if (resultResistance) resultResistance.textContent = `${results.resistanceOhm.toFixed(4)} \u03A9`;
+
+      if (resultStatusCard) {
+        resultStatusCard.className = "bg-surface-soft p-6 border col-span-1 md:col-span-2 " +
+          (results.lossPercent > 5 ? "border-red-600" :
+           results.lossPercent > 3 ? "border-yellow-500" : "border-hairline");
+      }
+    }
+
+    wireDropdown.addEventListener('change', toggleCustomArea);
+    [currentInput, lengthInput, customAreaInput, materialSelect, temperatureInput, runtimeInput, totalPowerInput].forEach(el => {
+      el.addEventListener('input', updateCalculations);
+    });
+
+    toggleCustomArea();
+  </script>
+</CalculatorLayout>

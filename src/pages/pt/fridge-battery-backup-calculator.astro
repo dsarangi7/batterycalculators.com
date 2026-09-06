@@ -1,0 +1,214 @@
+---
+import CalculatorLayout from '../../layouts/CalculatorLayout.astro';
+import FormulaBox from '../../components/FormulaBox.astro';
+import FAQSection from '../../components/FAQSection.astro';
+import PowerOutageForm from '../../components/PowerOutageForm.astro';
+import WorkedExample from '../../components/WorkedExample.astro';
+import ComparisonTable from '../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../components/EngineeringDiagram.astro';
+
+const whatIs = `Uma calculadora de backup de bateria para geladeira determina a capacidade da bateria, o tamanho do inversor e a duração do backup que você precisa para manter sua geladeira funcionando durante um apagão. Geladeiras estão entre as cargas domésticas mais críticas para backup — uma geladeira cheia custa US$300–US$600 para reabastecer se os alimentos estragarem. Esta calculadora dimensiona seu banco de baterias com base na potência real de funcionamento e no surto de inicialização do compressor da sua geladeira, levando em consideração a eficiência do inversor, limites de profundidade de descarga e uma margem de segurança configurável.`;
+
+const whyItMatters = [
+  "Uma geladeira padrão consome 150W mas atinge 600W durante a inicialização do compressor — subdimensionar seu inversor o desligará no pior momento.",
+  "Compressores de geladeira alternam entre ligado e desligado a cada 15–30 minutos, funcionando 30–50% do tempo. O dimensionamento da bateria deve considerar tanto o surto quanto o comportamento cíclico.",
+  "A deterioração de alimentos começa quando a temperatura da geladeira sobe acima de 4°C — após apenas 4 horas sem energia, alimentos perecíveis se tornam inseguros.",
+  "A temporada de furacões, tempestades de inverno e cortes de energia por incêndios florestais causam regularmente apagões de vários dias onde manter alimentos frios é prioridade máxima.",
+  "Uma estação de energia portátil anunciada como pronta para geladeira pode não ter capacidade de surto suficiente para iniciar o compressor — sempre verifique as classificações de surto."
+];
+
+const practicalApplications = [
+  { title: "Preparação para Furacões e Tempestades", description: "Dimensione uma bateria para manter sua geladeira fria durante apagões de 12–48 horas comuns durante furacões e tempestades severas." },
+  { title: "Cortes de Energia por Incêndios Florestais", description: "Prepare-se para cortes planejados da rede durante alto risco de incêndio. Utilitários da Califórnia regularmente desenergizam linhas por dias." },
+  { title: "Backup para Tempestades de Inverno", description: "Tempestades de gelo e nevascas podem cortar a energia por dias. Uma bateria de backup para geladeira previne perda alimentar custosa." },
+  { title: "Dimensionamento de Estação de Energia Portátil", description: "Combine uma estação de energia portátil à sua geladeira específica antes de comprar. Nem todas as unidades lidam com o surto do compressor." },
+];
+
+const expertNotes: { title: string; variant: 'engineering' | 'tip' | 'warning'; content: string }[] = [
+  { title: "Ciclos de Trabalho da Geladeira", variant: "engineering", content: "Uma geladeira consome 150W quando o compressor está ligado, mas alterna entre ligado e desligado — geralmente funcionando 30–50% do tempo. Esta calculadora usa a potência contínua para dimensionamento conservador. O tempo real pode ser 40–60% maior." },
+  { title: "Surto de Inicialização do Compressor", variant: "warning", content: "Compressores de geladeira consomem 3–4× sua potência durante a inicialização (1–3 segundos). Se a classificação de surto do seu inversor for muito baixa, ele desligará quando o compressor tentar iniciar. Sempre verifique a capacidade de surto do inversor." },
+  { title: "LiFePO4 para Backup de Geladeira", variant: "tip", content: "Baterias LiFePO4 fornecem 80–100% de capacidade utilizável e duram 10× mais ciclos que chumbo-ácido. Para backup de emergência de geladeira, a LFP é a recomendação clara. Chumbo-ácido a 50% de DoD requer o dobro da capacidade." }
+];
+
+const trustSection = {
+  text: "Esta calculadora usa fórmulas padrão de engenharia elétrica para dimensionamento de sistemas de bateria. Todos os cálculos são transparentes e verificáveis.",
+  link: { label: "Veja nossa metodologia", href: "/methodology/" }
+};
+
+const references = [
+  { title: "FDA — Segurança Alimentar Durante Cortes de Energia", url: "https://www.fda.gov/food/buy-store-serve-safe-food/food-safety-during-power-outages", source: "Administração de Alimentos e Medicamentos dos EUA" },
+  { title: "FEMA — Orientação sobre Energia de Backup de Emergência", url: "https://www.fema.gov/emergency-managers/risk-management/power/guidance", source: "Agência Federal de Gestão de Emergências" },
+];
+
+const faqItems = [
+  { question: "Quanto tempo uma bateria pode rodar uma geladeira?", answer: "O tempo de funcionamento depende da capacidade da sua bateria e de quantas vezes o compressor alterna. Uma geladeira padrão de 150W com um ciclo de trabalho típico de 30% consome uma média de 45W ao longo do tempo. Uma bateria LiFePO4 de 12V 100Ah (1.280 Wh utilizáveis a 80% de DoD) fornece aproximadamente 28 horas de energia média — mas temperatura ambiente, aberturas de porta e qualidade do isolamento da geladeira podem reduzir isso para 12–16 horas na prática. Geladeiras ENERGY STAR usam 30–40% menos energia que modelos mais antigos." },
+  { question: "Qual tamanho de bateria preciso para uma geladeira?", answer: "Para 12 horas de backup confiável de geladeira, planeje 1.500–3.000 Wh de capacidade utilizável de bateria, dependendo do modelo da sua geladeira. Uma bateria LiFePO4 de 24V 100Ah (2.560 Wh) cobre uma geladeira padrão de 150W por aproximadamente 16–20 horas, incluindo ciclagem do compressor. Um banco de 24V 200Ah (5.120 Wh) fornece 24–36 horas. Adicione 20% de margem para temperaturas ambientes frias e aberturas frequentes de porta." },
+  { question: "Uma estação de energia portátil pode rodar uma geladeira?", answer: "A maioria das estações de energia portáteis de médio porte (1.000–2.000 Wh) pode rodar uma geladeira padrão por 8–14 horas, mas verifique duas especificações cuidadosamente: a saída contínua deve exceder 1.500W (para lidar com a inicialização do compressor sem desligar), e a classificação de surto deve atingir 3.000W+. Muitas estações econômicas afirmam alta capacidade mas não conseguem sustentar o pico de 600W na inicialização do compressor. Procure saída de onda senoidal pura — inversores de onda senoidal modificada podem danificar compressores de geladeira." },
+  { question: "Qual tamanho de inversor é necessário para uma geladeira?", answer: "Uma geladeira padrão de 150W precisa de um inversor contínuo de 1.500–2.000W com pelo menos 3.000W de capacidade de surto. O detalhe crítico é que o surto de inicialização do compressor dura apenas 1–3 segundos mas pode atingir 600W — 4× a potência em funcionamento. Se você planeja rodar cargas adicionais (luzes, carregamento de telefone), some suas watts ao requisito contínuo. Inversores de onda senoidal pura são fortemente recomendados para motores de compressor." },
+  { question: "O tamanho da geladeira afeta os requisitos de bateria?", answer: "Sim, significativamente. Uma geladeira compacta de dormitório (60–100W) usa 40–60% menos energia que um modelo tamanho família (150–250W). Modelos com freezer no topo são mais eficientes que designs lado a lado. Freezers tipo baú são os mais eficientes devido à retenção de ar frio. Verifique o selo ENERGY STAR amarelo na sua geladeira para o consumo anual real em kWh — divida por 8.760 para obter a potência média, depois multiplique pelas horas de backup desejadas." },
+];
+
+const commonMistakes = [
+  "Ignorar o surto de inicialização do compressor — uma geladeira de 150W consome 600W durante a inicialização (3–4× a potência em funcionamento), e um inversor subdimensionado vai desligar.",
+  "Usar a potência nominal em vez do consumo real de ciclagem — compressores de geladeira funcionam 30–50% do tempo, então o consumo médio é muito menor que a potência nominal.",
+  "Esquecer que aberturas de porta e temperatura ambiente aumentam o tempo de funcionamento — cada abertura de porta deixa o ar frio escapar, forçando o compressor a funcionar mais.",
+  "Assumir que a classificação Wh de uma estação de energia portátil é igual à capacidade utilizável — perdas de eficiência do inversor (10–15%) e limites de DoD reduzem o tempo real.",
+  "Não verificar a classificação de surto do inversor ou estação de energia — a classificação de saída contínua sozinha não garante que a unidade consegue lidar com a inicialização do compressor.",
+  "Usar inversores de onda senoidal modificada para compressores de geladeira — onda senoidal modificada pode danificar motores de compressor; sempre use onda senoidal pura.",
+  "Superdimensionar a bateria para um único apagão sem plano de recarga — uma bateria de 5 kWh para um único apagão de geladeira é desperdício sem recarga solar ou de rede.",
+  "Ignorar que geladeiras mais antigas usam 2–3× mais energia que modelos ENERGY STAR — verifique o selo amarelo para o consumo anual real em kWh."
+];
+
+const relatedArticles = [
+  { title: "Quanto Tempo Uma Bateria Roda uma Geladeira 12V", href: "/learn/how-long-will-a-battery-run-a-12v-fridge/" },
+  { title: "LiFePO4 vs Chumbo-Ácido", href: "/learn/lifepo4-vs-lead-acid/" },
+  { title: "Planejamento de Backup de Bateria Doméstica", href: "/learn/home-battery-backup-planning/" },
+  { title: "Guia de Bateria para Cortes de Energia", href: "/learn/power-outage-battery-guide/" },
+];
+
+const relatedCalculators = [
+  { href: "/home-power-outage-battery-backup-calculator/", title: "Calculadora de Bateria de Backup para Cortes de Energia Domésticos", description: "Calculadora completa de energia de backup para todos os eletrodomésticos domésticos." },
+  { href: "/cpap-battery-backup-calculator/", title: "Calculadora de Bateria para CPAP", description: "Dimensione baterias para energia noturna de CPAP." },
+  { href: "/sump-pump-battery-backup-calculator/", title: "Calculadora de Bateria para Bomba d'Água", description: "Mantenha sua bomba d'água funcionando durante apagões de tempestade." },
+  { href: "/portable-power-station-runtime-calculator/", title: "Calculadora de Tempo de Estação de Energia Portátil", description: "Veja quanto tempo uma estação de energia portátil roda suas cargas." },
+  { href: "/solar-generator-sizing-calculator/", title: "Calculadora de Dimensionamento de Gerador Solar", description: "Dimensione um sistema completo de backup solar com painéis e bateria." },
+  { href: "/tools/runtime-calculator/", title: "Calculadora de Tempo de Bateria", description: "Estime o tempo de descarga a partir da capacidade e carga." },
+  { href: "/tools/battery-sizing-calculator/", title: "Calculadora de Dimensionamento de Bateria", description: "Dimensionamento completo de banco de baterias com degradação por temperatura." },
+  { href: "/tools/solar-battery-sizing-calculator/", title: "Calculadora de Bateria Solar", description: "Dimensione baterias pareadas com matrizes de painéis solares." },
+  { href: "/tools/energy-conversion-calculator/", title: "Calculadora de Conversão de Energia", description: "Converta entre Ah, Wh e kWh em qualquer voltagem." },
+  { href: "/tools/charging-time-calculator/", title: "Calculadora de Tempo de Carga", description: "Estime o tempo de carga a partir de solar ou rede elétrica." },
+  { href: "/tools/voltage-drop-calculator/", title: "Calculadora de Queda de Voltagem", description: "Dimensione extensões de fio para minimizar queda de voltagem." },
+  { href: "/tools/dc-cable-loss-calculator/", title: "Calculadora de Perda em Cabo DC", description: "Calcule perdas de fiação em conexões DC." },
+];
+
+const presetAppliances = [
+  { name: "Geladeira", runningW: 150, surgeW: 600 }, { name: "Freezer", runningW: 120, surgeW: 500 },
+  { name: "Roteador Wi-Fi", runningW: 12, surgeW: 12 }, { name: "Luz LED", runningW: 10, surgeW: 10 },
+  { name: "Notebook", runningW: 60, surgeW: 90 }, { name: "TV", runningW: 100, surgeW: 150 },
+  { name: "Máquina de CPAP", runningW: 40, surgeW: 80 }, { name: "Ventilador", runningW: 50, surgeW: 75 },
+  { name: "Bomba d'Água", runningW: 800, surgeW: 2000 }, { name: "Micro-ondas", runningW: 1000, surgeW: 1500 },
+];
+---
+
+<CalculatorLayout
+  title="Calculadora de Bateria para Geladeira | Battery Calculators"
+  description="Calcule o tamanho da bateria, capacidade do inversor e tempo de backup necessário para manter sua geladeira funcionando durante um apagão. Previna deterioração de alimentos com energia de backup de emergência adequadamente dimensionada."
+  faqItems={faqItems}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+  relatedCalculators={relatedCalculators}
+  commonMistakes={commonMistakes}
+  relatedArticles={relatedArticles}
+  lang="pt"
+>
+  <PowerOutageForm
+    presetAppliances={presetAppliances}
+    defaultBackupHours={12}
+    defaultVoltage="24"
+    defaultLoadsDescription="Uma geladeira foi pré-carregada acima. Ajuste a duração do backup e as configurações para corresponder às suas necessidades."
+    defaultLoads={[{ name: "Geladeira", quantity: 1 }]}
+  />
+
+  <section class="mb-16 border-t border-hairline pt-12">
+    <FormulaBox title="Fórmulas Matemáticas">
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Total Funcionamento W = Σ (Eletrodoméstico Funcionamento W × Quantidade)</div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Surto W = Maior Surto de Eletrodoméstico Único + Outras Cargas em Funcionamento</div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Energia Necessária (Wh) = (Funcionamento W × Horas) / Eficiência do Inversor × (1 + Margem de Segurança)</div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Bateria Ah = Wh Necessários / (Voltagem da Bateria × Profundidade de Descarga)</div>
+    </FormulaBox>
+
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">Fórmulas e Exemplos Resolvidos</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample
+        number={1}
+        title="Geladeira Mini (Dormitório / Escritório)"
+        scenario="Manter uma geladeira mini compacta fria durante um apagão de 8 horas de expediente."
+        inputs={[
+          { label: "Geladeira Mini", value: "60W funcionamento / 180W surto" },
+          { label: "Duração do Backup", value: "8 horas" },
+          { label: "Ciclo de Trabalho", value: "~35%" },
+        ]}
+        steps={[
+          { label: "Passo 1: Consumo médio (35% ciclo de trabalho)", formula: "60W × 0,35", result: "21W média" },
+          { label: "Passo 2: Energia para 8 horas", formula: "21W × 8h = 168 Wh", result: "168 Wh" },
+          { label: "Passo 3: Após eficiência do inversor (90%)", formula: "168 / 0,90", result: "187 Wh" },
+          { label: "Passo 4: Com 20% de margem", formula: "187 × 1,20", result: "224 Wh" },
+          { label: "Passo 5: Bateria (12V LFP, 80% DoD)", formula: "224 / (12 × 0,80)", result: "23,3 Ah → LFP 12V 25Ah" },
+        ]}
+        answer="Uma bateria LiFePO4 de 12V 25Ah (320 Wh) mantém uma geladeira mini funcionando durante um expediente de 8 horas."
+        interpretation="Geladeiras minis são eficientes — baterias pequenas as manejam bem. O ciclo de trabalho estende significativamente o tempo de funcionamento."
+      />
+      <WorkedExample
+        number={2}
+        title="Geladeira Tamanho Família (Backup para Furacão)"
+        scenario="Manter uma geladeira tamanho família fria durante um apagão de furacão de 24 horas."
+        inputs={[
+          { label: "Geladeira Família", value: "150W funcionamento / 600W surto" },
+          { label: "Duração do Backup", value: "24 horas" },
+          { label: "Ciclo de Trabalho", value: "~40%" },
+        ]}
+        steps={[
+          { label: "Passo 1: Consumo médio (40% ciclo de trabalho)", formula: "150W × 0,40", result: "60W média" },
+          { label: "Passo 2: Energia para 24 horas", formula: "60W × 24h = 1.440 Wh", result: "1.440 Wh" },
+          { label: "Passo 3: Após eficiência do inversor (90%)", formula: "1.440 / 0,90", result: "1.600 Wh" },
+          { label: "Passo 4: Com 20% de margem", formula: "1.600 × 1,20", result: "1.920 Wh" },
+          { label: "Passo 5: Bateria (24V LFP, 80% DoD)", formula: "1.920 / (24 × 0,80)", result: "100 Ah → LFP 24V 100Ah" },
+        ]}
+        answer="Uma bateria LiFePO4 de 24V 100Ah (2.560 Wh) mantém uma geladeira tamanho família fria por 24 horas, incluindo ciclagem do compressor."
+        interpretation="A ciclagem do compressor significa que a geladeira não funciona continuamente — o consumo médio é muito menor que a potência nominal."
+      />
+      <WorkedExample
+        number={3}
+        title="Freezer Tipo Baú (Apagão Prolongado)"
+        scenario="Manter um freezer tipo baú congelado durante um apagão de tempestade de inverno de 48 horas."
+        inputs={[
+          { label: "Freezer Baú", value: "120W funcionamento / 500W surto" },
+          { label: "Duração do Backup", value: "48 horas" },
+          { label: "Ciclo de Trabalho", value: "~30%" },
+          { label: "Bônus de Inverno", value: "Ambiente frio estende ciclos" },
+        ]}
+        steps={[
+          { label: "Passo 1: Consumo médio (30% ciclo de trabalho)", formula: "120W × 0,30", result: "36W média" },
+          { label: "Passo 2: Energia para 48 horas", formula: "36W × 48h = 1.728 Wh", result: "1.728 Wh" },
+          { label: "Passo 3: Após eficiência do inversor (90%)", formula: "1.728 / 0,90", result: "1.920 Wh" },
+          { label: "Passo 4: Com 20% de margem", formula: "1.920 × 1,20", result: "2.304 Wh" },
+          { label: "Passo 5: Bateria (24V LFP, 80% DoD)", formula: "2.304 / (24 × 0,80)", result: "120 Ah → LFP 24V 130Ah" },
+        ]}
+        answer="Uma bateria LiFePO4 de 24V 130Ah (3,1 kWh) mantém um freezer tipo baú congelado por 48 horas durante uma tempestade de inverno."
+        interpretation="Freezers tipo baú são o tipo de geladeira mais eficiente — o ambiente frio de inverno reduz ainda mais o tempo de funcionamento do compressor."
+      />
+    </div>
+  </section>
+
+  <EngineeringDiagram
+    title="Fluxo de Energia de Backup da Geladeira"
+    description="A energia DC da bateria é convertida para AC através do inversor, que então alimenta o motor do compressor da geladeira."
+    steps={[
+      { label: "Banco de Baterias", icon: "battery" },
+      { label: "Inversor", icon: "inverter" },
+      { label: "Proteção contra Surto", icon: "cable" },
+      { label: "Compressor da Geladeira", icon: "load" },
+    ]}
+    variant="system"
+  />
+
+  <ComparisonTable
+    title="Comparação de Backup de Bateria para Geladeira"
+    headers={["Tipo de Geladeira", "Funcionamento W", "Surto W", "Consumo Médio (40% ciclo)", "Energia 12h", "Bateria Necessária (LFP 24V)"]}
+    rows={[
+      ["Mini (dormitório)", "60 W", "180 W", "24 W", "288 Wh", "12V 25Ah (320 Wh)"],
+      ["Compacta", "100 W", "350 W", "40 W", "480 Wh", "12V 50Ah (640 Wh)"],
+      ["Padrão com Freezer no Topo", "150 W", "600 W", "60 W", "720 Wh", "24V 50Ah (1.280 Wh)"],
+      ["Lado a Lado", "200 W", "800 W", "80 W", "960 Wh", "24V 65Ah (1.560 Wh)"],
+      ["Porta Francesa (grande)", "250 W", "1.000 W", "100 Wh", "1.200 Wh", "24V 80Ah (1.920 Wh)"],
+      ["Freezer Baú", "120 W", "500 W", "36 W", "432 Wh", "24V 30Ah (720 Wh)"],
+    ]}
+    caption="O consumo médio assume 30–40% de ciclo de trabalho do compressor. O tempo real varia com a temperatura ambiente, aberturas de porta e isolamento da geladeira."
+  />
+
+  <FAQSection items={faqItems} />
+</CalculatorLayout>

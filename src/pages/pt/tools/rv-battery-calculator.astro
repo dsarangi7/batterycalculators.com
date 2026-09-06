@@ -1,0 +1,544 @@
+---
+import CalculatorLayout from '../../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import InputField from '../../../components/InputField.astro';
+import ResultBox from '../../../components/ResultBox.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import WorkedExample from '../../../components/WorkedExample.astro';
+import ComparisonTable from '../../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../../components/EngineeringDiagram.astro';
+
+const whatIs = `Uma calculadora de bateria de RV determina o tamanho do banco de baterias necess\u00E1rio para acampamento off-grid somando todas as cargas dos aparelhos, multiplicando pelas horas de uso di\u00E1rias e considerando os limites de profundidade de descarga espec\u00EDficos de cada qu\u00EDmica. Sistemas de energia de RV enfrentam restri\u00E7\u00F5es \u00FAnicas: limita\u00E7\u00F5es de espa\u00E7o e peso, sistemas DC 12V nativos, carregamento pelo alternador ao dirigir e a necessidade de equilibrar capacidade contra peso de carga. Seja planejando viagens de fim de semana ao campground ou boondocking permanente, esta calculadora garante que seu banco de baterias sustente seu estilo de vida sem exigir gera\u00E7\u00F5es di\u00E1rias ou conex\u00F5es de energia da rede.`;
+
+const whyItMatters = [
+  "Bancos de bateria de RV subdimensionados deixam voc\u00EA sem refrigera\u00E7\u00E3o ou ilumina\u00E7\u00E3o \u00E0 meia-noite \u2014 encerrando sua viagem de acampamento mais cedo ou for\u00E7ando uma compra emergencial de gerador.",
+  "Bancos superdimensionados consomem peso precioso de carga e espa\u00E7o de armazenamento; em uma van Classe B, cada 100Ah de capacidade LFP ocupa cerca de 30cm \u00D7 20cm \u00D7 20cm de espa\u00E7o no arm\u00E1rio.",
+  "Ignorar limites de carregamento do alternador significa que dirigir o dia inteiro n\u00E3o rep\u00F5e totalmente seu banco \u2014 um alternador de 50A precisa de 4+ horas para recarregar 200Ah de 50% de DoD.",
+  "Usar baterias chumbo-\u00E1cido a 80% de DoD repetidamente pode reduzir a vida \u00FAtil de 500 ciclos para menos de 100 \u2014 custando mais em substitui\u00E7\u00F5es do que uma atualiza\u00E7\u00E3o LFP antecipada.",
+  "N\u00E3o considerar cargas parasitas (detectores de CO, placas de controle da geladeira, cargas fantasma) pode drenar 20\u201340Ah durante a noite mesmo com todos os aparelhos desligados."
+];
+
+const practicalApplications = [
+  { title: "Viagens de Camping de Fim de Semana", description: "Dimensione um banco LFP moderado de 200\u2013400Ah para 2\u20133 dias de camping off-grid com geladeira, luzes e carregamento de dispositivos sem energia da rede." },
+  { title: "Boondocking Permanente", description: "Calcule o banco de 600\u20131000Ah+ necess\u00E1rio para vida permanente em RV com aparelhos de alto consumo como cooc\u00E7\u00E3o por indu\u00E7\u00E3o, micro-ondas e m\u00E1quina de caf\u00E9." },
+  { title: "Sistemas RV com Suplemento Solar", description: "Planeje a capacidade da bateria para armazenar energia solar coletada durante o dia para uso \u00E0 noite, reduzindo a depend\u00EAncia de carregamento por alternador ou gerador." },
+  { title: "Convers\u00E3o de Van e Constru\u00E7\u00E3o de Camper", description: "Projete sistemas de bateria compactos e eficientes em peso para vans Classe B onde cada quilograma e cent\u00EDmetro c\u00FAbico importa para capacidade de carga e manuseio." }
+];
+
+const expertNotes: { title: string; variant: 'engineering' | 'tip'; content: string }[] = [
+  {
+    title: "12V vs 24V para Sistemas RV",
+    variant: "engineering",
+    content: "A maioria dos RVs usa sistemas 12V porque aparelhos RV (geladeira, bomba d'\u00E1gua, ilumina\u00E7\u00E3o) funcionam nativamente em 12V DC. Para sistemas com carga total abaixo de 2000W, 12V \u00E9 pr\u00E1tico e simples. Para configura\u00E7\u00F5es de alta pot\u00EAncia (cooktop por indu\u00E7\u00E3o, micro-ondas residencial, mini-split AC), 24V reduz o consumo de corrente pela metade, permitindo fia\u00E7\u00E3o mais fina e menor queda de tens\u00E3o. Um sistema 24V com conversor DC-DC para reduzir a 12V para aparelhos \u00E9 uma abordagem moderna e eficiente para motorhomes Classe A e quintas rodas grandes."
+  },
+  {
+    title: "Instala\u00E7\u00E3o Port\u00E1til vs Permanente",
+    variant: "tip",
+    content: "Estações de bateria port\u00E1teis (Goal Zero, EcoFlow) s\u00E3o ideais para acampantes ocasionais de fim de semana \u2014 sem necessidade de fia\u00E7\u00E3o, plug-and-play. Instala\u00E7\u00F5es permanentes (Victron, Battleborn, Renogy) oferecem maior capacidade, menor custo por kWh e integra\u00E7\u00E3o com carregamento por alternador e solar. Se voc\u00EA acampa mais de 10 fins de semana por ano ou mora no RV, um sistema permanente LFP se paga em 2\u20133 anos comparado a unidades port\u00E1teis."
+  }
+];
+
+const trustSection = {
+  text: "Esta calculadora aplica metodologia padr\u00E3o de projeto el\u00E9trico RV utilizada por Airstream, Winnebago e construtores de vans personalizados. Perfis de carga s\u00E3o baseados em classifica\u00E7\u00F5es de pot\u00EAncia dos fabricantes e padr\u00F5es t\u00EDpicos de uso de pesquisas da ind\u00FAstria RV. Todas as f\u00F3rmulas s\u00E3o transparentes e verific\u00E1veis independentemente.",
+  link: { label: "Veja nossa metodologia e deriva\u00E7\u00F5es de f\u00F3rmulas", href: "/methodology/" }
+};
+
+const references = [
+  { title: "RVIA \u2014 Padr\u00F5es da Associa\u00E7\u00E3o da Ind\u00FAstria de Ve\u00EDculos Recreativos", url: "https://www.rvia.org/", source: "Padr\u00F5es T\u00E9cnicos RVIA" },
+  { title: "Victron Energy \u2014 Guia de Projeto de Sistemas M\u00F3veis de Energia", url: "https://www.victronenergy.com/learn/mobile-power", source: "Biblioteca T\u00E9cnica Victron Energy" },
+  { title: "Battleborn Batteries \u2014 Guia de Dimensionamento de Bateria RV", url: "https://battlebornbatteries.com/rv-battery-sizing/", source: "Battleborn Batteries" },
+  { title: "Expedition Portal \u2014 Sistemas El\u00E9tricos de Ve\u00EDculos Overland", url: "https://expeditionportal.com/", source: "Comunidade Expedition Portal" }
+];
+
+const faqItems = [
+  {
+    question: "Como calculo as cargas dos aparelhos do meu RV?",
+    answer: "Verifique a classifica\u00E7\u00E3o de pot\u00EAncia em cada aparelho ou multiplique amperes \u00D7 volts. Cargas RV comuns: luzes LED (10W cada), geladeira (150W quando ligada), laptop (60W), carregador de celular (10W), bomba d'\u00E1gua (60W), ventilador (20W). Multiplique cada uma pelas horas de uso di\u00E1rias.",
+  },
+  {
+    question: "Qual qu\u00EDmica de bateria \u00E9 melhor para RV?",
+    answer: "LFP (LiFePO4) \u00E9 a melhor escolha para aplica\u00E7\u00F5es RV: leve, 80% de DoD utiliz\u00E1vel, mais de 5.000 ciclos de vida e segura para espa\u00E7os fechados. AGM chumbo-\u00E1cido \u00E9 uma op\u00E7\u00E3o econ\u00F4mica, mas limitado a 50% de DoD e mais pesado. NMC l\u00EDtio \u00E9 mais leve, mas mais caro que LFP.",
+  },
+  {
+    question: "Quantos dias de acampamento devo planejar?",
+    answer: "Para viagens de fim de semana (2\u20133 dias), um banco de bateria moderado \u00E9 suficiente. Para boondocking estendido (5\u20137 dias), voc\u00EA precisa de significativamente mais capacidade ou uma forma de recarregar (solar, gerador, rede). A maioria dos RVers planeja 2\u20134 dias com capacidade de recarga.",
+  },
+  {
+    question: "Devo dimensionar para 12V ou 24V?",
+    answer: "A maioria dos RVs usa sistemas 12V. Se voc\u00EA tem altas demandas de pot\u00EAncia (ar-condicionado, cooc\u00E7\u00E3o por indu\u00E7\u00E3o), considere um sistema 24V com inversor. Sistemas 24V usam fio mais fino e t\u00EAm menores perdas de corrente para a mesma pot\u00EAncia.",
+  },
+  {
+    question: "Como considerar o consumo da geladeira do RV?",
+    answer: "Uma geladeira a g\u00E1s/el\u00E9trica usa m\u00EDnima energia da bateria (2\u20135W para a placa de controle). Uma geladeira compressor 12V (Dometic, Isotherm) consome 40\u201380W quando o compressor funciona, ciclando 30\u201350% do tempo \u2014 ent\u00E3o o consumo m\u00E9dio \u00E9 20\u201340W. Uma geladeira residencial com inversor consome 100\u2013150W, mas requer um banco de bateria maior.",
+  },
+  {
+    question: "Quais cargas parasitas devo considerar?",
+    answer: "Mesmo com tudo desligado, RVs t\u00EAm cargas fantasma: detectores de CO/fuma\u00E7a (1\u20132W cada), placa de controle da geladeira (2\u20135W), piloto do aquecedor de \u00E1gua (3\u20135W), mem\u00F3ria do som (1W) e controlador de carga solar em standby (0,5W). Isso soma 15\u201340W continuamente \u2014 drenando 360\u2013960Wh por dia mesmo quando o RV est\u00E9 estacionado.",
+  },
+  {
+    question: "Posso carregar a bateria do RV enquanto dirijo?",
+    answer: "Sim \u2014 o alternador do ve\u00EDculo carrega a bateria da casa atrav\u00E9s do sistema de carregamento do RV ou um carregador DC-DC. Um alternador padr\u00E3o de 50A fornece ~50Ah por hora de dire\u00E7\u00E3o. Um carregador DC-DC dedicado (ex: Victron Orion) pode fornecer 20\u201360A de carregamento controlado, protegendo tanto a bateria de partida quanto a da casa.",
+  },
+  {
+    question: "Como o tempo frio afeta as baterias de RV?",
+    answer: "Baterias LFP perdem 10\u201315% de capacidade abaixo de 0\u00B0C e n\u00E3o devem ser carregadas abaixo de -10\u00B0C sem aquecedor de bateria. Chumbo-\u00E1cido perde 20\u201330% de capacidade a -10\u00B0C. Para acampamento no inverno, isole o compartimento da bateria e considere um corte de carregamento em baixa temperatura. Baterias AGM lidam melhor com frio que chumbo-\u00E1cido inundado.",
+  },
+  {
+    question: "Qual \u00E9 a diferen\u00E7a entre necessidades de bateria das Classes A, B e C?",
+    answer: "Vans Classe B t\u00EAm espa\u00E7o limitado (200\u2013400Ah LFP t\u00EDpico). Motorhomes Classe C suportam bancos maiores (400\u2013800Ah). Ve\u00EDculos Classe A podem acomodar 800\u20131200Ah+ com m\u00FAltiplos bancos de bateria. O dimensionamento corresponde ao espa\u00E7o de armazenamento dispon\u00EDvel e \u00E0s demandas de pot\u00EAncia t\u00EDpicas de cada classe de RV.",
+  },
+  {
+    question: "Preciso de um monitor de bateria para meu RV?",
+    answer: "Sim \u2014 altamente recomendado. Um monitor de bateria com shunt (Victron BMV-712, Renogy 500A) fornece leitura precisa do estado de carga, estimativas de autonomia restante e dados hist\u00F3ricos de uso. A leitura de SOC baseada em tens\u00E3o \u00E9 n\u00E3o confi\u00E1vel para baterias de l\u00EDtio devido \u00E0 sua curva de descarga plana.",
+  },
+  {
+    question: "Como reduzo o consumo de energia do RV?",
+    answer: "Mude para ilumina\u00E7\u00E3o LED em toda parte (economiza 80% vs incandescente). Use uma geladeira compressor 12V em vez de g\u00E1s/el\u00E9trica. Carregue dispositivos diretamente de 12V DC em vez de atrav\u00E9s de inversor (evita 10\u201315% de perda de convers\u00E3o). Desligue cargas fantasma quando estacionado. Use um temporizador para ventiladores.",
+  },
+  {
+    question: "Posso usar um ar-condicionado com baterias de RV?",
+    answer: "Um AC RV de 13.500 BTU requer ~1.500W cont\u00EDnuos (~3.500W na partida). Um banco LFP 48V 400Ah (19,2 kWh) pode funcion\u00E1-lo por 6\u20138 horas. Isso requer um inversor de alta capacidade e investimento significativo na bateria. Resfriadores evaporativos port\u00E1teis (200\u2013400W) s\u00E3o uma alternativa mais pr\u00E1tica para a maioria dos RVers.",
+  },
+];
+
+const commonMistakes = [
+  "Ignorar limites de carregamento do alternador \u2014 um alternador de 50A precisa de 4+ horas para recarregar 200Ah de 50% de DoD, n\u00E3o a 1 hora que muitos RVers assumem.",
+  "Dimensionar apenas para carga cont\u00EDnua e esquecer cargas parasitas \u2014 detectores de CO, placas de controle da geladeira e cargas fantasma drenam 20\u201340Ah durante a noite.",
+  "Usar baterias chumbo-\u00E1cido a 80% de DoD \u2014 isso reduz pela metade a vida \u00FAtil de 500 para menos de 100 ciclos; mantenha dentro de 50% de DoD para chumbo-\u00E1cido.",
+  "Superdimensionar o banco de bateria sem verificar limites de peso de carga \u2014 cada 100Ah de LFP adiciona ~12 kg, o que importa em vans Classe B.",
+  "Ignorar redu\u00E7\u00E3o por temperatura \u2014 LFP perde 10\u201315% de capacidade abaixo de 0\u00B0C e n\u00E3o deve ser carregada abaixo de -10\u00B0C sem aquecedor.",
+  "Subdimensionar o inversor para aparelhos de alto consumo \u2014 um micro-ondas ou cooktop por indu\u00E7\u00E3o precisa de 2.000W+ cont\u00EDnuos, n\u00E3o apenas a capacidade da bateria.",
+  "Misturar qu\u00EDmicas de bateria em paralelo \u2014 chumbo-\u00E1cido e l\u00EDtio t\u00EAm curvas de carga diferentes e criam riscos de seguran\u00E7a quando combinados.",
+  "N\u00E3o considerar queda de tens\u00E3o em trajetos longos de fio \u2014 um trajeto de 3 metros em 12V a 100A pode perder 0,5V, reduzindo a capacidade efetiva.",
+  "Assumir que pain\u00E9is solares recarregam completamente o banco diariamente \u2014 um painel de 200W em 4 horas pico de sol produz apenas 800Wh, n\u00E3o suficiente para uma carga di\u00E1ria de 2.000Wh.",
+  "Esquecer de or\u00E7ar o consumo em standby do inversor \u2014 muitos inversores consomem 5\u201315W continuamente, adicionando 120\u2013360Wh por dia."
+];
+
+const relatedArticles = [
+  { title: "Guia de Dimensionamento de Bateria RV", href: "/learn/rv-battery-sizing-guide/" },
+  { title: "Melhor Qu\u00EDmica de Bateria para RV", href: "/learn/best-battery-chemistry-for-rv/" },
+  { title: "Baterias RV 12V vs 24V", href: "/learn/12v-vs-24v-rv-batteries/" },
+  { title: "Quantas Baterias para RV", href: "/learn/how-many-batteries-for-rv/" },
+  { title: "Planejamento de Bateria para Van Life", href: "/learn/van-life-battery-planning/" },
+];
+
+const relatedCalculators = [
+  { href: "/tools/runtime-calculator/", title: "Calculadora de Autonomia", description: "Verifique quanto tempo seu banco de baterias vai durar." },
+  { href: "/tools/energy-conversion-calculator/", title: "Convers\u00E3o de Energia", description: "Converta entre Ah e Wh para a tens\u00E3o do seu sistema." },
+  { href: "/tools/battery-sizing-calculator/", title: "Calculadora de Dimensionamento", description: "Dimensionamento completo de banco de baterias com redu\u00E7\u00E3o por temperatura." },
+  { href: "/tools/inverter-battery-calculator/", title: "Calculadora Inversor-Bateria", description: "Dimensione a capacidade do inversor para aparelhos AC de RV." },
+  { href: "/tools/parallel-string-calculator/", title: "Calculadora de String Paralela", description: "Projete configura\u00E7\u00F5es personalizadas de pacotes de bateria." },
+  { href: "/tools/voltage-drop-calculator/", title: "Calculadora de Queda de Tens\u00E3o", description: "Garanta que os trajetos de cabo atendam \u00E0s especifica\u00E7\u00F5es de queda de tens\u00E3o do RV." },
+];
+---
+
+<CalculatorLayout
+  title="Calculadora de Bateria de RV | Calculadoras de Bateria"
+  description="Calcule o tamanho do banco de baterias que voc\u00EA precisa para seu RV ou camper. Estime o consumo di\u00E1rio e a capacidade necess\u00E1ria para suas viagens de acampamento."
+  faqItems={faqItems}
+  commonMistakes={commonMistakes}
+  relatedArticles={relatedArticles}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+  relatedCalculators={relatedCalculators}
+  lang="pt"
+>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Perfil de Carga do RV</h3>
+      <div class="flex flex-col gap-6">
+
+        <div id="appliance-list" class="flex flex-col gap-4">
+          <div class="appliance-row flex flex-col gap-3 p-3 bg-surface-soft border border-hairline rounded" data-index="0">
+            <div class="flex items-center justify-between">
+              <span class="text-label-uppercase text-xs text-primary">Aparelho 1</span>
+              <button type="button" class="remove-row text-caption text-red-600 hover:text-red-400 cursor-pointer hidden" aria-label="Remover linha do aparelho">\u2715</button>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div class="flex flex-col gap-1">
+                <label for="appliance-name-0" class="text-label-uppercase text-[10px] text-muted">Nome</label>
+                <input id="appliance-name-0" type="text" class="text-input w-full" value="Geladeira" aria-label="Nome do aparelho 1" />
+              </div>
+              <div class="flex flex-col gap-1">
+                <label for="appliance-power-0" class="text-label-uppercase text-[10px] text-muted">Pot\u00EAncia (W)</label>
+                <input id="appliance-power-0" type="number" class="text-input w-full" value={150} min={0} step={10} aria-label="Pot\u00EAncia do aparelho 1 em watts" />
+              </div>
+              <div class="flex flex-col gap-1">
+                <label for="appliance-hours-0" class="text-label-uppercase text-[10px] text-muted">Horas/dia</label>
+                <input id="appliance-hours-0" type="number" class="text-input w-full" value={8} min={0} max={24} step={0.5} aria-label="Horas por dia do aparelho 1" />
+              </div>
+            </div>
+          </div>
+
+          <div class="appliance-row flex flex-col gap-3 p-3 bg-surface-soft border border-hairline rounded" data-index="1">
+            <div class="flex items-center justify-between">
+              <span class="text-label-uppercase text-xs text-primary">Aparelho 2</span>
+              <button type="button" class="remove-row text-caption text-red-600 hover:text-red-400 cursor-pointer hidden" aria-label="Remover linha do aparelho">\u2715</button>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div class="flex flex-col gap-1">
+                <label for="appliance-name-1" class="text-label-uppercase text-[10px] text-muted">Nome</label>
+                <input id="appliance-name-1" type="text" class="text-input w-full" value="Luzes LED" aria-label="Nome do aparelho 2" />
+              </div>
+              <div class="flex flex-col gap-1">
+                <label for="appliance-power-1" class="text-label-uppercase text-[10px] text-muted">Pot\u00EAncia (W)</label>
+                <input id="appliance-power-1" type="number" class="text-input w-full" value={100} min={0} step={10} aria-label="Pot\u00EAncia do aparelho 2 em watts" />
+              </div>
+              <div class="flex flex-col gap-1">
+                <label for="appliance-hours-1" class="text-label-uppercase text-[10px] text-muted">Horas/dia</label>
+                <input id="appliance-hours-1" type="number" class="text-input w-full" value={6} min={0} max={24} step={0.5} aria-label="Horas por dia do aparelho 2" />
+              </div>
+            </div>
+          </div>
+
+          <div class="appliance-row flex flex-col gap-3 p-3 bg-surface-soft border border-hairline rounded" data-index="2">
+            <div class="flex items-center justify-between">
+              <span class="text-label-uppercase text-xs text-primary">Aparelho 3</span>
+              <button type="button" class="remove-row text-caption text-red-600 hover:text-red-400 cursor-pointer hidden" aria-label="Remover linha do aparelho">\u2715</button>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div class="flex flex-col gap-1">
+                <label for="appliance-name-2" class="text-label-uppercase text-[10px] text-muted">Nome</label>
+                <input id="appliance-name-2" type="text" class="text-input w-full" value="Laptop" aria-label="Nome do aparelho 3" />
+              </div>
+              <div class="flex flex-col gap-1">
+                <label for="appliance-power-2" class="text-label-uppercase text-[10px] text-muted">Pot\u00EAncia (W)</label>
+                <input id="appliance-power-2" type="number" class="text-input w-full" value={60} min={0} step={10} aria-label="Pot\u00EAncia do aparelho 3 em watts" />
+              </div>
+              <div class="flex flex-col gap-1">
+                <label for="appliance-hours-2" class="text-label-uppercase text-[10px] text-muted">Horas/dia</label>
+                <input id="appliance-hours-2" type="number" class="text-input w-full" value={4} min={0} max={24} step={0.5} aria-label="Horas por dia do aparelho 3" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button type="button" id="add-appliance" class="w-full py-2 px-4 border border-dashed border-m-blue-light text-m-blue-light hover:bg-m-blue-light hover:text-on-primary rounded cursor-pointer text-caption font-bold uppercase tracking-wider transition-colors">
+          + Adicionar Aparelho
+        </button>
+
+        <div class="border-t border-hairline pt-6">
+          <InputField id="voltage" label="Tens\u00E3o do Sistema de Bateria" value={12} min={12} max={48} step={12} unit="V" helperText="A maioria dos RVs usa 12V. Considere 24V para configura\u00E7\u00F5es de alta pot\u00EAncia." />
+
+          <InputField id="camping-days" label="Dias de Acampamento" value={3} min={1} max={14} step={1} unit="dias" helperText="N\u00FAmero de dias entre recargas." />
+
+          <InputField
+            id="chemistry"
+            label="Qu\u00EDmica da Bateria"
+            type="select"
+            value="lfp"
+            helperText="LFP recomendado: leve e 80% de DoD utiliz\u00E1vel."
+            options={[
+              { label: "LFP (LiFePO4)", value: "lfp" },
+              { label: "NMC (L\u00EDtio N\u00EDquel Mangan\u00EAs Cobalto)", value: "nmc" },
+              { label: "Chumbo-\u00E1cido (AGM/Gel)", value: "lead-acid" },
+            ]}
+          />
+        </div>
+
+      </div>
+    </CalculatorCard>
+
+    <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Resultados do Dimensionamento</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <ResultBox
+            label="Consumo Di\u00E1rio"
+            value="1.820 Wh"
+            suffix="1,82 kWh por dia"
+            variant="primary"
+            id="result-daily"
+          />
+          <ResultBox
+            label="Capacidade Necess\u00E1ria"
+            value="455,0 Ah"
+            suffix="A 12V nominal"
+            id="result-capacity"
+          />
+          <ResultBox
+            label="Banco Recomendado"
+            value="460 Ah"
+            suffix="Arredondado para tamanho pr\u00E1tico"
+            id="result-recommended"
+          />
+        </div>
+      </div>
+
+      <div class="border-t border-hairline pt-6">
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">Notas do Sistema</h4>
+        <p class="text-body-sm text-muted" id="system-notes">
+          Para 3 dias de boondocking com 1.820 Wh de consumo di\u00E1rio a 12V LFP, voc\u00EA precisa de um banco de bateria de 460 Ah.
+        </p>
+      </div>
+    </CalculatorCard>
+
+  </div>
+
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">F\u00F3rmulas & Exemplos Resolvidos</h2>
+
+    <FormulaBox title="F\u00F3rmulas Matem\u00E1ticas">
+      <p>
+        O consumo di\u00E1rio \u00E9 a soma de todas as cargas dos aparelhos multiplicada pelas horas de uso:
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Consumo Di\u00E1rio (Wh) = \u03A3 (Pot\u00EAncia do Aparelho \u00D7 Horas de Uso)
+      </div>
+      <p>
+        A capacidade necess\u00E1ria considera limites de DoD e dura\u00E7\u00E3o do acampamento:
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Capacidade (Ah) = (Consumo Di\u00E1rio \u00D7 Dias) / (DoD% \u00D7 Tens\u00E3o)
+      </div>
+      <p>
+        Limites de DoD: LFP 80%, NMC 80%, Chumbo-\u00E1cido 50%.
+      </p>
+    </FormulaBox>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample
+        number={1}
+        title="Camping de Fim de Semana \u2014 Geladeira, Luzes, Bomba d'\u00E1gua"
+        scenario="Um casal vai a um parque estadual de acampamento para uma viagem de fim de semana. Eles precisam de energia para a geladeira, luzes LED e uma bomba d'\u00E1gua ao longo de 2 dias sem energia da rede."
+        inputs={[
+          { label: "Geladeira", value: "150W \u00D7 8h/dia" },
+          { label: "Luzes LED", value: "40W \u00D7 6h/dia" },
+          { label: "Bomba d'\u00E1gua", value: "60W \u00D7 1h/dia" },
+          { label: "Tens\u00E3o do Sistema", value: "12V" },
+          { label: "Qu\u00EDmica", value: "LFP (80% DoD)" },
+          { label: "Dura\u00E7\u00E3o da Viagem", value: "2 dias" },
+        ]}
+        steps={[
+          "Carga di\u00E1ria = (150\u00D78) + (40\u00D76) + (60\u00D71) = 1.200 + 240 + 60 = 1.500 Wh/dia",
+          "Energia total da viagem = 1.500 Wh \u00D7 2 dias = 3.000 Wh",
+          "Ah necess\u00E1rios = 3.000 / (0,80 \u00D7 12) = 312,5 Ah",
+        ]}
+        answer="Um banco de bateria LFP 12V 350 Ah (arredondado para tamanho pr\u00E1tico) fornece 4.200 Wh, cobrindo a necessidade de 3.000 Wh do fim de semana com uma reserva confort\u00E1vel."
+        interpretation="Esta configura\u00E7\u00E3o deixa ~30% de reserva no final do segundo dia, acomodando cargas inesperadas ou um ciclo tardio da geladeira. Um banco LFP 350 Ah pesa cerca de 35 kg \u2014 gerenci\u00E1vel para a maioria dos caminhonetes de camping."
+        variant="rv"
+      />
+
+      <WorkedExample
+        number={2}
+        title="Vida Permanente em RV \u2014 Cargas Extensivas com Solar"
+        scenario="Um RVer que trabalha remotamente de um motorhome Classe C. O sistema inclui carregamento solar (pain\u00E9is de 400W) que suplementa a bateria durante o dia, reduzindo o armazenamento noturno necess\u00E1rio."
+        inputs={[
+          { label: "Geladeira", value: "80W \u00D7 12h/dia (ciclos do compressor)" },
+          { label: "Laptop + Monitores", value: "200W \u00D7 8h/dia" },
+          { label: "Ilumina\u00E7\u00E3o LED", value: "60W \u00D7 5h/dia" },
+          { label: "Bomba d'\u00E1gua", value: "60W \u00D7 1h/dia" },
+          { label: "Roteador + Starlink", value: "75W \u00D7 24h/dia" },
+          { label: "Ventilador", value: "20W \u00D7 10h/dia" },
+          { label: "Carregamento Celular/Tablet", value: "30W \u00D7 3h/dia" },
+          { label: "Tens\u00E3o do Sistema", value: "12V" },
+          { label: "Qu\u00EDmica", value: "LFP (80% DoD)" },
+          { label: "Coleta Solar", value: "~1.600 Wh/dia (400W \u00D7 4 horas pico)" },
+        ]}
+        steps={[
+          "Carga di\u00E1ria = (80\u00D712) + (200\u00D78) + (60\u00D75) + (60\u00D71) + (75\u00D724) + (20\u00D710) + (30\u00D73) = 960 + 1.600 + 300 + 60 + 1.800 + 200 + 90 = 5.010 Wh/dia",
+          "Demanda noturna l\u00EDquida = 5.010 \u2212 1.600 (solar) = 3.410 Wh (solar cobre cargas diurnas)",
+          "Ah necess\u00E1rios = 3.410 / (0,80 \u00D7 12) = 355,2 Ah",
+          "Com reserva de 1 dia de autonomia: 3.410 \u00D7 2 / (0,80 \u00D7 12) = 710,4 Ah",
+        ]}
+        answer="Um banco de bateria LFP 12V 750 Ah fornece 9.000 Wh. Com 400W de solar reposto ~1.600 Wh/dia, o sistema alcan\u00E7a quase equil\u00EDbrio em dias ensolarados."
+        interpretation="Vida permanente demanda um banco maior porque trabalho remoto torna voc\u00EA dependente de energia. A matriz solar \u00E9 cr\u00EDtica \u2014 sem ela, voc\u00EA precisaria de 1.100+ Ah. Em dias nublados, espere 40\u201360% de redu\u00E7\u00E3o solar, ent\u00E3o um gerador de backup \u00E9 recomendado."
+        variant="rv"
+      />
+
+      <WorkedExample
+        number={3}
+        title="Boondocking Sem Solar \u2014 Maximize a Autonomia"
+        scenario="Um boondocker em um caminhonete-camper quer 4 dias de completa independ\u00EAncia energ\u00E9tica sem solar, carregamento por alternador ou gerador. O objetivo \u00E9 maximizar o tempo off-grid antes de precisar dirigir para recarregar."
+        inputs={[
+          { label: "Geladeira Compressor 12V", value: "60W \u00D7 10h/dia (50% ciclo de trabalho)" },
+          { label: "Luzes LED Puck", value: "20W \u00D7 5h/dia" },
+          { label: "Bomba d'\u00E1gua", value: "50W \u00D7 0,5h/dia" },
+          { label: "Carregamento de Dispositivos", value: "40W \u00D7 3h/dia" },
+          { label: "Tens\u00E3o do Sistema", value: "12V" },
+          { label: "Qu\u00EDmica", value: "LFP (80% DoD)" },
+          { label: "Alvo de Autonomia", value: "4 dias" },
+        ]}
+        steps={[
+          "Carga di\u00E1ria = (60\u00D710) + (20\u00D75) + (50\u00D70,5) + (40\u00D73) = 600 + 100 + 25 + 120 = 845 Wh/dia",
+          "Energia total de 4 dias = 845 \u00D7 4 = 3.380 Wh",
+          "Ah necess\u00E1rios = 3.380 / (0,80 \u00D7 12) = 352,1 Ah",
+          "Tamanho pr\u00E1tico do banco: 400 Ah (arredonda para 4\u00D7100Ah m\u00F3dulos LFP padr\u00E3o)",
+        ]}
+        answer="Um banco de bateria LFP 12V 400 Ah (4.800 Wh) fornece 4 dias completos de energia com 1.420 Wh (29,6%) de reserva para emerg\u00EAncias."
+        interpretation="Sem solar ou carregamento, cada Wh importa. Esta configura\u00E7\u00E3o assume uso disciplinado \u2014 sem cargas desperdi\u00E7adoras. Considere um painel solar dobr\u00E1vel de 200W como backup emergencial; mesmo sol parcial adiciona 200\u2013400 Wh/dia e estende a autonomia para 5\u20136 dias."
+        variant="rv"
+      />
+    </div>
+  </section>
+
+  <EngineeringDiagram
+    title="Arquitetura do Sistema de Energia RV"
+    description="Carregamento por alternador, entrada solar e armazenamento de bateria alimentando cargas de RV"
+    variant="system"
+    steps={[
+      { label: "Alternador/Solar", icon: "solar" },
+      { label: "Controlador de Carga", icon: "charge" },
+      { label: "Banco de Baterias", icon: "battery" },
+      { label: "Cargas do RV", icon: "load" },
+    ]}
+  />
+
+  <ComparisonTable
+    title="Comparativo de Qu\u00EDmicas de Bateria RV"
+    headers={["Caracter\u00EDstica", "LiFePO4", "AGM Chumbo-\u00E1cido", "C\u00E9lula Gel"]}
+    rows={[
+      ["Peso (100Ah)", "12 kg", "30 kg", "28 kg"],
+      ["Capacidade Utiliz\u00E1vel", "80\u201390 Ah", "50 Ah", "50 Ah"],
+      ["Vida \u00FAtil", "5.000+", "500\u20131.000", "1.000"],
+      ["Taxa de Carga", "0,5\u20131C", "0,1C", "0,1C"],
+      ["Pre\u00E7o (100Ah 12V)", "R$4.000\u20136.000", "R$1.000\u20131.500", "R$1.250\u20131.750"],
+      ["Autorrecarga", "1\u20133%/m\u00EAs", "3\u20135%/m\u00EAs", "2\u20134%/m\u00EAs"],
+      ["Manuten\u00E7\u00E3o", "Nenhuma", "Verificar \u00E1gua", "Nenhuma"],
+    ]}
+    caption="LFP tem custo inicial maior, mas economia de ciclo de vida superior para uso em RV"
+  />
+
+  <FAQSection items={faqItems} />
+
+  <script>
+    import { calculateRVBattery } from '../../../utils/calculators';
+
+    const applianceList = document.getElementById('appliance-list') as HTMLElement;
+    const addApplianceBtn = document.getElementById('add-appliance') as HTMLButtonElement;
+    const voltageInput = document.getElementById('voltage') as HTMLInputElement;
+    const campingDays = document.getElementById('camping-days') as HTMLInputElement;
+    const chemistrySelect = document.getElementById('chemistry') as HTMLSelectElement;
+
+    const resultDailyBox = document.getElementById('result-daily');
+    const resultDailyValue = resultDailyBox?.querySelector('.text-display-md') as HTMLElement;
+    const resultDailyKwh = resultDailyBox?.querySelector('.text-caption') as HTMLElement;
+
+    const resultCapacityBox = document.getElementById('result-capacity');
+    const resultCapacityValue = resultCapacityBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultCapacityRef = resultCapacityBox?.querySelector('.text-caption') as HTMLElement;
+
+    const resultRecommendedBox = document.getElementById('result-recommended');
+    const resultRecommendedValue = resultRecommendedBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultRecommendedRef = resultRecommendedBox?.querySelector('.text-caption') as HTMLElement;
+
+    const systemNotes = document.getElementById('system-notes');
+
+    let rowIndex = 3;
+
+    function createApplianceRow(index: number): HTMLElement {
+      const row = document.createElement('div');
+      row.className = 'appliance-row flex flex-col gap-3 p-3 bg-surface-soft border border-hairline rounded';
+      row.dataset.index = String(index);
+      row.innerHTML = `
+        <div class="flex items-center justify-between">
+          <span class="text-label-uppercase text-xs text-primary">Aparelho ${index + 1}</span>
+          <button type="button" class="remove-row text-caption text-red-600 hover:text-red-400 cursor-pointer" aria-label="Remover linha do aparelho">\u2715</button>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div class="flex flex-col gap-1">
+            <label for="appliance-name-${index}" class="text-label-uppercase text-[10px] text-muted">Nome</label>
+            <input id="appliance-name-${index}" type="text" class="text-input w-full" value="Novo Aparelho" aria-label="Nome do aparelho ${index + 1}" />
+          </div>
+          <div class="flex flex-col gap-1">
+            <label for="appliance-power-${index}" class="text-label-uppercase text-[10px] text-muted">Pot\u00EAncia (W)</label>
+            <input id="appliance-power-${index}" type="number" class="text-input w-full" value={0} min={0} step={10} aria-label="Pot\u00EAncia do aparelho ${index + 1} em watts" />
+          </div>
+          <div class="flex flex-col gap-1">
+            <label for="appliance-hours-${index}" class="text-label-uppercase text-[10px] text-muted">Horas/dia</label>
+            <input id="appliance-hours-${index}" type="number" class="text-input w-full" value={0} min={0} max={24} step={0.5} aria-label="Horas por dia do aparelho ${index + 1}" />
+          </div>
+        </div>
+      `;
+      return row;
+    }
+
+    function updateRemoveButtons() {
+      const rows = applianceList.querySelectorAll('.appliance-row');
+      const removeBtns = applianceList.querySelectorAll('.remove-row');
+      removeBtns.forEach(btn => {
+        if (rows.length <= 1) {
+          (btn as HTMLElement).classList.add('hidden');
+        } else {
+          (btn as HTMLElement).classList.remove('hidden');
+        }
+      });
+    }
+
+    function updateCalculations() {
+      const rows = applianceList.querySelectorAll('.appliance-row');
+      const loads: number[] = [];
+      const hours: number[] = [];
+
+      rows.forEach(row => {
+        const powerInput = row.querySelector('[id^="appliance-power-"]') as HTMLInputElement;
+        const hoursInput = row.querySelector('[id^="appliance-hours-"]') as HTMLInputElement;
+        loads.push(parseFloat(powerInput?.value) || 0);
+        hours.push(parseFloat(hoursInput?.value) || 0);
+      });
+
+      const voltage = parseFloat(voltageInput.value) || 12;
+      const days = parseFloat(campingDays.value) || 3;
+      const chemistry = chemistrySelect.value as "lfp" | "nmc" | "lead-acid";
+
+      const results = calculateRVBattery(loads, hours, voltage, days, chemistry);
+
+      if (resultDailyValue) resultDailyValue.textContent = `${Math.round(results.dailyConsumptionWh).toLocaleString()} Wh`;
+      if (resultDailyKwh) resultDailyKwh.textContent = `${(results.dailyConsumptionWh / 1000).toFixed(2)} kWh por dia`;
+
+      if (resultCapacityValue) resultCapacityValue.textContent = `${results.requiredCapacityAh.toFixed(1)} Ah`;
+      if (resultCapacityRef) resultCapacityRef.textContent = `A ${voltage}V nominal`;
+
+      if (resultRecommendedValue) resultRecommendedValue.textContent = `${results.recommendedBankSizeAh} Ah`;
+      if (resultRecommendedRef) resultRecommendedRef.textContent = `Arredondado para tamanho pr\u00E1tico`;
+
+      if (systemNotes) {
+        const chemistryName = chemistry === "lfp" ? "LFP" : chemistry === "nmc" ? "NMC" : "Chumbo-\u00E1cido";
+        systemNotes.textContent = `Para ${days} dia${days > 1 ? 's' : ''} de boondocking com ${Math.round(results.dailyConsumptionWh).toLocaleString()} Wh de consumo di\u00E1rio a ${voltage}V ${chemistryName}, voc\u00EA precisa de um banco de bateria de ${results.recommendedBankSizeAh} Ah.`;
+      }
+    }
+
+    addApplianceBtn.addEventListener('click', () => {
+      const row = createApplianceRow(rowIndex);
+      applianceList.appendChild(row);
+      rowIndex++;
+      updateRemoveButtons();
+      row.querySelectorAll('input').forEach(input => {
+        input.addEventListener('input', updateCalculations);
+      });
+      row.querySelector('.remove-row')?.addEventListener('click', () => {
+        row.remove();
+        updateRemoveButtons();
+        updateCalculations();
+      });
+      updateCalculations();
+    });
+
+    applianceList.querySelectorAll('.appliance-row').forEach(row => {
+      row.querySelectorAll('input').forEach(input => {
+        input.addEventListener('input', updateCalculations);
+      });
+      row.querySelector('.remove-row')?.addEventListener('click', () => {
+        row.remove();
+        updateRemoveButtons();
+        updateCalculations();
+      });
+    });
+
+    [voltageInput, campingDays, chemistrySelect].forEach(el => {
+      el.addEventListener('input', updateCalculations);
+    });
+
+    updateRemoveButtons();
+    updateCalculations();
+  </script>
+
+</CalculatorLayout>

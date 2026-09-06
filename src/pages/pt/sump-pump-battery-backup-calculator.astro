@@ -1,0 +1,217 @@
+---
+import CalculatorLayout from '../../layouts/CalculatorLayout.astro';
+import FormulaBox from '../../components/FormulaBox.astro';
+import FAQSection from '../../components/FAQSection.astro';
+import PowerOutageForm from '../../components/PowerOutageForm.astro';
+import WorkedExample from '../../components/WorkedExample.astro';
+import ComparisonTable from '../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../components/EngineeringDiagram.astro';
+
+const whatIs = "Uma calculadora de backup de bateria para bomba d'água (sump pump) determina a capacidade da bateria, o tamanho do inversor e a duração do backup que você precisa para manter sua bomba d'água funcionando durante um apagão. Bombas d'água são dispositivos críticos de prevenção de inundação — quando a rede falha durante uma tempestade, os níveis de água sobem rápido. Esta calculadora dimensiona sua bateria com base na potência real de funcionamento e no surto de inicialização do motor da sua bomba d'água, levando em consideração a eficiência do inversor, limites de profundidade de descarga e uma margem de segurança configurável.";
+
+const whyItMatters = [
+  "Bombas d'água consomem 800–1.200W funcionando e 2.000–3.000W de surto durante a inicialização do motor — um dos eletrodomésticos residenciais de maior consumo para backup.",
+  "Cortes de energia durante tempestades são exatamente quando você mais precisa da sua bomba d'água — sem energia de backup, porões inundam em horas.",
+  "Uma bomba d'água de 1/3 HP move 26–38 litros por minuto. Um porão inundado causa US$5.000–US$15.000 em danos médios.",
+  "Sistemas de bomba d'água com backup de bateria são um produto separado, mas uma bateria para toda a casa oferece mais flexibilidade e maior capacidade de surto.",
+  "Motores de bomba d'água têm surto de inicialização muito alto (3–5× a potência) — a maioria dos inversores baratos não consegue lidar com a carga."
+];
+
+const practicalApplications = [
+  { title: "Prevenção de Inundação em Tempestades", description: "Mantenha sua bomba d'água funcionando quando a energia corta durante chuvas fortes — exatamente quando o risco de inundação é mais alto." },
+  { title: "Proteção de Porão", description: "Previna milhares em danos por água garantindo que sua bomba d'água principal tenha energia durante apagões na rede." },
+  { title: "Dimensionamento de Bateria para Toda a Casa", description: "Considere o alto surto da sua bomba d'água no dimensionamento do sistema de bateria para toda a casa." },
+  { title: "Canteiros de Obras e Reformas", description: "Desaguamento temporário em projetos de construção frequentemente requer operação de bomba movida a bateria." },
+];
+
+const expertNotes: { title: string; variant: 'engineering' | 'tip' | 'warning'; content: string }[] = [
+  { title: "O Surto da Bomba d'Água é o Grande Desafio", variant: "engineering", content: "Uma bomba d'água de 1/3 HP consome ~800W funcionando mas atinge 2.000–3.000W durante a inicialização do motor (1–3 segundos). Seu inversor deve lidar com esse pico. Um inversor contínuo de 2.000W com 4.000W de surto é o mínimo." },
+  { title: "O Ciclo de Trabalho É Baixo", variant: "tip", content: "Bombas d'água alternam entre ligado e desligado com base no nível da água — geralmente funcionando 30 segundos a 2 minutos por ciclo, com minutos entre ciclos. O consumo real de energia é muito menor que o funcionamento contínuo sugere." },
+  { title: "Considere uma Bomba d'Água com Backup de Bateria", variant: "warning", content: "Existem sistemas de bomba d'água com backup de bateria dedicados como bomba secundária. Eles usam uma bateria marinha de 12V e funcionam independentemente. Porém, têm capacidade limitada — uma bateria para toda a casa oferece mais tempo e potência." }
+];
+
+const trustSection = {
+  text: "Esta calculadora usa fórmulas padrão de engenharia elétrica para dimensionamento de sistemas de bateria. O surto de bomba d'água varia significativamente por modelo — sempre verifique com seu dispositivo específico.",
+  link: { label: "Veja nossa metodologia", href: "/methodology/" }
+};
+
+const references = [
+  { title: "FEMA — Seguro contra Inundação e Proteção", url: "https://www.fema.gov/flood-insurance", source: "Agência Federal de Gestão de Emergências" },
+  { title: "InterNACHI — Inspeção de Bomba d'Água", url: "https://www.nachi.org/sump-pumps.htm", source: "Associação Internacional de Inspectores de Imóveis Certificados" },
+];
+
+const faqItems = [
+  { question: "Qual tamanho de bateria para uma bomba d'água?", answer: "Uma bomba d'água de 1/3 HP (~800W funcionando) precisa de uma bateria LiFePO4 de 24V 100Ah (2.560 Wh) para 4–6 horas de bombagem intermitente. O alto surto do motor (2.000–3.000W) requer um inversor de alto surto — pelo menos 2.000W contínuo com 4.000W+ de pico." },
+  { question: "Quanto tempo uma bateria pode rodar uma bomba d'água?", answer: "O tempo depende de quantas vezes a bomba alterna. Durante chuva constante, uma bomba d'água pode funcionar 30 segundos a cada 5–10 minutos. Uma bateria de 24V 100Ah pode suportar esse padrão de ciclagem por 6–12 horas. Funcionamento contínuo a esgota em 1–2 horas." },
+  { question: "Uma estação de energia portátil pode rodar uma bomba d'água?", answer: "Apenas unidades de alta capacidade (2.000W+ de saída, 2.000+ Wh de capacidade) conseguem lidar com o surto do motor da bomba d'água. A maioria das estações de 1.000W não consegue lidar com o pico de 2.000–3.000W. Sempre verifique a classificação de surto, não apenas a saída contínua." },
+  { question: "Por que uma bomba d'água precisa de tanta energia?", answer: "Bombas d'água usam motores de indução que consomem 3–5× sua potência durante a inicialização (1–3 segundos). Uma bomba de 1/3 HP consome ~800W funcionando mas 2.500W+ durante a inicialização. Esse surto é o fator limitante para dimensionamento de backup de bateria." },
+];
+
+const commonMistakes = [
+  "Ignorar o surto de inicialização do motor — uma bomba d'água de 1/3 HP consome 2.000–3.000W durante a inicialização (3–5× a potência), e a maioria dos inversores não consegue lidar com esse pico.",
+  "Dimensionar bateria para funcionamento contínuo em vez de ciclagem intermitente — bombas d'água alternam 30 segundos a cada 5–10 minutos, então o consumo real é muito menor.",
+  "Usar um inversor de baixo surto — motores de bomba d'água requerem pelo menos 4.000W de capacidade de surto; um inversor contínuo de 2.000W sem surto suficiente vai desligar.",
+  "Esquecer que cortes de energia durante tempestades são quando o backup de bomba d'água é mais necessário — subdimensionar deixa você inundando exatamente quando o risco é maior.",
+  "Depender apenas de uma bomba d'água com backup de bateria sem suporte de bateria para toda a casa — bombas de backup dedicadas têm capacidade e tempo limitados.",
+  "Não testar o sistema de backup antes da temporada de tempestades — uma bateria morta ou degradada descoberta durante um evento de inundação é inútil.",
+  "Usar baterias automotivas para backup de bomba d'água — baterias de carro não são projetadas para ciclos profundos e vão falhar rapidamente nas taxas de descarga necessárias.",
+  "Ignorar a queda de voltagem na fiação entre bateria e bomba — um sistema de 12V em alta corrente pode perder voltagem significativa em extensões de cabo longas."
+];
+
+const relatedArticles = [
+  { title: "Quanto Tempo Uma Bomba d'Água com Backup de Bateria Vai Durar", href: "/learn/how-long-will-a-battery-backup-sump-pump-run/" },
+  { title: "Planejamento de Backup de Bateria Doméstica", href: "/learn/home-battery-backup-planning/" },
+  { title: "LiFePO4 vs Chumbo-Ácido", href: "/learn/lifepo4-vs-lead-acid/" },
+  { title: "Guia de Bateria para Cortes de Energia", href: "/learn/power-outage-battery-guide/" },
+];
+
+const relatedCalculators = [
+  { href: "/home-power-outage-battery-backup-calculator/", title: "Calculadora de Bateria de Backup para Cortes de Energia", description: "Calculadora completa de energia de backup para todos os eletrodomésticos domésticos." },
+  { href: "/fridge-battery-backup-calculator/", title: "Calculadora de Bateria para Geladeira", description: "Dimensionamento de bateria para backup de geladeira durante apagões." },
+  { href: "/cpap-battery-backup-calculator/", title: "Calculadora de Bateria para CPAP", description: "Dimensione baterias para energia noturna de CPAP." },
+  { href: "/portable-power-station-runtime-calculator/", title: "Calculadora de Tempo de Estacao de Energia Portatil", description: "Veja quanto tempo uma estacao de energia portatil roda suas cargas." },
+  { href: "/solar-generator-sizing-calculator/", title: "Calculadora de Dimensionamento de Gerador Solar", description: "Dimensione um sistema completo de backup solar com painéis e bateria." },
+  { href: "/tools/runtime-calculator/", title: "Calculadora de Tempo de Bateria", description: "Estime o tempo de descarga a partir da capacidade e carga." },
+  { href: "/tools/battery-sizing-calculator/", title: "Calculadora de Dimensionamento de Bateria", description: "Dimensionamento completo de banco de baterias com degradacao por temperatura." },
+  { href: "/tools/solar-battery-sizing-calculator/", title: "Calculadora de Bateria Solar", description: "Dimensione baterias pareadas com matrizes de paineis solares." },
+  { href: "/tools/energy-conversion-calculator/", title: "Calculadora de Conversao de Energia", description: "Converta entre Ah, Wh e kWh em qualquer voltagem." },
+  { href: "/tools/charging-time-calculator/", title: "Calculadora de Tempo de Carga", description: "Estime o tempo de carga a partir de solar ou rede eletrica." },
+  { href: "/tools/voltage-drop-calculator/", title: "Calculadora de Queda de Voltagem", description: "Dimensione extensoes de fio para minimizar queda de voltagem." },
+  { href: "/tools/dc-cable-loss-calculator/", title: "Calculadora de Perda em Cabo DC", description: "Calcule perdas de fiacao em conexoes DC." },
+];
+
+const presetAppliances = [
+  { name: "Sump Pump", runningW: 800, surgeW: 2000 }, { name: "Refrigerator", runningW: 150, surgeW: 600 },
+  { name: "Wi-Fi Router", runningW: 12, surgeW: 12 }, { name: "LED Light", runningW: 10, surgeW: 10 },
+  { name: "Laptop", runningW: 60, surgeW: 90 }, { name: "TV", runningW: 100, surgeW: 150 },
+  { name: "Fan", runningW: 50, surgeW: 75 }, { name: "Microwave", runningW: 1000, surgeW: 1500 },
+  { name: "Freezer", runningW: 120, surgeW: 500 }, { name: "CPAP Machine", runningW: 40, surgeW: 80 },
+];
+---
+
+<CalculatorLayout
+  title="Calculadora de Bateria para Bomba d'Agua | Battery Calculators"
+  description="Calcule o tamanho da bateria, capacidade do inversor e tempo de backup necessários para manter sua bomba d'agua funcionando durante um corte de energia. Previna inundacao de porao com energia de backup de emergencia adequadamente dimensionada."
+  faqItems={faqItems}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+  relatedCalculators={relatedCalculators}
+  commonMistakes={commonMistakes}
+  relatedArticles={relatedArticles}
+  lang="pt"
+>
+  <PowerOutageForm
+    presetAppliances={presetAppliances}
+    defaultBackupHours={4}
+    defaultVoltage="24"
+    defaultLoadsDescription="Uma bomba d'agua foi pre-carregada acima. Adicione outras cargas criticas e ajuste a duracao do backup."
+    defaultLoads={[{ name: "Sump Pump", quantity: 1 }]}
+  />
+
+  <section class="mb-16 border-t border-hairline pt-12">
+    <FormulaBox title="Fórmulas Matemáticas">
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Total Funcionamento W = Σ (Eletrodoméstico Funcionamento W × Quantidade)</div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Surto W = Maior Surto de Eletrodoméstico Único + Outras Cargas em Funcionamento</div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Energia Necessária (Wh) = (Funcionamento W × Horas) / Eficiência do Inversor × (1 + Margem de Segurança)</div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Bateria Ah = Wh Necessários / (Voltagem da Bateria × Profundidade de Descarga)</div>
+      <p class="text-xs text-muted mt-4">Nota: Bombas d'água alternam intermitentemente — o tempo real pode ser 2–4× maior do que estimativas de funcionamento contínuo sugerem.</p>
+    </FormulaBox>
+
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">Fórmulas e Exemplos Resolvidos</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample
+        number={1}
+        title="Bomba d'Água de 1/3 HP (Backup para Tempestade)"
+        scenario="Manter uma bomba d'água de 1/3 HP funcionando durante um apagão de tempestade severa de 4 horas com ciclagem frequente."
+        inputs={[
+          { label: "Bomba d'Água 1/3 HP", value: "800W funcionamento / 2.000W surto" },
+          { label: "Duração do Backup", value: "4 horas" },
+          { label: "Padrão de Ciclo", value: "30s ligada / 8min desligada" },
+        ]}
+        steps={[
+          { label: "Passo 1: Ciclo de trabalho efetivo", formula: "30s / (30s + 480s) ≈ 6,3%", result: "~6,3% ciclo de trabalho" },
+          { label: "Passo 2: Consumo médio", formula: "800W × 0,063", result: "~50W média" },
+          { label: "Passo 3: Energia para 4 horas", formula: "50W × 4h = 200 Wh", result: "200 Wh" },
+          { label: "Passo 4: Após eficiência do inversor (90%)", formula: "200 / 0,90", result: "222 Wh" },
+          { label: "Passo 5: Com 20% de margem", formula: "222 × 1,20", result: "267 Wh" },
+          { label: "Passo 6: Bateria (24V LFP, 80% DoD)", formula: "267 / (24 × 0,80)", result: "13,9 Ah → LFP 12V 20Ah" },
+        ]}
+        answer="Uma bateria LFP de 12V 20Ah lida com uma bomba d'água de 1/3 HP por 4+ horas de ciclagem intermitente de tempestade."
+        interpretation="Bombas d'água têm ciclos de trabalho muito baixos durante chuva moderada — a bateria dura muito mais que estimativas de funcionamento contínuo sugerem."
+      />
+      <WorkedExample
+        number={2}
+        title="Bomba d'Água de 1/2 HP (Chuva Forte)"
+        scenario="Alimentar uma bomba d'água maior de 1/2 HP durante chuva forte causando ciclagem frequente por 6 horas."
+        inputs={[
+          { label: "Bomba d'Água 1/2 HP", value: "1.000W funcionamento / 2.500W surto" },
+          { label: "Duração do Backup", value: "6 horas" },
+          { label: "Padrão de Ciclo", value: "45s ligada / 3min desligada" },
+        ]}
+        steps={[
+          { label: "Passo 1: Ciclo de trabalho efetivo", formula: "45s / (45s + 180s) = 20%", result: "20% ciclo de trabalho" },
+          { label: "Passo 2: Consumo médio", formula: "1.000W × 0,20", result: "200W média" },
+          { label: "Passo 3: Energia para 6 horas", formula: "200W × 6h = 1.200 Wh", result: "1.200 Wh" },
+          { label: "Passo 4: Após eficiência do inversor (90%)", formula: "1.200 / 0,90", result: "1.333 Wh" },
+          { label: "Passo 5: Com 20% de margem", formula: "1.333 × 1,20", result: "1.600 Wh" },
+          { label: "Passo 6: Bateria (24V LFP, 80% DoD)", formula: "1.600 / (24 × 0,80)", result: "83,3 Ah → LFP 24V 100Ah" },
+        ]}
+        answer="Uma bateria LFP de 24V 100Ah (2.560 Wh) lida com uma bomba d'água de 1/2 HP por 6 horas de ciclagem de chuva forte."
+        interpretation="Chuva forte aumenta a frequência de ciclagem da bomba — planeje 20–30% de ciclo de trabalho durante tempestades severas."
+      />
+      <WorkedExample
+        number={3}
+        title="Bomba d'Água + Alarme de Água (Combo)"
+        scenario="Alimentar uma bomba d'água mais um sensor de alarme de água movido a bateria durante um apagão noturno de tempestade (10 horas)."
+        inputs={[
+          { label: "Bomba d'Água (1/3 HP)", value: "800W funcionamento / 2.000W surto" },
+          { label: "Sensor Alarme de Água", value: "5W contínuo" },
+          { label: "Duração do Backup", value: "10 horas" },
+          { label: "Padrão de Ciclo da Bomba", value: "30s / 10min" },
+        ]}
+        steps={[
+          { label: "Passo 1: Consumo médio da bomba (5% ciclo)", formula: "800W × 0,05", result: "40W média" },
+          { label: "Passo 2: Consumo médio combinado", formula: "40W + 5W = 45W", result: "45W" },
+          { label: "Passo 3: Energia para 10 horas", formula: "45W × 10h = 450 Wh", result: "450 Wh" },
+          { label: "Passo 4: Após eficiência do inversor (90%)", formula: "450 / 0,90", result: "500 Wh" },
+          { label: "Passo 5: Com 20% de margem", formula: "500 × 1,20", result: "600 Wh" },
+          { label: "Passo 6: Bateria (24V LFP, 80% DoD)", formula: "600 / (24 × 0,80)", result: "31,3 Ah → LFP 12V 35Ah" },
+        ]}
+        answer="Uma bateria LFP de 12V 35Ah roda uma bomba d'água mais alarme de água por 10 horas de proteção noturna contra tempestade."
+        interpretation="Adicionar um alarme de água consome energia insignificante mas fornece aviso crítico — sempre inclua um no seu plano de backup."
+      />
+    </div>
+  </section>
+
+  <EngineeringDiagram
+    title="Fluxo de Energia de Backup da Bomba d'Água"
+    description="A energia da bateria flui através de um inversor de alto surto para lidar com o pico de inicialização do motor da bomba d'água."
+    steps={[
+      { label: "Banco de Baterias", icon: "battery" },
+      { label: "Inversor de Alto Surto", icon: "inverter" },
+      { label: "Interruptor de Flutuação", icon: "chart" },
+      { label: "Motor da Bomba d'Água", icon: "load" },
+    ]}
+    variant="system"
+  />
+
+  <ComparisonTable
+    title="Requisitos de Backup da Bomba d'Água por Tamanho"
+    headers={["Tamanho da Bomba", "Funcionamento W", "Surto W", "Inversor Mínimo", "Bateria (4h backup)", "Bateria (8h backup)"]}
+    rows={[
+      ["1/4 HP", "600 W", "1.500 W", "1.500W / 3.000W surto", "12V 30Ah (384 Wh)", "12V 60Ah (768 Wh)"],
+      ["1/3 HP", "800 W", "2.000 W", "2.000W / 4.000W surto", "12V 40Ah (512 Wh)", "24V 50Ah (1.280 Wh)"],
+      ["1/2 HP", "1.000 W", "2.500 W", "2.500W / 5.000W surto", "24V 60Ah (1.536 Wh)", "24V 100Ah (2.560 Wh)"],
+      ["3/4 HP", "1.500 W", "3.500 W", "3.500W / 7.000W surto", "24V 100Ah (2.560 Wh)", "48V 100Ah (5.120 Wh)"],
+      ["1 HP", "2.000 W", "5.000 W", "5.000W / 10.000W surto", "48V 100Ah (5.120 Wh)", "48V 200Ah (10.240 Wh)"],
+      ["+ Alarme de Água", "+5 W", "—", "Nenhum adicional", "+6 Wh", "+12 Wh"],
+    ]}
+    caption="Tamanhos de bateria assume ciclagem intermitente (5–20% ciclo de trabalho). Funcionamento contínuo requer 3–5× a capacidade listada. Sempre verifique se a classificação de surto corresponde à sua bomba específica."
+  />
+
+  <FAQSection items={faqItems} />
+</CalculatorLayout>

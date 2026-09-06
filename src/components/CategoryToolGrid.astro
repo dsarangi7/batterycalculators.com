@@ -1,5 +1,6 @@
 ---
 import CalculatorCard from './CalculatorCard.astro';
+import { t, type Locale } from '../utils/i18n';
 
 export interface Tool {
   name: string;
@@ -10,9 +11,10 @@ export interface Tool {
 
 export interface Props {
   tools: Tool[];
+  lang?: Locale;
 }
 
-const { tools } = Astro.props as Props;
+const { tools, lang = 'en' } = Astro.props as Props;
 ---
 
 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -24,14 +26,14 @@ const { tools } = Astro.props as Props;
             <h3 class="text-title-lg text-primary mb-2 group-hover:text-m-blue-light transition-colors">{tool.name}</h3>
             <p class="text-body-sm text-muted mb-6">{tool.description}</p>
           </div>
-          <span class="btn-primary-outline text-xs text-center py-3 w-full">Open Calculator</span>
+          <span class="btn-primary-outline text-xs text-center py-3 w-full">{t('components.category_tool_grid.open_calculator', lang)}</span>
         </CalculatorCard>
       </a>
     ) : (
       <div class="bg-surface-card border border-hairline p-6 opacity-60">
         <div class="flex items-center justify-between mb-2">
           <h3 class="text-title-lg text-primary">{tool.name}</h3>
-          <span class="text-[10px] text-muted border border-hairline px-2 py-0.5 uppercase tracking-wider">Coming Soon</span>
+          <span class="text-[10px] text-muted border border-hairline px-2 py-0.5 uppercase tracking-wider">{t('components.category_tool_grid.coming_soon', lang)}</span>
         </div>
         <p class="text-body-sm text-muted">{tool.description}</p>
       </div>

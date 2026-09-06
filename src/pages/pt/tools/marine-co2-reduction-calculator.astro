@@ -1,0 +1,565 @@
+---
+import CalculatorLayout from '../../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import InputField from '../../../components/InputField.astro';
+import ResultBox from '../../../components/ResultBox.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import RelatedTools from '../../../components/RelatedTools.astro';
+import WorkedExample from '../../../components/WorkedExample.astro';
+import ComparisonTable from '../../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../../components/EngineeringDiagram.astro';
+
+const whatIs = `O Calculador de Redução de CO₂ Marítimo estima as reduções de emissões alcançáveis por meio da hibridização de embarcações, propulsão elétrica por bateria e adoção de energia de costa. Quantifica economia de combustível, reduções de CO₂, NOx e SOx usando fatores de emissão padrão da indústria do Quarto Estudo de GEE da OMI (2020). Esta ferramenta ajuda proprietários, operadores e arquitetos navais a avaliar o impacto ambiental de estratégias de descarbonização antes de se comprometerem com investimentos em capital em sistemas de propulsão híbrida ou elétrica.`;
+
+const whyItMatters = [
+  "A OMI tem como meta uma redução de 40% na intensidade de carbono até 2030 e emissões líquidas zero de GEE até ou por volta de 2050 — quantificar seu potencial de redução é o primeiro passo em direção à conformidade.",
+  "Embarcações híbridas e elétricas a bateria podem reduzir o consumo de combustível em 15–30%, diminuindo diretamente custos operacionais e exposição ao carbono em esquemas de comércio de emissões.",
+  "Autoridades portuárias exigem cada vez mais relatórios de emissões e oferecem incentivos para a adoção de energia de costa — conhecer sua linha de base e potencial de redução desbloqueia esses benefícios.",
+  "As reduções de NOx e SOx melhoram a qualidade do ar em portos e comunidades costeiras, apoiando a conformidade com ECAs (Áreas de Controle de Emissões) e regulamentações regionais.",
+  "Investidores e afretadores exigem dados verificáveis de emissões — uma estratégia de redução documentada fortalece a competitividade comercial da embarcação."
+];
+
+const practicalApplications = [
+  { title: "Planejamento de Propulsão Híbrida", description: "Estime reduções de emissões antes de investir em retrofit híbrido diesel-elétrico para ferrys, embarcações de suporte offshore ou embarcações de trabalho." },
+  { title: "Caso de Negócio de Energia de Costa", description: "Quantifique reduções de emissões e economia de combustível do cold ironing para justificar o investimento em infraestrutura de energia de costa." },
+  { title: "Melhoria da Classificação CII", description: "Modele a melhoria do CII com hibridificação ou eletrificação para atender às metas do Indicador de Intensidade de Carbono da OMI." },
+  { title: "Estratégia de Conformidade Regulatória", description: "Construa uma linha de base documentada de redução de emissões para submissões ao estado pavilhão e avaliações de impacto ambiental." }
+];
+
+const expertNotes: { title: string; variant: 'warning' | 'engineering' | 'info'; content: string }[] = [
+  {
+    title: "Premissas dos Fatores de Emissão",
+    variant: "engineering",
+    content: "Este calculador usa fatores de emissão do Quarto Estudo de Gases de Efeito Estufa da OMI (2020): MGO em 3,206 kg CO₂/litro, MDO em 3,206 kg CO₂/litro, HFO em 3,114 kg CO₂/litro e GNL em 2,750 kg CO₂/litro. Os fatores de NOx e SOx variam conforme o teor de enxofre do combustível e o tipo de motor. As emissões reais dependem da carga do motor, eficiência de combustão, limpeza de gases de exaustão e qualidade do combustível. Esses valores representam operação moderada de motor diesel marítimo em cargas típicas de cruzeiro."
+  },
+  {
+    title: "Economia de Combustível por Hibridização",
+    variant: "info",
+    content: "O percentual de hibridização representa a proporção do consumo total de combustível eliminada por operação elétrica a bateria, nivelamento de carga e otimização da carga do motor. As economias reais de hibridização dependem fortemente do ciclo operacional da embarcação — embarcações com cargas variáveis (ferrys, rebocadores, PSVs) alcançam maiores economias do que embarcações com cargas de cruzeiro constantes. As economias típicas variam de 15–30% para sistemas híbridos bem projetados."
+  },
+  {
+    title: "Limitações",
+    variant: "warning",
+    content: "Esta ferramenta fornece apenas estimativas educacionais. Não considera curvas de emissão específicas do motor, pós-tratamento de exaustão (SCR, EGR), variações no teor de enxofre do combustível, escape de metano (GNL) ou fatores operacionais como otimização de velocidade e roteamento meteorológico. Para relatórios oficiais de emissões ou conformidade com a OMI, use ferramentas de cálculo de emissões certificadas aprovadas por sua sociedade classificadora."
+  }
+];
+
+const trustSection = {
+  text: "Os fatores de emissão são provenientes do Quarto Estudo de Gases de Efeito Estufa da OMI (2020) e literatura revisada por pares sobre emissões marítimas. Todas as fórmulas e premissas estão documentadas abaixo.",
+  link: { label: "Veja nossa metodologia e derivações de fórmulas", href: "/methodology/" }
+};
+
+const references = [
+  { title: "Quarto Estudo de GEE da OMI 2020", url: "https://www.imo.org/en/OurWork/Environment/Pages/Fourth-IMO-Greenhouse-Gas-Study-2020.aspx", source: "Organização Marítima Internacional" },
+  { title: "Estratégia Inicial de GEE da OMI (Resolução MEPC.304(72))", url: "https://www.imo.org/en/OurWork/Environment/Pages/Strategy-on-reduction-of-GHG-emissions-from-ships.aspx", source: "Organização Marítima Internacional" },
+  { title: "Calculadora de Equivalências de Gases de Efeito Estufa da EPA", url: "https://www.epa.gov/energy/greenhouse-gas-equivalencies-calculator", source: "Agência de Proteção Ambiental dos EUA" },
+  { title: "Guia de Inventário de Emissões de Poluentes Atmosféricos EMEP/EEA 2019", url: "https://www.eea.europa.eu/publications/emep-eea-guidebook-2019", source: "Agência Europeia do Ambiente" }
+];
+
+const faqItems = [
+  {
+    question: "Quão precisos são os fatores de emissão usados neste calculador?",
+    answer: "Os fatores de emissão são provenientes do Quarto Estudo de GEE da OMI (2020), o conjunto de dados de emissões marítimas mais abrangente e amplamente referenciado. MGO e MDO compartilham o mesmo fator de CO₂ (3,206 kg/litro) porque possuem conteúdo de carbono semelhante. A HFO tem um fator de CO₂ ligeiramente menor, mas NOx e SOx significativamente maiores devido ao maior teor de enxofre e nitrogênio. As emissões reais variam conforme o tipo de motor, carga e qualidade do combustível."
+  },
+  {
+    question: "O que significa 'percentual de hibridização'?",
+    answer: "O percentual de hibridização representa a porção do consumo anual de combustível eliminada por propulsão elétrica a bateria, nivelamento de carga e otimização da carga do motor. Uma hibridização de 20% em uma embarcação que consome 500.000 litros/ano significa que 100.000 litros são economizados anualmente. As economias reais dependem do ciclo operacional — embarcações com cargas variáveis (ferrys, rebocadores) alcançam maiores economias do que embarcações com cruzeiro constante."
+  },
+  {
+    question: "Como a energia de costa reduz emissões?",
+    answer: "A energia de costa (cold ironing) permite que embarcações desliguem geradores diesel enquanto estão atracadas, conectando-se à rede elétrica do porto. Isso elimina todas as emissões de combustão a bordo durante estadias no porto. A redução líquida de emissões depende da intensidade de carbono da rede — se a rede for alimentada por energias renováveis, a redução é substancial. Se a rede usar carvão, o benefício é reduzido."
+  },
+  {
+    question: "Quais são os níveis típicos de redução de NOx e SOx?",
+    answer: "As reduções de NOx por hibridização variam de 15–30%, proporcionais ao combustível economizado. As reduções de SOx seguem o teor de enxofre do combustível — MGO e MDO têm baixo enxofre (0,1% em ECAs), enquanto a HFO tem maior enxofre (até 3,5% globalmente). O GNL elimina completamente o SOx e reduz o NOx em ~50%. Sistemas de pós-tratamento (SCR, scrubbers) podem reduzir ainda mais esses poluentes além do que a troca de combustível alcança."
+  },
+  {
+    question: "Posso usar este calculador para conformidade CII da OMI?",
+    answer: "Este calculador fornece estimativas preliminares para planejamento e análise de viabilidade. Não é um substituto para ferramentas certificadas de cálculo do CII. Para submissões oficiais de classificação CII da OMI, você deve usar o próprio calculador da OMI e dados verificados por sua sociedade classificadora. No entanto, esta ferramenta ajuda a modelar cenários de melhoria e estimar o impacto da hibridização em sua trajetória de CII."
+  },
+  {
+    question: "Como converter reduções de CO₂ em carros ou árvores equivalentes?",
+    answer: "O calculador usa equivalências baseadas na EPA: um veículo de passageiros emite aproximadamente 4,6 toneladas de CO₂ por ano, e uma árvore absorve aproximadamente 21 kg de CO₂ por ano. São médias aproximadas — os valores reais variam conforme o tipo de veículo, padrões de direção, espécie de árvore e clima. As equivalências ajudam a comunicar reduções de emissões de forma compreensível para partes interessadas e relatórios públicos."
+  },
+  {
+    question: "Qual é o impacto do GNL nas emissões?",
+    answer: "O GNL reduz o CO₂ em ~10–15% comparado ao MGO por litro, elimina completamente o SOx e reduz o NOx em ~50%. No entanto, o GNL introduz escape de metano — metano não queimado liberado durante a combustão — que tem potencial de aquecimento global 80× maior que o CO₂ ao longo de 20 anos. Ao considerar o escape de metano, o benefício líquido de GEE do GNL é contestado e depende fortemente da tecnologia do motor e das taxas de escape de metano."
+  },
+  {
+    question: "Devo considerar emissões do poço ao tanque?",
+    answer: "Este calculador aborda apenas emissões do tanque ao fundo (TTW) — o que é queimado a bordo. As emissões do poço ao tanque (WTT) da produção, refino e transporte de combustível não estão incluídas. Para uma avaliação completa do ciclo de vida, o WTT adiciona aproximadamente 15–25% às emissões TTW para combustíveis fósseis. Sistemas elétricos a bateria e de energia de costa deslocam as emissões para montante na rede elétrica, tornando a análise WTT essencial para comparação precisa."
+  }
+];
+
+const relatedArticles = [
+  { title: "Como Embarcações Híbridas Reduzem Consumo de Combustível e Emissões", href: "/learn/how-hybrid-vessels-reduce-emissions/" },
+  { title: "Roteiro de Descarbonização Marítima", href: "/learn/maritime-decarbonization-roadmap/" },
+];
+
+const commonMistakes = [
+  "Usar o fator de emissão de CO₂ errado para o tipo de combustível — MGO (3,206 kg/L) e HFO (3,114 kg/L) têm fatores diferentes apesar de ambos serem combustíveis marítimos.",
+  "Ignorar o escape de metano de motores GNL — metano não queimado tem 80× o potencial de aquecimento do CO₂ ao longo de 20 anos, reduzindo significativamente o benefício líquido de GEE do GNL.",
+  "Assumir que as economias de hibridização se aplicam ao combustível total sem considerar o ciclo operacional — embarcações com cargas de cruzeiro constantes alcançam economias muito menores do que embarcações com cargas variáveis.",
+  "Aplicar reduções de emissões de energia de costa sem verificar a intensidade de carbono da rede local — redes com muita carvão podem produzir mais CO₂ do que geradores a bordo eficientes.",
+  "Usar apenas emissões do tanque ao fundo ao comparar troca de combustível — sistemas elétricos a bateria e de energia de costa deslocam emissões para montante na rede elétrica.",
+  "Ignorar a variabilidade dos fatores de NOx e SOx por tipo de motor e carga — fatores de emissão a 75% de MCR diferem significativamente dos que estão a 50% ou 100% de carga.",
+  "Esquecer que o pós-tratamento de exaustão (SCR, EGR) altera os perfis de emissão reais — fatores de emissão padrão assumem ausência de pós-tratamento.",
+  "Contar duplamente as economias de combustível de hibridização e energia de costa — devem ser calculadas como caminhos de redução independentes."
+];
+
+const relatedCalculators = [
+  { href: "/tools/hybrid-vessel-roi-calculator/", title: "Calculador de ROI de Embarcação Híbrida", description: "Avalie o retorno financeiro do investimento em propulsão híbrida." },
+  { href: "/tools/vessel-energy-storage-calculator/", title: "Calculador de Armazenamento de Energia de Embarcação", description: "Determine a capacidade da bateria para sistemas híbridos ou elétricos de embarcação." },
+  { href: "/marine/", title: "Hub de Eletrificação Marítima", description: "Explore todas as ferramentas e recursos de descarbonização marítima." },
+];
+
+const fuelOptions = [
+  { label: 'Óleo de Gás Marítimo (MGO)', value: 'mgo' },
+  { label: 'Óleo Diesel Marítimo (MDO)', value: 'mdo' },
+  { label: 'Óleo Pesado (HFO)', value: 'hfo' },
+  { label: 'GNL', value: 'lng' },
+];
+---
+
+<CalculatorLayout
+  title="Calculador de Redução de CO₂ Marítimo | Battery Calculators"
+  description="Estime reduções de emissões de CO₂, NOx e SOx por hibridização de embarcação, eletrificação e adoção de energia de costa usando fatores de emissão padrão da indústria."
+  faqItems={faqItems}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+  relatedCalculators={relatedCalculators}
+  commonMistakes={commonMistakes}
+  relatedArticles={relatedArticles}
+  lang="pt"
+>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+
+    <!-- Input Form -->
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Configuração da Embarcação</h3>
+      <div class="flex flex-col gap-6">
+
+        <InputField
+          id="fuel-type"
+          label="Tipo de Combustível"
+          type="select"
+          value="mgo"
+          options={fuelOptions}
+          helperText="Selecione o combustível principal usado pela embarcação."
+        />
+
+        <InputField
+          id="annual-fuel"
+          label="Consumo Anual de Combustível"
+          value={200000}
+          min={100}
+          step={1000}
+          unit="L/ano"
+          helperText="Total de combustível consumido por ano em litros."
+        />
+
+        <InputField
+          id="operating-hours"
+          label="Horas de Operação"
+          value={5000}
+          min={100}
+          max={8760}
+          step={100}
+          unit="hrs/ano"
+          helperText="Total de horas operacionais anuais (máx. 8.760)."
+        />
+
+        <InputField
+          id="hybrid-percent"
+          label="Percentual de Hibridização"
+          value={20}
+          min={0}
+          max={100}
+          step={1}
+          unit="%"
+          helperText="Porção de combustível eliminada por operação híbrida/elétrica (0–100%)."
+        />
+
+        <InputField
+          id="shore-power-percent"
+          label="Percentual de Uso de Energia de Costa"
+          value={10}
+          min={0}
+          max={100}
+          step={1}
+          unit="%"
+          helperText="Porção do tempo conectado à energia de costa no cais (0–100%)."
+        />
+
+      </div>
+    </CalculatorCard>
+
+    <!-- Results -->
+    <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Resultados da Redução de Emissões</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <ResultBox
+            label="Combustível Economizado Anual"
+            value="50.000 L"
+            suffix="redução de 25,0%"
+            variant="primary"
+            id="result-fuel-saved"
+          />
+          <ResultBox
+            label="Redução Anual de CO₂"
+            value="160,3 t"
+            suffix="toneladas de CO₂ eliminadas"
+            id="result-co2"
+          />
+          <ResultBox
+            label="Redução Anual de NOx"
+            value="0 kg"
+            suffix="kg de NOx eliminados"
+            id="result-nox"
+          />
+          <ResultBox
+            label="Redução Anual de SOx"
+            value="0 kg"
+            suffix="kg de SOx eliminados"
+            id="result-sox"
+          />
+          <ResultBox
+            label="Carros Equivalentes Removidos"
+            value="0"
+            suffix="veículos de passageiros fora da estrada"
+            id="result-cars"
+          />
+          <ResultBox
+            label="Árvores Equivalentes Plantadas"
+            value="0"
+            suffix="árvores absorvendo CO₂ por um ano"
+            id="result-trees"
+          />
+        </div>
+      </div>
+
+      <div class="border-t border-hairline pt-6">
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">Resumo da Redução</h4>
+        <p class="text-body-sm text-muted" id="reduction-summary">
+          A hibridização em 20% com 10% de uso de energia de costa reduz as emissões anuais de CO₂ de 641,2 toneladas para 480,9 toneladas.
+        </p>
+      </div>
+    </CalculatorCard>
+
+  </div>
+
+  <!-- Before vs After Emissions Chart -->
+  <section class="mb-16">
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-4 uppercase tracking-wider">Comparação Antes vs Depois das Emissões</h3>
+      <p class="text-body-sm text-muted mb-6">Emissões de linha de base (esquerda) versus emissões reduzidas (direita) para cada poluente.</p>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- CO2 Chart -->
+        <div>
+          <span class="text-label-uppercase text-primary text-[10px] block mb-2">CO₂ (toneladas/ano)</span>
+          <div id="chart-co2" class="flex flex-col gap-2"></div>
+        </div>
+        <!-- NOx Chart -->
+        <div>
+          <span class="text-label-uppercase text-primary text-[10px] block mb-2">NOx (kg/ano)</span>
+          <div id="chart-nox" class="flex flex-col gap-2"></div>
+        </div>
+        <!-- SOx Chart -->
+        <div>
+          <span class="text-label-uppercase text-primary text-[10px] block mb-2">SOx (kg/ano)</span>
+          <div id="chart-sox" class="flex flex-col gap-2"></div>
+        </div>
+      </div>
+      <div class="flex items-center gap-4 mt-6 text-caption text-muted">
+        <span class="flex items-center gap-1.5"><span class="w-3 h-3 bg-m-blue-light inline-block"></span> Linha de Base</span>
+        <span class="flex items-center gap-1.5"><span class="w-3 h-3 bg-green-600 inline-block"></span> Após Redução</span>
+      </div>
+    </CalculatorCard>
+  </section>
+
+  <!-- Formulas and Worked Examples -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">Fórmulas e Exemplos Resolvidos</h2>
+    <FormulaBox title="Fórmulas Matemáticas">
+      <p>
+        As reduções de emissões são calculadas usando fatores de emissão específicos por combustível padrão da indústria:
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Combustível Economizado = Combustível Anual × [(Hibrid% × (1 - EnergiaCusta%)) + EnergiaCusta%]
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Redução CO₂ (t) = Combustível Economizado × Fator CO₂ / 1000
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Redução NOx (kg) = Combustível Economizado × Fator NOx
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Redução SOx (kg) = Combustível Economizado × Fator SOx
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Carros Equiv. = Redução CO₂ / 4,6
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Árvores Equiv. = Redução CO₂ (kg) / 21
+      </div>
+      <p class="mt-4">
+        Fatores CO₂ (kg/litro): MGO 3,206, MDO 3,206, HFO 3,114, GNL 2,750<br/>
+        Equivalências: 4,6 t CO₂/carro/ano (EPA), 21 kg CO₂/árvore/ano (EPA)
+      </p>
+    </FormulaBox>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample
+        number={1}
+        title="Ferry Convertendo 30% do Combustível para Elétrico"
+        scenario="Um ferry de automóveis opera 280 dias por ano em uma rota fixa, consumindo 800.000 litros de MGO anualmente. O operador planeja converter 30% da propulsão para elétrica a bateria usando um sistema de bateria a bordo de 6 MWh carregado via energias renováveis costeiras durante atracação noturna."
+        inputs={[
+          { label: "Tipo de Combustível", value: "MGO (3,206 kg CO₂/L)" },
+          { label: "Consumo Anual de Combustível", value: "800.000 L/ano" },
+          { label: "Percentual de Hibridização", value: "30%" },
+          { label: "Uso de Energia de Costa", value: "15%" },
+        ]}
+        steps={[
+          { label: "Passo 1: Combustível economizado por hibridização", formula: "800.000 × 0,30 × (1 - 0,15) = 204.000 L", result: "204.000 litros economizados via propulsão elétrica" },
+          { label: "Passo 2: Combustível economizado por energia de costa", formula: "800.000 × 0,15 = 120.000 L", result: "120.000 litros economizados durante estadias no porto" },
+          { label: "Passo 3: Total de combustível economizado", formula: "204.000 + 120.000 = 324.000 L", result: "324.000 L total (redução de 40,5%)" },
+          { label: "Passo 4: Redução de CO₂", formula: "324.000 × 3,206 / 1000 = 1.038,7 t", result: "1.038,7 toneladas de CO₂ eliminadas" },
+          { label: "Passo 5: Impacto equivalente", formula: "1.038,7 / 4,6 = 226 carros | 1.038.700 / 21 = 49.462 árvores", result: "226 carros removidos ou 49.462 árvores por um ano" },
+        ]}
+        answer="Converter um ferry para 30% de propulsão elétrica elimina 1.038,7 toneladas de CO₂ anualmente — equivalente a remover 226 carros de passageiros da estrada."
+        interpretation="A combinação de propulsão elétrica a bateria e carregamento noturno por energia de costa gera uma redução total de emissões de 40,5%. A rota previsível do ferry e a atracação noturna programada tornam ideal o carregamento noturno com eletricidade renovável da rede."
+        variant="marine"
+      />
+
+      <WorkedExample
+        number={2}
+        title="Rebocador com Conexão de Energia de Costa"
+        scenario="Um rebocador portuário passa 40% de suas horas anuais de operação atracado entre tarefas. O operador instala energia de costa (cold ironing) para eliminar o tempo de operação do gerador durante períodos ociosos, conectando-se a uma rede alimentada por 60% de energia renovável."
+        inputs={[
+          { label: "Tipo de Combustível", value: "MGO (3,206 kg CO₂/L)" },
+          { label: "Consumo Anual de Combustível", value: "350.000 L/ano" },
+          { label: "Percentual de Hibridização", value: "10% (nivelamento de carga)" },
+          { label: "Uso de Energia de Costa", value: "40%" },
+        ]}
+        steps={[
+          { label: "Passo 1: Combustível economizado por hibridização", formula: "350.000 × 0,10 × (1 - 0,40) = 21.000 L", result: "21.000 litros economizados por nivelamento de carga" },
+          { label: "Passo 2: Combustível economizado por energia de costa", formula: "350.000 × 0,40 = 140.000 L", result: "140.000 litros economizados durante tempo ocioso no porto" },
+          { label: "Passo 3: Total de combustível economizado", formula: "21.000 + 140.000 = 161.000 L", result: "161.000 L total (redução de 46,0%)" },
+          { label: "Passo 4: Redução de CO₂", formula: "161.000 × 3,206 / 1000 = 516,2 t", result: "516,2 toneladas de CO₂ eliminadas" },
+          { label: "Passo 5: Redução líquida ajustada pela rede", formula: "516,2 × 0,60 (parte renovável) + 516,2 × 0,40 × (1 - 0,4) = 432,0 t", result: "432,0 toneladas de redução líquida de CO₂ considerando a matriz da rede" },
+        ]}
+        answer="A energia de costa mais nivelamento de carga elimina 432,0 toneladas de redução líquida de CO₂ anualmente após considerar a intensidade de carbono da rede."
+        interpretation="Rebocadores são candidatos ideais para energia de costa porque passam longos períodos atracados entre tarefas. A conexão de costa de 40% do tempo ocioso elimina a operação mais ineficiente do gerador — baixa carga. A intensidade de carbono da rede afeta significativamente o benefício líquido."
+        variant="marine"
+      />
+
+      <WorkedExample
+        number={3}
+        title="Iate com Painéis Solares — Compensação Anual de CO₂"
+        scenario="Um iate motorizado de 25 metros instala 8 kW de painéis solares no convés, gerando uma média de 32 kWh por dia ao longo de 300 dias de cruzeiro. A energia solar compensa a demanda de carga hotel que seria suprida pelo gerador diesel a bordo."
+        inputs={[
+          { label: "Tipo de Combustível", value: "MGO (3,206 kg CO₂/L)" },
+          { label: "Consumo de Combustível do Gerador", value: "8 L/hr" },
+          { label: "Produção Solar", value: "32 kWh/dia" },
+          { label: "Compensação de Carga do Gerador", value: "4 horas/dia equivalente" },
+          { label: "Dias de Operação", value: "300 dias/ano" },
+        ]}
+        steps={[
+          { label: "Passo 1: Compensação diária de combustível por solar", formula: "32 kWh / (8 L/hr × 5,0 kWh/L) = 0,8 hr equiv → 8 × 0,8 = 6,4 L/dia", result: "6,4 litros de diesel compensados por dia" },
+          { label: "Passo 2: Compensação anual de combustível", formula: "6,4 × 300 = 1.920 L/ano", result: "1.920 litros de diesel compensados por ano" },
+          { label: "Passo 3: Redução de CO₂", formula: "1.920 × 3,206 / 1000 = 6,2 t", result: "6,16 toneladas de CO₂ eliminadas por ano" },
+          { label: "Passo 4: Impacto equivalente", formula: "6,16 / 4,6 = 1,3 carros | 6.160 / 21 = 293 árvores", result: "Equivalente a remover 1 carro ou plantar 293 árvores por um ano" },
+        ]}
+        answer="Painéis solares em um iate de 25m compensam 6,2 toneladas de CO₂ anualmente — equivalente a remover 1,3 carro de passageiros da estrada."
+        interpretation="Painéis solares em iates fornecem uma compensação significativa, porém modesta de CO₂ comparada ao consumo total de combustível da embarcação. O valor principal está na geração silenciosa e sem emissões de carga hotel durante a âncora, melhorando a experiência dos hóspedes enquanto reduz horas de operação do gerador e custos de combustível."
+        variant="marine"
+      />
+    </div>
+  </section>
+
+  <!-- Assumptions Section -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Premissas e Limitações</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <CalculatorCard>
+        <h4 class="text-primary font-bold text-sm mb-3">Fatores de Emissão</h4>
+        <ul class="text-body-sm text-muted flex flex-col gap-2">
+          <li class="flex gap-2"><span class="text-m-blue-light shrink-0">→</span> Fatores CO₂ do Quarto Estudo de GEE da OMI (2020)</li>
+          <li class="flex gap-2"><span class="text-m-blue-light shrink-0">→</span> Fatores NOx assumem carga moderada do motor (75% MCR)</li>
+          <li class="flex gap-2"><span class="text-m-blue-light shrink-0">→</span> Fatores SOx assumem 0,5% de enxofre (global) para HFO, 0,1% para MGO/MDO</li>
+          <li class="flex gap-2"><span class="text-m-blue-light shrink-0">→</span> SOx do GNL é zero (sem conteúdo de enxofre)</li>
+        </ul>
+      </CalculatorCard>
+      <CalculatorCard>
+        <h4 class="text-primary font-bold text-sm mb-3">O Que Este Calculador Não Inclui</h4>
+        <ul class="text-body-sm text-muted flex flex-col gap-2">
+          <li class="flex gap-2"><span class="text-m-red shrink-0">✗</span> Curvas de emissão específicas do motor ou fatores dependentes de carga</li>
+          <li class="flex gap-2"><span class="text-m-red shrink-0">✗</span> Pós-tratamento de exaustão (SCR, EGR, scrubbers)</li>
+          <li class="flex gap-2"><span class="text-m-red shrink-0">✗</span> Escape de metano de motores GNL</li>
+          <li class="flex gap-2"><span class="text-m-red shrink-0">✗</span> Emissões upstream do poço ao tanque</li>
+          <li class="flex gap-2"><span class="text-m-red shrink-0">✗</span> Medidas operacionais (otimização de velocidade, roteamento meteorológico)</li>
+        </ul>
+      </CalculatorCard>
+    </div>
+  </section>
+
+  <section class="mb-16">
+    <EngineeringDiagram
+      title="Caminho de Descarbonização Marítima"
+      description="Passos progressivos da diesel-only para eletrificação total"
+      variant="flow"
+      steps={[
+        { label: "Apenas Diesel", icon: "charge" },
+        { label: "Híbrida", icon: "battery" },
+        { label: "Energia de Costa", icon: "inverter" },
+        { label: "Zero Emissão", icon: "solar" },
+      ]}
+    />
+  </section>
+
+  <section class="mb-16">
+    <ComparisonTable
+      title="Padrões de Emissões Marítimas"
+      headers={["Padrão", "Abrangência", "Meta", "Prazo", "Multa"]}
+      rows={[
+        ["EEXI da OMI", "Embarcações existentes", "Redução de 40% CO₂ vs 2008", "Jan 2023", "Redução de velocidade"],
+        ["CII da OMI", "Navios >5.000 TG", "Classificação anual de eficiência A–E", "Jan 2023", "Plano de ação corretiva"],
+        ["EU ETS", "Chamadas de porto da UE", "Preço do carbono ~€80/tonelada", "2024", "Custo financeiro"],
+        ["FuelEU Maritime", "Embarcações da UE", "Redução de 2% de GEE até 2025", "2025", "Excedente de conformidade"],
+      ]}
+      caption="Regulamentações internacionais e regionais impulsionando a eletrificação marítima"
+    />
+  </section>
+
+  <FAQSection items={faqItems} />
+  <RelatedTools tools={relatedCalculators} />
+
+  <!-- Engineering Support CTA -->
+  <div class="bg-surface-card border border-hairline p-6 mt-8 mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div class="max-w-xl">
+      <h3 class="text-title-sm text-primary mb-1">Precisa de uma revisão de engenharia mais aprofundada?</h3>
+      <p class="text-body-sm text-muted font-light">
+        Use este calculador para estimativas preliminares. Para análise específica de embarcação, revisão de dimensionamento de bateria, planejamento de redução de emissões ou suporte à viabilidade híbrida, entre em contato com a equipe de suporte de engenharia da Battery Calculators.
+      </p>
+    </div>
+    <a href="/marine/#marine-advisory" class="btn-primary text-xs px-6 py-3 shrink-0 whitespace-nowrap">Solicitar Suporte de Engenharia</a>
+  </div>
+
+  <!-- Calculation Script -->
+  <script>
+    import { calculateMarineCo2Reduction } from '../../../utils/calculators';
+
+    const fuelTypeInput = document.getElementById('fuel-type') as HTMLSelectElement;
+    const annualFuelInput = document.getElementById('annual-fuel') as HTMLInputElement;
+    const operatingHoursInput = document.getElementById('operating-hours') as HTMLInputElement;
+    const hybridPercentInput = document.getElementById('hybrid-percent') as HTMLInputElement;
+    const shorePowerPercentInput = document.getElementById('shore-power-percent') as HTMLInputElement;
+
+    function getResultElements(id: string) {
+      const box = document.getElementById(id);
+      return {
+        value: box?.querySelector('.text-display-md, .text-title-lg') as HTMLElement,
+        suffix: box?.querySelector('.text-caption') as HTMLElement,
+      };
+    }
+
+    const fuelSaved = getResultElements('result-fuel-saved');
+    const co2Result = getResultElements('result-co2');
+    const noxResult = getResultElements('result-nox');
+    const soxResult = getResultElements('result-sox');
+    const carsResult = getResultElements('result-cars');
+    const treesResult = getResultElements('result-trees');
+    const summaryEl = document.getElementById('reduction-summary');
+
+    function fmt(n: number, decimals = 1): string {
+      return n.toLocaleString('pt-BR', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+    }
+
+    function updateChart(containerId: string, baseline: number, reduced: number) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      const maxVal = Math.max(baseline, 0.001);
+      const baselinePct = (baseline / maxVal) * 100;
+      const reducedPct = (reduced / maxVal) * 100;
+      const pctReduced = maxVal > 0 ? ((baseline - reduced) / baseline) * 100 : 0;
+
+      container.innerHTML = `
+        <div class="flex flex-col gap-1">
+          <div class="flex items-center gap-2">
+            <span class="text-caption text-muted w-16 text-right shrink-0">Antes</span>
+            <div class="flex-1 h-5 bg-surface-soft border border-hairline relative overflow-hidden">
+              <div class="h-full bg-m-blue-light transition-all duration-300" style="width: ${baselinePct}%"></div>
+            </div>
+            <span class="text-caption text-primary font-mono w-20 shrink-0">${fmt(baseline)}</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-caption text-muted w-16 text-right shrink-0">Depois</span>
+            <div class="flex-1 h-5 bg-surface-soft border border-hairline relative overflow-hidden">
+              <div class="h-full bg-green-600 transition-all duration-300" style="width: ${reducedPct}%"></div>
+            </div>
+            <span class="text-caption text-primary font-mono w-20 shrink-0">${fmt(reduced)}</span>
+          </div>
+          <span class="text-caption text-green-500 font-mono text-[10px]">↓ ${fmt(pctReduced)}% de redução</span>
+        </div>
+      `;
+    }
+
+    function updateCalculations() {
+      const fuelType = fuelTypeInput.value as 'mgo' | 'mdo' | 'hfo' | 'lng';
+      const annualFuel = parseFloat(annualFuelInput.value) || 200000;
+      const operatingHours = parseFloat(operatingHoursInput.value) || 5000;
+      const hybridPercent = parseFloat(hybridPercentInput.value) || 0;
+      const shorePowerPercent = parseFloat(shorePowerPercentInput.value) || 0;
+
+      const result = calculateMarineCo2Reduction({
+        fuelType,
+        annualFuelLiters: annualFuel,
+        operatingHours,
+        hybridPercent,
+        shorePowerPercent,
+      });
+
+      if (fuelSaved.value) fuelSaved.value.textContent = `${Math.round(result.annualFuelSavedLiters).toLocaleString()} L`;
+      if (fuelSaved.suffix) fuelSaved.suffix.textContent = `redução de ${fmt(result.annualFuelSavedPercent)}%`;
+
+      if (co2Result.value) co2Result.value.textContent = `${fmt(result.co2ReductionTonnes)} t`;
+      if (co2Result.suffix) co2Result.suffix.textContent = 'toneladas de CO₂ eliminadas';
+
+      if (noxResult.value) noxResult.value.textContent = `${fmt(result.noxReductionKg)} kg`;
+      if (noxResult.suffix) noxResult.suffix.textContent = 'kg de NOx eliminados';
+
+      if (soxResult.value) soxResult.value.textContent = `${fmt(result.soxReductionKg)} kg`;
+      if (soxResult.suffix) soxResult.suffix.textContent = 'kg de SOx eliminados';
+
+      if (carsResult.value) carsResult.value.textContent = `${fmt(result.equivalentCarsRemoved, 0)}`;
+      if (carsResult.suffix) carsResult.suffix.textContent = 'veículos de passageiros fora da estrada';
+
+      if (treesResult.value) treesResult.value.textContent = `${Math.round(result.equivalentTreesPlanted).toLocaleString()}`;
+      if (treesResult.suffix) treesResult.suffix.textContent = 'árvores absorvendo CO₂ por um ano';
+
+      if (summaryEl) {
+        summaryEl.textContent = `A hibridização em ${fmt(hybridPercent)}% com ${fmt(shorePowerPercent)}% de uso de energia de costa reduz as emissões anuais de CO₂ de ${fmt(result.baselineCo2Tonnes)} toneladas para ${fmt(result.reducedCo2Tonnes)} toneladas.`;
+      }
+
+      // Update charts
+      updateChart('chart-co2', result.baselineCo2Tonnes, result.reducedCo2Tonnes);
+      updateChart('chart-nox', result.baselineNoxKg, result.reducedNoxKg);
+      updateChart('chart-sox', result.baselineSoxKg, result.reducedSoxKg);
+    }
+
+    [fuelTypeInput, annualFuelInput, operatingHoursInput, hybridPercentInput, shorePowerPercentInput].forEach(el => {
+      el.addEventListener('input', updateCalculations);
+    });
+
+    updateCalculations();
+  </script>
+
+</CalculatorLayout>

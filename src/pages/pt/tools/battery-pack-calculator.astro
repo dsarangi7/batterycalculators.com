@@ -1,0 +1,380 @@
+---
+import CalculatorLayout from '../../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import InputField from '../../../components/InputField.astro';
+import ResultBox from '../../../components/ResultBox.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import RelatedTools from '../../../components/RelatedTools.astro';
+import WorkedExample from '../../../components/WorkedExample.astro';
+import ComparisonTable from '../../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../../components/EngineeringDiagram.astro';
+
+const whatIs = `Uma calculadora de pacote de bateria projeta configurações série-paralelo a partir de células individuais para atingir especificações de tensão, capacidade e corrente alvo. <strong>Conexões em série</strong> aumentam a tensão (células empilhadas de ponta a ponta), enquanto <strong>conexões em paralelo</strong> aumentam a capacidade (células lado a lado). A notação SxP (ex: 8S4P) descreve a configuração: S = contagem de série (define a tensão), P = contagem paralela (define a capacidade). Esta ferramenta calcula a tensão do pacote, capacidade total (Ah), energia (Wh/kWh) e corrente contínua máxima a partir de especificações no nível da célula. O projeto de pacotes de baterias é fundamental para módulos de bateria EV, sistemas de armazenamento de energia doméstica, powerwalls DIY, bancos de propulsão marinha e soluções de energia portátil personalizadas.`;
+
+const whyItMatters = [
+  "Uma contagem de série incorreta produz a tensão errada — poucas células significam que o inversor não funcionará; muitas células arriscam dano por sobretensão.",
+  "Contagem paralela insuficiente significa que o pacote não consegue fornecer a corrente contínua necessária, causando desligamentos do BMS sob carga.",
+  "Misturar células de diferentes lotes ou fabricantes causa desequilíbrio, degradação acelerada e potenciais riscos de segurança.",
+  "Pacotes subdimensionados levam a ciclos profundos de descarga que reduzem a vida útil da bateria, enquanto pacotes superdimensionados desperdiçam capital.",
+  "Entender a configuração do pacote é essencial para seleção do BMS, pois as unidades BMS são classificadas para contagens específicas de série e química.",
+];
+
+const practicalApplications = [
+  { title: "Módulos de Bateria EV", description: "Projete módulos de bateria para veículos elétricos com requisitos específicos de tensão e capacidade." },
+  { title: "Powerwalls DIY", description: "Configure pacotes de bateria de lítio para armazenamento de energia doméstica a partir de células prismáticas ou cilíndricas individuais." },
+  { title: "Bancos de Propulsão Marinha", description: "Projete bancos de bateria de alta capacidade e alta corrente para sistemas de propulsão de barcos elétricos." },
+  { title: "Estações de Energia Portáteis", description: "Dimensione pacotes de bateria compactos para aplicações de camping, emergência e energia móvel." },
+  { title: "Sistemas de Backup Telecom", description: "Configure bancos de bateria 48V a partir de células individuais para energia de backup de torres de telecom." },
+  { title: "Robótica e UAV", description: "Projete pacotes de bateria leves e de alta descarga para aplicações robóticas e de drones." },
+];
+
+const expertNotes = [
+  { title: 'Correspondência de Células', variant: 'warning', content: 'Nunca misture diferentes químicas de células, capacidades ou condições de idade em um único pacote. Células dessincronizadas causam distribuição desigual de carga, desempenho reduzido, riscos de segurança e degradação acelerada. Sempre use células idênticas do mesmo fabricante e lote de produção.' },
+  { title: 'Compatibilidade BMS', variant: 'engineering', content: 'Garanta que seu BMS suporte a contagem de série e química da sua configuração. Um BMS 4S não pode proteger um pacote 8S. Unidades BMS são específicas de química — um BMS LFP tem limiares de tensão diferentes de um BMS NMC.' },
+];
+
+const commonMistakes = [
+  "Misturar células de diferentes fabricantes ou lotes — resistência interna dessincronizada causa compartilhamento desigual de corrente, degradação acelerada e potenciais riscos de segurança.",
+  "Ignorar limites de contagem de série do BMS — um BMS 4S não pode proteger um pacote 8S. Sempre verifique a compatibilidade BMS com sua configuração de série antes de comprar células.",
+  "Subdimensionar contagem paralela para demandas de corrente — a corrente contínua máxima do pacote é igual à corrente máxima da célula × contagem paralela. Contagem paralela insuficiente causa desligamentos do BMS sob carga.",
+  "Usar tensão de química de célula errada — usar 3,7V (NMC) em vez de 3,2V (LFP) em cálculos produz tensão incorreta do pacote, levando a incompatibilidade com inversor ou controlador de carga.",
+  "Ignorar dimensionamento de barramento de cobre e fiação — pacotes de alta corrente requerem barramentos e cabos de dimensionamento adequado. Conexões subdimensionadas criam pontos quentes e queda de tensão.",
+  "Não planejar gestão térmica — pacotes de alta descarga geram calor significativo. Sem resfriamento adequado, temperaturas das células podem exceder limites seguros.",
+  "Assumir que células em paralelo se auto-balanceiam indefinidamente — embora células em paralelo se balanceiem inicialmente, variações de fabricação podem causar desequilíbrio gradual ao longo de centenas de ciclos.",
+  "Ignorar requisitos de correspondência de células — as células devem ser correspondidas dentro de 2% de capacidade e 5% de resistência interna para desempenho e longevidade ideais do pacote.",
+  "Ignorar orçamento de contagem total de células — grandes pacotes (16S4P = 64 células) requerem investimento significativo. Planeje a aquisição de células cuidadosamente para garantir consistência do lote.",
+  "Não considerar consumo em standby do BMS — unidades BMS consomem 10–50mA continuamente, o que pode drenar 7–36 Ah por mês em aplicações de baixa carga."
+];
+
+const relatedArticles = [
+  { href: "/learn/battery-pack-design-basics/", title: "Noções Básicas de Projeto de Pacotes de Bateria" },
+  { href: "/learn/how-to-build-a-battery-pack/", title: "Como Construir um Pacote de Bateria" },
+  { href: "/learn/lifepo4-pack-design/", title: "Projeto de Pacote LiFePO4" },
+  { href: "/learn/series-vs-parallel-batteries/", title: "Série vs Paralelo em Baterias" },
+];
+
+const trustSection = {
+  text: "As fórmulas de configuração do pacote (V_pacote = V_célula × S, Ah_pacote = Ah_célula × P, Wh = V × Ah) são relacionamentos fundamentais de engenharia elétrica. Todos os cálculos são transparentes e seguem convenções padrão da indústria para projeto de pacotes de baterias.",
+  link: { label: "Veja nossa metodologia completa", href: "/methodology/" },
+};
+
+const references = [
+  { title: "Battery University — Construindo Pacotes de Bateria", url: "https://batteryuniversity.com/article/bu-104-1a-electrical-connections-in-packs", source: "Battery University / Cadex Electronics" },
+  { title: "JBD BMS — Guia de Configuração Série/Paralelo", url: "https://www.jbdbms.com/", source: "Fabricante JBD BMS" },
+  { title: "EVE Energy — Especificações de Células e Projeto de Pacotes", url: "https://www.evebattery.com/", source: "EVE Energy Co., Ltd" },
+];
+
+const faqItems = [
+  {
+    question: "Qual é a diferença entre conexões série e paralelo de células?",
+    answer: "Em série, as células são conectadas de ponta a ponta para aumentar a tensão (ex: 8 × 3,2V = 25,6V). Em paralelo, as células são conectadas lado a lado para aumentar a capacidade (ex: 4 × 100Ah = 400Ah). Um pacote de bateria tipicamente usa ambos: série para tensão, paralelo para capacidade.",
+  },
+  {
+    question: "Como escolho a célula certa para meu pacote de bateria?",
+    answer: "Selecione uma célula cuja tensão nominal corresponda à tensão nominal do pacote alvo quando disposta em série. Escolhas comuns: LFP (3,2V nominal) para segurança e vida útil dos ciclos, NMC (3,7V nominal) para maior densidade de energia. Garanta que a corrente contínua máxima de descarga da célula atenda aos seus requisitos de carga.",
+  },
+  {
+    question: "O que significa a notação SxP?",
+    answer: "A notação SxP descreve a configuração de um pacote de bateria. 'S' = número de células em série (define a tensão), 'P' = número de células em paralelo (define a capacidade). Por exemplo, 8S4P significa 8 células em série e 4 strings paralelas, totalizando 32 células.",
+  },
+  {
+    question: "Posso misturar diferentes tipos de células em um pacote?",
+    answer: "Não. Nunca misture diferentes químicas de células, capacidades ou condições de idade em um único pacote. Células dessincronizadas causam distribuição desigual de carga, desempenho reduzido, riscos de segurança e degradação acelerada. Sempre use células idênticas do mesmo fabricante e lote.",
+  },
+  {
+    question: "Quantas células preciso para uma bateria 48V?",
+    answer: "Para LFP (3,2V nominal): 16S = 51,2V nominal (comum para sistemas 48V). Para NMC (3,7V nominal): 13S = 48,1V ou 14S = 51,8V. A contagem exata depende da sua química e da faixa de tensão do seu inversor.",
+  },
+  {
+    question: "Qual é a fórmula para contagem total de células?",
+    answer: "Células totais = Contagem de série × Contagem paralela. Por exemplo, uma configuração 8S4P usa 32 células. Uma configuração 16S2P usa 32 células, mas produz o dobro da tensão com metade da capacidade paralela.",
+  },
+  {
+    question: "Como a contagem paralela afeta a corrente máxima?",
+    answer: "Corrente máxima do pacote = Corrente máxima da célula × Contagem paralela. Se cada célula suporta 50A contínuos, uma configuração 4P suporta 200A no total. Este é o limite seguro de descarga contínua para todo o pacote.",
+  },
+  {
+    question: "Devo projetar série-primeiro ou paralelo-primeiro?",
+    answer: "Série-primeiro (S depois P) é o padrão para a maioria das aplicações — cria uma string de alta tensão que é depois colocada em paralelo para capacidade. Paralelo-primeiro (P depois S) pode ser mais seguro para aplicações de alta corrente, mas requer dimensionamento cuidadoso de barramento de cobre.",
+  },
+  {
+    question: "Qual tensão devo alvo para minha aplicação?",
+    answer: "12V: Sistemas portáteis pequenos. 24V: Off-grid médio, RV. 48V: Solar residencial, telecom, a maioria dos inversores modernos. Tensão mais alta reduz a corrente para a mesma potência, permitindo cabos mais finos e menores perdas.",
+  },
+  {
+    question: "Como considerar a sobrecarga do BMS?",
+    answer: "Unidades BMS consomem 10–50mA continuamente para monitoramento e balanceamento. Ao longo de um mês, isso pode drenar 7–36 Ah. Considere o consumo em standby do BMS em aplicações de baixa carga ou longa autonomia.",
+  },
+  {
+    question: "Posso adicionar células a um pacote existente?",
+    answer: "Somente adicione células idênticas (mesma química, capacidade, fabricante, lote) a um pacote existente. Adicionar células diferentes cria desequilíbrio. Novas células devem ser pré-balanceadas para corresponder à tensão do pacote existente antes da conexão.",
+  },
+];
+---
+
+<CalculatorLayout
+  title="Calculadora de Pacote de Bateria | Calculadoras de Bateria"
+  description="Projete pacotes de bateria a partir de células individuais. Calcule tensão, capacidade, energia e corrente máxima do pacote para qualquer configuração série-paralelo."
+  faqItems={faqItems}
+  commonMistakes={commonMistakes}
+  relatedArticles={relatedArticles}
+  relatedCalculators={[
+    { href: "/tools/parallel-string-calculator/", title: "Calculadora de String Paralela", description: "Projete configurações série/paralelo para tensão e capacidade alvo." },
+    { href: "/tools/c-rate-calculator/", title: "Calculadora de Taxa C", description: "Calcule taxas de carregamento e descarga para suas células." },
+    { href: "/tools/battery-sizing-calculator/", title: "Calculadora de Dimensionamento", description: "Determine o tamanho geral do banco para sua aplicação." },
+    { href: "/tools/runtime-calculator/", title: "Calculadora de Autonomia", description: "Calcule a autonomia a partir de perfis de potência." },
+    { href: "/tools/battery-degradation-estimator/", title: "Estimador de Degradação", description: "Estime o declínio de capacidade ao longo do tempo." },
+    { href: "/tools/soc-estimator/", title: "Estimador de SOC", description: "Interpole o Estado de Carga a partir da tensão." },
+  ]}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+  lang="pt"
+>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+
+    <!-- Input Form -->
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Parâmetros da Célula</h3>
+      <div class="flex flex-col gap-6">
+
+        <InputField id="cell-voltage" label="Tensão Nominal da Célula" value={3.2} min={1} max={5} step={0.1} unit="V" helperText="LFP: 3,2V, NMC: 3,7V, NCA: 3,6V, Chumbo-Ácido: 2,0V" />
+
+        <InputField id="cell-capacity" label="Capacidade da Célula" value={100} min={1} step={1} unit="Ah" helperText="Capacidade em Ampere-horas de uma célula individual." />
+
+        <InputField id="series-count" label="Células em Série" value={8} min={1} max={200} step={1} helperText="Define a tensão do pacote. 8 × 3,2V = 25,6V para um sistema 24V nominal." />
+
+        <InputField id="parallel-count" label="Células em Paralelo" value={4} min={1} max={200} step={1} helperText="Define a capacidade do pacote. 4 × 100Ah = 400Ah capacidade do pacote." />
+
+        <InputField id="cell-max-current" label="Corrente Contínua Máxima por Célula" value={50} min={1} step={1} unit="A" helperText="Corrente máxima segura de descarga contínua por célula." />
+
+      </div>
+    </CalculatorCard>
+
+    <!-- Results -->
+    <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Especificações do Pacote</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <ResultBox
+            label="Tensão Nominal do Pacote"
+            value="25,6 V"
+            suffix="Configuração 8S"
+            variant="primary"
+            id="result-voltage"
+          />
+          <ResultBox
+            label="Capacidade do Pacote"
+            value="400 Ah"
+            suffix="Configuração 4P"
+            id="result-capacity"
+          />
+          <ResultBox
+            label="Energia do Pacote"
+            value="10.240 Wh"
+            suffix="10,24 kWh"
+            id="result-energy"
+          />
+          <ResultBox
+            label="Corrente Contínua Máxima"
+            value="200 A"
+            suffix="Limite de descarga do pacote"
+            id="result-max-current"
+          />
+        </div>
+      </div>
+
+      <div class="border-t border-hairline pt-6">
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">Resumo da Configuração</h4>
+        <p class="text-body-sm text-muted" id="config-summary">
+          8S4P — 32 células no total (8 série × 4 paralelo)
+        </p>
+      </div>
+    </CalculatorCard>
+
+  </div>
+
+  <!-- Formulas and Worked Examples -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">Fórmulas & Exemplos Resolvidos</h2>
+
+    <FormulaBox title="Fórmulas Matemáticas">
+      <p>
+        As características elétricas de um pacote de bateria são determinadas pelo número de células em série e paralelo:
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Tensão do Pacote = Tensão da Célula × Contagem de Série
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Capacidade do Pacote = Capacidade da Célula × Contagem Paralela
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Energia do Pacote = Tensão do Pacote × Capacidade do Pacote
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Corrente Máxima do Pacote = Corrente Máxima da Célula × Contagem Paralela
+      </div>
+      <p>
+        Células totais = Contagem de Série × Contagem Paralela. Todas as células devem ser idênticas em química, capacidade e idade.
+      </p>
+    </FormulaBox>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample
+        number={1}
+        title="Pacote LFP 48V 200Ah a partir de Células 3,2V 100Ah"
+        scenario="Você precisa de um pacote de bateria 48V nominal para um sistema solar residencial usando células prismáticas LFP. Cada célula é 3,2V nominal com 100Ah de capacidade."
+        inputs={[
+          { label: "Tensão da Célula", value: "3,2V (LFP)" },
+          { label: "Capacidade da Célula", value: "100Ah" },
+          { label: "Tensão Alvo do Pacote", value: "48V nominal" },
+          { label: "Capacidade Alvo do Pacote", value: "200Ah" },
+        ]}
+        steps={[
+          { label: "Passo 1: Determine contagem de série para 48V", formula: "S = 48V ÷ 3,2V = 15 → arredonda para 16S", result: "16S × 3,2V = 51,2V nominal" },
+          { label: "Passo 2: Determine contagem paralela para 200Ah", formula: "P = 200Ah ÷ 100Ah = 2P", result: "2P × 100Ah = 200Ah" },
+          { label: "Passo 3: Contagem total de células", formula: "16 × 2 = 32 células", result: "32 células necessárias" },
+          { label: "Passo 4: Energia do pacote", formula: "51,2V × 200Ah = 10.240 Wh", result: "10,24 kWh" },
+        ]}
+        answer="Pacote 16S2P: 51,2V, 200Ah, 10,24 kWh a partir de 32 × 100Ah células LFP."
+        interpretation="Esta é uma configuração solar residencial padrão. 16S LFP é o formato 48Vnom mais comum — compatível com a maioria dos inversores e controladores de carga 48V."
+        variant="solar"
+      />
+
+      <WorkedExample
+        number={2}
+        title="Bateria de Partida 12V 50Ah a partir de Células NMC"
+        scenario="Você está construindo uma bateria de partida compacta 12V para aplicação marinha usando células cilíndricas NMC 3,7V com 5Ah de capacidade cada."
+        inputs={[
+          { label: "Tensão da Célula", value: "3,7V (NMC)" },
+          { label: "Capacidade da Célula", value: "5Ah" },
+          { label: "Tensão Alvo do Pacote", value: "12V nominal" },
+          { label: "Capacidade Alvo do Pacote", value: "50Ah" },
+        ]}
+        steps={[
+          { label: "Passo 1: Determine contagem de série para 12V", formula: "S = 12V ÷ 3,7V = 3,24 → arredonda para 4S", result: "4S × 3,7V = 14,8V nominal" },
+          { label: "Passo 2: Determine contagem paralela para 50Ah", formula: "P = 50Ah ÷ 5Ah = 10P", result: "10P × 5Ah = 50Ah" },
+          { label: "Passo 3: Contagem total de células", formula: "4 × 10 = 40 células", result: "40 células necessárias" },
+          { label: "Passo 4: Energia do pacote", formula: "14,8V × 50Ah = 740 Wh", result: "740 Wh" },
+        ]}
+        answer="Pacote 4S10P: 14,8V, 50Ah, 740 Wh a partir de 40 × 5Ah células NMC."
+        interpretation="4S NMC fornece 14,8V nominal, que funciona bem como uma bateria de partida '12V' — a faixa de tensão (12,0–16,8V) corresponde aos perfis de carga 12V padrão."
+        variant="marine"
+      />
+
+      <WorkedExample
+        number={3}
+        title="Escale um Pacote 24V para 48V Adicionando Células em Série"
+        scenario="Você tem um pacote LFP 24V (8S) existente com 2 strings paralelas (8S2P, 200Ah). Você quer dobrar a tensão para 48V adicionando mais 8 células em série a cada string."
+        inputs={[
+          { label: "Configuração Existente", value: "8S2P LFP (células 3,2V 100Ah)" },
+          { label: "Tensão Atual do Pacote", value: "25,6V" },
+          { label: "Tensão Alvo do Pacote", value: "51,2V (16S)" },
+          { label: "Capacidade do Pacote (inalterada)", value: "200Ah" },
+        ]}
+        steps={[
+          { label: "Passo 1: Especificações atuais do pacote", formula: "8S × 3,2V = 25,6V | 2P × 100Ah = 200Ah", result: "25,6V, 200Ah, 5.120 Wh" },
+          { label: "Passo 2: Adicione 8 células em série por string", formula: "8S → 16S | 16 × 3,2V = 51,2V", result: "Nova tensão: 51,2V" },
+          { label: "Passo 3: Capacidade inalterada (mesma contagem paralela)", formula: "2P × 100Ah = 200Ah", result: "Capacidade permanece 200Ah" },
+          { label: "Passo 4: Nova energia", formula: "51,2V × 200Ah = 10.240 Wh", result: "Dobrado de 5.120 Wh → 10.240 Wh" },
+        ]}
+        answer="8S2P → 16S2P: 51,2V, 200Ah, 10,24 kWh. Energia dobrada adicionando 16 células em série."
+        interpretation="É assim que a maioria dos construtores DIY escala a tensão: adicionar células em série a strings existentes. As células adicionadas devem ser idênticas às originais. Um novo BMS classificado para 16S é necessário."
+        variant="home"
+      />
+    </div>
+  </section>
+
+  <EngineeringDiagram
+    title="Configuração Série-Paralelo do Pacote de Bateria"
+    description="Células conectadas em série para tensão, strings paralelas para capacidade"
+    variant="system"
+    steps={[
+      { label: "Célula Individual", icon: "battery" },
+      { label: "String Série", icon: "battery" },
+      { label: "Grupo Paralelo", icon: "battery" },
+      { label: "Saída do Pacote", icon: "inverter" },
+    ]}
+  />
+
+  <ComparisonTable
+    title="Impacto da Configuração do Pacote"
+    headers={["Configuração", "Tensão", "Capacidade", "Energia", "Caso de Uso"]}
+    rows={[
+      ["8S1P (LFP)", "25,6V", "100 Ah", "2.560 Wh", "RV, solar pequeno"],
+      ["16S1P (LFP)", "51,2V", "100 Ah", "5.120 Wh", "Solar residencial"],
+      ["16S2P (LFP)", "51,2V", "200 Ah", "10.240 Wh", "Backup de casa inteira"],
+      ["7S3P (NMC)", "25,9V", "300 Ah", "7.770 Wh", "Banco marinho"],
+      ["14S1P (NMC)", "51,8V", "100 Ah", "5.180 Wh", "Backup telecom"],
+    ]}
+    caption="Configurações comuns de pacotes LFP e NMC para diferentes aplicações"
+  />
+
+  <FAQSection items={faqItems} />
+
+  <!-- Calculation Script -->
+  <script>
+    import { calculateBatteryPack } from '../../../utils/calculators';
+
+    const cellVoltageInput = document.getElementById('cell-voltage') as HTMLInputElement;
+    const cellCapacityInput = document.getElementById('cell-capacity') as HTMLInputElement;
+    const seriesCountInput = document.getElementById('series-count') as HTMLInputElement;
+    const parallelCountInput = document.getElementById('parallel-count') as HTMLInputElement;
+    const cellMaxCurrentInput = document.getElementById('cell-max-current') as HTMLInputElement;
+
+    const resultVoltageBox = document.getElementById('result-voltage');
+    const resultVoltageValue = resultVoltageBox?.querySelector('.text-display-md') as HTMLElement;
+    const resultVoltageSuffix = resultVoltageBox?.querySelector('.text-caption') as HTMLElement;
+
+    const resultCapacityBox = document.getElementById('result-capacity');
+    const resultCapacityValue = resultCapacityBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultCapacitySuffix = resultCapacityBox?.querySelector('.text-caption') as HTMLElement;
+
+    const resultEnergyBox = document.getElementById('result-energy');
+    const resultEnergyValue = resultEnergyBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultEnergySuffix = resultEnergyBox?.querySelector('.text-caption') as HTMLElement;
+
+    const resultMaxCurrentBox = document.getElementById('result-max-current');
+    const resultMaxCurrentValue = resultMaxCurrentBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultMaxCurrentSuffix = resultMaxCurrentBox?.querySelector('.text-caption') as HTMLElement;
+
+    const configSummaryEl = document.getElementById('config-summary');
+
+    function updateCalculations() {
+      const cellVoltage = parseFloat(cellVoltageInput.value) || 3.2;
+      const cellCapacity = parseFloat(cellCapacityInput.value) || 100;
+      const seriesCount = parseInt(seriesCountInput.value) || 8;
+      const parallelCount = parseInt(parallelCountInput.value) || 4;
+      const cellMaxCurrent = parseFloat(cellMaxCurrentInput.value) || 50;
+
+      const results = calculateBatteryPack(cellVoltage, cellCapacity, seriesCount, parallelCount, cellMaxCurrent);
+
+      if (resultVoltageValue) resultVoltageValue.textContent = `${results.packVoltageV.toFixed(1)} V`;
+      if (resultVoltageSuffix) resultVoltageSuffix.textContent = `Configuração ${seriesCount}S`;
+
+      if (resultCapacityValue) resultCapacityValue.textContent = `${results.packCapacityAh.toFixed(0)} Ah`;
+      if (resultCapacitySuffix) resultCapacitySuffix.textContent = `Configuração ${parallelCount}P`;
+
+      if (resultEnergyValue) resultEnergyValue.textContent = `${Math.round(results.packEnergyWh).toLocaleString()} Wh`;
+      if (resultEnergySuffix) resultEnergySuffix.textContent = `${results.packEnergyKwh.toFixed(2)} kWh`;
+
+      if (resultMaxCurrentValue) resultMaxCurrentValue.textContent = `${results.maxContinuousCurrentA.toFixed(0)} A`;
+      if (resultMaxCurrentSuffix) resultMaxCurrentSuffix.textContent = 'Limite de descarga do pacote';
+
+      if (configSummaryEl) configSummaryEl.textContent = results.configSummary;
+    }
+
+    [cellVoltageInput, cellCapacityInput, seriesCountInput, parallelCountInput, cellMaxCurrentInput].forEach(el => {
+      el.addEventListener('input', updateCalculations);
+    });
+
+    updateCalculations();
+  </script>
+
+</CalculatorLayout>

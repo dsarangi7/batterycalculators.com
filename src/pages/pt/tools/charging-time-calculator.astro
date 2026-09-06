@@ -1,0 +1,287 @@
+---
+import CalculatorLayout from '../../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import InputField from '../../../components/InputField.astro';
+import ResultBox from '../../../components/ResultBox.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import RelatedTools from '../../../components/RelatedTools.astro';
+import MiniSimulationChart from '../../../components/MiniSimulationChart.astro';
+import WorkedExample from '../../../components/WorkedExample.astro';
+import ComparisonTable from '../../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../../components/EngineeringDiagram.astro';
+
+const whatIs = `O tempo de carga da bateria é a duração necessária para restaurar uma bateria de um determinado estado de carga a um SOC alvo usando uma corrente de carregador especificada. Baterias de íon-lítio são carregadas em duas fases distintas: <strong>Corrente Constante (CC)</strong>, onde o carregador fornece corrente total até que a célula atinja seu limite de tensão superior (tipicamente por volta de 80% SOC), seguido de <strong>Tensão Constante (CV)</strong>, onde o carregador mantém a tensão estável enquanto a corrente decai exponencialmente à medida que a célula se aproxima de 100% SOC. A fase CV pode representar 20–30% do tempo total de carga, apesar de fornecer apenas os últimos 20% da capacidade. Entender o tempo de carga é essencial para agendar recargas de veículos elétricos, planejar janelas de recarga de baterias solares, gerenciar orçamentos de energia fora da rede e otimizar tempos de retorno de frotas de veículos.`;
+
+const whyItMatters = [
+  "A fase CV adiciona 20–40% mais tempo do que um cálculo simples de capacidade/corrrente sugere — levando a tempos de carga subestimados.",
+  "Carregar acima da taxa C recomendada acelera deposição de lítio e estresse térmico, reduzindo a vida útil da bateria em 20–40%.",
+  "Baterias de chumbo-ácido requerem fases de absorção e flutuação estendidas que podem dobrar o tempo de carga esperado comparado ao lítio.",
+  "O balancing do BMS a altos SOC pode desacelerar ou interromper a carga quando as tensões das células divergem, adicionando sobrecarga imprevisível.",
+  "Sistemas carregados por solar devem considerar taxas de carga variáveis com base nas horas de sol disponíveis e na saída dos painéis.",
+];
+
+const practicalApplications = [
+  { title: "Agendamento de Carga de VE", description: "Estimar tempos de carga para nível 1, nível 2 e carga CC rápida para planejar a disponibilidade do veículo." },
+  { title: "Planejamento de Recarga Solar", description: "Determinar se as horas de luz disponíveis são suficientes para recarregar as baterias antes das cargas noturnas." },
+  { title: "Gestão de Frota de Veículos", description: "Agendar janelas de carga para frotas comerciais de VE para minimizar tempo de inatividade." },
+  { title: "Orçamentos de Energia Fora da Rede", description: "Planejar tempos de funcionamento do gerador e janelas de carga solar para manter o SOC da bateria através de ciclos de carga." },
+  { title: "Recarga de Bateria Marinha", description: "Estimar tempos de carga por alternador ou energia da costa para bancos residenciais marinhos." },
+];
+
+const expertNotes = [
+  { title: 'Impacto da Fase CV', variant: 'engineering', content: 'Os últimos 20% da carga (fase CV) levam tempo desproporcionalmente maior porque o carregador restringe a corrente para evitar sobretensão. Isso é comportamento CC-CV normal — não uma falha do carregador. Planejar para 80% de carga fornece a melhor relação tempo/energia.' },
+  { title: 'Chumbo-Ácido vs Lítio', variant: 'info', content: 'Baterias de chumbo-ácido requerem fases de absorção (CV) e flutuação significativamente mais longas comparadas ao lítio. Sua menor eficiência de carga (80–85%) também significa que mais energia deve ser fornecida do que armazenada. Espere tempos de carga de chumbo-ácido 1,5–2× maiores que lítio para a mesma capacidade e corrente.' },
+];
+
+const trustSection = {
+  text: "Esta calculadora modela o perfil de carga CC-CV padrão usado universalmente em carregadores de baterias de íon-lítio. O estágio CC calcula a entrega linear de carga, enquanto o estágio CV usa um modelo de sobrecarga empírico baseado no decaimento exponencial da corrente. Todos os valores intermediários são exibidos para verificação.",
+  link: { label: "Ver nossa metodologia completa", href: "/methodology/" },
+};
+
+const references = [
+  { title: "Battery University — Carregando Baterias de Íon-Lítio", url: "https://batteryuniversity.com/article/bu-409-charging-lithium-ion-batteries", source: "Battery University / Cadex Electronics" },
+  { title: "Nota de Aplicação TI — Perfil de Carga Li-Ion", url: "https://www.ti.com/lit/an/slua480/slua480.pdf", source: "Texas Instruments" },
+  { title: "IEEE Std 1188 — Práticas de Carga de Baterias", url: "https://standards.ieee.org/ieee/1188/1076/", source: "IEEE Standards Association" },
+];
+
+const faqItems = [
+  {
+    question: "Por que os últimos 20% da carga levam tanto tempo?",
+    answer: "Isso se deve à fase CV (Tensão Constante). À medida que as células da bateria se aproximam da carga total, sua tensão de terminal coincide com a do carregador. Para evitar sobrecarregar as células, o carregador trava a tensão e permite que a corrente decaia exponencialmente, resultando em taxas de transferência de carga mais lentas.",
+  },
+  {
+    question: "Posso calcular o tempo de carga para Chumbo-Ácido?",
+    answer: "Baterias de chumbo-ácido podem ser estimadas, mas têm uma fase de absorção (CV) e flutuação muito mais longa comparada ao lítio. Sua eficiência também é menor (tipicamente 80–85%). Uma regra padrão é dobrar o fator de sobrecarga CV para perfis de chumbo-ácido.",
+  },
+  {
+    question: "Qual é a taxa C de carga recomendada para células LiFePO4?",
+    answer: "Células LiFePO4 padrão preferem uma taxa de 0,2C a 0,5C para vida prolongada. Por exemplo, uma bateria de 100 Ah é carregada idealmente a 20A a 50A. Carga mais rápida (1C) é suportada por muitas células de alta potência, mas pode aumentar as temperaturas internas das células.",
+  },
+  {
+    question: "Como as perdas do balanceador afetam o tempo de carga?",
+    answer: "Quando as tensões das células divergem, o sistema de gerenciamento de bateria (BMS) balanceia as células desviando corrente através de resistores shunt nas células de alta tensão. Se a divergência das células for alta, a carga será interrompida ou desacelerada significativamente no topo para permitir o balanceamento, adicionando sobrecarga imprevisível.",
+  },
+  {
+    question: "Quanto tempo leva para carregar uma bateria de 100Ah?",
+    answer: "A 0,2C (20A), uma bateria de 100Ah de 20% a 100% leva aproximadamente 5 horas. A 0,5C (50A), leva cerca de 2 horas. A 1C (100A), leva cerca de 1 hora, embora a fase CV adicione 20–30 minutos para atingir 100% SOC completo.",
+  },
+  {
+    question: "Posso acelerar a carga sem danificar a bateria?",
+    answer: "Aumentar a corrente de carga acelera a fase CC mas gera mais calor e pode acelerar a degradação. A maioria dos fabricantes recomenda 0,2C–0,5C para vida ótima. Carregar a 1C é aceitável para cargas rápidas ocasionais, mas não para uso diário.",
+  },
+  {
+    question: "A temperatura afeta o tempo de carga?",
+    answer: "Sim. Temperaturas baixas aumentam a resistência interna, fazendo o BMS reduzir a corrente de carga para evitar deposição de lítio. A 0°C, muitas unidades de BMS reduzem a taxa de carga para 0,1C ou menor. A carga ótima ocorre entre 10–35°C.",
+  },
+  {
+    question: "Qual é a diferença entre carga CC e CV?",
+    answer: "CC (Corrente Constante) fornece uma corrente fixa até que a bateria atinja seu limite de tensão (~80% SOC). CV (Tensão Constante) mantém a tensão constante enquanto a corrente decai exponencialmente à medida que a bateria se aproxima de 100% SOC. Ambas as fases são necessárias para uma carga segura e completa.",
+  },
+  {
+    question: "Devo carregar a 80% ou 100%?",
+    answer: "Carregar a 80% evita a lenta fase CV e reduz o estresse de envelhecimento calendário nas células. Para uso diário, 80% é recomendado para longevidade ótima da bateria. Carregue a 100% apenas quando a capacidade total for necessária para uma viagem ou apagão iminente.",
+  },
+  {
+    question: "Como a eficiência do carregador afeta o tempo de carga?",
+    answer: "A eficiência do carregador (tipicamente 90–95%) significa que 5–10% da energia de entrada é perdida como calor. Um carregador com 95% de eficiência deve fornecer 105Wh para armazenar 100Wh, estendendo o tempo de carga proporcionalmente. Esta calculadora considera a eficiência do carregador em seus cálculos.",
+  },
+  {
+    question: "Posso carregar baterias de lítio com um carregador de chumbo-ácido?",
+    answer: "Não recomendado. Carregadores de chumbo-ácido usam pontos de tensão diferentes e perfis de múltiplos estágios (em massa, absorção, flutuação) que podem sobrecarregar ou subcarregar células de lítio. Sempre use um carregador projetado para química de íon-lítio ou LiFePO4.",
+  },
+];
+
+const commonMistakes = [
+  "Ignorar a fase CV (Tensão Constante) — os últimos 20% da carga levam tempo desproporcionalmente maior devido ao decaimento exponencial da corrente. Um cálculo simples Ah/corrrente subestima o tempo total de carga em 20–40%.",
+  "Carregar acima da taxa C recomendada diariamente — embora a carga a 1C seja possível para muitas células de lítio, a carga rápida diária acelera a degradação em 20–40% comparada a 0,2C–0,5C.",
+  "Usar carregadores de chumbo-ácido para baterias de lítio — carregadores de chumbo-ácido usam pontos de tensão diferentes e perfis de múltiplos estágios que podem sobrecarregar ou subcarregar células de lítio, causando danos.",
+  "Ignorar a eficiência do carregador — um carregador com 90% de eficiência desperdiça 10% da energia de entrada como calor, estendendo o tempo de carga proporcionalmente. Sempre considere a eficiência do carregador nas estimativas de tempo.",
+  "Não considerar a sobrecarga do balancing do BMS — quando as tensões das células divergem, o BMS pode desacelerar ou interromper a carga para balancear as células, adicionando tempo imprevisível ao ciclo de carga.",
+  "Assumir corrente de carga constante durante todo o processo — a corrente de carga diminui à medida que a bateria se aproxima da carga completa, especialmente acima de 80% SOC. O perfil CC-CV não é linear.",
+  "Ignorar a redução por temperatura — temperaturas baixas fazem o BMS reduzir a corrente de carga para evitar deposição de lítio. A 0°C, as taxas de carga podem cair para 0,1C ou menor.",
+  "Carregar a 100% para uso diário — carregar a 80% evita a lenta fase CV e reduz o estresse de envelhecimento calendário. Reserve cargas a 100% para quando a capacidade total for genuinamente necessária.",
+  "Misturar químicas de carregador e bateria — carregadores NMC têm perfis de tensão diferentes de carregadores LFP. Usar o perfil de química errado pode causar sobrecarga ou subcarga.",
+  "Não considerar a variabilidade solar para sistemas carregados por solar — a corrente de carga solar varia com a irradiância. Um controlador de carga solar com taxa nominal de 0,2C pode fornecer apenas 0,05C em dias nublados.",
+];
+
+const relatedArticles = [
+  { href: "/learn/how-long-to-charge-a-battery/", title: "Quanto Tempo para Carregar uma Bateria" },
+  { href: "/learn/how-long-to-charge-a-100ah-battery/", title: "Quanto Tempo para Carregar uma Bateria de 100Ah" },
+  { href: "/learn/charger-sizing-guide/", title: "Guia de Dimensionamento de Carregador" },
+  { href: "/learn/lifepo4-charge-voltage-table/", title: "Tabela de Tensão de Carga LiFePO4" },
+];
+---
+
+<CalculatorLayout
+  title="Calculadora de Tempo de Carga de Bateria | Calculadoras de Bateria"
+  description="Estimar tempos de carga CC-CV para baterias de íon-lítio e LFP com base em capacidade, corrente do carregador e SOC alvo."
+  faqItems={faqItems}
+  commonMistakes={commonMistakes}
+  relatedArticles={relatedArticles}
+  relatedCalculators={[
+    { href: "/tools/c-rate-calculator/", title: "Calculadora de Taxa C", description: "Converta entre valores de corrente em Amperes e taxa C." },
+    { href: "/tools/soc-estimator/", title: "Estimador de SOC", description: "Consulte o Estado de Carga com base em linhas de OCV." },
+    { href: "/tools/battery-sizing-calculator/", title: "Ferramenta de Dimensionamento", description: "Determinar requisitos de dimensionamento por consumo diário." },
+    { href: "/tools/runtime-calculator/", title: "Calculadora de Autonomia", description: "Calcular autonomia a partir de perfis de potência de carga." },
+    { href: "/tools/battery-degradation-estimator/", title: "Estimador de Degradação", description: "Estimar queda de capacidade ao longo do tempo." },
+    { href: "/tools/solar-battery-sizing-calculator/", title: "Dimensionamento Solar", description: "Dimensionar bancos de baterias solares por consumo diário." },
+  ]}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+  lang="pt"
+>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Parâmetros</h3>
+      <div class="flex flex-col gap-6">
+        <InputField id="capacity" label="Capacidade da Bateria (Ah)" value={100} min={0.1} step="any" />
+        <InputField id="voltage" label="Tensão Nominal (V)" value={12.8} min={1} step="any" />
+        <InputField id="charge-current" label="Corrente de Saída do Carregador (Amperes)" value={20} min={0.1} step="any" helperText="Taxas comuns de carregador: 5A, 10A, 20A, 50A" />
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <InputField id="start-soc" label="SOC Inicial (%)" value={20} min={0} max={100} />
+          <InputField id="target-soc" label="SOC Alvo (%)" value={100} min={0} max={100} />
+        </div>
+        <InputField id="efficiency" label="Eficiência do Carregador (%)" value={95} min={50} max={100} helperText="Perdas de conversão de potência térmica na circuitaria do carregador (90-95% típico)" />
+      </div>
+    </CalculatorCard>
+
+    <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Saídas Estimadas</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <ResultBox label="Tempo Total de Carga" value="5h 01m" suffix="5,01 horas" variant="primary" id="result-time" />
+          <ResultBox label="Energia Adicionada" value="1.024 Wh" suffix="1,02 kWh" id="result-energy-box" />
+          <ResultBox label="Taxa C de Carga" value="0,20 C" suffix="Carga de velocidade lenta" id="result-c-rate-box" />
+        </div>
+        <MiniSimulationChart title="Perfil de Carga SOC" description="Evolução do estado de carga durante carga CC-CV" xLabel="Tempo (horas)" yLabel="SOC (%)" chartId="chart-charging" />
+      </div>
+      <div class="border-t border-hairline pt-6">
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">Nota sobre a Fase de Saturação CV</h4>
+        <p class="text-body-sm text-muted">
+          Baterias Li-ion e LiFePO4 são carregadas em dois estágios: Corrente Constante (CC) até ~80% SOC, depois Tensão Constante (CV) até 100%. No modo CV, a bateria restringe a entrada de corrente, adicionando um modelo de sobrecarga.
+        </p>
+      </div>
+    </CalculatorCard>
+  </div>
+
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">Fórmulas e Exemplos Práticos</h2>
+    <FormulaBox title="Fórmulas Matemáticas">
+      <p>O tempo de carga T_total considera a eficiência de carga de corrente constante e o desvio de saturação CV:</p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Ah Necessários (Ah) = Capacidade (Ah) x (SOC Alvo% - SOC Inicial%) / 100</div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Tempo Estágio CC (Horas) = Ah Necessários / (Corrente do Carregador (A) x (Eficiência% / 100))</div>
+      <p>Se o SOC alvo for 80% ou acima, adicionamos uma sobrecarga empírica do estágio CV representando o decaimento exponencial da corrente:</p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Sobrecarga Estágio CV = (SOC Alvo% - máx(80, SOC Inicial%)) x 0,04 Horas/%</div>
+    </FormulaBox>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample number={1} title="Carregando LFP 100Ah a 0,5C (50A) — Fases CC/CV"
+        scenario="Uma bateria LiFePO4 de 12,8V a 20% SOC é carregada com um carregador de 50A (0,5C) até 100% SOC a 95% de eficiência."
+        inputs={[{ label: "Capacidade", value: "100 Ah" }, { label: "Tensão", value: "12,8 V" }, { label: "Corrente do Carregador", value: "50 A (0,5C)" }, { label: "SOC Inicial → SOC Alvo", value: "20% → 100%" }, { label: "Eficiência", value: "95%" }]}
+        steps={[{ label: "Passo 1: Ah necessários", formula: "Ah = 100 × (100 − 20) / 100", result: "80 Ah" }, { label: "Passo 2: Tempo fase CC", formula: "T_CC = 80 / (50 × 0,95)", result: "1,68 horas (~1h 41m)" }, { label: "Passo 3: Sobrecarga fase CV", formula: "T_CV = (100 − 80) × 0,04", result: "0,80 horas (~48m)" }, { label: "Passo 4: Tempo total", formula: "T_total = 1,68 + 0,80", result: "2,48 horas" }]}
+        answer="~ 2 horas 29 minutos" interpretation="A 0,5C, a fase CC fornece energia em massa em menos de 2 horas. A fase CV adiciona cerca de 48 minutos para atingir 100% SOC completo." variant="default" />
+      <WorkedExample number={2} title="Carregando Chumbo-Ácido 200Ah a 0,1C (20A)"
+        scenario="Uma bateria de chumbo-ácido de 12V a 30% SOC é carregada com um carregador de 20A (0,1C) até 100% SOC."
+        inputs={[{ label: "Capacidade", value: "200 Ah" }, { label: "Tensão", value: "12 V" }, { label: "Corrente do Carregador", value: "20 A (0,1C)" }, { label: "SOC Inicial → SOC Alvo", value: "30% → 100%" }, { label: "Eficiência de Carga", value: "85%" }]}
+        steps={[{ label: "Passo 1: Ah necessários", formula: "Ah = 200 × (100 − 30) / 100", result: "140 Ah" }, { label: "Passo 2: Fase em massa", formula: "T_massa = 140 / (20 × 0,85)", result: "8,24 horas" }, { label: "Passo 3: Absorção", formula: "T_abs ≈ 3–5 horas", result: "~4 horas" }, { label: "Passo 4: Flutuação", formula: "T_flut ≈ 1–3 horas", result: "~2 horas" }, { label: "Passo 5: Total", formula: "T_total = 8,24 + 4 + 2", result: "14,24 horas" }]}
+        answer="~ 14 horas 15 minutos" interpretation="As fases de absorção e flutuação do chumbo-ácido quase dobram o tempo total de carga." variant="marine" />
+      <WorkedExample number={3} title="Carga Rápida NMC 100Ah a 1C (100A)"
+        scenario="Uma bateria NMC de 36V a 10% SOC é carregada rapidamente até 90% SOC a 1C (100A)."
+        inputs={[{ label: "Capacidade", value: "100 Ah" }, { label: "Tensão", value: "36 V" }, { label: "Corrente do Carregador", value: "100 A (1C)" }, { label: "SOC Inicial → SOC Alvo", value: "10% → 90%" }, { label: "Eficiência", value: "93%" }]}
+        steps={[{ label: "Passo 1: Ah necessários", formula: "Ah = 100 × (90 − 10) / 100", result: "80 Ah" }, { label: "Passo 2: Fase CC", formula: "T_CC = 70 / (100 × 0,93)", result: "0,75 horas (45 min)" }, { label: "Passo 3: Fase CV", formula: "T_CV = (90 − 80) × 0,04", result: "0,40 horas (24 min)" }, { label: "Passo 4: Total", formula: "T_total = 0,75 + 0,40", result: "1,15 horas" }]}
+        answer="~ 1 hora 9 minutos" interpretation="A carga rápida a 1C é concluída em pouco mais de 1 hora, mas o uso diário acelera a queda de capacidade em 20–40%." variant="industrial" />
+    </div>
+  </section>
+
+  <EngineeringDiagram title="Processo de Carga CC-CV" description="Fase de Corrente Constante seguida por fase de Tensão Constante na carga de baterias de lítio" variant="flow" steps={[{ label: "Fonte de Carga", icon: "charge" }, { label: "Fase CC", icon: "battery" }, { label: "Fase CV", icon: "battery" }, { label: "Carga Completa", icon: "chart" }]} />
+
+  <ComparisonTable title="Tempo de Carga por Química e Taxa C" headers={["Química", "0,1C", "0,25C", "0,5C", "1C", "Máx. Recomendado"]} rows={[["LiFePO4", "~11 horas", "~4,5 horas", "~2,5 horas", "~1,5 horas", "1C"], ["NMC", "~11 horas", "~4,5 horas", "~2,5 horas", "~1,2 horas", "0,7C"], ["Chumbo-Ácido (Absorção)", "~14 horas", "~7 horas", "~4 horas", "Não recomendado", "0,1C"], ["Chumbo-Ácido (Flutuação)", "Massa + 3h", "Massa + 3h", "N/A", "N/A", "0,1C"]]} caption="Tempos de carga aproximados incluindo fases CC e CV" />
+
+  <FAQSection items={faqItems} />
+
+  <script>
+    import { calculateChargingTime } from '../../../../utils/calculators';
+    import { renderLineChart, clearChart } from '../../../../utils/charting';
+
+    const capacityInput = document.getElementById('capacity') as HTMLInputElement;
+    const voltageInput = document.getElementById('voltage') as HTMLInputElement;
+    const chargeCurrentInput = document.getElementById('charge-current') as HTMLInputElement;
+    const startSocInput = document.getElementById('start-soc') as HTMLInputElement;
+    const targetSocInput = document.getElementById('target-soc') as HTMLInputElement;
+    const efficiencyInput = document.getElementById('efficiency') as HTMLInputElement;
+
+    const resultTimeCard = document.getElementById('result-time');
+    const resultTime = resultTimeCard?.querySelector('.text-display-md') as HTMLElement;
+    const resultHoursDecimal = resultTimeCard?.querySelector('.text-caption') as HTMLElement;
+
+    const resultEnergy = document.getElementById('result-energy-box')?.querySelector('.text-title-lg') as HTMLElement;
+    const resultKwh = document.getElementById('result-energy-box')?.querySelector('.text-caption') as HTMLElement;
+    const resultCRate = document.getElementById('result-c-rate-box')?.querySelector('.text-title-lg') as HTMLElement;
+    const resultCRateDesc = document.getElementById('result-c-rate-box')?.querySelector('.text-caption') as HTMLElement;
+
+    const chartSvg = document.getElementById('chart-charging') as unknown as SVGElement;
+
+    function updateCalculations() {
+      const cap = parseFloat(capacityInput.value) || 100;
+      const voltage = parseFloat(voltageInput.value) || 12.8;
+      const current = parseFloat(chargeCurrentInput.value) || 20;
+      const startSoc = parseFloat(startSocInput.value) || 0;
+      const targetSoc = parseFloat(targetSocInput.value) || 100;
+      const eff = parseFloat(efficiencyInput.value) || 95;
+
+      const results = calculateChargingTime(cap, voltage, startSoc, targetSoc, current, eff);
+
+      if (results.chargeTimeHours <= 0) {
+        if (resultTime) resultTime.textContent = '0h 00m';
+        if (resultHoursDecimal) resultHoursDecimal.textContent = '0,00 horas';
+      } else {
+        const totalMinutes = Math.round(results.chargeTimeHours * 60);
+        const hours = Math.floor(totalMinutes / 60);
+        const mins = totalMinutes % 60;
+        if (resultTime) resultTime.textContent = `${hours}h ${mins < 10 ? '0' : ''}${mins}m`;
+        if (resultHoursDecimal) resultHoursDecimal.textContent = `${results.chargeTimeHours.toFixed(2)} horas`;
+      }
+
+      if (resultEnergy) resultEnergy.textContent = `${Math.round(results.energyAddedWh).toLocaleString()} Wh`;
+      if (resultKwh) resultKwh.textContent = `${(results.energyAddedWh / 1000).toFixed(3)} kWh`;
+
+      const cRate = cap > 0 ? current / cap : 0;
+      if (resultCRate) resultCRate.textContent = `${cRate.toFixed(2)} C`;
+
+      let desc = 'Carga de velocidade lenta';
+      if (cRate >= 1.0) desc = 'Ultra alta velocidade (risco de estresse térmico)';
+      else if (cRate >= 0.5) desc = 'Taxa de carga rápida padrão';
+      else if (cRate >= 0.1) desc = 'Taxa de carga lenta ideal';
+      else desc = 'Carga de flutuação/manutenção';
+      if (resultCRateDesc) resultCRateDesc.textContent = desc;
+
+      if (chartSvg && results.chargeTimeHours > 0 && cap > 0 && current > 0 && targetSoc > startSoc) {
+        const totalT = results.chargeTimeHours;
+        const ccEndSoc = Math.min(80, targetSoc);
+        const effectiveI = current * eff / 100;
+        const ccAh = cap * Math.max(0, ccEndSoc - startSoc) / 100;
+        const ccTime = effectiveI > 0 ? ccAh / effectiveI : 0;
+        const cvTime = Math.max(0, totalT - ccTime);
+        const pts: { x: number; y: number }[] = [];
+        for (let i = 0; i < 20; i++) {
+          const t = totalT * (i / 19);
+          let soc: number;
+          if (ccTime > 0 && t <= ccTime) soc = startSoc + (ccEndSoc - startSoc) * (t / ccTime);
+          else if (cvTime > 0) { const cvProg = (t - ccTime) / cvTime; soc = ccEndSoc + (targetSoc - ccEndSoc) * (1 - Math.exp(-3 * cvProg)); }
+          else soc = targetSoc;
+          pts.push({ x: t, y: Math.max(0, Math.min(100, soc)) });
+        }
+        renderLineChart(chartSvg, pts, { width: 320, height: 160, xLabel: 'Tempo (horas)', yLabel: 'SOC (%)', xMin: 0, xMax: Math.ceil(totalT), yMin: Math.max(0, startSoc - 5), yMax: Math.min(100, targetSoc + 5) });
+      } else if (chartSvg) clearChart(chartSvg);
+    }
+
+    [capacityInput, voltageInput, chargeCurrentInput, startSocInput, targetSocInput, efficiencyInput].forEach(el => { el.addEventListener('input', updateCalculations); });
+    updateCalculations();
+  </script>
+</CalculatorLayout>

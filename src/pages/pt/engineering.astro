@@ -1,0 +1,182 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import CategoryToolGrid from '../../components/CategoryToolGrid.astro';
+import FAQSection from '../../components/FAQSection.astro';
+
+const tools = [
+  {
+    name: "Gerador de Passaporte de Bateria",
+    href: "/pt/battery-passport-generator/",
+    description: "Crie um relatório estruturado de ciclo de vida e prontidão de conformidade de bateria contendo dados de identidade, SOH e pegada de carbono.",
+    available: true,
+  },
+  {
+    name: "Calculadora de C-Rate",
+    href: "/pt/tools/c-rate-calculator/",
+    description: "Calcule corrente de carga/descarga, velocidade de C-rate e tempos de carga com base na capacidade.",
+    available: true,
+  },
+  {
+    name: "Estimador de SOC",
+    href: "/pt/tools/soc-estimator/",
+    description: "Interpole Estado de Carga a partir de curvas de Tensão de Circuito Aberto (OCV) ou simule Contagem de Coulomb.",
+    available: true,
+  },
+  {
+    name: "Estimador de Degradação",
+    href: "/pt/tools/battery-degradation-estimator/",
+    description: "Estime degradação de vida útil de calendário e ciclo (SOH) para químicas LFP, NMC, LTO e Chumbo-Ácido.",
+    available: true,
+  },
+  {
+    name: "Calculadora de Queda de Tensão DC",
+    href: "/pt/tools/voltage-drop-calculator/",
+    description: "Calcule porcentagens de queda de tensão em condutores DC com base em calibre, distância de percurso e corrente de carga.",
+    available: true,
+  },
+  {
+    name: "Calculadora de Perda em Cabo DC",
+    href: "/pt/tools/dc-cable-loss-calculator/",
+    description: "Determine perdas resistivas de potência (I²R) e dissipação térmica em linhas de transmissão DC.",
+    available: true,
+  },
+  {
+    name: "Calculadora de Autonomia de Bateria",
+    href: "/pt/tools/runtime-calculator/",
+    description: "Estime autonomia de descarga da bateria com base na capacidade nominal, potência da carga, eficiência e limites de DoD.",
+    available: true,
+  },
+];
+
+const learnArticles = [
+  { title: "O Que É C-Rate de Bateria?", href: "/pt/learn/what-is-battery-c-rate/" },
+  { title: "Entendendo Estado de Carga (SOC)", href: "/pt/learn/understanding-state-of-charge/" },
+  { title: "Degradação de Bateria Explicada", href: "/pt/learn/battery-degradation-explained/" },
+  { title: "Queda de Tensão Explicada", href: "/pt/learn/voltage-drop-explained/" },
+  { title: "Como Calcular a Autonomia da Bateria", href: "/pt/learn/how-to-calculate-battery-runtime/" },
+  { title: "Como Dimensionar um Banco de Baterias", href: "/pt/learn/how-to-size-a-battery-bank/" },
+  { title: "Fórmula de Autonomia de Bateria", href: "/pt/learn/battery-runtime-formula/" },
+  { title: "Autonomia 12V vs 24V vs 48V", href: "/pt/learn/12v-vs-24v-vs-48v-runtime/" },
+  { title: "Gráfico de Tensão LiFePO4", href: "/pt/learn/lifepo4-voltage-chart/" },
+  { title: "Referência de C-Rate de Bateria", href: "/pt/learn/battery-c-rate-reference/" },
+  { title: "Gráfico de Correção de Temperatura", href: "/pt/learn/battery-temperature-correction-chart/" },
+];
+
+const faqItems = [
+  {
+    question: "O que é C-rate e por que importa?",
+    answer: "C-rate expressa a corrente de carga ou descarga relativa à capacidade da bateria. Uma taxa de 1C em uma bateria de 100Ah significa corrente de 100A. Taxas C mais altas geram mais calor, aumentam a queda de tensão e reduzem a capacidade utilizável. Entender C-rate é essencial para selecionar a bateria certa para sua aplicação e garantir operação segura dentro dos limites do fabricante.",
+  },
+  {
+    question: "Como a temperatura afeta o desempenho da bateria?",
+    answer: "A temperatura tem um impacto significativo no desempenho. Temperaturas frias aumentam a resistência interna, reduzindo a capacidade disponível e tensão de saída. A 0°C, baterias de lítio podem perder 10% da capacidade. A -20°C, as perdas podem alcançar 30%. Temperaturas altas aceleram o envelhecimento do calendário e podem acionar sistemas de gerenciamento térmico. A maioria dos cálculos assume 25°C como ambiente padrão.",
+  },
+  {
+    question: "Qual a diferença entre SOC e DoD?",
+    answer: "Estado de Carga (SOC) representa a porcentagem de capacidade restante na bateria (100% = totalmente carregada, 0% = vazia). Profundidade de Descarga (DoD) representa a porcentagem de capacidade que foi usada (0% = totalmente carregada, 100% = vazia). Eles são complementares: SOC + DoD = 100%. A maioria das especificações de bateria referencia limites de DoD para vida útil dos ciclos.",
+  },
+  {
+    question: "Como calculo a queda de tensão na fiação DC?",
+    answer: "A queda de tensão é calculada usando V_drop = I × R × 2L, onde I é a corrente, R é a resistência por unidade de comprimento e 2L representa a distância round-trip (condutores positivo e negativo). Use nossa Calculadora de Queda de Tensão DC para determinar se sua fiação atende à queda máxima aceitável de 3% para alimentadores e 1% para circuitos ramais.",
+  },
+  {
+    question: "Por que baterias degradam ao longo do tempo?",
+    answer: "Baterias degradam através de dois mecanismos primários: envelhecimento do calendário (degradação química mesmo quando não em uso) e envelhecimento de ciclo (degradação de ciclos carga-descarga). O envelhecimento do calendário é impulsionado pela temperatura e estado de carga. O envelhecimento de ciclo é impulsionado pela profundidade de descarga, C-rate e temperatura. Ambos os mecanismos aumentam a resistência interna e reduzem a capacidade ao longo do tempo.",
+  },
+];
+
+const relatedCategories = [
+  { href: "/pt/solar/", title: "Solar", description: "Dimensionamento de bateria solar e planejamento off-grid" },
+  { href: "/pt/ev/", title: "VE e Packs de Baterias", description: "Design de packs e configuração de células" },
+  { href: "/pt/bess/", title: "BESS e Comercial", description: "Análise de ROI de armazenamento de energia comercial" },
+];
+
+const breadcrumbItems = [
+  { label: "Ferramentas de Engenharia" },
+];
+---
+
+<Layout
+  title="Calculadoras de Engenharia de Bateria | Calculadoras de Bateria"
+  description="Calculadoras profissionais de engenharia de bateria para análise de C-rate, estimativa de SOC, degradação SOH, queda de tensão e cálculos de perda em cabos."
+  schema="website"
+  schemaName="Calculadoras de Engenharia de Bateria"
+  schemaDescription="Ferramentas profissionais de engenharia elétrica para projeto, análise e diagnóstico de sistemas de bateria."
+  breadcrumbs={[{ label: 'Ferramentas de Engenharia' }]}
+  lang="pt"
+>
+  <Breadcrumb items={breadcrumbItems} />
+
+  <section class="mb-12 md:mb-16 border-b border-hairline pb-12">
+    <div class="max-w-4xl">
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">FERRAMENTAS DE ENGENHARIA</span>
+      <h1 class="text-display-md text-primary mb-6">Calculadoras de Engenharia de Bateria</h1>
+      <p class="text-body-md text-body max-w-2xl font-light">
+        Calculadoras profissionais de engenharia de bateria para projeto de sistema, análise e diagnóstico. Fórmulas transparentes baseadas em princípios padrão de engenharia elétrica.
+      </p>
+    </div>
+  </section>
+
+  <section class="mb-16">
+    <div class="max-w-4xl text-body-md text-body font-light flex flex-col gap-6">
+      <p>
+        A engenharia de bateria vai muito além de cálculos simples de capacidade. O projeto profissional de sistemas de bateria requer compreensão do comportamento eletroquímico, gerenciamento térmico, perdas de distribuição elétrica e padrões de degradação de longo prazo. As calculadoras de engenharia desta página abordam a análise técnica que sustenta o projeto confiável de sistemas de bateria.
+      </p>
+      <p>
+        A análise de C-rate é fundamental para toda aplicação de bateria. O C-rate determina quão rapidamente uma bateria pode carregar ou descarregar relativa à sua capacidade. Uma bateria classificada em 1C pode teoricamente carregar ou descarregar sua capacidade total em uma hora. Taxas C mais altas fornecem mais potência, mas geram mais calor, aumentam perdas internas e aceleram a degradação.
+      </p>
+      <p>
+        A estimativa de Estado de Carga (SOC) é crítica para o gerenciamento de bateria. Dados precisos de SOC previnem eventos de descarga profunda que danificam células e garantem reserva suficiente para sua aplicação pretendida. Nosso estimador de SOC suporta interpolação de Tensão de Circuito Aberto (OCV) e simulação de Contagem de Coulomb, fornecendo dois métodos independentes para verificar níveis de carga da bateria.
+      </p>
+      <p>
+        Perdas de distribuição DC são frequentemente negligenciadas no projeto de sistemas de bateria. A resistência do cabo causa queda de tensão e perda de potência que reduz a eficiência do sistema. Para um sistema transportando 100A em 10 metros usando cabo 2 AWG, a queda de tensão é aproximadamente 0,46V em um sistema de 48V (quase 1%), e a perda de potência é 46W contínuo.
+      </p>
+      <p>
+        A análise de degradação de bateria permite projeções precisas de custo de vida útil. Entender como a capacidade diminui ao longo do tempo e ciclos permite dimensionar sistemas de bateria com margem apropriada, planejar cronogramas de substituição e calcular o custo nivelado verdadeiro de armazenamento.
+      </p>
+    </div>
+  </section>
+
+  <section class="mb-16">
+    <h2 class="text-title-lg text-primary mb-6">Todas as Calculadoras de Engenharia</h2>
+    <CategoryToolGrid tools={tools} />
+  </section>
+
+  {learnArticles.length > 0 && (
+    <section class="mb-16 border-t border-hairline pt-12">
+      <h2 class="text-title-lg text-primary mb-6">Guias de Engenharia</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {learnArticles.map((article) => (
+          <a href={article.href} class="bg-surface-card border border-hairline p-4 hover:border-primary transition-colors">
+            <span class="text-label-uppercase text-muted text-[10px] block mb-2">CENTRO DE APRENDIZAGEM</span>
+            <h3 class="text-title-sm text-primary">{article.title}</h3>
+          </a>
+        ))}
+      </div>
+    </section>
+  )}
+
+  <FAQSection items={faqItems} />
+
+  {relatedCategories.length > 0 && (
+    <section class="mb-16 border-t border-hairline pt-12">
+      <h2 class="text-title-lg text-primary mb-6">Categorias Relacionadas</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {relatedCategories.map((cat) => (
+          <a href={cat.href} class="bg-surface-card border border-hairline p-6 hover:border-primary transition-colors block">
+            <h3 class="text-title-md text-primary mb-2">{cat.title}</h3>
+            <p class="text-body-sm text-muted">{cat.description}</p>
+          </a>
+        ))}
+      </div>
+    </section>
+  )}
+
+  <section class="bg-surface-soft border border-hairline p-6 text-caption text-muted mb-8">
+    <span class="text-primary font-bold text-[10px] tracking-wider uppercase border border-hairline px-1.5 py-0.5 mr-2 inline-block mb-3">
+      Aviso de Engenharia
+    </span>
+    Todos os cálculos usam fórmulas padrão de engenharia e são fornecidos para referência educacional. Os resultados devem ser verificados por engenheiros qualificados para sistemas de bateria de produção.
+  </section>
+</Layout>

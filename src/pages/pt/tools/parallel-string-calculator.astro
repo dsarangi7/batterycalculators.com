@@ -1,0 +1,396 @@
+---
+import CalculatorLayout from '../../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import InputField from '../../../components/InputField.astro';
+import ResultBox from '../../../components/ResultBox.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import WorkedExample from '../../../components/WorkedExample.astro';
+import ComparisonTable from '../../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../../components/EngineeringDiagram.astro';
+
+const whatIs = `Uma calculadora de string paralela determina a configuração ideal de série (S) e paralelo (P) de células individuais ou módulos de bateria para atingir uma tensão e capacidade alvo do pacote. No projeto de pacotes de baterias, células em série multiplicam a tensão enquanto células em paralelo multiplicam a capacidade — esta ferramenta calcula a exata disposição SxP necessária. Seja construindo um pacote de bateria de lítio personalizado para um EV, armazenamento solar ou aplicação marinha, a configuração correta da string é crítica para compatibilidade BMS, distribuição equilibrada de corrente e atendimento aos limiares de tensão do seu controlador de carga e inversor.`;
+
+const whyItMatters = [
+  "Uma contagem de série incorreta produz uma tensão do pacote que fica fora da janela de operação do seu controlador de carga ou inversor — impedindo o carregamento adequado ou acionando códigos de falha.",
+  "Muitas strings paralelas aumentam o risco de corrente cruzada — resistência interna desigual entre strings causa compartilhamento desigual de corrente, aquecimento localizado e potencial dano às células.",
+  "Misturar células com diferentes capacidades ou idades no mesmo pacote limita a capacidade utilizável à célula mais fraca, desperdiçando o investimento em células mais fortes.",
+  "Exceder o número máximo de células do BMS (ex: 16S para a maioria das unidades BMS LFP) requer hardware de balanceamento multi-camada caro que pode não estar disponível para sua aplicação.",
+  "Subestimar o número total de células leva a erros de pedido — a correspondência precisa de células requer que todas sejam do mesmo lote de produção para impedância consistente."
+];
+
+const practicalApplications = [
+  { title: "Pacotes de Bateria EV Personalizados", description: "Configure disposições série-paralelo para conversões de veículos elétricos que requerem sistemas de bateria 48V–400V com alvos específicos de densidade de energia." },
+  { title: "Bancos de Bateria Solar Off-Grid", description: "Projetar bancos LFP 48V usando células 3.2V padrão para corresponder às janelas de tensão de entrada do controlador de carga solar e requisitos DC do inversor." },
+  { title: "Sistemas de Bateria Telecom e UPS", description: "Calcule configurações de bateria telecom 48V usando células LFP 3.2V ou chumbo-ácido 2V para atender especificações precisas de tensão flutuante." },
+  { title: "Powerwall e Armazenamento Doméstico DIY", description: "Planeje disposições paralelo-série para projetos de bateria doméstica usando células 18650/21700 recuperadas ou novas para atingir capacidade kWh alvo." }
+];
+
+const expertNotes: { title: string; variant: 'engineering' | 'tip'; content: string }[] = [
+  {
+    title: "Topologia Série-Primeiro vs Paralelo-Primeiro",
+    variant: "engineering",
+    content: "Paralelo-primeiro (grupos P conectados em série, ex: 4P16S) é o padrão da indústria porque células em paralelo se auto-balanceiam à mesma tensão, reduzindo o número de canais do BMS. Série-primeiro (strings S em paralelo) requer que cada string seja individualmente monitorada e correspondida — só praticável para pacotes pequenos de 4S ou menos. Para pacotes acima de 100 células, a topologia paralelo-primeiro simplifica significativamente a arquitetura do BMS e melhora a confiabilidade."
+  },
+  {
+    title: "Contagem de Canais BMS e Correspondência de Células",
+    variant: "tip",
+    content: "Um pacote LFP 16S requer um BMS com 16 canais de monitoramento de células. Adicionar strings paralelas NÃO aumenta a contagem de canais — um pacote 16S4P ainda usa um BMS de 16 canais. No entanto, cada grupo paralelo deve ser construído com células de capacidade correspondida (dentro de 2%), resistência interna (dentro de 5%) e da mesma data de produção para garantir distribuição equilibrada de corrente."
+  }
+];
+
+const trustSection = {
+  text: "Esta calculadora usa funções de arredondamento para cima para contagens inteiras de células e calcula a tensão/capacidade real a partir da configuração resultante. As fórmulas seguem a metodologia padrão de projeto de pacotes de baterias utilizada em datasheets de BMS e notas de aplicação de fabricantes de células. Todos os cálculos são transparentes e verificáveis.",
+  link: { label: "Veja nossa metodologia e derivações de fórmulas", href: "/methodology/" }
+};
+
+const references = [
+  { title: "Samsung SDI — Diretrizes de Projeto de Pacotes de Bateria", url: "https://www.samsungsdi.com/battery-library/detail.html?id=52986", source: "Documentos Técnicos Samsung SDI" },
+  { title: "EVE Energy — Configuração Série-Paralelo de Células LFP", url: "https://www.evebatteries.com/technical-documents", source: "Biblioteca Técnica EVE Energy" },
+  { title: "Texas Instruments — Balanceamento de Células em Strings Série", url: "https://www.ti.com/lit/an/slua749a/slua749a.pdf", source: "Relatório de Aplicação Texas Instruments" },
+  { title: "JBD (Junsi Power) — Fiação BMS e Configuração de String", url: "https://www.jbdms.com/technical-documents", source: "Documentação Técnica JBD BMS" }
+];
+
+const faqItems = [
+  {
+    question: "As células devem ser configuradas paralelo-primeiro ou série-primeiro?",
+    answer: "Configurações paralelo-primeiro (ex: blocos 1S4P conectados em série, escrito como 4P16S) são o padrão da indústria para grandes pacotes. Esta configuração reduz o número de canais de monitoramento de tensão necessários pelo BMS, já que grupos paralelos se balanceiam automaticamente ao mesmo nível de tensão.",
+  },
+  {
+    question: "Por que alguns projetos de bateria de lítio 48V usam configurações 15S ou 16S?",
+    answer: "Um pacote LFP 15S tem tensão nominal de 48,0V (pico de carregamento 54,75V). Um pacote 16S tem tensão nominal de 51,2V (pico de carregamento 58,4V). Muitos sistemas telecom são classificados exatamente para 48V, então 15S é comum. Inversores solares off-grid tipicamente preferem configuração 16S porque maximiza o desempenho sob limites de inversores 48V.",
+  },
+  {
+    question: "O que é corrente cruzada em strings paralelas de bateria?",
+    answer: "Quando strings paralelas com diferentes resistências internas ou temperaturas são carregadas/descarregadas, a corrente não se divide igualmente. A string com menor resistência recebe uma parcela maior de corrente. Em estados de dessincronização extremos, isso causa sobrecarga térmica localizada. Fusíveis inline para cada string paralela são recomendados.",
+  },
+  {
+    question: "Posso misturar células com diferentes capacidades em série?",
+    answer: "<span class=\"text-primary font-bold\">Nunca misture capacidades em série.</span> A capacidade utilizável total da string série é limitada pela célula mais fraca. A célula com menor capacidade se esgotará primeiro, atingindo limites de baixa tensão enquanto outras células ainda estão cheias, causando o desligamento do pacote inteiro pelo BMS.",
+  },
+  {
+    question: "O que é a notação SxP e como a leio?",
+    answer: "A notação SxP descreve a topologia de um pacote de baterias. 'S' (série) é o número de células conectadas de ponta a ponta para multiplicar a tensão. 'P' (paralelo) é o número de células agrupadas em paralelo para multiplicar a capacidade. Um pacote 16S4P tem 16 células em série, com 4 strings paralelas — totalizando 64 células. Exemplo: 16 × 3,2V = 51,2V, 4 × 100Ah = 400Ah.",
+  },
+  {
+    question: "Quantas strings paralelas é demais?",
+    answer: "A maioria dos fabricantes de BMS recomenda máximo de 4–6 strings paralelas. Acima disso, a corrente cruzada entre strings se torna significativa, e o benefício prático diminui — adicionar uma 7ª ou 8ª string paralela produz ganho marginal de capacidade enquanto aumenta complexidade e pontos de falha.",
+  },
+  {
+    question: "Preciso de fusíveis em cada string paralela?",
+    answer: "<span class=\"text-primary font-bold\">Sim — esta é uma exigência de segurança.</span> Cada string paralela deve ter um fusível inline classificado em 1,5–2× a corrente máxima esperada da string. Se uma string desenvolver um curto-circuito, o fusível impede que outras strings paralelas forneçam corrente de falha para o ponto de falha, o que pode causar fuga térmica.",
+  },
+  {
+    question: "O que acontece se minha contagem de série não corresponder ao BMS?",
+    answer: "A maioria das unidades BMS suporta uma contagem de série fixa (ex: 16S para LFP, 14S para NMC). Se sua tensão alvo requer uma contagem de série não-padrão, você pode precisar de um modelo BMS diferente ou uma química de célula diferente. Por exemplo, 48V telecom tipicamente usa 15S LFP ou 14S NMC — verifique a compatibilidade BMS antes de comprar células.",
+  },
+  {
+    question: "Posso adicionar strings paralelas a um pacote existente depois?",
+    answer: "Somente se a nova string usar células do mesmo lote de produção com capacidade e impedância correspondidas. Strings dessincronizadas criam compartilhamento desigual de corrente. A nova string também deve ser pré-carregada para corresponder ao estado de carga do pacote existente antes da conexão paralela para evitar grandes correntes de equalização.",
+  },
+  {
+    question: "Como a temperatura afeta o balanceamento de strings paralelas?",
+    answer: "Diferenças de temperatura entre strings paralelas causam desequilíbrio de corrente — uma string mais quente tem menor resistência interna e puxa mais corrente durante o carregamento. Mantenha temperatura uniforme em todas as strings montando-as na mesma caixa com fluxo de ar adequado. Evite colocar strings próximas a fontes de calor.",
+  },
+  {
+    question: "Qual é o número mínimo prático de células?",
+    answer: "Para a maioria das aplicações, 4S (12V LFP) ou 7S (24V NMC) é o tamanho mínimo prático do pacote. Abaixo disso, variações individuais de tensão das células têm impacto desproporcional no desempenho do pacote. Para sistemas 48V, 15S ou 16S é o mínimo padrão.",
+  },
+  {
+    question: "Como calculo a energia total a partir da configuração SxP?",
+    answer: "Energia Total (Wh) = S × Tensão da Célula × P × Capacidade da Célula. Exemplo: 16S4P com células 3,2V 100Ah = 16 × 3,2 × 4 × 100 = 20.480 Wh (20,48 kWh). Isso representa o máximo teórico — a energia utilizável real depende dos limites de DoD e limiares de corte do BMS.",
+  },
+];
+
+const commonMistakes = [
+  "Misturar células com diferentes capacidades ou idades no mesmo pacote — a célula mais fraca limita a capacidade utilizável de toda a string e acelera a degradação de todas as células.",
+  "Exceder o número máximo de séries do BMS — um BMS LFP 16S não pode proteger um pacote 17S ou 18S. Verifique a compatibilidade BMS antes de comprar células.",
+  "Ignorar corrente cruzada em strings paralelas — strings com diferentes resistências internas compartilham corrente desigualmente, causando aquecimento localizado e potencial fuga térmica.",
+  "Não colocar fusíveis em strings paralelas individuais — cada string paralela deve ter um fusível inline para impedir que corrente de falha de outras strings alimente um curto-circuito.",
+  "Usar topologia série-primeiro para grandes pacotes — paralelo-primeiro (grupos P em série) é o padrão da indústria porque células em paralelo se auto-balanceiam, reduzindo a complexidade do BMS.",
+  "Pré-carregar novas strings com SOC errado — conectar uma nova string paralela a um pacote existente sem corresponder o SOC causa grandes correntes de equalização que podem danificar as células.",
+  "Assumir que strings paralelas adicionam tensão — conexões paralelas aumentam a capacidade (Ah), não a tensão. Apenas conexões em série aumentam a tensão.",
+  "Ignorar dimensionamento de barramento de cobre para pacotes de alta corrente — barramentos subdimensionados entre strings paralelas criam pontos quentes e queda de tensão, reduzindo a eficiência do pacote.",
+  "Misturar fabricantes de células no mesmo pacote — células de diferentes fabricantes têm características diferentes de resistência interna, causando compartilhamento desigual de corrente.",
+  "Não considerar limites de corrente de balanceamento do BMS — se o desequilíbrio de células exceder a capacidade de balanceamento do BMS, o carregamento pode parar ou as células podem ser sobrecarregadas.",
+];
+
+const relatedCalculators = [
+  { href: "/tools/battery-sizing-calculator/", title: "Ferramenta de Dimensionamento", description: "Determine o dimensionamento de capacidade de armazenamento de energia diário." },
+  { href: "/tools/runtime-calculator/", title: "Calculadora de Autonomia", description: "Estime horas de backup sob cargas Watt estáticas." },
+  { href: "/tools/c-rate-calculator/", title: "Calculadora de Taxa C", description: "Calcule velocidades de carregamento e correntes de carga." },
+  { href: "/tools/inverter-battery-calculator/", title: "Calculadora Inversor-Bateria", description: "Dimensione bancos de baterias para cargas AC do inversor." },
+  { href: "/tools/energy-conversion-calculator/", title: "Conversão de Energia", description: "Converta entre Ah e Wh em qualquer tensão." },
+  { href: "/tools/voltage-drop-calculator/", title: "Calculadora de Queda de Tensão", description: "Verifique o dimensionamento de cabos para sua configuração de string." },
+];
+---
+
+<CalculatorLayout
+  title="Calculadora de String Paralela de Bateria | Calculadoras de Bateria"
+  description="Determine a configuração de série e paralelo de empilhamentos de células ou módulos de bateria para atingir tensão e capacidade alvo. Ferramenta gratuita."
+  faqItems={faqItems}
+  commonMistakes={commonMistakes}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+  relatedCalculators={relatedCalculators}
+  lang="pt"
+>
+
+  <!-- Main Calculator Grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+
+    <!-- Input Form -->
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Especificações Alvo</h3>
+      <div class="flex flex-col gap-6">
+
+        <!-- Target System Voltage -->
+        <InputField id="target-voltage" label="Tensão do Sistema Alvo (V)" value={48} min={1} step="any" helperText="Alvos comuns: 12V, 24V, 48V, 400V, 800V" />
+
+        <!-- Target System Capacity -->
+        <InputField id="target-capacity" label="Capacidade Alvo (Ah)" value={200} min={1} step="any" />
+
+        <h3 class="text-title-sm text-primary uppercase border-t border-hairline pt-6 tracking-wider">Bloco Construtivo de Célula / Módulo</h3>
+
+        <!-- Cell Voltage -->
+        <InputField id="cell-voltage" label="Tensão da Célula/Módulo Individual (V)" value={3.2} min={0.1} step="any" helperText="Valores nominais comuns: célula LFP (3,2V), célula NMC (3,7V), Chumbo-Ácido (12V)" />
+
+        <!-- Cell Capacity -->
+        <InputField id="cell-capacity" label="Capacidade da Célula/Módulo Individual (Ah)" value={100} min={0.1} step="any" helperText="Capacidade do bloco construtivo de uma célula (ex: 100Ah, 280Ah, 3,2Ah)" />
+
+      </div>
+    </CalculatorCard>
+
+    <!-- Calculation Results -->
+    <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Configuração Calculada</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <!-- Main Output -->
+          <ResultBox
+            label="Estrutura da Configuração"
+            value="15S 2P"
+            suffix="30 células ou módulos totais necessários"
+            variant="primary"
+            id="result-structure"
+          />
+
+          <!-- Secondary Outputs -->
+          <ResultBox
+            label="Tensão Real do Sistema"
+            value="48,0 V"
+            suffix="15 células em série"
+            id="result-actual-voltage"
+          />
+
+          <ResultBox
+            label="Capacidade Real do Pacote"
+            value="200 Ah"
+            suffix="2 strings paralelas"
+            id="result-actual-capacity"
+          />
+
+          <!-- Total Energy Output -->
+          <ResultBox
+            label="Energia Total Real"
+            value="9.600 Wh"
+            suffix="9,60 kWh capacidade de armazenamento"
+            variant="primary"
+            id="result-actual-energy"
+          />
+        </div>
+      </div>
+
+      <!-- Action Area -->
+      <div class="border-t border-hairline pt-6">
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">Nota de Segurança sobre Balanceamento de Strings</h4>
+        <p class="text-body-sm text-muted">
+          Strings paralelas devem sempre conter contagens idênticas de células em série. Resistência dessincronizada ou estado de carga entre strings paralelas causa compartilhamento desigual de corrente, superaquecimento localizado e riscos de destruição de células.
+        </p>
+      </div>
+    </CalculatorCard>
+
+  </div>
+
+  <!-- Formulas and Worked Examples -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">Fórmulas & Exemplos Resolvidos</h2>
+
+    <FormulaBox title="Fórmulas Matemáticas">
+      <p>
+        Para configurar um pacote, células em série aumentam o potencial de tensão e células ou strings em paralelo escalam a capacidade de corrente disponível:
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Células em Série (S) = ⌈Tensão Alvo / Tensão do Bloco⌉
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Strings Paralelas (P) = ⌈Capacidade Alvo (Ah) / Capacidade do Bloco (Ah)⌉
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Blocos Totais (N) = Células em Série (S) × Strings Paralelas (P)
+      </div>
+      <p>
+        As capacidades reais do sistema são calculadas a partir dessas contagens inteiras:
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Tensão Real do Sistema = S × Tensão do Bloco
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Capacidade Real do Sistema = P × Capacidade do Bloco
+      </div>
+    </FormulaBox>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample
+        number={1}
+        title="Células em Série para 48V a partir de Células LFP 3,2V"
+        scenario="Projete uma string de bateria 48V nominal usando células LiFePO4 3,2V padrão dispostas em série."
+        inputs={[
+          { label: "Tensão Alvo", value: "48 V" },
+          { label: "Tensão da Célula", value: "3,2 V (LFP)" },
+        ]}
+        steps={[
+          { label: "Calcule a contagem de série", detail: "S = ⌈48 V / 3,2 V⌉ = 15 células" },
+          { label: "Calcule a tensão real", detail: "V_real = 15 × 3,2 V = 48,0 V" },
+        ]}
+        answer="Configuração 15S — 15 células em série produzem exatamente 48,0 V nominal."
+        interpretation="Esta é a configuração LFP 48V mais comum utilizada em telecom e armazenamento solar. Uma opção 16S (51,2V) é preferida quando se necessita de folga para inversores."
+      />
+
+      <WorkedExample
+        number={2}
+        title="Strings Paralelas para 400Ah a partir de Células 100Ah"
+        scenario="Escale a capacidade para 400Ah conectando células LFP idênticas 100Ah em paralelo."
+        inputs={[
+          { label: "Capacidade Alvo", value: "400 Ah" },
+          { label: "Capacidade da Célula", value: "100 Ah" },
+        ]}
+        steps={[
+          { label: "Calcule a contagem paralela", detail: "P = ⌈400 Ah / 100 Ah⌉ = 4 strings" },
+          { label: "Calcule a capacidade real", detail: "Ah_real = 4 × 100 Ah = 400 Ah" },
+        ]}
+        answer="Configuração 4P — 4 strings paralelas produzem 400 Ah no total."
+        interpretation="Cada grupo paralelo deve usar células correspondidas (mesmo lote, capacidade dentro de 2%). Adicione fusíveis inline em cada string para prevenir falhas de corrente cruzada."
+      />
+
+      <WorkedExample
+        number={3}
+        title="Combinado 16S4P para Pacote 48V 400Ah"
+        scenario="Construa um pacote completo de bateria 48V 400Ah usando células LFP 3,2V 100Ah em uma topologia 16S4P."
+        inputs={[
+          { label: "Tensão Alvo", value: "48 V" },
+          { label: "Capacidade Alvo", value: "400 Ah" },
+          { label: "Tensão da Célula", value: "3,2 V (LFP)" },
+          { label: "Capacidade da Célula", value: "100 Ah" },
+        ]}
+        steps={[
+          { label: "Calcule a contagem de série", detail: "S = ⌈48 V / 3,2 V⌉ = 16 células (arredonda para 51,2V nominal)" },
+          { label: "Calcule a contagem paralela", detail: "P = ⌈400 Ah / 100 Ah⌉ = 4 strings" },
+          { label: "Total de células necessárias", detail: "N = 16 × 4 = 64 células" },
+          { label: "Especificações reais", detail: "V = 51,2 V, Ah = 400 Ah, E = 20.480 Wh (20,48 kWh)" },
+        ]}
+        answer="16S4P — 64 células no total, fornecendo 51,2V a 400Ah (20,48 kWh)."
+        interpretation="Este pacote excede ligeiramente o alvo de 48V (51,2V nominal), o que fornece melhor desempenho com inversores 48V. Um BMS de 16 canais é necessário para monitoramento de série."
+      />
+    </div>
+  </section>
+
+  <EngineeringDiagram
+    title="Fiação de Bateria Série vs Paralelo"
+    description="Série aumenta tensão, paralelo aumenta capacidade"
+    variant="circuit"
+    steps={[
+      { label: "Célula Individual", icon: "battery" },
+      { label: "Série (Tensão↑)", icon: "battery" },
+      { label: "Paralelo (Capacidade↑)", icon: "battery" },
+      { label: "Pacote Combinado", icon: "battery" },
+    ]}
+  />
+
+  <ComparisonTable
+    title="Comparação Série vs Paralelo"
+    headers={["Fiação", "Efeito", "Tensão", "Capacidade", "Risco"]}
+    rows={[
+      ["Série", "Tensão soma", "V_total = n × V_célula", "Igual a célula individual", "Desequilíbrio de células"],
+      ["Paralelo", "Capacidade soma", "Igual a célula individual", "Ah_total = n × Ah_célula", "Desequilíbrio de corrente"],
+      ["Série-Paralelo", "Ambos aumentam", "nS × V_célula", "mP × Ah_célula", "Balanceamento complexo"],
+    ]}
+    caption="Regras fundamentais de configuração de strings de bateria"
+  />
+
+  <FAQSection items={faqItems} />
+
+  <!-- Calculation Script -->
+  <script>
+    import { calculateParallelString } from '../../../utils/calculators';
+
+    const targetVoltageInput = document.getElementById('target-voltage') as HTMLInputElement;
+    const targetCapacityInput = document.getElementById('target-capacity') as HTMLInputElement;
+    const cellVoltageInput = document.getElementById('cell-voltage') as HTMLInputElement;
+    const cellCapacityInput = document.getElementById('cell-capacity') as HTMLInputElement;
+
+    // Outputs
+    const resultStructure = document.getElementById('result-structure');
+    const resultStructureValue = resultStructure?.querySelector('.text-display-md') as HTMLElement;
+    const resultStructureSuffix = resultStructure?.querySelector('.text-caption') as HTMLElement;
+
+    const resultActualVoltage = document.getElementById('result-actual-voltage');
+    const resultVoltageValue = resultActualVoltage?.querySelector('.text-title-lg') as HTMLElement;
+    const resultVoltageSuffix = resultActualVoltage?.querySelector('.text-caption') as HTMLElement;
+
+    const resultActualCapacity = document.getElementById('result-actual-capacity');
+    const resultCapacityValue = resultActualCapacity?.querySelector('.text-title-lg') as HTMLElement;
+    const resultCapacitySuffix = resultActualCapacity?.querySelector('.text-caption') as HTMLElement;
+
+    const resultActualEnergy = document.getElementById('result-actual-energy');
+    const resultEnergyValue = resultActualEnergy?.querySelector('.text-title-lg') as HTMLElement;
+    const resultEnergySuffix = resultActualEnergy?.querySelector('.text-caption') as HTMLElement;
+
+    function updateCalculations() {
+      const targetVoltage = parseFloat(targetVoltageInput.value) || 12;
+      const targetCapacity = parseFloat(targetCapacityInput.value) || 100;
+      const cellVoltage = parseFloat(cellVoltageInput.value) || 3.2;
+      const cellCapacity = parseFloat(cellCapacityInput.value) || 100;
+
+      const results = calculateParallelString(targetVoltage, targetCapacity, cellVoltage, cellCapacity);
+
+      // Render Outputs
+      if (resultStructureValue) {
+        resultStructureValue.textContent = `${results.seriesCells}S ${results.parallelStrings}P`;
+      }
+      if (resultStructureSuffix) {
+        resultStructureSuffix.textContent = `${results.totalCells} células ou módulos totais necessários`;
+      }
+      if (resultVoltageValue) {
+        resultVoltageValue.textContent = `${results.actualVoltageV.toFixed(1)} V`;
+      }
+      if (resultVoltageSuffix) {
+        resultVoltageSuffix.textContent = `${results.seriesCells} células em série`;
+      }
+      if (resultCapacityValue) {
+        resultCapacityValue.textContent = `${results.actualCapacityAh.toFixed(1)} Ah`;
+      }
+      if (resultCapacitySuffix) {
+        resultCapacitySuffix.textContent = `${results.parallelStrings} strings paralelas`;
+      }
+      if (resultEnergyValue) {
+        resultEnergyValue.textContent = `${results.actualEnergyWh.toLocaleString()} Wh`;
+      }
+      if (resultEnergySuffix) {
+        resultEnergySuffix.textContent = `${(results.actualEnergyWh / 1000).toFixed(2)} kWh capacidade de armazenamento`;
+      }
+    }
+
+    [targetVoltageInput, targetCapacityInput, cellVoltageInput, cellCapacityInput].forEach(el => {
+      el.addEventListener('input', updateCalculations);
+    });
+
+    // Run on boot
+    updateCalculations();
+  </script>
+</CalculatorLayout>

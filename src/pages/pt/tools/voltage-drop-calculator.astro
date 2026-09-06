@@ -1,0 +1,417 @@
+---
+import CalculatorLayout from '../../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import InputField from '../../../components/InputField.astro';
+import ResultBox from '../../../components/ResultBox.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import WorkedExample from '../../../components/WorkedExample.astro';
+import ComparisonTable from '../../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../../components/EngineeringDiagram.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import RelatedTools from '../../../components/RelatedTools.astro';
+
+const wireSizes = [
+  { label: "16 AWG (1.31 mm²)", value: 1.31 },
+  { label: "14 AWG (2.08 mm²)", value: 2.08 },
+  { label: "12 AWG (3.31 mm²)", value: 3.31 },
+  { label: "10 AWG (5.26 mm²)", value: 5.26 },
+  { label: "8 AWG (8.37 mm²)", value: 8.37 },
+  { label: "6 AWG (13.3 mm²)", value: 13.3 },
+  { label: "4 AWG (21.15 mm²)", value: 21.15 },
+  { label: "2 AWG (33.6 mm²)", value: 33.6 },
+  { label: "1/0 AWG (53.5 mm²)", value: 53.5 },
+  { label: "2/0 AWG (67.4 mm²)", value: 67.4 },
+  { label: "4/0 AWG (107 mm²)", value: 107.0 },
+  { label: "Tamanho Métrico Personalizado (mm²)", value: "-1" },
+];
+
+const materialOptions = [
+  { label: "Cobre (Alta condutividade)", value: "copper" },
+  { label: "Alumínio", value: "aluminum" },
+];
+
+const whatIs = `A queda de tensão DC é a redução no potencial elétrico ao longo de um condutor que transporta corrente entre uma fonte de bateria e sua carga conectada. É causada pela resistência inerente do fio, que converte energia elétrica em calor (perdas I²R). A queda de tensão depende de quatro fatores: <strong> magnitude da corrente</strong>, <strong>comprimento do cabo</strong>, <strong>área da seção transversal do condutor</strong> e <strong>resistividade do material do condutor</strong> (com correção de temperatura). Uma queda de tensão excessiva faz com que dispositivos eletrônicos funcionem incorretamente, reduz o brilho da iluminação, diminui a eficiência do motor e desperdiça energia. Em sistemas de 12V, mesmo uma queda de 0,5V representa uma perda de 4% — significativa o suficiente para causar problemas. O dimensionamento adequado dos cabos de acordo com os limites de queda de tensão é exigido pelas normas marítimas (ISO 13297), automotivas (SAE J1127) e solares (NEC 690).`;
+
+const whyItMatters = [
+  "Uma queda de tensão de 5% em um sistema de 12V significa 0,6V perdidos — suficiente para causar desligamentos de inversores e escurecimento de LEDs.",
+  "Trechos longos de cabo entre bateria e carga aumentam a queda de tensão — um trecho de 10m a 30A pode perder 1V ou mais com fio subdimensionado.",
+  "Cabos subdimensionados causam superaquecimento e riscos de incêndio, não apenas degradação de desempenho.",
+  "A queda de tensão é proporcional à corrente — dobrar a corrente da carga dobra a queda para o mesmo cabo.",
+  "Sistemas de maior tensão (48V vs 12V) reduzem a corrente para a mesma potência, reduzindo drasticamente a queda de tensão.",
+];
+
+const practicalApplications = [
+  { title: "Sistemas Elétricos Marítimos", description: "Dimensione cabos de bateria para atender aos limites de queda de tensão da ISO 13297 para navegação, iluminação e propulsão." },
+  { title: "Fiação Solar Fotovoltaica", description: "Calcule a queda de tensão na fiação DC desde os controladores de carga solar até os bancos de baterias." },
+  { title: "Automotivo e RV", description: "Dimensione cabos de bateria para inversores em sistemas DC de RV e automotivos." },
+  { title: "Instalações de Telecomunicações", description: "Verifique o dimensionamento de cabos para distribuição de energia DC de 48V em equipamentos de telecomunicações." },
+  { title: "Fiação de Cabana Off-Grid", description: "Calcule o dimensionamento de fios para trechos longos entre bancos de baterias remotos e cargas." },
+];
+
+const expertNotes = [
+  { title: 'Normas Marítimas', variant: 'engineering', content: 'As diretrizes marítimas padrão (ISO 13297) permitem uma queda de tensão máxima de 3% para componentes críticos (luzes de navegação, bombas de sentina, eletrônicos) e 10% de queda para cargas não críticas (circuitos de iluminação, dispositivos domésticos).' },
+  { title: 'Sensibilidade à Temperatura', variant: 'warning', content: 'A resistência do cobre aumenta 0,393% por °C. Em um compartimento de motor quente a 60°C, a resistência do cabo aumenta em ~15,7%. Sempre considere a temperatura de operação real do trecho de cabo, não a temperatura ambiente do ambiente.' },
+];
+
+const commonMistakes = [
+  "Ignorar completamente a queda de tensão — mesmo uma queda de 0,5V em um sistema de 12V representa uma perda de 4%, suficiente para causar desligamentos de inversores e escurecimento de LEDs.",
+  "Usar distância de ida em vez de distância de circuito — a queda de tensão se aplica aos condutores de alimentação e retorno. Sempre dobre a distância de ida para os cálculos.",
+  "Não verificar tanto a queda de tensão QUANTO a capacidade de corrente — um cabo pode ser termicamente seguro (capacidade de corrente OK) mas ainda apresentar queda de tensão inaceitável em trechos longos. Sempre verifique ambos os critérios.",
+  "Ignorar os efeitos da temperatura na resistência — a resistência do cobre aumenta 0,393% por °C. A 60°C, a resistência do cabo é 15,7% maior do que a 20°C.",
+  "Usar tensão nominal em vez da tensão real da bateria — a porcentagem de queda de tensão depende da tensão da fonte. Uma queda de 0,5V a 12,8V é 3,9%, mas a 12,0V é 4,2%.",
+  "Ignorar a resistência das conexões — terminais corroídos, parafusos frouxos e conectores oxidados adicionam resistência significativa que não é incluída nos cálculos apenas do cabo.",
+  "Usar alumínio sem aumento de tamanho — o alumínio requer 1,6× a área da seção transversal do cobre para queda de tensão equivalente. Esquecer esse fator leva a cabos subdimensionados.",
+  "Não considerar corrente de pico vs média — a queda de tensão é proporcional à corrente. Cargas de pico (partida de motor, corrente de entrada) causam quedas de tensão transitórias que podem acionar falhas no BMS.",
+  "Ignorar o impacto da queda de tensão nas leituras do BMS — a queda de tensão nos terminais da bateria faz com que o BMS leia tensão menor, potencialmente acionando desconexões de baixa tensão prematuras.",
+  "Assumir que a queda de tensão é constante — a queda de tensão varia com a corrente da carga. Um sistema que atende a queda de 3% na carga nominal pode excedê-la na carga de pico.",
+];
+
+const relatedArticles = [
+  { href: "/learn/voltage-drop-explained/", title: "Queda de Tensão Explicada" },
+  { href: "/learn/battery-voltage-systems/", title: "Sistemas de Tensão de Bateria" },
+  { href: "/learn/marine-battery-voltage-selection/", title: "Seleção de Tensão de Bateria Marítima" },
+];
+
+const trustSection = {
+  text: "Esta calculadora utiliza o modelo padrão de queda de tensão baseado em resistividade com fatores de correção de temperatura para condutores de cobre e alumínio. Todas as fórmulas seguem as normas IEEE e IEC de dimensionamento de condutores.",
+  link: { label: "Veja nossa metodologia completa", href: "/methodology/" },
+};
+
+const references = [
+  { title: "ISO 13297 — Instalação Elétrica Marítima", url: "https://www.iso.org/standard/68333.html", source: "Organização Internacional de Normalização" },
+  { title: "NEC Artigo 690 — Sistemas Fotovoltaicos Solares", url: "https://www.nfpa.org/codes-and-standards/nfpa-70-standard-for-electrical-safety-in-the-workplace", source: "NFPA / Código Elétrico Nacional" },
+  { title: "SAE J1127 — Cabos de Bateria", url: "https://www.sae.org/standards/content/j1127_202004/", source: "SAE International" },
+  { title: "Associação de Desenvolvimento do Cobre — Tabelas de Resistência de Fio", url: "https://www.copper.org/", source: "Associação de Desenvolvimento do Cobre" },
+];
+
+const faqItems = [
+  {
+    question: "Por que a queda de tensão aumenta em temperaturas mais altas?",
+    answer: "Em condutores metálicos como cobre e alumínio, as vibrações térmicas dos átomos interrompem o caminho dos elétrons condutores, aumentando a resistência interna. Para o cobre, a resistência aumenta aproximadamente 0,393% para cada aumento de 1°C. Se um cabo passa por um compartimento de motor quente (ex: 60°C), sua resistência aumenta cerca de 15,7%.",
+  },
+  {
+    question: "Por que a queda de tensão é crítica em sistemas de 12V comparados a sistemas de 48V?",
+    answer: "A queda de tensão é proporcional à corrente, não à tensão. Uma carga de 480W puxa 37,5A a 12,8V, mas apenas 9,37A a 51,2V. A 12,8V, uma queda de 0,5V é 3,9% do potencial do sistema. A 51,2V, a queda é reduzida para 0,125V devido à menor corrente, representando uma perda desprezível de 0,24%. Aumentar a tensão do sistema é a melhor forma de resolver a perda em cabos.",
+  },
+  {
+    question: "Devo dimensionar cabos para queda de tensão ou limites de corrente seguros (capacidade de corrente)?",
+    answer: "Você deve verificar ambos. Os limites de capacidade de corrente são definidos pelos códigos de segurança contra incêndio para evitar que a isolação do fio derreta sob carga. No entanto, um cabo que é termicamente seguro ainda pode apresentar queda de tensão inaceitável em trechos longos. Sempre selecione o tamanho de fio maior determinado pelos dois critérios.",
+  },
+  {
+    question: "Qual é a resistividade do alumínio vs cobre?",
+    answer: "A resistividade do alumínio é aproximadamente 64% maior que a do cobre (2,82 x 10^-8 ohm.m vs 1,72 x 10^-8 ohm.m). Um cabo de alumínio requer aproximadamente 1,6 vezes a área da seção transversal de um cabo de cobre para transportar a mesma carga elétrica com queda de tensão idêntica.",
+  },
+  {
+    question: "Qual é uma porcentagem aceitável de queda de tensão?",
+    answer: "Para sistemas de energia DC: máximo 3% para cargas críticas (navegação, equipamentos de segurança), 5% para cargas gerais e máximo 10% para iluminação não crítica. Instalações solares geralmente visam 2% ou menos para fiação DC entre o controlador de carga e a bateria.",
+  },
+  {
+    question: "Como o comprimento do cabo afeta a queda de tensão?",
+    answer: "A queda de tensão é diretamente proporcional ao comprimento do cabo. Dobrar a distância do cabo dobra a queda de tensão. Para um cabo de 5m com queda de 0,5V, um cabo de 10m terá uma queda de 1,0V com a mesma corrente e tamanho de fio.",
+  },
+  {
+    question: "Posso usar alumínio em vez de cobre para economizar custos?",
+    answer: "O alumínio é mais leve e mais barato por capacidade de corrente, mas requer 1,6× a área da seção transversal do cobre para queda de tensão equivalente. O alumínio também requer composto antioxidante nas conexões e torque adequado para evitar afrouxamento. O cobre é preferido para a maioria das instalações de baterias e solares.",
+  },
+  {
+    question: "Como a queda de tensão afeta o desempenho da bateria?",
+    answer: "A queda de tensão nos terminais da bateria faz com que o BMS leia uma tensão menor que a real, potencialmente acionando desconexões de baixa tensão prematuras. Também reduz a energia efetiva entregue às cargas, diminuindo o tempo de operação aparente.",
+  },
+  {
+    question: "Que fio AWG preciso para 30 amperes a 5 metros?",
+    answer: "Para 30A a 5m de ida em um sistema de 12V com queda máxima de 3%: é necessário fio de cobre 6 AWG (13,3 mm²). A 48V, 10 AWG (5,26 mm²) pode ser suficiente devido à menor corrente para a mesma potência.",
+  },
+  {
+    question: "O tipo de isolação do fio afeta a queda de tensão?",
+    answer: "Não, a isolação não afeta a resistência elétrica. No entanto, a classificação de temperatura da isolação determina a temperatura máxima de operação segura. Usar fio classificado para 90°C permite cargas de corrente mais altas sem exceder os limites térmicos da isolação.",
+  },
+  {
+    question: "Como medir a queda de tensão real no meu sistema?",
+    answer: "Meça a tensão nos terminais da bateria sob carga, depois meça a tensão nos terminais da carga sob a mesma carga. A diferença é a queda de tensão. Compare a porcentagem de queda com a tensão do sistema para determinar se o dimensionamento do cabo é adequado.",
+  },
+];
+---
+
+<CalculatorLayout
+  lang="pt"
+  title="Calculadora de Queda de Tensão DC | Calculadoras de Bateria"
+  description="Calcule a queda de tensão em cabos de bateria DC com base na carga atual, comprimento do cabo, material do condutor e tamanho do calibre."
+  faqItems={faqItems}
+  commonMistakes={commonMistakes}
+  relatedArticles={relatedArticles}
+  relatedCalculators={[
+    { href: "/tools/dc-cable-loss-calculator/", title: "Perda em Cabo DC", description: "Calcule as perdas de potência resistiva diretamente." },
+    { href: "/tools/battery-sizing-calculator/", title: "Ferramenta de Dimensionamento de Bateria", description: "Determine os requisitos de dimensionamento do consumo diário." },
+    { href: "/tools/parallel-string-calculator/", title: "Ferramenta de Corrente Paralela", description: "Configure o layout de correntes série e paralela." },
+    { href: "/tools/runtime-calculator/", title: "Calculadora de Tempo de Execução", description: "Calcule o tempo de execução a partir de perfis de potência da carga." },
+    { href: "/tools/battery-pack-calculator/", title: "Calculadora de Pacote de Bateria", description: "Projete configurações de células série/paralela." },
+    { href: "/tools/energy-conversion-calculator/", title: "Conversão de Energia", description: "Converta entre capacidade Ah e energia Wh." },
+  ]}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+>
+
+  <!-- Main Calculator Grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+
+    <!-- Input Form -->
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Parâmetros do Cabo</h3>
+      <div class="flex flex-col gap-6">
+        <InputField id="voltage" label="Tensão DC do Sistema (V)" value={12.8} min={1} step="any" helperText="Comum: 12,8V, 25,6V, 51,2V" />
+        <InputField id="current" label="Corrente Contínua da Carga (Amperes)" value={30} min={0.1} step="any" />
+        <InputField id="length" label="Distância de Percursso de Ida (Metros)" value={5} min={0.1} step="any" helperText="A calculadora dobra este valor para incluir os condutores positivo e de retorno." />
+        <InputField id="wire-dropdown" label="Tamanho do Condutor" type="select" options={wireSizes} value="13.3" />
+        <InputField id="custom-area" label="Área da Seção Transversal Personalizada (mm²)" value={10} min={0.01} step="any" wrapperId="custom-area-wrapper" />
+        <InputField id="material" label="Material do Condutor" type="select" options={materialOptions} value="copper" />
+        <InputField id="temperature" label="Temperatura de Operação do Condutor (°C)" value={25} min={-40} max={200} helperText="A resistência aumenta com a temperatura (coef. de temperatura do cobre: 0,393%/°C)" />
+      </div>
+    </CalculatorCard>
+
+    <!-- Calculation Results -->
+    <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Saídas Estimadas</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <ResultBox
+            label="Queda de Tensão"
+            value="4.03%"
+            suffix="Queda de 0,52 V ao longo do circuito"
+            variant="primary"
+            id="result-status-card"
+          />
+          <ResultBox
+            label="Tensão no Terminal da Carga"
+            value="12.28 V"
+            suffix="Potencial disponível"
+            id="result-end-voltage-box"
+          />
+          <ResultBox
+            label="Resistência do Circuito"
+            value="0.0172 Ω"
+            suffix="Ajustada para temperatura"
+            id="result-resistance-box"
+          />
+        </div>
+      </div>
+
+      <!-- Action Area -->
+      <div class="border-t border-hairline pt-6">
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">Diretrizes de Engenharia de Cabos DC</h4>
+        <p class="text-body-sm text-muted">
+          As diretrizes marítimas padrão (ISO 13297) permitem uma <span class="text-primary font-bold">queda de tensão máxima de 3%</span> para componentes críticos (luzes de navegação, bombas de sentina, eletrônicos) e <span class="text-primary font-bold">queda de 10%</span> para cargas não críticas (circuitos de iluminação, dispositivos domésticos).
+        </p>
+      </div>
+    </CalculatorCard>
+
+  </div>
+
+  <!-- Formulas and Worked Examples -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">Fórmulas & Exemplos Práticos</h2>
+
+    <FormulaBox title="Fórmulas Matemáticas">
+      <p>
+        A resistência do circuito do condutor é calculada com base na distância, espessura, resistividade do material e coeficientes térmicos:
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Resistividade ρ(T) = ρ(20°C) × [1 + α × (T - 20)]
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Resistência do Circuito (Ω) = ρ(T) × (2 × Distância (m)) / Área (m²)
+      </div>
+      <p>
+        A queda de tensão é derivada usando a Lei de Ohm (V = I x R):
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Queda de Tensão (V) = Corrente da Carga (A) × Resistência do Circuito (Ω)
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Porcentagem de Queda (%) = (Queda de Tensão (V) / Tensão da Fonte (V)) × 100
+      </div>
+    </FormulaBox>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample
+        number={1}
+        title="Circuito de Navegação Marítima 12V"
+        scenario="Dimensione um cabo de cobre para um circuito de luz de navegação de 30A com um trecho de 5m de ida em um sistema de 12,8V a 25°C."
+        inputs={[
+          { label: "Tensão da Fonte", value: "12,8 V" },
+          { label: "Corrente da Carga", value: "30 A" },
+          { label: "Distância de Ida", value: "5 m (10 m circuito)" },
+          { label: "Condutor", value: "Cobre, 10 mm² (~8 AWG)" },
+          { label: "Temperatura", value: "25°C" },
+        ]}
+        steps={[
+          { label: "Passo 1: Resistência do circuito", formula: "R = ρ × (2 × L) / A = 1,72×10⁻⁸ × 10 / 10×10⁻⁶", result: "0,0172 Ω" },
+          { label: "Passo 2: Queda de tensão", formula: "V_queda = I × R = 30 × 0,0172", result: "0,516 V" },
+          { label: "Passo 3: Porcentagem de queda", formula: "% = (0,516 / 12,8) × 100", result: "4,03%" },
+          { label: "Passo 4: Tensão no terminal da carga", formula: "V_final = 12,8 - 0,516", result: "12,28 V" },
+        ]}
+        answer="Queda de tensão de 4,03% — excede o limite crítico marítimo de 3%. Considere atualizar para 6 AWG (13,3 mm²)."
+        interpretation="A 4,03%, este cabo está no limite para equipamentos de navegação críticos. Para iluminação não crítica (limite de 10%), é aceitável. Atualizar para 6 AWG reduz a queda para ~2,5%."
+        variant="marine"
+      />
+
+      <WorkedExample
+        number={2}
+        title="Cabo de Bateria Solar 48V"
+        scenario="Calcule a queda de tensão para um sistema solar de 48V com saída do controlador de carga de 20A ao longo de um trecho de 15m a 35°C."
+        inputs={[
+          { label: "Tensão da Fonte", value: "51,2 V" },
+          { label: "Corrente de Carga", value: "20 A" },
+          { label: "Distância de Ida", value: "15 m (30 m circuito)" },
+          { label: "Condutor", value: "Cobre, 6 mm² (~10 AWG)" },
+          { label: "Temperatura", value: "35°C" },
+        ]}
+        steps={[
+          { label: "Passo 1: Resistividade corrigida por temperatura", formula: "ρ(35°C) = 1,72×10⁻⁸ × [1 + 0,00393 × 15]", result: "1,82×10⁻⁸ Ω·m" },
+          { label: "Passo 2: Resistência do circuito", formula: "R = 1,82×10⁻⁸ × 30 / 6×10⁻⁶", result: "0,091 Ω" },
+          { label: "Passo 3: Queda de tensão", formula: "V_queda = 20 × 0,091", result: "1,82 V" },
+          { label: "Passo 4: Porcentagem de queda", formula: "% = (1,82 / 51,2) × 100", result: "3,55%" },
+        ]}
+        answer="Queda de 3,55% — acima do alvo solar DC de 2%. Atualize para 4 AWG (21,15 mm²) para atingir ~2,1%."
+        interpretation="A maior tensão do sistema (48V vs 12V) mantém a corrente baixa, mas trechos longos de cabo ainda acumulam queda significativa. Para fiação solar DC, a NEC recomenda ≤2% do controlador de carga para a bateria."
+        variant="solar"
+      />
+
+      <WorkedExample
+        number={3}
+        title="Cabo de Inversor RV 12V"
+        scenario="Um inversor de 2000W puxa 167A de uma bateria de 12V. Calcule os requisitos de cabo para um trecho de 1m."
+        inputs={[
+          { label: "Potência do Inversor", value: "2000 W" },
+          { label: "Tensão do Sistema", value: "12,8 V" },
+          { label: "Corrente da Carga", value: "167 A (2000W / 12V)" },
+          { label: "Distância de Ida", value: "1 m (2 m circuito)" },
+          { label: "Queda Alvo", value: "≤3%" },
+        ]}
+        steps={[
+          { label: "Passo 1: Resistência máxima permitida", formula: "R_max = (V × 0,03) / I = (12,8 × 0,03) / 167", result: "0,0023 Ω" },
+          { label: "Passo 2: Área necessária do cabo", formula: "A = ρ × 2L / R = 1,72×10⁻⁸ × 2 / 0,0023", result: "14,96 mm²" },
+          { label: "Passo 3: Selecionar AWG", formula: "14,96 mm² → 6 AWG (13,3 mm²) ou 4 AWG (21,15 mm²)", result: "4 AWG recomendado" },
+        ]}
+        answer="Cabo de cobre 4 AWG (21,15 mm²) para queda ≤3% a 167A"
+        interpretation="Sistemas 12V de alta corrente exigem cabos muito grossos. É por isso que sistemas de 24V ou 48V são preferidos para cargas acima de 2kW — eles reduzem a corrente e os requisitos de cabo drasticamente."
+        variant="rv"
+      />
+    </div>
+  </section>
+
+  <EngineeringDiagram
+    title="Sistema de Queda de Tensão DC"
+    description="Circuito completo da fonte de bateria através do cabo até a carga, mostrando onde a tensão é perdida"
+    variant="circuit"
+    steps={[
+      { label: "Fonte da Bateria", icon: "battery" },
+      { label: "Cabo Positivo", icon: "cable" },
+      { label: "Carga Conectada", icon: "load" },
+      { label: "Cabo de Retorno", icon: "cable" },
+    ]}
+  />
+
+  <ComparisonTable
+    title="Queda de Tensão Aceitável por Aplicação"
+    headers={["Aplicação", "Queda Máx %", "Norma", "Limite Crítico", "Observações"]}
+    rows={[
+      ["Navegação Marítima", "3%", "ISO 13297", "1% preferido", "Equipamentos críticos de segurança"],
+      ["Marítimo Não Crítico", "10%", "ISO 13297", "5%", "Iluminação, cargas domésticas"],
+      ["Fiação Solar DC", "2%", "NEC 690", "1%", "Controlador de carga para bateria"],
+      ["Automotivo", "2%", "SAE J1127", "1%", "Bateria para motor de partida, ignição"],
+      ["Telecom 48V", "1%", "ITU-T", "0,5%", "Distribuição de energia DC"],
+      ["DC Geral", "3%", "IEEE", "1%", "Sistemas de bateria para carga"],
+    ]}
+    caption="Normas industriais para queda de tensão máxima permitida em sistemas DC"
+  />
+
+  <ComparisonTable
+    title="Cobre vs Alumínio — Dimensionamento de Cabos para Queda de Tensão Equivalente"
+    headers={["Parâmetro", "Cobre", "Alumínio", "Proporção"]}
+    rows={[
+      ["Resistividade (Ω·m)", "1,72×10⁻⁸", "2,82×10⁻⁸", "1,64×"],
+      ["Área para mesma queda", "1,0×", "1,6×", "Al precisa de 60% mais"],
+      ["Peso por metro", "1,0×", "0,5×", "Al é 50% mais leve"],
+      ["Custo por capacidade", "1,0×", "0,6×", "Al é 40% mais barato"],
+      ["Risco de oxidação", "Baixo", "Alto", "Al precisa de antioxidante"],
+      ["Flexibilidade", "Alta", "Baixa", "Cu preferido para trechos apertados"],
+    ]}
+    caption="Comparação de materiais para condutores de energia DC"
+  />
+
+  <FAQSection items={faqItems} />
+
+  <!-- Calculation Script -->
+  <script>
+    import { calculateVoltageDrop } from '../../../../utils/calculators';
+
+    const voltageInput = document.getElementById('voltage') as HTMLInputElement;
+    const currentInput = document.getElementById('current') as HTMLInputElement;
+    const lengthInput = document.getElementById('length') as HTMLInputElement;
+    const wireDropdown = document.getElementById('wire-dropdown') as HTMLSelectElement;
+    const customAreaWrapper = document.getElementById('custom-area-wrapper');
+    const customAreaInput = document.getElementById('custom-area') as HTMLInputElement;
+    const materialSelect = document.getElementById('material') as HTMLSelectElement;
+    const temperatureInput = document.getElementById('temperature') as HTMLInputElement;
+
+    // Outputs
+    const resultStatusCard = document.getElementById('result-status-card');
+    const resultDropPercent = resultStatusCard?.querySelector('.text-display-md') as HTMLElement;
+    const resultDropVoltage = resultStatusCard?.querySelector('.text-caption') as HTMLElement;
+    const resultEndVoltage = document.getElementById('result-end-voltage-box')?.querySelector('.text-title-lg') as HTMLElement;
+    const resultResistance = document.getElementById('result-resistance-box')?.querySelector('.text-title-lg') as HTMLElement;
+
+    function toggleCustomArea() {
+      const isCustom = wireDropdown.value === "-1";
+      if (isCustom) {
+        customAreaWrapper?.classList.remove('hidden');
+      } else {
+        customAreaWrapper?.classList.add('hidden');
+      }
+      updateCalculations();
+    }
+
+    function updateCalculations() {
+      const voltage = parseFloat(voltageInput.value) || 12.8;
+      const current = parseFloat(currentInput.value) || 0;
+      const length = parseFloat(lengthInput.value) || 0;
+      const material = materialSelect.value as "copper" | "aluminum";
+      const temperature = parseFloat(temperatureInput.value) || 25;
+
+      const dropdownArea = parseFloat(wireDropdown.value);
+      const wireSize = dropdownArea === -1 ? (parseFloat(customAreaInput.value) || 0.1) : dropdownArea;
+
+      const results = calculateVoltageDrop(voltage, current, length, wireSize, material, temperature);
+
+      // Render percentage
+      if (resultDropPercent) resultDropPercent.textContent = `${results.voltageDropPercent.toFixed(2)}%`;
+      if (resultDropVoltage) resultDropVoltage.textContent = `${results.voltageDropV.toFixed(3)} V drop along loop`;
+      if (resultEndVoltage) resultEndVoltage.textContent = `${results.endVoltageV.toFixed(2)} V`;
+
+      // Resistance per wire = loop resistance / 2.
+      // But loop resistance is results.voltageDropV / current.
+      const loopR = current > 0 ? results.voltageDropV / current : 0;
+      if (resultResistance) resultResistance.textContent = `${loopR.toFixed(4)} Ω`;
+
+      // Update card color border based on safety threshold (3% target)
+      if (resultStatusCard) {
+        resultStatusCard.className = "bg-surface-soft p-6 border col-span-1 md:col-span-2 " +
+          (results.voltageDropPercent > 10 ? "border-red-600" :
+           results.voltageDropPercent > 3 ? "border-yellow-500" : "border-hairline");
+      }
+    }
+
+    wireDropdown.addEventListener('change', toggleCustomArea);
+    [voltageInput, currentInput, lengthInput, customAreaInput, materialSelect, temperatureInput].forEach(el => {
+      el.addEventListener('input', updateCalculations);
+    });
+
+    // Run on boot
+    toggleCustomArea();
+  </script>
+</CalculatorLayout>

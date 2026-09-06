@@ -1,0 +1,163 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import CategoryToolGrid from '../../components/CategoryToolGrid.astro';
+import FAQSection from '../../components/FAQSection.astro';
+
+const tools = [
+  {
+    name: "Calculadora de Pack de Baterias",
+    href: "/pt/tools/battery-pack-calculator/",
+    description: "Projetar packs de baterias a partir de células individuais. Calcule tensão, capacidade, energia e corrente máxima para qualquer configuração série-paralelo.",
+    available: true,
+  },
+  {
+    name: "Calculadora de String Paralela",
+    href: "/pt/tools/parallel-string-calculator/",
+    description: "Configure strings série e paralelo de células para construir packs de bateria com tensão e capacidade alvo.",
+    available: true,
+  },
+  {
+    name: "Calculadora de Tensão de Bateria",
+    href: "/pt/tools/energy-conversion-calculator/",
+    description: "Converta entre Ah e Wh em qualquer tensão nominal para entender a densidade de energia do seu pack.",
+    available: true,
+  },
+  {
+    name: "Calculadora de C-Rate",
+    href: "/pt/tools/c-rate-calculator/",
+    description: "Calcule C-rates de carga e descarga para células e packs de bateria de VE.",
+    available: true,
+  },
+];
+
+const learnArticles = [
+  { title: "Fundamentos de Projeto de Pack de Bateria", href: "/pt/learn/battery-pack-design-basics/" },
+  { title: "Baterias em Série vs Paralelo", href: "/pt/learn/series-vs-parallel-batteries/" },
+  { title: "Sistemas de Tensão de Bateria", href: "/pt/learn/battery-voltage-systems/" },
+  { title: "Como Montar um Pack de Bateria", href: "/pt/learn/how-to-build-a-battery-pack/" },
+  { title: "Projeto de Pack LiFePO4", href: "/pt/learn/lifepo4-pack-design/" },
+  { title: "O Que É C-Rate de Bateria?", href: "/pt/learn/what-is-battery-c-rate/" },
+  { title: "Gráfico de Tensão LiFePO4", href: "/pt/learn/lifepo4-voltage-chart/" },
+  { title: "Referência de C-Rate de Bateria", href: "/pt/learn/battery-c-rate-reference/" },
+  { title: "LiFePO4 vs NMC", href: "/pt/learn/lifepo4-vs-nmc/" },
+  { title: "Gráfico de Densidade de Energia de Bateria", href: "/pt/learn/battery-energy-density-chart/" },
+];
+
+const faqItems = [
+  {
+    question: "Qual a diferença entre conexões série e paralelo de baterias?",
+    answer: "Conexões série aumentam a tensão mantendo a capacidade constante. Conectar duas células de 3.2V 100Ah em série produz um pack de 6.4V 100Ah. Conexões paralelo aumentam a capacidade mantendo a tensão constante. Conectar duas células de 3.2V 100Ah em paralelo produz um pack de 3.2V 200Ah. Combinações série-paralelo alcançam tanto a tensão quanto a capacidade alvo.",
+  },
+  {
+    question: "Como determino o número de células para um pack de bateria?",
+    answer: "Divida a tensão alvo do pack pela tensão da célula individual para obter o número de células em série (contagem S). Divida a capacidade alvo pela capacidade da célula individual para obter o número de strings paralelas (contagem P). Por exemplo, para construir um pack de 48V 200Ah com células de 3.2V 100Ah, você precisa de 16S (48V ÷ 3.2V) e 2P (200Ah ÷ 100Ah), totalizando 32 células.",
+  },
+  {
+    question: "O que é C-rate e por que importa no design de packs?",
+    answer: "C-rate expressa a corrente de carga ou descarga relativa à capacidade da bateria. Uma taxa de 1C em uma bateria de 100Ah significa corrente de 100A. Taxas C mais altas geram mais calor, aumentam a queda de tensão e reduzem a capacidade utilizável. O design do pack deve garantir que as células suportem sua corrente máxima esperada. Exceder a taxa C classificada causa superaquecimento, degradação acelerada e riscos potenciais de segurança.",
+  },
+  {
+    question: "Preciso de um BMS para meu pack de bateria?",
+    answer: "Sim. Um Sistema de Gerenciamento de Bateria (BMS) é essencial para packs de bateria de lítio. Ele monitora tensões individuais das células, previne sobrecarga e sobredescarga, equilibra capacidades das células, monitora temperatura e fornece proteção contra curto-circuito. Operar células de lítio sem um BMS arrisca danos à célula, incêndio ou explosão de eventos de sobrecarga ou sobredescarga profunda.",
+  },
+  {
+    question: "Qual sistema de tensão devo escolher para meu projeto de VE?",
+    answer: "Tensões comuns de VE são 48V (LEVs leves, carrinhos de golfe, e-bikes), 72V–96V (motocicletas, carros pequenos) e 300V–400V+ (VEs de tamanho completo). Tensões mais altas reduzem a corrente para a mesma potência, permitindo fiação mais fina e componentes menores. No entanto, sistemas de alta tensão exigem equipamentos e conhecimento especializados. Comece com 48V para aprendizado, avance para 72V–96V para projetos médios.",
+  },
+];
+
+const relatedCategories = [
+  { href: "/pt/engineering/", title: "Engenharia", description: "Ferramentas de C-rate, SOC, queda de tensão e perda em cabos" },
+  { href: "/pt/bess/", title: "BESS e Comercial", description: "Análise de ROI de armazenamento de energia comercial" },
+  { href: "/pt/solar/", title: "Solar", description: "Dimensionamento de bateria solar e planejamento off-grid" },
+];
+
+const breadcrumbItems = [
+  { label: "VE e Packs de Baterias" },
+];
+---
+
+<Layout
+  title="Calculadoras de VE e Packs de Baterias | Calculadoras de Bateria"
+  description="Calculadoras gratuitas de bateria para VE para design de packs, configuração série-paralelo, cálculo de tensão e análise de C-rate."
+  schema="website"
+  schemaName="Calculadoras de VE e Packs de Baterias"
+  schemaDescription="Calculadoras de bateria de nível de engenharia para design de packs de VE, configuração de células e planejamento de tensão."
+  breadcrumbs={[{ label: 'VE e Packs de Baterias' }]}
+  lang="pt"
+>
+  <Breadcrumb items={breadcrumbItems} />
+
+  <section class="mb-12 md:mb-16 border-b border-hairline pb-12">
+    <div class="max-w-4xl">
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">VE E PACKS DE BATERIAS</span>
+      <h1 class="text-display-md text-primary mb-6">Calculadoras de VE e Packs de Baterias</h1>
+      <p class="text-body-md text-body max-w-2xl font-light">
+        Projetar packs de bateria de VE com calculadoras de nível de engenharia. Configure arranjos de células série e paralelo, calcule tensão do pack e analise C-rates para carga e descarga.
+      </p>
+    </div>
+  </section>
+
+  <section class="mb-16">
+    <div class="max-w-4xl text-body-md text-body font-light flex flex-col gap-6">
+      <p>
+        O design de pack de bateria é o processo de combinar células individuais em uma montagem configurada que atende a requisitos específicos de tensão, capacidade e corrente. Seja construindo uma bateria para um veículo elétrico, um sistema de armazenamento solar, uma ferramenta elétrica ou um projeto de energia personalizado, os princípios fundamentais de configuração série e paralelo se aplicam.
+      </p>
+      <p>
+        Conexões série aumentam a tensão do pack. Quando células são conectadas positivo-a-negativo em série, suas tensões somam enquanto a capacidade permanece a de uma string. Conectar 16 células LiFePO4 (3.2V cada) em série produz um pack nominal de 51.2V. Esta é a configuração padrão para sistemas de 48V usados em armazenamento solar, LEVs leves e aplicações marítimas.
+      </p>
+      <p>
+        Conexões paralelo aumentam a capacidade do pack. Quando células idênticas são conectadas positivo-a-positivo e negativo-a-negativo, suas capacidades somam enquanto a tensão permanece a mesma. Duas células de 100Ah em paralelo produzem um pack de 200Ah na mesma tensão. A contagem P determina quanta energia o pack pode armazenar e entregar.
+      </p>
+      <p>
+        A contagem P também determina a corrente máxima de descarga. Se cada célula é classificada para 1C de descarga contínua, uma configuração 2P de células de 100Ah pode entregar 200A continuamente. Uma configuração 4P pode entregar 400A. Igualar a capacidade de corrente do pack às demandas de pico da sua aplicação é crítico para segurança e longevidade.
+      </p>
+      <p>
+        A seleção de célula é a decisão mais importante no design de packs. Células LiFePO4 oferecem o melhor equilíbrio de segurança, vida útil e custo para a maioria das aplicações. Células NMC fornecem maior densidade de energia para aplicações sensíveis a peso como VE. Células LTO oferecem carga ultra-rápida e desempenho em frio, mas a custo maior.
+      </p>
+    </div>
+  </section>
+
+  <section class="mb-16">
+    <h2 class="text-title-lg text-primary mb-6">Calculadoras Disponíveis</h2>
+    <CategoryToolGrid tools={tools} />
+  </section>
+
+  {learnArticles.length > 0 && (
+    <section class="mb-16 border-t border-hairline pt-12">
+      <h2 class="text-title-lg text-primary mb-6">Guias de Packs de Baterias</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {learnArticles.map((article) => (
+          <a href={article.href} class="bg-surface-card border border-hairline p-4 hover:border-primary transition-colors">
+            <span class="text-label-uppercase text-muted text-[10px] block mb-2">CENTRO DE APRENDIZAGEM</span>
+            <h3 class="text-title-sm text-primary">{article.title}</h3>
+          </a>
+        ))}
+      </div>
+    </section>
+  )}
+
+  <FAQSection items={faqItems} />
+
+  {relatedCategories.length > 0 && (
+    <section class="mb-16 border-t border-hairline pt-12">
+      <h2 class="text-title-lg text-primary mb-6">Categorias Relacionadas</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {relatedCategories.map((cat) => (
+          <a href={cat.href} class="bg-surface-card border border-hairline p-6 hover:border-primary transition-colors block">
+            <h3 class="text-title-md text-primary mb-2">{cat.title}</h3>
+            <p class="text-body-sm text-muted">{cat.description}</p>
+          </a>
+        ))}
+      </div>
+    </section>
+  )}
+
+  <section class="bg-surface-soft border border-hairline p-6 text-caption text-muted mb-8">
+    <span class="text-primary font-bold text-[10px] tracking-wider uppercase border border-hairline px-1.5 py-0.5 mr-2 inline-block mb-3">
+      Aviso de Engenharia
+    </span>
+    Todas as calculadoras fornecem apenas estimativas de design. O design de pack de bateria de VE requer consideração de requisitos de BMS, gerenciamento térmico e certificações de segurança. Consulte engenheiros qualificados para projetos de produção.
+  </section>
+</Layout>

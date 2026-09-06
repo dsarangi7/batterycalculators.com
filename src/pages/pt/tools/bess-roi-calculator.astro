@@ -1,0 +1,438 @@
+---
+import CalculatorLayout from '../../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import InputField from '../../../components/InputField.astro';
+import ResultBox from '../../../components/ResultBox.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import RelatedTools from '../../../components/RelatedTools.astro';
+import MiniSimulationChart from '../../../components/MiniSimulationChart.astro';
+import WorkedExample from '../../../components/WorkedExample.astro';
+import ComparisonTable from '../../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../../components/EngineeringDiagram.astro';
+
+const whatIs = `Um calculador de ROI de Sistema de Armazenamento de Energia em Bateria (BESS) avalia a viabilidade financeira de investimentos em armazenamento de baterias comerciais e industriais. Modela <strong>arbtragem energética</strong> (comprando eletricidade barata durante horários fora de pico e vendendo ou usando durante horários caros de pico), <strong>redução de demanda</strong> (reduzindo picos de potência para baixar tarifas de demanda da concessionária) e <strong>métricas financeiras de longo prazo</strong> incluindo período de payback simples, valor presente líquido (VPL) e taxa interna de retorno. O cálculo contabiliza perdas de eficiência de ida e volta, degradação anual da bateria reduzindo capacidade disponível, despesas operacionais e o valor temporal do dinheiro através de análise de fluxo de caixa descontado. A análise de ROI do BESS é essencial para instalações comerciais, plantas industriais, microrredes e projetos de armazenamento em escala de utilidade.`;
+
+const whyItMatters = [
+  "Um projeto BESS com VPL positivo pode gerar $10.000–$100.000+ em economias anuais, mas apenas se o modelo financeiro refletir com precisão a degradação e perdas de eficiência do mundo real.",
+  "Ignorar a degradação da bateria superestima os fluxos de caixa dos anos posteriores em 20–40%, levando a projeções de payback irrealistas e decisões de investimento pobres.",
+  "Perdas de eficiência de ida e volta de 10–15% reduzem diretamente as margens de arbtragem — um spread que parece lucrativo no papel pode se tornar marginal após contabilizar o RTE.",
+  "A redução de demanda pode representar 30–50% do total de economias BESS em aplicações comerciais, mas frequentemente é negligenciada em análises básicas.",
+  "A seleção da taxa de desconto afeta dramaticamente o VPL — uma diferença de 2% no WACC pode alternar o VPL de positivo para negativo."
+];
+
+const practicalApplications = [
+  { title: "Redução de Pico", description: "Reduza tarifas de demanda da instalação descarregando baterias durante períodos de pico para achatamento do perfil de carga." },
+  { title: "Arbtragem Energética", description: "Carregue baterias durante horários fora de pico de baixa tarifa e descarregue durante horários de pico de alta tarifa para economia de custos de energia." },
+  { title: "Resposta à Demanda", description: "Participe de programas de resposta à demanda da concessionária reduzindo o consumo da rede durante eventos de estresse para receita adicional." },
+  { title: "Integração de Renováveis", description: "Armazene excedente de geração solar ou eólica para uso posterior, reduzindo desperdício e maximizando o valor do ativo renovável." },
+  { title: "Economia de Microrrede", description: "Avalie o ROI de armazenamento de baterias para microrredes isoladas em aplicações remotas ou militares." },
+  { title: "Armazenamento em Escala de Utilidade", description: "Avalie a viabilidade financeira de projetos de baterias em escala de rede que fornecem regulação de frequência e serviços de capacidade." },
+];
+
+const expertNotes = [
+  { title: 'Modelagem de Degradação', variant: 'warning', content: 'A degradação da bateria diminui as capacidades de descarga do BESS por uma taxa composta anualmente. Um sistema com 2% de degradação anual retém apenas ~82% da capacidade no ano 10. Falhar em modelar o declínio do SOH resulta em fluxos de caixa altamente superestimados nos anos posteriores do projeto.' },
+  { title: 'Tarifas de Demanda', variant: 'engineering', content: 'Em muitas tarifas comerciais de concessionárias, as tarifas de demanda (baseadas no pico de 15 minutos de consumo) podem representar 30–50% da conta total de eletricidade. O pico de redução do BESS visando tarifas de demanda frequentemente entrega payback mais rápido que a arbtragem energética isolada.' },
+  { title: 'Impacto do RTE', variant: 'info', content: 'Eficiência de ida e volta (RTE) de 88% significa que 12% da energia é perdida em cada ciclo de carga-descarga. Para arbtragem, o custo efetivo fora de pico é tarifa_fora_pico / RTE, o que pode significativamente estreitar a margem de lucro em spreads de preço pequenos.' },
+];
+
+const trustSection = {
+  text: "Este calculador usa metodologia padrão de análise de fluxo de caixa descontado (DCF). As economias anuais são modeladas com degradação composta, OPEX é deduzido das economias brutas e os fluxos de caixa são descontados no WACC especificado. Todos os valores intermediários são exibidos para verificação independente. Nosso modelo financeiro segue práticas padrão de finanças de projetos usadas na análise da indústria de armazenamento de energia.",
+  link: { label: "Ver nossa metodologia completa", href: "/methodology/" },
+};
+
+const references = [
+  { title: "NREL — Métodos de Análise Econômica BESS", url: "https://www.nrel.gov/analysis/bess-economic-analysis.html", source: "Laboratório Nacional de Energia Renovável" },
+  { title: "US DOE — Framework de Valoração de Armazenamento de Energia", url: "https://www.energy.gov/eere/storage/energy-storage-valuation", source: "Departamento de Energia dos EUA" },
+  { title: "IEEE 2800-2022 — Padrão para Interconexão de Armazenamento de Energia", url: "https://standards.ieee.org/ieee/2800/11000/", source: "Associação de Padrões IEEE" },
+  { title: "Lazard — Análise de Custo Nivelado de Armazenamento", url: "https://www.lazard.com/research-insights/levelized-cost-of-storage/", source: "Lazard Advisory Financeiro" },
+  { title: "BloombergNEF — Perspectiva do Mercado de Armazenamento de Energia", url: "https://about.bnef.com/energy-storage/", source: "BloombergNEF" },
+];
+
+const faqItems = [
+  {
+    question: "O que é redução de pico vs arbtragem energética?",
+    answer: "A arbtragem energética consiste em carregar a bateria durante horários baratos fora de pico e descarregá-la durante horários caros de pico. A redução de pico é descarregar a bateria para achatamento dos picos de consumo geral do edifício, reduzindo as 'tarifas de demanda' que as concessionárias cobram com base no maior pico de 15 minutos do mês.",
+  },
+  {
+    question: "Por que a Eficiência de Ida e Volta (RTE) é importante para o ROI do BESS?",
+    answer: "Carregar um BESS consome mais eletricidade do que libera. Uma descarga de 100 kWh requer puxar 114 kWh da rede se o RTE do sistema for 88%. Isso significa que o custo da energia fora de pico deve ser dividido por 0,88 nos cálculos de arbtragem, o que comprime o spread de preço.",
+  },
+  {
+    question: "Como a degradação da capacidade afeta os retornos financeiros?",
+    answer: "As capacidades das baterias de lítio diminuem a cada ano devido ao decaimento químico. Um sistema com 2% de degradação anual retém apenas ~82% de capacidade no ano 10. Consequentemente, a energia disponível para as mudanças diárias de arbtragem diminui 2% anualmente, reduzindo os fluxos de caixa progressivamente.",
+  },
+  {
+    question: "Qual é uma boa taxa de desconto alvo para armazenamento comercial?",
+    answer: "A maioria das operações comerciais usa uma taxa de desconto (custo médio ponderado de capital, WACC) de 6% a 10% para analisar projetos de armazenamento. Uma taxa de desconto mais alta penaliza fluxos de caixa futuros, exigindo períodos de payback mais rápidos para atingir um Valor Presente Líquido positivo (VPL > 0).",
+  },
+  {
+    question: "Qual é o período de payback típico para BESS?",
+    answer: "Os períodos de payback variam amplamente por aplicação. Sistemas de redução de pico comercial com altas tarifas de demanda podem atingir payback de 5–7 anos. A arbtragem energética isolada tipicamente rende 8–12 anos. Sistemas combinando múltiplos fluxos de valor (arbtragem + resposta à demanda + capacidade) podem atingir 5–8 anos.",
+  },
+  {
+    question: "Como o dimensionamento do BESS afeta o ROI?",
+    answer: "BESS sobredimensionado desperdiça CAPEX em capacidade não utilizada. BESS subdimensionado não consegue capturar todo o potencial de economia. O dimensionamento ideal combina com o perfil de carga diária — o BESS deve ser grande o suficiente para deslocar a carga máxima prática, mas não maior do que a oportunidade diária de arbtragem suporta.",
+  },
+  {
+    question: "O que são tarifas de demanda?",
+    answer: "Tarifas de demanda são taxas da concessionária baseadas no maior consumo médio de 15 minutos (kW) durante um período de fatura, separadamente do consumo de energia (kWh). Podem representar 30–50% das contas de eletricidade comerciais. A redução de pico do BESS reduz tarifas de demanda descarregando durante períodos de alta carga.",
+  },
+  {
+    question: "Devo incluir incentivos nos cálculos de ROI?",
+    answer: "Sim. Créditos Tributários de Investimento Federais (ITC), incentivos estaduais e reembolsos da concessionária podem reduzir o CAPEX efetivo em 30–50%. Inclua todos os incentivos aplicáveis para obter uma imagem precisa do custo líquido de investimento e cronograma de payback.",
+  },
+  {
+    question: "Como a taxa de degradação afeta o VPL?",
+    answer: "Taxas de degradação mais altas reduzem fluxos de caixa dos anos posteriores, estendendo o payback e reduzindo o VPL. Um sistema com 1% de degradação anual terá VPL significativamente maior que o mesmo sistema com 3% de degradação, porque mais energia está disponível para arbtragem nos anos 5–15.",
+  },
+  {
+    question: "Qual é a diferença entre payback simples e payback descontado?",
+    answer: "Payback simples divide o CAPEX pelas economias anuais sem considerar o valor temporal do dinheiro. Payback descontado contabiliza o fato de que economias futuras valem menos hoje. Payback descontado é sempre mais longo que payback simples e é a métrica financeiramente mais rigorosa.",
+  },
+  {
+    question: "O ROI do BESS pode ser negativo?",
+    answer: "Sim. Se o spread tarifário for muito estreito, a degradação for alta, o CAPEX for excessivo ou a taxa de desconto for agressiva, o projeto pode nunca atingir VPL positivo. Sempre execute análise de sensibilidade nas variáveis-chave antes de investir.",
+  },
+  {
+    question: "Quais OPEX devo incluir?",
+    answer: "OPEX típico do BESS inclui inspeções de manutenção ($500–$2.000/ano), seguro (0,5–1% do CAPEX/ano), substituição de componentes auxiliares e custos de sistema de monitoramento. OPEX tipicamente varia de 1–3% do CAPEX anualmente.",
+  },
+];
+
+const relatedTools = [
+  { href: "/tools/battery-degradation-estimator/", title: "Estimador de Degradação", description: "Estime degradação de vida útil calendário e ciclística (SOH)." },
+  { href: "/tools/battery-sizing-calculator/", title: "Ferramenta de Dimensionamento", description: "Dimensionamento de capacidade a partir de perfis de consumo elétrico." },
+  { href: "/tools/runtime-calculator/", title: "Calculadora de Autonomia", description: "Verifique horas de operação sob uma carga contínua específica em Watts." },
+  { href: "/tools/solar-battery-sizing-calculator/", title: "Dimensionamento Solar", description: "Dimensione bancos de baterias solares a partir de dados de consumo diário." },
+  { href: "/tools/c-rate-calculator/", title: "Calculadora de Taxa C", description: "Calcule taxas de corrente de carga e descarga." },
+  { href: "/tools/soc-estimator/", title: "Estimador de SOC", description: "Interpole o Estado de Carga da bateria a partir de tensões." },
+];
+
+const commonMistakes = [
+  "Ignorar a degradação da bateria — uma taxa de degradação anual de 2% significa 18% menos capacidade no ano 10. Sempre modele o declínio do SOH em projeções de fluxo de caixa de vários anos.",
+  "Superestimar o spread de arbtragem — spreads tarifários do mundo real variam sazonalmente e podem estreitar devido a mudanças de mercado. Use spreads médios conservadores, não valores de dias de pico.",
+  "Esquecer o OPEX — custos de manutenção, seguro e monitoramento são despesas reais que reduzem as economias anuais líquidas. Inclua 1–3% do CAPEX como OPEX anual.",
+  "Usar taxa de desconto errada — uma taxa muito baixa faz os projetos parecerem melhores do que são. Use seu WACC real ou mínimo de 8% para projetos comerciais.",
+  "Ignorar a variabilidade das tarifas de demanda — tarifas de demanda dependem do único pico de 15 minutos mais alto de cada mês. Se seu pico for sazonal, as economias variarão mês a mês.",
+  "Sobredimensionar o BESS — um sistema maior do que o perfil de carga diário pode utilizar desperdiça CAPEX. Dimensione o BESS para corresponder à oportunidade diária de arbtragem real.",
+  "Não incluir incentivos — ITC federal (30%+), incentivos estaduais e reembolsos da concessionária podem melhorar drasticamente o ROI. Sempre modele o CAPEX líquido após incentivos.",
+];
+
+const relatedArticles = [
+  { href: "/learn/bess-roi-explained/", title: "O que é ROI de BESS?" },
+  { href: "/learn/battery-degradation-explained/", title: "Impacto Financeiro da Degradação de Bateria" },
+];
+---
+
+<CalculatorLayout
+  title="Calculadora de ROI de BESS | Battery Calculators"
+  description="Avalie período de payback, valor presente líquido (VPL) e economias de redução de pico de Sistemas de Armazenamento de Energia em Bateria Comerciais (BESS)."
+  lang="pt"
+  faqItems={faqItems}
+  commonMistakes={commonMistakes}
+  relatedCalculators={relatedTools}
+  relatedArticles={relatedArticles}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+>
+
+  <!-- Grade Principal do Calculador -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+
+    <!-- Formulário de Entrada -->
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Entradas Financeiras e de Dimensionamento</h3>
+      <div class="flex flex-col gap-6">
+
+        <!-- CAPEX / OPEX -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <InputField id="capex" label="CAPEX do Sistema ($)" value={150000} min={0} step="any" />
+          <InputField id="opex" label="OPEX Anual ($/ano)" value={3000} min={0} step="any" />
+        </div>
+
+        <!-- Dimensionamento do Sistema -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <InputField id="capacity" label="Capacidade BESS (kWh)" value={200} min={1} step="any" />
+          <InputField id="daily-shift" label="Deslocamento Diário de Arbtragem (kWh)" value={180} min={0} step="any" />
+        </div>
+
+        <!-- Tarifas TOU -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <InputField id="peak-tariff" label="Tarifa de Pico ($/kWh)" value={0.35} min={0} step={0.01} />
+          <InputField id="offpeak-tariff" label="Tarifa Fora de Pico ($/kWh)" value={0.10} min={0} step={0.01} />
+        </div>
+
+        <!-- Tarifas de Demanda -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <InputField id="demand-reduction" label="Redução de Demanda (kW)" value={50} min={0} step="any" />
+          <InputField id="demand-price" label="Tarifa de Demanda ($/kW/mês)" value={15} min={0} step="any" />
+        </div>
+
+        <!-- Parâmetros de Vida Útil -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <InputField id="rte" label="Eficiência de Ida e Volta (%)" value={88} min={50} max={100} />
+          <InputField id="degradation" label="Degradação Anual (%)" value={2.0} min={0} max={10} step={0.1} />
+        </div>
+
+        <!-- Desconto e Vida Útil -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <InputField id="lifetime" label="Vida Útil do Sistema (Anos)" value={10} min={1} max={25} />
+          <InputField id="discount" label="Taxa de Desconto (%)" value={8.0} min={0} max={25} step={0.1} />
+        </div>
+
+      </div>
+    </CalculatorCard>
+
+    <!-- Resultados do Cálculo -->
+    <CalculatorCard class="border-m-red flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Saídas Financeiras</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <!-- Saída Principal 1 -->
+          <ResultBox
+            label="Período de Payback Simples"
+            value="7,8 Anos"
+            suffix="Tempo para recuperar CAPEX padrão de $150k"
+            variant="primary"
+            id="result-payback"
+          />
+
+          <!-- Saída Principal 2 (VPL) -->
+          <ResultBox
+            label="Valor Presente Líquido (VPL)"
+            value="$12.453"
+            suffix="Retorno líquido descontado de vida útil"
+            variant="primary"
+            id="result-npv-card"
+          />
+
+          <!-- Economias Secundárias -->
+          <ResultBox
+            label="Economias de Arbtragem Ano 1"
+            value="$15.531 / ano"
+            id="result-arbitrage"
+          />
+
+          <ResultBox
+            label="Economias de Demanda Ano 1"
+            value="$9.000 / ano"
+            id="result-demand"
+          />
+        </div>
+
+        <MiniSimulationChart
+          title="Economias Líquidas Acumuladas"
+          description="Trajetória projetada de economias ao longo da vida útil do projeto"
+          xLabel="Ano"
+          yLabel="Acumulado ($)"
+          chartId="chart-bess-roi"
+        />
+      </div>
+
+      <!-- Área de Ação -->
+      <div class="border-t border-hairline pt-6">
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">Aviso de Risco de ROI BESS</h4>
+        <p class="text-body-sm text-muted">
+          A degradação diminui as capacidades de descarga do BESS por uma taxa composta anualmente. Falhar em modelar o declínio do SOH resulta em fluxos de caixa altamente superestimados nos anos posteriores do projeto.
+        </p>
+      </div>
+    </CalculatorCard>
+
+  </div>
+
+  <!-- Fórmulas e Exemplos Resolvidos -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">Fórmulas e Exemplos Resolvidos</h2>
+
+    <FormulaBox title="Fórmulas Matemáticas">
+      <p>As economias anuais de arbtragem energética contabilizam perdas de conversão de eficiência de ida e volta (RTE):</p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Arbtragem Diária ($) = Deslocamento × [Tarifa_pico - (Tarifa_fora_pico / (RTE% / 100))]</div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Arbtragem Anual ($) = Arbtragem Diária × 365</div>
+      <p>As economias de demanda de pico representam reduções mensais da tarifa de demanda:</p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Economias de Demanda Anual ($) = Redução kW × Tarifa de Demanda ($/kW) × 12</div>
+      <p>O Valor Presente Líquido (VPL) desconta fluxos de caixa anuais (S_t - OPEX) em relação ao CAPEX:</p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">FluxoCaixa_t = (Economias Ano 1 × (1 - Degradação%)^(t-1)) - OPEX</div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">VPL ($) = Σ [ FluxoCaixa_t / (1 + TaxaDesconto%)^t ] - CAPEX</div>
+      <p class="text-xs text-muted mt-4"><strong>Variáveis:</strong> Tarifas em $/kWh, RTE como porcentagem, Degradação como % anual, Taxa de Desconto como % WACC, CAPEX/OPEX em $. Pressupostos: arbtragem diária constante, modelo de degradação linear, fim da vida no horizonte do projeto.</p>
+    </FormulaBox>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample
+        number={1}
+        title="Arbtragem TOU Residencial"
+        scenario="Um proprietário instala uma bateria de 10 kWh para deslocar autoconsumo solar e explorar spreads tarifários de uso do horário."
+        inputs={[
+          { label: "Capacidade da bateria", value: "10 kWh" },
+          { label: "Spread TOU", value: "$0,15/kWh" },
+          { label: "Ciclos por ano", value: "300" },
+          { label: "RTE", value: "90%" },
+        ]}
+        steps={[
+          "Valor de arbtragem diária = 10 kWh × $0,15/kWh = $1,50",
+          "Economias anuais = $1,50 × 300 ciclos = $450/ano",
+          "Após perdas RTE (10%): $450 × 0,90 = $405/ano líquidos",
+        ]}
+        answer="Aproximadamente $405/ano em economias líquidas de arbtragem"
+        interpretation="Com custo instalado de ~$5.000, o payback é de aproximadamente 12 anos. A arbtragem TOU isolada é modesta; combinar com autoconsumo melhora significativamente os retornos."
+      />
+
+      <WorkedExample
+        number={2}
+        title="Redução Comercial de Tarifa de Demanda"
+        scenario="Uma instalação comercial implanta 100 kWh de BESS para reduzir picos de demanda e diminuir tarifas mensais de demanda."
+        inputs={[
+          { label: "Capacidade BESS", value: "100 kWh" },
+          { label: "Redução de demanda", value: "15 kW" },
+          { label: "Tarifa de demanda", value: "$15/kW/mês" },
+        ]}
+        steps={[
+          "Economias mensais de demanda = 15 kW × $15/kW = $225/mês",
+          "Economias anuais de demanda = $225 × 12 = $2.700/ano",
+          "Adicionar arbtragem TOU se aplicável: 90 kWh × $0,12 spread × 365 = $3.942/ano",
+          "Economias combinadas Ano 1: $2.700 + $3.942 = $6.642/ano",
+        ]}
+        answer="$2.700/ano apenas com tarifas de demanda; $6.642/ano combinado"
+        interpretation="A redução de tarifa de demanda isolada pode justificar um BESS menor. Combinar arbtragem com redução de pico acelera significativamente o payback."
+      />
+
+      <WorkedExample
+        number={3}
+        title="Autoconsumo Solar"
+        scenario="Uma casa com energia solar instala uma bateria de 15 kWh para armazenar excedente de geração diurna para uso noturno, reduzindo importações da rede."
+        inputs={[
+          { label: "Capacidade da bateria", value: "15 kWh" },
+          { label: "Excedente solar diário armazenado", value: "12 kWh" },
+          { label: "Tarifa de importação da rede", value: "$0,25/kWh" },
+          { label: "Tarifa de injeção", value: "$0,05/kWh" },
+        ]}
+        steps={[
+          "Valor do solar armazenado = 12 kWh × ($0,25 - $0,05) = $2,40/dia",
+          "Economias anuais = $2,40 × 365 = $876/ano",
+          "Após perdas RTE (10%): $876 × 0,90 = $788/ano líquidos",
+        ]}
+        answer="Aproximadamente $788/ano em custos de importação da rede evitados"
+        interpretation="O autoconsumo maximiza o valor do investimento solar existente. O spread efetivo entre tarifa de importação e injeção determina o ROI — residências com altas tarifas de importação se beneficiam mais."
+      />
+    </div>
+  </section>
+
+  <EngineeringDiagram title="Fontes de Receita BESS" description="Múltiplos fluxos de valor contribuem para o retorno do investimento em armazenamento de baterias" variant="flow" steps={[{ label: "Arbtragem Energética", icon: "chart" }, { label: "Redução de Demanda", icon: "chart" }, { label: "Autoconsumo Solar", icon: "solar" }, { label: "Economias Líquidas", icon: "chart" }]} />
+
+  <ComparisonTable title="Fontes de Receita BESS por Aplicação" headers={["Fonte de Receita", "Residencial", "Comercial", "Industrial", "Utilidade"]} rows={[["Arbtragem TOU", "$50–200/ano", "$500–5.000/ano", "$5.000–50.000/ano", "$100k–1M/ano"], ["Tarifas de Demanda", "N/A", "$1.000–10.000/ano", "$10.000–100.000/ano", "$500k–5M/ano"], ["Autoconsumo Solar", "$200–800/ano", "$2.000–20.000/ano", "$20.000–200.000/ano", "Varia"], ["Serviços de Rede", "N/A", "Limitado", "$5.000–30.000/ano", "$500k–5M/ano"], ["Valor de Backup", "$100–500/ano", "$1.000–10.000/ano", "$10.000–100.000/ano", "Regulatório"]]} caption="O potencial de receita varia significativamente por escala e aplicação" />
+
+  <FAQSection items={faqItems} />
+  <RelatedTools tools={relatedTools} />
+
+  <!-- Script de Cálculo -->
+  <script>
+    import { calculateBessRoi } from '../../../utils/calculators';
+    import { renderLineChart, clearChart } from '../../../utils/charting';
+
+    const capexInput = document.getElementById('capex') as HTMLInputElement;
+    const opexInput = document.getElementById('opex') as HTMLInputElement;
+    const capacityInput = document.getElementById('capacity') as HTMLInputElement;
+    const dailyShiftInput = document.getElementById('daily-shift') as HTMLInputElement;
+    const peakTariffInput = document.getElementById('peak-tariff') as HTMLInputElement;
+    const offpeakTariffInput = document.getElementById('offpeak-tariff') as HTMLInputElement;
+    const demandReductionInput = document.getElementById('demand-reduction') as HTMLInputElement;
+    const demandPriceInput = document.getElementById('demand-price') as HTMLInputElement;
+    const rteInput = document.getElementById('rte') as HTMLInputElement;
+    const degradationInput = document.getElementById('degradation') as HTMLInputElement;
+    const lifetimeInput = document.getElementById('lifetime') as HTMLInputElement;
+    const discountInput = document.getElementById('discount') as HTMLInputElement;
+
+    // Saídas - consultar elementos internos dos ResultBox
+    const resultPaybackCard = document.getElementById('result-payback');
+    const resultPayback = resultPaybackCard?.querySelector('.text-display-md') as HTMLElement;
+    const resultPaybackDesc = resultPaybackCard?.querySelector('.text-caption') as HTMLElement;
+    const resultNpvCard = document.getElementById('result-npv-card');
+    const resultNpv = resultNpvCard?.querySelector('.text-display-md') as HTMLElement;
+    const resultArbitrageCard = document.getElementById('result-arbitrage');
+    const resultArbitrage = resultArbitrageCard?.querySelector('.text-title-lg') as HTMLElement;
+    const resultDemandCard = document.getElementById('result-demand');
+    const resultDemand = resultDemandCard?.querySelector('.text-title-lg') as HTMLElement;
+
+    const chartSvg = document.getElementById('chart-bess-roi') as unknown as SVGElement;
+
+    function updateCalculations() {
+      const capex = parseFloat(capexInput.value) || 0;
+      const opex = parseFloat(opexInput.value) || 0;
+      const capacity = parseFloat(capacityInput.value) || 0;
+      const dailyShift = parseFloat(dailyShiftInput.value) || 0;
+      const peakTariff = parseFloat(peakTariffInput.value) || 0;
+      const offpeakTariff = parseFloat(offpeakTariffInput.value) || 0;
+      const demandReduction = parseFloat(demandReductionInput.value) || 0;
+      const demandPrice = parseFloat(demandPriceInput.value) || 0;
+      const rte = parseFloat(rteInput.value) || 90;
+      const degradation = parseFloat(degradationInput.value) || 0;
+      const lifetime = parseFloat(lifetimeInput.value) || 10;
+      const discount = parseFloat(discountInput.value) || 0;
+
+      const results = calculateBessRoi(
+        capex, opex, capacity, dailyShift, peakTariff, offpeakTariff,
+        demandReduction, demandPrice, rte, degradation, lifetime, discount
+      );
+
+      // Renderizar Payback
+      if (results.paybackYears < 0) {
+        if (resultPayback) resultPayback.textContent = '> Vida Útil';
+        if (resultPaybackDesc) resultPaybackDesc.textContent = `O payback não é alcançado dentro de ${lifetime} anos.`;
+      } else {
+        if (resultPayback) resultPayback.textContent = `${results.paybackYears.toFixed(1)} Anos`;
+        if (resultPaybackDesc) resultPaybackDesc.textContent = `Tempo para recuperar $${Math.round(capex).toLocaleString()} de CAPEX`;
+      }
+
+      // Renderizar VPL
+      if (resultNpv) {
+        const sign = results.npv < 0 ? "-" : "";
+        resultNpv.textContent = `${sign}$${Math.abs(Math.round(results.npv)).toLocaleString()}`;
+      }
+
+      if (resultNpvCard) {
+        resultNpvCard.className = "bg-surface-soft p-6 border col-span-1 md:col-span-2 " +
+          (results.npv >= 0 ? "border-green-600" : "border-red-800");
+      }
+
+      // Secundário
+      if (resultArbitrage) resultArbitrage.textContent = `$${Math.round(results.annualSavingsArbitrage).toLocaleString()} / ano`;
+      if (resultDemand) resultDemand.textContent = `$${Math.round(results.annualSavingsDemand).toLocaleString()} / ano`;
+
+      if (chartSvg && capex > 0 && lifetime > 0) {
+        const totalSavingsYr1 = results.annualSavingsArbitrage + results.annualSavingsDemand;
+        const cumPts: { x: number; y: number }[] = [];
+        let cumulative = -capex;
+        cumPts.push({ x: 0, y: -capex });
+
+        for (let year = 1; year <= lifetime; year++) {
+          const degMult = Math.pow(1 - degradation / 100, year - 1);
+          cumulative += totalSavingsYr1 * degMult - opex;
+          cumPts.push({ x: year, y: cumulative });
+        }
+
+        renderLineChart(chartSvg, cumPts, {
+          width: 320, height: 160,
+          xLabel: 'Ano', yLabel: 'Acumulado ($)',
+          xMin: 0, xMax: lifetime,
+        });
+      } else if (chartSvg) {
+        clearChart(chartSvg);
+      }
+    }
+
+    [
+      capexInput, opexInput, capacityInput, dailyShiftInput, peakTariffInput, offpeakTariffInput,
+      demandReductionInput, demandPriceInput, rteInput, degradationInput, lifetimeInput, discountInput
+    ].forEach(el => {
+      el.addEventListener('input', updateCalculations);
+    });
+
+    // Executar ao iniciar
+    updateCalculations();
+  </script>
+</CalculatorLayout>

@@ -1,0 +1,210 @@
+---
+import CalculatorLayout from '../../layouts/CalculatorLayout.astro';
+import FormulaBox from '../../components/FormulaBox.astro';
+import FAQSection from '../../components/FAQSection.astro';
+import PowerOutageForm from '../../components/PowerOutageForm.astro';
+import WorkedExample from '../../components/WorkedExample.astro';
+import ComparisonTable from '../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../components/EngineeringDiagram.astro';
+
+const whatIs = `Uma calculadora de backup de bateria para CPAP determina a capacidade da bateria e o tempo de funcionamento que você precisa para alimentar sua máquina de CPAP durante uma noite completa de sono durante um apagão. Máquinas de CPAP são dispositivos médicos de sustento de vida — perder energia no meio do sono pode causar episódios perigosos de apneia. Esta calculadora dimensiona sua bateria com base na potência real de funcionamento da sua CPAP (com ou sem umidificador), levando em consideração a eficiência do inversor, limites de profundidade de descarga e uma margem de segurança configurável.`;
+
+const whyItMatters = [
+  "Usuários de CPAP que perdem energia durante o sono enfrentam riscos imediatos de saúde — apneia do sono não tratada causa dessaturação de oxigênio e estresse cardíaco.",
+  "Uma CPAP com umidificador aquecido consome 30–60W, enquanto sem umidificador consome apenas 10–30W — essa diferença de 2× altera drasticamente os requisitos de bateria.",
+  "A maioria dos usuários de CPAP precisa de 6–10 horas de funcionamento por noite. Subdimensionar a bateria deixa você sem energia antes do amanhecer.",
+  "Acampamento, viagens e preparação para emergências todos requerem energia portátil para CPAP — mas nem todas as estações de energia lidam com a carga de forma eficiente.",
+  "Tempo frio reduz a capacidade de baterias de lítio em 10–30%, o que pode deixar usuários de CPAP sem energia durante apagões de inverno."
+];
+
+const practicalApplications = [
+  { title: "Backup Médico Noturno", description: "Garanta que sua CPAP funcione a noite inteira durante apagões na rede — o caso de uso mais crítico para pacientes com apneia do sono." },
+  { title: "Acampamento e Viagens", description: "Alimente sua CPAP enquanto acampa, viaja de RV ou fica em locais sem energia confiável." },
+  { title: "Preparação de Kit de Emergência", description: "Inclua backup de bateria para CPAP em seu kit de emergência doméstico, junto com alimentos, água e dispositivos de comunicação." },
+  { title: "Energia em Abrigos e Hospitais", description: "Durante desastres naturais, abrigos podem não ter energia para dispositivos médicos — backup de bateria portátil garante continuidade." },
+];
+
+const expertNotes: { title: string; variant: 'engineering' | 'tip' | 'warning'; content: string }[] = [
+  { title: "O Umidificador Faz Grande Diferença", variant: "engineering", content: "Uma CPAP com umidificador aquecido consome 30–60W vs 10–30W sem. Se você puder tolerar dormir sem o umidificador durante emergências, pode dobrar o tempo de bateria." },
+  { title: "Verifique a Potência Real do Seu Dispositivo", variant: "warning", content: "O consumo de energia da CPAP varia significativamente por modelo e configuração de pressão. Verifique o selo do adaptador de energia ou manual do seu dispositivo para a potência exata. Esta calculadora fornece estimativas — sempre confirme com seu dispositivo específico." },
+  { title: "Conexão Direta 12V DC", variant: "tip", content: "Muitas máquinas de CPAP podem funcionar em 12V DC diretamente, eliminando completamente o inversor. Isso elimina perdas do inversor (10–15%) e estende o tempo de bateria. Verifique se sua CPAP tem um adaptador 12V DC." }
+];
+
+const trustSection = {
+  text: "Esta calculadora usa fórmulas padrão de engenharia elétrica. Sempre confirme os requisitos reais de energia da sua CPAP com o fabricante do dispositivo.",
+  link: { label: "Veja nossa metodologia", href: "/methodology/" }
+};
+
+const references = [
+  { title: "FDA — Orientação sobre Dispositivos CPAP", url: "https://www.fda.gov/medical-devices/sleep-apnea/continuous-positive-airway-pressure-cpap-devices", source: "Administração de Alimentos e Medicamentos dos EUA" },
+  { title: "Academia Americana de Medicina do Sono", url: "https://aasm.org/resources/factsheets/sleepapnea.pdf", source: "AASM" },
+];
+
+const faqItems = [
+  { question: "Qual tamanho de bateria preciso para uma CPAP?", answer: "Para 8 horas sem umidificador (~20W), você precisa de aproximadamente 160–200 Wh utilizáveis. Com umidificador (~50W), planeje 400–500 Wh. Uma bateria LiFePO4 de 12V 50Ah (640 Wh) fornece uma noite completa com margem." },
+  { question: "Quanto tempo uma bateria de 100Ah vai durar uma CPAP?", answer: "Uma bateria LiFePO4 de 12V 100Ah (1.280 Wh) a 80% de DoD fornece 1.024 Wh utilizáveis. Sem umidificador (~20W), roda uma CPAP por aproximadamente 40+ horas. Com umidificador (~50W), aproximadamente 16–20 horas." },
+  { question: "Uma estação de energia portátil pode rodar uma CPAP durante a noite?", answer: "Sim, a maioria das estações de energia portáteis de lítio com 300Wh+ pode rodar uma CPAP por uma noite completa. Unidades com 500–1.000Wh fornecem várias noites. Procure saída DC para evitar perdas do inversor." },
+  { question: "O umidificador da CPAP aumenta o consumo de bateria?", answer: "Sim, significativamente. Um umidificador aquecido adiciona 20–40W, efetivamente dobrando ou triplicando o consumo de bateria. Durante emergências, considere reduzir o nível de umidade ou desligar o aquecedor para estender o tempo de funcionamento." },
+];
+
+const commonMistakes = [
+  "Ignorar o impacto energético do umidificador aquecido — ele adiciona 20–40W, efetivamente dobrando ou triplicando o consumo de bateria vs funcionar sem ele.",
+  "Usar inversor AC quando a conexão direta 12V DC está disponível — perdas do inversor (10–15%) reduzem o tempo de funcionamento; a maioria das CPAPs tem adaptadores 12V DC.",
+  "Assumir que a potência do adaptador da CPAP é o único consumo — o consumo real varia com a configuração de pressão e padrão de respiração.",
+  "Dimensionar a bateria para exatamente uma noite sem margem de segurança — tempo frio reduz capacidade 10–30%, e degradação da bateria ao longo dos anos reduz capacidade utilizável.",
+  "Usar uma estação de energia portátil com baixa eficiência de saída DC — algumas estações perdem 20–30% convertendo DC da bateria para saída DC regulada para CPAP.",
+  "Esquecer que configurações de pressão mais altas aumentam o consumo de energia — uma CPAP a 15 cmH₂O consome mais que uma a 8 cmH₂O.",
+  "Não considerar mudanças de altitude e temperatura durante viagens — ambientes frios de acampamento reduzem significativamente a capacidade de baterias de lítio.",
+  "Assumir que todas as estações de energia portáteis lidam com cargas de CPAP durante a noite — uma estação de 300Wh pode durar apenas 6–8 horas sem umidificador, menos com ele."
+];
+
+const relatedArticles = [
+  { title: "LiFePO4 vs Chumbo-Ácido", href: "/learn/lifepo4-vs-lead-acid/" },
+  { title: "Fórmula de Tempo de Bateria", href: "/learn/battery-runtime-formula/" },
+  { title: "Planejamento de Backup de Bateria Doméstica", href: "/learn/home-battery-backup-planning/" },
+];
+
+const relatedCalculators = [
+  { href: "/home-power-outage-battery-backup-calculator/", title: "Calculadora de Bateria de Backup para Cortes de Energia Domésticos", description: "Calculadora completa de energia de backup para todos os eletrodomésticos domésticos." },
+  { href: "/fridge-battery-backup-calculator/", title: "Calculadora de Bateria para Geladeira", description: "Dimensionamento de bateria especificamente para backup de geladeira durante apagões." },
+  { href: "/sump-pump-battery-backup-calculator/", title: "Calculadora de Bateria para Bomba d'Água", description: "Mantenha sua bomba d'água funcionando durante apagões de tempestade." },
+  { href: "/portable-power-station-runtime-calculator/", title: "Calculadora de Tempo de Estação de Energia Portátil", description: "Veja quanto tempo uma estação de energia portátil roda suas cargas." },
+  { href: "/solar-generator-sizing-calculator/", title: "Calculadora de Dimensionamento de Gerador Solar", description: "Dimensione um sistema completo de backup solar com painéis e bateria." },
+  { href: "/tools/runtime-calculator/", title: "Calculadora de Tempo de Bateria", description: "Estime o tempo de descarga a partir da capacidade e carga." },
+  { href: "/tools/battery-sizing-calculator/", title: "Calculadora de Dimensionamento de Bateria", description: "Dimensionamento completo de banco de baterias com degradação por temperatura." },
+  { href: "/tools/solar-battery-sizing-calculator/", title: "Calculadora de Bateria Solar", description: "Dimensione baterias pareadas com matrizes de painéis solares." },
+  { href: "/tools/energy-conversion-calculator/", title: "Calculadora de Conversão de Energia", description: "Converta entre Ah, Wh e kWh em qualquer voltagem." },
+  { href: "/tools/charging-time-calculator/", title: "Calculadora de Tempo de Carga", description: "Estime o tempo de carga a partir de solar ou rede elétrica." },
+  { href: "/tools/voltage-drop-calculator/", title: "Calculadora de Queda de Voltagem", description: "Dimensione extensões de fio para minimizar queda de voltagem." },
+  { href: "/tools/dc-cable-loss-calculator/", title: "Calculadora de Perda em Cabo DC", description: "Calcule perdas de fiação em conexões DC." },
+];
+
+const presetAppliances = [
+  { name: "Máquina de CPAP", runningW: 40, surgeW: 80 }, { name: "CPAP (sem umidificador)", runningW: 20, surgeW: 40 },
+  { name: "Roteador Wi-Fi", runningW: 12, surgeW: 12 }, { name: "Luz LED", runningW: 10, surgeW: 10 },
+  { name: "Carregador de Telefone", runningW: 15, surgeW: 15 }, { name: "Notebook", runningW: 60, surgeW: 90 },
+  { name: "Geladeira", runningW: 150, surgeW: 600 }, { name: "Ventilador", runningW: 50, surgeW: 75 },
+];
+---
+
+<CalculatorLayout
+  title="Calculadora de Bateria para CPAP | Battery Calculators"
+  description="Calcule o tamanho da bateria e o tempo de backup necessário para alimentar sua máquina de CPAP durante a noite durante um apagão. Garanta terapia contínua para apneia do sono com backup de bateria de emergência adequadamente dimensionado."
+  faqItems={faqItems}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+  relatedCalculators={relatedCalculators}
+  commonMistakes={commonMistakes}
+  relatedArticles={relatedArticles}
+  lang="pt"
+>
+  <PowerOutageForm
+    presetAppliances={presetAppliances}
+    defaultBackupHours={10}
+    defaultVoltage="12"
+    defaultLoadsDescription="Uma máquina de CPAP foi pré-carregada acima. Ajuste as configurações para corresponder ao seu dispositivo e necessidades."
+    defaultLoads={[{ name: "Máquina de CPAP", quantity: 1 }]}
+  />
+
+  <section class="mb-16 border-t border-hairline pt-12">
+    <FormulaBox title="Fórmulas Matemáticas">
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Total Funcionamento W = Σ (Eletrodoméstico Funcionamento W × Quantidade)</div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Energia Necessária (Wh) = (Funcionamento W × Horas) / Eficiência do Inversor × (1 + Margem de Segurança)</div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Bateria Ah = Wh Necessários / (Voltagem da Bateria × Profundidade de Descarga)</div>
+      <p class="text-xs text-muted mt-4">Para backup de CPAP, considere a conexão direta 12V DC para eliminar perdas do inversor e estender o tempo de funcionamento.</p>
+    </FormulaBox>
+
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">Fórmulas e Exemplos Resolvidos</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample
+        number={1}
+        title="CPAP com Umidificador (Noite Completa)"
+        scenario="Alimentar uma máquina de CPAP com umidificador aquecido durante uma noite completa de 8 horas durante um apagão."
+        inputs={[
+          { label: "CPAP + Umidificador", value: "40W" },
+          { label: "Duração do Backup", value: "8 horas" },
+          { label: "Voltagem da Bateria", value: "12V" },
+          { label: "Eficiência do Inversor", value: "90%" },
+        ]}
+        steps={[
+          { label: "Passo 1: Energia necessária", formula: "40W × 8h = 320 Wh", result: "320 Wh" },
+          { label: "Passo 2: Após eficiência do inversor", formula: "320 / 0,90", result: "356 Wh" },
+          { label: "Passo 3: Com 20% de margem de segurança", formula: "356 × 1,20", result: "427 Wh" },
+          { label: "Passo 4: Capacidade da bateria (12V LFP, 80% DoD)", formula: "427 / (12 × 0,80)", result: "44,5 Ah → LFP 12V 50Ah" },
+        ]}
+        answer="Uma bateria LiFePO4 de 12V 50Ah (640 Wh) fornece energia de CPAP para a noite inteira com umidificador mais margem."
+        interpretation="O umidificador aquecido dobra o consumo de energia — se você puder tolerar umidade reduzida, o tempo de bateria se estende significativamente."
+      />
+      <WorkedExample
+        number={2}
+        title="CPAP sem Umidificador (Viagem Estendida)"
+        scenario="Alimentar uma CPAP sem umidificador por 3 noites consecutivas durante acampamento (10 horas por noite)."
+        inputs={[
+          { label: "CPAP (sem umidificador)", value: "20W" },
+          { label: "Duração Noturna", value: "10 horas" },
+          { label: "Noites", value: "3" },
+          { label: "Energia Total", value: "20W × 30h = 600 Wh" },
+        ]}
+        steps={[
+          { label: "Passo 1: Energia total necessária", formula: "20W × 30h = 600 Wh", result: "600 Wh" },
+          { label: "Passo 2: Após eficiência do inversor", formula: "600 / 0,90", result: "667 Wh" },
+          { label: "Passo 3: Com 20% de margem de segurança", formula: "667 × 1,20", result: "800 Wh" },
+          { label: "Passo 4: Capacidade da bateria (12V LFP, 80% DoD)", formula: "800 / (12 × 0,80)", result: "83,3 Ah → LFP 12V 100Ah" },
+        ]}
+        answer="Uma bateria LiFePO4 de 12V 100Ah (1.280 Wh) roda uma CPAP sem umidificador por 3 noites completas de acampamento."
+        interpretation="Desligar o umidificador estende dramaticamente o tempo de bateria — ideal para acampamentos de várias noites."
+      />
+      <WorkedExample
+        number={3}
+        title="CPAP de Viagem (12V DC Direto)"
+        scenario="Rodar uma CPAP de viagem em 12V DC direto (sem inversor) por 2 noites durante uma viagem de carro."
+        inputs={[
+          { label: "CPAP de Viagem (12V DC)", value: "25W" },
+          { label: "Duração Noturna", value: "8 horas" },
+          { label: "Noites", value: "2" },
+          { label: "Inversor Bypassado", value: "100% eficiência" },
+        ]}
+        steps={[
+          { label: "Passo 1: Energia total necessária", formula: "25W × 16h = 400 Wh", result: "400 Wh" },
+          { label: "Passo 2: Sem perdas do inversor (12V DC direto)", formula: "400 / 1,00", result: "400 Wh" },
+          { label: "Passo 3: Com 20% de margem de segurança", formula: "400 × 1,20", result: "480 Wh" },
+          { label: "Passo 4: Capacidade da bateria (12V LFP, 80% DoD)", formula: "480 / (12 × 0,80)", result: "50 Ah → LFP 12V 50Ah" },
+        ]}
+        answer="Uma bateria LFP de 12V 50Ah roda uma CPAP de viagem por 2 noites em DC direto — 15% mais tempo que com inversor AC."
+        interpretation="A conexão direta 12V DC elimina perdas do inversor e é a forma mais eficiente de alimentar uma CPAP com bateria."
+      />
+    </div>
+  </section>
+
+  <EngineeringDiagram
+    title="Caminho de Energia da Bateria CPAP"
+    description="Dois caminhos: inversor AC (com perdas) e conexão direta DC (sem perdas do inversor, mais eficiente)."
+    steps={[
+      { label: "Bateria 12V", icon: "battery" },
+      { label: "Inversor", icon: "inverter" },
+      { label: "Adaptador AC", icon: "cable" },
+      { label: "Máquina de CPAP", icon: "load" },
+    ]}
+    variant="circuit"
+  />
+
+  <ComparisonTable
+    title="Requisitos de Energia CPAP por Configuração"
+    headers={["Configuração", "Consumo", "Energia 8h", "Bateria Necessária (LFP 12V)", "Tempo em 100Ah"]}
+    rows={[
+      ["CPAP com umidificador (alto)", "50W", "400 Wh", "12V 60Ah (768 Wh)", "15–16 h"],
+      ["CPAP com umidificador (típico)", "40W", "320 Wh", "12V 50Ah (640 Wh)", "16–20 h"],
+      ["CPAP sem umidificador", "20W", "160 Wh", "12V 25Ah (320 Wh)", "32–40 h"],
+      ["CPAP de viagem (12V DC direto)", "25W", "200 Wh", "12V 30Ah (384 Wh)", "28–32 h"],
+      ["CPAP + carregamento de telefone", "55W", "440 Wh", "12V 60Ah (768 Wh)", "14–16 h"],
+      ["CPAP + Wi-Fi + luz", "72W", "576 Wh", "12V 75Ah (960 Wh)", "11–13 h"],
+    ]}
+    caption="Tempos baseados em bateria LiFePO4 de 12V 100Ah (1.280 Wh) a 80% de DoD. DC direto elimina 10–15% de perdas do inversor."
+  />
+
+  <FAQSection items={faqItems} />
+</CalculatorLayout>

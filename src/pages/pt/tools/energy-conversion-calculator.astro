@@ -1,0 +1,348 @@
+---
+import CalculatorLayout from '../../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import InputField from '../../../components/InputField.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import RelatedTools from '../../../components/RelatedTools.astro';
+import WorkedExample from '../../../components/WorkedExample.astro';
+import ComparisonTable from '../../../components/ComparisonTable.astro';
+
+const directionOptions = [
+  { label: "Ampere-horas (Ah) para Watt-horas (Wh)", value: "ahToWh" },
+  { label: "Watt-horas (Wh) para Ampere-horas (Ah)", value: "whToAh" },
+];
+
+const whatIs = `A conversão de energia entre Ampere-horas (Ah) e Watt-horas (Wh) é o cálculo mais fundamental na engenharia de baterias. <strong>Ampere-horas medem capacidade de carga</strong> — a carga elétrica total que uma bateria pode fornecer em uma tensão determinada. <strong>Watt-horas medem energia total</strong> — o trabalho real que uma bateria pode realizar. A conversão requer uma variável adicional: <strong>tensão nominal</strong>. Uma bateria de 100Ah a 12V armazena 1.200 Wh, enquanto a mesma 100Ah a 48V armazena 4.800 Wh — quatro vezes mais energia apesar de capacidade de carga idêntica. Entender esta distinção é essencial para comparar baterias em diferentes sistemas de tensão, dimensionar energia de backup e projetar sistemas de armazenamento de energia.`;
+
+const whyItMatters = [
+  "Comparar baterias apenas por Ah é enganoso — uma bateria 100Ah 12V contém 3× menos energia que uma 100Ah 48V.",
+  "Cálculos de carga requerem Wh, não Ah — uma carga de 500W funciona por 2,4 horas com 1.200 Wh, mas você precisa da unidade correta.",
+  "Baterias em diferentes tensões não podem ser comparadas por Ah — apenas Wh fornece uma comparação justa de energia.",
+  "Sistemas solares e de backup são projetados em Wh/kWh — converter Ah para Wh é o primeiro passo em qualquer cálculo de dimensionamento.",
+  "Especificações de carregadores frequentemente misturam classificações Ah e Wh — confusão leva a sistemas de carregamento subdimensionados ou superdimensionados.",
+];
+
+const practicalApplications = [
+  { title: "Comparação de Baterias", description: "Compare baterias de diferentes tensões e químicas em pé de igualdade convertendo para Wh." },
+  { title: "Dimensionamento de Sistemas", description: "Converta classificações Ah para Wh para cálculos de dimensionamento de armazenamento de energia baseados em carga." },
+  { title: "Projeto Solar", description: "Converta classificações Ah da bateria para Wh para corresponder à produção e consumo solar diário." },
+  { title: "Estimativa de Autonomia", description: "Converta Ah para Wh para calcular quanto tempo uma bateria pode sustentar uma carga de potência determinada." },
+  { title: "Cálculo de Autonomia EV", description: "Converta a capacidade do pacote de Ah para Wh para estimativa de autonomia e análise de consumo de energia." },
+];
+
+const expertNotes = [
+  { title: 'Seleção de Tensão Nominal', variant: 'engineering', content: 'Sempre use a tensão nominal média do pacote em vez de tensões de carga máxima ou corte de descarga baixa. Por exemplo, uma única célula LiFePO4 é nominal 3.2V (pico 3.65V, corte 2.5V). Para um sistema 4S, nominal é 12.8V.' },
+  { title: 'Efeitos de Temperatura', variant: 'warning', content: 'Temperaturas mais baixas reduzem a cinética química dentro das células, o que aumenta a resistência interna e reduz a curva de tensão de saída da célula durante a descarga. Como Wh = Ah × V, esta tensão mais baixa se traduz diretamente em menos Watt-horas totais fornecidos.' },
+];
+
+const trustSection = {
+  text: "As fórmulas de conversão (Wh = Ah × V, Ah = Wh / V) são relacionamentos elétricos fundamentais. Todos os cálculos são transparentes e utilizam unidades SI padrão.",
+  link: { label: "Veja nossa metodologia completa", href: "/methodology/" },
+};
+
+const references = [
+  { title: "Battery University — Como Medir Capacidade", url: "https://batteryuniversity.com/article/bu-901-how-to-measure-capacity", source: "Battery University / Cadex Electronics" },
+  { title: "IEC 61960 — Células de Lítio Secundárias para Aplicações Portáteis", url: "https://webstore.iec.ch/en/publication/25543", source: "Comissão Eletrotécnica Internacional" },
+];
+
+const faqItems = [
+  {
+    question: "Qual é a diferença entre Ah e Wh?",
+    answer: "Ampere-horas (Ah) medem capacidade de carga elétrica (o volume de elétrons passando por um ponto). Watt-horas (Wh) medem capacidade total de energia elétrica (o volume de elétrons multiplicado pela força elétrica, ou tensão). Wh é a medição real do potencial de energia.",
+  },
+  {
+    question: "Qual valor de tensão devo usar para tensão nominal?",
+    answer: "Sempre use a tensão nominal média do pacote em vez de tensões de carga máxima ou corte de descarga baixa. Por exemplo, uma única célula LiFePO4 é nominal 3.2V (pico 3.65V, corte 2.5V). Para um sistema 4S, nominal é 12.8V.",
+  },
+  {
+    question: "Por que a capacidade às vezes é medida em Ah em vez de Wh?",
+    answer: "Historicamente, baterias chumbo-ácido foram padronizadas com saídas de 6V ou 12V, tornando Ampere-horas um atalho conveniente para comparação. No entanto, com as modernas arquiteturas de lítio multi-tensão (12V, 24V, 48V, 400V, 800V), Watt-horas são necessários para comparação segura.",
+  },
+  {
+    question: "Como os efeitos de temperatura impactam a capacidade em Wh?",
+    answer: "Temperaturas mais baixas reduzem a cinética química dentro das células, o que aumenta a resistência interna e reduz a curva de tensão de saída da célula durante a descarga. Como Wh = Ah × V, esta queda de tensão mais baixa se traduz diretamente em menos Watt-horas totais fornecidos.",
+  },
+  {
+    question: "Como comparo uma bateria 12V 200Ah com uma 48V 100Ah?",
+    answer: "Converta ambas para Wh: 12V × 200Ah = 2.400 Wh. 48V × 100Ah = 4.800 Wh. A bateria 48V armazena o dobro da energia apesar de ter metade da classificação Ah. Sempre compare em Wh para uma comparação justa.",
+  },
+  {
+    question: "Posso usar Ah para calcular autonomia?",
+    answer: "Somente se a carga for especificada em amperes. Se a carga for em watts (o caso mais comum), converta para Wh primeiro, depois divida pela potência da carga. Fórmula: Autonomia (horas) = (Ah × V × DoD) / (Potência da Carga / Eficiência).",
+  },
+  {
+    question: "Qual é a relação entre Ah, Wh e kWh?",
+    answer: "Ah × Tensão = Wh. Wh / 1000 = kWh. Por exemplo, uma bateria 200Ah a 51.2V = 10.240 Wh = 10,24 kWh. kWh é simplesmente Wh expresso em milhares para grandes sistemas.",
+  },
+  {
+    question: "Por que algumas baterias listam apenas Ah e outras apenas Wh?",
+    answer: "Ah é tradicional para chumbo-ácido e alguns fabricantes de lítio. Wh é cada vez mais preferido porque representa diretamente o conteúdo de energia. Sempre verifique se o Ah declarado é na tensão nominal do pacote antes de comparar.",
+  },
+  {
+    question: "A capacidade Ah muda com a taxa de descarga?",
+    answer: "Sim. Taxas de descarga mais altas reduzem o Ah utilizável devido a perdas por resistência interna. Isso é especialmente pronunciado em chumbo-ácido (efeito Peukert). Uma bateria chumbo-ácido 100Ah pode fornecer apenas 60Ah a uma taxa 1C. LFP é menos afetado, mas ainda apresenta alguma redução de capacidade em taxas C altas.",
+  },
+  {
+    question: "Como o DoD afeta a comparação Ah vs Wh?",
+    answer: "Limites de DoD reduzem a capacidade utilizável igualmente em Ah e Wh. Uma bateria 100Ah a 80% de DoD fornece 80Ah utilizáveis, ou (80Ah × V) Wh utilizáveis. A conversão entre Ah e Wh continua válida independentemente do DoD — o DoD simplesmente escala ambos proporcionalmente.",
+  },
+  {
+    question: "Wh é a melhor métrica para comparar todas as baterias?",
+    answer: "Wh é a melhor métrica para comparar o conteúdo total de energia. No entanto, para aplicações que requerem alta corrente, considere também a descarga contínua máxima (A) e a taxa C. Duas baterias com o mesmo Wh podem ter capacidades de fornecimento de corrente muito diferentes.",
+  },
+];
+
+const commonMistakes = [
+  "Comparar baterias apenas por Ah sem considerar a tensão — uma bateria 100Ah 48V armazena 4× mais energia que uma 100Ah 12V. Sempre converta para Wh para uma comparação justa.",
+  "Usar tensão de carga máxima em vez de tensão nominal — cálculos de Wh devem usar tensão nominal (ex: 3.2V para LFP, 3.7V para NMC), não a tensão de carga máxima (3.65V ou 4.2V).",
+  "Ignorar DoD ao converter — uma bateria 100Ah a 80% de DoD fornece apenas 80Ah utilizáveis. Converta os Ah utilizáveis, não os Ah totais classificados, para cálculos de autonomia.",
+  "Confundir Wh e Ah para cálculos de carga — cargas são especificadas em watts, não amperes. Sempre converta a capacidade da bateria para Wh antes de dividir pela potência da carga para autonomia.",
+  "Esquecer a eficiência do sistema — uma bateria 100Ah 12.8V armazena 1.280 Wh, mas após perdas no inversor (90% de eficiência), apenas 1.152 Wh chegam à carga.",
+  "Assumir que Ah é independente da taxa de descarga — taxas C mais altas reduzem o Ah utilizável devido a perdas por resistência interna, especialmente em baterias chumbo-ácido (efeito Peukert).",
+  "Usar kWh para comparações de pequenas baterias — kWh é apropriado para grandes sistemas, mas Wh fornece resolução mais intuitiva para pequenas baterias abaixo de 5 kWh.",
+  "Misturar unidades em cálculos — nunca misture Ah e Wh na mesma fórmula sem converter. Ah × Tensão = Wh; Wh / Tensão = Ah.",
+  "Ignorar redução por temperatura — temperaturas frias reduzem tanto a capacidade Ah quanto Wh. Uma bateria classificada com 100Ah a 25°C pode fornecer apenas 85Ah a 0°C.",
+  "Não verificar tensão nominal — sempre verifique a especificação de tensão nominal do fabricante. Usar 12V em vez de 12.8V para LFP introduz um erro de 6,25%.",
+];
+
+const relatedArticles = [
+  { href: "/learn/lifepo4-voltage-chart/", title: "Tabela de Tensão LiFePO4" },
+  { href: "/learn/battery-voltage-systems/", title: "Sistemas de Tensão de Bateria" },
+  { href: "/learn/lifepo4-vs-lead-acid/", title: "LiFePO4 vs Chumbo-Ácido" },
+  { href: "/learn/battery-efficiency-reference/", title: "Referência de Eficiência de Bateria" },
+];
+
+---
+
+<CalculatorLayout
+  title="Conversor de Capacidade de Bateria Ah para Wh | Calculadoras de Bateria"
+  description="Converta métricas de capacidade de bateria entre Ampere-horas (Ah) e Watt-horas (Wh) usando tensão nominal do pacote. Calculadora rápida e transparente."
+  faqItems={faqItems}
+  commonMistakes={commonMistakes}
+  relatedArticles={relatedArticles}
+  relatedCalculators={[
+    { href: "/tools/runtime-calculator/", title: "Calculadora de Autonomia", description: "Estime horas de backup com uma carga de W." },
+    { href: "/tools/c-rate-calculator/", title: "Calculadora de Taxa C", description: "Analise parâmetros de velocidade de carga da bateria." },
+    { href: "/tools/battery-sizing-calculator/", title: "Ferramenta de Dimensionamento", description: "Dimensione pacotes a partir do consumo elétrico diário." },
+    { href: "/tools/solar-battery-sizing-calculator/", title: "Dimensionamento Solar", description: "Dimensione bancos de baterias solares a partir do consumo diário." },
+    { href: "/tools/battery-pack-calculator/", title: "Calculadora de Pacote", description: "Projete configurações de células série/paralelo." },
+  ]}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+  lang="pt"
+>
+
+  <!-- Main Calculator Grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+
+    <!-- Input Form -->
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Parâmetros</h3>
+      <div class="flex flex-col gap-6">
+
+        <!-- Direction -->
+        <InputField id="direction" label="Tipo de Conversão" type="select" options={directionOptions} value="ahToWh" />
+
+        <!-- Input Capacity (raw HTML for dynamic label) -->
+        <div class="flex flex-col gap-2">
+          <label for="input-val" class="text-label-uppercase text-xs text-primary" id="value-label">Capacidade (Ah)</label>
+          <input type="number" id="input-val" value="100" class="text-input" min="0.1" step="any" />
+        </div>
+
+        <!-- Voltage -->
+        <InputField id="voltage" label="Tensão Nominal (V)" value={12.8} min={0.1} step="any" helperText="Tensão nominal do empilhamento de células ou módulo" />
+
+      </div>
+    </CalculatorCard>
+
+    <!-- Calculation Results -->
+    <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Saídas Estimadas</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <!-- Main Output -->
+          <div class="bg-surface-soft p-6 border border-hairline col-span-1 md:col-span-2">
+            <span class="text-label-uppercase text-muted text-[10px] block mb-1" id="out-label">Energia Equivalente</span>
+            <div class="text-display-md text-primary font-bold animate-pulse-once" id="result-converted">1.280 Wh</div>
+            <span class="text-caption text-muted block mt-1" id="result-kwh">1,28 kWh</span>
+          </div>
+
+          <!-- Secondary Context -->
+          <div class="bg-surface-soft p-6 border border-hairline col-span-1 md:col-span-2">
+            <span class="text-label-uppercase text-muted text-[10px] block mb-1">Comparação de referência padrão</span>
+            <p class="text-body-sm text-body mt-2 font-light" id="result-ref">
+              Um pacote de 1,28 kWh pode alimentar uma carga de 100W por aproximadamente 11,5 horas com 90% de eficiência do sistema.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Area -->
+      <div class="border-t border-hairline pt-6">
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">Por que a tensão nominal é importante</h4>
+        <p class="text-body-sm text-muted">
+          Duas baterias com capacidades idênticas de 100 Ah podem conter quantidades muito diferentes de energia total. Um pacote 100 Ah 12V contém 1,2 kWh, enquanto um pacote 100 Ah 48V contém 4,8 kWh. A capacidade total de energia é o índice correto para comparações.
+        </p>
+      </div>
+    </CalculatorCard>
+
+  </div>
+
+  <!-- Formulas and Worked Examples -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">Fórmulas & Exemplos Resolvidos</h2>
+
+    <FormulaBox title="Fórmulas Matemáticas">
+      <p>
+        A conversão entre capacidade de carga elétrica (Ah) e capacidade total de energia (Wh) é direta, baseada na Lei de Ohm:
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Watt-horas (Wh) = Ampere-horas (Ah) × Tensão Nominal (V)
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Ampere-horas (Ah) = Watt-horas (Wh) / Tensão Nominal (V)
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Quilowatt-horas (kWh) = Watt-horas (Wh) / 1000
+      </div>
+    </FormulaBox>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample
+        number={1}
+        title="Converter 200Ah a 12.8V para Wh"
+        scenario="Você tem uma bateria LiFePO4 200Ah a 12.8V nominal e precisa encontrar a energia total em Watt-horas."
+        inputs={[
+          { label: "Capacidade", value: "200 Ah" },
+          { label: "Tensão Nominal", value: "12.8 V" },
+        ]}
+        steps={[
+          "Wh = Ah × V",
+          "Wh = 200 Ah × 12.8 V",
+          "Wh = 2.560 Wh",
+        ]}
+        answer="2.560 Wh"
+        interpretation="Uma bateria 200Ah a 12.8V armazena 2.560 Wh (2,56 kWh) de energia total — suficiente para alimentar uma carga de 256W por 10 horas."
+      />
+
+      <WorkedExample
+        number={2}
+        title="Converter 5kWh para Ah a 48V"
+        scenario="Você está projetando um banco de baterias 48V e precisa determinar a capacidade em Ampere-horas necessária para 5 kWh de energia utilizável."
+        inputs={[
+          { label: "Energia", value: "5 kWh (5.000 Wh)" },
+          { label: "Tensão Nominal", value: "48 V" },
+        ]}
+        steps={[
+          "Ah = Wh / V",
+          "Ah = 5.000 Wh / 48 V",
+          "Ah ≈ 104,17 Ah",
+        ]}
+        answer="≈ 104,17 Ah"
+        interpretation="A 48V, um banco de baterias de 5 kWh requer aproximadamente 104,17 Ah de capacidade. Isso é equivalente a cerca de 3,3 células em uma configuração 16S LFP 48V com 105Ah cada."
+      />
+
+      <WorkedExample
+        number={3}
+        title="Converter 500Wh para Joules e kWh"
+        scenario="Você tem uma estação de energia portátil classificada em 500Wh e precisa expressar sua capacidade em Joules (unidade SI) e kWh para comparação."
+        inputs={[
+          { label: "Energia", value: "500 Wh" },
+        ]}
+        steps={[
+          "Joules: J = Wh × 3.600",
+          "J = 500 × 3.600 = 1.800.000 J",
+          "kWh: kWh = Wh / 1.000",
+          "kWh = 500 / 1.000 = 0,5 kWh",
+        ]}
+        answer="1.800.000 J (1,8 MJ) ou 0,5 kWh"
+        interpretation="500 Wh equivale a 1,8 milhão de Joules ou 0,5 kWh. Para referência, 0,5 kWh pode alimentar uma geladeira de 50W por 10 horas ou carregar um smartphone aproximadamente 40 vezes."
+      />
+    </div>
+  </section>
+
+  <ComparisonTable
+    title="Referência de Conversão de Unidades de Energia"
+    headers={["De", "Para", "Fórmula", "Exemplo"]}
+    rows={[
+      ["Ah → Wh", "Multiplicar por tensão", "Wh = Ah × V", "100Ah × 12.8V = 1.280 Wh"],
+      ["Wh → Ah", "Dividir por tensão", "Ah = Wh / V", "1.280 Wh / 12.8V = 100 Ah"],
+      ["Wh → kWh", "Dividir por 1000", "kWh = Wh / 1000", "1.280 Wh = 1,28 kWh"],
+      ["kWh → Wh", "Multiplicar por 1000", "Wh = kWh × 1000", "1,28 kWh = 1.280 Wh"],
+      ["Wh → Joules", "Multiplicar por 3600", "J = Wh × 3600", "1.280 Wh = 4.608.000 J"],
+      ["Wh → BTU", "Multiplicar por 3,412", "BTU = Wh × 3,412", "1.280 Wh = 4.367 BTU"],
+    ]}
+    caption="Conversões comuns de unidades de energia para cálculos de bateria"
+  />
+
+  <FAQSection items={faqItems} />
+
+  <!-- Calculation Script -->
+  <script>
+    import { calculateEnergyConversion } from '../../../utils/calculators';
+
+    const directionSelect = document.getElementById('direction') as HTMLSelectElement;
+    const inputValElement = document.getElementById('input-val') as HTMLInputElement;
+    const valueLabel = document.getElementById('value-label');
+    const voltageInput = document.getElementById('voltage') as HTMLInputElement;
+
+    // Outputs
+    const outLabel = document.getElementById('out-label');
+    const resultConverted = document.getElementById('result-converted');
+    const resultKwh = document.getElementById('result-kwh');
+    const resultRef = document.getElementById('result-ref');
+
+    function updateLabels() {
+      const dir = directionSelect.value;
+      if (dir === 'ahToWh') {
+        if (valueLabel) valueLabel.textContent = 'Capacidade (Ampere-horas, Ah)';
+        if (outLabel) outLabel.textContent = 'Energia Equivalente (Watt-horas)';
+      } else {
+        if (valueLabel) valueLabel.textContent = 'Energia (Watt-horas, Wh)';
+        if (outLabel) outLabel.textContent = 'Capacidade Equivalente (Ampere-horas)';
+      }
+      updateCalculations();
+    }
+
+    function updateCalculations() {
+      const dir = directionSelect.value as "ahToWh" | "whToAh";
+      const val = parseFloat(inputValElement.value) || 0;
+      const voltage = parseFloat(voltageInput.value) || 12.8;
+
+      const converted = calculateEnergyConversion(val, dir, voltage);
+
+      if (dir === 'ahToWh') {
+        if (resultConverted) resultConverted.textContent = `${Math.round(converted).toLocaleString()} Wh`;
+        const kwh = converted / 1000;
+        if (resultKwh) resultKwh.textContent = `${kwh.toFixed(2)} kWh`;
+
+        // Runtime simulation for 100W load at 90% efficiency
+        const runtimeHours = (converted * 0.90) / 100;
+        if (resultRef) {
+          resultRef.textContent = `Um pacote de ${kwh.toFixed(2)} kWh pode alimentar uma carga de 100W por aproximadamente ${runtimeHours.toFixed(1)} horas com 90% de eficiência do sistema.`;
+        }
+      } else {
+        if (resultConverted) resultConverted.textContent = `${converted.toFixed(2)} Ah`;
+        if (resultKwh) resultKwh.textContent = `${(val / 1000).toFixed(2)} kWh fonte de energia`;
+
+        if (resultRef) {
+          resultRef.textContent = `A ${voltage.toFixed(1)}V nominal, uma capacidade de ${converted.toFixed(1)} Ah é equivalente a um sistema de armazenamento de bateria de ${val.toLocaleString()} Wh.`;
+        }
+      }
+    }
+
+    directionSelect.addEventListener('change', updateLabels);
+    [inputValElement, voltageInput].forEach(el => {
+      el.addEventListener('input', updateCalculations);
+    });
+
+    // Run on boot
+    updateLabels();
+  </script>
+</CalculatorLayout>

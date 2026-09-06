@@ -1,0 +1,630 @@
+---
+import CalculatorLayout from '../../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import ResultBox from '../../../components/ResultBox.astro';
+import ComparisonTable from '../../../components/ComparisonTable.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import RelatedTools from '../../../components/RelatedTools.astro';
+
+const whatIs = `O Seletor de Química de Bateria é um assistente interativo que o guia na escolha da química de bateria ideal para sua aplicação específica. Ele avalia o <strong>tipo de aplicação</strong>, <strong>prioridades de desempenho</strong> e <strong>restrições orçamentárias</strong> para recomendar a melhor tecnologia de bateria — seja LFP (LiFePO4), NMC (Níquel-Manganês-Cobalto), NCA (Níquel-Cobalto-Alumínio), Chumbo-Ácido (AGM/Gel/Inundada), LTO (Titanato de Lítio) ou Salino (Íon de Sódio). Cada química tem compensações distintas em densidade energética, vida em ciclos, segurança, custo e desempenho em temperatura.`;
+
+const whyItMatters = [
+  "Escolher a química errada pode reduzir pela metade a vida útil do seu sistema — um banco de chumbo-Ácido em uma aplicação solar com ciclagem diária pode precisar de substituição em 3 anos, enquanto LFP dura 10+.",
+  "Os perfis de segurança variam dramaticamente — LFP é termicamente estável até 270°C, enquanto NMC pode sofrer fuga térmica a 150°C em condições de abuso.",
+  "Custo inicial vs. custo ao longo da vida — chumbo-Ácido parece barato, mas custa 3–4× mais por ciclo ao longo da sua vida útil comparado ao LFP.",
+  "Extremos de temperatura eliminam algumas químicas — lítio padrão não pode ser carregado abaixo de 0°C, e chumbo-Ácido perde 20%+ de capacidade no frio.",
+  "Incompatibilidade de aplicação causa falha prematura — usar NMC de alta densidade em uma aplicação de telecom de alta ciclagem desperdiça seus pontos fortes e expõe suas fraquezas.",
+];
+
+const practicalApplications = [
+  { title: "Solar Off-Grid", description: "Ciclagem diária, necessidade de 5.000+ ciclos, temperaturas moderadas, orçamento sensível ao longo da vida." },
+  { title: "RV e Marinho", description: "Resistência a vibração, ampla faixa de temperatura, peso importa, profundidade de ciclagem moderada." },
+  { title: "Tração de VE", description: "Máxima densidade energética, carregamento rápido, peso crítico, altas taxas de descarga." },
+  { title: "Backup de Telecom", description: "Longa vida em float, ampla tolerância a temperatura, alta confiabilidade, vida útil de projeto de 10+ anos." },
+  { title: "Eletrônicos Portáteis", description: "Máxima densidade energética por kg, leve, vida útil em ciclos moderada aceitável." },
+  { title: "Armazenamento em Escala de Rede", description: "Menor $/kWh ao longo da vida, segurança primordial, vida útil de projeto de 15+ anos, escala massiva." },
+];
+
+const expertNotes = [
+  { title: 'Regra de Seleção de Química', variant: 'engineering', content: 'Sempre corresponda a química ao seu caso de uso principal. Se você cicla diariamente (solar, VE), priorize vida em ciclos e DoD. Se carrega em float (telecom, UPS), priorize vida em float e faixa de temperatura. Se o peso é crítico (portátil, drone), priorize densidade energética. Nenhuma química vence em todos os eixos.' },
+  { title: 'Aviso de Segurança', variant: 'warning', content: 'Químicas NMC e NCA exigem BMS sofisticado para gerenciamento térmico. LFP é inerentemente mais seguro devido à sua estrutura cristalina olivina que resiste à liberação de oxigênio. Para ambientes não controlados (telecom remoto, externo), LFP é fortemente recomendado.' },
+];
+
+const trustSection = {
+  text: "Este seletor usa especificações de química de bateria documentadas publicamente da IEEE, IEC e datasheets de fabricantes. As recomendações são baseadas em pontuação ponderada das suas prioridades declaradas contra as características documentadas de cada química. Todas as especificações mostradas são valores típicos — o desempenho real varia por fabricante e design da célula.",
+  link: { label: "Ver nossa metodologia", href: "/methodology/" },
+};
+
+const references = [
+  { title: "Battery University — Comparar Químicas de Bateria", url: "https://batteryuniversity.com/article/bu-103-comparison-practical-batteries", source: "Battery University / Cadex Electronics" },
+  { title: "IEC 62619 — Padrão de Segurança de Bateria de Lítio", url: "https://webstore.iec.ch/en/publication/26133", source: "IEC Standards" },
+  { title: "DOE — Visão Geral de Tecnologia de Bateria", url: "https://www.energy.gov/eere/vehiclebatteries/battery-technology", source: "U.S. Department of Energy" },
+  { title: "Sandia National Labs — Testes de Abuso de Bateria", url: "https://www.sandia.gov/ess-ssl/battery-abuse-testing/", source: "Sandia National Laboratories" },
+];
+
+const faqItems = [
+  {
+    question: "Qual química de bateria é melhor para armazenamento de energia solar?",
+    answer: "LFP (LiFePO4) é a química recomendada para a maioria das aplicações solares. Oferece 5.000+ ciclos de vida a 80% DoD, excelente estabilidade térmica e sem risco de fuga térmica. Enquanto NMC tem maior densidade energética, o armazenamento solar prioriza vida em ciclos e segurança sobre peso.",
+  },
+  {
+    question: "Por que LFP é mais caro inicialmente, mas mais barato a longo prazo?",
+    answer: "LFP custa 2–3× mais por kWh inicialmente que chumbo-Ácido, mas entrega 5.000+ ciclos vs. 500–1.000 para chumbo-Ácido. Ao longo de 10 anos de ciclagem diária, chumbo-Ácido precisa de 3–4 substituições enquanto LFP não precisa nenhuma. O custo total de propriedade favorece significativamente o LFP.",
+  },
+  {
+    question: "Baterias NMC podem ser usadas em armazenamento solar residencial?",
+    answer: "Sim, mas com ressalvas. NMC oferece maior densidade energética (útil para espaço limitado), mas tem vida em ciclos mais curta (2.000 vs. 5.000+) e exige gerenciamento térmico mais sofisticado. Para a maioria das instalações solares residenciais onde o espaço não é restrito, LFP é preferido pela sua segurança e longevidade.",
+  },
+  {
+    question: "Qual química funciona melhor em frio extremo?",
+    answer: "LTO (Titanato de Lítio) funciona bem até -30°C e pode ser carregado a -10°C sem dano. Lítio padrão (LFP/NMC) não pode ser carregado abaixo de 0°C sem aquecimento. Chumbo-Ácido perde 20–40% de capacidade abaixo de -10°C. Para climas frios, LTO ou LFP com aquecedores são recomendados.",
+  },
+  {
+    question: "Como o salino (íon de sódio) se compara ao lítio?",
+    answer: "Íon de sódio oferece menor custo e usa materiais abundantes, mas atualmente tem menor densidade energética (100–150 Wh/kg vs. 150–250 para lítio), vida em ciclos mais curta (2.000–3.000) e é mais adequado para armazenamento estacionário onde o peso não é uma restrição.",
+  },
+  {
+    question: "Chumbo-Ácido está completamente obsoleto?",
+    answer: "Não. Chumbo-Ácido continua viável para aplicações de float (UPS, iluminação de emergência) onde as baterias ficam carregadas e raramente ciclam. Seu baixo custo inicial e confiabilidade comprovada tornam-no adequado para aplicações com orçamento restrito e poucos ciclos. Está obsoleto para aplicações de ciclagem diária.",
+  },
+  {
+    question: "Qual é a química de bateria mais segura?",
+    answer: "LFP (LiFePO4) é amplamente considerada a química de lítio mais segura devido à sua estrutura cristalina olivina que resiste à liberação de oxigênio durante abuso térmico. Não sofre fuga térmica abaixo de 270°C. NMC e NCA são menos termicamente estáveis. Chumbo-Ácido é não inflamável, mas produz gás hidrogênio durante o carregamento.",
+  },
+  {
+    question: "Posso misturar diferentes químicas de bateria?",
+    answer: "Nunca misture químicas no mesmo banco de baterias. Curvas diferentes de carga/descarga, perfis de tensão e resistências internas causam carregamento desigual, degradação acelerada e riscos potenciais de segurança. Sempre use células de química, idade e capacidade idênticas em um banco.",
+  },
+  {
+    question: "Qual química é mais leve para a mesma energia?",
+    answer: "NMC e NCA oferecem a maior densidade energética (150–250 Wh/kg), tornando-os ideais para VE e aplicações portáteis onde o peso importa. LFP é mais pesado (90–160 Wh/kg), mas mais seguro. Chumbo-Ácido é o mais pesado (30–50 Wh/kg) e inadequado para aplicações onde o peso é crítico.",
+  },
+  {
+    question: "Como escolher entre LFP e NMC para um VE?",
+    answer: "LFP é adequado para VE de autonomia padrão priorizando segurança, longevidade e custo. NMC é adequado para VE de longa autonomia onde a densidade energética (mais autonomia por kg) justifica o custo mais alto e vida em ciclos mais curta. Tesla usa LFP para Model 3/Y de autonomia padrão e NMC para variantes de longa autonomia.",
+  },
+];
+
+const relatedTools = [
+  { href: "/tools/battery-sizing-calculator/", title: "Calculadora de Dimensionamento de Bateria", description: "Dimensione seu banco de baterias com base na carga e requisitos de autonomia." },
+  { href: "/tools/battery-degradation-estimator/", title: "Estimadora de Vida em Ciclos", description: "Estime a vida útil da bateria com base em DoD e temperatura." },
+  { href: "/tools/battery-degradation-estimator/", title: "Estimadora de Degradação de Bateria", description: "Modele a perda de capacidade ao longo do tempo para diferentes químicas." },
+  { href: "/tools/charging-time-calculator/", title: "Calculadora de Tempo de Carga", description: "Calcule o tempo de carga para diferentes químicas e taxas C." },
+  { href: "/tools/battery-pack-calculator/", title: "Calculadora de Pacote de Bateria", description: "Projete configurações de células série/paralelo." },
+  { href: "/tools/solar-battery-sizing-calculator/", title: "Dimensionamento Solar", description: "Dimensione bancos de bateria solar com DoD específica da química." },
+];
+
+const commonMistakes = [
+  "Escolher apenas pelo custo inicial — chumbo-Ácido parece barato, mas custa 3–4× mais por ciclo ao longo da sua vida útil comparado ao LFP.",
+  "Ignorar restrições de temperatura — lítio padrão não pode ser carregado abaixo de 0°C. Instalações em climas frios precisam de LTO ou sistemas de aquecimento.",
+  "Selecionar NMC para armazenamento estacionário de alta ciclagem — a vida de 2.000 ciclos do NMC é inadequada para aplicações solares ou de telecom com ciclagem diária.",
+  "Esquecer requisitos de segurança — NMC/NCA exigem BMS sofisticado. Para ambientes não controlados, LFP é a única escolha segura.",
+  "Misturar químicas em um banco — sempre use células idênticas. Perfis de tensão diferentes causam desequilíbrio e degradação acelerada.",
+  "Ignorar peso para aplicações móveis — chumbo-Ácido a 30–50 Wh/kg dobra ou triplica o peso do sistema vs. lítio a 100–250 Wh/kg.",
+  "Não considerar o fim de vida — baterias de lítio retêm 70–80% de capacidade após sua vida em ciclos nominal. Chumbo-Ácido degrada mais acentuadamente.",
+  "Usar químicas de bateria portátil para armazenamento estacionário — células de alta densidade energética são otimizadas para peso, não para vida em ciclos.",
+];
+
+const relatedArticles = [
+  { href: "/learn/lifepo4-vs-nmc/", title: "LFP vs NMC: Comparação Completa" },
+  { href: "/reference/battery-chemistry-comparison/", title: "Guia de Química de Bateria" },
+];
+---
+
+<CalculatorLayout
+  title="Seletor de Química de Bateria | Calculadoras de Bateria"
+  description="Assistente interativo para escolher a melhor química de bateria — LFP, NMC, Chumbo-Ácido, LTO ou Íon de Sódio — com base na sua aplicação, prioridades e orçamento."
+  faqItems={faqItems}
+  commonMistakes={commonMistakes}
+  relatedCalculators={relatedTools}
+  relatedArticles={relatedArticles}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+  lang="pt"
+>
+
+  <!-- Wizard Steps -->
+  <div class="mb-16">
+
+    <!-- Step Indicator -->
+    <div class="flex items-center gap-3 mb-8">
+      <span class="step-indicator active" id="step-dot-1">1</span>
+      <span class="step-line" id="step-line-1"></span>
+      <span class="step-indicator" id="step-dot-2">2</span>
+      <span class="step-line" id="step-line-2"></span>
+      <span class="step-indicator" id="step-dot-3">3</span>
+      <span class="step-line"></span>
+      <span class="step-indicator" id="step-dot-r">R</span>
+    </div>
+
+    <!-- Step 1: Application -->
+    <div id="step-1" class="wizard-step">
+      <CalculatorCard>
+        <h3 class="text-title-lg text-primary mb-2 uppercase tracking-wider">Passo 1: Aplicação</h3>
+        <p class="text-body-sm text-muted mb-6">Para que este sistema de bateria será usado?</p>
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          <button class="app-btn selected" data-app="solar">
+            <span class="text-2xl mb-1">☀️</span>
+            <span class="text-label-uppercase text-[10px]">Solar / Off-Grid</span>
+          </button>
+          <button class="app-btn" data-app="rv">
+            <span class="text-2xl mb-1">🚐</span>
+            <span class="text-label-uppercase text-[10px]">RV / Camping</span>
+          </button>
+          <button class="app-btn" data-app="marine">
+            <span class="text-2xl mb-1">⛵</span>
+            <span class="text-label-uppercase text-[10px]">Marinho</span>
+          </button>
+          <button class="app-btn" data-app="ev">
+            <span class="text-2xl mb-1">🚗</span>
+            <span class="text-label-uppercase text-[10px]">Veículo Elétrico</span>
+          </button>
+          <button class="app-btn" data-app="telecom">
+            <span class="text-2xl mb-1">📡</span>
+            <span class="text-label-uppercase text-[10px]">Telecom / UPS</span>
+          </button>
+          <button class="app-btn" data-app="portable">
+            <span class="text-2xl mb-1">🔋</span>
+            <span class="text-label-uppercase text-[10px]">Portátil</span>
+          </button>
+        </div>
+        <div class="mt-6 flex justify-end">
+          <button id="next-1" class="btn-primary">PRÓXIMO →</button>
+        </div>
+      </CalculatorCard>
+    </div>
+
+    <!-- Step 2: Priority -->
+    <div id="step-2" class="wizard-step hidden">
+      <CalculatorCard>
+        <h3 class="text-title-lg text-primary mb-2 uppercase tracking-wider">Passo 2: Prioridade</h3>
+        <p class="text-body-sm text-muted mb-6">O que é mais importante para esta aplicação?</p>
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          <button class="prio-btn" data-prio="cycle-life">
+            <span class="text-2xl mb-1">♻️</span>
+            <span class="text-label-uppercase text-[10px]">Vida em Ciclos</span>
+          </button>
+          <button class="prio-btn" data-prio="cost">
+            <span class="text-2xl mb-1">💰</span>
+            <span class="text-label-uppercase text-[10px]">Baixo Custo</span>
+          </button>
+          <button class="prio-btn" data-prio="weight">
+            <span class="text-2xl mb-1">⚖️</span>
+            <span class="text-label-uppercase text-[10px]">Peso Leve</span>
+          </button>
+          <button class="prio-btn selected" data-prio="safety">
+            <span class="text-2xl mb-1">🛡️</span>
+            <span class="text-label-uppercase text-[10px]">Segurança</span>
+          </button>
+          <button class="prio-btn" data-prio="temperature">
+            <span class="text-2xl mb-1">🌡️</span>
+            <span class="text-label-uppercase text-[10px]">Faixa de Temp.</span>
+          </button>
+          <button class="prio-btn" data-prio="energy-density">
+            <span class="text-2xl mb-1">⚡</span>
+            <span class="text-label-uppercase text-[10px]">Densidade Energ.</span>
+          </button>
+        </div>
+        <div class="mt-6 flex justify-between">
+          <button id="back-2" class="btn-outline">← VOLTAR</button>
+          <button id="next-2" class="btn-primary">PRÓXIMO →</button>
+        </div>
+      </CalculatorCard>
+    </div>
+
+    <!-- Step 3: Budget -->
+    <div id="step-3" class="wizard-step hidden">
+      <CalculatorCard>
+        <h3 class="text-title-lg text-primary mb-2 uppercase tracking-wider">Passo 3: Orçamento</h3>
+        <p class="text-body-sm text-muted mb-6">Qual é sua faixa de orçamento para o sistema de bateria?</p>
+        <div class="flex flex-col gap-3">
+          <button class="budget-btn" data-budget="low">
+            <div class="flex justify-between items-center">
+              <span class="text-label-uppercase text-primary">Econômico / Orçamento</span>
+              <span class="text-caption text-muted">&lt; $200/kWh</span>
+            </div>
+            <span class="text-body-sm text-muted">Chumbo-Ácido, Inundada — Menor custo inicial, vida mais curta</span>
+          </button>
+          <button class="budget-btn selected" data-budget="mid">
+            <div class="flex justify-between items-center">
+              <span class="text-label-uppercase text-primary">Faixa Intermediária</span>
+              <span class="text-caption text-muted">$200–400/kWh</span>
+            </div>
+            <span class="text-body-sm text-muted">LFP, AGM/Gel — Melhor equilíbrio entre custo e vida útil</span>
+          </button>
+          <button class="budget-btn" data-budget="high">
+            <div class="flex justify-between items-center">
+              <span class="text-label-uppercase text-primary">Premium</span>
+              <span class="text-caption text-muted">$400–800/kWh</span>
+            </div>
+            <span class="text-body-sm text-muted">NMC, NCA — Maior densidade energética, tecnologia avançada</span>
+          </button>
+          <button class="budget-btn" data-budget="unlimited">
+            <div class="flex justify-between items-center">
+              <span class="text-label-uppercase text-primary">Sem Limite de Orçamento</span>
+              <span class="text-caption text-muted">$800+/kWh</span>
+            </div>
+            <span class="text-body-sm text-muted">LTO, Estado Sólido — Desempenho de ponta</span>
+          </button>
+        </div>
+        <div class="mt-6 flex justify-between">
+          <button id="back-3" class="btn-outline">← VOLTAR</button>
+          <button id="calculate-btn" class="btn-primary">OBTER RECOMENDAÇÃO →</button>
+        </div>
+      </CalculatorCard>
+    </div>
+
+    <!-- Results -->
+    <div id="step-result" class="wizard-step hidden">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-8">
+        <!-- Top Recommendation -->
+        <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+          <div>
+            <h3 class="text-label-uppercase text-m-blue-light text-[10px] tracking-wider mb-2">QUÍMICA RECOMENDADA</h3>
+            <h2 class="text-display-sm text-primary mb-4" id="result-name">LFP (LiFePO4)</h2>
+            <p class="text-body-sm text-muted mb-6" id="result-summary">Melhor correspondência para sua aplicação solar off-grid com segurança como prioridade principal.</p>
+            <div class="grid grid-cols-2 gap-3 mb-6">
+              <ResultBox label="Vida em Ciclos" value="5.000+" id="rc-cycle" />
+              <ResultBox label="Faixa de Custo" value="$250–350/kWh" id="rc-cost" />
+              <ResultBox label="Densidade Energética" value="90–160 Wh/kg" id="rc-density" />
+              <ResultBox label="Classificação de Segurança" value="Excelente" id="rc-safety" />
+            </div>
+          </div>
+          <div class="border-t border-hairline pt-4">
+            <h4 class="text-label-uppercase text-primary text-[10px] mb-2">VANTAGENS</h4>
+            <ul class="text-body-sm text-muted flex flex-col gap-1" id="result-pros">
+              <li>→ Vida excepcional em ciclos (5.000+ ciclos)</li>
+              <li>→ Inerentemente seguro — sem fuga térmica</li>
+              <li>→ 80–90% de profundidade de descarga utilizável</li>
+            </ul>
+            <h4 class="text-label-uppercase text-primary text-[10px] mb-2 mt-3">DESVANTAGENS</h4>
+            <ul class="text-body-sm text-muted flex flex-col gap-1" id="result-cons">
+              <li>→ Mais pesado que alternativas NMC/NCA</li>
+              <li>→ Menor densidade energética que NMC</li>
+              <li>→ Não pode ser carregado abaixo de 0°C sem aquecimento</li>
+            </ul>
+          </div>
+        </CalculatorCard>
+
+        <!-- Second and Third Recommendations -->
+        <div class="flex flex-col gap-6">
+          <CalculatorCard>
+            <h3 class="text-label-uppercase text-muted text-[10px] tracking-wider mb-2">SEGUNDO LUGAR</h3>
+            <h4 class="text-title-lg text-primary mb-2" id="result2-name">NMC</h4>
+            <p class="text-body-sm text-muted mb-3" id="result2-summary">Maior densidade energética, mas vida em ciclos mais curta.</p>
+            <div class="grid grid-cols-3 gap-2">
+              <ResultBox label="Ciclos" value="2.000" id="rc2-cycle" />
+              <ResultBox label="Custo" value="$350–500/kWh" id="rc2-cost" />
+              <ResultBox label="Densidade" value="150–220 Wh/kg" id="rc2-density" />
+            </div>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h3 class="text-label-uppercase text-muted text-[10px] tracking-wider mb-2">OPÇÃO DE ORÇAMENTO</h3>
+            <h4 class="text-title-lg text-primary mb-2" id="result3-name">Chumbo-Ácido AGM</h4>
+            <p class="text-body-sm text-muted mb-3" id="result3-summary">Menor custo inicial, adequado para float.</p>
+            <div class="grid grid-cols-3 gap-2">
+              <ResultBox label="Ciclos" value="500–1.000" id="rc3-cycle" />
+              <ResultBox label="Custo" value="$100–200/kWh" id="rc3-cost" />
+              <ResultBox label="Densidade" value="30–50 Wh/kg" id="rc3-density" />
+            </div>
+          </CalculatorCard>
+          <div class="flex justify-start">
+            <button id="restart-btn" class="btn-outline">↺ COMEÇAR DE NOVO</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Comparison Table -->
+  <ComparisonTable
+    title="Comparação de Químicas de Bateria"
+    headers={["Química", "Densidade Energética", "Vida em Ciclos", "Custo ($/kWh)", "Segurança", "Faixa de Temp.", "Melhor Para"]}
+    rows={[
+      ["LFP (LiFePO4)", "90–160 Wh/kg", "5.000–10.000", "$250–350", "Excelente", "-20 a 60°C", "Solar, Telecom, Armaz. Doméstico"],
+      ["NMC", "150–220 Wh/kg", "1.000–2.000", "$350–500", "Boa", "-20 a 55°C", "VE, Portátil, Alta Densidade"],
+      ["NCA", "200–260 Wh/kg", "500–1.000", "$400–600", "Moderada", "-20 a 55°C", "VE, Ferramentas Elétricas"],
+      ["LTO", "50–80 Wh/kg", "10.000–20.000", "$800–1.200", "Excelente", "-30 a 65°C", "Clima Frio, Carga Rápida"],
+      ["Chumbo-Ácido (AGM)", "30–50 Wh/kg", "500–1.000", "$100–200", "Não inflamável", "-20 a 50°C", "UPS, Float, Orçamento"],
+      ["Íon de Sódio", "100–150 Wh/kg", "2.000–3.000", "$80–150", "Boa", "-30 a 55°C", "Armaz. de Rede, Estacionário"],
+    ]}
+    caption="Especificações típicas — valores reais variam por fabricante e design da célula"
+  />
+
+  <FAQSection items={faqItems} />
+  <RelatedTools tools={relatedTools} />
+
+  <style>
+    .step-indicator {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      border: 1px solid var(--color-hairline);
+      color: var(--color-muted);
+      background: var(--color-surface-card);
+      transition: all 0.2s;
+    }
+    .step-indicator.active {
+      border-color: var(--color-m-blue-light);
+      color: var(--color-primary);
+      background: var(--color-surface-soft);
+    }
+    .step-line {
+      flex: 1;
+      height: 1px;
+      background: var(--color-hairline);
+    }
+    .app-btn, .prio-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 16px 12px;
+      border: 1px solid var(--color-hairline);
+      background: var(--color-surface-card);
+      color: var(--color-body);
+      cursor: pointer;
+      transition: all 0.15s;
+      text-align: center;
+    }
+    .app-btn:hover, .prio-btn:hover {
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+    }
+    .app-btn.selected, .prio-btn.selected {
+      border-color: var(--color-m-blue-light);
+      color: var(--color-primary);
+      background: var(--color-surface-soft);
+    }
+    .budget-btn {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 16px;
+      border: 1px solid var(--color-hairline);
+      background: var(--color-surface-card);
+      cursor: pointer;
+      transition: all 0.15s;
+      text-align: left;
+    }
+    .budget-btn:hover {
+      border-color: var(--color-primary);
+    }
+    .budget-btn.selected {
+      border-color: var(--color-m-blue-light);
+      background: var(--color-surface-soft);
+    }
+    .btn-primary {
+      padding: 12px 24px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      border: 1px solid var(--color-primary);
+      background: var(--color-canvas);
+      color: var(--color-primary);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-primary:hover {
+      background: var(--color-primary);
+      color: var(--color-canvas);
+    }
+    .btn-outline {
+      padding: 12px 24px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      border: 1px solid var(--color-hairline);
+      background: transparent;
+      color: var(--color-muted);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-outline:hover {
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+    }
+    .hidden { display: none; }
+  </style>
+
+  <script>
+    const appBtns = document.querySelectorAll('.app-btn');
+    const prioBtns = document.querySelectorAll('.prio-btn');
+    const budgetBtns = document.querySelectorAll('.budget-btn');
+
+    let selectedApp = 'solar';
+    let selectedPrio = 'safety';
+    let selectedBudget = 'mid';
+
+    const chemData: Record<string, {
+      name: string; summary: string;
+      cycle: string; cost: string; density: string; safety: string;
+      pros: string[]; cons: string[];
+    }> = {
+      lfp: {
+        name: 'LFP (LiFePO4)',
+        summary: 'Melhor escolha geral para aplicações estacionárias e marinha com ciclagem diária.',
+        cycle: '5.000+', cost: '$250–350/kWh', density: '90–160 Wh/kg', safety: 'Excelente',
+        pros: ['Vida excepcional em ciclos (5.000+ ciclos)', 'Inerentemente seguro — sem fuga térmica', '80–90% de DoD utilizável', 'Ampla faixa de operação'],
+        cons: ['Mais pesado que NMC/NCA', 'Menor densidade energética que NMC', 'Não pode ser carregado abaixo de 0°C sem aquecimento'],
+      },
+      nmc: {
+        name: 'NMC (Níquel-Manganês-Cobalto)',
+        summary: 'Maior densidade energética de lítio — ideal para aplicações onde o peso é crítico.',
+        cycle: '1.000–2.000', cost: '$350–500/kWh', density: '150–220 Wh/kg', safety: 'Boa',
+        pros: ['Maior densidade energética entre químicas convencionais', 'Bom desempenho em temperaturas moderadas', 'Amplamente disponível em células de qualidade VE'],
+        cons: ['Vida em ciclos mais curta que LFP', 'Exige BMS sofisticado', 'Risco de fuga térmica acima de 150°C', 'Maior custo por kWh que LFP'],
+      },
+      nca: {
+        name: 'NCA (Níquel-Cobalto-Alumínio)',
+        summary: 'Densidade energética ultra-alta para aplicações premium de VE.',
+        cycle: '500–1.000', cost: '$400–600/kWh', density: '200–260 Wh/kg', safety: 'Moderada',
+        pros: ['Maior densidade energética disponível', 'Excelente para VE onde o peso é crítico', 'Boa entrega de potência'],
+        cons: ['Vida em ciclos mais curta de todas as químicas de lítio', 'Gerenciamento térmico crítico', 'Química de lítio mais cara', 'Não recomendado para armazenamento estacionário'],
+      },
+      lto: {
+        name: 'LTO (Titanato de Lítio)',
+        summary: 'Vida ultra-longa e desempenho em temperaturas extremas — escolha premium para ambientes severos.',
+        cycle: '10.000–20.000', cost: '$800–1.200/kWh', density: '50–80 Wh/kg', safety: 'Excelente',
+        pros: ['Maior vida em ciclos de qualquer química de lítio', 'Opera até -30°C', 'Pode ser carregado no frio sem dano', 'Capacidade de carga extremamente rápida'],
+        cons: ['Custo muito alto', 'Menor densidade energética de lítio', 'Disponibilidade comercial limitada', 'Exagero para a maioria das aplicações'],
+      },
+      lead: {
+        name: 'Chumbo-Ácido (AGM/Gel)',
+        summary: 'Menor custo inicial — adequado para float e aplicações com orçamento restrito.',
+        cycle: '500–1.000', cost: '$100–200/kWh', density: '30–50 Wh/kg', safety: 'Não inflamável',
+        pros: ['Menor custo inicial', 'Tecnologia comprovada com décadas de histórico', 'Sem BMS necessário', 'Totalmente reciclável'],
+        cons: ['Limite de 50% DoD — metade da capacidade utilizável', 'Pesado e volumoso', 'Exige ventilação (desprendimento de hidrogênio)', 'Necessita substituição a cada 3–5 anos em aplicações cíclicas'],
+      },
+      sodium: {
+        name: 'Íon de Sódio (Salino)',
+        summary: 'Tecnologia emergente de baixo custo para armazenamento estacionário onde o peso não é fator.',
+        cycle: '2.000–3.000', cost: '$80–150/kWh', density: '100–150 Wh/kg', safety: 'Boa',
+        pros: ['Menor custo por kWh', 'Usa materiais abundantes', 'Bom desempenho em clima frio', 'Eletrólito não inflamável opcional'],
+        cons: ['Menor densidade energética que lítio', 'Disponibilidade comercial limitada', 'Vida em ciclos mais curta que LFP', 'Tecnologia em estágio inicial — menos dados de campo'],
+      },
+    };
+
+    const appScores: Record<string, Record<string, number>> = {
+      solar:    { lfp: 10, nmc: 6, nca: 3, lto: 7, lead: 5, sodium: 8 },
+      rv:       { lfp: 9, nmc: 7, nca: 5, lto: 6, lead: 4, sodium: 3 },
+      marine:   { lfp: 10, nmc: 6, nca: 4, lto: 7, lead: 5, sodium: 3 },
+      ev:       { lfp: 7, nmc: 10, nca: 9, lto: 5, lead: 1, sodium: 2 },
+      telecom:  { lfp: 9, nmc: 5, nca: 3, lto: 8, lead: 7, sodium: 6 },
+      portable: { lfp: 5, nmc: 9, nca: 10, lto: 3, lead: 1, sodium: 2 },
+    };
+
+    const prioScores: Record<string, Record<string, number>> = {
+      'cycle-life':     { lfp: 10, nmc: 5, nca: 3, lto: 10, lead: 3, sodium: 5 },
+      'cost':           { lfp: 6, nmc: 5, nca: 3, lto: 1, lead: 10, sodium: 8 },
+      'weight':         { lfp: 5, nmc: 9, nca: 10, lto: 3, lead: 1, sodium: 4 },
+      'safety':         { lfp: 10, nmc: 6, nca: 4, lto: 10, lead: 7, sodium: 7 },
+      'temperature':    { lfp: 7, nmc: 6, nca: 5, lto: 10, lead: 4, sodium: 7 },
+      'energy-density': { lfp: 5, nmc: 9, nca: 10, lto: 3, lead: 1, sodium: 4 },
+    };
+
+    const budgetFilter: Record<string, string[]> = {
+      low:      ['lead', 'sodium'],
+      mid:      ['lfp', 'lead', 'sodium'],
+      high:     ['lfp', 'nmc', 'nca'],
+      unlimited: ['lfp', 'nmc', 'nca', 'lto', 'sodium'],
+    };
+
+    function selectBtns(btns: NodeListOf<Element>, key: string, val: string) {
+      btns.forEach(b => {
+        b.classList.remove('selected');
+        if ((b as HTMLElement).dataset[key] === val) b.classList.add('selected');
+      });
+    }
+
+    appBtns.forEach(b => b.addEventListener('click', () => {
+      selectedApp = (b as HTMLElement).dataset.app!;
+      selectBtns(appBtns, 'app', selectedApp);
+    }));
+    prioBtns.forEach(b => b.addEventListener('click', () => {
+      selectedPrio = (b as HTMLElement).dataset.prio!;
+      selectBtns(prioBtns, 'prio', selectedPrio);
+    }));
+    budgetBtns.forEach(b => b.addEventListener('click', () => {
+      selectedBudget = (b as HTMLElement).dataset.budget!;
+      selectBtns(budgetBtns, 'budget', selectedBudget);
+    }));
+
+    function showStep(n: number | string) {
+      document.querySelectorAll('.wizard-step').forEach(s => s.classList.add('hidden'));
+      if (n === 'result') {
+        document.getElementById('step-result')!.classList.remove('hidden');
+        [1,2,3].forEach(i => {
+          document.getElementById(`step-dot-${i}`)!.classList.add('active');
+        });
+        document.getElementById('step-dot-r')!.classList.add('active');
+      } else {
+        const el = document.getElementById(`step-${n}`);
+        if (el) el.classList.remove('hidden');
+        [1,2,3,'r'].forEach(i => {
+          const dot = document.getElementById(`step-dot-${i}`);
+          if (!dot) return;
+          dot.classList.remove('active');
+          if (typeof i === 'number' && i <= n) dot.classList.add('active');
+        });
+      }
+    }
+
+    document.getElementById('next-1')!.addEventListener('click', () => showStep(2));
+    document.getElementById('back-2')!.addEventListener('click', () => showStep(1));
+    document.getElementById('next-2')!.addEventListener('click', () => showStep(3));
+    document.getElementById('back-3')!.addEventListener('click', () => showStep(2));
+
+    document.getElementById('calculate-btn')!.addEventListener('click', () => {
+      const allowed = budgetFilter[selectedBudget] || Object.keys(chemData);
+      const scores: Record<string, number> = {};
+      const appS = appScores[selectedApp] || {};
+      const prioS = prioScores[selectedPrio] || {};
+
+      for (const chem of allowed) {
+        scores[chem] = (appS[chem] || 5) * 0.5 + (prioS[chem] || 5) * 0.5;
+      }
+
+      const ranked = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+      const top3 = ranked.slice(0, 3);
+
+      if (top3[0]) {
+        const d = chemData[top3[0][0]];
+        document.getElementById('result-name')!.textContent = d.name;
+        document.getElementById('result-summary')!.textContent = d.summary;
+        document.getElementById('rc-cycle')!.querySelector('.text-title-lg')!.textContent = d.cycle;
+        document.getElementById('rc-cost')!.querySelector('.text-title-lg')!.textContent = d.cost;
+        document.getElementById('rc-density')!.querySelector('.text-title-lg')!.textContent = d.density;
+        document.getElementById('rc-safety')!.querySelector('.text-title-lg')!.textContent = d.safety;
+        const prosEl = document.getElementById('result-pros')!;
+        const consEl = document.getElementById('result-cons')!;
+        prosEl.innerHTML = d.pros.map(p => `<li>→ ${p}</li>`).join('');
+        consEl.innerHTML = d.cons.map(c => `<li>→ ${c}</li>`).join('');
+      }
+
+      if (top3[1]) {
+        const d = chemData[top3[1][0]];
+        document.getElementById('result2-name')!.textContent = d.name;
+        document.getElementById('result2-summary')!.textContent = d.summary;
+        document.getElementById('rc2-cycle')!.querySelector('.text-title-lg')!.textContent = d.cycle;
+        document.getElementById('rc2-cost')!.querySelector('.text-title-lg')!.textContent = d.cost;
+        document.getElementById('rc2-density')!.querySelector('.text-title-lg')!.textContent = d.density;
+      }
+
+      if (top3[2]) {
+        const d = chemData[top3[2][0]];
+        document.getElementById('result3-name')!.textContent = d.name;
+        document.getElementById('result3-summary')!.textContent = d.summary;
+        document.getElementById('rc3-cycle')!.querySelector('.text-title-lg')!.textContent = d.cycle;
+        document.getElementById('rc3-cost')!.querySelector('.text-title-lg')!.textContent = d.cost;
+        document.getElementById('rc3-density')!.querySelector('.text-title-lg')!.textContent = d.density;
+      }
+
+      showStep('result');
+    });
+
+    document.getElementById('restart-btn')!.addEventListener('click', () => {
+      selectedApp = 'solar';
+      selectedPrio = 'safety';
+      selectedBudget = 'mid';
+      selectBtns(appBtns, 'app', selectedApp);
+      selectBtns(prioBtns, 'prio', selectedPrio);
+      selectBtns(budgetBtns, 'budget', selectedBudget);
+      showStep(1);
+    });
+  </script>
+
+</CalculatorLayout>

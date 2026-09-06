@@ -1,5 +1,7 @@
 <!-- src/components/FAQSection.astro -->
 ---
+import { t, type Locale } from '../utils/i18n';
+
 export interface FAQItem {
   question: string;
   answer: string;
@@ -8,13 +10,15 @@ export interface FAQItem {
 export interface Props {
   title?: string;
   items: FAQItem[];
+  lang?: Locale;
 }
 
-const { title = 'Frequently Asked Questions', items } = Astro.props as Props;
+const { title, items, lang = 'en' } = Astro.props as Props;
+const resolvedTitle = title || t('components.faq_section.default_title', lang);
 ---
 
 <section class="mb-16 border-t border-hairline pt-12">
-  <h2 class="text-display-sm text-primary mb-8 text-center md:text-left">{title}</h2>
+  <h2 class="text-display-sm text-primary mb-8 text-center md:text-left">{resolvedTitle}</h2>
   <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-body-sm text-muted">
     {items.map((item) => (
       <div>

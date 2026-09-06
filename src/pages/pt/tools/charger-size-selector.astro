@@ -1,0 +1,439 @@
+---
+import CalculatorLayout from '../../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import InputField from '../../../components/InputField.astro';
+import ResultBox from '../../../components/ResultBox.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import WorkedExample from '../../../components/WorkedExample.astro';
+import ComparisonTable from '../../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../../components/EngineeringDiagram.astro';
+
+const whatIs = `A seleção do tamanho do carregador determina a corrente e potência nominal ideal do carregador para um determinado banco de baterias, equilibrando <strong>tempo de carga</strong>, <strong>vida útil da bateria</strong> e <strong>custo do sistema</strong>. O parâmetro-chave é a <strong>taxa C</strong> — a razão entre a corrente de carga e a capacidade da bateria. Uma taxa de 0,2C carrega uma bateria de 100Ah a 20A, enquanto uma taxa de 1C carrega a 100A. Taxas C mais altas oferecem carregamento mais rápido, mas geram mais calor, aceleram a degradação das células e exigem hardware de carregador maior e mais caro. A taxa C ideal depende da química da bateria (LFP tolera taxas mais altas que NMC), da urgência da aplicação (carregamento rápido de VE vs. solar noturno) e da capacidade de gerenciamento térmico.`;
+
+const whyItMatters = [
+  "Um carregador subdimensionado pode levar 12+ horas para carregar completamente, perdendo janelas críticas de carga como solar noturno ou retorno de frota.",
+  "Um carregador sobredimensionado desperdiça dinheiro em capacidade raramente usada e pode exceder a taxa de carga recomendada da bateria, reduzindo a vida útil.",
+  "Baterias LFP toleram carregamento a 0,5C–1C; NMC deve ficar abaixo de 0,7C para uso diário para evitar degradação acelerada.",
+  "O tipo de carregador importa — carregadores SMPS são 85–95% eficientes, enquanto carregadores lineares desperdiçam 30–50% como calor.",
+  "Controladores de carga solar MPPT ajustam dinamicamente a corrente com base na saída dos painéis, oferecendo taxas de carga ideais de fontes variáveis.",
+];
+
+const practicalApplications = [
+  { title: "Carga de Bateria Solar", description: "Selecione o tamanho correto do controlador de carga MPPT para seu arranjo solar e banco de baterias." },
+  { title: "Carga de VE / Frota", description: "Escolha níveis de potência do carregador para veículos de frota com tempos de retorno definidos." },
+  { title: "Energia de Rede Marinha", description: "Dimensione carregadores de rede para bancos de bateria marinhos com base no tempo disponível no cais." },
+  { title: "Sistemas RV / Off-Grid", description: "Selecione carregadores de alternador e solares para sistemas de bateria móveis." },
+  { title: "Sistemas UPS / Backup", description: "Garanta que baterias de backup possam recarregar dentro das janelas de recuperação necessárias." },
+];
+
+const expertNotes = [
+  { title: 'Taxa C vs. Vida Útil', variant: 'engineering', content: 'Carregar a 0,2C entrega 2–3× mais ciclos de carga que carregar a 1C para a maioria das químicas de lítio. Se o carregamento diário for necessário, 0,25C–0,5C é o ponto ideal equilibrando tempo e longevidade. Reserve taxas de 1C para recargas rápidas ocasionais.' },
+  { title: 'Impacto da Eficiência do Carregador', variant: 'info', content: 'Um carregador de 90% de eficiência deve consumir 111W para entregar 100W à bateria. Essa ineficiência estende o tempo de carga da tomada e aumenta o calor. Carregadores SMPS (comutação) são 85–95% eficientes; carregadores lineares são apenas 50–70% eficientes.' },
+];
+
+const trustSection = {
+  text: "Esta calculadora modela o dimensionamento de carregadores usando a metodologia padrão de taxa C. O modelo calcula a corrente necessária do carregador a partir do tempo de carga desejado e capacidade da bateria, e recomenda tipos apropriados de carregadores. Todos os valores intermediários são exibidos para verificação.",
+  link: { label: "Ver nossa metodologia completa", href: "/methodology/" },
+];
+
+const references = [
+  { title: "Battery University — Carregando Lítio-Ion", url: "https://batteryuniversity.com/article/bu-409-charging-lithium-ion-batteries", source: "Battery University / Cadex Electronics" },
+  { title: "TI — Guia de Seleção de Carregador de Bateria", url: "https://www.ti.com/lit/an/slyt185/slyt185.pdf", source: "Texas Instruments" },
+  { title: "Victron Energy — Dimensionamento de Controlador MPPT", url: "https://www.victronenergy.com/help-center", source: "Victron Energy" },
+];
+
+const faqItems = [
+  {
+    question: "Qual taxa C devo usar para carregar minha bateria LiFePO4?",
+    answer: "Para carregamento diário, 0,2C–0,5C é recomendado para vida útil ideal. Uma bateria LFP de 100Ah deve ser carregada a 20A–50A. Carregamento ocasional de 1C (100A) é aceitável, mas reduz a vida útil em ciclos em 20–40% ao longo do tempo.",
+  },
+  {
+    question: "Como escolher entre um carregador linear e SMPS?",
+    answer: "Carregadores SMPS (comutação) são 85–95% eficientes, compactos e leves. Carregadores lineares são mais simples, mas apenas 50–70% eficientes e geram calor significativo. Sempre escolha SMPS para aplicações acima de 50W.",
+  },
+  {
+    question: "Qual tamanho de controlador MPPT preciso?",
+    answer: "Dimensione o controlador MPPT para a corrente de saída máxima do seu arranjo solar na tensão da bateria. Um arranjo de 400W a 48V produz ~8,3A. Adicione 25% de margem para aumento de tensão em clima frio: escolha um controlador de 10A ou 15A.",
+  },
+  {
+    question: "Posso usar um carregador maior que o recomendado?",
+    answer: "Sim, mas o carregador deve ter limites de corrente ajustáveis. Usar um carregador de 50A a 20A (0,2C) é adequado e fornece margem para expansão futura da bateria. Nunca carregue além da taxa C máxima do fabricante da bateria.",
+  },
+  {
+    question: "Como o tipo de carregador afeta o tempo de carga?",
+    answer: "O tempo de carga é determinado principalmente pela corrente do carregador (taxa C), não pelo tipo de carregador. No entanto, a eficiência do carregador afeta o consumo da tomada: um carregador de 95% de eficiência entrega 95% da potência de entrada à bateria, enquanto um de 70% desperdiça 30% como calor.",
+  },
+  {
+    question: "Devo sobredimensionar meu carregador?",
+    answer: "Um sobredimensionamento de 15–25% fornece margem para envelhecimento da bateria (que aumenta a resistência interna) e cargas rápidas ocasionais. No entanto, carregadores sobredimensionados custam mais e podem incentivar carregamentos rápidos frequentes que reduzem a vida da bateria.",
+  },
+  {
+    question: "Como carregar duas baterias com um carregador?",
+    answer: "Conecte baterias da mesma química, tensão e capacidade em paralelo a um único carregador. Nunca misture baterias antigas e novas ou químicas diferentes. O BMS de cada bateria gerencia o balanceamento individual das células.",
+  },
+  {
+    question: "O que acontece se eu carregar muito devagar?",
+    answer: "Carregamento muito lento (abaixo de 0,05C) é seguro, mas pode não repor completamente a bateria antes do próximo ciclo de descarga. Para sistemas solares, isso significa que a bateria pode não atingir o SOC completo antes do início das cargas noturnas.",
+  },
+  {
+    question: "A temperatura afeta o dimensionamento do carregador?",
+    answer: "Sim. Temperaturas baixas reduzem a taxa de carga segura da bateria. Abaixo de 0°C, muitas unidades de BMS limitam a corrente de carga para 0,1C ou menos para evitar deposição de lítio. Em climas frios, sobredimensione menos o carregador, mas planeje taxas de carga reduzidas no inverno.",
+  },
+  {
+    question: "Qual é a diferença entre taxa de carga e tempo de carga?",
+    answer: "A taxa de carga (taxa C) é a corrente entregue em relação à capacidade da bateria (ex: 0,5C = 50A para 100Ah). O tempo de carga é a duração total para atingir o SOC alvo, incluindo a fase de saturação CV. Taxa C mais alta significa tempo de carga mais curto.",
+  },
+];
+
+const commonMistakes = [
+  "Sobredimensionar o carregador sem limites de corrente ajustáveis — um carregador de 100A em uma bateria de 50Ah sobrecarregará se o BMS falhar em limitar a corrente.",
+  "Ignorar a fase CV — os últimos 20% da carga levam desproporcionalmente mais tempo, então estimativas de tempo de carga baseadas apenas em Ah/corrente são 20–40% baixas demais.",
+  "Misturar químicas de carregador e bateria — carregadores NMC têm perfis de tensão diferentes dos carregadores LFP. Usar a química errada pode causar sobrecarga ou subcarga.",
+  "Não considerar a eficiência do carregador — um carregador de 90% de eficiência deve consumir mais energia da tomada, afetando o dimensionamento do disjuntor e o tempo de carga.",
+  "Usar um carregador linear para aplicações de alta potência — carregadores lineares desperdiçam 30–50% como calor, exigindo dissipadores grandes e reduzindo a corrente de carga disponível.",
+  "Ignorar a redução por temperatura — temperaturas baixas reduzem as taxas de carga seguras. Um carregador dimensionado para o verão pode ser inadequado no inverno quando o BMS limita a corrente.",
+  "Dimensionar para pico em vez de carga média — se as baterias raramente precisam de cargas completas, um carregador menor que funciona por mais tempo é mais eficiente e econômico.",
+  "Não planejar expansão da bateria — se você pode adicionar baterias depois, dimensione o carregador para o banco futuro, não apenas para o atual.",
+];
+
+const relatedArticles = [
+  { href: "/learn/charger-sizing-guide/", title: "Guia de Dimensionamento de Carregador" },
+  { href: "/reference/charge-controller-specs/", title: "Controladores MPPT vs PWM" },
+  { href: "/learn/lifepo4-charge-voltage-table/", title: "Tabela de Tensão de Carga LiFePO4" },
+  { href: "/learn/battery-charging-formula/", title: "Melhores Práticas de Carga de Bateria" },
+];
+---
+
+<CalculatorLayout
+  title="Seletor de Tamanho do Carregador | Calculadoras de Bateria"
+  description="Selecione o tamanho correto do carregador para seu banco de baterias com base na química, tempo de carga desejado e diretrizes de taxa C."
+  faqItems={faqItems}
+  commonMistakes={commonMistakes}
+  relatedArticles={relatedArticles}
+  relatedCalculators={[
+    { href: "/tools/charging-time-calculator/", title: "Calculadora de Tempo de Carga", description: "Estime durações de carga CC-CV." },
+    { href: "/tools/c-rate-calculator/", title: "Calculadora de Taxa C", description: "Converta entre Amperes e valores de taxa C." },
+    { href: "/tools/battery-sizing-calculator/", title: "Ferramenta de Dimensionamento de Bateria", description: "Determine requisitos de dimensionamento por consumo diário." },
+    { href: "/tools/solar-battery-sizing-calculator/", title: "Dimensionamento Solar", description: "Dimensione bancos de bateria solar a partir do consumo diário." },
+    { href: "/tools/runtime-calculator/", title: "Calculadora de Autonomia", description: "Calcule autonomia a partir de perfis de potência da carga." },
+    { href: "/tools/energy-conversion-calculator/", title: "Conversão de Energia", description: "Converta entre capacidade Ah e energia Wh." },
+  ]}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+  lang="pt"
+>
+
+  <!-- Main Calculator Grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+
+    <!-- Input Form -->
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Parâmetros do Carregador</h3>
+      <div class="flex flex-col gap-6">
+        <InputField id="capacity" label="Capacidade da Bateria (Ah)" value={100} min={0.1} step="any" helperText="Capacidade total do banco de baterias em Ampere-horas." />
+        <InputField id="voltage" label="Tensão do Sistema (V)" value={48} min={1} step="any" helperText="Tensão nominal do banco de baterias. Comum: 12V, 24V, 48V." />
+        <InputField
+          id="chemistry"
+          label="Química da Bateria"
+          type="select"
+          value="lfp"
+          helperText="A química determina a taxa C máxima segura."
+          options={[
+            { label: "LFP (LiFePO4) — Máx 1C diário", value: "lfp" },
+            { label: "NMC (Níquel-Manganês-Cobalto) — Máx 0,7C diário", value: "nmc" },
+            { label: "Chumbo-Ácido (AGM/Gel) — Máx 0,1C", value: "lead-acid" },
+          ]}
+        />
+        <InputField id="charge-time" label="Tempo de Carga Desejado (horas)" value={4} min={0.5} step="any" helperText="Tempo alvo para carregar de 20% a 100% SOC." />
+        <InputField id="charge-efficiency" label="Eficiência do Carregador (%)" value={92} min={50} max={100} step={1} helperText="SMPS: 85–95%, Linear: 50–70%. Padrão 92% para SMPS de qualidade." />
+      </div>
+    </CalculatorCard>
+
+    <!-- Calculation Results -->
+    <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Carregador Recomendado</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <ResultBox
+            label="Corrente Necessária do Carregador"
+            value="20 A"
+            suffix="Na tensão da bateria"
+            variant="primary"
+            id="result-current"
+          />
+          <ResultBox
+            label="Taxa C de Carga"
+            value="0,20 C"
+            suffix="Carga lenta ideal"
+            id="result-crate"
+          />
+          <ResultBox
+            label="Potência Nominal do Carregador"
+            value="960 W"
+            suffix="Potência de saída DC"
+            id="result-power"
+          />
+          <ResultBox
+            label="Potência Consumida da Rede"
+            value="1.043 W"
+            suffix="Com 92% de eficiência"
+            id="result-wall"
+          />
+        </div>
+      </div>
+
+      <!-- Action Area -->
+      <div class="border-t border-hairline pt-6">
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">Guia de Seleção do Carregador</h4>
+        <p class="text-body-sm text-muted" id="charger-guide">
+          A 0,2C, esta é uma configuração de carga lenta ideal para carregamento noturno. Recomenda-se um carregador SMPS nominal de 20A / 48V ou superior.
+        </p>
+      </div>
+    </CalculatorCard>
+
+  </div>
+
+  <!-- Formulas and Worked Examples -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">Fórmulas e Exemplos Práticos</h2>
+    <FormulaBox title="Fórmulas Matemáticas">
+      <p>
+        A corrente necessária do carregador é derivada do tempo de carga desejado, capacidade da bateria e eficiência do carregador:
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Taxa C = Tempo de Carga Desejado (horas) / 1,25
+      </div>
+      <p>
+        O fator 1,25 compensa o custo da fase de saturação CV (aproximadamente 20% do tempo total).
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Corrente do Carregador (A) = Capacidade (Ah) × Taxa C
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Potência do Carregador (W) = Corrente do Carregador (A) × Tensão do Sistema (V)
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Potência da Rede (W) = Potência do Carregador (W) / Eficiência do Carregador
+      </div>
+    </FormulaBox>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample
+        number={1}
+        title="LFP 100Ah — Carga de 4 Horas"
+        scenario="Uma bateria LFP 48V 100Ah precisa ser carregada de 20% a 100% em 4 horas usando um carregador SMPS de 92% de eficiência."
+        inputs={[
+          { label: "Capacidade", value: "100 Ah" },
+          { label: "Tensão", value: "48 V" },
+          { label: "Química", value: "LFP (LiFePO4)" },
+          { label: "Tempo Desejado", value: "4 horas" },
+          { label: "Eficiência do Carregador", value: "92%" },
+        ]}
+        steps={[
+          { label: "Passo 1: Taxa C alvo", formula: "Taxa C = 4 / 1,25", result: "0,32C" },
+          { label: "Passo 2: Corrente do carregador", formula: "I = 100 × 0,32", result: "32A" },
+          { label: "Passo 3: Potência DC do carregador", formula: "P_dc = 32 × 48", result: "1.536W" },
+          { label: "Passo 4: Potência da rede", formula: "P_rede = 1.536 / 0,92", result: "1.670W" },
+        ]}
+        answer="Carregador de 32A a 48V, nominal 1.536W de saída DC. O circuito da rede deve suportar 1.670W."
+        interpretation="Um controlador de carga MPPT de 32A ou carregador SMPS é apropriado. A taxa de 0,32C está bem dentro dos limites seguros de carga diária do LFP e fornece boa longevidade da bateria."
+        variant="default"
+      />
+
+      <WorkedExample
+        number={2}
+        title="NMC 200Ah — Carga Rápida de 2 Horas"
+        scenario="Uma bateria NMC 36V 200Ah precisa de tempo de carga de 2 horas. NMC não deve exceder 0,7C para uso diário."
+        inputs={[
+          { label: "Capacidade", value: "200 Ah" },
+          { label: "Tensão", value: "36 V" },
+          { label: "Química", value: "NMC" },
+          { label: "Tempo Desejado", value: "2 horas" },
+          { label: "Eficiência do Carregador", value: "90%" },
+        ]}
+        steps={[
+          { label: "Passo 1: Taxa C alvo", formula: "Taxa C = 2 / 1,25", result: "0,60C" },
+          { label: "Passo 2: Corrente do carregador", formula: "I = 200 × 0,60", result: "120A" },
+          { label: "Passo 3: Potência DC do carregador", formula: "P_dc = 120 × 36", result: "4.320W" },
+          { label: "Passo 4: Potência da rede", formula: "P_rede = 4.320 / 0,90", result: "4.800W" },
+        ]}
+        answer="Carregador de 120A a 36V, nominal 4.320W de saída DC."
+        interpretation="0,60C está próximo do limite diário do NMC. Essa taxa de carga reduz a vida útil em ciclos em ~20% comparada a 0,25C. Reserve essa taxa para cargas rápidas ocasionais, não para uso diário."
+        variant="default"
+      />
+
+      <WorkedExample
+        number={3}
+        title="Controlador Solar MPPT — Arranjo 400W, LFP 48V"
+        scenario="Um arranjo solar de 400W carrega um banco LFP 48V 200Ah. Selecione o controlador de carga MPPT apropriado."
+        inputs={[
+          { label: "Arranjo Solar", value: "400W" },
+          { label: "Tensão da Bateria", value: "48V" },
+          { label: "Capacidade da Bateria", value: "200 Ah" },
+          { label: "Química", value: "LFP (LiFePO4)" },
+          { label: "Horas de Sol Pico", value: "5 horas" },
+        ]}
+        steps={[
+          { label: "Passo 1: Corrente máx. do arranjo", formula: "I_max = 400 / (48 × 0,92)", result: "9,06A" },
+          { label: "Passo 2: Aumento em clima frio", formula: "I_frio = 9,06 × 1,25", result: "11,3A" },
+          { label: "Passo 3: Nominal do controlador", formula: "Selecione controlador MPPT ≥ 15A", result: "15A recomendado" },
+          { label: "Passo 4: Carga diária", formula: "400W × 5h × 0,92 = 1.840Wh", result: "1.840 Wh/dia" },
+        ]}
+        answer="Controlador de carga MPPT de 15A ou 20A nominal para sistemas de bateria 48V."
+        interpretation="Sempre sobredimensione o controlador MPPT em 25–50% acima da corrente máxima do arranjo. Clima frio aumenta tensão e corrente dos painéis. Um controlador de 15A suporta este arranjo de 400W com margem."
+        variant="solar"
+      />
+    </div>
+  </section>
+
+  <EngineeringDiagram
+    title="Sistema de Seleção do Carregador"
+    description="Da fonte de energia ao carregador à bateria, com parâmetros-chave de dimensionamento em cada etapa"
+    variant="flow"
+    steps={[
+      { label: "Fonte de Energia", icon: "charge" },
+      { label: "Carregador (SMPS)", icon: "charge" },
+      { label: "Banco de Baterias", icon: "battery" },
+      { label: "Proteção BMS", icon: "battery" },
+    ]}
+  />
+
+  <ComparisonTable
+    title="Comparação de Tipos de Carregador"
+    headers={["Tipo", "Eficiência", "Tamanho", "Custo", "Melhor Para", "Desvantagem"]}
+    rows={[
+      ["Linear", "50–70%", "Grande (dissipador)", "Baixo", "Muito baixa potência (<20W)", "Desperdiça 30–50% como calor"],
+      ["SMPS", "85–95%", "Compacto", "Médio", "Carga de uso geral", "Circuitaria complexa"],
+      ["MPPT (Solar)", "95–99%", "Médio", "Alto", "Arranjo solar à bateria", "Custo inicial mais alto"],
+      ["PFM", "80–90%", "Pequeno", "Baixo", "Dispositivos com bateria", "Menor capacidade de corrente"],
+    ]}
+    caption="Comparação de tecnologias de carregador para aplicações de carga de bateria"
+  />
+
+  <ComparisonTable
+    title="Diretrizes de Taxa C por Química"
+    headers={["Química", "Diário Ideal", "Máx. Ocasional", "Tempo de Carga (Ideal)", "Tempo de Carga (Máx)", "Impacto na Vida Útil"]}
+    rows={[
+      ["LFP (LiFePO4)", "0,2C–0,5C", "1C", "2,5–5 horas", "~1,5 hora", "0,5C perde ~10% vs 0,2C"],
+      ["NMC", "0,2C–0,5C", "0,7C", "2,5–5 horas", "~2 horas", "0,7C perde ~20% vs 0,2C"],
+      ["Chumbo-Ácido", "0,05C–0,1C", "0,15C", "12–24 horas", "~8 horas", "Acima de 0,1C causa sulfatação"],
+    ]}
+    caption="Taxas de carga recomendadas para químicas comuns de bateria"
+  />
+
+  <FAQSection items={faqItems} />
+
+  <!-- Calculation Script -->
+  <script>
+    const capacityInput = document.getElementById('capacity') as HTMLInputElement;
+    const voltageInput = document.getElementById('voltage') as HTMLInputElement;
+    const chemistrySelect = document.getElementById('chemistry') as HTMLSelectElement;
+    const chargeTimeInput = document.getElementById('charge-time') as HTMLInputElement;
+    const chargeEfficiencyInput = document.getElementById('charge-efficiency') as HTMLInputElement;
+
+    // Result elements
+    const resultCurrentBox = document.getElementById('result-current');
+    const resultCurrentValue = resultCurrentBox?.querySelector('.text-display-md') as HTMLElement;
+    const resultCurrentNote = resultCurrentBox?.querySelector('.text-caption') as HTMLElement;
+
+    const resultCrateBox = document.getElementById('result-crate');
+    const resultCrateValue = resultCrateBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultCrateDesc = resultCrateBox?.querySelector('.text-caption') as HTMLElement;
+
+    const resultPowerBox = document.getElementById('result-power');
+    const resultPowerValue = resultPowerBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultPowerNote = resultPowerBox?.querySelector('.text-caption') as HTMLElement;
+
+    const resultWallBox = document.getElementById('result-wall');
+    const resultWallValue = resultWallBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultWallNote = resultWallBox?.querySelector('.text-caption') as HTMLElement;
+
+    const chargerGuide = document.getElementById('charger-guide');
+
+    function getChemistryLimits(chemistry: string): { maxDaily: number; maxOccasional: number } {
+      switch (chemistry) {
+        case 'lfp': return { maxDaily: 1.0, maxOccasional: 1.5 };
+        case 'nmc': return { maxDaily: 0.7, maxOccasional: 1.0 };
+        case 'lead-acid': return { maxDaily: 0.1, maxOccasional: 0.15 };
+        default: return { maxDaily: 0.5, maxOccasional: 1.0 };
+      }
+    }
+
+    function updateCalculations() {
+      const capacity = parseFloat(capacityInput.value) || 100;
+      const voltage = parseFloat(voltageInput.value) || 48;
+      const chemistry = chemistrySelect.value;
+      const desiredTime = parseFloat(chargeTimeInput.value) || 4;
+      const efficiency = parseFloat(chargeEfficiencyInput.value) || 92;
+
+      // Calculate C-rate from desired time
+      // T_total ≈ T_CC + T_CV. T_CC = capacity / (I * eff). T_CV ≈ 0.25 * T_CC for 80-100%.
+      // Simplified: total time ≈ 1.25 * capacity / (I * eff)
+      // Solving for I: I = 1.25 * capacity / (T_total * eff/100)
+      const cRate = desiredTime > 0 ? 1.25 / (desiredTime * (efficiency / 100)) : 0;
+      const chargerCurrent = capacity * cRate;
+      const chargerPower = chargerCurrent * voltage;
+      const wallPower = chargerPower / (efficiency / 100);
+
+      // Render current
+      if (resultCurrentValue) resultCurrentValue.textContent = `${chargerCurrent.toFixed(1)} A`;
+      if (resultCurrentNote) resultCurrentNote.textContent = `A ${voltage}V nominal`;
+
+      // Render C-rate
+      if (resultCrateValue) resultCrateValue.textContent = `${cRate.toFixed(2)} C`;
+      let cRateDesc = '';
+      const limits = getChemistryLimits(chemistry);
+      if (cRate > limits.maxOccasional) {
+        cRateDesc = 'Excede o máximo recomendado — risco de dano às células';
+      } else if (cRate > limits.maxDaily) {
+        cRateDesc = 'Aceitável apenas para carga rápida ocasional';
+      } else if (cRate >= 0.2) {
+        cRateDesc = 'Taxa de carga diária ideal';
+      } else if (cRate >= 0.05) {
+        cRateDesc = 'Carga lenta — boa para longevidade da bateria';
+      } else {
+        cRateDesc = 'Muito lenta — pode não repor o consumo diário';
+      }
+      if (resultCrateDesc) resultCrateDesc.textContent = cRateDesc;
+
+      // Render power
+      if (resultPowerValue) resultPowerValue.textContent = `${Math.round(chargerPower).toLocaleString()} W`;
+      if (resultPowerNote) resultPowerNote.textContent = 'Potência de saída DC';
+
+      // Render wall draw
+      if (resultWallValue) resultWallValue.textContent = `${Math.round(wallPower).toLocaleString()} W`;
+      if (resultWallNote) resultWallNote.textContent = `A ${efficiency}% de eficiência`;
+
+      // Render guide
+      if (chargerGuide) {
+        const chemistryName = chemistry === 'lfp' ? 'LFP' : chemistry === 'nmc' ? 'NMC' : 'Chumbo-Ácido';
+        if (cRate > limits.maxOccasional) {
+          chargerGuide.textContent = `Aviso: ${cRate.toFixed(2)}C excede o máximo de ${chemistryName} de ${limits.maxOccasional}C. Reduza o tempo de carga desejado ou aceite carregamento mais lento para proteger a vida útil da bateria.`;
+        } else if (cRate > limits.maxDaily) {
+          chargerGuide.textContent = `A ${cRate.toFixed(2)}C, esta é uma configuração de carga rápida. Adequada para uso ocasional em ${chemistryName}, mas o uso diário acelerará a degradação. Considere uma carga mais lenta para ciclagem de rotina.`;
+        } else {
+          chargerGuide.textContent = `A ${cRate.toFixed(2)}C, esta é uma configuração de carga ${cRate <= 0.3 ? 'lenta' : 'padrão'} ideal para carregamento ${cRate <= 0.3 ? 'noturno' : 'diário'}. Recomenda-se um carregador SMPS nominal de ${chargerCurrent.toFixed(0)}A / ${voltage}V ou superior.`;
+        }
+      }
+
+      // Update border color based on safety
+      if (resultCurrentBox) {
+        resultCurrentBox.className = "bg-surface-soft p-6 border col-span-1 md:col-span-2 " +
+          (cRate > limits.maxOccasional ? "border-red-600" :
+           cRate > limits.maxDaily ? "border-yellow-500" : "border-hairline");
+      }
+    }
+
+    [capacityInput, voltageInput, chemistrySelect, chargeTimeInput, chargeEfficiencyInput].forEach(el => {
+      el.addEventListener('input', updateCalculations);
+    });
+
+    updateCalculations();
+  </script>
+</CalculatorLayout>

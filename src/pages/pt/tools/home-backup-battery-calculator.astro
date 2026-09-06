@@ -1,0 +1,247 @@
+---
+import CalculatorLayout from '../../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import InputField from '../../../components/InputField.astro';
+import ResultBox from '../../../components/ResultBox.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import MiniSimulationChart from '../../../components/MiniSimulationChart.astro';
+import WorkedExample from '../../../components/WorkedExample.astro';
+import ComparisonTable from '../../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../../components/EngineeringDiagram.astro';
+
+const whatIs = `Uma calculadora de backup residencial de bateria determina a capacidade do banco de baterias necessária para alimentar cargas domésticas críticas durante apagões na rede. Ela separa cargas essenciais — geladeira, iluminação, dispositivos médicos, equipamentos de comunicação — de cargas não essenciais como ar-condicionado e fogão elétrico. A calculadora considera perdas de eficiência do inversor, limites de profundidade de descarga específicos da química e metas de autonomia. Independentemente de você estar se preparando para a temporada de tempestades ou construindo um sistema completo de solar+armazenamento, esta ferramenta dimensiona o banco de baterias para manter conforto e segurança durante apagões prolongados.`;
+
+const whyItMatters = [
+  "Sistemas residenciais de baterias subdimensionados deixam você sem energia para refrigeração durante apagões de vários dias — a deterioração de uma geladeira cheia custa R$ 1.500–R$ 3.000 em alimentos perdidos.",
+  "Sistemas superdimensionados aumentam desnecessariamente o custo — cada 5 kWh de capacidade LFP excedente adiciona R$ 10.000–R$ 20.000 à instalação sem estender a autonomia para cargas críticas.",
+  "Ignorar o consumo em espera do inversor (5–20W contínuos) significa que sua bateria drena mais rápido que o calculado, especialmente durante prolongados períodos noturnos de baixa carga.",
+  "Não distinguir cargas críticas de não críticas leva a backup insuficiente para essenciais ou um sistema dimensionado para alimentar a casa inteira — o que requer 3–5× mais capacidade.",
+  "Não considerar a degradação da bateria ao longo do tempo significa que seu sistema pode não atingir sua meta de autonomia após 3–5 anos, à medida que a capacidade cai 15–20% da classificação inicial."
+];
+
+const practicalApplications = [
+  { title: "Preparação para Tempestades e Furacões", description: "Dimensionar um sistema de bateria para manter cargas críticas durante apagões de 24–72 horas comuns durante eventos climáticos severos." },
+  { title: "Backup Solar + Armazenamento", description: "Calcular a capacidade de bateria necessária para armazenar energia solar para uso noturno e em dias nublados." },
+  { title: "Backup de Equipamentos Médicos Críticos", description: "Garantir autonomia suficiente da bateria para concentradores de oxigênio, máquinas CPAP, equipamentos de diálise e outros dispositivos médicos de sustento de vida." },
+  { title: "Otimização por Faixa de Preço", description: "Dimensionar baterias para armazenar energia barata da rede no horário fora de ponta para uso durante as horas de ponta mais caras." }
+];
+
+const expertNotes: { title: string; variant: 'engineering' | 'tip'; content: string }[] = [
+  { title: "Seleção de Química para Instalação Interna", variant: "engineering", content: "LFP (LiFePO4) é a única química de lítio recomendada para instalação residencial interna devido à sua estabilidade térmica e ausência de risco de corrida térmica. NMC de lítio requer ventilação e invólucros com classificação contra incêndio. Chumbo-ácido emite gás hidrogênio durante a carga e exige salas dedicadas de baterias ventiladas. Para instalações em garagem ou espaço habitacional, LFP é a escolha clara — a maioria das jurisdições requer classificação UL 9540 para instalações internas de baterias." },
+  { title: "Estratégia de Expansão Modular", variant: "tip", content: "Comece com uma capacidade de bateria que cubra suas cargas críticas por 8–12 horas, depois planeje expansão modular. A maioria das baterias residenciais LFP modernas (Tesla Powerwall, Enphase, Sol-Ark) suporta expansão paralela — adicione módulos depois conforme suas necessidades crescem ou as tarifas de energia mudam. Isso evita superinvestimento inicial preservando flexibilidade de atualização." }
+];
+
+const trustSection = {
+  text: "Esta calculadora utiliza metodologia padrão de dimensionamento de energia residencial alinhada com diretrizes de armazenamento de energia em bateria UL 9540 e normas de interconexão IEEE 2800. Todas as fórmulas são derivadas de dados de desempenho de fabricantes e estudos de perfilamento de cargas residenciais. Os cálculos são totalmente transparentes e verificáveis independentemente.",
+  link: { label: "Ver nossa metodologia e derivações de fórmulas", href: "/methodology/" }
+};
+
+const references = [
+  { title: "UL 9540 — Sistemas e Equipamentos de Armazenamento de Energia", url: "https://www.ul.com/resources/ul-9540-energy-storage-systems-and-equipment", source: "Underwriters Laboratories" },
+  { title: "IEEE 2800 — Padrão de Interconexão de DER", url: "https://standards.ieee.org/ieee/2800/11054/", source: "IEEE Standards Association" },
+  { title: "NREL — Análise de Dimensionamento de Armazenamento Residencial", url: "https://www.nrel.gov/docs/fy23osti/85472.pdf", source: "National Renewable Energy Laboratory" },
+  { title: "Energy Sage — Guia de Dimensionamento de Backup Residencial", url: "https://www.energysage.com/home-batteries/", source: "Energy Sage Marketplace" }
+];
+
+const faqItems = [
+  { question: "O que qualifica como carga crítica durante um apagão?", answer: "Cargas críticas incluem itens essenciais: geladeira/congelador, iluminação, carregamento de celular, dispositivos médicos, bomba de poço e roteador de internet. Cargas não essenciais como ar-condicionado, fogão elétrico e máquina de lavar são tipicamente excluídas do dimensionamento de backup." },
+  { question: "Quanto tempo meu backup residencial deve durar?", answer: "A maioria dos sistemas de backup residencial é projetada para 8–24 horas de autonomia. Para apagões noturnos, 8–12 horas é típico. Para áreas propensas a tempestades, 24–48 horas oferece mais resiliência. Backup mais longo requer mais capacidade de bateria e maior custo." },
+  { question: "Que eficiência do inversor devo assumir?", answer: "Inversores híbridos modernos tipicamente operam a 90–95% de eficiência. Uma estimativa conservadora de 90% considera perdas de conversão, consumo em standby e condições reais de operação." },
+  { question: "Posso usar painéis solares para estender a autonomia?", answer: "Sim, com um sistema de inversor híbrido. Painéis solares podem recarregar a bateria durante as horas de luz, estendendo o backup indefinidamente enquanto houver sol." },
+  { question: "Como listar as cargas da minha residência para dimensionamento preciso?", answer: "Percorra sua casa e identifique cada eletrodoméstico que deseja alimentado durante um apagão. Verifique a potência em cada dispositivo — multiplique amperes × volts para obter watts. Considere o ciclo de operação: o compressor de uma geladeira funciona apenas 30–50% do tempo." },
+  { question: "Devo dimensionar para a casa inteira ou apenas cargas críticas?", answer: "A maioria dos proprietários dimensiona apenas para cargas críticas (geladeira, luzes, roteador, dispositivos médicos). Isso normalmente requer 3–8 kWh para 24 horas. Dimensionar para a casa inteira requer 30–60+ kWh — viável mas significativamente mais caro." },
+  { question: "O que é otimização por faixa de preço (TOU) com baterias?", answer: "A otimização TOU significa carregar baterias durante horários fora de pico (quando a energia é barata, ex: à noite) e descarregar durante horários de pico (quando as tarifas são mais altas, ex: 16h–21h). Isso pode economizar R$ 1.000–R$ 3.000/ano." },
+  { question: "Como a degradação da bateria afeta meu plano de backup?", answer: "Baterias LFP retêm aproximadamente 80% da capacidade após 6.000 ciclos ou ~15 anos. NMC retém 80% após ~3.000 ciclos. Planeje uma redução de 15–20% na capacidade ao longo da vida útil do sistema." },
+  { question: "Preciso de um interruptor de transferência para backup de bateria?", answer: "Sim — um interruptor de transferência manual ou automático é necessário para desconectar com segurança da rede durante apagões. A maioria dos sistemas modernos inclui inversor híbrido com interruptor de transferência automático." },
+  { question: "Posso adicionar mais baterias depois?", answer: "A maioria dos sistemas modernos de baterias residenciais suporta expansão modular. Tesla Powerwall, Enphase e Sol-Ark permitem módulos adicionais em paralelo." },
+  { question: "O que acontece durante um apagão prolongado de vários dias?", answer: "Sem recarga solar, sua bateria será esgotada de acordo com o cálculo de autonomia. Com painéis solares, um arranjo de 5 kW pode fornecer 15–25 kWh por dia — suficiente para recarregar uma bateria residencial típica." },
+  { question: "Existem incentivos fiscais para sistemas de baterias residenciais?", answer: "Sim — nos EUA, o Crédito Fiscal de Investimento (ITC) federal cobre 30% do custo do sistema. Verifique os incentivos disponíveis na sua região." },
+];
+
+const commonMistakes = [
+  "Ignorar a eficiência do inversor — um inversor com 90% de eficiência desperdiça 10% da energia da bateria como calor. Sempre considere a eficiência do inversor nos cálculos.",
+  "Usar carga total em vez de carga crítica — dimensionar para cada eletrodoméstico cria um sistema superdimensionado e caro. Foque nas cargas críticas durante apagões.",
+  "Ignorar cargas de pico — motores em geladeiras, bombas de poço e ar-condicionados requerem 3–5× sua potência nominal na partida. Bateria e inversor devem suportar esses picos.",
+  "Esquecer a redução por temperatura — baterias de lítio perdem 10–30% da capacidade em condições frias.",
+  "Não considerar limites de DoD — descarregar baterias de lítio a 0% SoC acelera a degradação.",
+  "Ignorar perdas nos cabos entre bateria e inversor — percursos longos de cabo introduzem queda de tensão.",
+  "Superdimensionar por falsa margem de segurança — adicionar fatores de 50%+ cria bancos desnecessariamente grandes. Uma margem de 15–20% é geralmente apropriada.",
+  "Misturar baterias antigas e novas — nunca combine baterias de diferentes idades ou químicas no mesmo banco.",
+  "Ignorar autor descarga em apagões de vários dias — ao longo de 2–3 dias, a autor descarga reduz a energia disponível.",
+  "Não planejar a recarga — um banco dimensionado para 3 dias de autonomia deve ser recarregado depois. Planeje capacidade de recarga por solar, gerador ou rede.",
+];
+
+const relatedArticles = [
+  { href: "/learn/home-battery-backup-planning/", title: "Planejamento de Backup Residencial" },
+  { href: "/learn/home-backup-runtime-guide/", title: "Guia de Autonomia de Backup Residencial" },
+  { href: "/learn/home-battery-sizing-guide/", title: "Guia de Dimensionamento de Bateria Residencial" },
+  { href: "/learn/power-outage-battery-guide/", title: "Guia de Bateria para Apagões" },
+  { href: "/learn/whole-house-battery-backup/", title: "Backup de Bateria para Casa Inteira" },
+];
+
+const relatedCalculators = [
+  { href: "/tools/battery-sizing-calculator/", title: "Calculadora de Dimensionamento", description: "Dimensionamento completo com redução por temperatura." },
+  { href: "/tools/runtime-calculator/", title: "Calculadora de Autonomia", description: "Estimar tempo de descarga a partir de capacidade e carga." },
+  { href: "/tools/charging-time-calculator/", title: "Calculadora de Tempo de Carga", description: "Calcular tempo de carga por solar ou rede." },
+  { href: "/tools/inverter-battery-calculator/", title: "Calculadora Inversor-Bateria", description: "Dimensionar bancos para cargas CA do inversor." },
+  { href: "/tools/energy-conversion-calculator/", title: "Conversão de Energia", description: "Converter entre Ah e Wh em qualquer tensão." },
+  { href: "/tools/marine-battery-sizing-calculator/", title: "Calculadora Marinha", description: "Comparar abordagens de dimensionamento marinho e residencial." },
+];
+---
+
+<CalculatorLayout
+  title="Calculadora de Backup Residencial de Bateria | Calculadoras de Bateria"
+  description="Calcule o tamanho da bateria necessária para backup residencial durante apagões. Dimensione cobertura de cargas críticas para 8–48 horas."
+  faqItems={faqItems}
+  commonMistakes={commonMistakes}
+  relatedArticles={relatedArticles}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+  relatedCalculators={relatedCalculators}
+  lang="pt"
+>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Requisitos de Backup</h3>
+      <div class="flex flex-col gap-6">
+        <InputField id="critical-load" label="Potência da Carga Crítica" value={2000} min={100} step={100} unit="W" helperText="Potência total das cargas essenciais (geladeira, luzes, ventiladores, dispositivos médicos, equipamentos de rede, etc.)" />
+        <InputField id="backup-duration" label="Duração do Backup" value={12} min={1} max={72} step={1} unit="horas" helperText="Quanto tempo você precisa de energia durante um apagão." />
+        <InputField id="voltage" label="Tensão do Sistema de Bateria" value={48} min={12} step={1} unit="V" helperText="Comum: 12V sistemas pequenos, 24V médios, 48V casa inteira." />
+        <InputField id="chemistry" label="Química da Bateria" type="select" value="lfp" helperText="LFP recomendado: maior vida útil e mais seguro para instalação interna." options={[{ label: "LFP (LiFePO4)", value: "lfp" }, { label: "NMC (Níquel-Manganês-Cobalto de Lítio)", value: "nmc" }, { label: "Chumbo-Ácido (AGM/Gel)", value: "lead-acid" }]} />
+        <InputField id="inverter-efficiency" label="Eficiência do Inversor" value={90} min={70} max={100} step={1} unit="%" helperText="Inversores híbridos modernos: 90–95%. Use 90% para dimensionamento conservador." />
+      </div>
+    </CalculatorCard>
+
+    <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Resultados do Dimensionamento</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <ResultBox label="Energia Total da Bateria" value="26.667 Wh" suffix="26,67 kWh — o que você precisa comprar" variant="primary" id="result-energy" />
+          <ResultBox label="Energia Utilizável" value="24.000 Wh" suffix="Após limites de profundidade de descarga" id="result-usable" />
+          <ResultBox label="Energia Entregue pelo Sistema" value="21.600 Wh" suffix="Disponível para carga após perdas do inversor" id="result-delivered" />
+          <ResultBox label="Tamanho Recomendado" value="555,6 Ah" suffix="A 48V nominal" id="result-capacity" />
+          <ResultBox label="Estimativa de Autonomia" value="12,0 horas" suffix="A 2.000W de carga crítica" id="result-runtime" />
+          <p class="text-[11px] text-muted col-span-1 md:col-span-2 -mt-4">Autonomia = Energia Entregue / Carga. Energia Total inclui sobrecarga de DoD e eficiência.</p>
+        </div>
+        <MiniSimulationChart title="Sensibilidade de Autonomia" description="Como a autonomia muda com o nível de carga" xLabel="Carga (W)" yLabel="Autonomia (horas)" chartId="chart-home-backup" />
+      </div>
+      <div class="border-t border-hairline pt-6">
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">Notas do Sistema</h4>
+        <p class="text-body-sm text-muted" id="system-notes">
+          Para 2.000W de cargas críticas por 12 horas a 48V LFP, você precisa de aproximadamente 26,67 kWh de capacidade de bateria (555,6 Ah a 48V).
+        </p>
+      </div>
+    </CalculatorCard>
+  </div>
+
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">Fórmulas e Exemplos Práticos</h2>
+    <FormulaBox title="Fórmulas Matemáticas">
+      <p>A energia necessária da bateria considera perdas do inversor e limites seguros de DoD:</p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Energia Necessária (Wh) = (Potência da Carga × Duração) / (DoD% × Eficiência do Inversor%)</div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Capacidade (Ah) = Energia Necessária (Wh) / Tensão do Sistema (V)</div>
+      <p>Limites de DoD por química: LFP 90%, NMC 80%, Chumbo-Ácido 50%.</p>
+    </FormulaBox>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample number={1} title="Backup de Cargas Essenciais" scenario="Alimentar geladeira, luzes e roteador durante um apagão noturno de 8 horas"
+        inputs={[{ label: "Geladeira", value: "150W" }, { label: "Luzes LED (×4)", value: "200W" }, { label: "Roteador", value: "20W" }, { label: "Carregamento de Celular", value: "30W" }, { label: "Carga Total", value: "400W" }, { label: "Duração", value: "8 horas" }, { label: "Tensão", value: "48V LFP" }, { label: "Eficiência Inversor", value: "90%" }]}
+        steps={["Energia bruta: 400W × 8h = 3.200 Wh", "Ajustar para DoD (90%) e inversor (90%): 3.200 / (0,90 × 0,90) = 3.951 Wh", "Converter para Ah: 3.951 Wh / 48V = 82,3 Ah"]}
+        answer="Uma bateria LFP 48V 85 Ah (~4,0 kWh) fornece 8+ horas de backup para cargas noturnas essenciais." interpretation="O ciclo de operação da geladeira significa que o consumo real é menor que a potência contínua." variant="home" />
+      <WorkedExample number={2} title="Backup Completo — 24 Horas" scenario="Cargas residenciais moderadas incluindo geladeira, iluminação, TV, internet e lavanderia por um dia inteiro"
+        inputs={[{ label: "Geladeira", value: "150W" }, { label: "Luzes", value: "300W" }, { label: "TV", value: "120W" }, { label: "Internet + Roteador", value: "40W" }, { label: "Celular/Notebook", value: "100W" }, { label: "Máquina de Lavar", value: "500W (2h)" }, { label: "Média Total", value: "1.200W" }, { label: "Duração", value: "24 horas" }, { label: "Tensão", value: "48V LFP" }, { label: "Eficiência", value: "90%" }]}
+        steps={["Energia diária total: (150×24) + (300×10) + (120×6) + (40×24) + (100×4) + (500×2) = 9.680 Wh", "Ajustar para DoD e perdas: 9.680 / (0,90 × 0,90) = 11.951 Wh", "Converter para Ah: 11.951 / 48 = 249,0 Ah"]}
+        answer="Um banco LFP 48V 250 Ah (~12,0 kWh) fornece backup completo de 24 horas para uma residência moderada." variant="home" />
+      <WorkedExample number={3} title="Equipamentos Médicos Críticos — 48 Horas" scenario="Concentrador de oxigênio, CPAP, sistema de segurança e dispositivos de comunicação por 2 dias"
+        inputs={[{ label: "Concentrador O2", value: "350W" }, { label: "CPAP", value: "100W" }, { label: "Segurança", value: "50W" }, { label: "Roteador + Modem", value: "40W" }, { label: "Iluminação Emergência", value: "100W" }, { label: "Celular", value: "30W" }, { label: "Carga Total", value: "670W" }, { label: "Duração", value: "48 horas" }, { label: "Tensão", value: "48V LFP" }, { label: "Eficiência", value: "90%" }]}
+        steps={["Energia bruta: 670W × 48h = 32.160 Wh", "Ajustar para DoD (90%) e inversor (90%): 32.160 / (0,90 × 0,90) = 39.704 Wh", "Converter para Ah: 39.704 / 48 = 827,2 Ah"]}
+        answer="Um banco LFP 48V 830 Ah (~39,8 kWh) fornece 48 horas de autonomia para equipamentos médicos críticos." interpretation="Cargas médicas são contínuas e não negociáveis. Um sistema de 40 kWh garante que equipamentos de sustento de vida permaneçam alimentados." variant="home" />
+    </div>
+  </section>
+
+  <EngineeringDiagram title="Sistema de Backup Residencial" description="Painéis solares carregam baterias que alimentam cargas essenciais através de um inversor" variant="system" steps={[{ label: "Painéis Solares", icon: "solar" }, { label: "Controlador de Carga", icon: "charge" }, { label: "Banco de Baterias", icon: "battery" }, { label: "Inversor + Cargas", icon: "inverter" }]} />
+
+  <ComparisonTable title="Backup Residencial — Níveis de Prioridade de Carga" headers={["Nível", "Cargas", "Potência Típica", "Meta de Autonomia", "Tamanho da Bateria"]} rows={[["Crítico", "Geladeira, médico, segurança, comunicações", "500–800W", "24–72 horas", "5–15 kWh"], ["Essencial", "+ luzes, internet, celular", "1.000–1.500W", "12–24 horas", "10–25 kWh"], ["Conforto", "+ TV, máquina de lavar, cozinha", "2.000–4.000W", "8–12 horas", "20–40 kWh"], ["Casa Inteira", "Todos os circuitos exceto HVAC pesado", "5.000–8.000W", "8–24 horas", "30–60 kWh"]]} caption="Abordagem por níveis para dimensionamento de backup residencial" />
+
+  <FAQSection items={faqItems} />
+
+  <script>
+    import { calculateHomeBackupBattery } from '../../../../utils/calculators';
+    import { renderLineChart, clearChart } from '../../../../utils/charting';
+
+    const loadInput = document.getElementById('critical-load') as HTMLInputElement;
+    const durationInput = document.getElementById('backup-duration') as HTMLInputElement;
+    const voltageInput = document.getElementById('voltage') as HTMLInputElement;
+    const chemistrySelect = document.getElementById('chemistry') as HTMLSelectElement;
+    const efficiencyInput = document.getElementById('inverter-efficiency') as HTMLInputElement;
+
+    const resultEnergyBox = document.getElementById('result-energy');
+    const resultEnergyValue = resultEnergyBox?.querySelector('.text-display-md') as HTMLElement;
+    const resultEnergyKwh = resultEnergyBox?.querySelector('.text-caption') as HTMLElement;
+    const resultUsableBox = document.getElementById('result-usable');
+    const resultUsableValue = resultUsableBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultUsableRef = resultUsableBox?.querySelector('.text-caption') as HTMLElement;
+    const resultDeliveredBox = document.getElementById('result-delivered');
+    const resultDeliveredValue = resultDeliveredBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultDeliveredRef = resultDeliveredBox?.querySelector('.text-caption') as HTMLElement;
+    const resultCapacityBox = document.getElementById('result-capacity');
+    const resultCapacityValue = resultCapacityBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultCapacityRef = resultCapacityBox?.querySelector('.text-caption') as HTMLElement;
+    const resultRuntimeBox = document.getElementById('result-runtime');
+    const resultRuntimeValue = resultRuntimeBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultRuntimeRef = resultRuntimeBox?.querySelector('.text-caption') as HTMLElement;
+    const systemNotes = document.getElementById('system-notes');
+    const chartSvg = document.getElementById('chart-home-backup') as unknown as SVGElement;
+
+    function updateCalculations() {
+      const load = parseFloat(loadInput.value) || 2000;
+      const duration = parseFloat(durationInput.value) || 12;
+      const voltage = parseFloat(voltageInput.value) || 48;
+      const chemistry = chemistrySelect.value as "lfp" | "nmc" | "lead-acid";
+      const efficiency = parseFloat(efficiencyInput.value) || 90;
+
+      const results = calculateHomeBackupBattery(load, duration, voltage, chemistry, efficiency);
+
+      if (resultEnergyValue) resultEnergyValue.textContent = `${Math.round(results.totalEnergyWh).toLocaleString()} Wh`;
+      if (resultEnergyKwh) resultEnergyKwh.textContent = `${(results.totalEnergyWh / 1000).toFixed(2)} kWh — o que você precisa comprar`;
+      if (resultUsableValue) resultUsableValue.textContent = `${Math.round(results.usableEnergyWh).toLocaleString()} Wh`;
+      if (resultUsableRef) resultUsableRef.textContent = `Após limites de profundidade de descarga`;
+      if (resultDeliveredValue) resultDeliveredValue.textContent = `${Math.round(results.deliveredEnergyWh).toLocaleString()} Wh`;
+      if (resultDeliveredRef) resultDeliveredRef.textContent = `Disponível para carga após perdas do inversor`;
+      if (resultCapacityValue) resultCapacityValue.textContent = `${results.recommendedCapacityAh.toFixed(1)} Ah`;
+      if (resultCapacityRef) resultCapacityRef.textContent = `At ${voltage}V nominal`;
+      if (resultRuntimeValue) resultRuntimeValue.textContent = `${results.runtimeHours.toFixed(1)} hours`;
+      if (resultRuntimeRef) resultRuntimeRef.textContent = `At ${load.toLocaleString()}W critical load`;
+
+      if (systemNotes) {
+        const chemistryName = chemistry === "lfp" ? "LFP" : chemistry === "nmc" ? "NMC" : "Lead-Acid";
+        systemNotes.textContent = `For ${load.toLocaleString()}W critical loads over ${duration} hours at ${voltage}V ${chemistryName}, you need approximately ${(results.totalEnergyWh / 1000).toFixed(1)} kWh of battery capacity (${results.recommendedCapacityAh.toFixed(0)} Ah at ${voltage}V).`;
+      }
+
+      if (chartSvg && results.totalEnergyWh > 0 && load > 0) {
+        const dodLimits: Record<string, number> = { lfp: 90, nmc: 80, 'lead-acid': 50 };
+        const dodFrac = (dodLimits[chemistry] || 80) / 100;
+        const effFrac = efficiency / 100;
+        const batteryWh = results.totalEnergyWh;
+        const pts: { x: number; y: number }[] = [];
+        const percents = [50, 64, 79, 93, 107, 121, 136, 150];
+        for (const pct of percents) {
+          const testLoad = load * pct / 100;
+          const runtime = testLoad > 0 ? (batteryWh * dodFrac * effFrac) / testLoad : 0;
+          pts.push({ x: testLoad, y: runtime });
+        }
+        renderLineChart(chartSvg, pts, { width: 320, height: 160, xLabel: 'Load (W)', yLabel: 'Runtime (hours)', yMin: 0 });
+      } else if (chartSvg) clearChart(chartSvg);
+    }
+
+    [loadInput, durationInput, voltageInput, chemistrySelect, efficiencyInput].forEach(el => { el.addEventListener('input', updateCalculations); });
+    updateCalculations();
+  </script>
+
+</CalculatorLayout>

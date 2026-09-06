@@ -1,0 +1,445 @@
+---
+import CalculatorLayout from '../../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import InputField from '../../../components/InputField.astro';
+import ResultBox from '../../../components/ResultBox.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import RelatedTools from '../../../components/RelatedTools.astro';
+import WorkedExample from '../../../components/WorkedExample.astro';
+import ComparisonTable from '../../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../../components/EngineeringDiagram.astro';
+
+const modeOptions = [
+  { label: "Tensão de Circuito Aberto (OCV)", value: "ocv" },
+  { label: "Contagem de Coulomb (Integração de Corrente)", value: "coulomb" },
+];
+
+const chemistryOptions = [
+  { label: "Lítio Ferro Fosfato (LiFePO4 / LFP)", value: "lfp" },
+  { label: "Lítio Níquel Manganês Cobalto (NMC)", value: "nmc" },
+  { label: "Chumbo-Ácido Ciclo Profundo (Pacote 12V)", value: "lead-acid" },
+];
+
+const durationUnitOptions = [
+  { label: "Minutos", value: "minutes" },
+  { label: "Segundos", value: "seconds" },
+  { label: "Horas", value: "hours" },
+];
+
+const whatIs = `A estimativa do Estado de Carga (SOC) é o processo de determinar quanto de energia resta em uma bateria em relação à sua capacidade máxima atual. Dois métodos principais são utilizados na prática: <strong>busca por Tensão de Circuito Aberto (OCV)</strong>, que correlaciona a tensão de repouso da bateria com uma curva de referência específica da química, e <strong>contagem de Coulomb</strong>, que integra o fluxo de corrente ao longo do tempo para rastrear a carga entraindo e saindo da célula. A estimativa precisa de SOC é crítica para sistemas de gerenciamento de baterias (BMS), previsão de autonomia em veículos elétricos, despacho de armazenamento solar e prevenção de eventos de sobredescarga ou sobrecarga que danificam as células.`;
+
+const whyItMatters = [
+  "Leituras incorretas de SOC podem causar sobredescarga, danificando permanentemente as células de lítio e reduzindo a vida útil da bateria.",
+  "Sobreestimar o SOC leva a desligamentos inesperados quando a bateria se esgota antes do que o BMS previa.",
+  "As baterias LFP têm curvas de tensão extremamente planas entre 20–80% de SOC, tornando a estimativa baseada em tensão não confiável sem medição precisa.",
+  "A deriva da contagem de Coulomb se acumula ao longo do tempo — sem recalibração periódica, o erro de SOC cresce para 5–15% em poucos dias.",
+  "Sistemas marinhos e de RVs que dependem de SOC impreciso podem deixar os usuários sem energia durante operações críticas.",
+];
+
+const practicalApplications = [
+  { title: "Sistemas de Gerenciamento de Baterias", description: "Unidades BMS utilizam estimativa de SOC para prevenir sobrecarga e sobredescarga, protegendo a química das células e estendendo a vida útil dos ciclos." },
+  { title: "Veículos Elétricos", description: "SOC preciso é a base para estimativa de autonomia e indicadores de bateria voltados ao motorista em EVs e veículos híbridos." },
+  { title: "Despacho de Armazenamento Solar", description: "Sistemas solares residenciais e comerciais utilizam SOC para decidir quando descarregar baterias vs. quando preservar carga para cargas noturnas." },
+  { title: "Gerenciamento de Energia Marinho e RV", description: "Viajantes off-grid utilizam SOC para planejar o uso de energia, sabendo exatamente quanto resta antes de recarregar." },
+  { title: "Monitoramento de Backup em Telecom", description: "Operadoras de telecom monitoram SOC para verificar se as baterias de backup estão carregadas e prontas para eventos de queda na rede." },
+  { title: "Armazenamento em Escala de Rede", description: "Operadores de BESS em escala utilitária utilizam SOC para gerenciar agendamento de carga/descarga e despacho de serviços de rede." },
+];
+
+const expertNotes = [
+  { title: 'Desafios do LFP', variant: 'warning', content: 'O LFP (LiFePO4) possui uma curva de tensão extremamente plana entre 20% e 80% de SOC. A tensão da célula se mantém estável entre 3.25V e 3.30V. Sob carga, ruído ou queda de tensão de contato facilmente imita mudanças de capacidade, tornando buscas puras por OCV não confiáveis. A maioria das unidades BMS LFP utiliza contagem de Coulomb, corrigindo para valores OCV ao repousar em carga total.' },
+  { title: 'Deriva da Contagem de Coulomb', variant: 'engineering', content: 'A contagem de Coulomb integra a corrente ao longo do tempo, mas offsets de sensores ou erros de medição se acumulam. Uma pequena deriva de 0.1A no sensor de corrente se acumula para 2.4 Ah de erro ao longo de 24 horas. A deriva de SOC crescerá progressivamente até ser redefinida ao atingir limites de tensão de 100% ou 0%.' },
+  { title: 'Requisito de Repouso', variant: 'info', content: 'Para medição precisa de OCV, a bateria deve repousar por pelo menos 1–2 horas após carga ou descarga. Gradientes de concentração química próximos às placas das células levam tempo para se equilibrarem à verdadeira tensão de circuito aberto.' },
+];
+
+const trustSection = {
+  text: "Este estimador utiliza curvas de referência OCV-SOC documentadas publicamente para químicas LFP, NMC e chumbo-ácido. O modelo de contagem de Coulomb integra a corrente ao longo do tempo usando unidades SI padrão. Ambos os métodos são abordagens padrão da indústria utilizadas em sistemas de gerenciamento de baterias em todo o mundo. Todos os valores intermediários são exibidos para verificação independente.",
+  link: { label: "Veja nossa metodologia completa", href: "/methodology/" },
+};
+
+const references = [
+  { title: "Battery University — Como Medir o Estado de Carga", url: "https://batteryuniversity.com/article/bu-902-how-to-measure-state-of-charge", source: "Battery University / Cadex Electronics" },
+  { title: "IEEE Std 1188-1996 — Monitoramento e Diagnóstico de Baterias", url: "https://standards.ieee.org/ieee/1188/1076/", source: "IEEE Standards Association" },
+  { title: "Texas Instruments — Contagem de Coulomb para Estimativa de SOC", url: "https://www.ti.com/lit/an/slua517/slua517.pdf", source: "Notas de Aplicação Texas Instruments" },
+  { title: "NREL — Métodos de Estimativa de Estado de Carga", url: "https://www.nrel.gov/analysis/state-of-charge-estimation.html", source: "Laboratório Nacional de Energia Renovável" },
+];
+
+const faqItems = [
+  {
+    question: "Por que a busca por OCV é difícil para químicas LFP (LiFePO4)?",
+    answer: "O LFP possui uma curva de tensão extremamente plana entre 20% e 80% de SOC. A tensão da célula se mantém estável entre 3.25V e 3.30V. Sob carga, ruído ou queda de tensão de contato facilmente imita mudanças de capacidade, tornando buscas puras por OCV não confiáveis. A maioria das unidades BMS LFP utiliza contagem de Coulomb, corrigindo para valores OCV ao repousar em carga total.",
+  },
+  {
+    question: "O que é a deriva da contagem de Coulomb?",
+    answer: "A contagem de Coulomb integra a corrente ao longo do tempo. No entanto, offsets de sensores ou erros de medição se acumulam ao longo do período. Uma pequena deriva de 0.1A no sensor de corrente se acumula para 2.4 Ah de erro ao longo de 24 horas. A deriva de SOC crescerá progressivamente até ser redefinida ao atingir limites de tensão de 100% ou 0%.",
+  },
+  {
+    question: "Por que a bateria deve repousar para medições de OCV?",
+    answer: "Descarregar ou carregar gera gradientes de concentração química próximos às placas das células. A tensão sobe durante a carga e cai sob carga. Uma vez que as correntes param, a química da célula se equilibra lentamente ao seu potencial químico de estado estável (o verdadeiro OCV), o que leva 1 a 2 horas.",
+  },
+  {
+    question: "Como as curvas OCV de Chumbo-Ácido diferem?",
+    answer: "O chumbo-ácido possui uma relação relativamente linear entre tensão e SOC (12.72V = 100%, 11.63V = 0%), tornando a estimativa baseada em tensão mais confiável do que em sistemas de lítio. No entanto, a queda de tensão do chumbo-ácido sob cargas pesadas é severa, exigindo fatores de correção de carga.",
+  },
+  {
+    question: "Qual é o melhor método para estimativa de SOC?",
+    answer: "A abordagem mais precisa combina contagem de Coulomb com recalibração OCV periódica. A contagem de Coulomb fornece rastreamento de SOC em tempo real, enquanto medições OCV em pontos de repouso (carga total, vazio) corrigem a deriva acumulada. Esta abordagem híbrida é padrão em implementações comerciais de BMS.",
+  },
+  {
+    question: "Quão precisa é a contagem de Coulomb?",
+    answer: "No curto prazo (horas), a contagem de Coulomb é precisa dentro de 1–3%. Ao longo de dias sem recalibração, a deriva do sensor pode se acumular para 5–15% de erro. Sensores de corrente de alta qualidade (hall-effect ou baseados em shunt) com calibração reduzem a deriva, mas a correção periódica baseada em tensão continua necessária.",
+  },
+  {
+    question: "Posso usar estimativa de SOC enquanto a bateria está sob carga?",
+    answer: "SOC baseado em OCV só é preciso quando a bateria está em repouso (sem fluxo de corrente). Sob carga, a tensão nos terminais cai devido à resistência interna, produzindo leituras de SOC enganosas. A contagem de Coulomb funciona sob carga, mas requer medição precisa de corrente.",
+  },
+  {
+    question: "Como a temperatura afeta a estimativa de SOC?",
+    answer: "A temperatura afeta tanto as curvas OCV quanto a precisão da contagem de Coulomb. Temperaturas frias aumentam a resistência interna, causando maior queda de tensão sob carga (distorcendo OCV). A eficiência da contagem de Coulomb também diminui em baixas temperaturas. A compensação de temperatura é essencial para SOC preciso.",
+  },
+  {
+    question: "Qual é a diferença entre SOC e SOH?",
+    answer: "SOC mede a carga atual em relação à capacidade atual (como um marcador de combustível). SOH mede a capacidade máxima restante em relação à capacidade de projeto original (como desgaste do motor). Uma bateria com 50% de SOC e 80% de SOH tem 40% da sua capacidade de projeto original restante.",
+  },
+  {
+    question: "Como calibro o indicador de SOC da minha bateria?",
+    answer: "Carregue a bateria a 100% e deixe repousar por 2+ horas — isso define o ponto superior de calibração. Em seguida, descarregue até o vazio (ou o corte do BMS) para definir o ponto inferior. A maioria das unidades BMS calibra automaticamente durante ciclos de carga total.",
+  },
+  {
+    question: "Por que meu SOC pula subitamente?",
+    answer: "Saltos súbitos de SOC geralmente indicam que o BMS foi recalibrado. Após um período de repouso, o BMS corrige a deriva da contagem de Coulomb comparando o OCV real com a curva de referência. Este é um comportamento normal e indica que o sistema está se autocorrigindo.",
+  },
+];
+
+const relatedTools = [
+  { href: "/tools/battery-degradation-estimator/", title: "Estimador de Degradação", description: "Estime o declínio de capacidade e estado de degradação da bateria." },
+  { href: "/tools/runtime-calculator/", title: "Calculadora de Autonomia", description: "Calcule a autonomia a partir de perfis de potência." },
+  { href: "/tools/charging-time-calculator/", title: "Tempo de Carregamento", description: "Estime durações de carga CC-CV." },
+  { href: "/tools/c-rate-calculator/", title: "Calculadora de Taxa C", description: "Calcule taxas de corrente de carga e descarga." },
+  { href: "/tools/battery-sizing-calculator/", title: "Ferramenta de Dimensionamento", description: "Dimensione armazenamento de baterias a partir de perfis de consumo elétrico." },
+  { href: "/tools/solar-battery-sizing-calculator/", title: "Dimensionamento Solar", description: "Dimensione bancos de baterias solares a partir do consumo diário." },
+];
+
+const commonMistakes = [
+  "Assumir que apenas a tensão determina o SOC — para LFP, a tensão é quase constante entre 20–80% de SOC. Um erro de medição de 10mV pode representar uma variação de 30% de SOC na região plana.",
+  "Ignorar o tempo de repouso para medições de OCV — medir tensão imediatamente após carga ou descarga produz leituras de SOC enganosas. Aguarde 1–2 horas para equilíbrio químico.",
+  "Não recalibrar a contagem de Coulomb — a deriva do sensor se acumula diariamente. Sem recalibração periódica baseada em OCV, o erro de SOC cresce para 10–15% dentro de uma semana.",
+  "Usar o perfil de química errado — LFP, NMC e chumbo-ácido têm curvas OCV-SOC completamente diferentes. Usar uma curva NMC para uma bateria LFP produz resultados extremamente imprecisos.",
+  "Ignorar os efeitos da temperatura — temperaturas frias aumentam a resistência interna, distorcendo medições de tensão. A contagem de Coulomb também se torna menos eficiente em baixas temperaturas.",
+  "Medir SOC sob carga — a tensão nos terminais sob carga inclui queda de IR, tornando o SOC baseado em OCV não confiável. Sempre meça OCV em repouso.",
+];
+
+const relatedArticles = [
+  { href: "/learn/understanding-state-of-charge/", title: "O que é Estado de Carga?" },
+  { href: "/learn/lifepo4-voltage-chart/", title: "Curva de Tensão LFP Explicada" },
+];
+---
+
+<CalculatorLayout
+  title="Estimador de Estado de Carga (SOC) de Bateria | Calculadoras de Bateria"
+  description="Estime a capacidade restante da bateria usando curvas de interpolação de Tensão de Circuito Aberto (OCV) ou simuladores de Contagem de Coulomb."
+  faqItems={faqItems}
+  commonMistakes={commonMistakes}
+  relatedCalculators={relatedTools}
+  relatedArticles={relatedArticles}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+  lang="pt"
+>
+
+  <!-- Main Calculator Grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+
+    <!-- Input Form -->
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Parâmetros</h3>
+      <div class="flex flex-col gap-6">
+
+        <!-- Mode selection -->
+        <InputField id="mode" label="Modo de Estimativa" type="select" options={modeOptions} value="ocv" />
+
+        <!-- Chemistry -->
+        <InputField id="chemistry" label="Perfil de Química" type="select" options={chemistryOptions} value="lfp" />
+
+        <!-- OCV Specific Inputs -->
+        <div id="ocv-inputs" class="flex flex-col gap-6">
+          <InputField id="voltage" label="Tensão de Circuito Aberto Medida (V)" value={13.16} min={0.1} step="any" />
+          <InputField id="nominal" label="Tensão Nominal do Pacote (V)" value={12.8} min={0.1} step="any" helperText="Usado para inferir contagem de células em série (ex: 12.8V nominal é um sistema 4S)" />
+        </div>
+
+        <!-- Coulomb Counting Specific Inputs -->
+        <div id="coulomb-inputs" class="flex flex-col gap-6 hidden">
+          <InputField id="initial-soc" label="SOC Inicial (%)" value={50} min={0} max={100} />
+          <InputField id="current" label="Corrente Líquida (Amperes)" value={-10} step="any" helperText="Use negativo (-) para cargas de descarga, positivo (+) para corrente de entrada do carregador." />
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <InputField id="duration" label="Duração" value={60} min={1} step="any" />
+            <InputField id="duration-unit" label="Unidade" type="select" options={durationUnitOptions} value="minutes" />
+          </div>
+          <InputField id="capacity" label="Capacidade Total SOH (Ah)" value={100} min={0.1} step="any" helperText="Capacidade real do pacote de baterias ajustada para degradação." />
+        </div>
+
+      </div>
+    </CalculatorCard>
+
+    <!-- Calculation Results -->
+    <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Resultado do Estado de Carga</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <!-- Main Output -->
+          <ResultBox
+            label="Estado de Carga (SOC)"
+            value="70.0%"
+            suffix="Bateria parcialmente descarregada"
+            variant="primary"
+            id="result-soc"
+          />
+
+          <!-- Secondary Outputs -->
+          <ResultBox
+            label="Energia Restante Estimada"
+            value="896 Wh"
+            suffix="Calculado na tensão nominal"
+            id="result-energy-remaining"
+          />
+        </div>
+      </div>
+
+      <!-- Action Area -->
+      <div class="border-t border-hairline pt-6">
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">Restrições de Estimativa de SOC</h4>
+        <p class="text-body-sm text-muted mb-4">
+          A estimativa OCV só é precisa quando a bateria esteve em repouso (sem carga ou descarga) por pelo menos <span class="text-primary font-bold">1 a 2 horas</span>. Cargas ativas reduzem a tensão, resultando em enorme erro de SOC.
+        </p>
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">Aviso Educacional</h4>
+        <p class="text-body-sm text-muted">
+          Esta ferramenta fornece <span class="text-primary font-bold">aproximações educacionais apenas</span>. Os resultados não são diagnósticos, não são previsões certificadas de saúde da bateria e não devem ser usados como única base para decisões críticas de segurança. Sempre valide com um BMS qualificado ou instrumentação profissional certificada.
+        </p>
+      </div>
+    </CalculatorCard>
+
+  </div>
+
+  <!-- Formulas and Worked Examples -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">Fórmulas & Exemplos Resolvidos</h2>
+
+    <FormulaBox title="Fórmulas Matemáticas">
+      <p>
+        <strong>Busca por OCV:</strong> A tensão medida é normalizada para o nível da célula (V_cell = V / S) e interpolada contra uma curva de referência padrão da química:
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2 text-xs">
+        Célula LFP: 3.40V (100%), 3.31V (90%), 3.29V (70%), 3.27V (40%), 3.23V (20%), 2.50V (0%)
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2 text-xs">
+        Célula NMC: 4.20V (100%), 4.05V (80%), 3.80V (50%), 3.60V (20%), 3.00V (0%)
+      </div>
+      <p>
+        <strong>Contagem de Coulomb (Integração de Corrente):</strong> As mudanças na capacidade de carga são calculadas somando fluxos contínuos de Ampere ao longo da duração:
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2 text-xs font-light">
+        SOC_final (%) = SOC_início + [ (Corrente (A) x (Duração (seg) / 3600)) / Capacidade (Ah) ] x 100
+      </div>
+      <p class="text-xs text-muted mt-4">
+        <strong>Variáveis:</strong> Tensão em V, Corrente em A (negativa = descarga), Duração em segundos, Capacidade em Ah (ajustada por SOH). Premissas: bateria em repouso para OCV, corrente constante para contagem de Coulomb, temperatura padrão (25°C).
+      </p>
+    </FormulaBox>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample
+        number={1}
+        title="Busca OCV para LFP"
+        scenario="Você tem um pacote de baterias LFP 4S em repouso e mede 3.30V nos terminais da célula. Determine o estado de carga usando a curva de referência OCV."
+        inputs={[
+          { label: "Tensão da Célula", value: "3.30 V" },
+          { label: "Química", value: "LFP (LiFePO4)" },
+          { label: "Tempo de Repouso", value: "> 2 horas" },
+        ]}
+        steps={[
+          "Identifique a química: células LFP têm tensão nominal de 3.2V.",
+          "Localize 3.30V na curva de referência OCV do LFP. A curva é extremamente plana entre 20–80% de SOC (3.23V–3.31V).",
+          "Interpole: 3.30V cai próximo à extremidade superior da região plana, correspondendo a aproximadamente **65% de SOC**.",
+        ]}
+        answer="SOC ≈ 65%"
+        interpretation="A tensão do pacote 4S seria 3.30 × 4 = 13.20V. Isso coloca a bateria na faixa média-alta. Como a curva de tensão LFP é quase plana nesta região, um pequeno erro de medição (10–20mV) pode alterar a estimativa de SOC em 15–20%. Para SOC LFP confiável, combine OCV em repouso com contagem de Coulomb."
+        variant="blue"
+      />
+
+      <WorkedExample
+        number={2}
+        title="Interpolação OCV para NMC"
+        scenario="Um pacote de baterias NMC 10S esteve em repouso por 3 horas. A tensão medida da célula é 3.75V. Encontre o estado de carga usando a curva de referência NMC."
+        inputs={[
+          { label: "Tensão da Célula", value: "3.75 V" },
+          { label: "Química", value: "NMC (Níquel Manganês Cobalto)" },
+          { label: "Tempo de Repouso", value: "> 2 horas" },
+        ]}
+        steps={[
+          "Identifique a química: células NMC têm tensão nominal de 3.6–3.7V.",
+          "Curva de referência: 4.20V = 100%, 4.05V = 80%, 3.80V = 50%, 3.60V = 20%, 3.00V = 0%.",
+          "Interpole: 3.75V cai entre 50% (3.80V) e 20% (3.60V). Interpolação linear fornece aproximadamente **44% de SOC**.",
+        ]}
+        answer="SOC ≈ 44%"
+        interpretation="A tensão do pacote 10S é 3.75 × 10 = 37.5V. A química NMC possui uma curva de tensão mais íngreme que o LFP, tornando a estimativa de SOC baseada em OCV mais precisa. Esta bateria está abaixo da carga nominal e deve ser recarregada em breve para vida útil ideal dos ciclos."
+        variant="blue"
+      />
+
+      <WorkedExample
+        number={3}
+        title="SOC Baseado em Tensão para Chumbo-Ácido"
+        scenario="Um pacote de baterias chumbo-ácido 12V mede 12.1V em repouso após uma noite sem carga. Estime o estado de carga usando a curva de referência chumbo-ácido."
+        inputs={[
+          { label: "Tensão do Pacote", value: "12.1 V" },
+          { label: "Química", value: "Chumbo-Ácido (6S)" },
+          { label: "Tempo de Repouso", value: "> 2 horas" },
+        ]}
+        steps={[
+          "Identifique a química: chumbo-ácido 12V nominal = 6 células × 2.1V por célula = 12.6V cheio, 11.63V = 0%.",
+          "Curva de referência: 12.72V = 100%, 12.45V = 75%, 12.24V = 50%, 12.06V = 25%, 11.63V = 0%.",
+          "Interpole: 12.1V cai entre 50% (12.24V) e 25% (12.06V). Interpolação linear fornece aproximadamente **35% de SOC**.",
+        ]}
+        answer="SOC ≈ 35%"
+        interpretation="O chumbo-ácido possui uma relação relativamente linear entre tensão e SOC, tornando a estimativa OCV mais confiável do que para químicas de lítio. No entanto, esta bateria está significativamente descarregada. Recarregue para pelo menos 12.45V (75%) para prevenir sulfatação e manter a saúde da bateria."
+        variant="red"
+      />
+    </div>
+  </section>
+
+  <EngineeringDiagram
+    title="Métodos de Estimativa de SOC"
+    description="Duas abordagens principais: busca OCV baseada em tensão e integração por contagem de Coulomb"
+    variant="flow"
+    steps={[
+      { label: "Tensão da Bateria", icon: "battery" },
+      { label: "Tabela de Busca OCV", icon: "chart" },
+      { label: "Estimativa de SOC", icon: "chart" },
+    ]}
+  />
+
+  <ComparisonTable
+    title="Precisão da Estimativa de SOC por Método"
+    headers={["Método", "Precisão", "Requisitos", "Limitações", "Melhor Para"]}
+    rows={[
+      ["Busca OCV", "±5%", "Voltímetro, tabela OCV", "Deve estar em repouso (>2h)", "Sistemas estacionários"],
+      ["Contagem de Coulomb", "±2–3%", "Sensor de corrente, temporizador", "Deriva com o tempo", "Sistemas ativos"],
+      ["Baseado em Impedância", "±5–10%", "Sensor de impedância AC", "Sensível à temperatura", "Integração BMS"],
+      ["Híbrido (BMS)", "±1–2%", "Tensão + corrente + temp", "Algoritmo complexo", "Todos os sistemas de lítio"],
+    ]}
+    caption="Comparação de técnicas de estimativa de estado de carga"
+  />
+
+  <FAQSection items={faqItems} />
+  <RelatedTools tools={relatedTools} />
+
+  <!-- Calculation Script -->
+  <script>
+    import { estimateSocFromOcv, simulateCoulombCounting } from '../../../utils/calculators';
+
+    const modeSelect = document.getElementById('mode') as HTMLSelectElement;
+    const chemistrySelect = document.getElementById('chemistry') as HTMLSelectElement;
+
+    // Inputs sections
+    const ocvInputs = document.getElementById('ocv-inputs');
+    const coulombInputs = document.getElementById('coulomb-inputs');
+
+    // Inputs elements
+    const voltageInput = document.getElementById('voltage') as HTMLInputElement;
+    const nominalInput = document.getElementById('nominal') as HTMLInputElement;
+    const initialSocInput = document.getElementById('initial-soc') as HTMLInputElement;
+    const currentInput = document.getElementById('current') as HTMLInputElement;
+    const durationInput = document.getElementById('duration') as HTMLInputElement;
+    const durationUnit = document.getElementById('duration-unit') as HTMLSelectElement;
+    const capacityInput = document.getElementById('capacity') as HTMLInputElement;
+
+    // Outputs elements - query inside ResultBox wrappers
+    const resultSocBox = document.getElementById('result-soc');
+    const resultSoc = resultSocBox?.querySelector('.text-display-md') as HTMLElement;
+    const resultStatusDesc = resultSocBox?.querySelector('.text-caption') as HTMLElement;
+    const resultEnergyBox = document.getElementById('result-energy-remaining');
+    const resultEnergyRemaining = resultEnergyBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultEnergyDesc = resultEnergyBox?.querySelector('.text-caption') as HTMLElement;
+
+    function toggleMode() {
+      const mode = modeSelect.value;
+      if (mode === 'ocv') {
+        ocvInputs?.classList.remove('hidden');
+        coulombInputs?.classList.add('hidden');
+      } else {
+        ocvInputs?.classList.add('hidden');
+        coulombInputs?.classList.remove('hidden');
+      }
+      updateCalculations();
+    }
+
+    function updateCalculations() {
+      const mode = modeSelect.value;
+      const chemistry = chemistrySelect.value as "lfp" | "nmc" | "lead-acid";
+
+      let finalSoc = 0;
+      let nominalV = 12.8;
+
+      if (mode === 'ocv') {
+        const voltage = parseFloat(voltageInput.value) || 0;
+        nominalV = parseFloat(nominalInput.value) || 12.8;
+        finalSoc = estimateSocFromOcv(chemistry, voltage, nominalV);
+      } else {
+        const initialSoc = parseFloat(initialSocInput.value) || 50;
+        const current = parseFloat(currentInput.value) || 0;
+        const duration = parseFloat(durationInput.value) || 0;
+        const unit = durationUnit.value;
+        const capacity = parseFloat(capacityInput.value) || 100;
+
+        let durationSec = duration;
+        if (unit === 'minutes') {
+          durationSec = duration * 60;
+        } else if (unit === 'hours') {
+          durationSec = duration * 3600;
+        }
+
+        finalSoc = simulateCoulombCounting(initialSoc, current, durationSec, capacity);
+
+        // Infer nominal voltage for remaining energy output based on chemistry
+        if (chemistry === 'lfp') nominalV = 12.8;
+        else if (chemistry === 'nmc') nominalV = 11.1;
+        else nominalV = 12.0;
+      }
+
+      // Render Outputs
+      if (resultSoc) resultSoc.textContent = `${finalSoc.toFixed(1)}%`;
+
+      let statusStr = "Bateria parcialmente descarregada";
+      if (finalSoc >= 95) statusStr = "Bateria totalmente carregada";
+      else if (finalSoc <= 15) statusStr = "Crítico: Bateria quase esgotada";
+      if (resultStatusDesc) resultStatusDesc.textContent = statusStr;
+
+      // Estimate Energy Remaining
+      const capacityAh = mode === 'ocv' ? 100 : (parseFloat(capacityInput.value) || 100);
+      const remainingWh = capacityAh * nominalV * (finalSoc / 100);
+
+      if (resultEnergyRemaining) {
+        resultEnergyRemaining.textContent = `${Math.round(remainingWh).toLocaleString()} Wh`;
+      }
+      if (resultEnergyDesc) {
+        resultEnergyDesc.textContent = `Calculado a ${nominalV.toFixed(1)}V nominal e uma capacidade referência de ${capacityAh.toFixed(0)} Ah.`;
+      }
+    }
+
+    modeSelect.addEventListener('change', toggleMode);
+    chemistrySelect.addEventListener('change', updateCalculations);
+
+    [
+      voltageInput, nominalInput, initialSocInput, currentInput,
+      durationInput, durationUnit, capacityInput
+    ].forEach(el => {
+      el.addEventListener('input', updateCalculations);
+    });
+
+    // Run on boot
+    toggleMode();
+  </script>
+</CalculatorLayout>

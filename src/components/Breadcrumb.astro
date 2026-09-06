@@ -1,4 +1,6 @@
 ---
+import { t, type Locale, getLocalePrefix } from '../utils/i18n';
+
 export interface BreadcrumbItem {
   label: string;
   href?: string;
@@ -6,15 +8,17 @@ export interface BreadcrumbItem {
 
 export interface Props {
   items: BreadcrumbItem[];
+  lang?: Locale;
 }
 
-const { items } = Astro.props as Props;
+const { items, lang = 'en' } = Astro.props as Props;
+const prefix = getLocalePrefix(lang);
 ---
 
-<nav aria-label="Breadcrumb" class="mb-6">
+<nav aria-label={t('components.breadcrumb.aria_label', lang)} class="mb-6">
   <ol class="flex flex-wrap items-center gap-1.5 text-caption text-muted">
     <li>
-      <a href="/" class="hover:text-primary transition-colors">Home</a>
+      <a href={`${prefix}/`} class="hover:text-primary transition-colors">{t('components.breadcrumb.home', lang)}</a>
     </li>
     {items.map((item) => (
       <li class="flex items-center gap-1.5">

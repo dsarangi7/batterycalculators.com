@@ -1,0 +1,386 @@
+---
+import CalculatorLayout from '../../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import InputField from '../../../components/InputField.astro';
+import ResultBox from '../../../components/ResultBox.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import RelatedTools from '../../../components/RelatedTools.astro';
+import WorkedExample from '../../../components/WorkedExample.astro';
+import ComparisonTable from '../../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../../components/EngineeringDiagram.astro';
+
+const whatIs = `A Calculadora de Armazenamento de Energia para Navios estima a capacidade necessária de armazenamento de energia em baterias para sistemas de propulsão híbrida e elétrica marítima. Contabiliza cargas hotel, potência de propulsão, demandas de pico, perfis operacionais e química da bateria para determinar capacidade utilizável, capacidade instalada, dimensões físicas e tensão DC ideal do sistema. Esta ferramenta preenche a lacuna entre a análise de perfil de carga e a especificação prática do sistema de bateria para projetistas de navios, engenheiros marítimos e gerentes de projeto avaliando opções de eletrificação.`;
+
+const whyItMatters = [
+  "Sistemas de bateria subdimensionados forçam partidas prematuras do motor, anulando as economias de emissões e combustível que justificaram o investimento híbrido em primeiro lugar.",
+  "Bancos de baterias superdimensionados adicionam peso, volume e custo desnecessários — restrições críticas em navios sensíveis ao peso como balsas rápidas e barcos de patrulha.",
+  "Compatibilizar a tensão DC do sistema com os requisitos de carga de pico minimiza custos de cabos, reduz queda de tensão e garante níveis seguros de corrente em toda a instalação.",
+  "A seleção da química da bateria (LFP vs NMC) afeta fundamentalmente a vida útil dos ciclos, requisitos de gerenciamento térmico, sistemas de segurança e custo total de propriedade.",
+  "O dimensionamento adequado do armazenamento de energia é a base de um caso de negócios viável para navios híbridos — determina tanto a viabilidade técnica quanto o retorno econômico."
+];
+
+const practicalApplications = [
+  { title: "Eletrificação de Balsas", description: "Dimensione pacotes de baterias para balsas de rotas curtas com base na distância de travessia, tempo de retorno do cronograma e perfis de carga hotel durante o embarque de passageiros." },
+  { title: "Navios de Suporte Offshore Híbridos", description: "Determine o armazenamento de energia para ciclos de trabalho de posicionamento dinâmico onde as baterias lidam com cargas de propulsores de pico enquanto os motores operam na eficiência ideal." },
+  { title: "Embarcações Portuárias e Traleres", description: "Calcule a capacidade de bateria para demandas intermitentes de alta potência durante manuseio de navios, com recarga entre operações." },
+  { title: "Hibridização de Navios de Cruzeiro", description: "Dimensione baterias de cargas hotel para permanência em porto, permitindo operação de zero emissão em áreas de controle de emissão e zonas portuárias." }
+];
+
+const expertNotes: { title: string; variant: 'warning' | 'engineering' | 'info'; content: string }[] = [
+  {
+    title: "LFP vs NMC — Compromissos de Química",
+    variant: "engineering",
+    content: "LFP (LiFePO4) oferece mais de 5000 ciclos de vida a 90% de DoD, estabilidade térmica superior (sem fuga térmica acima de 270°C) e sem dependência de cobalto — tornando-o a escolha preferida para aplicações marítimas com altos números de ciclos. NMC fornece 20–30% maior densidade energética (5,0 vs 6,5 kg/kWh instalado), mas requer gerenciamento térmico mais sofisticado e tem menor vida útil (~2000 a 80% de DoD). Para navios onde peso e volume são restrições críticas, NMC pode ser justificado."
+  },
+  {
+    title: "Seleção de Tensão DC do Sistema",
+    variant: "engineering",
+    content: "A tensão do sistema deve ser selecionada com base na potência de pico para manter correntes gerenciáveis. Abaixo de 500 kW, sistemas de 48V–150V são práticos. Para 500 kW–1 MW, sistemas de 400V–600V reduzem requisitos de calibre de cabos. Acima de 1 MW, sistemas de 600V–1000V são padrão. Tensões mais altas requerem monitoramento de isolamento mais rigoroso, protocolos de segurança HV e sistemas de cabos marítimos em conformidade com IEC 60092."
+  },
+  {
+    title: "Capacidade Instalada vs Utilizável",
+    variant: "warning",
+    content: "Nunca projete um sistema de bateria em seus limites de capacidade utilizável. A capacidade instalada deve exceder a capacidade utilizável pelo denominador de DoD — para LFP a 90% de DoD, a capacidade instalada é aproximadamente 111% da capacidade utilizável. Para NMC a 80% de DoD, a instalada é 125% da utilizável. Além disso, sistemas marítimos requerem uma margem de reserva (tipicamente 15–25%) para flexibilidade operacional, incerteza de carga e degradação da bateria ao longo da vida útil do navio."
+  }
+];
+
+const trustSection = {
+  text: "Este calculador usa metodologia de dimensionamento baseada em física alinhada com IEC 62619 (células secundárias de lítio para uso marítimo) e diretrizes de classificação de baterias DNV. Estimativas de peso e volume são baseadas em densidades representativas de pacotes instalados de fabricantes de baterias marítimas.",
+  link: { label: "Ver nossa metodologia e derivação de fórmulas", href: "/methodology/" }
+};
+
+const references = [
+  { title: "IEC 62619:2022 — Células secundárias de lítio para aplicações marítimas", url: "https://webstore.iec.ch/en/publication/26887", source: "Comissão Eletrotécnica Internacional" },
+  { title: "DNV GL Regras de Classificação — Sistemas de Bateria (RU-SHIP Part 4 Ch.12)", url: "https://www.dnv.com/maritime/", source: "DNV" },
+  { title: "DNV Battery Notation — Princípios de Design Sugeridos", url: "https://www.dnv.com/media/assets/attach/3198956/file/Battery-Notation.pdf", source: "DNV" },
+  { title: "ISO 13297:2014 — Instalações elétricas em pequenas embarcações", url: "https://www.iso.org/standard/65870.html", source: "Organização Internacional de Padronização" }
+];
+
+const faqItems = [
+  {
+    question: "Qual é a diferença entre capacidade utilizável e instalada?",
+    answer: "A capacidade utilizável é a energia que você pode realmente extrair da bateria antes do BMS desconectar no limite de profundidade de descarga. A capacidade instalada (ou nominal) é a energia total armazenada na bateria. Para LFP a 90% de DoD, uma bateria instalada de 1000 kWh entrega 900 kWh utilizáveis. Para NMC a 80% de DoD, os mesmos 1000 kWh entregam 800 kWh utilizáveis. A lacuna cresce quando margens de reserva são adicionadas."
+  },
+  {
+    question: "Como escolho entre LFP e NMC para meu navio?",
+    answer: "Escolha LFP se vida útil dos ciclos, segurança e custo total de propriedade são prioridades — típico para balsas, embarcações portuárias e navios com ciclagem profunda diária. Escolha NMC se peso e volume são restrições críticas — típico para balsas rápidas, navios militares ou projetos de retrofit com espaço limitado. LFP é a química dominante em aplicações marítimas devido ao seu perfil de segurança e vantagens de vida útil dos ciclos."
+  },
+  {
+    question: "Qual margem de reserva devo usar?",
+    answer: "15–25% é típico para aplicações marítimas. Uma margem de 15% é adequada para perfis de carga bem caracterizados com operações estáveis (balsas agendadas). Uma margem de 25% é prudente para ciclos de trabalho variáveis (navios de suporte offshore, traleres) ou quando a incerteza de carga é alta. A margem de reserva também contabiliza a perda de capacidade da bateria ao longo da vida útil do navio — uma margem de 20% fornece espaço para 15–20% de degradação de capacidade."
+  },
+  {
+    question: "Como o tempo de operação afeta o dimensionamento da bateria?",
+    answer: "O tempo de operação determina quantas horas a bateria deve sustentar as cargas combinadas de hotel e propulsão. Para balsas de rotas curtas (1–2 horas de travessia), as baterias podem ser dimensionadas para uma única viagem com carga de oportunidade em cada terminal. Para navios que requerem 8+ horas de operação elétrica, a capacidade da bateria escala linearmente com o tempo, aumentando significativamente peso e custo."
+  },
+  {
+    question: "Qual tensão DC é apropriada para meu navio?",
+    answer: "A tensão é determinada pelos requisitos de potência de pico. Abaixo de 10 kW de pico: 48V é seguro e prático. 10–100 kW: 48V–150V. 100–500 kW: 150V–400V. 500 kW–1 MW: 400V–600V. Acima de 1 MW: 600V–1000V+ é padrão. Tensões mais altas reduzem tamanhos de cabos e perdas, mas requerem infraestrutura de segurança HV, monitoramento de isolamento e treinamento da tripulação."
+  },
+  {
+    question: "Posso usar esta calculadora para submissões oficiais de sociedades classificadoras?",
+    answer: "Não. Esta ferramenta fornece estimativas preliminares de engenharia para planejamento e análise de viabilidade. O projeto final do sistema de bateria deve estar em conformidade com IEC 62619, DNV Battery Notation, regras da Lloyd's Register ou requisitos aplicáveis da sociedade classificadora. Projetos finais requerem análise térmica detalhada, especificação de BMS, projeto de sistemas de segurança e revisão de classificação."
+  },
+  {
+    question: "Como o peso da bateria afeta a estabilidade do navio?",
+    answer: "O peso da bateria é um fator crítico nos cálculos de estabilidade do navio. Um sistema de bateria LFP de 1 MWh pesa aproximadamente 6.500 kg — significativo em navios sensíveis ao peso. Posições de montagem baixas melhoram a estabilidade ao baixar o centro de gravidade. Arquitetos navais devem contabilizar o peso da bateria em cálculos de estabilidade intacta e danificada conforme SOLAS e requisitos da sociedade classificadora."
+  },
+  {
+    question: "E a degradação da bateria ao longo da vida útil do navio?",
+    answer: "Baterias LFP tipicamente retêm 80% de capacidade após mais de 5000 ciclos a 90% de DoD. NMC retém 80% após ~2000 ciclos a 80% de DoD. O envelhecimento calendário também reduz a capacidade — aproximadamente 1,5–2% por ano a 25°C. Dimensione a capacidade instalada com uma margem de degradação (15–25%) para garantir capacidade utilizável adequada durante toda a vida útil operacional de 15–25 anos do navio."
+  }
+];
+
+const relatedArticles = [
+  { title: "Sistemas de Armazenamento de Energia para Navios Explicados", href: "/learn/vessel-energy-storage-systems-explained/" },
+  { title: "Balsas Elétricas a Bateria: Considerações de Projeto, Benefícios e Desafios", href: "/learn/battery-electric-ferries-explained/" },
+];
+
+const commonMistakes = [
+  "Confundir capacidade utilizável com capacidade instalada — LFP a 90% de DoD significa que a capacidade instalada deve ser ~111% da capacidade utilizável, não igual a ela.",
+  "Ignorar a margem de reserva para incerteza de carga — uma margem de reserva de 15–25% contabiliza flexibilidade operacional e degradação da bateria ao longo da vida útil do navio.",
+  "Selecionar tensão DC com base na potência média em vez de potência de pico — a tensão deve manter correntes de pico gerenciáveis para evitar superaquecimento de cabos.",
+  "Misturar especificações LFP e NMC — LFP (6,5 kg/kWh, 90% DoD) e NMC (5,0 kg/kWh, 80% DoD) têm parâmetros de dimensionamento fundamentalmente diferentes.",
+  "Omitir gerenciamento térmico da bateria em ambientes marítimos de alta temperatura ambiente — baterias acima de 35°C requerem resfriamento ativo para prevenir degradação.",
+  "Dimensionar bateria para carga média sem contabilizar demandas de pico — cargas de propulsores de posicionamento dinâmico podem atingir picos de 2–3× acima da potência média de propulsão.",
+  "Usar densidade energética em nível de célula em vez de densidade em nível de pacote instalado — BMS, gerenciamento térmico e invólucros adicionam 30–50% ao peso apenas de células.",
+  "Falhar em verificar a estabilidade do navio após adicionar peso de bateria — um sistema LFP de 1 MWh pesa ~6.500 kg e afeta o centro de gravidade."
+];
+
+const relatedCalculators = [
+  { href: "/tools/marine-battery-sizing-calculator/", title: "Calculadora de Dimensionamento de Bateria Marítima", description: "Dimensione bancos de baterias para cargas hotel em navios de recreio e pequenos comerciais." },
+  { href: "/tools/marine-co2-reduction-calculator/", title: "Calculadora de Redução de CO₂ Marítimo", description: "Estime reduções de emissões de hibridização de navios e energia de terra." },
+  { href: "/tools/hybrid-vessel-roi-calculator/", title: "Calculadora ROI de Navio Híbrido", description: "Avalie o retorno financeiro do investimento em propulsão híbrida." },
+  { href: "/marine/", title: "Hub de Eletrificação Marítima", description: "Explore todas as ferramentas e recursos de descarbonização marítima." },
+];
+
+const chemistryOptions = [
+  { label: 'LFP (LiFePO4)', value: 'lfp' },
+  { label: 'NMC (Níquel Manganês Cobalto)', value: 'nmc' },
+];
+---
+
+<CalculatorLayout
+  title="Calculadora de Armazenamento de Energia para Navios | Battery Calculators"
+  description="Estime a capacidade necessária de armazenamento de energia em baterias para sistemas de propulsão híbrida e elétrica marítima com base em perfis de carga, tempo de operação e química da bateria."
+  lang="pt"
+  faqItems={faqItems}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+  relatedCalculators={relatedCalculators}
+  commonMistakes={commonMistakes}
+  relatedArticles={relatedArticles}
+>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+
+    <!-- Formulário de Entrada -->
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Perfil de Carga do Navio</h3>
+      <div class="flex flex-col gap-6">
+
+        <InputField id="hotel-load" label="Carga Hotel" value={200} min={0} step={10} unit="kW" helperText="Navegação, iluminação, HVAC, cozinha, serviços hotel." />
+
+        <InputField id="propulsion-load" label="Carga de Propulsão" value={500} min={0} step={10} unit="kW" helperText="Potência média de propulsão elétrica durante operação." />
+
+        <InputField id="peak-load" label="Carga de Pico" value={900} min={0} step={10} unit="kW" helperText="Carga máxima simultânea (propulsão + hotel + propulsores)." />
+
+        <InputField id="operating-time" label="Tempo de Operação" value={4} min={0.5} max={24} step={0.5} unit="hours" helperText="Horas de operação elétrica por dia ou por viagem." />
+
+        <InputField id="reserve-margin" label="Margem de Reserva" value={20} min={0} max={50} step={1} unit="%" helperText="Margem de segurança para incerteza de carga e degradação (15–25% típico)." />
+
+        <InputField id="battery-chemistry" label="Química da Bateria" type="select" value="lfp" options={chemistryOptions} helperText="LFP: maior vida útil dos ciclos, mais seguro. NMC: mais leve, maior densidade energética." />
+
+      </div>
+    </CalculatorCard>
+
+    <!-- Resultados -->
+    <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Requisitos de Armazenamento</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <ResultBox label="Demanda Energética Diária" value="2.800 kWh" suffix="Carga combinada × horas de operação" variant="primary" id="result-daily-energy" />
+          <ResultBox label="Capacidade Utilizável Necessária" value="3.360 kWh" suffix="Incluindo margem de reserva" id="result-usable-capacity" />
+          <ResultBox label="Capacidade Instalada Recomendada" value="3.733 kWh" suffix="Contabilizando limites de DoD" id="result-installed-capacity" />
+          <ResultBox label="Peso Estimado da Bateria" value="24.267 kg" suffix="Baseado na densidade instalada LFP" id="result-weight" />
+          <ResultBox label="Volume Estimado da Bateria" value="25.382 L" suffix="≈ 25,4 m³" id="result-volume" />
+          <ResultBox label="Tensão DC do Sistema Sugerida" value="400 V" suffix="Corrente contínua máxima: 2.250 A" id="result-voltage" />
+        </div>
+      </div>
+
+      <div class="border-t border-hairline pt-6">
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">Nota sobre a Química</h4>
+        <p class="text-body-sm text-muted" id="chemistry-note">
+          LFP oferece vida útil superior dos ciclos (5000+), estabilidade térmica e 90% de DoD utilizável. Preferido para aplicações marítimas que requerem alto número de ciclos e segurança.
+        </p>
+      </div>
+    </CalculatorCard>
+
+  </div>
+
+  <!-- Visualização da Decomposição da Capacidade -->
+  <section class="mb-16">
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-4 uppercase tracking-wider">Decomposição da Capacidade</h3>
+      <p class="text-body-sm text-muted mb-6">Representação visual da capacidade utilizável, reserva e não utilizável na bateria instalada recomendada.</p>
+      <div id="capacity-breakdown" class="space-y-3"></div>
+    </CalculatorCard>
+  </section>
+
+  <!-- Fórmulas e Exemplos Resolvidos -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">Fórmulas e Exemplos Resolvidos</h2>
+    <FormulaBox title="Fórmulas Matemáticas">
+      <p>O dimensionamento do armazenamento de energia segue uma abordagem de baixo para cima, partindo dos perfis de carga até a capacidade instalada:</p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Energia Diária = (Carga Hotel + Carga Propulsão) × Horas de Operação</div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Capacidade Utilizável = Energia Diária × (1 + Margem de Reserva%)</div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Capacidade Instalada = Capacidade Utilizável / (DoD% / 100)</div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Peso = Capacidade Instalada × Fator de Peso do Pacote</div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Tensão = f(Potência de Pico) → I = P / V</div>
+      <p class="mt-4">Fatores de peso do pacote: LFP 6,5 kg/kWh, NMC 5,0 kg/kWh (pacote instalado incluindo BMS, gerenciamento térmico e invólucros).</p>
+    </FormulaBox>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample number={1} title="Balsa de Rota Curta com Carga Hotel" scenario="Uma balsa de 120 passageiros opera uma travessia de ida e volta de 8 horas com uma carga hotel contínua de 2 MW. O navio deve operar inteiramente com energia de bateria durante a travessia com 20% de margem de reserva." inputs={[{ label: "Carga hotel", value: "2.000 kW" }, { label: "Carga de propulsão", value: "0 kW" }, { label: "Carga de pico", value: "2.400 kW" }, { label: "Tempo de operação", value: "8 horas" }, { label: "Margem de reserva", value: "20%" }, { label: "Química", value: "LFP (90% DoD, 6,5 kg/kWh)" }]} steps={[{ label: "Demanda diária", formula: "Diária = 2.000 × 8", result: "16.000 kWh" }, { label: "Margem de reserva", formula: "Utilizável = 16.000 × 1,20", result: "19.200 kWh" }, { label: "Capacidade instalada", formula: "Instalada = 19.200 / 0,90", result: "21.333 kWh" }, { label: "Peso da bateria", formula: "Peso = 21.333 × 6,5", result: "138.667 kg ≈ 139 t" }, { label: "Tensão DC", formula: "Pico 2.400 kW → 600V", result: "600 V DC" }]} answer="Sistema LFP de 21.333 kWh, ~139 toneladas, a 600V DC" interpretation="Uma grande balsa com travessias de 8 horas requer capacidade substancial de bateria. Recarga rápida em terra entre viagens é tipicamente necessária." variant="marine" />
+
+      <WorkedExample number={2} title="Traler com Cargas de Pico de Manobra" scenario="Um traler portuário com demanda de pico de amarração de 500 kW opera intermitentemente, com média de 200 kW em um ciclo de trabalho típico." inputs={[{ label: "Carga hotel", value: "50 kW" }, { label: "Carga média de propulsão", value: "200 kW" }, { label: "Carga de pico", value: "500 kW" }, { label: "Tempo de operação", value: "6 horas/dia" }, { label: "Margem de reserva", value: "25%" }, { label: "Química", value: "LFP (90% DoD, 6,5 kg/kWh)" }]} steps={[{ label: "Demanda diária", formula: "Diária = (50 + 200) × 6", result: "1.500 kWh" }, { label: "Margem de reserva", formula: "Utilizável = 1.500 × 1,25", result: "1.875 kWh" }, { label: "Capacidade instalada", formula: "Instalada = 1.875 / 0,90", result: "2.083 kWh" }, { label: "Peso da bateria", formula: "Peso = 2.083 × 6,5", result: "13.542 kg ≈ 13,5 t" }, { label: "Tensão DC", formula: "Pico 500 kW → 600V", result: "600 V DC" }]} answer="Sistema LFP de 2.083 kWh, ~13,5 toneladas, a 600V DC" interpretation="Traleres requerem altas relações potência-energia. A carga de pico de 500 kW direciona a seleção de tensão." variant="marine" />
+
+      <WorkedExample number={3} title="Navio Offshore com Posicionamento Dinâmico" scenario="Um navio de suprimento offshore requer capacidade de posicionamento dinâmico (PD) com cargas simultâneas de hotel, propulsão e propulsores." inputs={[{ label: "Carga hotel", value: "400 kW" }, { label: "Carga de propulsão", value: "800 kW" }, { label: "Carga de pico PD", value: "3.200 kW" }, { label: "Tempo de operação", value: "12 horas" }, { label: "Margem de reserva", value: "25%" }, { label: "Química", value: "NMC (80% DoD, 5,0 kg/kWh)" }]} steps={[{ label: "Demanda diária", formula: "Diária = (400 + 800) × 12", result: "14.400 kWh" }, { label: "Margem de reserva", formula: "Utilizável = 14.400 × 1,25", result: "18.000 kWh" }, { label: "Capacidade instalada", formula: "Instalada = 18.000 / 0,80", result: "22.500 kWh" }, { label: "Peso da bateria", formula: "Peso = 22.500 × 5,0", result: "112.500 kg ≈ 112,5 t" }, { label: "Tensão DC", formula: "Pico 3.200 kW → 1.000V", result: "1.000 V DC" }]} answer="Sistema NMC de 22.500 kWh, ~112,5 toneladas, a 1.000 V DC" interpretation="Navios PD têm relações extremas de pico-média. NMC é escolhido pela maior densidade energética para minimizar peso." variant="marine" />
+    </div>
+  </section>
+
+  <!-- Comparação de Químicas -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Comparação LFP vs NMC</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <CalculatorCard>
+        <h4 class="text-primary font-bold text-sm mb-3 flex items-center gap-2"><span class="w-3 h-3 bg-m-blue-light inline-block"></span> LFP (LiFePO4)</h4>
+        <ul class="text-body-sm text-muted flex flex-col gap-2">
+          <li class="flex gap-2"><span class="text-m-blue-light shrink-0">→</span> Vida útil dos ciclos: 5.000+ a 90% DoD</li>
+          <li class="flex gap-2"><span class="text-m-blue-light shrink-0">→</span> DoD utilizável: 90%</li>
+          <li class="flex gap-2"><span class="text-m-blue-light shrink-0">→</span> Peso instalado: ~6,5 kg/kWh</li>
+          <li class="flex gap-2"><span class="text-m-blue-light shrink-0">→</span> Volume: ~6,8 L/kWh</li>
+          <li class="flex gap-2"><span class="text-m-blue-light shrink-0">→</span> Início de fuga térmica: >270°C</li>
+          <li class="flex gap-2"><span class="text-m-blue-light shrink-0">→</span> Sem cobalto — cadeia de suprimentos resiliente</li>
+          <li class="flex gap-2"><span class="text-m-blue-light shrink-0">→</span> Ideal para: balsas, embarcações portuárias, navios de alto ciclo</li>
+        </ul>
+      </CalculatorCard>
+      <CalculatorCard>
+        <h4 class="text-primary font-bold text-sm mb-3 flex items-center gap-2"><span class="w-3 h-3 bg-m-blue-dark inline-block"></span> NMC (Níquel Manganês Cobalto)</h4>
+        <ul class="text-body-sm text-muted flex flex-col gap-2">
+          <li class="flex gap-2"><span class="text-m-blue-dark shrink-0">→</span> Vida útil dos ciclos: ~2.000 a 80% DoD</li>
+          <li class="flex gap-2"><span class="text-m-blue-dark shrink-0">→</span> DoD utilizável: 80%</li>
+          <li class="flex gap-2"><span class="text-m-blue-dark shrink-0">→</span> Peso instalado: ~5,0 kg/kWh</li>
+          <li class="flex gap-2"><span class="text-m-blue-dark shrink-0">→</span> Volume: ~5,2 L/kWh</li>
+          <li class="flex gap-2"><span class="text-m-blue-dark shrink-0">→</span> Início de fuga térmica: ~150°C</li>
+          <li class="flex gap-2"><span class="text-m-blue-dark shrink-0">→</span> Requer gerenciamento térmico ativo</li>
+          <li class="flex gap-2"><span class="text-m-blue-dark shrink-0">→</span> Ideal para: navios sensíveis ao peso e espaço</li>
+        </ul>
+      </CalculatorCard>
+    </div>
+  </section>
+
+  <EngineeringDiagram title="Arquitetura de Armazenamento de Energia do Navio" description="Sistema de bateria de alta tensão integrado com distribuição de energia do navio" variant="system" steps={[{ label: "Rede/Gerador", icon: "charge" }, { label: "ESS Bateria", icon: "battery" }, { label: "Conversão de Energia", icon: "inverter" }, { label: "Cargas do Navio", icon: "load" }]} />
+
+  <ComparisonTable title="Comparação de Tecnologias de Baterias Marítimas" headers={["Tecnologia", "Densidade Energética", "Densidade de Potência", "Vida Útil Ciclística", "Certificação Marítima"]} rows={[["LFP (LiFePO4)", "90–120 Wh/kg", "200–400 W/kg", "5.000+", "DNV, Lloyd's, BV"], ["NMC (Níquel Manganês)", "150–220 Wh/kg", "300–600 W/kg", "2.000", "DNV, Lloyd's"], ["NCA (Níquel Cobalto)", "200–260 Wh/kg", "400–800 W/kg", "1.500", "Marítimo limitado"], ["Sódio-Íon", "100–140 Wh/kg", "150–300 W/kg", "3.000+", "Emergente"], ["Estado Sólido (Futuro)", "300–500 Wh/kg", "500–1000 W/kg", "10.000+", "Em desenvolvimento"]]} caption="Panorama da tecnologia de baterias marítimas — LFP domina por segurança e vida útil dos ciclos" />
+
+  <FAQSection items={faqItems} />
+  <RelatedTools tools={relatedCalculators} />
+
+  <!-- CTA de Suporte de Engenharia -->
+  <div class="bg-surface-card border border-hairline p-6 mt-8 mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div class="max-w-xl">
+      <h3 class="text-title-sm text-primary mb-1">Precisa de uma revisão de engenharia mais aprofundada?</h3>
+      <p class="text-body-sm text-muted font-light">Use esta calculadora para estimativas preliminares. Para análise específica do navio, revisão de dimensionamento de bateria, planejamento de redução de emissões ou suporte à viabilidade de sistemas híbridos, entre em contato com a equipe de suporte de engenharia da Battery Calculators.</p>
+    </div>
+    <a href="/marine/#marine-advisory" class="btn-primary text-xs px-6 py-3 shrink-0 whitespace-nowrap">Solicitar Suporte de Engenharia</a>
+  </div>
+
+  <!-- Script de Cálculo -->
+  <script>
+    import { calculateVesselEnergyStorage } from '../../../utils/calculators';
+
+    const hotelLoadInput = document.getElementById('hotel-load') as HTMLInputElement;
+    const propulsionLoadInput = document.getElementById('propulsion-load') as HTMLInputElement;
+    const peakLoadInput = document.getElementById('peak-load') as HTMLInputElement;
+    const operatingTimeInput = document.getElementById('operating-time') as HTMLInputElement;
+    const reserveMarginInput = document.getElementById('reserve-margin') as HTMLInputElement;
+    const batteryChemistryInput = document.getElementById('battery-chemistry') as HTMLSelectElement;
+
+    function getResultElements(id: string) {
+      const box = document.getElementById(id);
+      return {
+        value: box?.querySelector('.text-display-md, .text-title-lg') as HTMLElement,
+        suffix: box?.querySelector('.text-caption') as HTMLElement,
+      };
+    }
+
+    const dailyEnergy = getResultElements('result-daily-energy');
+    const usableCapacity = getResultElements('result-usable-capacity');
+    const installedCapacity = getResultElements('result-installed-capacity');
+    const weight = getResultElements('result-weight');
+    const volume = getResultElements('result-volume');
+    const voltage = getResultElements('result-voltage');
+    const chemistryNoteEl = document.getElementById('chemistry-note');
+
+    function fmt(n: number, decimals = 1): string {
+      return n.toLocaleString('pt-BR', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+    }
+
+    function updateCapacityBreakdown(usableKwh: number, installedKwh: number, _dodPercent: number, reservePercent: number) {
+      const container = document.getElementById('capacity-breakdown');
+      if (!container) return;
+
+      const usablePct = installedKwh > 0 ? (usableKwh / installedKwh) * 100 : 0;
+      const reserveKwh = usableKwh * (reservePercent / 100);
+      const netUsableKwh = usableKwh - reserveKwh;
+      const unusableKwh = installedKwh - usableKwh;
+      const netPct = installedKwh > 0 ? (netUsableKwh / installedKwh) * 100 : 0;
+      const reservePct = installedKwh > 0 ? (reserveKwh / installedKwh) * 100 : 0;
+      const unusablePct = 100 - usablePct;
+
+      container.innerHTML = `
+        <div class="flex items-center gap-3">
+          <span class="text-caption text-muted w-28 text-right shrink-0">Utilizável Líquido</span>
+          <div class="flex-1 h-6 bg-surface-soft border border-hairline overflow-hidden">
+            <div class="h-full bg-m-blue-light transition-all duration-300" style="width: ${netPct}%"></div>
+          </div>
+          <span class="text-caption text-primary font-mono w-24 shrink-0">${fmt(netUsableKwh)} kWh</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="text-caption text-muted w-28 text-right shrink-0">Reserva</span>
+          <div class="flex-1 h-6 bg-surface-soft border border-hairline overflow-hidden">
+            <div class="h-full bg-yellow-500 transition-all duration-300" style="width: ${reservePct}%"></div>
+          </div>
+          <span class="text-caption text-primary font-mono w-24 shrink-0">${fmt(reserveKwh)} kWh</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="text-caption text-muted w-28 text-right shrink-0">Não Utilizável (DoD)</span>
+          <div class="flex-1 h-6 bg-surface-soft border border-hairline overflow-hidden">
+            <div class="h-full bg-m-red/60 transition-all duration-300" style="width: ${unusablePct}%"></div>
+          </div>
+          <span class="text-caption text-primary font-mono w-24 shrink-0">${fmt(unusableKwh)} kWh</span>
+        </div>
+        <div class="text-caption text-muted mt-2">
+          Utilizável: ${fmt(usablePct)}% | Reserva: ${fmt(reservePct)}% | Não Utilizável: ${fmt(unusablePct)}% de ${fmt(installedKwh)} kWh instalados
+        </div>
+      `;
+    }
+
+    function updateCalculations() {
+      const hotelLoad = parseFloat(hotelLoadInput.value) || 0;
+      const propulsionLoad = parseFloat(propulsionLoadInput.value) || 0;
+      const peakLoad = parseFloat(peakLoadInput.value) || 0;
+      const operatingTime = parseFloat(operatingTimeInput.value) || 4;
+      const reserveMargin = parseFloat(reserveMarginInput.value) || 20;
+      const batteryChemistry = batteryChemistryInput.value as 'lfp' | 'nmc';
+
+      const result = calculateVesselEnergyStorage({
+        hotelLoadKw: hotelLoad,
+        propulsionLoadKw: propulsionLoad,
+        peakLoadKw: peakLoad,
+        operatingHours: operatingTime,
+        reserveMarginPercent: reserveMargin,
+        batteryChemistry,
+      });
+
+      if (dailyEnergy.value) dailyEnergy.value.textContent = `${Math.round(result.dailyEnergyDemandKwh).toLocaleString()} kWh`;
+      if (dailyEnergy.suffix) dailyEnergy.suffix.textContent = 'Carga combinada × horas de operação';
+
+      if (usableCapacity.value) usableCapacity.value.textContent = `${Math.round(result.requiredUsableCapacityKwh).toLocaleString()} kWh`;
+      if (usableCapacity.suffix) usableCapacity.suffix.textContent = 'Incluindo margem de reserva';
+
+      if (installedCapacity.value) installedCapacity.value.textContent = `${Math.round(result.recommendedInstalledCapacityKwh).toLocaleString()} kWh`;
+      if (installedCapacity.suffix) installedCapacity.suffix.textContent = 'Contabilizando limites de DoD';
+
+      if (weight.value) weight.value.textContent = `${Math.round(result.estimatedBatteryWeightKg).toLocaleString()} kg`;
+      if (weight.suffix) weight.suffix.textContent = `Baseado na densidade instalada ${batteryChemistry.toUpperCase()}`;
+
+      if (volume.value) {
+        volume.value.textContent = `${Math.round(result.estimatedBatteryVolumeLiters).toLocaleString()} L`;
+      }
+      if (volume.suffix) volume.suffix.textContent = `≈ ${(result.estimatedBatteryVolumeLiters / 1000).toFixed(1)} m³`;
+
+      if (voltage.value) voltage.value.textContent = `${result.suggestedDcVoltage} V`;
+      if (voltage.suffix) voltage.suffix.textContent = `Corrente contínua máxima: ${Math.round(result.maxContinuousCurrentA).toLocaleString()} A`;
+
+      if (chemistryNoteEl) chemistryNoteEl.textContent = result.chemistryNote;
+
+      const dodPercent = batteryChemistry === 'lfp' ? 90 : 80;
+      updateCapacityBreakdown(result.requiredUsableCapacityKwh, result.recommendedInstalledCapacityKwh, dodPercent, reserveMargin);
+    }
+
+    [hotelLoadInput, propulsionLoadInput, peakLoadInput, operatingTimeInput, reserveMarginInput, batteryChemistryInput].forEach(el => {
+      el.addEventListener('input', updateCalculations);
+    });
+
+    updateCalculations();
+  </script>
+
+</CalculatorLayout>

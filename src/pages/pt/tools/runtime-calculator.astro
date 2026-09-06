@@ -1,0 +1,500 @@
+---
+import CalculatorLayout from '../../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import InputField from '../../../components/InputField.astro';
+import ResultBox from '../../../components/ResultBox.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import RelatedTools from '../../../components/RelatedTools.astro';
+import MiniSimulationChart from '../../../components/MiniSimulationChart.astro';
+import WorkedExample from '../../../components/WorkedExample.astro';
+import ComparisonTable from '../../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../../components/EngineeringDiagram.astro';
+
+const whatIs = `A autonomia da bateria é o tempo que uma bateria pode sustentar uma carga elétrica determinada antes que sua tensão caia abaixo de um limite utilizável. Ela depende de quatro fatores inter-relacionados: <strong>energia total armazenada</strong> (medida em watt-horas), <strong>a potência contínua extraída</strong> da carga conectada, <strong>limites de profundidade de descarga</strong> impostos pela química da bateria para preservar a vida útil dos ciclos, e <strong>perdas de eficiência do sistema</strong> no inversor, fiação e sistema de gerenciamento de bateria. Calcular a autonomia corretamente é essencial para dimensionar arranjos solares fora da rede, planejar orçamentos de energia RV, projetar sistemas de cargas marinhos, especificar duração de backup de UPS e configurar backup de baterias residenciais durante apagões na rede. Uma estimativa de autonomia imprecisa pode deixá-lo sem energia em momentos críticos ou levar a gastos excessivos com capacidade desnecessária de baterias.`;
+
+const whyItMatters = [
+  "Apagões inesperados podem deixar cargas críticas — dispositivos médicos, equipamentos de comunicação, refrigeração — sem backup quando a autonomia é superestimada.",
+  "Superdimensionar um banco de baterias desperdiça capital. Subdimensionar causa queda prematura de tensão e desligamentos forçados antes do ciclo de carga ser concluído.",
+  "Perdas de eficiência do inversor de 4–12% são frequentemente ignoradas, significando que a autonomia real é menor do que o cálculo ingênuo de capacidade/carga sugere.",
+  "Temperaturas extremas podem reduzir a capacidade utilizável em 10–30%, tornando as estimativas de autonomia em laboratório não confiáveis para implantações ao ar livre ou em climas frios.",
+  "Ignorar limites de profundidade de descarga acelera a degradação da bateria — uma bateria ciclada a 100% DoD pode perder 20–40% de sua vida útil nominal em ciclos.",
+];
+
+const practicalApplications = [
+  { title: "RV e Camping", description: "Planejar orçamentos de energia para iluminação, refrigeração, ventiladores e eletrônicos durante viagens de camping de vários dias fora da rede." },
+  { title: "Solar Fora da Rede", description: "Determinar quantos dias nublados seu banco de baterias pode sustentar cargas domésticas sem entrada solar." },
+  { title: "Cargas Marítimas de Hotel", description: "Dimensionar bancos de baterias para eletrônicos de navegação, iluminação, refrigeração e bombas de sentina em embarcações." },
+  { title: "Backup Residencial", description: "Estimar quanto tempo um sistema de baterias residencial pode alimentar cargas críticas durante apagões na rede." },
+  { title: "UPS e Cargas Críticas", description: "Verificar se as baterias de fonte de alimentação ininterrupta podem sustentar cargas de servidores ou médicas durante durações de apagão." },
+  { title: "Backup de Telecomunicações", description: "Validar se as baterias de torres de telecom atendem aos requisitos mínimos de autonomia durante falhas de energia." },
+];
+
+const expertNotes = [
+  { title: 'Sistemas Marinhos', variant: 'engineering', content: 'Sistemas de baterias marinhos frequentemente operam com diferentes limites de profundidade de descarga que sistemas residenciais. Um banco residencial marinho é tipicamente dimensionado para 50% DoD para preservar a vida útil dos ciclos, enquanto um banco de partida do motor pode ser dimensionado para correntes de pico muito maiores com DoD menor.' },
+  { title: 'Impacto da Temperatura', variant: 'warning', content: 'A autonomia da bateria diminui significativamente em baixas temperaturas. A 0°C, a capacidade de lítio cai aproximadamente 10%. A -20°C, a energia utilizável pode cair 30% ou mais. Sempre dimensione para sua pior temperatura de operação, não condições de laboratório.' },
+  { title: 'A Química Importa', variant: 'info', content: 'As baterias LFP (LiFePO4) mantêm uma curva de tensão mais plana durante a descarga comparada a NMC ou chumbo-ácido. Isso significa que a capacidade utilizável é mais previsível ao longo do ciclo de descarga, mas o joelho no final da descarga é mais acentuado — monitore a tensão de perto abaixo de 20% SOC.' },
+];
+
+const trustSection = {
+  text: "Todas as fórmulas usadas nesta calculadora são derivadas de princípios de engenharia de baterias documentados publicamente. O modelo de autonomia considera capacidade utilizável (Ah × V × DoD), carga ajustada pela eficiência (W / η) e cálculos de corrente de descarga. Nenhum algoritmo caixa-preta é usado — cada valor intermediário é exibido para que você possa verificar os cálculos independentemente. Nossa metodologia segue práticas padrão da Battery University, normas IEEE e notas de aplicação de fabricantes.",
+  link: { label: "Ver nossa metodologia completa", href: "/methodology/" },
+};
+
+const references = [
+  { title: "Battery University — Taxa de Descarga e Autonomia", url: "https://batteryuniversity.com/article/bu-502-discharging-at-high-current", source: "Battery University / Cadex Electronics" },
+  { title: "IEEE Std 1188-1996 — Prática Recomendada para Manutenção de Baterias Estacionárias", url: "https://standards.ieee.org/ieee/1188/1076/", source: "IEEE Standards Association" },
+  { title: "Efeito Peukert e Autonomia de Chumbo-Ácido", url: "https://batteryuniversity.com/article/bu-402-what-is-the-peukert-effect", source: "Battery University" },
+  { title: "Victron Energy — Cálculos de Autonomia de Bateria", url: "https://www.victronenergy.com/help-center", source: "Victron Energy" },
+  { title: "US Department of Energy — Visão Geral da Tecnologia de Armazenamento em Bateria", url: "https://www.energy.gov/eere/storage/battery-storage-technology", source: "U.S. DOE" },
+];
+
+const faqItems = [
+  {
+    question: "Como a taxa C afeta a autonomia da bateria?",
+    answer: "Correntes de descarga elevadas (altas taxas C) causam aquecimento interno e aumentam a queda de tensão devido à resistência interna (perda I²R). Consequentemente, a energia entregue real é menor que as especificações nominais. Em células de lítio, este efeito é pequeno (tipicamente <5%), mas em baterias de chumbo-ácido, o efeito Peukert pode reduzir a capacidade disponível em mais de 30% a uma taxa de 1C.",
+  },
+  {
+    question: "Qual é uma profundidade de descarga (DoD) segura para baterias de lítio?",
+    answer: "Células de Ferro Fosfato de Lítio (LiFePO4) podem ser descarregadas até 80%–90% DoD regularmente sem penalidades críticas na vida útil dos ciclos. Células de Níquel-Manganês-Cobalto (NMC) são tipicamente limitadas a 80% para proteger a integridade dos ciclos. Descarregar até 100% SoC acelerará o envelhecimento calendário e riscos de dano às células.",
+  },
+  {
+    question: "Por que a eficiência do inversor é considerada?",
+    answer: "Inversores DC-CA têm eficiências de pico variando de 88% a 96%. Operar inversores em cargas baixas ou extremamente altas desloca a eficiência para baixo. Incluímos um multiplicador padrão de eficiência para modelar essas perdas térmicas e evitar superestimar a autonomia.",
+  },
+  {
+    question: "Como a temperatura ambiente afeta a descarga?",
+    answer: "Temperaturas mais baixas aumentam a resistência química interna, reduzindo a tensão de saída e a capacidade geral. A 0°C, as capacidades típicas de células de lítio diminuem aproximadamente 10%. A -20°C, a energia utilizável pode cair 30% ou mais.",
+  },
+  {
+    question: "Quanto tempo dura uma bateria de 100Ah?",
+    answer: "Uma bateria LFP de 100Ah 12,8V a 80% DoD armazena 1.024 Wh. Com uma carga de 250W e 90% de eficiência do inversor, durará aproximadamente 3 horas e 41 minutos. Com uma carga de 100W, a mesma bateria dura cerca de 9 horas e 13 minutos. A autonomia escala linearmente com a carga no caso ideal.",
+  },
+  {
+    question: "Quanto tempo dura uma bateria de 200Ah?",
+    answer: "Uma bateria LFP de 200Ah 12,8V a 80% DoD armazena 2.048 Wh. Com uma carga de 250W e 90% de eficiência do inversor, dura aproximadamente 7 horas e 22 minutos. Dobrar a capacidade de um banco de 100Ah dobra a autonomia para a mesma carga.",
+  },
+  {
+    question: "Como calcular a autonomia da bateria?",
+    answer: "Divida a energia utilizável (Capacidade × Tensão × DoD) pela carga ajustada pela eficiência (Potência da Carga / Eficiência do Sistema). A fórmula é: Autonomia (horas) = (Ah × V × DoD%) / (Carga W / Eficiência%). Sempre use watt-horas, não ampères-horas, para o cálculo de energia.",
+  },
+  {
+    question: "O que mais afeta a autonomia da bateria?",
+    answer: "A potência extraída da carga é o fator dominante — reduzir a carga pela metade dobra a autonomia. Fatores secundários incluem limites de profundidade de descarga, eficiência do inversor, temperatura ambiente, idade da bateria (SOH) e resistência interna que aumenta com descarga de alta taxa C.",
+  },
+  {
+    question: "A temperatura afeta a autonomia da bateria?",
+    answer: "Sim. A 0°C, baterias de lítio perdem aproximadamente 10% da capacidade nominal. A -20°C, as perdas podem atingir 30%. Baterias de chumbo-ácido são ainda mais sensíveis à temperatura. Aplicações em climas frios devem aplicar fatores de redução por temperatura nos cálculos de autonomia.",
+  },
+  {
+    question: "Qual é a diferença entre Ah e Wh?",
+    answer: "Ampères-horas (Ah) medem a capacidade de carga a uma tensão dada. Watt-horas (Wh) medem a energia total. Uma bateria de 100Ah a 12V armazena 1.200 Wh, enquanto a mesma de 100Ah a 48V armazena 4.800 Wh. Sempre converta para Wh ao comparar baterias em diferentes tensões ou calcular autonomia com cargas de potência em watts.",
+  },
+  {
+    question: "Posso usar esta calculadora para baterias de chumbo-ácido?",
+    answer: "Sim, mas ajuste o DoD para 50% para chumbo-ácido inundado ou 80% para AGM/Gel. Baterias de chumbo-ácido também sofrem com o efeito Peukert — a altas taxas de descarga, a capacidade disponível cai significativamente. Para resultados precisos de chumbo-ácido, use um valor de capacidade ajustado pelo Peukert.",
+  },
+  {
+    question: "Como a idade da bateria afeta a autonomia?",
+    answer: "Conforme as baterias envelhecem, seu Estado de Saúde (SOH) diminui. Uma bateria com 80% SOH entrega apenas 80% de sua capacidade nominal original. Uma bateria de 100Ah com 80% SOH se comporta efetivamente como uma bateria de 80Ah. Considere o SOH nos cálculos de autonomia para bancos de baterias envelhecidos.",
+  },
+];
+
+const relatedTools = [
+  { href: "/tools/c-rate-calculator/", title: "Calculadora de Taxa C", description: "Calcular taxas de corrente de carga e descarga para qualquer configuração de bateria." },
+  { href: "/tools/battery-sizing-calculator/", title: "Ferramenta de Dimensionamento", description: "Determinar requisitos de dimensionamento baseados em consumo diário e autonomia." },
+  { href: "/tools/energy-conversion-calculator/", title: "Conversão de Energia", description: "Converter entre capacidade Ah e energia Wh em qualquer tensão." },
+  { href: "/tools/charging-time-calculator/", title: "Calculadora de Tempo de Carga", description: "Estimar durações de carga CC-CV para baterias de lítio e chumbo-ácido." },
+  { href: "/tools/soc-estimator/", title: "Estimador de SOC", description: "Interpolar o Estado de Carga da bateria a partir da tensão de circuito aberto." },
+  { href: "/tools/solar-battery-sizing-calculator/", title: "Dimensionamento Solar", description: "Dimensionar banco de baterias solar a partir de dados de consumo diário." },
+  { href: "/tools/home-backup-battery-calculator/", title: "Calculadora de Backup Residencial", description: "Dimensionar sistema de backup residencial para cargas críticas." },
+  { href: "/home-power-outage-battery-backup-calculator/", title: "Calculadora de Backup para Apagões", description: "Dimensionar bateria e inversor para apagões de tempestade e emergência." },
+  { href: "/tools/rv-battery-calculator/", title: "Calculadora de Bateria RV", description: "Planejar orçamentos de energia RV para viagens de camping fora da rede." },
+];
+
+const commonMistakes = [
+  "Ignorar a eficiência do inversor — um inversor com 90% de eficiência significa que 10% da energia da bateria é perdida como calor antes de chegar à carga. Sempre considere a eficiência do sistema.",
+  "Usar 100% de Profundidade de Descarga — descarregar baterias de lítio até 0% SoC acelera a degradação. Use 80% DoD para LFP e 80% para NMC para preservar a vida útil dos ciclos.",
+  "Esquecer os efeitos da temperatura — a 0°C, a capacidade de lítio cai ~10%. A -20°C, pode cair 30% ou mais. Dimensione para sua pior temperatura de operação.",
+  "Confundir Ah e Wh — uma bateria de 100Ah a 12V armazena 1.280 Wh, não 100 Wh. Sempre verifique se está usando a unidade correta para seu cálculo de carga.",
+  "Ignorar a idade da bateria — uma bateria com 80% SOH entrega apenas 80% da capacidade nominal. Baterias antigas fornecem menos autonomia do que seu rótulo sugere.",
+  "Assumir descarga linear — a tensão real da bateria cai sob carga, especialmente a altas taxas C. A energia utilizável real é menor que a capacidade nominal vezes a tensão.",
+  "Usar carga de pico para estimativas de autonomia — a autonomia contínua deve usar carga contínua média, não cargas de pico momentâneas de partidas de motores ou correntes de entrada.",
+  "Desconsiderar autor descarga — ao longo de períodos de vários dias, a autor descarga da bateria (1–5% por mês para lítio, maior para chumbo-ácido) reduz a energia disponível.",
+  "Não considerar perdas nos cabos — percursos longos de cabo entre a bateria e a carga introduzem queda de tensão, reduzindo a energia efetiva entregue à carga.",
+  "Superdimensionar para margem de segurança — adicionar fatores de redução excessivos (ex: 50% de eficiência) resulta em bancos de baterias desnecessariamente grandes e caros.",
+];
+
+const relatedArticles = [
+  { href: "/learn/how-to-calculate-battery-runtime/", title: "Como Calcular a Autonomia da Bateria" },
+  { href: "/learn/battery-runtime-formula/", title: "Fórmula de Autonomia da Bateria" },
+  { href: "/learn/how-long-will-a-battery-last/", title: "Quanto Tempo uma Bateria Dura?" },
+  { href: "/learn/12v-vs-24v-vs-48v-runtime/", title: "Autonomia 12V vs 24V vs 48V" },
+  { href: "/learn/battery-temperature-correction-chart/", title: "Autonomia da Bateria vs Temperatura" },
+];
+---
+
+<CalculatorLayout
+  title="Calculadora de Autonomia de Bateria (Lítio + Marinho) | Calculadoras de Bateria"
+  description="Use esta calculadora de autonomia de bateria para estimar a autonomia de baterias de lítio e marinhas. Insira Ah/Wh, tensão, watts de carga (W), DoD % e eficiência do sistema % para obter energia total e autonomia estimada em horas e minutos com fórmulas de engenharia transparentes."
+  faqItems={faqItems}
+  commonMistakes={commonMistakes}
+  relatedCalculators={relatedTools}
+  relatedArticles={relatedArticles}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+  lang="pt"
+>
+
+  <!-- Main Calculator Grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+
+    <!-- Input Form -->
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Parâmetros do Sistema</h3>
+      <div class="flex flex-col gap-5 md:gap-6">
+
+        <!-- Capacity (number + unit select side by side) -->
+        <div class="flex flex-col gap-2">
+          <label for="capacity" class="text-label-uppercase text-xs text-primary">Capacidade da Bateria</label>
+          <div class="grid grid-cols-3 gap-2">
+            <input type="number" id="capacity" value="100" class="text-input col-span-2" min="1" step="any" />
+            <select id="capacity-unit" class="select-input">
+              <option value="ah">Ah</option>
+              <option value="wh">Wh</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Voltage -->
+        <InputField
+          id="voltage"
+          label="Tensão Nominal (V)"
+          value={12.8}
+          min={1}
+          step="any"
+          wrapperId="voltage-wrapper"
+          helperText="Comum: LFP (12,8V / 25,6V), NMC (11,1V / 37V), Chumbo-Ácido (12V)"
+        />
+
+        <!-- DoD -->
+        <InputField
+          id="dod"
+          label="Profundidade Máxima de Descarga (DoD %)"
+          value={80}
+          min={1}
+          max={100}
+          helperText="Limites recomendados: LFP (80-90%), NMC (80%), Chumbo-Ácido (50%)"
+        />
+
+        <!-- Inverter / System Efficiency -->
+        <InputField
+          id="efficiency"
+          label="Eficiência do Sistema (%)"
+          value={90}
+          min={1}
+          max={100}
+          helperText="Considera conversões do inversor, resistência dos cabos e perdas de autor descarga."
+        />
+
+        <!-- Power Load -->
+        <InputField
+          id="load"
+          label="Carga Contínua (Watts)"
+          value={250}
+          min={1}
+          step="any"
+        />
+
+      </div>
+    </CalculatorCard>
+
+    <!-- Calculation Results -->
+    <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Saídas Estimadas</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <!-- Main Output -->
+          <ResultBox
+            label="Autonomia de Backup"
+            value="3h 41m"
+            suffix="3,68 horas"
+            variant="primary"
+            id="result-runtime"
+          />
+
+          <!-- Energy Metrics -->
+          <ResultBox
+            label="Energia Utilizável da Bateria"
+            value="1.024 Wh"
+            suffix="1,02 kWh"
+            id="result-energy-box"
+            helperText="Disponível após limites de profundidade de descarga."
+          />
+
+          <ResultBox
+            label="Energia Entregue pelo Sistema"
+            value="921,6 Wh"
+            suffix="0,92 kWh"
+            id="result-delivered-box"
+            helperText="Disponível para carga após perdas do inversor e do sistema."
+          />
+
+          <ResultBox
+            label="Corrente de Descarga"
+            value="19,53 A"
+            suffix="0,20 C"
+            id="result-current-box"
+          />
+        </div>
+
+        <MiniSimulationChart
+          title="Curva de Depleção de Energia"
+          description="Energia restante da bateria ao longo do tempo de descarga"
+          xLabel="Tempo (horas)"
+          yLabel="Energia (%)"
+          chartId="chart-runtime"
+        />
+      </div>
+
+      <!-- Action Area -->
+      <div class="border-t border-hairline pt-6">
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">Aviso Técnico / Aviso de Segurança</h4>
+        <p class="text-body-sm text-muted">
+          As estimativas são baseadas em curvas de descarga padrão. Cargas contínuas de alta corrente aumentarão a temperatura das células e degradarão a capacidade total devido ao efeito Peukert.
+        </p>
+      </div>
+    </CalculatorCard>
+
+  </div>
+
+  <!-- Formulas and Worked Examples -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">Fórmulas e Exemplos Práticos</h2>
+
+    <FormulaBox title="Fórmulas Matemáticas">
+      <p>
+        A autonomia T é calculada dividindo a capacidade utilizável da bateria pela carga de descarga ajustada pela eficiência:
+      </p>
+      <div class="bg-surface-soft p-3 md:p-4 font-mono text-primary border border-hairline my-2 overflow-x-auto whitespace-nowrap md:whitespace-normal text-xs md:text-sm">
+        Energia Total (Wh) = Capacidade (Ah) x Tensão (V)
+      </div>
+      <div class="bg-surface-soft p-3 md:p-4 font-mono text-primary border border-hairline my-2 overflow-x-auto whitespace-nowrap md:whitespace-normal text-xs md:text-sm">
+        Energia Utilizável da Bateria (Wh) = Energia Total (Wh) x (DoD% / 100)
+      </div>
+      <div class="bg-surface-soft p-3 md:p-4 font-mono text-primary border border-hairline my-2 overflow-x-auto whitespace-nowrap md:whitespace-normal text-xs md:text-sm">
+        Energia Entregue pelo Sistema (Wh) = Energia Utilizável da Bateria (Wh) x (Eficiência% / 100)
+      </div>
+      <div class="bg-surface-soft p-3 md:p-4 font-mono text-primary border border-hairline my-2 overflow-x-auto whitespace-nowrap md:whitespace-normal text-xs md:text-sm">
+        Autonomia (Horas) = Energia Entregue pelo Sistema (Wh) / Carga (W)
+      </div>
+      <p>
+        A corrente de descarga I e a taxa C são definidas como:
+      </p>
+      <div class="bg-surface-soft p-3 md:p-4 font-mono text-primary border border-hairline my-2 overflow-x-auto whitespace-nowrap md:whitespace-normal text-xs md:text-sm">
+        Corrente de Descarga (A) = Carga (W) / Tensão (V)
+      </div>
+      <div class="bg-surface-soft p-3 md:p-4 font-mono text-primary border border-hairline my-2 overflow-x-auto whitespace-nowrap md:whitespace-normal text-xs md:text-sm">
+        Taxa C = Corrente de Descarga (A) / Capacidade (Ah)
+      </div>
+      <p class="text-xs text-muted mt-4">
+        <strong>Variáveis:</strong> Capacidade em Ah, Tensão em V (nominal), DoD como porcentagem (0–100), Carga em Watts contínuos, Eficiência como porcentagem (0–100). Premissas: carga constante, tensão nominal durante toda a descarga, temperatura padrão (25°C).
+      </p>
+    </FormulaBox>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample
+        number={1}
+        title="Autonomia de Geladeira Marinha 12V"
+        scenario="Uma geladeira marinha de 12V consome 45W continuamente. Você tem um banco LFP residencial de 100Ah. Quanto tempo pode funcionar?"
+        inputs={[
+          { label: "Capacidade", value: "100 Ah" },
+          { label: "Tensão", value: "12,8V" },
+          { label: "DoD", value: "80%" },
+          { label: "Eficiência", value: "90%" },
+          { label: "Carga", value: "45W" },
+        ]}
+        steps={[
+          { label: "Energia Total", formula: "100 × 12,8", result: "1.280 Wh" },
+          { label: "Energia Utilizável da Bateria", formula: "1.280 × 0,80", result: "1.024 Wh" },
+          { label: "Energia Entregue pelo Sistema", formula: "1.024 × 0,90", result: "921,6 Wh" },
+          { label: "Autonomia", formula: "921,6 / 45", result: "20,48 horas (~20h 29m)" },
+        ]}
+        answer="20,48 horas (aproximadamente 20 horas e 29 minutos)"
+        interpretation="Um banco LFP de 100Ah pode manter uma geladeira marinha de 45W funcionando por quase um dia completo em uma única carga a 80% DoD, tornando-a prática para ancoragem noturna sem motor ou energia da costa."
+        variant="marine"
+      />
+
+      <WorkedExample
+        number={2}
+        title="Configuração de TV em RV"
+        scenario="Um sistema de entretenimento de RV com uma TV LED de 32 polegadas e stick de streaming consome cerca de 80W. A energia vem de um banco LFP de 24V 200Ah através de um inversor com 92% de eficiência."
+        inputs={[
+          { label: "Capacidade", value: "200 Ah" },
+          { label: "Tensão", value: "25,6V" },
+          { label: "DoD", value: "80%" },
+          { label: "Eficiência", value: "92%" },
+          { label: "Carga", value: "80W" },
+        ]}
+        steps={[
+          { label: "Energia Total", formula: "200 × 25,6", result: "5.120 Wh" },
+          { label: "Energia Utilizável da Bateria", formula: "5.120 × 0,80", result: "4.096 Wh" },
+          { label: "Energia Entregue pelo Sistema", formula: "4.096 × 0,92", result: "3.768,32 Wh" },
+          { label: "Autonomia", formula: "3.768,32 / 80", result: "47,1 horas (~47h 6m)" },
+        ]}
+        answer="47,1 horas (aproximadamente 47 horas e 6 minutos)"
+        interpretation="Com um banco de 24V 200Ah, uma TV de RV de 80W pode funcionar por quase dois dias completos. Isso fornece tempo de entretenimento suficiente durante viagens de boondocking de vários dias sem recarga solar."
+        variant="rv"
+      />
+
+      <WorkedExample
+        number={3}
+        title="Autonomia de Máquina CPAP"
+        scenario="Uma máquina CPAP médica consome 30W com umidificador. Usando uma bateria LFP de 12V 100Ah a 80% DoD com 90% de eficiência do sistema."
+        inputs={[
+          { label: "Capacidade", value: "100 Ah" },
+          { label: "Tensão", value: "12,8V" },
+          { label: "DoD", value: "80%" },
+          { label: "Eficiência", value: "90%" },
+          { label: "Carga", value: "30W" },
+        ]}
+        steps={[
+          { label: "Energia Total", formula: "100 × 12,8", result: "1.280 Wh" },
+          { label: "Energia Utilizável da Bateria", formula: "1.280 × 0,80", result: "1.024 Wh" },
+          { label: "Energia Entregue pelo Sistema", formula: "1.024 × 0,90", result: "921,6 Wh" },
+          { label: "Autonomia", formula: "921,6 / 30", result: "30,72 horas (~30h 43m)" },
+        ]}
+        answer="30,72 horas (aproximadamente 30 horas e 43 minutos)"
+        interpretation="Uma bateria LFP de 100Ah pode alimentar uma máquina CPAP por mais de 30 horas, fornecendo backup confiável de múltiplas noites para usuários médicos durante viagens de camping ou apagões."
+        variant="default"
+      />
+    </div>
+  </section>
+
+  <EngineeringDiagram
+    title="Fluxo do Sistema de Autonomia da Bateria"
+    description="Caminho da energia do armazenamento da bateria through o consumo de carga até a saída de autonomia"
+    variant="flow"
+    steps={[
+      { label: "Banco de Baterias", icon: "battery" },
+      { label: "Consumo da Carga", icon: "load" },
+      { label: "Saída de Autonomia", icon: "chart" },
+    ]}
+  />
+
+  <ComparisonTable
+    title="Autonomia por Química da Bateria e Carga"
+    headers={["Química", "100Ah a 10W", "100Ah a 50W", "100Ah a 200W", "Capacidade Utilizável"]}
+    rows={[
+      ["LiFePO4 (80% DoD)", "96 horas", "19,2 horas", "4,8 horas", "80 Ah"],
+      ["NMC (70% DoD)", "84 horas", "16,8 horas", "4,2 horas", "70 Ah"],
+      ["Chumbo-Ácido (50% DoD)", "48 horas", "9,6 horas", "2,4 horas", "50 Ah"],
+      ["Chumbo-Ácido a 1C", "N/A (Peukert)", "7,2 horas", "1,8 horas", "~36 Ah efetivos"],
+    ]}
+    caption="Autonomia aproximada para sistemas de bateria de 12V em diferentes taxas de descarga"
+  />
+
+  <FAQSection items={faqItems} />
+  <RelatedTools tools={relatedTools} />
+
+  <!-- Client-side Calculation Script -->
+  <script>
+    import { calculateRuntime } from '../../../../utils/calculators';
+    import { renderLineChart, clearChart } from '../../../../utils/charting';
+
+    const capacityInput = document.getElementById('capacity') as HTMLInputElement;
+    const capacityUnit = document.getElementById('capacity-unit') as HTMLSelectElement;
+    const voltageInput = document.getElementById('voltage') as HTMLInputElement;
+    const dodInput = document.getElementById('dod') as HTMLInputElement;
+    const efficiencyInput = document.getElementById('efficiency') as HTMLInputElement;
+    const loadInput = document.getElementById('load') as HTMLInputElement;
+
+    // Outputs — query inner elements from ResultBox wrappers
+    const resultRuntimeBox = document.getElementById('result-runtime');
+    const resultRuntime = resultRuntimeBox?.querySelector('.text-display-md') as HTMLElement;
+    const resultHoursDecimal = resultRuntimeBox?.querySelector('.text-caption') as HTMLElement;
+    const resultEnergyBox = document.getElementById('result-energy-box');
+    const resultEnergy = resultEnergyBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultKwh = resultEnergyBox?.querySelector('.text-caption') as HTMLElement;
+    const resultDeliveredBox = document.getElementById('result-delivered-box');
+    const resultDelivered = resultDeliveredBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultDeliveredKwh = resultDeliveredBox?.querySelector('.text-caption') as HTMLElement;
+    const resultCurrentBox = document.getElementById('result-current-box');
+    const resultCurrent = resultCurrentBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultCRate = resultCurrentBox?.querySelector('.text-caption') as HTMLElement;
+
+    const chartSvg = document.getElementById('chart-runtime') as unknown as SVGElement;
+
+    function updateCalculations() {
+      const cap = parseFloat(capacityInput.value) || 0;
+      const isWh = capacityUnit.value === 'wh';
+      const voltage = parseFloat(voltageInput.value) || 12.8;
+      const dod = parseFloat(dodInput.value) || 80;
+      const eff = parseFloat(efficiencyInput.value) || 90;
+      const load = parseFloat(loadInput.value) || 0;
+
+      if (isWh) {
+        // We can keep it visible but document it's only for current
+      }
+
+      const results = calculateRuntime(cap, isWh, voltage, dod, eff, load);
+
+      // Render Runtime hours/minutes
+      if (results.runtimeHours <= 0) {
+        if (resultRuntime) resultRuntime.textContent = '0h 00m';
+        if (resultHoursDecimal) resultHoursDecimal.textContent = '0,00 horas';
+      } else {
+        const totalMinutes = Math.round(results.runtimeHours * 60);
+        const hours = Math.floor(totalMinutes / 60);
+        const mins = totalMinutes % 60;
+
+        if (resultRuntime) resultRuntime.textContent = `${hours}h ${mins < 10 ? '0' : ''}${mins}m`;
+        if (resultHoursDecimal) resultHoursDecimal.textContent = `${results.runtimeHours.toFixed(2)} horas`;
+      }
+
+      // Render Battery Usable Energy
+      if (resultEnergy) resultEnergy.textContent = `${Math.round(results.usableEnergyWh).toLocaleString()} Wh`;
+      if (resultKwh) resultKwh.textContent = `${(results.usableEnergyWh / 1000).toFixed(3)} kWh`;
+
+      // Render Delivered System Energy
+      if (resultDelivered) resultDelivered.textContent = `${Math.round(results.deliveredEnergyWh).toLocaleString()} Wh`;
+      if (resultDeliveredKwh) resultDeliveredKwh.textContent = `${(results.deliveredEnergyWh / 1000).toFixed(3)} kWh`;
+
+      // Render Current
+      if (resultCurrent) resultCurrent.textContent = `${results.dischargeCurrentA.toFixed(2)} A`;
+
+      // Calculate C-rate
+      const capacityAh = isWh ? cap / voltage : cap;
+      const cRate = capacityAh > 0 ? results.dischargeCurrentA / capacityAh : 0;
+      if (resultCRate) resultCRate.textContent = `${cRate.toFixed(2)} C`;
+
+      if (chartSvg && results.runtimeHours > 0 && load > 0) {
+        const pts: { x: number; y: number }[] = [];
+        for (let i = 0; i < 20; i++) {
+          pts.push({ x: results.runtimeHours * (i / 19), y: 100 * (1 - i / 19) });
+        }
+        renderLineChart(chartSvg, pts, {
+          width: 320, height: 160,
+          xLabel: 'Tempo (horas)', yLabel: 'Energia (%)',
+          xMin: 0, xMax: Math.ceil(results.runtimeHours),
+          yMin: 0, yMax: 100,
+        });
+      } else if (chartSvg) {
+        clearChart(chartSvg);
+      }
+    }
+
+    [capacityInput, capacityUnit, voltageInput, dodInput, efficiencyInput, loadInput].forEach(el => {
+      el.addEventListener('input', updateCalculations);
+      el.addEventListener('change', updateCalculations);
+    });
+
+    // Run once on load
+    updateCalculations();
+  </script>
+</CalculatorLayout>

@@ -1,0 +1,396 @@
+---
+import CalculatorLayout from '../../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import InputField from '../../../components/InputField.astro';
+import ResultBox from '../../../components/ResultBox.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import WorkedExample from '../../../components/WorkedExample.astro';
+import ComparisonTable from '../../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../../components/EngineeringDiagram.astro';
+
+const whatIs = `Um calculador de bateria com inversor determina a capacidade do banco de baterias DC necessária para alimentar cargas AC através de um inversor CC/CA. Inversores convertem energia de bateria de 12V, 24V ou 48V em energia AC doméstica de 120V/240V — mas essa conversão não é 100% eficiente. O calculador contabiliza as perdas de eficiência do inversor (tipicamente 8–15%), limites de profundidade de descarga e demandas de corrente de pico. Seja dimensionando um sistema de backup para eletrodomésticos ou um sistema solar fora da rede, esta ferramenta garante que seu banco de baterias possa sustentar a carga AC desejada pelo tempo de uso desejado sem falha prematura da bateria.`;
+
+const whyItMatters = [
+  "Bancos de baterias subdimensionados fazem os inversores desligarem sob carga quando a tensão cai abaixo do corte de baixa tensão — frequentemente no meio da noite durante um apagão.",
+  "Ignorar a eficiência do inversor (tipicamente 10–15% de perda) leva a um banco de baterias que parece suficiente no papel, mas entrega 15% menos tempo de uso do que o esperado.",
+  "Não contabilizar correntes de pico de motores e compressores causa disparos de sobrecarga no inversor — geladeiras e bombas podem consumir 3–5× sua potência em watts na partida.",
+  "Usar baterias de chumbo-ácido além de 50% de DoD com um inversor cria queda de tensão que aciona alarmes de bateria baixa mesmo quando o inversor está longe de sua potência nominal.",
+  "Desajustar a tensão da bateria com a classificação do inversor força corrente DC excessiva — puxar 200A de uma bateria de 12V requer fios de calibre 00 e cria perdas resistivas significativas."
+];
+
+const practicalApplications = [
+  { title: "Backup de Apagão Residencial", description: "Dimensione um banco de baterias para operar eletrodomésticos AC essenciais — geladeira, luzes, roteador, equipamentos médicos — durante apagões de 8–48 horas." },
+  { title: "Armazenamento Solar Fora da Rede", description: "Calcule a capacidade de bateria necessária para armazenar energia solar para cargas AC noturnas em cabanas, casas minúsculas ou instalações remotas." },
+  { title: "Energia para Oficinas e Canteiros de Obras", description: "Dimensione sistemas de inversores portáteis para operar ferramentas elétricas, iluminação e equipamentos em locais sem acesso à rede." },
+  { title: "Preparação para Emergências e Desastres", description: "Projete um sistema de backup de baterias com capacidade suficiente para manter comunicação, refrigeração e dispositivos médicos críticos durante apagões de vários dias." }
+];
+
+const expertNotes: { title: string; variant: 'engineering' | 'warning'; content: string }[] = [
+  {
+    title: "Eficiência do Inversor em Diferentes Níveis de Carga",
+    variant: "engineering",
+    content: "A eficiência do inversor não é constante — a 10% da carga nominal, a eficiência pode ser de apenas 80–85%. A 50–80% de carga, atinge o pico de 90–95%. Para dimensionamento preciso, use 90% como média conservadora para cargas entre 25–75% da capacidade do inversor. Para cargas muito leves (energia em espera), considere que o próprio inversor consome 5–20W mesmo sem carga conectada."
+  },
+  {
+    title: "Potência de Pico vs Contínua",
+    variant: "warning",
+    content: "Inversores têm duas classificações de potência: contínua (saída sustentada) e de pico (pico por 1–10 segundos). A partida de um motor pode consumir 3–7× sua corrente operacional por 1–3 segundos. Se seu banco de baterias não conseguir fornecer essa corrente de pico sem queda de tensão excessiva, o inversor disparará mesmo que a carga contínua esteja dentro da classificação. Sempre verifique se a taxa máxima de descarga da sua bateria corresponde à especificação de pico do inversor."
+  }
+];
+
+const trustSection = {
+  text: "Este calculador aplica fatores padrão de eficiência de conversão CC/CA (88–95% dependendo do nível de carga) e limites de DoD específicos por química. Todas as fórmulas são derivadas de fichas técnicas de fabricantes e padrões IEEE para descarga de baterias. Os cálculos são totalmente transparentes — você pode verificar cada etapa independentemente.",
+  link: { label: "Ver nossa metodologia e derivação de fórmulas", href: "/methodology/" }
+};
+
+const references = [
+  { title: "IEEE 1189 — Guia para Seleção de Baterias de Chumbo-Ácido Reguladas por Válvula", url: "https://standards.ieee.org/ieee/1189/5989/", source: "Associação de Padrões IEEE" },
+  { title: "NREL — Curvas de Eficiência de Inversores para Dimensionamento de Baterias", url: "https://www.nrel.gov/docs/fy23osti/85472.pdf", source: "Laboratório Nacional de Energia Renovável" },
+  { title: "Victron Energy — Guia de Dimensionamento de Inversores e Bancos de Baterias", url: "https://www.victronenergy.com/learn/inverter-battery-sizing", source: "Biblioteca Técnica Victron Energy" },
+  { title: "Battery University — Dimensionamento do Banco de Baterias", url: "https://batteryuniversity.com/article/sizing-the-bank", source: "Battery University (Cadex Electronics)" }
+];
+
+const faqItems = [
+  {
+    question: "Qual eficiência de inversor devo considerar?",
+    answer: "Inversores modernos de onda senoidal pura operam com 88–95% de eficiência. Uma estimativa conservadora de 90% contabiliza as perdas de conversão em níveis típicos de carga. A eficiência cai em cargas muito leves (abaixo de 10% da capacidade nominal) e aumenta em direção à carga nominal.",
+  },
+  {
+    question: "Qual profundidade de descarga é segura para baterias com inversor?",
+    answer: "Baterias LFP (LiFePO4) podem ser descarregadas com segurança até 80–90% de DoD. Chumbo-ácido (AGM/Gel) não devem exceder 50% de DoD para vida útil aceitável. NMC lítio pode usar 80% de DoD. Exceder o DoD recomendado reduz significativamente a vida útil da bateria.",
+  },
+  {
+    question: "Posso usar um inversor com bateria de 12V, 24V ou 48V?",
+    answer: "Sim, mas a tensão da bateria afeta o consumo de corrente. Uma carga de 2000W em bateria de 12V consome ~185A (requer cabos grossos), enquanto a mesma carga em 48V consome ~46A (cabos mais finos, menores perdas). Sistemas de tensão mais alta são mais eficientes para cargas acima de 2000W.",
+  },
+  {
+    question: "Como calculo o tempo de uso da minha bateria com inversor?",
+    answer: "Tempo de uso = (Wh da bateria × DoD% × Eficiência do Inversor) / Potência da Carga. Por exemplo, uma bateria LFP de 12V 200Ah (2400Wh) a 80% de DoD com 90% de eficiência do inversor alimentando uma carga de 1000W: (2400 × 0,80 × 0,90) / 1000 = 1,73 horas.",
+  },
+  {
+    question: "Qual é a diferença entre inversores de onda senoidal pura e onda senoidal modificada?",
+    answer: "Inversores de onda senoidal pura produzem energia AC limpa idêntica à da rede, compatível com todos os aparelhos, incluindo eletrônicos sensíveis. Inversores de onda senoidal modificada produzem uma aproximação em degraus que pode danificar motores, produzir zumbido audível e reduzir a eficiência. Sempre use onda senoidal pura para equipamentos médicos, geladeiras e eletrônicos.",
+  },
+  {
+    question: "Como contabilizar a corrente de pico dos aparelhos?",
+    answer: "Motores e compressores consomem 3–7× sua corrente operacional por 1–3 segundos na partida. O compressor de uma geladeira de 500W pode atingir um pico de 1500–2000W brevemente. Garanta que a classificação de pico do seu inversor exceda a maior demanda de partida e que seu banco de baterias possa fornecer a corrente de pico sem queda de tensão abaixo do corte de baixa tensão do inversor.",
+  },
+  {
+    question: "Posso usar baterias de carro com inversor?",
+    answer: "<span class=\"text-primary font-bold\">Não recomendado.</span> Baterias de partida de carro são projetadas para alta corrente, curta duração — não para descarga profunda. Usar uma bateria de carro abaixo de 50% de DoD com inversor a danificará em semanas. Use baterias AGM, Gel ou LFP de ciclo profundo, projetadas especificamente para taxas de descarga sustentadas.",
+  },
+  {
+    question: "Como a tensão da bateria afeta o desempenho do inversor?",
+    answer: "Tensão mais alta da bateria reduz a corrente DC para a mesma saída de potência AC. A 12V, uma carga de 2000W consome ~185A (requer cabos grossos de 4/0 AWG). A 48V, a mesma carga consome ~46A (cabo padrão de 6 AWG). Menor corrente significa menor queda de tensão, cabos menores e maior eficiência. Para sistemas acima de 2000W, 48V é fortemente preferido.",
+  },
+  {
+    question: "O que acontece quando a tensão da bateria cai muito baixa?",
+    answer: "Quando a tensão da bateria cai abaixo do corte de baixa tensão do inversor (tipicamente 10,5V para sistemas de 12V, 21V para 24V, 42V para 48V), o inversor desliga para proteger a bateria. Com chumbo-ácido, essa descarga profunda causa sulfatação e perda permanente de capacidade. Baterias LFP toleram baixa tensão melhor, mas ainda requerem corte do BMS.",
+  },
+  {
+    question: "Preciso de um sistema de gerenciamento de bateria (BMS) para uso com inversor?",
+    answer: "Sim, para baterias de lítio (LFP/NMC) um BMS é essencial — protege contra sobredescarga, sobrecarga, sobrecorrente e temperaturas extremas. Sistemas de chumbo-ácido usam um controlador de carga e monitor de tensão. O corte de baixa tensão do BMS deve ser definido mais alto que o corte do inversor para evitar danos às células.",
+  },
+  {
+    question: "Posso usar um ar-condicionado com inversor de bateria?",
+    answer: "Depende da classificação de BTU e da capacidade da bateria. Um ar-condicionado de janela de 5000 BTU consome ~500W em operação, mas 1000–1500W de pico na partida. Um banco LFP de 48V 200Ah (9,6 kWh) pode operá-lo por 6–8 horas. Unidades maiores requerem sistemas de 48V com 400Ah+ de capacidade. Considere mini-splits de bomba de calor, que são mais eficientes.",
+  },
+  {
+    question: "Quanto tempo leva para recarregar a bateria após uso do inversor?",
+    answer: "Tempo de recarga = (Energia consumida / Potência do carregador) / eficiência. Se você descarrega 5 kWh de uma bateria e carrega a 1 kW (rede ou solar), leva ~5,5 horas (contando com 90% de eficiência de carga). A recarga solar depende da potência dos painéis e horas de sol — 400W de painéis fornecem ~1,6 kWh por dia em condições médias.",
+  },
+];
+
+const commonMistakes = [
+  "Ignorar a eficiência do inversor — um inversor com 90% de eficiência desperdiça 10% da energia da bateria. Multiplique a potência da carga por 1/eficiência para obter a potência DC real necessária da bateria.",
+  "Usar a potência da carga AC diretamente para dimensionamento DC da bateria — a potência de entrada do inversor é maior que a potência de saída devido às perdas de conversão. Sempre contabilize a eficiência do inversor.",
+  "Ignorar cargas de pico — motores em aparelhos requerem 3–5× a potência em watts durante a partida. A bateria e o inversor devem suportar esses picos sem desligar.",
+  "Confundir Ah e Wh — uma bateria de 100Ah 12V armazena 1.280 Wh, não 100 Wh. Sempre converta para Wh antes de dividir pela potência da carga para cálculos de tempo de uso.",
+  "Não contabilizar limites de DoD — descarregar baterias de lítio até 0% acelera a degradação. Use 80% de DoD para LFP e 80% para NMC nos cálculos.",
+  "Ignorar perdas nos cabos entre bateria e inversor — cabos subdimensionados causam queda de tensão que reduz a energia efetiva que chega à entrada do inversor.",
+  "Sobredimensionar o inversor para a bateria — um inversor grande com uma bateria pequena drenará a bateria muito rapidamente. Combine a capacidade do inversor com a capacidade da bateria.",
+  "Ignorar a redução por temperatura — temperaturas frias reduzem a capacidade da bateria em 10–30%. Dimensione para sua temperatura de operação mais desfavorável.",
+  "Usar pico em vez de carga média — os cálculos de tempo de uso devem usar a carga média contínua, não picos momentâneos de partidas de motores.",
+  "Não considerar a eficiência de ida e volta — carregar e descarregar baterias perde 5–15% da energia. Considere isso nos cálculos de eficiência total do sistema.",
+];
+
+const relatedArticles = [
+  { href: "/learn/inverter-battery-runtime-guide/", title: "Guia de Autonomia de Bateria com Inversor" },
+  { href: "/learn/12v-vs-24v-vs-48v-runtime/", title: "Autonomia 12V vs 24V vs 48V" },
+  { href: "/learn/battery-voltage-systems/", title: "Sistemas de Tensão de Bateria" },
+];
+
+const relatedCalculators = [
+  { href: "/tools/runtime-calculator/", title: "Calculadora de Autonomia", description: "Calcule o tempo de descarga a partir da capacidade e da carga." },
+  { href: "/tools/battery-sizing-calculator/", title: "Calculadora de Dimensionamento de Bateria", description: "Dimensionamento completo de banco de baterias com redução por temperatura." },
+  { href: "/tools/energy-conversion-calculator/", title: "Conversão de Energia", description: "Converta entre Ah e Wh em qualquer tensão." },
+  { href: "/tools/parallel-string-calculator/", title: "Calculadora de Strings Paralelas", description: "Projete configurações de células série/paralelo para seu banco." },
+  { href: "/tools/c-rate-calculator/", title: "Calculadora de Taxa C", description: "Verifique se as taxas de descarga da bateria atendem às demandas do inversor." },
+  { href: "/tools/home-backup-battery-calculator/", title: "Calculadora de Backup Residencial", description: "Dimensione um sistema completo de backup residencial com cargas críticas." },
+];
+---
+
+<CalculatorLayout
+  title="Calculadora de Bateria com Inversor | Battery Calculators"
+  description="Calcule a capacidade de bateria necessária para sua carga com inversor. Determine Ah e kWh necessários para cargas AC com DoD e eficiência do inversor."
+  lang="pt"
+  faqItems={faqItems}
+  commonMistakes={commonMistakes}
+  relatedArticles={relatedArticles}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+  relatedCalculators={relatedCalculators}
+>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+
+    <!-- Formulário de Entrada -->
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Parâmetros de Carga</h3>
+      <div class="flex flex-col gap-6">
+
+        <InputField id="ac-load" label="Potência da Carga AC" value={2000} min={100} step={100} unit="W" helperText="Potência total em watts de todos os dispositivos AC conectados ao inversor." />
+
+        <InputField id="runtime-hours" label="Tempo de Uso Necessário" value={2} min={0.5} max={72} step={0.5} unit="hours" helperText="Quanto tempo a bateria deve alimentar a carga AC." />
+
+        <InputField id="inverter-efficiency" label="Eficiência do Inversor" value={90} min={70} max={100} step={1} unit="%" helperText="Onda senoidal pura: 90–95%. Use 90% para dimensionamento conservador." />
+
+        <InputField id="battery-voltage" label="Tensão do Sistema de Bateria" value={48} min={12} step={1} unit="V" helperText="12V pequeno, 24V médio, 48V para casa inteira ou alta potência." />
+
+        <InputField id="usable-dod" label="Profundidade de Descarga Utilizável" value={80} min={20} max={100} step={1} unit="%" helperText="LFP: 80–90%, Chumbo-Ácido: 50% recomendado." />
+
+      </div>
+    </CalculatorCard>
+
+    <!-- Resultados -->
+    <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Resultados do Dimensionamento</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <ResultBox
+            label="Energia AC Necessária"
+            value="4.000 Wh"
+            suffix="Carga × tempo de uso"
+            variant="primary"
+            id="result-ac-energy"
+          />
+          <ResultBox
+            label="Energia DC da Bateria Necessária"
+            value="4.444 Wh"
+            suffix="Após perdas do inversor"
+            id="result-dc-energy"
+          />
+          <ResultBox
+            label="Capacidade Recomendada"
+            value="116,1 Ah"
+            suffix="Em tensão nominal de 48V"
+            id="result-capacity"
+          />
+          <ResultBox
+            label="Tamanho do Banco Recomendado"
+            value="5,56 kWh"
+            suffix="Energia total da bateria"
+            id="result-bank-size"
+          />
+        </div>
+      </div>
+
+      <div class="border-t border-hairline pt-6">
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">Recomendação de Bateria</h4>
+        <p class="text-body-sm text-muted" id="battery-recommendation">
+          Para uma carga AC de 2.000W por 2 horas a 48V, uma bateria LFP de 48V 120Ah (5,76 kWh) fornece o tempo de backup necessário.
+        </p>
+      </div>
+    </CalculatorCard>
+
+  </div>
+
+  <!-- Fórmulas e Exemplos Resolvidos -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">Fórmulas e Exemplos Resolvidos</h2>
+
+    <FormulaBox title="Fórmulas Matemáticas">
+      <p>
+        O dimensionamento de bateria com inversor converte os requisitos de carga AC de volta para capacidade de bateria DC, contabilizando perdas de conversão:
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Energia AC = Potência da Carga × Tempo de Uso
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Energia DC = Energia AC / Eficiência do Inversor
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Energia Ajustada da Bateria = Energia DC / DoD%
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Ah Necessários = Energia Ajustada da Bateria / Tensão da Bateria
+      </div>
+      <p>
+        O fator de eficiência do inversor (tipicamente 90%) contabiliza as perdas de conversão CC/CA. O fator de DoD garante que você não sobredescarregue a bateria.
+      </p>
+    </FormulaBox>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample
+        number={1}
+        title="Dimensionar Bateria para Inversor de 2000W — Sistema 12V"
+        scenario="Projetando um backup de bateria de 12V para operar uma carga AC de 2000W por 4 horas durante apagões da rede."
+        inputs={[
+          "Carga AC: 2.000W",
+          "Tempo de Uso Necessário: 4 horas",
+          "Eficiência do Inversor: 90%",
+          "Tensão da Bateria: 12V",
+          "DoD Utilizável: 80% (LFP)",
+        ]}
+        steps={[
+          "Energia AC = 2.000W × 4h = 8.000 Wh",
+          "Energia DC = 8.000 / 0,90 = 8.889 Wh",
+          "Energia da Bateria = 8.889 / 0,80 = 11.111 Wh",
+          "Ah Necessários = 11.111 / 12 = 925,9 Ah",
+        ]}
+        answer="É necessário um banco de baterias LFP de 12V 950Ah (11,4 kWh)."
+        interpretation="A 12V, a corrente DC consumida é ~185A — cabos grossos de 4/0 AWG são obrigatórios. Considere atualizar para 24V ou 48V para esse nível de carga para reduzir o tamanho dos cabos e perdas resistivas."
+      />
+
+      <WorkedExample
+        number={2}
+        title="Dimensionar Bateria para Inversor de 5000W — Sistema 48V"
+        scenario="Dimensionando um banco de baterias de 48V para uma carga de oficina de 5000W que precisa de 2 horas de autonomia."
+        inputs={[
+          "Carga AC: 5.000W",
+          "Tempo de Uso Necessário: 2 horas",
+          "Eficiência do Inversor: 90%",
+          "Tensão da Bateria: 48V",
+          "DoD Utilizável: 80% (LFP)",
+        ]}
+        steps={[
+          "Energia AC = 5.000W × 2h = 10.000 Wh",
+          "Energia DC = 10.000 / 0,90 = 11.111 Wh",
+          "Energia da Bateria = 11.111 / 0,80 = 13.889 Wh",
+          "Ah Necessários = 13.889 / 48 = 289,4 Ah",
+        ]}
+        answer="É necessário um banco de baterias LFP de 48V 300Ah (14,4 kWh)."
+        interpretation="A 48V, a corrente DC é ~115A — gerenciável com cabos de 2 AWG. Este sistema de 5kW se beneficia significativamente da tensão mais alta, com aproximadamente metade da corrente DC de um equivalente de 12V."
+      />
+
+      <WorkedExample
+        number={3}
+        title="Comparar 12V vs 48V para Mesma Carga de 3000W"
+        scenario="Comparando duas configurações de tensão para uma carga de 3000W com 2 horas de autonomia para entender os compromisso de eficiência."
+        inputs={[
+          "Carga AC: 3.000W",
+          "Tempo de Uso Necessário: 2 horas",
+          "Eficiência do Inversor: 90%",
+          "Opção A: Sistema 12V",
+          "Opção B: Sistema 48V",
+          "DoD Utilizável: 80% (LFP)",
+        ]}
+        steps={[
+          "Energia AC = 3.000W × 2h = 6.000 Wh",
+          "Energia DC = 6.000 / 0,90 = 6.667 Wh",
+          "Energia da Bateria = 6.667 / 0,80 = 8.333 Wh",
+          "12V: Ah = 8.333 / 12 = 694,4 Ah | Corrente DC ~278A",
+          "48V: Ah = 8.333 / 48 = 173,6 Ah | Corrente DC ~69A",
+        ]}
+        answer="Ambos precisam de 8,33 kWh de bateria. 12V requer 694Ah com ~278A de consumo; 48V requer 174Ah com ~69A de consumo."
+        interpretation="O sistema 48V usa 4× menos corrente, permitindo cabos mais finos (6 AWG vs 4/0 AWG), menores perdas resistivas e entrega de energia mais eficiente. Para qualquer carga acima de 1500W, 48V é fortemente preferido."
+      />
+    </div>
+  </section>
+
+  <EngineeringDiagram
+    title="Sistema Inversor-Bateria"
+    description="Potência DC da bateria convertida para AC através do inversor com perdas em cada etapa"
+    variant="system"
+    steps={[
+      { label: "Banco de Baterias", icon: "battery" },
+      { label: "Cabos DC", icon: "cable" },
+      { label: "Inversor", icon: "inverter" },
+      { label: "Cargas AC", icon: "load" },
+    ]}
+  />
+
+  <ComparisonTable
+    title="Eficiência do Inversor por Nível de Carga"
+    headers={["Nível de Carga", "Eficiência Típica", "Perda de Potência", "Calor Gerado", "Observações"]}
+    rows={[
+      ["10% (200W)", "82–85%", "30–35W", "Moderado", "Perdas em espera dominam"],
+      ["25% (500W)", "88–90%", "60–70W", "Moderado", "Boa faixa de eficiência"],
+      ["50% (1kW)", "90–93%", "70–100W", "Normal", "Ponto de operação ideal"],
+      ["75% (1,5kW)", "91–93%", "110–140W", "Normal", "Próximo ao pico de eficiência"],
+      ["100% (2kW)", "89–92%", "160–220W", "Alto", "Redução térmica possível"],
+    ]}
+    caption="A eficiência do inversor varia significativamente com a carga — sobredimensionamento reduz a eficiência em cargas leves"
+  />
+
+  <FAQSection items={faqItems} />
+
+  <!-- Script de Cálculo -->
+  <script>
+    import { calculateInverterBattery } from '../../../utils/calculators';
+
+    const acLoadInput = document.getElementById('ac-load') as HTMLInputElement;
+    const runtimeHoursInput = document.getElementById('runtime-hours') as HTMLInputElement;
+    const inverterEfficiencyInput = document.getElementById('inverter-efficiency') as HTMLInputElement;
+    const batteryVoltageInput = document.getElementById('battery-voltage') as HTMLInputElement;
+    const usableDodInput = document.getElementById('usable-dod') as HTMLInputElement;
+
+    const resultAcEnergyBox = document.getElementById('result-ac-energy');
+    const resultAcEnergyValue = resultAcEnergyBox?.querySelector('.text-display-md') as HTMLElement;
+    const resultAcEnergySuffix = resultAcEnergyBox?.querySelector('.text-caption') as HTMLElement;
+
+    const resultDcEnergyBox = document.getElementById('result-dc-energy');
+    const resultDcEnergyValue = resultDcEnergyBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultDcEnergySuffix = resultDcEnergyBox?.querySelector('.text-caption') as HTMLElement;
+
+    const resultCapacityBox = document.getElementById('result-capacity');
+    const resultCapacityValue = resultCapacityBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultCapacitySuffix = resultCapacityBox?.querySelector('.text-caption') as HTMLElement;
+
+    const resultBankSizeBox = document.getElementById('result-bank-size');
+    const resultBankSizeValue = resultBankSizeBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultBankSizeSuffix = resultBankSizeBox?.querySelector('.text-caption') as HTMLElement;
+
+    const batteryRecommendationEl = document.getElementById('battery-recommendation');
+
+    function updateCalculations() {
+      const acLoad = parseFloat(acLoadInput.value) || 2000;
+      const runtimeHours = parseFloat(runtimeHoursInput.value) || 2;
+      const inverterEfficiency = parseFloat(inverterEfficiencyInput.value) || 90;
+      const batteryVoltage = parseFloat(batteryVoltageInput.value) || 48;
+      const usableDod = parseFloat(usableDodInput.value) || 80;
+
+      const results = calculateInverterBattery(acLoad, runtimeHours, inverterEfficiency, batteryVoltage, usableDod);
+
+      if (resultAcEnergyValue) resultAcEnergyValue.textContent = `${Math.round(results.acEnergyWh).toLocaleString()} Wh`;
+      if (resultAcEnergySuffix) resultAcEnergySuffix.textContent = 'Carga × tempo de uso';
+
+      if (resultDcEnergyValue) resultDcEnergyValue.textContent = `${Math.round(results.dcEnergyWh).toLocaleString()} Wh`;
+      if (resultDcEnergySuffix) resultDcEnergySuffix.textContent = 'Após perdas do inversor';
+
+      if (resultCapacityValue) resultCapacityValue.textContent = `${results.requiredCapacityAh.toFixed(1)} Ah`;
+      if (resultCapacitySuffix) resultCapacitySuffix.textContent = `Em ${batteryVoltage}V nominal`;
+
+      if (resultBankSizeValue) resultBankSizeValue.textContent = `${results.adjustedBatteryEnergyKwh.toFixed(2)} kWh`;
+      if (resultBankSizeSuffix) resultBankSizeSuffix.textContent = 'Energia total da bateria';
+
+      if (batteryRecommendationEl) {
+        const recommendedAh = Math.ceil(results.requiredCapacityAh / 10) * 10;
+        batteryRecommendationEl.textContent = `Para uma carga AC de ${acLoad.toLocaleString()}W por ${runtimeHours} horas a ${batteryVoltage}V, uma bateria LFP de ${batteryVoltage}V ${recommendedAh}Ah (${(recommendedAh * batteryVoltage / 1000).toFixed(1)} kWh) fornece o tempo de backup necessário.`;
+      }
+    }
+
+    [acLoadInput, runtimeHoursInput, inverterEfficiencyInput, batteryVoltageInput, usableDodInput].forEach(el => {
+      el.addEventListener('input', updateCalculations);
+    });
+
+    updateCalculations();
+  </script>
+
+</CalculatorLayout>

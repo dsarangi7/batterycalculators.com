@@ -1,0 +1,891 @@
+---
+import CalculatorLayout from '../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../components/CalculatorCard.astro';
+import InputField from '../../components/InputField.astro';
+import ResultBox from '../../components/ResultBox.astro';
+import FormulaBox from '../../components/FormulaBox.astro';
+import FAQSection from '../../components/FAQSection.astro';
+import WorkedExample from '../../components/WorkedExample.astro';
+import ComparisonTable from '../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../components/EngineeringDiagram.astro';
+
+const whatIs = `Um calculador de bateria de backup para cortes de energia domésticos ajuda a estimar a capacidade da bateria, o tamanho do inversor e o sistema de energia de backup necessário para manter eletrodomésticos essenciais funcionando durante um apagão na rede elétrica. Independentemente de estar se preparando para a temporada de furacões, cortes de energia por incêndios florestais, tempestades de inverno ou apagões inesperados, esta ferramenta dimensiona seu banco de baterias com base nos dispositivos específicos que você quer alimentados — geladeira, máquina de CPAP, bomba d'água, roteador Wi-Fi, luzes e mais. Ela leva em consideração as perdas de conversão do inversor, os limites de profundidade de descarga da química da bateria e uma margem de segurança configurável para fornecer uma estimativa realista e de nível de engenharia.`;
+
+const whyItMatters = [
+  "Os cortes de energia nos EUA aumentaram 67% na última década — tempestades, incêndios florestais e tensão na rede tornam a energia de backup uma necessidade prática em muitas regiões.",
+  "Sistemas de bateria subdimensionados deixam você sem refrigeração ou energia para dispositivos médicos durante apagões de vários dias. Uma geladeira cheia custa US$300–US$600 para reabastecer se os alimentos estragarem.",
+  "Sistemas superdimensionados desperdiçam dinheiro — cada 5 kWh desnecessário de capacidade LFP adiciona US$2.000–US$4.000 ao custo. Dimensionar corretamente economiza milhares.",
+  "Ignorar cargas de partida de eletrodomésticos como bombas d'água e geladeiras pode desligar seu inversor no pior momento — o dimensionamento correto de surto previne falhas no meio do apagão.",
+  "Não planejar para temperaturas extremas significa que a capacidade da bateria cai 10–30% em climas frios, deixando você sem energia quando mais precisa durante tempestades de inverno."
+];
+
+const practicalApplications = [
+  { title: "Preparação para Furacões e Tempestades", description: "Dimensione um sistema de bateria para manter cargas críticas durante apagões de 24–72 horas comuns durante furacões, tempestades e tempestades severas." },
+  { title: "Cortes de Energia de Segurança Pública por Incêndios Florestais", description: "Prepare-se para cortes planejados da rede durante alto risco de incêndio. Utilitários da Califórnia e do oeste dos EUA regularmente desenergizam linhas para prevenir ignição." },
+  { title: "Energia de Backup para Equipamentos Médicos", description: "Garanta tempo de bateria suficiente para máquinas de CPAP, concentradores de oxigênio, nebulizadores e outros dispositivos médicos de sustento de vida." },
+  { title: "Backup para Tempestades de Inverno e Gelo", description: "Mantenha controles de aquecimento, bombas d'água, refrigeração e equipamentos de comunicação funcionando durante tempestades de gelo e nevascas que cortam a energia por dias." },
+  { title: "Dimensionamento de Estação de Energia Portátil", description: "Use esta calculadora para combinar uma estação de energia portátil ou gerador solar às suas necessidades específicas de carga de emergência antes de comprar." },
+  { title: "Proteção de Geladeira e Freezer", description: "Calcule exatamente quanto tempo uma bateria pode manter sua geladeira e freezer funcionando para prevenir a deterioração de alimentos durante apagões prolongados." }
+];
+
+const expertNotes: { title: string; variant: 'engineering' | 'tip' | 'warning'; content: string }[] = [
+  {
+    title: "Ciclos de Trabalho dos Eletrodomésticos Importam",
+    variant: "engineering",
+    content: "Uma geladeira consome 150W quando o compressor está ligado, mas ela alterna entre ligado e desligado — geralmente funcionando 30–50% do tempo. Esta calculadora usa a potência contínua para dimensionamento conservador. O tempo real de funcionamento pode ser 40–60% maior do que o calculado para cargas cíclicas como geladeiras e freezers."
+  },
+  {
+    title: "LiFePO4 vs Chumbo-Ácido para Backup de Emergência",
+    variant: "tip",
+    content: "As baterias LiFePO4 (LFP) fornecem 80–100% de capacidade utilizável, pesam 60% menos, duram 10× mais ciclos e não requerem manutenção. As baterias de chumbo-ácido são limitadas a 50% de profundidade de descarga e perdem capacidade rapidamente em clima frio. Para backup de emergência onde a confiabilidade importa, a LFP é a recomendação clara."
+  },
+  {
+    title: "Cargas de Partida Podem Desligar Seu Inversor",
+    variant: "warning",
+    content: "Bombas d'água, geladeiras e micro-ondas consomem 2–3× sua potência durante a inicialização. Se a classificação de surto do seu inversor for muito baixa, ele desligará precisamente quando você mais precisar. Sempre dimensione a capacidade de surto do inversor para o pior cenário de inicialização."
+  }
+];
+
+const trustSection = {
+  text: "Esta calculadora usa fórmulas padrão de engenharia elétrica para dimensionamento de sistemas de bateria, alinhadas com os padrões de inversores UL 1741 e diretrizes de interconexão IEEE 1547. Todos os cálculos são transparentes, derivados de dados públicos de potência de eletrodomésticos e especificações do fabricante. A matemática é totalmente verificável.",
+  link: { label: "Veja nossa metodologia e derivações de fórmulas", href: "/methodology/" }
+};
+
+const references = [
+  { title: "EIA dos EUA — Dados de Consumo Residencial de Eletricidade", url: "https://www.eia.gov/electricity/monthly/", source: "Administração de Informação Energética dos EUA" },
+  { title: "UL 1741 — Padrão para Inversores de Recursos Energéticos Distribuídos", url: "https://www.ul.com/resources/ul-1741-edition-3", source: "Underwriters Laboratories" },
+  { title: "FEMA — Orientação sobre Energia de Backup de Emergência", url: "https://www.fema.gov/emergency-managers/risk-management/power/guidance", source: "Agência Federal de Gestão de Emergências" },
+  { title: "NREL — Dimensionamento de Armazenamento de Bateria para Aplicações Residenciais", url: "https://www.nrel.gov/docs/fy23osti/85472.pdf", source: "Laboratório Nacional de Energia Renovável" }
+];
+
+const faqItems = [
+  {
+    question: "Qual tamanho de bateria preciso para um corte de energia?",
+    answer: "Para backup básico de internet e telefone (roteador Wi-Fi + notebook + luzes por 8 horas), você precisa de aproximadamente 300–500 Wh. Para proteção de alimentos (geladeira + freezer por 12 horas), planeje 2.000–4.000 Wh. Para backup completo de emergência com dispositivos médicos, 3.000–8.000 Wh cobrem a maioria das cargas domésticas críticas por 24 horas.",
+  },
+  {
+    question: "Quanto tempo uma bateria de 100Ah vai durar uma geladeira?",
+    answer: "Uma bateria LiFePO4 de 12V 100Ah (1.280 Wh) pode manter uma geladeira padrão funcionando por aproximadamente 8–12 horas. O compressor da geladeira alterna entre ligado e desligado, então o tempo real depende da temperatura ambiente, eficiência da geladeira e de quantas vezes a porta é aberta. Em condições quentes com aberturas frequentes da porta, espere algo mais próximo de 6–8 horas.",
+  },
+  {
+    question: "LiFePO4 é melhor que chumbo-ácido para backup doméstico?",
+    answer: "Sim, para energia de backup de emergência. LiFePO4 fornece 80–100% de profundidade de descarga utilizável vs 50% para chumbo-ácido, dura 3.000–6.000 ciclos vs 300–500 para chumbo-ácido, carrega mais rápido, pesa 60% menos e não requer manutenção. O custo inicial é maior, mas o custo por ciclo ao longo da vida é significativamente menor.",
+  },
+  {
+    question: "Qual tamanho de inversor preciso para uma geladeira?",
+    answer: "Uma geladeira padrão precisa de um inversor contínuo de 1.500–2.000W com pelo menos 3.000W de capacidade de surto. A carga em funcionamento é tipicamente 150W, mas a partida do compressor pode atingir 600W ou mais. Se você vai usar outros eletrodomésticos, some as watts em funcionamento e a maior carga de surto para dimensionar seu inversor.",
+  },
+  {
+    question: "Uma estação de energia portátil pode rodar uma geladeira?",
+    answer: "Sim, uma estação de energia portátil com classificação de 1.500W+ contínuo com 3.000W+ de surto pode rodar uma geladeira padrão. Você precisará de uma unidade com pelo menos 1.000–1.500 Wh de capacidade para 8–12 horas de backup. Opções populares incluem EcoFlow Delta 2 (1.024 Wh), Bluetti AC200MAX (2.048 Wh) e Goal Zero Yeti 1500X (1.516 Wh).",
+  },
+  {
+    question: "Quanta energia de backup de bateria preciso para uma máquina de CPAP?",
+    answer: "Uma máquina de CPAP típica consome 30–60W com umidificador (10–30W sem). Para 8 horas de sono, você precisa de 240–480 Wh. Uma bateria LiFePO4 de 12V 50Ah (640 Wh) fornece energia de CPAP para a noite inteira. Sem o umidificador, uma bateria de 12V 20Ah (256 Wh) pode durar uma noite.",
+  },
+  {
+    question: "Devo usar 12V, 24V ou 48V para backup doméstico?",
+    answer: "Para sistemas de backup doméstico acima de 1.000W, use 24V ou 48V. Voltagem maior reduz a corrente, permitindo fios mais finos e menores perdas. 48V é ideal para sistemas acima de 3.000W e é o padrão para sistemas modernos de bateria doméstica. 12V é prático apenas para configurações portáteis pequenas abaixo de 1.000W.",
+  },
+  {
+    question: "Painéis solares podem recarregar minha bateria durante um apagão?",
+    answer: "Sim, se você tiver um inversor híbrido com entrada para bateria. Uma matriz de painéis solares de 400W em 4–5 horas de sol pico pode gerar 1.600–2.000 Wh diários — suficiente para recarregar parcialmente uma bateria doméstica ou estender significativamente o tempo de backup. Esta é a estratégia mais eficaz para sobreviver a apagões de vários dias.",
+  },
+  {
+    question: "Por que minha bateria não dura tanto quanto a calculadora diz?",
+    answer: "Razões comuns: idade e degradação da bateria (capacidade cai 20–30% ao longo dos anos), tempo frio reduzindo capacidade 10–30%, cargas de surto reais maiores que as classificadas, perdas na fiação, consumo de energia em standby do inversor e padrões de ciclagem dos eletrodomésticos diferentes das premissas. Esta calculadora fornece estimativas conservadoras — resultados reais variam.",
+  },
+  {
+    question: "Quais eletrodomésticos devo evitar rodar com backup de bateria?",
+    answer: "Evite cargas resistivas de alto consumo: ar-condicionado (1.500–5.000W), fogões elétricos (2.000–5.000W), aquecedores de água elétricos (4.500W), secadoras de roupas (2.500–5.000W) e aquecedores de ambiente (1.500W). Esses esgotam baterias rapidamente e requerem sistemas impraticavelmente grandes. Foque em cargas críticas: refrigeração, iluminação, dispositivos médicos, comunicação e eletrônicos pequenos."
+  },
+];
+
+const commonMistakes = [
+  "Subdimensionar o inversor para cargas de surto — bombas d'água, geladeiras e micro-ondas consomem 2–3× a potência durante a inicialização, desligando inversores baratos.",
+  "Ignorar perdas de eficiência do inversor — uma perda de conversão CA/CC de 10–15% significa que uma bateria de 1.000Wh fornece apenas 850–900Wh de energia CA utilizável.",
+  "Dimensionar para potência sem considerar os ciclos de trabalho dos eletrodomésticos — geladeiras alternam 30–50% do tempo, então estimativas de funcionamento contínuo são conservadoras.",
+  "Usar baterias de chumbo-ácido na capacidade total classificada — chumbo-ácido não deve exceder 50% de DoD, exigindo o dobro da capacidade nominal vs LiFePO4.",
+  "Esquecer a margem de segurança para envelhecimento e temperatura da bateria — tempo frio reduz capacidade 10–30%, e capacidade degrada 20–30% ao longo da vida útil da bateria.",
+  "Não planejar a instalação do interruptor de transferência — conectar um sistema de bateria à fiação doméstica sem um interruptor de transferência pode eletrocutar trabalhadores da concessionária.",
+  "Superdimensionar o banco de baterias sem considerar estratégia de recarga — uma bateria de 10 kWh sem recarga solar ou gerador é um sistema de uso único.",
+  "Rodar cargas resistivas de alto consumo da bateria — ar-condicionados, fogões elétricos e aquecedores de água (1.500–5.000W) esgotam baterias em horas."
+];
+
+const relatedArticles = [
+  { title: "Planejamento de Backup de Bateria Doméstica", href: "/learn/home-battery-backup-planning/" },
+  { title: "Guia de Tempo de Backup Doméstico", href: "/learn/home-backup-runtime-guide/" },
+  { title: "LiFePO4 vs Chumbo-Ácido", href: "/learn/lifepo4-vs-lead-acid/" },
+  { title: "Backup de Bateria para Toda a Casa", href: "/learn/whole-house-battery-backup/" },
+  { title: "Guia de Bateria para Cortes de Energia", href: "/learn/power-outage-battery-guide/" },
+];
+
+const relatedCalculators = [
+  { href: "/fridge-battery-backup-calculator/", title: "Calculadora de Bateria para Geladeira", description: "Dimensionamento de bateria especificamente para backup de geladeira durante apagões." },
+  { href: "/cpap-battery-backup-calculator/", title: "Calculadora de Bateria para CPAP", description: "Dimensione baterias para energia noturna de CPAP." },
+  { href: "/sump-pump-battery-backup-calculator/", title: "Calculadora de Bateria para Bomba d'Água", description: "Mantenha sua bomba d'água funcionando durante apagões de tempestade." },
+  { href: "/portable-power-station-runtime-calculator/", title: "Calculadora de Tempo de Estação de Energia Portátil", description: "Veja quanto tempo uma estação de energia portátil roda suas cargas." },
+  { href: "/solar-generator-sizing-calculator/", title: "Calculadora de Dimensionamento de Gerador Solar", description: "Dimensione um sistema completo de backup solar com painéis e bateria." },
+  { href: "/tools/runtime-calculator/", title: "Calculadora de Tempo de Bateria", description: "Estime o tempo de descarga a partir da capacidade e carga." },
+  { href: "/tools/battery-sizing-calculator/", title: "Calculadora de Dimensionamento de Bateria", description: "Dimensionamento completo de banco de baterias com degradação por temperatura." },
+  { href: "/tools/solar-battery-sizing-calculator/", title: "Calculadora de Bateria Solar", description: "Dimensione baterias pareadas com matrizes de painéis solares." },
+  { href: "/tools/energy-conversion-calculator/", title: "Calculadora de Conversão de Energia", description: "Converta entre Ah, Wh e kWh em qualquer voltagem." },
+  { href: "/tools/charging-time-calculator/", title: "Calculadora de Tempo de Carga", description: "Estime o tempo de carga a partir de solar ou rede elétrica." },
+  { href: "/tools/voltage-drop-calculator/", title: "Calculadora de Queda de Voltagem", description: "Dimensione extensões de fio para minimizar queda de voltagem." },
+  { href: "/tools/dc-cable-loss-calculator/", title: "Calculadora de Perda em Cabo DC", description: "Calcule perdas de fiação em conexões DC." },
+];
+
+const appliancePresets = [
+  { name: "Geladeira", runningW: 150, surgeW: 600 },
+  { name: "Freezer", runningW: 120, surgeW: 500 },
+  { name: "Roteador Wi-Fi", runningW: 12, surgeW: 12 },
+  { name: "Luz LED", runningW: 10, surgeW: 10 },
+  { name: "Notebook", runningW: 60, surgeW: 90 },
+  { name: "TV", runningW: 100, surgeW: 150 },
+  { name: "Máquina de CPAP", runningW: 40, surgeW: 80 },
+  { name: "Ventilador", runningW: 50, surgeW: 75 },
+  { name: "Bomba d'Água", runningW: 800, surgeW: 2000 },
+  { name: "Micro-ondas", runningW: 1000, surgeW: 1500 },
+];
+---
+
+<CalculatorLayout
+  title="Calculadora de Bateria de Backup para Cortes de Energia Domésticos | Battery Calculators"
+  description="Calcule qual tamanho de bateria, inversor e sistema de energia de backup você precisa para rodar eletrodomésticos essenciais durante um corte de energia, tempestade, furacão, apagão por incêndio florestal ou falha de emergência na rede elétrica."
+  faqItems={faqItems}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+  relatedCalculators={relatedCalculators}
+  commonMistakes={commonMistakes}
+  relatedArticles={relatedArticles}
+  lang="pt"
+>
+
+  <!-- Calculator Grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+
+    <!-- Input Form -->
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Cargas de Eletrodomésticos</h3>
+      <div class="flex flex-col gap-5" id="appliance-list">
+        <div class="flex flex-col gap-2">
+          <label class="text-label-uppercase text-xs text-primary">Adicionar Eletrodomésticos</label>
+          <div class="relative flex items-center">
+            <select id="appliance-select" class="select-input w-full">
+              <option value="">Selecione um eletrodoméstico...</option>
+              {appliancePresets.map((a) => (
+                <option value={a.name} class="bg-surface-card">{a.name} ({a.runningW}W / {a.surgeW}W surto)</option>
+              ))}
+              <option value="custom" class="bg-surface-card">Carga Personalizada...</option>
+            </select>
+          </div>
+          <p class="text-caption text-muted">Selecione eletrodomésticos para adicioná-los ao seu plano de backup.</p>
+        </div>
+
+        <div id="custom-load-fields" class="hidden flex-col gap-4 p-4 bg-surface-soft border border-hairline">
+          <div class="flex flex-col gap-2">
+            <label for="custom-name" class="text-label-uppercase text-xs text-primary">Nome do Eletrodoméstico Personalizado</label>
+            <input id="custom-name" type="text" class="text-input w-full" placeholder="ex., Bomba de Poço" />
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div class="flex flex-col gap-2">
+              <label for="custom-running" class="text-label-uppercase text-xs text-primary">Potência em Funcionamento</label>
+              <input id="custom-running" type="number" class="text-input w-full" value={500} min={1} />
+            </div>
+            <div class="flex flex-col gap-2">
+              <label for="custom-surge" class="text-label-uppercase text-xs text-primary">Potência de Surto</label>
+              <input id="custom-surge" type="number" class="text-input w-full" value={750} min={1} />
+            </div>
+          </div>
+          <button id="add-custom-btn" type="button" class="btn-primary w-full">Adicionar Carga Personalizada</button>
+        </div>
+
+        <div id="selected-appliances" class="flex flex-col gap-2"></div>
+      </div>
+
+      <div class="border-t border-hairline mt-6 pt-6 flex flex-col gap-5">
+        <h3 class="text-title-lg text-primary uppercase tracking-wider">Configurações de Backup</h3>
+
+        <InputField id="backup-hours" label="Duração do Backup" value={8} min={0.5} max={72} step={0.5} unit="hours" helperText="Quanto tempo você precisa de energia de backup durante o apagão." />
+
+        <InputField
+          id="battery-voltage"
+          label="Voltagem do Sistema de Bateria"
+          type="select"
+          value="24"
+          helperText="12V para configurações portáteis pequenas, 24V para médio porte, 48V para toda a casa."
+          options={[
+            { label: "12 V", value: "12" },
+            { label: "24 V", value: "24" },
+            { label: "48 V", value: "48" },
+          ]}
+        />
+
+        <InputField
+          id="battery-chemistry"
+          label="Química da Bateria"
+          type="select"
+          value="lifepo4"
+          helperText="LiFePO4 recomendado: mais seguro, maior vida útil, maior descarga."
+          options={[
+            { label: "LiFePO4", value: "lifepo4" },
+            { label: "AGM / Chumbo-Ácido Selado", value: "agm" },
+            { label: "Chumbo-Ácido Acima do Nível", value: "flooded" },
+          ]}
+        />
+
+        <InputField id="dod-percent" label="Profundidade de Descarga" value={80} min={10} max={100} step={1} unit="%" helperText="Definido automaticamente pela química. LiFePO4: 80%, Chumbo-Ácido: 50%. Você pode alterar." />
+
+        <InputField id="inverter-efficiency" label="Eficiência do Inversor" value={90} min={80} max={98} step={1} unit="%" helperText="Inversores modernos de onda senoidal pura: 90–95%. Use 90% para dimensionamento conservador." />
+
+        <InputField id="safety-margin" label="Margem de Segurança" value={20} min={0} max={50} step={1} unit="%" helperText="Capacidade extra de buffer para temperatura, envelhecimento e cargas inesperadas." />
+      </div>
+
+      <div class="border-t border-hairline mt-6 pt-6 flex flex-col gap-5">
+        <div class="flex items-center gap-3">
+          <input type="checkbox" id="solar-enabled" class="w-4 h-4 accent-m-blue-light" />
+          <label for="solar-enabled" class="text-label-uppercase text-xs text-primary cursor-pointer">Ativar Recarga Solar</label>
+        </div>
+
+        <div id="solar-fields" class="hidden flex-col gap-5">
+          <InputField id="solar-watts" label="Potência dos Painéis Solares" value={400} min={50} max={10000} step={50} unit="W" helperText="Potência total dos painéis solares conectados ao controlador de carga." />
+
+          <InputField id="peak-sun-hours" label="Horas de Sol Pico" value={5} min={1} max={10} step={0.5} unit="hours" helperText="Média diária de horas de sol pico para sua localização. Média dos EUA: 4–6 horas." />
+
+          <InputField id="charge-controller-efficiency" label="Eficiência do Controlador de Carga" value={95} min={80} max={99} step={1} unit="%" helperText="Controladores MPPT: 95–98%. Controladores PWM: 80–90%." />
+        </div>
+      </div>
+    </CalculatorCard>
+
+    <!-- Results -->
+    <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Resultados do Sistema de Backup</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <ResultBox
+            label="Energia Necessária da Bateria"
+            value="0 Wh"
+            suffix="0 kWh total do banco de baterias"
+            variant="primary"
+            id="result-battery-wh"
+          />
+          <ResultBox
+            label="Capacidade da Bateria"
+            value="0 Ah"
+            suffix="Em 24V nominal"
+            id="result-battery-ah"
+          />
+          <ResultBox
+            label="Carga Total em Funcionamento"
+            value="0 W"
+            suffix="Consumo contínuo"
+            id="result-running-w"
+          />
+          <ResultBox
+            label="Surto Estimado"
+            value="0 W"
+            suffix="Pico de inicialização"
+            id="result-surge-w"
+          />
+          <ResultBox
+            label="Inversor Contínuo"
+            value="0 W"
+            suffix="Mínimo recomendado"
+            id="result-inverter-cont"
+          />
+          <ResultBox
+            label="Classificação de Surto do Inversor"
+            value="0 W"
+            suffix="Mínimo recomendado"
+            id="result-inverter-surge"
+          />
+        </div>
+
+        <div class="bg-surface-soft border border-hairline p-4 mb-6">
+          <h4 class="text-label-uppercase text-primary text-[10px] mb-3">Configurações de Bateria Sugeridas</h4>
+          <div class="grid grid-cols-2 gap-3 text-body-sm text-muted">
+            <div class="flex justify-between"><span>Baterias 12V 100Ah:</span> <span class="text-primary font-bold" id="result-bat-12v100">0</span></div>
+            <div class="flex justify-between"><span>Baterias 12V 200Ah:</span> <span class="text-primary font-bold" id="result-bat-12v200">0</span></div>
+            <div class="flex justify-between"><span>Baterias 24V 100Ah:</span> <span class="text-primary font-bold" id="result-bat-24v100">0</span></div>
+            <div class="flex justify-between"><span>Baterias 48V 100Ah:</span> <span class="text-primary font-bold" id="result-bat-48v100">0</span></div>
+          </div>
+        </div>
+
+        <div id="solar-results" class="hidden bg-surface-soft border border-hairline p-4 mb-6">
+          <h4 class="text-label-uppercase text-primary text-[10px] mb-3">Estimativa de Recarga Solar</h4>
+          <div class="flex flex-col gap-2 text-body-sm text-muted">
+            <div class="flex justify-between"><span>Energia solar diária:</span> <span class="text-primary font-bold" id="result-solar-daily">0 Wh</span></div>
+            <div class="flex justify-between"><span>Tempo para recarga completa:</span> <span class="text-primary font-bold" id="result-solar-recharge">0 horas</span></div>
+            <div class="flex justify-between"><span>Solar suficiente para uso diário:</span> <span class="text-primary font-bold" id="result-solar-sufficient">—</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="border-t border-hairline pt-6">
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">Notas de Planejamento</h4>
+        <p class="text-body-sm text-muted" id="planning-notes">
+          Adicione eletrodomésticos acima para calcular seus requisitos de energia de backup. Os resultados são atualizados instantaneamente conforme você ajusta as entradas.
+        </p>
+      </div>
+    </CalculatorCard>
+  </div>
+
+  <!-- Formulas + Worked Examples -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <FormulaBox title="Fórmulas Matemáticas">
+      <p>O cálculo segue uma abordagem padrão de cadeia de energia da carga ao banco de baterias:</p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Total Funcionamento W = Σ (Eletrodoméstico Funcionamento W × Quantidade)
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Surto W = Maior Surto de Eletrodoméstico Único + Outras Cargas em Funcionamento
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Energia Necessária (Wh) = (Funcionamento W × Horas) / Eficiência do Inversor × (1 + Margem de Segurança)
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Bateria Ah = Wh Necessários / (Voltagem da Bateria × Profundidade de Descarga)
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Inversor Contínuo = Funcionamento W × 1.25
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Surto do Inversor = Surto W × 1.10
+      </div>
+      <p>O surto é calculado como o maior surto de inicialização de um eletrodoméstico somado à carga em funcionamento de todos os outros eletrodomésticos — não todos os surtos somados simultaneamente.</p>
+    </FormulaBox>
+
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">Fórmulas e Exemplos Resolvidos</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample
+        number={1}
+        title="Cargas Essenciais — Apagão de 8 Horas"
+        scenario="Manter Wi-Fi, carregamento de telefone, algumas luzes e um notebook funcionando durante um apagão noturno (8 horas)."
+        inputs={[
+          { label: "Roteador Wi-Fi", value: "12W" },
+          { label: "Notebook", value: "60W" },
+          { label: "Luzes LED ×2", value: "20W" },
+          { label: "Carregador de Telefone", value: "15W" },
+          { label: "Duração do Backup", value: "8 horas" },
+        ]}
+        steps={[
+          { label: "Passo 1: Carga total em funcionamento", formula: "12 + 60 + 20 + 15", result: "107W" },
+          { label: "Passo 2: Energia para 8 horas", formula: "107W × 8h", result: "856 Wh" },
+          { label: "Passo 3: Após eficiência do inversor (90%)", formula: "856 / 0.90", result: "951 Wh" },
+          { label: "Passo 4: Com 20% de margem", formula: "951 × 1.20", result: "1.141 Wh" },
+          { label: "Passo 5: Bateria (12V LFP, 80% DoD)", formula: "1.141 / (12 × 0,80)", result: "119 Ah → LFP 12V 120Ah" },
+        ]}
+        answer="Uma bateria LiFePO4 de 12V 120Ah (1.536 Wh) cobre cargas noturnas essenciais com margem confortável."
+        interpretation="Cargas essenciais leves são acessíveis de fazer backup — uma única bateria de 12V as maneja facilmente."
+      />
+      <WorkedExample
+        number={2}
+        title="Backup para Toda a Casa — Apagão de 24 Horas"
+        scenario="Manter geladeira, freezer, Wi-Fi, luzes, bomba d'água e carregamento de telefone funcionando por um dia inteiro (24 horas)."
+        inputs={[
+          { label: "Geladeira + Freezer", value: "270W (média cíclica ~110W)" },
+          { label: "Roteador Wi-Fi", value: "12W" },
+          { label: "Luzes LED ×4", value: "40W" },
+          { label: "Bomba d'Água (intermitente)", value: "800W (média ~50W)" },
+          { label: "Telefone + Notebook", value: "75W" },
+          { label: "Duração do Backup", value: "24 horas" },
+        ]}
+        steps={[
+          { label: "Passo 1: Carga média em funcionamento", formula: "110 + 12 + 40 + 50 + 75", result: "287W média" },
+          { label: "Passo 2: Energia para 24 horas", formula: "287W × 24h", result: "6.888 Wh" },
+          { label: "Passo 3: Após eficiência do inversor (90%)", formula: "6.888 / 0,90", result: "7.653 Wh" },
+          { label: "Passo 4: Com 20% de margem", formula: "7.653 × 1,20", result: "9.184 Wh" },
+          { label: "Passo 5: Bateria (48V LFP, 80% DoD)", formula: "9.184 / (48 × 0,80)", result: "239 Ah → LFP 48V 250Ah" },
+        ]}
+        answer="Um banco de baterias LiFePO4 de 48V 250Ah (12 kWh) cobre cargas domésticas essenciais por 24 horas."
+        interpretation="Backup de dia inteiro requer capacidade séria — sistemas de 48V são mais eficientes para cargas deste porte."
+      />
+      <WorkedExample
+        number={3}
+        title="Médico Crítico — Apagão de 48 Horas"
+        scenario="Alimentar uma máquina de CPAP, concentrador de oxigênio, telefone, Wi-Fi e algumas luzes por 2 dias inteiros."
+        inputs={[
+          { label: "Máquina de CPAP", value: "40W" },
+          { label: "Concentrador de Oxigênio", value: "300W" },
+          { label: "Roteador Wi-Fi", value: "12W" },
+          { label: "Luzes LED ×2", value: "20W" },
+          { label: "Carregador de Telefone", value: "15W" },
+          { label: "Duração do Backup", value: "48 horas" },
+        ]}
+        steps={[
+          { label: "Passo 1: Carga total em funcionamento", formula: "40 + 300 + 12 + 20 + 15", result: "387W" },
+          { label: "Passo 2: Energia para 48 horas", formula: "387W × 48h", result: "18.576 Wh" },
+          { label: "Passo 3: Após eficiência do inversor (90%)", formula: "18.576 / 0,90", result: "20.640 Wh" },
+          { label: "Passo 4: Com 20% de margem", formula: "20.640 × 1,20", result: "24.768 Wh" },
+          { label: "Passo 5: Bateria (48V LFP, 80% DoD)", formula: "24.768 / (48 × 0,80)", result: "645 Ah → LFP 48V 650Ah" },
+        ]}
+        answer="Um banco de baterias LiFePO4 de 48V 650Ah (31,2 kWh) alimenta equipamentos médicos críticos por 48 horas."
+        interpretation="Equipamentos médicos demandam capacidade séria — recarga solar é essencial para backup médico de vários dias."
+      />
+    </div>
+  </section>
+
+  <!-- Exemplos de Planejamento de Cortes de Energia nos EUA -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Exemplos de Planejamento de Cortes de Energia nos EUA</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+      <CalculatorCard>
+        <h4 class="text-primary font-bold text-sm mb-3">Backup Básico de Internet</h4>
+        <p class="text-body-sm text-muted mb-3">Mantenha sua casa conectada durante um apagão.</p>
+        <ul class="text-body-sm text-muted flex flex-col gap-1 mb-3">
+          <li>• Roteador Wi-Fi: 12W</li>
+          <li>• Notebook: 60W</li>
+          <li>• Luzes LED ×2: 20W</li>
+        </ul>
+        <div class="bg-surface-soft p-3 border border-hairline">
+          <p class="text-caption text-muted">Total: 92W por 8 horas = <span class="text-primary font-bold">736 Wh → Bateria LFP 12V 80Ah</span></p>
+        </div>
+      </CalculatorCard>
+
+      <CalculatorCard>
+        <h4 class="text-primary font-bold text-sm mb-3">Backup de Proteção Alimentar</h4>
+        <p class="text-body-sm text-muted mb-3">Mantenha geladeira e freezer frios durante apagões prolongados.</p>
+        <ul class="text-body-sm text-muted flex flex-col gap-1 mb-3">
+          <li>• Geladeira: 150W</li>
+          <li>• Freezer: 120W</li>
+          <li>• Roteador Wi-Fi: 12W</li>
+        </ul>
+        <div class="bg-surface-soft p-3 border border-hairline">
+          <p class="text-caption text-muted">Total: 282W por 12 horas = <span class="text-primary font-bold">3.760 Wh → Bateria LFP 24V 200Ah</span></p>
+        </div>
+      </CalculatorCard>
+
+      <CalculatorCard>
+        <h4 class="text-primary font-bold text-sm mb-3">Backup para Dispositivos Médicos</h4>
+        <p class="text-body-sm text-muted mb-3">Alimente CPAP e comunicação essencial durante a noite.</p>
+        <ul class="text-body-sm text-muted flex flex-col gap-1 mb-3">
+          <li>• Máquina de CPAP: 40W</li>
+          <li>• Roteador Wi-Fi: 12W</li>
+          <li>• Carregador de Telefone: 15W</li>
+          <li>• Luz LED: 10W</li>
+        </ul>
+        <div class="bg-surface-soft p-3 border border-hairline">
+          <p class="text-caption text-muted">Total: 77W por 10 horas = <span class="text-primary font-bold">963 Wh → Bateria LFP 12V 100Ah</span></p>
+        </div>
+      </CalculatorCard>
+
+      <CalculatorCard>
+        <h4 class="text-primary font-bold text-sm mb-3">Backup de Emergência para Tempestade</h4>
+        <p class="text-body-sm text-muted mb-3">Backup completo para eventos de clima severo.</p>
+        <ul class="text-body-sm text-muted flex flex-col gap-1 mb-3">
+          <li>• Geladeira: 150W</li>
+          <li>• Freezer: 120W</li>
+          <li>• Bomba d'Água: 800W</li>
+          <li>• Luzes LED ×3: 30W</li>
+          <li>• Roteador Wi-Fi: 12W</li>
+        </ul>
+        <div class="bg-surface-soft p-3 border border-hairline">
+          <p class="text-caption text-muted">Total: 1.112W por 12 horas = <span class="text-primary font-bold">16.680 Wh → Sistema LFP 48V 440Ah</span></p>
+        </div>
+      </CalculatorCard>
+
+    </div>
+  </section>
+
+  <!-- Tabela de Referência de Potência dos Eletrodomésticos -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Tabela de Referência de Potência dos Eletrodomésticos</h2>
+    <div class="overflow-x-auto">
+      <table class="w-full text-body-sm text-muted border border-hairline">
+        <thead>
+          <tr class="border-b border-hairline">
+            <th class="text-left p-3 text-label-uppercase text-primary text-[10px]">Eletrodoméstico</th>
+            <th class="text-right p-3 text-label-uppercase text-primary text-[10px]">Funcionamento (W)</th>
+            <th class="text-right p-3 text-label-uppercase text-primary text-[10px]">Surto (W)</th>
+            <th class="text-right p-3 text-label-uppercase text-primary text-[10px]">Notas</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="border-b border-hairline"><td class="p-3">Geladeira</td><td class="p-3 text-right">150 W</td><td class="p-3 text-right">600 W</td><td class="p-3 text-right text-muted">Alterna 30–50% do tempo</td></tr>
+          <tr class="border-b border-hairline"><td class="p-3">Freezer</td><td class="p-3 text-right">120 W</td><td class="p-3 text-right">500 W</td><td class="p-3 text-right text-muted">Alterna 30–40% do tempo</td></tr>
+          <tr class="border-b border-hairline"><td class="p-3">Roteador Wi-Fi</td><td class="p-3 text-right">12 W</td><td class="p-3 text-right">12 W</td><td class="p-3 text-right text-muted">Consumo contínuo</td></tr>
+          <tr class="border-b border-hairline"><td class="p-3">Lâmpada LED</td><td class="p-3 text-right">10 W</td><td class="p-3 text-right">10 W</td><td class="p-3 text-right text-muted">Por lâmpada</td></tr>
+          <tr class="border-b border-hairline"><td class="p-3">Notebook</td><td class="p-3 text-right">60 W</td><td class="p-3 text-right">90 W</td><td class="p-3 text-right text-muted">Carregando + funcionando</td></tr>
+          <tr class="border-b border-hairline"><td class="p-3">TV (LED/LCD)</td><td class="p-3 text-right">100 W</td><td class="p-3 text-right">150 W</td><td class="p-3 text-right text-muted">55" típica</td></tr>
+          <tr class="border-b border-hairline"><td class="p-3">Máquina de CPAP</td><td class="p-3 text-right">40 W</td><td class="p-3 text-right">80 W</td><td class="p-3 text-right text-muted">Com umidificador</td></tr>
+          <tr class="border-b border-hairline"><td class="p-3">Ventilador de Mesa</td><td class="p-3 text-right">50 W</td><td class="p-3 text-right">75 W</td><td class="p-3 text-right text-muted">Ventilador 20"</td></tr>
+          <tr class="border-b border-hairline"><td class="p-3">Bomba d'Água</td><td class="p-3 text-right">800 W</td><td class="p-3 text-right">2.000 W</td><td class="p-3 text-right text-muted">½ HP típico</td></tr>
+          <tr class="border-b border-hairline"><td class="p-3">Micro-ondas</td><td class="p-3 text-right">1.000 W</td><td class="p-3 text-right">1.500 W</td><td class="p-3 text-right text-muted">Modelo de 1.000W</td></tr>
+          <tr class="border-b border-hairline"><td class="p-3">Carregador de Telefone</td><td class="p-3 text-right">15 W</td><td class="p-3 text-right">15 W</td><td class="p-3 text-right text-muted">USB-C carga rápida</td></tr>
+          <tr class="p-3"><td class="p-3">Cafeteira</td><td class="p-3 text-right">900 W</td><td class="p-3 text-right">1.200 W</td><td class="p-3 text-right text-muted">Filtro 12 xícaras</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Comparação LiFePO4 vs Chumbo-Ácido -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">LiFePO4 vs Chumbo-Ácido para Energia de Backup</h2>
+    <div class="overflow-x-auto">
+      <table class="w-full text-body-sm text-muted border border-hairline">
+        <thead>
+          <tr class="border-b border-hairline">
+            <th class="text-left p-3 text-label-uppercase text-primary text-[10px]">Característica</th>
+            <th class="text-center p-3 text-label-uppercase text-primary text-[10px]">LiFePO4</th>
+            <th class="text-center p-3 text-label-uppercase text-primary text-[10px]">AGM / Selado</th>
+            <th class="text-center p-3 text-label-uppercase text-primary text-[10px]">Chumbo-Ácido</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="border-b border-hairline"><td class="p-3">Profundidade de Descarga Utilizável</td><td class="p-3 text-center font-bold text-primary">80–100%</td><td class="p-3 text-center">50%</td><td class="p-3 text-center">50%</td></tr>
+          <tr class="border-b border-hairline"><td class="p-3">Vida Útil em Ciclos</td><td class="p-3 text-center font-bold text-primary">3.000–6.000</td><td class="p-3 text-center">300–500</td><td class="p-3 text-center">200–400</td></tr>
+          <tr class="border-b border-hairline"><td class="p-3">Peso</td><td class="p-3 text-center font-bold text-primary">Mais Leve</td><td class="p-3 text-center">Pesado</td><td class="p-3 text-center">Mais Pesado</td></tr>
+          <tr class="border-b border-hairline"><td class="p-3">Manutenção</td><td class="p-3 text-center font-bold text-primary">Nenhuma</td><td class="p-3 text-center">Nenhuma</td><td class="p-3 text-center">Reabastecer água</td></tr>
+          <tr class="border-b border-hairline"><td class="p-3">Desempenho em Clima Frio</td><td class="p-3 text-center font-bold text-primary">Bom</td><td class="p-3 text-center">Ruim</td><td class="p-3 text-center">Ruim</td></tr>
+          <tr class="border-b border-hairline"><td class="p-3">Instalação Interna</td><td class="p-3 text-center font-bold text-primary">Seguro</td><td class="p-3 text-center">Ventilação necessária</td><td class="p-3 text-center">Ventilação obrigatória</td></tr>
+          <tr class="border-b border-hairline"><td class="p-3">Custo Inicial</td><td class="p-3 text-center">Maior</td><td class="p-3 text-center">Menor</td><td class="p-3 text-center">Menor</td></tr>
+          <tr class="p-3"><td class="p-3">Custo por Ciclo na Vida Útil</td><td class="p-3 text-center font-bold text-primary">Menor</td><td class="p-3 text-center">Maior</td><td class="p-3 text-center">Maior</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Notas de Segurança -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Notas de Segurança</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <CalculatorCard>
+        <p class="text-body-sm text-muted flex gap-3">
+          <span class="text-m-red shrink-0 mt-0.5">⚠</span>
+          <span>Nunca conecte um gerador portátil ou sistema de bateria à fiação da sua casa sem um interruptor de transferência adequado. A alimentação reversa pode eletrocutar trabalhadores da concessionária que estão restaurando a energia.</span>
+        </p>
+      </CalculatorCard>
+      <CalculatorCard>
+        <p class="text-body-sm text-muted flex gap-3">
+          <span class="text-m-red shrink-0 mt-0.5">⚠</span>
+          <span>Baterias de lítio devem ser instaladas longe de espaços habitados conforme os códigos de incêndio locais. LiFePO4 é a química de lítio mais segura, mas sempre siga as diretrizes de instalação do fabricante.</span>
+        </p>
+      </CalculatorCard>
+      <CalculatorCard>
+        <p class="text-body-sm text-muted flex gap-3">
+          <span class="text-m-red shrink-0 mt-0.5">⚠</span>
+          <span>Não exceda a classificação contínua ou de surto do seu inversor. Inversores sobrecarregados podem superaquecer, desligar ou causar incêndio. Adicione 25% de margem à sua estimativa de carga contínua.</span>
+        </p>
+      </CalculatorCard>
+      <CalculatorCard>
+        <p class="text-body-sm text-muted flex gap-3">
+          <span class="text-m-red shrink-0 mt-0.5">⚠</span>
+          <span>Baterias de chumbo-ácido emitem gás hidrogênio durante o carregamento. Instale em áreas bem ventiladas, longe de fontes de ignição. Nunca carregue uma bateria de chumbo-ácido congelada.</span>
+        </p>
+      </CalculatorCard>
+    </div>
+  </section>
+
+  <EngineeringDiagram
+    title="Fluxo do Sistema de Energia de Backup Doméstico"
+    description="A rede solar ou elétrica carrega o banco de baterias, que alimenta o inversor para energizar os circuitos essenciais da sua casa através de um interruptor de transferência."
+    steps={[
+      { label: "Rede / Solar", icon: "solar" },
+      { label: "Controlador de Carga", icon: "charge" },
+      { label: "Banco de Baterias", icon: "battery" },
+      { label: "Inversor", icon: "inverter" },
+      { label: "Interruptor de Transferência", icon: "cable" },
+      { label: "Cargas Domésticas", icon: "load" },
+    ]}
+    variant="system"
+  />
+
+  <ComparisonTable
+    title="Comparação de Cenários de Backup Doméstico"
+    headers={["Cenário", "Cargas Principais", "Duração", "Consumo Médio", "Tamanho da Bateria", "Custo Estimado"]}
+    rows={[
+      ["Essencial 8h", "Wi-Fi, luzes, telefone, notebook", "8 horas", "~110W", "12V 120Ah (1,5 kWh)", "US$800–US$1.200"],
+      ["Proteção Alimentar 24h", "Geladeira, freezer, Wi-Fi, luzes", "24 horas", "~290W", "24V 200Ah (4,8 kWh)", "US$2.500–US$3.500"],
+      ["Médico Crítico 48h", "CPAP, concentrador O₂, Wi-Fi, luzes", "48 horas", "~390W", "48V 650Ah (31 kWh)", "US$12.000–US$18.000"],
+      ["Emergência de Tempestade 12h", "Geladeira, bomba d'água, Wi-Fi, luzes", "12 horas", "~350W", "24V 250Ah (6 kWh)", "US$3.500–US$5.000"],
+      ["Toda a Casa 24h", "Todos os circuitos essenciais", "24 horas", "~1.500W", "48V 500Ah (24 kWh)", "US$10.000–US$15.000"],
+      ["Vários Dias + Solar", "Essenciais com recarga diária", "72+ horas", "~300W", "48V 200Ah + 1.200W solar", "US$8.000–US$12.000"],
+    ]}
+    caption="Os custos são aproximados para sistemas de bateria LiFePO4 incluindo inversor. Preços variam significativamente por marca e complexidade de instalação."
+  />
+
+  <FAQSection items={faqItems} />
+
+  <!-- Calculation Script -->
+  <script>
+    import { calculatePowerOutageBackup } from '../../utils/calculators';
+
+    interface ApplianceEntry {
+      id: string;
+      name: string;
+      runningW: number;
+      surgeW: number;
+      quantity: number;
+    }
+
+    const appliancePresets: Record<string, { runningW: number; surgeW: number }> = {
+      "Geladeira": { runningW: 150, surgeW: 600 },
+      "Freezer": { runningW: 120, surgeW: 500 },
+      "Roteador Wi-Fi": { runningW: 12, surgeW: 12 },
+      "Luz LED": { runningW: 10, surgeW: 10 },
+      "Notebook": { runningW: 60, surgeW: 90 },
+      "TV": { runningW: 100, surgeW: 150 },
+      "Máquina de CPAP": { runningW: 40, surgeW: 80 },
+      "Ventilador": { runningW: 50, surgeW: 75 },
+      "Bomba d'Água": { runningW: 800, surgeW: 2000 },
+      "Micro-ondas": { runningW: 1000, surgeW: 1500 },
+    };
+
+    let appliances: ApplianceEntry[] = [];
+    let nextId = 1;
+
+    const applianceSelect = document.getElementById('appliance-select') as HTMLSelectElement;
+    const customLoadFields = document.getElementById('custom-load-fields') as HTMLDivElement;
+    const addCustomBtn = document.getElementById('add-custom-btn') as HTMLButtonElement;
+    const selectedAppliancesDiv = document.getElementById('selected-appliances') as HTMLDivElement;
+
+    const backupHoursInput = document.getElementById('backup-hours') as HTMLInputElement;
+    const batteryVoltageSelect = document.getElementById('battery-voltage') as HTMLSelectElement;
+    const batteryChemistrySelect = document.getElementById('battery-chemistry') as HTMLSelectElement;
+    const dodInput = document.getElementById('dod-percent') as HTMLInputElement;
+    const inverterEfficiencyInput = document.getElementById('inverter-efficiency') as HTMLInputElement;
+    const safetyMarginInput = document.getElementById('safety-margin') as HTMLInputElement;
+
+    const solarEnabledCheckbox = document.getElementById('solar-enabled') as HTMLInputElement;
+    const solarFields = document.getElementById('solar-fields') as HTMLDivElement;
+    const solarWattsInput = document.getElementById('solar-watts') as HTMLInputElement;
+    const peakSunHoursInput = document.getElementById('peak-sun-hours') as HTMLInputElement;
+    const chargeControllerEffInput = document.getElementById('charge-controller-efficiency') as HTMLInputElement;
+
+    const solarResultsDiv = document.getElementById('solar-results') as HTMLDivElement;
+
+    const chemistryDodMap: Record<string, number> = {
+      lifepo4: 80,
+      agm: 50,
+      flooded: 50,
+    };
+
+    function addAppliance(name: string, runningW: number, surgeW: number) {
+      const id = `appliance-${nextId++}`;
+      appliances.push({ id, name, runningW, surgeW, quantity: 1 });
+      renderAppliances();
+      updateCalculations();
+    }
+
+    function removeAppliance(id: string) {
+      appliances = appliances.filter(a => a.id !== id);
+      renderAppliances();
+      updateCalculations();
+    }
+
+    function updateQuantity(id: string, qty: number) {
+      const appliance = appliances.find(a => a.id === id);
+      if (appliance) {
+        appliance.quantity = Math.max(1, Math.min(20, qty));
+        updateCalculations();
+      }
+    }
+
+    function renderAppliances() {
+      if (!selectedAppliancesDiv) return;
+      selectedAppliancesDiv.innerHTML = '';
+
+      if (appliances.length === 0) return;
+
+      const header = document.createElement('div');
+      header.className = 'flex items-center justify-between mb-1';
+      header.innerHTML = `<span class="text-label-uppercase text-muted text-[10px]">ELETRODOMÉSTICOS SELECIONADOS</span><span class="text-caption text-muted">${appliances.length} item${appliances.length !== 1 ? 's' : ''}</span>`;
+      selectedAppliancesDiv.appendChild(header);
+
+      for (const appliance of appliances) {
+        const row = document.createElement('div');
+        row.className = 'flex items-center gap-3 bg-surface-soft border border-hairline p-3';
+
+        row.innerHTML = `
+          <div class="flex-1 min-w-0">
+            <span class="text-primary font-bold text-sm block truncate">${appliance.name}</span>
+            <span class="text-caption text-muted">${appliance.runningW}W funcionamento / ${appliance.surgeW}W surto</span>
+          </div>
+          <div class="flex items-center gap-2 shrink-0">
+            <label class="text-caption text-muted">Qtd:</label>
+            <input type="number" class="text-input w-16 h-8 text-center text-sm" value="${appliance.quantity}" min="1" max="20" data-id="${appliance.id}" />
+          </div>
+          <button type="button" class="text-m-red hover:text-primary text-lg font-bold px-2 h-8 flex items-center justify-center border border-hairline hover:border-primary transition-colors shrink-0" data-remove="${appliance.id}">✕</button>
+        `;
+
+        const qtyInput = row.querySelector('input') as HTMLInputElement;
+        qtyInput.addEventListener('input', () => {
+          updateQuantity(appliance.id, parseInt(qtyInput.value) || 1);
+        });
+
+        const removeBtn = row.querySelector('[data-remove]') as HTMLButtonElement;
+        removeBtn.addEventListener('click', () => {
+          removeAppliance(appliance.id);
+        });
+
+        selectedAppliancesDiv.appendChild(row);
+      }
+    }
+
+    applianceSelect?.addEventListener('change', () => {
+      const val = applianceSelect.value;
+      if (!val) return;
+
+      if (val === 'custom') {
+        customLoadFields?.classList.remove('hidden');
+        customLoadFields?.classList.add('flex');
+      } else {
+        customLoadFields?.classList.add('hidden');
+        customLoadFields?.classList.remove('flex');
+        const preset = appliancePresets[val];
+        if (preset) {
+          addAppliance(val, preset.runningW, preset.surgeW);
+        }
+      }
+      applianceSelect.value = '';
+    });
+
+    addCustomBtn?.addEventListener('click', () => {
+      const nameInput = document.getElementById('custom-name') as HTMLInputElement;
+      const runningInput = document.getElementById('custom-running') as HTMLInputElement;
+      const surgeInput = document.getElementById('custom-surge') as HTMLInputElement;
+
+      const name = nameInput?.value.trim() || 'Carga Personalizada';
+      const runningW = Math.max(1, parseInt(runningInput?.value) || 500);
+      const surgeW = Math.max(runningW, parseInt(surgeInput?.value) || Math.ceil(runningW * 1.5));
+
+      addAppliance(name, runningW, surgeW);
+
+      if (nameInput) nameInput.value = '';
+    });
+
+    solarEnabledCheckbox?.addEventListener('change', () => {
+      if (solarEnabledCheckbox.checked) {
+        solarFields?.classList.remove('hidden');
+        solarFields?.classList.add('flex');
+        solarResultsDiv?.classList.remove('hidden');
+      } else {
+        solarFields?.classList.add('hidden');
+        solarFields?.classList.remove('flex');
+        solarResultsDiv?.classList.add('hidden');
+      }
+      updateCalculations();
+    });
+
+    batteryChemistrySelect?.addEventListener('change', () => {
+      const chem = batteryChemistrySelect.value;
+      const dod = chemistryDodMap[chem];
+      if (dod && dodInput) {
+        dodInput.value = String(dod);
+      }
+      updateCalculations();
+    });
+
+    function updateCalculations() {
+      const backupHours = parseFloat(backupHoursInput?.value) || 8;
+      const batteryVoltage = parseFloat(batteryVoltageSelect?.value) || 24;
+      const dodPercent = parseFloat(dodInput?.value) || 80;
+      const inverterEfficiency = parseFloat(inverterEfficiencyInput?.value) || 90;
+      const safetyMargin = parseFloat(safetyMarginInput?.value) || 20;
+
+      const solarEnabled = solarEnabledCheckbox?.checked || false;
+      const solarWatts = parseFloat(solarWattsInput?.value) || 400;
+      const peakSunHours = parseFloat(peakSunHoursInput?.value) || 5;
+      const chargeControllerEff = parseFloat(chargeControllerEffInput?.value) || 95;
+
+      const applianceLoads = appliances.map(a => ({
+        name: a.name,
+        runningW: a.runningW,
+        surgeW: a.surgeW,
+        quantity: a.quantity,
+      }));
+
+      const results = calculatePowerOutageBackup(
+        applianceLoads,
+        backupHours,
+        batteryVoltage,
+        dodPercent,
+        inverterEfficiency,
+        safetyMargin,
+        solarEnabled,
+        solarWatts,
+        peakSunHours,
+        chargeControllerEff
+      );
+
+      // Update result displays
+      const batteryWhBox = document.getElementById('result-battery-wh');
+      const batteryWhValue = batteryWhBox?.querySelector('.text-display-md') as HTMLElement;
+      const batteryWhSuffix = batteryWhBox?.querySelector('.text-caption') as HTMLElement;
+      if (batteryWhValue) batteryWhValue.textContent = `${Math.round(results.energyRequiredWh).toLocaleString()} Wh`;
+      if (batteryWhSuffix) batteryWhSuffix.textContent = `${results.energyRequiredKwh.toFixed(1)} kWh total do banco de baterias`;
+
+      const batteryAhBox = document.getElementById('result-battery-ah');
+      const batteryAhValue = batteryAhBox?.querySelector('.text-title-lg') as HTMLElement;
+      const batteryAhSuffix = batteryAhBox?.querySelector('.text-caption') as HTMLElement;
+      if (batteryAhValue) batteryAhValue.textContent = `${Math.round(results.batteryCapacityAh).toLocaleString()} Ah`;
+      if (batteryAhSuffix) batteryAhSuffix.textContent = `Em ${batteryVoltage}V nominal`;
+
+      const runningBox = document.getElementById('result-running-w');
+      const runningValue = runningBox?.querySelector('.text-title-lg') as HTMLElement;
+      if (runningValue) runningValue.textContent = `${Math.round(results.totalRunningW).toLocaleString()} W`;
+
+      const surgeBox = document.getElementById('result-surge-w');
+      const surgeValue = surgeBox?.querySelector('.text-title-lg') as HTMLElement;
+      if (surgeValue) surgeValue.textContent = `${Math.round(results.surgeW).toLocaleString()} W`;
+
+      const inverterContBox = document.getElementById('result-inverter-cont');
+      const inverterContValue = inverterContBox?.querySelector('.text-title-lg') as HTMLElement;
+      if (inverterContValue) inverterContValue.textContent = `${results.inverterContinuousW.toLocaleString()} W`;
+
+      const inverterSurgeBox = document.getElementById('result-inverter-surge');
+      const inverterSurgeValue = inverterSurgeBox?.querySelector('.text-title-lg') as HTMLElement;
+      if (inverterSurgeValue) inverterSurgeValue.textContent = `${results.inverterSurgeW.toLocaleString()} W`;
+
+      // Battery configurations
+      const bat12v100 = document.getElementById('result-bat-12v100');
+      const bat12v200 = document.getElementById('result-bat-12v200');
+      const bat24v100 = document.getElementById('result-bat-24v100');
+      const bat48v100 = document.getElementById('result-bat-48v100');
+      if (bat12v100) bat12v100.textContent = String(results.batteries12v100ah);
+      if (bat12v200) bat12v200.textContent = String(results.batteries12v200ah);
+      if (bat24v100) bat24v100.textContent = String(results.batteries24v100ah);
+      if (bat48v100) bat48v100.textContent = String(results.batteries48v100ah);
+
+      // Solar results
+      if (solarEnabled) {
+        const solarDaily = document.getElementById('result-solar-daily');
+        const solarRecharge = document.getElementById('result-solar-recharge');
+        const solarSufficient = document.getElementById('result-solar-sufficient');
+        if (solarDaily) solarDaily.textContent = `${Math.round(results.solarDailyWh).toLocaleString()} Wh`;
+        if (solarRecharge) solarRecharge.textContent = `${results.solarRechargeHours.toFixed(1)} horas`;
+        if (solarSufficient) solarSufficient.textContent = results.solarSufficient ? 'Sim' : 'Não — precisa de mais painéis';
+      }
+
+      // Planning notes
+      const planningNotes = document.getElementById('planning-notes');
+      if (planningNotes) {
+        if (appliances.length === 0) {
+          planningNotes.textContent = 'Adicione eletrodomésticos acima para calcular seus requisitos de energia de backup. Os resultados são atualizados instantaneamente conforme você ajusta as entradas.';
+        } else {
+          const chemistryName = batteryChemistrySelect?.value === 'lifepo4' ? 'LiFePO4' : batteryChemistrySelect?.value === 'agm' ? 'AGM Chumbo-Ácido' : 'Chumbo-Ácido';
+          planningNotes.textContent = `Para ${Math.round(results.totalRunningW)}W de cargas por ${backupHours} horas a ${batteryVoltage}V ${chemistryName}, você precisa de aproximadamente ${results.energyRequiredKwh.toFixed(1)} kWh de capacidade de bateria (${Math.round(results.batteryCapacityAh)} Ah). Inversor recomendado: ${results.inverterContinuousW}W contínuo com classificação de ${results.inverterSurgeW}W de surto.`;
+        }
+      }
+    }
+
+    // Attach event listeners
+    [backupHoursInput, dodInput, inverterEfficiencyInput, safetyMarginInput, solarWattsInput, peakSunHoursInput, chargeControllerEffInput].forEach(el => {
+      el?.addEventListener('input', updateCalculations);
+    });
+
+    [batteryVoltageSelect, batteryChemistrySelect].forEach(el => {
+      el?.addEventListener('change', updateCalculations);
+    });
+
+    // Initial render
+    updateCalculations();
+  </script>
+
+</CalculatorLayout>

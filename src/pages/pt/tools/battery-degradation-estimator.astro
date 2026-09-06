@@ -1,0 +1,379 @@
+---
+import CalculatorLayout from '../../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import InputField from '../../../components/InputField.astro';
+import ResultBox from '../../../components/ResultBox.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import RelatedTools from '../../../components/RelatedTools.astro';
+import WorkedExample from '../../../components/WorkedExample.astro';
+import ComparisonTable from '../../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../../components/EngineeringDiagram.astro';
+
+const chemistryOptions = [
+  { label: "Ferro Fosfato de Lítio (LiFePO4 / LFP)", value: "lfp" },
+  { label: "Níquel Manganês Cobalto de Lítio (NMC)", value: "nmc" },
+  { label: "Titanato de Lítio (LTO - altos ciclos)", value: "lto" },
+  { label: "Chumbo-Ácido de Ciclo Profundo", value: "lead-acid" },
+];
+
+const whatIs = `A estimativa de degradação de bateria prevê como a capacidade máxima de uma bateria (Estado de Saúde, SOH) diminui ao longo do tempo devido a dois mecanismos principais: <strong>envelhecimento por ciclagem</strong> (perda de capacidade de ciclos repetidos de carga-descarga) e <strong>envelhecimento calendário</strong> (perda de capacidade de reações químicas que ocorrem mesmo em repouso). O modelo de degradação usa a equação de Arrhenius para contabilizar efeitos de temperatura, uma relação de lei de potência para o impacto da profundidade de descarga e ciclos nominalizados específicos de cada química. Entender a degradação é essencial para prever cronogramas de substituição de baterias, avaliar a economia de projetos BESS e planejar manutenções de sistemas de armazenamento de energia.`;
+
+const whyItMatters = [
+  "Uma bateria com 80% de SOH perdeu 20% de sua capacidade original — uma bateria de 100Ah agora se comporta como uma de 80Ah, reduzindo autonomia e armazenamento.",
+  "As taxas de degradação variam dramaticamente por química — LFP pode durar mais de 10 anos, enquanto chumbo-ácido pode precisar de substituição em 3–5 anos em condições semelhantes.",
+  "A temperatura é o maior fator controlável — cada 10°C acima de 25°C aproximadamente dobra a taxa de degradação devido à cinética de Arrhenius.",
+  "Ignorar a degradação em modelos financeiros superestima o ROI do BESS em 20–40%, levando a decisões de investimento pobres.",
+  "O fim da vida útil (80% SOH) chega mais cedo do que o esperado quando as baterias são operadas em alta DoD ou temperaturas elevadas.",
+];
+
+const practicalApplications = [
+  { title: "Modelagem Financeira BESS", description: "Incorpore curvas realistas de degradação nos cálculos de VPL e payback para projetos comerciais de armazenamento de baterias." },
+  { title: "Ciclo de Vida de Bateria EV", description: "Preveja quando a capacidade da bateria EV cairá abaixo de 80% para estimar a degradação da autonomia do veículo e o momento da substituição." },
+  { title: "Planejamento de Armazenamento Solar", description: "Planeje ciclos de substituição de baterias em sistemas solares fora da rede com base nas taxas de degradação esperadas." },
+  { title: "Validação de Garantia", description: "Compare a degradação real com as alegações de garantia do fabricante para verificar as garantias de SOH." },
+  { title: "Manutenção de Telecomunicações", description: "Agende substituições proativas de baterias em sites de telecomunicações antes que a capacidade caia abaixo dos requisitos de backup." },
+  { title: "Gestão de Ativos em Escala de Rede", description: "Otimize cronogramas de substituição e estimativas de valor residual para ativos de bateria em escala de utilidade." },
+];
+
+const expertNotes = [
+  { title: 'Efeito Arrhenius', variant: 'warning', content: 'A velocidade de envelhecimento dobra para cada 10°C acima de 25°C. Uma bateria operando a 35°C envelhece duas vezes mais rápido que uma a 25°C. A 45°C, envelhece quatro vezes mais rápido. O gerenciamento de temperatura é a maneira mais eficaz de estender a vida útil da bateria.' },
+  { title: 'Impacto da DoD', variant: 'engineering', content: 'A degradação por ciclagem segue uma relação de lei de potência com a profundidade de descarga. Ciclagem rasa (20% DoD) pode estender a vida útil em 3–5× comparada a ciclagem profunda (80% DoD). É por isso que muitos sistemas BESS limitam o throughput diário.' },
+  { title: 'Definição de EOL', variant: 'info', content: 'Em aplicações de energia solar, EV e BESS, uma bateria atinge o Fim da Vida (EOL) quando o SOH cai abaixo de 80%. Nesse ponto, a resistência interna aumenta significativamente e a capacidade se torna menos previsível.' },
+];
+
+const trustSection = {
+  text: "Este estimador usa a equação de Arrhenius para envelhecimento calendário dependente da temperatura e um modelo de lei de potência de DoD para envelhecimento por ciclagem — ambos são modelos de degradação eletroquímica bem estabelecidos publicados na literatura revisada por pares. Os ciclos nominalizados específicos por química são baseados em fichas técnicas de fabricantes e pesquisas publicadas. Todos os valores intermediários são exibidos para verificação independente.",
+  link: { label: "Ver nossa metodologia completa", href: "/methodology/" },
+};
+
+const references = [
+  { title: "Battery University — Como Prolongar Baterias de Íon de Lítio", url: "https://batteryuniversity.com/article/bu-705-how-to-prolong-lithium-based-batteries", source: "Battery University / Cadex Electronics" },
+  { title: "Journal of Power Sources — Modelos de Envelhecimento para Baterias de Íon de Lítio", url: "https://www.sciencedirect.com/journal/journal-of-power-sources", source: "Elsevier / Journal of Power Sources" },
+  { title: "NREL — Modelagem de Degradação de Baterias", url: "https://www.nrel.gov/analysis/battery-degradation.html", source: "Laboratório Nacional de Energia Renovável" },
+  { title: "IEEE — Envelhecimento Calendário e por Ciclo de Baterias de Íon de Lítio", url: "https://ieeexplore.ieee.org/", source: "IEEE Xplore" },
+  { title: "Sandia National Laboratories — Testes de Abuso de Baterias", url: "https://www.sandia.gov/ess-ssl/battery-abuse-testing/", source: "Laboratórios Nacionais de Sandia" },
+];
+
+const faqItems = [
+  {
+    question: "Qual é a diferença entre SOC e SOH?",
+    answer: "O Estado de Carga (SOC) mede a quantidade atual de energia elétrica restante na bateria em relação à sua *capacidade máxima atual* (como um indicador de combustível). O Estado de Saúde (SOH) mede a *capacidade máxima de armazenamento restante* em relação à *capacidade de design original quando nova*.",
+  },
+  {
+    question: "Por que a temperatura acelera o envelhecimento calendário?",
+    answer: "Baterias de lítio sofrem reações químicas parassitas entre o lítio ativo, as placas e o eletrólito líquido. Essas reações ocorrem constantemente, mesmo quando a bateria está em repouso. Como as velocidades de reação química seguem a lei de Arrhenius, temperaturas mais altas aceleram essa degradação parassita.",
+  },
+  {
+    question: "Como o estado de carga afeta o envelhecimento calendário?",
+    answer: "Armazenar baterias de íon de lítio (especificamente NMC) em alta tensão (100% SOC) aumenta o estresse físico nas estruturas cristalinas do âodo e cátodo, acelerando a degradação calendário. Para armazenamento, recomenda-se manter baterias de lítio a 40%–60% SOC em ambiente fresco.",
+  },
+  {
+    question: "Baterias LFP realmente podem operar por 5.000 ciclos?",
+    answer: "Sim, células prismáticas LiFePO4 de alta qualidade regularmente alcançam 4.000 a 6.000 ciclos a 80% de DoD antes de atingir o limite de EOL (80% SOH), desde que operadas entre 20°C e 30°C e carregadas em baixas taxas C. O gerenciamento adequado da temperatura da bateria é a chave para a vida útil dos ciclos.",
+  },
+  {
+    question: "Como a DoD afeta a vida útil dos ciclos?",
+    answer: "Descargas mais profundas causam mais estresse mecânico nos materiais dos eletrodos. Uma bateria ciclada a 80% de DoD pode alcançar 2.000 ciclos, enquanto a mesma bateria a 20% de DoD pode alcançar mais de 10.000 ciclos. A relação segue uma lei de potência — ciclagem rasa estende drasticamente a vida útil.",
+  },
+  {
+    question: "O que é envelhecimento calendário?",
+    answer: "O envelhecimento calendário é a perda de capacidade que ocorre mesmo quando a bateria não está sendo usada. Reações parassitas químicas entre o eletrólito e os eletrodos causam perda gradual de inventário de lítio. O envelhecimento calendário depende da temperatura e ocorre mais rápido em níveis de armazenamento de SOC alto.",
+  },
+  {
+    question: "Como posso desacelerar a degradação da bateria?",
+    answer: "Mantenha as baterias em temperaturas moderadas (20–25°C), evite descargas profundas frequentes (use 60–80% de DoD em vez de 100%), armazene a 40–60% de SOC quando não estiver em uso e evite carregar abaixo de 0°C. Essas práticas podem estender a vida útil da bateria em 2–3× comparada ao uso agressivo.",
+  },
+  {
+    question: "O que acontece quando o SOH cai abaixo de 80%?",
+    answer: "Abaixo de 80% de SOH, a resistência interna aumenta significativamente, causando maior queda de tensão sob carga. A capacidade se torna menos previsível e pode cair mais rapidamente. Para a maioria das aplicações (solar, EV, BESS), 80% de SOH é considerado fim da vida, e a substituição deve ser planejada.",
+  },
+  {
+    question: "Quão precisa é essa estimativa de degradação?",
+    answer: "Esta ferramenta fornece uma aproximação de primeira ordem baseada em modelos de degradação publicados. A degradação real varia por fabricante, qualidade da célula, taxas de carga e condições operacionais específicas. Use para fins de planejamento e valide com dados de monitoramento do mundo real.",
+  },
+  {
+    question: "A carga rápida afeta a degradação?",
+    answer: "Sim. Taxas de carga altas (acima de 1C) aumentam o risco de deposição de lítio, especialmente em temperaturas baixas. Isso acelera a perda de capacidade. A maioria dos fabricantes recomenda 0,5C ou menos para vida útil ideal dos ciclos. A carga rápida pode reduzir a vida útil dos ciclos em 20–40% comparada à carga lenta.",
+  },
+  {
+    question: "Como monitorar o SOH real?",
+    answer: "O SOH pode ser estimado comparando a capacidade de carga total atual com a capacidade nominal original. A maioria das unidades BMS rastreia isso automaticamente. Métodos manuais incluem carregar totalmente, descarregar a uma taxa conhecida e medir o total de Ah entregues vs. capacidade nominal.",
+  },
+];
+
+const relatedTools = [
+  { href: "/tools/bess-roi-calculator/", title: "Calculadora ROI BESS", description: "Integre esta curva de degradação no VPL financeiro de longo prazo." },
+  { href: "/tools/battery-sizing-calculator/", title: "Ferramenta de Dimensionamento de Bateria", description: "Calcule o dimensionamento de armazenamento a partir de cargas contínuas." },
+  { href: "/tools/soc-estimator/", title: "Estimador de SOC", description: "Interpole o Estado de Carga da bateria a partir de tensões de células." },
+  { href: "/tools/runtime-calculator/", title: "Calculadora de Autonomia", description: "Calcule a autonomia a partir de perfis de potência de carga." },
+  { href: "/tools/c-rate-calculator/", title: "Calculadora de Taxa C", description: "Calcule taxas de corrente de carga e descarga." },
+  { href: "/tools/solar-battery-sizing-calculator/", title: "Dimensionamento de Bateria Solar", description: "Dimensione bancos de baterias solares a partir do consumo diário." },
+];
+
+const commonMistakes = [
+  "Assumir que o SOH permanece em 100% — todas as baterias degradam. Uma bateria de 5 anos tipicamente tem 85–90% de SOH dependendo dos padrões de uso e temperatura.",
+  "Ignorar a temperatura nos modelos de degradação — a temperatura é o fator controlável mais significativo. Uma bateria a 40°C envelhece 4× mais rápido que uma a 25°C.",
+  "Usar capacidade de placa nominal para projeções financeiras — sempre modele o declínio de capacidade ano a ano. Uma taxa de degradação anual de 2% significa 18% menos capacidade no ano 10.",
+  "Armazenar baterias a 100% de SOC — armazenamento em SOC alto acelera o envelhecimento calendário. Armazene baterias de lítio a 40–60% de SOC em ambientes frescos.",
+  "Ciclagem profunda sem ajustar expectativas — ciclagem repetida a 100% de DoD pode reduzir pela metade a vida útil comparada a operação a 80% de DoD.",
+  "Ignorar efeitos da taxa de carga — carregar acima de 1C aumenta o risco de deposição de lítio e acelera a degradação, especialmente em temperaturas baixas.",
+];
+
+const relatedArticles = [
+  { href: "/learn/battery-degradation-explained/", title: "Degradação de Bateria Explicada" },
+  { href: "/learn/battery-depth-of-discharge-chart/", title: "Como Estender a Vida Útil da Bateria" },
+  { href: "/learn/understanding-state-of-charge/", title: "SOH vs SOC de Bateria" },
+];
+---
+
+<CalculatorLayout
+  title="Estimador de Degradação e Vida Útil de Bateria | Battery Calculators"
+  description="Estime a perda de capacidade e o Estado de Saúde (SOH) restante para baterias LFP, NMC, LTO ou Chumbo-Ácido com base em ciclos, idade e temperatura. Nota: Esta ferramenta fornece apenas aproximações educacionais. Os resultados não são medições diagnósticas ou previsões certificadas de saúde da bateria. A degradação real varia com base em taxas de carga, condições de armazenamento e formulações de células específicas do fabricante."
+  lang="pt"
+  faqItems={faqItems}
+  commonMistakes={commonMistakes}
+  relatedCalculators={relatedTools}
+  relatedArticles={relatedArticles}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+>
+
+  <!-- Grade Principal do Calculador -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+
+    <!-- Formulário de Entrada -->
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Parâmetros Operacionais</h3>
+      <div class="flex flex-col gap-6">
+        <InputField id="chemistry" label="Química da Bateria" type="select" options={chemistryOptions} value="lfp" />
+        <InputField id="cycles" label="Ciclos Concluídos" value={1500} min={0} step={1} helperText="Um ciclo completo representa descarregar de 100% a 0% e recarregar novamente." />
+        <InputField id="dod" label="Profundidade Média de Descarga (DoD %)" value={80} min={10} max={100} helperText="Profundidade típica de descarga por ciclo." />
+        <InputField id="temperature" label="Temperatura Média da Célula (°C)" value={30} min={5} max={60} helperText="Fator Arrhenius: a velocidade de envelhecimento dobra para cada 10°C acima de 25°C." />
+        <InputField id="age" label="Idade Calendário (Anos)" value={3} min={0} step={0.5} />
+      </div>
+    </CalculatorCard>
+
+    <!-- Resultados do Cálculo -->
+    <CalculatorCard class="border-m-red flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Status de Saúde Estimado</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <ResultBox
+            label="Estado de Saúde (SOH)"
+            value="85,2%"
+            suffix="O sistema degradou 14,8%"
+            variant="primary"
+            id="soh-status-card"
+          />
+          <ResultBox
+            label="Perda por Degradação Ciclística"
+            value="8,5%"
+            suffix="Devido aos ciclos da bateria"
+            id="result-cycle-loss-box"
+          />
+          <ResultBox
+            label="Perda por Envelhecimento Calendário"
+            value="6,4%"
+            suffix="Devido ao envelhecimento químico"
+            id="result-calendar-loss-box"
+          />
+        </div>
+      </div>
+
+      <!-- Área de Ação -->
+      <div class="border-t border-hairline pt-6">
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">Limite de Fim da Vida (EOL)</h4>
+        <p class="text-body-sm text-muted">
+          Em aplicações de energia solar, veículos elétricos e BESS, uma bateria é considerada no Fim da Vida quando seu SOH cai abaixo de <span class="text-primary font-bold">80%</span>. Nesse ponto, a resistência aumenta e a capacidade da célula se torna volátil.
+        </p>
+      </div>
+    </CalculatorCard>
+
+  </div>
+
+  <!-- Fórmulas e Exemplos Resolvidos -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">Fórmulas e Exemplos Resolvidos</h2>
+
+    <FormulaBox title="Fórmulas Matemáticas">
+      <p>
+        O modelo de degradação calcula a perda de capacidade como soma do envelhecimento por ciclagem e envelhecimento calendário (dependência de temperatura Arrhenius):
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        FatorTemp = 2^((Temperatura - 25) / 10) (para T > 25°C)
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        FatorDoD = (DoD / DoDNom)^1.7
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Perda Ciclística (%) = (Ciclos / CiclosNom) × 20 × FatorDoD × FatorTemp
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Perda Calendário (%) = Idade (Anos) × TaxaBase × FatorTemp
+      </div>
+      <p>
+        Pressupostos de classificação padrão (a 25°C):
+      </p>
+      <ul class="list-disc pl-6 flex flex-col gap-1 text-xs">
+        <li><strong>LFP:</strong> 5000 ciclos até 80% de SOH. Taxa calendário base = 1,5% SOH / ano.</li>
+        <li><strong>NMC:</strong> 2000 ciclos até 80% de SOH. Taxa calendário base = 2,0% SOH / ano.</li>
+        <li><strong>LTO:</strong> 15000 ciclos até 80% de SOH. Taxa calendário base = 0,8% SOH / ano.</li>
+        <li><strong>Chumbo-Ácido:</strong> 500 ciclos até 80% de SOH a 50% de DoD. Taxa calendário base = 3,0% SOH / ano.</li>
+      </ul>
+    </FormulaBox>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample
+        number={1}
+        title="LFP a 80% DoD, 25°C — Prever Capacidade Após 2000 Ciclos"
+        scenario="Um pacote de baterias LFP em um sistema BESS solar é ciclado diariamente a 80% de DoD em um invólucro com controle de temperatura mantendo 25°C. Após 2000 ciclos, que capacidade restante podemos esperar?"
+        inputs={[
+          "Química: LiFePO4 (LFP)",
+          "Ciclos nominalizados para 80% de SOH: 5.000",
+          "Ciclos concluídos: 2.000",
+          "DoD: 80%",
+          "Temperatura: 25°C",
+          "Idade calendário: 3 anos",
+        ]}
+        steps={[
+          "FatorTemp = 2^((25 − 25) / 10) = 2^0 = 1,0",
+          "FatorDoD = (80 / 80)^1,7 = 1,0",
+          "Perda Ciclística = (2000 / 5000) × 20 × 1,0 × 1,0 = 8,0%",
+          "Perda Calendário = 3 × 1,5 × 1,0 = 4,5%",
+          "SOH = 100 − 8,0 − 4,5 = 87,5%",
+        ]}
+        answer="SOH = 87,5%"
+        interpretation="A bateria LFP retém 87,5% de sua capacidade original — bem acima do limite de fim de vida de 80%. A operação fresca a 25°C com ciclagem moderada preserva margem significativa. A essa taxa, o pacote tem aproximadamente 1.000+ ciclos restantes antes de atingir o EOL."
+      />
+
+      <WorkedExample
+        number={2}
+        title="NMC a 70% DoD, 35°C — Prever Capacidade Após 500 Ciclos"
+        scenario="Uma bateria NMC em um EV é carregada a 100% diariamente e regularmente descarregada a 30% (70% DoD) em condições ambientes quentes com média de 35°C. Após 500 ciclos e 2 anos de uso, qual é o SOH estimado?"
+        inputs={[
+          "Química: NMC",
+          "Ciclos nominalizados para 80% de SOH: 2.000",
+          "Ciclos concluídos: 500",
+          "DoD: 70%",
+          "Temperatura: 35°C",
+          "Idade calendário: 2 anos",
+        ]}
+        steps={[
+          "FatorTemp = 2^((35 − 25) / 10) = 2^1 = 2,0",
+          "FatorDoD = (70 / 80)^1,7 = 0,798",
+          "Perda Ciclística = (500 / 2000) × 20 × 0,798 × 2,0 = 7,98%",
+          "Perda Calendário = 2 × 2,0 × 2,0 = 8,0%",
+          "SOH = 100 − 7,98 − 8,0 = 84,0%",
+        ]}
+        answer="SOH = 84,0%"
+        interpretation="Apesar de apenas 500 ciclos, o pacote NMC já perdeu 16% de capacidade. A temperatura elevada (35°C) dobra o envelhecimento calendário, e a taxa base mais alta do NMC (2,0%/ano vs 1,5% para LFP) compõe a perda. Operação contínua nessa temperatura empurrará o pacote para o EOL dentro de 3–4 anos."
+      />
+
+      <WorkedExample
+        number={3}
+        title="Chumbo-Ácido a 50% DoD vs. LFP — Comparação de Curvas de Degradação"
+        scenario="Compare a trajetória de degradação de uma bateria de chumbo-ácido inundada a 50% de DoD com uma bateria LFP a 80% de DoD, ambas operando a 25°C e com 3 anos de idade. Isso ilustra por que a seleção de química importa para planejamento de ciclo de vida."
+        inputs={[
+          "Chumbo-Ácido: 500 ciclos nominalizados a 50% de DoD, taxa calendário base 3,0%/ano",
+          "LFP: 5.000 ciclos nominalizados a 80% de DoD, taxa calendário base 1,5%/ano",
+          "Ambas a 25°C, 3 anos de idade calendário",
+        ]}
+        steps={[
+          "Chumbo-Ácido FatorTemp = 1,0 (a 25°C)",
+          "Chumbo-Ácido Perda Ciclística = (500 / 5000) × 20 × 1,0 × 1,0 = 2,0%",
+          "Chumbo-Ácido Perda Calendário = 3 × 3,0 × 1,0 = 9,0%",
+          "Chumbo-Ácido SOH = 100 − 2,0 − 9,0 = 89,0%",
+          "LFP Perda Ciclística = (500 / 5000) × 20 × 1,0 × 1,0 = 2,0%",
+          "LFP Perda Calendário = 3 × 1,5 × 1,0 = 4,5%",
+          "LFP SOH = 100 − 2,0 − 4,5 = 93,5%",
+        ]}
+        answer="Chumbo-Ácido SOH = 89,0% | LFP SOH = 93,5%"
+        interpretation="Após 500 ciclos e 3 anos, ambas as químicas ainda estão acima do EOL. No entanto, a taxa de envelhecimento calendário do chumbo-ácido é 2× maior (3,0% vs 1,5%/ano). Em um horizonte de 10 anos, o chumbo-ácido atingirá o EOL aproximadamente no ano 3–5, enquanto o LFP opera bem além de 10 anos. O custo inicial premium do LFP é compensado pela menor frequência de substituição e maior eficiência de ida e volta."
+      />
+    </div>
+  </section>
+
+  <EngineeringDiagram
+    title="Fatores de Degradação de Bateria"
+    description="Múltiplos fatores de estresse se combinam para acelerar a perda de capacidade ao longo do tempo"
+    variant="flow"
+    steps={[
+      { label: "Estresse Ciclístico", icon: "battery" },
+      { label: "Envelhecimento Calendário", icon: "chart" },
+      { label: "Temperatura", icon: "chart" },
+      { label: "Perda de Capacidade", icon: "chart" },
+    ]}
+  />
+
+  <ComparisonTable
+    title="Taxas de Degradação por Química"
+    headers={["Química", "Vida Útil Ciclística (80% DoD)", "Vida Calendário", "Sensibilidade à Temperatura", "Limite de Fim de Vida"]}
+    rows={[
+      ["LiFePO4", "5.000+ ciclos", "15–20 anos", "Baixa", "80% do inicial"],
+      ["NMC", "1.500–2.500 ciclos", "10–15 anos", "Moderada", "80% do inicial"],
+      ["NCA", "1.000–2.000 ciclos", "8–12 anos", "Alta", "80% do inicial"],
+      ["Chumbo-Ácido (AGM)", "500–1.000 ciclos", "5–8 anos", "Moderada", "50% do inicial"],
+      ["Chumbo-Ácido (Inundada)", "300–600 ciclos", "3–5 anos", "Alta", "50% do inicial"],
+    ]}
+    caption="Vida útil esperada sob condições operacionais padrão"
+  />
+
+  <FAQSection items={faqItems} />
+  <RelatedTools tools={relatedTools} />
+
+  <!-- Script de Cálculo -->
+  <script>
+    import { calculateDegradation } from '../../../utils/calculators';
+
+    const chemistrySelect = document.getElementById('chemistry') as HTMLSelectElement;
+    const cyclesInput = document.getElementById('cycles') as HTMLInputElement;
+    const dodInput = document.getElementById('dod') as HTMLInputElement;
+    const temperatureInput = document.getElementById('temperature') as HTMLInputElement;
+    const ageInput = document.getElementById('age') as HTMLInputElement;
+
+    // Saídas
+    const resultSohCard = document.getElementById('soh-status-card');
+    const resultSoh = resultSohCard?.querySelector('.text-display-md') as HTMLElement;
+    const resultStatusDesc = resultSohCard?.querySelector('.text-caption') as HTMLElement;
+    const resultCycleLoss = document.getElementById('result-cycle-loss-box')?.querySelector('.text-title-lg') as HTMLElement;
+    const resultCalendarLoss = document.getElementById('result-calendar-loss-box')?.querySelector('.text-title-lg') as HTMLElement;
+
+    function updateCalculations() {
+      const chemistry = chemistrySelect.value as "lfp" | "nmc" | "lto" | "lead-acid";
+      const cycles = parseFloat(cyclesInput.value) || 0;
+      const dod = parseFloat(dodInput.value) || 0;
+      const temperature = parseFloat(temperatureInput.value) || 25;
+      const age = parseFloat(ageInput.value) || 0;
+
+      const results = calculateDegradation(chemistry, cycles, dod, temperature, age);
+
+      // Renderizar Saídas
+      if (resultSoh) resultSoh.textContent = `${results.remainingSohPercent.toFixed(1)}%`;
+
+      const fade = 100 - results.remainingSohPercent;
+      if (resultStatusDesc) resultStatusDesc.textContent = `O sistema degradou ${fade.toFixed(1)}%`;
+
+      if (resultCycleLoss) resultCycleLoss.textContent = `${results.cycleLossPercent.toFixed(1)}%`;
+      if (resultCalendarLoss) resultCalendarLoss.textContent = `${results.calendarLossPercent.toFixed(1)}%`;
+
+      // Destaques de cor do cartão de status para EOL (SOH < 80%)
+      if (resultSohCard) {
+        resultSohCard.className = "bg-surface-soft p-6 border col-span-1 md:col-span-2 " +
+          (results.remainingSohPercent < 80 ? "border-red-600 animate-pulse" : "border-hairline");
+      }
+    }
+
+    [chemistrySelect, cyclesInput, dodInput, temperatureInput, ageInput].forEach(el => {
+      el.addEventListener('input', updateCalculations);
+    });
+
+    // Executar ao iniciar
+    updateCalculations();
+  </script>
+</CalculatorLayout>

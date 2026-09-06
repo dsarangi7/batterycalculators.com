@@ -1,5 +1,14 @@
 ---
 import MStripe from './MStripe.astro';
+import { t, type Locale, getLocalePrefix } from '../utils/i18n';
+
+interface Props {
+  lang?: Locale;
+}
+
+const { lang = 'en' } = Astro.props as Props;
+const currentPath = Astro.url.pathname;
+const prefix = getLocalePrefix(lang);
 ---
 
 <!-- M-Stripe Accent -->
@@ -14,39 +23,48 @@ import MStripe from './MStripe.astro';
   <div class="max-w-7xl mx-auto px-4 md:px-8 h-[72px] md:h-[80px] flex items-center justify-between overflow-hidden">
 
     <!-- Brand Block -->
-    <a href="/" class="flex items-center gap-3 hover:opacity-90 transition-opacity min-w-0 shrink-0">
+    <a href={`${prefix}/`} class="flex items-center gap-3 hover:opacity-90 transition-opacity min-w-0 shrink-0">
       <!-- Brand Logo -->
-      <img src="/favicon.svg" alt="Battery Calculators" class="w-7 h-7 shrink-0" />
+      <img src="/favicon.svg" alt={t('site.name', lang)} class="w-7 h-7 shrink-0" />
       <!-- Name + Tagline -->
       <div class="flex flex-col min-w-0">
         <span class="text-label-uppercase text-primary font-bold tracking-[2px] leading-none truncate">
-          Battery Calculators
+          {t('site.name', lang)}
         </span>
         <span class="text-[10px] text-muted tracking-[1px] uppercase mt-0.5 hidden sm:block">
-          Battery Calculation Tools
+          {t('site.tagline', lang)}
         </span>
       </div>
     </a>
 
     <!-- Desktop Navigation -->
     <nav class="hidden md:flex items-center gap-7">
-      <a href="/" class="text-nav-link text-body hover:text-primary transition-colors py-2">Home</a>
-      <a href="/tools/" class="text-nav-link text-body hover:text-primary transition-colors py-2">Tools</a>
-      <a href="/learn/" class="text-nav-link text-body hover:text-primary transition-colors py-2">Learn</a>
-      <a href="/solar/" class="text-nav-link text-body hover:text-primary transition-colors py-2">Solar</a>
-      <a href="/rv/" class="text-nav-link text-body hover:text-primary transition-colors py-2">RV</a>
-      <a href="/marine/" class="text-nav-link text-body hover:text-primary transition-colors py-2">Marine</a>
-      <a href="/engineering/" class="text-nav-link text-body hover:text-primary transition-colors py-2">Engineering</a>
-      <a href="/resources/" class="text-nav-link text-body hover:text-primary transition-colors py-2">Resources</a>
-      <a href="/news/" class="text-nav-link text-body hover:text-primary transition-colors py-2">News</a>
+      <a href={`${prefix}/`} class="text-nav-link text-body hover:text-primary transition-colors py-2">{t('nav.home', lang)}</a>
+      <a href={`${prefix}/tools/`} class="text-nav-link text-body hover:text-primary transition-colors py-2">{t('nav.tools', lang)}</a>
+      <a href={`${prefix}/learn/`} class="text-nav-link text-body hover:text-primary transition-colors py-2">{t('nav.learn', lang)}</a>
+      <a href={`${prefix}/solar/`} class="text-nav-link text-body hover:text-primary transition-colors py-2">{t('nav.solar', lang)}</a>
+      <a href={`${prefix}/rv/`} class="text-nav-link text-body hover:text-primary transition-colors py-2">{t('nav.rv', lang)}</a>
+      <a href={`${prefix}/marine/`} class="text-nav-link text-body hover:text-primary transition-colors py-2">{t('nav.marine', lang)}</a>
+      <a href={`${prefix}/engineering/`} class="text-nav-link text-body hover:text-primary transition-colors py-2">{t('nav.engineering', lang)}</a>
+      <a href={`${prefix}/resources/`} class="text-nav-link text-body hover:text-primary transition-colors py-2">{t('nav.resources', lang)}</a>
+      <a href={`${prefix}/news/`} class="text-nav-link text-body hover:text-primary transition-colors py-2">{t('nav.news', lang)}</a>
     </nav>
 
     <!-- Right Controls -->
     <div class="flex items-center gap-2">
+      <!-- Language Switcher -->
+      <a
+        href={lang === 'en' ? `/pt${currentPath}` : currentPath.replace('/pt/', '/')}
+        class="hidden md:flex items-center justify-center w-10 h-10 border border-hairline bg-transparent text-body hover:text-primary hover:border-primary transition-colors text-[11px] font-bold tracking-wider"
+        aria-label={lang === 'en' ? 'Mudar para Português' : 'Switch to English'}
+      >
+        {lang === 'en' ? 'PT' : 'EN'}
+      </a>
+
       <!-- Search Button (desktop) -->
       <a
-        href="/search/"
-        aria-label="Search"
+        href={`${prefix}/search/`}
+        aria-label={t('nav.search', lang)}
         class="hidden md:flex items-center justify-center w-10 h-10 border border-hairline bg-transparent text-body hover:text-primary hover:border-primary transition-colors"
       >
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
@@ -59,7 +77,7 @@ import MStripe from './MStripe.astro';
       <button
         id="theme-toggle"
         type="button"
-        aria-label="Toggle dark/light theme"
+        aria-label={t('header.toggle_theme_light', lang)}
         class="hidden md:flex items-center justify-center w-10 h-10 border border-hairline bg-transparent text-body hover:text-primary hover:border-primary transition-colors"
       >
         <svg class="w-4 h-4 theme-icon-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
@@ -73,8 +91,8 @@ import MStripe from './MStripe.astro';
 
       <!-- Search Button (mobile) -->
       <a
-        href="/search/"
-        aria-label="Search"
+        href={`${prefix}/search/`}
+        aria-label={t('nav.search', lang)}
         class="md:hidden flex items-center justify-center w-10 h-10 text-body hover:text-primary transition-colors"
       >
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
@@ -84,7 +102,7 @@ import MStripe from './MStripe.astro';
       </a>
 
       <!-- Mobile Menu Button -->
-      <button id="menu-btn" aria-label="Toggle Navigation Menu" class="md:hidden text-primary p-2 hover:bg-surface-card transition-colors">
+      <button id="menu-btn" aria-label={t('header.toggle_nav', lang)} class="md:hidden text-primary p-2 hover:bg-surface-card transition-colors">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
           <path stroke-linecap="square" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
         </svg>
@@ -94,22 +112,29 @@ import MStripe from './MStripe.astro';
 
   <!-- Mobile Dropdown Menu -->
   <div id="mobile-menu" class="hidden md:hidden bg-surface-elevated border-t border-hairline/50 w-full px-4 py-4 flex flex-col gap-0 overflow-hidden">
-    <a href="/search/" class="text-nav-link text-primary hover:opacity-80 py-3 border-b border-hairline-strong min-h-[44px] flex items-center">Search</a>
-    <a href="/" class="text-nav-link text-primary hover:opacity-80 py-3 border-b border-hairline-strong min-h-[44px] flex items-center">Home</a>
-    <a href="/tools/" class="text-nav-link text-primary hover:opacity-80 py-3 border-b border-hairline-strong min-h-[44px] flex items-center">Tools</a>
-    <a href="/learn/" class="text-nav-link text-primary hover:opacity-80 py-3 border-b border-hairline-strong min-h-[44px] flex items-center">Learn</a>
-    <a href="/solar/" class="text-nav-link text-primary hover:opacity-80 py-3 border-b border-hairline-strong min-h-[44px] flex items-center">Solar</a>
-    <a href="/rv/" class="text-nav-link text-primary hover:opacity-80 py-3 border-b border-hairline-strong min-h-[44px] flex items-center">RV</a>
-    <a href="/marine/" class="text-nav-link text-primary hover:opacity-80 py-3 border-b border-hairline-strong min-h-[44px] flex items-center">Marine</a>
-    <a href="/engineering/" class="text-nav-link text-primary hover:opacity-80 py-3 border-b border-hairline-strong min-h-[44px] flex items-center">Engineering</a>
-    <a href="/resources/" class="text-nav-link text-primary hover:opacity-80 py-3 border-b border-hairline-strong min-h-[44px] flex items-center">Resources</a>
-    <a href="/news/" class="text-nav-link text-primary hover:opacity-80 py-3 border-b border-hairline-strong min-h-[44px] flex items-center">News</a>
-    <a href="/about/" class="text-nav-link text-primary hover:opacity-80 py-3 min-h-[44px] flex items-center">About</a>
+    <a href={`${prefix}/search/`} class="text-nav-link text-primary hover:opacity-80 py-3 border-b border-hairline-strong min-h-[44px] flex items-center">{t('nav.search', lang)}</a>
+    <a href={`${prefix}/`} class="text-nav-link text-primary hover:opacity-80 py-3 border-b border-hairline-strong min-h-[44px] flex items-center">{t('nav.home', lang)}</a>
+    <a href={`${prefix}/tools/`} class="text-nav-link text-primary hover:opacity-80 py-3 border-b border-hairline-strong min-h-[44px] flex items-center">{t('nav.tools', lang)}</a>
+    <a href={`${prefix}/learn/`} class="text-nav-link text-primary hover:opacity-80 py-3 border-b border-hairline-strong min-h-[44px] flex items-center">{t('nav.learn', lang)}</a>
+    <a href={`${prefix}/solar/`} class="text-nav-link text-primary hover:opacity-80 py-3 border-b border-hairline-strong min-h-[44px] flex items-center">{t('nav.solar', lang)}</a>
+    <a href={`${prefix}/rv/`} class="text-nav-link text-primary hover:opacity-80 py-3 border-b border-hairline-strong min-h-[44px] flex items-center">{t('nav.rv', lang)}</a>
+    <a href={`${prefix}/marine/`} class="text-nav-link text-primary hover:opacity-80 py-3 border-b border-hairline-strong min-h-[44px] flex items-center">{t('nav.marine', lang)}</a>
+    <a href={`${prefix}/engineering/`} class="text-nav-link text-primary hover:opacity-80 py-3 border-b border-hairline-strong min-h-[44px] flex items-center">{t('nav.engineering', lang)}</a>
+    <a href={`${prefix}/resources/`} class="text-nav-link text-primary hover:opacity-80 py-3 border-b border-hairline-strong min-h-[44px] flex items-center">{t('nav.resources', lang)}</a>
+    <a href={`${prefix}/news/`} class="text-nav-link text-primary hover:opacity-80 py-3 border-b border-hairline-strong min-h-[44px] flex items-center">{t('nav.news', lang)}</a>
+    <a href={`${prefix}/about/`} class="text-nav-link text-primary hover:opacity-80 py-3 min-h-[44px] flex items-center">{t('nav.about', lang)}</a>
+    <!-- Language Switcher (mobile) -->
+    <a
+      href={lang === 'en' ? `/pt${currentPath}` : currentPath.replace('/pt/', '/')}
+      class="text-nav-link text-primary hover:opacity-80 py-3 border-t border-hairline-strong min-h-[44px] flex items-center"
+    >
+      {lang === 'en' ? 'Português (PT)' : 'English (EN)'}
+    </a>
     <!-- Theme Toggle (mobile) -->
     <button
       id="theme-toggle-mobile"
       type="button"
-      aria-label="Toggle dark/light theme"
+      aria-label={t('header.toggle_theme_light', lang)}
       class="flex items-center gap-2 text-nav-link text-primary hover:opacity-80 py-3 min-h-[44px]"
     >
       <svg class="w-4 h-4 theme-icon-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
@@ -119,8 +144,8 @@ import MStripe from './MStripe.astro';
       <svg class="w-4 h-4 theme-icon-light hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
         <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
       </svg>
-      <span class="theme-label-dark">Switch to Light Mode</span>
-      <span class="theme-label-light hidden">Switch to Dark Mode</span>
+      <span class="theme-label-dark">{t('header.toggle_theme_light', lang)}</span>
+      <span class="theme-label-light hidden">{t('header.toggle_theme_dark', lang)}</span>
     </button>
   </div>
 </header>

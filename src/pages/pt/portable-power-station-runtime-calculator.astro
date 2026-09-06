@@ -1,0 +1,211 @@
+---
+import CalculatorLayout from '../../layouts/CalculatorLayout.astro';
+import FormulaBox from '../../components/FormulaBox.astro';
+import FAQSection from '../../components/FAQSection.astro';
+import PowerOutageForm from '../../components/PowerOutageForm.astro';
+import WorkedExample from '../../components/WorkedExample.astro';
+import ComparisonTable from '../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../components/EngineeringDiagram.astro';
+
+const whatIs = "Uma calculadora de tempo de funcionamento de estação de energia portátil estima quanto tempo uma estação de energia portátil (gerador de bateria) vai rodar seus eletrodomésticos específicos durante um apagão. Diferente de geradores a gasolina, estações de energia portáteis são silenciosas, sem emissões e seguras para uso interno — mas têm capacidade limitada. Esta calculadora informa exatamente quantas horas sua estação vai durar com base em sua carga real, ajudando você a escolher o tamanho certo e planejar o uso de energia durante apagões prolongados.";
+
+const whyItMatters = [
+  "Estações de energia portáteis são classificadas em Wh (watt-horas), mas o tempo real depende dos seus eletrodomésticos específicos — uma estação classificada para '2.000Wh' não significa 2.000W por 1 hora.",
+  "Perdas de eficiência do inversor (10–15%) reduzem a capacidade utilizável. Uma estação de 1.000Wh fornece aproximadamente 850–900Wh de saída real.",
+  "Baterias de lítio NMC não devem ser descarregadas abaixo de 80–90% de profundidade de descarga. Unidades LiFePO4 permitem 80–100% de DoD.",
+  "Taxas de descarga mais altas reduzem a capacidade utilizável — rodar uma carga de 1.500W de uma estação de 1.000Wh a esgota mais rápido que rodar 500W.",
+  "Combinar sua carga com a classificação de saída da estação é fundamental — exceder a saída contínua desliga a unidade, mesmo que capacidade permaneça."
+];
+
+const practicalApplications = [
+  { title: "Preparação para Cortes de Energia", description: "Antes de comprar uma estação de energia portátil, calcule exatamente quanto tempo ela vai alimentar seus eletrodomésticos críticos durante um apagão." },
+  { title: "Viagens de Acampamento e RV", description: "Planeje a capacidade da sua estação de energia portátil com base no que você vai conectar — geladeira, luzes, carregamento de telefone, CPAP." },
+  { title: "Energia para Canteiros de Obras e Locais Remotos", description: "Alimente ferramentas, iluminação e equipamentos em locais remotos sem acesso à rede elétrica." },
+  { title: "Planejamento de Kit de Emergência", description: "Determine qual tamanho de estação de energia portátil se encaixa nos requisitos de carga crítica de emergência da sua residência." },
+];
+
+const expertNotes: { title: string; variant: 'engineering' | 'tip' | 'warning'; content: string }[] = [
+  { title: "Saída Contínua vs Surto", variant: "warning", content: "Uma estação classificada como '1.500W contínuo, 3.000W surto' pode rodar cargas de até 1.500W continuamente. A classificação de surto lida apenas com inicializações breves de motor (1–3 segundos). Rodar 1.800W vai desligá-la, mesmo que esteja abaixo da capacidade de surto." },
+  { title: "Eficiência do Inversor Importa", variant: "engineering", content: "Estações de energia portáteis perdem 10–15% convertendo energia DC da bateria para saída AC. Uma estação de 1.000Wh fornece aproximadamente 850Wh de energia AC utilizável. Alguns fabricantes citam 'capacidade DC' que exclui essa perda." },
+  { title: "Temperatura Afeta o Tempo de Funcionamento", variant: "tip", content: "Tempo frio (abaixo de 0°C) reduz a capacidade de baterias de lítio em 10–25%. Se você usar uma estação de energia portátil no inverno, planeje 20% menos tempo que a capacidade nominal sugere." }
+];
+
+const trustSection = {
+  text: "Esta calculadora usa fórmulas padrão de engenharia elétrica. As estimativas de tempo assumem 80% de eficiência do inversor e limites padrão de profundidade de descarga.",
+  link: { label: "Veja nossa metodologia", href: "/methodology/" }
+};
+
+const references = [
+  { title: "DOE — Segurança de Armazenamento de Energia em Bateria", url: "https://www.energy.gov/eere/solar/battery-safety-and-performance", source: "Departamento de Energia dos EUA" },
+  { title: "UL 2743 — Estações de Energia Portáteis", url: "https://www.ul.com/resources/ul-2743-standard-safety-portable-lithium-ion-battery", source: "Underwriters Laboratories" },
+];
+
+const faqItems = [
+  { question: "Quanto tempo uma estação de energia portátil vai rodar uma geladeira?", answer: "Uma estação de energia portátil de lítio de 1.000Wh roda uma geladeira padrão (150W funcionando) por aproximadamente 5–6 horas. Uma estação de 2.000Wh estende isso para 10–12 horas. Lembre-se que o compressor alterna entre ligado e desligado, então o tempo real pode ser maior." },
+  { question: "Qual tamanho de estação de energia portátil preciso?", answer: "Para cargas essenciais (geladeira + Wi-Fi + luzes + carregamento de telefone, ~250W média), uma estação de 1.000Wh fornece 3–4 horas. Para backup noturno (8 horas), planeje 2.000–3.000Wh. Para apagões de vários dias, considere 3.000Wh+ com recarga solar." },
+  { question: "Uma estação de energia portátil pode rodar uma micro-ondas ou aquecedor?", answer: "A maioria das estações de energia portáteis (1.000–2.000W de saída) não consegue rodar micro-ondas (1.000–1.500W) ou aquecedores (1.500W+) simultaneamente com outras cargas. Elas podem lidar com uma micro-ondas sozinha brevemente, mas não continuamente." },
+  { question: "Estações de energia portáteis perdem carga quando não estão em uso?", answer: "Sim, todas as baterias de lítio têm autodescarga de 1–5% por mês. Armazene estações de energia portáteis com 50–80% de carga em local fresco. Verifique a carga a cada 3 meses se estiver em armazenamento de longo prazo." },
+];
+
+const commonMistakes = [
+  "Comparar capacidade Wh entre diferentes químicas de bateria — estações NMC a 80% de DoD fornecem menos energia utilizável que estações LFP classificadas no mesmo Wh.",
+  "Ignorar perdas de eficiência do inversor — uma estação de 1.000Wh fornece apenas 850–900Wh de energia AC utilizável após conversão DC-CA.",
+  "Exceder a classificação de saída contínua — rodar uma carga de 1.800W em uma estação classificada para 1.500W a desliga, mesmo que esteja abaixo da capacidade de surto.",
+  "Assumir que as classificações Wh do fabricante incluem limites de DoD — alguns fabricantes citam capacidade DC que exclui tanto perdas do inversor quanto degradação por DoD.",
+  "Esquecer que taxas de descarga altas reduzem capacidade utilizável — uma estação de 1.000Wh alimentando 1.000W drena mais rápido que uma alimentando 250W.",
+  "Não verificar classificação de surto para eletrodomésticos com motor — geladeiras e bombas precisam de 3–4× a potência durante a inicialização.",
+  "Armazenar uma estação de energia portátil totalmente carregada por meses — baterias de lítio autodescascam 1–5% por mês; armazene com 50–80% para armazenamento de longo prazo.",
+  "Ignorar efeitos da temperatura no tempo de funcionamento — tempo frio abaixo de 0°C reduz capacidade de lítio em 10–25%."
+];
+
+const relatedArticles = [
+  { title: "Guia de Tempo de Backup Doméstico", href: "/learn/home-backup-runtime-guide/" },
+  { title: "LiFePO4 vs Chumbo-Ácido", href: "/learn/lifepo4-vs-lead-acid/" },
+  { title: "Fórmula de Tempo de Bateria", href: "/learn/battery-runtime-formula/" },
+  { title: "Guia de Bateria para Cortes de Energia", href: "/learn/power-outage-battery-guide/" },
+];
+
+const relatedCalculators = [
+  { href: "/home-power-outage-battery-backup-calculator/", title: "Calculadora de Bateria de Backup para Cortes de Energia", description: "Calculadora completa de energia de backup para todos os eletrodomésticos domésticos." },
+  { href: "/fridge-battery-backup-calculator/", title: "Calculadora de Bateria para Geladeira", description: "Dimensionamento de bateria para backup de geladeira durante apagões." },
+  { href: "/cpap-battery-backup-calculator/", title: "Calculadora de Bateria para CPAP", description: "Dimensione baterias para energia noturna de CPAP." },
+  { href: "/sump-pump-battery-backup-calculator/", title: "Calculadora de Bateria para Bomba d'Agua", description: "Mantenha sua bomba d'agua funcionando durante apagoes." },
+  { href: "/solar-generator-sizing-calculator/", title: "Calculadora de Dimensionamento de Gerador Solar", description: "Dimensione um sistema completo de backup solar com paineis e bateria." },
+  { href: "/tools/runtime-calculator/", title: "Calculadora de Tempo de Bateria", description: "Estime o tempo de descarga a partir da capacidade e carga." },
+  { href: "/tools/battery-sizing-calculator/", title: "Calculadora de Dimensionamento de Bateria", description: "Dimensionamento completo de banco de baterias com degradacao por temperatura." },
+  { href: "/tools/solar-battery-sizing-calculator/", title: "Calculadora de Bateria Solar", description: "Dimensione baterias pareadas com matrizes de paineis solares." },
+  { href: "/tools/energy-conversion-calculator/", title: "Calculadora de Conversao de Energia", description: "Converta entre Ah, Wh e kWh em qualquer voltagem." },
+  { href: "/tools/charging-time-calculator/", title: "Calculadora de Tempo de Carga", description: "Estime o tempo de carga a partir de solar ou rede eletrica." },
+  { href: "/tools/voltage-drop-calculator/", title: "Calculadora de Queda de Voltagem", description: "Dimensione extensoes de fio para minimizar queda de voltagem." },
+  { href: "/tools/dc-cable-loss-calculator/", title: "Calculadora de Perda em Cabo DC", description: "Calcule perdas de fiacao em conexoes DC." },
+];
+
+const presetAppliances = [
+  { name: "Refrigerator", runningW: 150, surgeW: 600 }, { name: "Freezer", runningW: 120, surgeW: 500 },
+  { name: "Wi-Fi Router", runningW: 12, surgeW: 12 }, { name: "LED Light", runningW: 10, surgeW: 10 },
+  { name: "Laptop", runningW: 60, surgeW: 90 }, { name: "TV", runningW: 100, surgeW: 150 },
+  { name: "CPAP Machine", runningW: 40, surgeW: 80 }, { name: "Fan", runningW: 50, surgeW: 75 },
+  { name: "Phone Charger", runningW: 15, surgeW: 15 }, { name: "Microwave", runningW: 1000, surgeW: 1500 },
+];
+---
+
+<CalculatorLayout
+  title="Calculadora de Tempo de Funcionamento de Estacao de Energia Portatil | Battery Calculators"
+  description="Calcule quanto tempo uma estacao de energia portatil vai rodar seus eletrodomesticos durante um corte de energia. Estime o tempo de funcionamento, compare tamanhos de estacoes e planeje energia de backup para acampamento, emergencias e uso off-grid."
+  faqItems={faqItems}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+  relatedCalculators={relatedCalculators}
+  commonMistakes={commonMistakes}
+  relatedArticles={relatedArticles}
+  lang="pt"
+>
+  <PowerOutageForm
+    presetAppliances={presetAppliances}
+    defaultBackupHours={8}
+    defaultVoltage="24"
+    defaultLoadsDescription="Cargas comuns de estacao de energia portatil pre-carregadas. Adicione seus dispositivos reais para ver o tempo de funcionamento preciso."
+    defaultLoads={[{ name: "Refrigerator", quantity: 1 }, { name: "Wi-Fi Router", quantity: 1 }, { name: "LED Light", quantity: 2 }]}
+  />
+
+  <section class="mb-16 border-t border-hairline pt-12">
+    <FormulaBox title="Fórmulas Matemáticas">
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Total Funcionamento W = Σ (Eletrodoméstico Funcionamento W × Quantidade)</div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Surto W = Maior Surto de Eletrodoméstico Único + Outras Cargas em Funcionamento</div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Energia Necessária (Wh) = (Funcionamento W × Horas) / Eficiência do Inversor × (1 + Margem de Segurança)</div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Bateria Ah = Wh Necessários / (Voltagem da Bateria × Profundidade de Descarga)</div>
+      <p class="text-xs text-muted mt-4">Para estações de energia portáteis, a Voltagem da Bateria e DoD são internas — compare a Energia Necessária com a classificação Wh utilizável da estação.</p>
+    </FormulaBox>
+
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">Fórmulas e Exemplos Resolvidos</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample
+        number={1}
+        title="Carregamento de Telefone e Dispositivos Pequenos"
+        scenario="Carregar dois telefones e rodar um roteador Wi-Fi durante um apagão noturno (6 horas)."
+        inputs={[
+          { label: "Carregadores de Telefone ×2", value: "15W cada = 30W total" },
+          { label: "Roteador Wi-Fi", value: "12W" },
+          { label: "Duração do Backup", value: "6 horas" },
+        ]}
+        steps={[
+          { label: "Passo 1: Carga total em funcionamento", formula: "30W + 12W", result: "42W" },
+          { label: "Passo 2: Energia para 6 horas", formula: "42W × 6h = 252 Wh", result: "252 Wh" },
+          { label: "Passo 3: Após eficiência do inversor (80%)", formula: "252 / 0,80", result: "315 Wh" },
+          { label: "Passo 4: Com 20% de margem de segurança", formula: "315 × 1,20", result: "378 Wh" },
+        ]}
+        answer="Uma estação de energia portátil de 400Wh fornece capacidade ampla para carregamento de telefone e Wi-Fi durante um apagão noturno de 6 horas."
+        interpretation="Cargas de dispositivos pequenos são fáceis de dar backup — mesmo estações compactas as manejam confortavelmente."
+      />
+      <WorkedExample
+        number={2}
+        title="Configuração de Trabalho com Notebook"
+        scenario="Manter um notebook e uma luminária de mesa funcionando durante um apagão diurno de trabalho (4 horas)."
+        inputs={[
+          { label: "Notebook", value: "60W" },
+          { label: "Luminária de Mesa LED", value: "10W" },
+          { label: "Duração do Backup", value: "4 horas" },
+        ]}
+        steps={[
+          { label: "Passo 1: Carga total em funcionamento", formula: "60W + 10W", result: "70W" },
+          { label: "Passo 2: Energia para 4 horas", formula: "70W × 4h = 280 Wh", result: "280 Wh" },
+          { label: "Passo 3: Após eficiência do inversor (80%)", formula: "280 / 0,80", result: "350 Wh" },
+          { label: "Passo 4: Com 20% de margem de segurança", formula: "350 × 1,20", result: "420 Wh" },
+        ]}
+        answer="Uma estação de energia portátil de 400–500Wh cobre uma configuração de trabalho com notebook para um apagão de meio período."
+        interpretation="Notebooks são cargas moderadas — planeje pelo menos 400Wh para deixar margem para degradação da bateria."
+      />
+      <WorkedExample
+        number={3}
+        title="Luzes e Ventilador de Acampamento"
+        scenario="Alimentar luzes LED decorativas e um ventilador portátil durante uma noite de acampamento (10 horas)."
+        inputs={[
+          { label: "Luzes LED ×2", value: "10W cada = 20W total" },
+          { label: "Ventilador Portátil", value: "50W" },
+          { label: "Duração do Backup", value: "10 horas" },
+        ]}
+        steps={[
+          { label: "Passo 1: Carga total em funcionamento", formula: "20W + 50W", result: "70W" },
+          { label: "Passo 2: Energia para 10 horas", formula: "70W × 10h = 700 Wh", result: "700 Wh" },
+          { label: "Passo 3: Após eficiência do inversor (80%)", formula: "700 / 0,80", result: "875 Wh" },
+          { label: "Passo 4: Com 20% de margem de segurança", formula: "875 × 1,20", result: "1.050 Wh" },
+        ]}
+        answer="Uma estação de energia portátil de 1.000Wh roda confortavelmente luzes e ventilador durante uma noite completa de acampamento."
+        interpretation="Cargas noturnas somam — uma estação de 1.000Wh é o ponto ideal para conforto de acampamento."
+      />
+    </div>
+  </section>
+
+  <EngineeringDiagram
+    title="Fluxo de Energia da Estação de Energia Portátil"
+    description="A energia flui da bateria DC interna através do inversor para seus eletrodomésticos AC, com perdas em cada etapa de conversão."
+    steps={[
+      { label: "Bateria DC", icon: "battery" },
+      { label: "Proteção BMS", icon: "charge" },
+      { label: "Inversor DC-CA", icon: "inverter" },
+      { label: "Saída CA", icon: "cable" },
+      { label: "Seus Eletrodomésticos", icon: "load" },
+    ]}
+    variant="system"
+  />
+
+  <ComparisonTable
+    title="Comparação de Capacidade de Estações de Energia Portáteis"
+    headers={["Capacidade da Estação", "Wh Utilizável (80% ef.)", "Tempo de Geladeira", "Cargas de Telefone", "Tempo de Notebook", "Ideal Para"]}
+    rows={[
+      ["250 Wh", "200 Wh", "1–2 h", "~13", "~3,3 h", "Telefone e carregamento de dispositivos"],
+      ["500 Wh", "400 Wh", "2–3 h", "~27", "~6,7 h", "Dispositivos pequenos + luzes"],
+      ["1.000 Wh", "800 Wh", "5–6 h", "~53", "~13 h", "Geladeira + dispositivos durante a noite"],
+      ["1.500 Wh", "1.200 Wh", "8–10 h", "~80", "~20 h", "Geladeira + luzes + Wi-Fi"],
+      ["2.000 Wh", "1.600 Wh", "10–12 h", "~107", "~27 h", "Carga essencial completa 12h"],
+      ["2.500 Wh", "2.000 Wh", "13–15 h", "~133", "~33 h", "Backup para apagão prolongado"],
+    ]}
+    caption="Tempos baseados em ciclagem padrão de geladeira (30–50% ciclo de trabalho). Cargas de telefone baseadas em 15Wh por carga. Tempo de notebook a 60W contínuo."
+  />
+
+  <FAQSection items={faqItems} />
+</CalculatorLayout>

@@ -1,0 +1,460 @@
+---
+import CalculatorLayout from '../../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import InputField from '../../../components/InputField.astro';
+import ResultBox from '../../../components/ResultBox.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import RelatedTools from '../../../components/RelatedTools.astro';
+import WorkedExample from '../../../components/WorkedExample.astro';
+import ComparisonTable from '../../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../../components/EngineeringDiagram.astro';
+
+const whatIs = `O Calculador de Dimensionamento de Bateria de Ferry estima a capacidade de bateria necessária para operações de ferry elétrico ou híbrido com base na distância da rota, cronograma, potência de propulsão, cargas hotel e infraestrutura de carregamento. Fornece capacidade instalada, peso da bateria, volume e recomendações de potência de carregamento personalizadas para o perfil operacional do ferry e a química de bateria escolhida. Esta ferramenta ajuda operadores de ferry, arquitetos navais e engenheiros marítimos a avaliar a viabilidade técnica e requisitos de dimensionamento para conversão de ferry elétrico a bateria ou projetos de construção nova.`;
+
+const whyItMatters = [
+  "A eletrificação de ferry é o segmento de maior crescimento na adoção de baterias marítimas — mais de 300 ferrys elétricos a bateria estão em operação ou encomendados globalmente até meados de 2026.",
+  "Dimensionamento incorreto da bateria limita o alcance elétrico (forçando backup diesel) ou adiciona peso e custo desnecessários — dimensionamento preciso é crítico para a viabilidade do projeto.",
+  "A estratégia de carregamento afeta fundamentalmente o tamanho da bateria: carregamento oportunista em ambos os terminais pode reduzir a capacidade necessária em 50–70% comparado ao carregamento fim do dia.",
+  "A seleção da química da bateria (LFP vs NMC) afeta a vida útil dos ciclos, segurança, peso e custo total de propriedade — ferrys com ciclos profundos diários favorecem fortemente o LFP.",
+  "A eletrificação de ferry elimina emissões portuárias, se qualifica para descontos em tarifas portuárias verdes e melhora a qualidade do ar em comunidades costeiras e ambientes de fjord."
+];
+
+const practicalApplications = [
+  { title: "Viabilidade de Eletrificação de Ferry", description: "Avalie se uma rota específica de ferry pode ser atendida por operação elétrica a bateria com base na distância, cronograma e perfil de carga." },
+  { title: "Planejamento de Infraestrutura de Carregamento", description: "Determine a potência de carregamento necessária do lado costeiro e o tempo de retorno para suportar operações de ferry elétrico a bateria." },
+  { title: "Especificação de Bateria para Construção Nova", description: "Especifique capacidade, peso e volume do sistema de bateria para projetos de construção nova de ferry para informar arquitetura naval e cálculos de estabilidade." },
+  { title: "Dimensionamento de Ferry Híbrido", description: "Dimensione o componente de bateria de um ferry híbrido diesel-elétrico para economia ideal de combustível mantendo confiabilidade na rota." }
+];
+
+const expertNotes: { title: string; variant: 'warning' | 'engineering' | 'info'; content: string }[] = [
+  {
+    title: "Premissas de Eficiência de Propulsão",
+    variant: "engineering",
+    content: "Este calculador aplica um fator de eficiência de 85% na transmissão, considerando eficiência do motor, perdas no inversor, perdas na caixa de engrenagens (se aplicável) e interação hélice-casco. A eficiência real da transmissão varia por tipo de embarcação: propulsores azimutais 78–82%, hélice convencional 82–88%, jato d'água 85–90%. O padrão de 85% representa um sistema de propulsão de ferry bem otimizado."
+  },
+  {
+    title: "Impacto da Estratégia de Carregamento",
+    variant: "info",
+    content: "A estratégia de carregamento é o fator de dimensionamento mais influente para bateria de ferry. Carregamento fim do dia exige baterias grandes o suficiente para todas as viagens diárias. Carregamento no terminal (retorno de 30 min) dimensiona baterias para viagens individuais com recarga rápida. Carregamento oportunista em ambos os terminais permite baterias menores suplementadas por carregamento de alta potência contínuo durante chamadas breves de porto. A escolha afeta fundamentalmente o custo de capital, peso e requisitos de infraestrutura."
+  },
+  {
+    title: "Limitações",
+    variant: "warning",
+    content: "Esta ferramenta fornece estimativas educacionais para análise preliminar de viabilidade. Não considera resistência hidrodinâmica específica da embarcação, impactos de roteamento meteorológico, correntes de maré, variações na carga de passageiros ou requisitos de gerenciamento térmico da bateria. O projeto real do sistema de bateria deve cumprir IEC 62619, notação de bateria DNV e requisitos da sociedade classificadora."
+  }
+];
+
+const trustSection = {
+  text: "Este calculador usa metodologia de dimensionamento baseada em física alinhada com diretrizes de notação de bateria DNV e estudos de caso publicados de eletrificação de ferry de operações nórdicas.",
+  link: { label: "Veja nossa metodologia e derivações de fórmulas", href: "/methodology/" }
+};
+
+const references = [
+  { title: "DNV — Previsão Marítima até 2050: Ferrys Elétricos a Bateria", url: "https://www.dnv.com/maritime/forecast/", source: "DNV" },
+  { title: "CE Delft — Ferrys Elétricos a Bateria: Estado da Arte", url: "https://www.cedelft.eu/", source: "CE Delft" },
+  { title: "IEA — Previsão Global de Veículos Elétricos 2024: Eletrificação Marítima", url: "https://www.iea.org/reports/global-ev-outlook-2024", source: "Agência Internacional de Energia" },
+  { title: "Lloyd's Register — Avaliação de Tecnologia de Ferry de Emissão Zero", url: "https://www.lr.org/", source: "Lloyd's Register" }
+];
+
+const faqItems = [
+  {
+    question: "Qual é a distância máxima de ferry adequada para operação elétrica a bateria?",
+    answer: "A tecnologia atual de bateria suporta rotas de ferry elétrico a bateria de até aproximadamente 50–80 nm (90–150 km) com uma carga, dependendo da velocidade da embarcação, requisitos de potência e capacidade da bateria. Com carregamento oportunista nos terminais, rotas de 10–30 km são mais comuns para operação totalmente elétrica. Rotas mais longas exigem sistemas híbridos diesel-elétricos ou células combustíveis de hidrogênio como fontes de energia suplementares."
+  },
+  {
+    question: "Como a estratégia de carregamento afeta o tamanho da bateria?",
+    answer: "A estratégia de carregamento é o fator dominante de dimensionamento. Carregamento fim do dia exige baterias dimensionadas para todas as viagens diárias (ex: 8 viagens × 500 kWh = 4.000 kWh). Carregamento no terminal (retorno de 30 min) dimensiona para viagens individuais (500 kWh) com recarga rápida. Carregamento oportunista em ambos os terminais pode reduzir a capacidade da bateria para 70% da energia de viagem individual (350 kWh) com potência de carregamento muito alta. O trade-off é custo de capital da bateria vs custo de infraestrutura de carregamento."
+  },
+  {
+    question: "Devo escolher LFP ou NMC para bateria de ferry?",
+    answer: "LFP (LiFePO4) é fortemente recomendado para ferrys. Ferrys tipicamente ciclam diariamente (365 ciclos/ano), e a vida útil de 5.000+ ciclos do LFP a 90% DoD fornece 13+ anos de serviço. Os 2.000 ciclos do NMC a 80% DoD podem exigir substituição de bateria no meio da vida útil. O LFP também oferece estabilidade térmica superior — crítica para segurança de embarcações de passageiros — e menor custo por ciclo, apesar de sua menor densidade energética."
+  },
+  {
+    question: "Qual potência de carregamento é necessária para retorno de 30 minutos?",
+    answer: "Para um ferry que requer 1.000 kWh por viagem com carregamento no terminal de 30 minutos, a potência de carregamento necessária é de aproximadamente 2.000–2.400 kW (considerando 85–90% de eficiência de carregamento e 20% de margem). Isso exige infraestrutura de carregamento DC de alta tensão (tipicamente 1.000V+) e conexões de rede dedicadas. Muitos portos estão instalando sistemas de carregamento de 1–5 MW para suportar operações de ferry elétrico a bateria."
+  },
+  {
+    question: "Como a velocidade da embarcação afeta os requisitos de bateria?",
+    answer: "A potência de propulsão escala aproximadamente com o cubo da velocidade (P ∝ V³). Dobrar a velocidade requer aproximadamente 8× a potência e energia. Reduzir a velocidade do ferry de 20 km/h para 15 km/h pode reduzir os requisitos de capacidade da bateria em aproximadamente 55%. Muitos ferrys elétricos a bateria bem-sucedidos operam em velocidades reduzidas (15–20 km/h) para otimizar o dimensionamento da bateria e reduzir custos de infraestrutura."
+  },
+  {
+    question: "E o impacto do peso da bateria na estabilidade do ferry?",
+    answer: "O peso da bateria é crítico para a estabilidade do ferry e capacidade de carga. Um sistema de bateria LFP de 4.000 kWh pesa aproximadamente 26.000 kg — significativo, mas gerenciável na maioria dos projetos de ferry. Posições de montagem baixas (abaixo do convés de automóveis) melhoram a estabilidade ao reduzir o centro de gravidade. Arquitetos navais devem verificar estabilidade intacta e danificada conforme SOLAS e regras da sociedade classificadora após adicionar o peso da bateria."
+  },
+  {
+    question: "Ferrys existentes podem ser convertidos para elétricos a bateria?",
+    answer: "Sim, muitas conversões bem-sucedidas foram concluídas, particularmente na Noruega (MF Ampere, MF Bastø Electric). A viabilidade da conversão depende da capacidade de peso disponível, volume para instalação da bateria e compatibilidade do sistema elétrico. Tipicamente, 10–20% do peso morto existente pode ser alocado para baterias. A conversão híbrida diesel-elétrica (eletrificação parcial) é mais comum do que totalmente elétrica a bateria para projetos de retrofit."
+  },
+  {
+    question: "Quais são os custos operacionais típicos de ferry elétrico a bateria?",
+    answer: "Ferrys elétricos a bateria tipicamente alcançam 50–80% menores custos de energia comparados a equivalentes a diesel, dependendo dos preços locais de eletricidade. Um ferry que consome 1.000 kWh por viagem a $0,12/kWh paga $120 por viagem vs $750 por viagem para diesel (150 litros a $5/litro). Custos de manutenção também diminuem 30–50% devido a menos partes móveis e eliminação de trocas de óleo do motor, manutenção de sistema de exaustão e manutenção do sistema de combustível."
+  }
+];
+
+const relatedArticles = [
+  { title: "Ferrys Elétricos a Bateria: Considerações de Projeto, Benefícios e Desafios", href: "/learn/battery-electric-ferries-explained/" },
+  { title: "Sistemas de Armazenamento de Energia de Embarcação Explicados", href: "/learn/vessel-energy-storage-systems-explained/" },
+];
+
+const commonMistakes = [
+  "Ignorar resistência hidrodinâmica específica da rota — estimativas de potência em água calma podem estar 20–40% abaixo do consumo real em correntes de maré ou mares agitados.",
+  "Usar dimensionamento de carregamento fim do dia sem avaliar carregamento oportunista — carregamento no terminal pode reduzir a capacidade de bateria necessária em 50–70%.",
+  "Selecionar NMC ao invés de LFP para rotas de ferry com alto ciclo — ciclos profundos diários (365 ciclos/ano) favorecem a vida útil de 5.000+ ciclos do LFP sobre os 2.000 do NMC.",
+  "Subestimar a variabilidade da carga hotel — mudanças no número de passageiros, cargas sazonais de HVAC e picos da cozinha podem aumentar a demanda hotel em 30–50% acima da média.",
+  "Não considerar o impacto do peso da bateria na estabilidade da embarcação e na carga — uma bateria LFP de 4.000 kWh pesa ~26.000 kg, exigindo verificação de estabilidade.",
+  "Ignorar a capacidade de conexão de rede da infraestrutura de carregamento — um carregador costeiro de 2 MW requer infraestrutura de rede de média tensão dedicada que a maioria dos portos não possui.",
+  "Dimensionar bateria para uma única travessia sem considerar a capacidade degradada ao longo da vida útil da embarcação — uma margem de degradação de 20% garante desempenho no fim da vida.",
+  "Usar eficiência de transmissão genérica ao invés de valores específicos da embarcação — propulsores azimutais (78–82%) são menos eficientes que hélices convencionais (82–88%).",
+  "Omitir requisitos de gerenciamento térmico da bateria em operações de ferry tropicais — temperaturas ambientes acima de 35°C exigem sistemas de resfriamento ativos."
+];
+
+const relatedCalculators = [
+  { href: "/tools/vessel-energy-storage-calculator/", title: "Calculador de Armazenamento de Energia de Embarcação", description: "Determine a capacidade ideal de armazenamento de energia para propulsão e cargas hotel de embarcação." },
+  { href: "/tools/marine-battery-sizing-calculator/", title: "Calculador de Dimensionamento de Bateria Marítima", description: "Dimensione bancos de bateria para cargas hotel em embarcações recreativas e comerciais pequenas." },
+  { href: "/marine/", title: "Hub de Eletrificação Marítima", description: "Explore todas as ferramentas e recursos de descarbonização marítima." },
+];
+
+const chargingOptions = [
+  { label: 'Apenas Fim do Dia', value: 'end_of_day' },
+  { label: 'Carregamento no Terminal', value: 'terminal' },
+  { label: 'Carregamento Oportunista', value: 'opportunity' },
+];
+
+const chemistryOptions = [
+  { label: 'LFP (LiFePO4)', value: 'lfp' },
+  { label: 'NMC (Níquel Manganês Cobalto)', value: 'nmc' },
+];
+---
+
+<CalculatorLayout
+  title="Calculador de Dimensionamento de Bateria de Ferry | Battery Calculators"
+  description="Estime capacidade, peso e requisitos de carregamento da bateria para operações de ferry elétrico ou híbrido com base na distância da rota, cronograma e perfil de carga."
+  faqItems={faqItems}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+  relatedCalculators={relatedCalculators}
+  commonMistakes={commonMistakes}
+  relatedArticles={relatedArticles}
+  lang="pt"
+>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Parâmetros da Rota e Embarcação</h3>
+      <div class="flex flex-col gap-6">
+        <InputField id="route-distance" label="Distância da Rota" value={15} min={1} max={200} step={0.5} unit="km" helperText="Distância de travessia ida." />
+        <InputField id="trips-per-day" label="Viagens por Dia" value={8} min={1} max={50} step={1} unit="viagens" helperText="Total de travessias ida por dia (ambas direções)." />
+        <InputField id="avg-speed" label="Velocidade Média" value={18} min={5} max={40} step={0.5} unit="km/h" helperText="Velocidade de serviço durante travessia (nós × 1,852 = km/h)." />
+        <InputField id="prop-power" label="Potência de Propulsão" value={500} min={10} max={5000} step={10} unit="kW" helperText="Potência contínua de propulsão na velocidade de serviço." />
+        <InputField id="hotel-load" label="Carga Hotel" value={200} min={0} max={2000} step={10} unit="kW" helperText="HVAC, iluminação, cozinha e sistemas de passageiros." />
+        <InputField id="charging-opportunity" label="Oportunidade de Carregamento" type="select" value="terminal" options={chargingOptions} helperText="Onde e quando as baterias podem ser recarregadas." />
+        <InputField id="reserve-margin" label="Margem de Reserva" value={20} min={0} max={50} step={1} unit="%" helperText="Capacidade extra para incerteza de carga e degradação." />
+        <InputField id="battery-chemistry" label="Química da Bateria" type="select" value="lfp" options={chemistryOptions} helperText="LFP recomendado para aplicações de ferry com alto ciclo." />
+      </div>
+    </CalculatorCard>
+
+    <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Resultados do Dimensionamento da Bateria</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <ResultBox label="Energia por Viagem" value="850 kWh" suffix="Propulsão + hotel para travessia individual" variant="primary" id="result-energy-per-trip" />
+          <ResultBox label="Demanda Energética Diária" value="6.800 kWh" suffix="Total de energia elétrica diária necessária" id="result-daily-energy" />
+          <ResultBox label="Capacidade Usável Necessária" value="850 kWh" suffix="Energia utilizável por ciclo de carga" id="result-usable-capacity" />
+          <ResultBox label="Capacidade Instalada Recomendada" value="1.172 kWh" suffix="Considerando DoD e margem de reserva" id="result-installed-capacity" />
+          <ResultBox label="Peso Estimado da Bateria" value="7.619 kg" suffix="Peso total do pacote de bateria instalado" id="result-battery-weight" />
+          <ResultBox label="Volume Estimado da Bateria" value="6,4 m³" suffix="Espaço necessário para instalação da bateria" id="result-battery-volume" />
+          <ResultBox label="Potência de Carregamento Sugerida" value="2.500 kW" suffix="Capacidade de carregamento costeira necessária" id="result-charging-power" />
+          <ResultBox label="Janela de Carregamento" value="30 min" suffix="Tempo disponível para recarga da bateria" id="result-charging-window" />
+        </div>
+      </div>
+      <div class="border-t border-hairline pt-6">
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">Avaliação da Estratégia de Carregamento</h4>
+        <p class="text-body-sm text-muted" id="charging-assessment">Carregamento no terminal a 2.500 kW por 30 minutos permite operação de bateria com recarga completa entre travessias.</p>
+      </div>
+    </CalculatorCard>
+  </div>
+
+  <section class="mb-16">
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-4 uppercase tracking-wider">Detalhamento Energético Diário</h3>
+      <p class="text-body-sm text-muted mb-6">Consumo de energia por viagem e total diário com base no cronograma atual.</p>
+      <div id="energy-breakdown-chart" class="flex flex-col gap-3"></div>
+      <div class="flex items-center gap-4 mt-4 text-caption text-muted">
+        <span class="flex items-center gap-1.5"><span class="w-3 h-3 bg-m-blue-light inline-block"></span> Energia de Propulsão</span>
+        <span class="flex items-center gap-1.5"><span class="w-3 h-3 bg-m-blue-dark inline-block"></span> Energia Carga Hotel</span>
+      </div>
+    </CalculatorCard>
+  </section>
+
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">Fórmulas e Exemplos Resolvidos</h2>
+    <FormulaBox title="Fórmulas Matemáticas">
+      <p>O dimensionamento da bateria é derivado da demanda energética do ferry por viagem e estratégia de carregamento:</p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Tempo de Viagem = Distância / Velocidade</div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Energia de Propulsão = Potência × Tempo × 0,85</div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Energia Hotel = Carga Hotel × Tempo de Viagem</div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Energia por Viagem = Propulsão + Hotel</div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Capacidade Usável = Energia por Viagem × (1 + Reserva%)</div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Capacidade Instalada = Usável / DoD</div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Peso da Bateria = Instalado × Densidade Energética</div>
+      <p class="mt-4">Eficiência da transmissão: 85% (motor + inversor + hélice)<br/>LFP: 6,5 kg/kWh instalado, 90% DoD, 5000+ ciclos<br/>NMC: 5,0 kg/kWh instalado, 80% DoD, 2000 ciclos</p>
+    </FormulaBox>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample
+        number={1}
+        title="Ferry de Comutação de 50 Passageiros"
+        scenario="Travessia curta de comutação com alto número de viagens diárias, carregamento no terminal entre viagens."
+        inputs={[
+          { label: "Distância da Rota", value: "8 km" },
+          { label: "Tempo de Travessia", value: "30 min (0,5 h)" },
+          { label: "Potência de Propulsão", value: "2.000 kW" },
+          { label: "Carga Hotel", value: "150 kW" },
+          { label: "Viagens por Dia", value: "24" },
+          { label: "Carregamento", value: "Terminal (retorno 30 min)" },
+          { label: "Química", value: "LFP" },
+        ]}
+        steps={[
+          { label: "Tempo de travessia", formula: "8 km / 16 km/h = 0,5 h", result: "30 minutos" },
+          { label: "Energia de propulsão", formula: "2.000 × 0,5 × 0,85", result: "850,0 kWh" },
+          { label: "Energia hotel", formula: "150 × 0,5", result: "75,0 kWh" },
+          { label: "Energia por viagem", formula: "850,0 + 75,0", result: "925,0 kWh" },
+          { label: "Energia diária", formula: "925,0 × 24", result: "22.200 kWh" },
+          { label: "Capacidade usável (20% reserva)", formula: "925,0 × 1,20", result: "1.110,0 kWh" },
+          { label: "Capacidade instalada (LFP 90% DoD)", formula: "1.110,0 / 0,90", result: "1.233,3 kWh" },
+          { label: "Peso da bateria", formula: "1.233,3 × 6,5", result: "8.017 kg" },
+          { label: "Potência de carregamento (30-min)", formula: "1.110,0 / 0,5 × 1,2", result: "2.664 kW" },
+        ]}
+        answer="Um ferry de comutação de 50 passageiros precisa de uma bateria LFP de 1.233 kWh (8.017 kg) com 2.664 kW de carregamento costeiro para retornos de 30 minutos no terminal."
+        interpretation="Altos números de viagens combinam a demanda energética rapidamente. O carregamento no terminal mantém a bateria dimensionada para uma viagem individual em vez de todas as viagens diárias, mas exige potência de carregamento muito alta."
+        variant="marine"
+      />
+
+      <WorkedExample
+        number={2}
+        title="Ferry de Automóveis de 200 Passageiros"
+        scenario="Ferry maior de transporte de automóveis em rota de média distância com 1 hora de travessia e carregamento no terminal."
+        inputs={[
+          { label: "Distância da Rota", value: "18 km" },
+          { label: "Tempo de Travessia", value: "1 hora" },
+          { label: "Potência de Propulsão", value: "5.000 kW" },
+          { label: "Carga Hotel", value: "400 kW" },
+          { label: "Viagens por Dia", value: "12" },
+          { label: "Carregamento", value: "Terminal (retorno 30 min)" },
+          { label: "Química", value: "LFP" },
+        ]}
+        steps={[
+          { label: "Tempo de travessia", formula: "18 km / 18 km/h = 1,0 h", result: "60 minutos" },
+          { label: "Energia de propulsão", formula: "5.000 × 1,0 × 0,85", result: "4.250,0 kWh" },
+          { label: "Energia hotel", formula: "400 × 1,0", result: "400,0 kWh" },
+          { label: "Energia por viagem", formula: "4.250,0 + 400,0", result: "4.650,0 kWh" },
+          { label: "Energia diária", formula: "4.650,0 × 12", result: "55.800 kWh" },
+          { label: "Capacidade usável (20% reserva)", formula: "4.650,0 × 1,20", result: "5.580,0 kWh" },
+          { label: "Capacidade instalada (LFP 90% DoD)", formula: "5.580,0 / 0,90", result: "6.200,0 kWh" },
+          { label: "Peso da bateria", formula: "6.200,0 × 6,5", result: "40.300 kg" },
+          { label: "Potência de carregamento (30-min)", formula: "5.580,0 / 0,5 × 1,2", result: "13.392 kW" },
+        ]}
+        answer="Um ferry de automóveis de 200 passageiros requer uma bateria LFP de 6.200 kWh (40.300 kg) com aproximadamente 13,4 MW de carregamento costeiro para retornos de 30 minutos."
+        interpretation="Ferrys de automóveis têm grandes cargas de propulsão e demandas hotel. Nessa escala, carregamento oportunista em ambos os terminais se torna atrativo para reduzir o tamanho da bateria. Uma abordagem híbrida diesel-elétrica pode também ser justificada para travessias mais longas."
+        variant="marine"
+      />
+
+      <WorkedExample
+        number={3}
+        title="Ferry Elétrico de Curta Distância"
+        scenario="Travessia urbana muito curta com carregamento rápido no cais — minimiza tamanho da bateria enquanto maximiza frequência de viagens."
+        inputs={[
+          { label: "Distância da Rota", value: "2 km" },
+          { label: "Tempo de Travessia", value: "15 min (0,25 h)" },
+          { label: "Potência de Propulsão", value: "500 kW" },
+          { label: "Carga Hotel", value: "80 kW" },
+          { label: "Viagens por Dia", value: "40" },
+          { label: "Carregamento", value: "Oportunista (carga rápida 5 min)" },
+          { label: "Química", value: "LFP" },
+        ]}
+        steps={[
+          { label: "Tempo de travessia", formula: "2 km / 8 km/h = 0,25 h", result: "15 minutos" },
+          { label: "Energia de propulsão", formula: "500 × 0,25 × 0,85", result: "106,3 kWh" },
+          { label: "Energia hotel", formula: "80 × 0,25", result: "20,0 kWh" },
+          { label: "Energia por viagem", formula: "106,3 + 20,0", result: "126,3 kWh" },
+          { label: "Energia diária", formula: "126,3 × 40", result: "5.050 kWh" },
+          { label: "Capacidade usável (30% reserva para ciclo rápido)", formula: "126,3 × 1,30", result: "164,1 kWh" },
+          { label: "Capacidade instalada (LFP 90% DoD)", formula: "164,1 / 0,90", result: "182,4 kWh" },
+          { label: "Peso da bateria", formula: "182,4 × 6,5", result: "1.185 kg" },
+          { label: "Potência de carga rápida (5-min)", formula: "164,1 / 0,083 × 1,2", result: "2.367 kW" },
+        ]}
+        answer="Um ferry de curta distância precisa apenas de 182 kWh de bateria LFP (1.185 kg) com um carregador rápido de 2,4 MW para retornos de 5 minutos no cais."
+        interpretation="Carregamento oportunista com retornos muito curtos reduz drasticamente o tamanho e peso da bateria — ideal para táxis aquáticos urbanos e serviços de transferência. O trade-off é custo maior de infraestrutura de carregamento por embarcação."
+        variant="marine"
+      />
+    </div>
+  </section>
+
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Premissas e Limitações</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <CalculatorCard>
+        <h4 class="text-primary font-bold text-sm mb-3">Comparação de Química de Bateria</h4>
+        <ul class="text-body-sm text-muted flex flex-col gap-2">
+          <li class="flex gap-2"><span class="text-m-blue-light shrink-0">→</span> LFP: 6,5 kg/kWh instalado, 90% DoD, 5.000+ ciclos, segurança térmica superior</li>
+          <li class="flex gap-2"><span class="text-m-blue-light shrink-0">→</span> NMC: 5,0 kg/kWh instalado, 80% DoD, 2.000 ciclos, 20–30% maior densidade energética</li>
+          <li class="flex gap-2"><span class="text-m-blue-light shrink-0">→</span> LFP recomendado para ferrys devido a ciclos profundos diários e requisitos de segurança de embarcação de passageiros</li>
+          <li class="flex gap-2"><span class="text-m-blue-light shrink-0">→</span> NMC pode ser adequado para ferrys rápidos sensíveis ao peso onde o volume é restrito</li>
+        </ul>
+      </CalculatorCard>
+      <CalculatorCard>
+        <h4 class="text-primary font-bold text-sm mb-3">O Que Este Calculador Não Inclui</h4>
+        <ul class="text-body-sm text-muted flex flex-col gap-2">
+          <li class="flex gap-2"><span class="text-m-red shrink-0">✗</span> Resistência hidrodinâmica ou efeitos de clima/corrente no consumo de energia</li>
+          <li class="flex gap-2"><span class="text-m-red shrink-0">✗</span> Variações na carga passageiros/veículos e mudanças sazonais de cronograma</li>
+          <li class="flex gap-2"><span class="text-m-red shrink-0">✗</span> Requisitos de sistema de gerenciamento térmico da bateria e carga de resfriamento</li>
+          <li class="flex gap-2"><span class="text-m-red shrink-0">✗</span> Capacidade de conexão de rede costeira e custos de infraestrutura de carregamento</li>
+          <li class="flex gap-2"><span class="text-m-red shrink-0">✗</span> Degradação da bateria ao longo da vida útil da embarcação e agendamento de substituição</li>
+        </ul>
+      </CalculatorCard>
+    </div>
+  </section>
+
+  <EngineeringDiagram title="Sistema de Potência de Ferry Elétrico" description="Pacote de bateria alimenta motores elétricos com carregamento rápido costeiro entre viagens" variant="system" steps={[{ label: "Carregamento Costeiro", icon: "charge" }, { label: "Pacote de Bateria", icon: "battery" }, { label: "Eletrônica de Potência", icon: "inverter" }, { label: "Motores Elétricos", icon: "load" }]} />
+
+  <ComparisonTable title="Configurações de Ferry Elétrico" headers={["Tipo de Ferry", "Tamanho Bateria", "Tempo Travessia", "Tempo Carregamento", "Viagens Diárias"]} rows={[["Comutação (50 pax)", "1–2 MWh", "15–30 min", "10–15 min", "20–40"], ["Ferry Automóveis (200 pax)", "5–10 MWh", "45–90 min", "20–30 min", "10–15"], ["Barco Turístico", "200–500 kWh", "2–4 horas", "1–2 horas", "3–6"], ["Ro-Pax (500 pax)", "15–30 MWh", "2–4 horas", "30–60 min", "6–10"]]} caption="O dimensionamento da bateria é impulsionado pela distância da viagem, velocidade e janelas de carregamento disponíveis" />
+
+  <FAQSection items={faqItems} />
+  <RelatedTools tools={relatedCalculators} />
+
+  <div class="bg-surface-card border border-hairline p-6 mt-8 mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div class="max-w-xl">
+      <h3 class="text-title-sm text-primary mb-1">Precisa de uma revisão de engenharia mais aprofundada?</h3>
+      <p class="text-body-sm text-muted font-light">Use este calculador para estimativas preliminares. Para análise específica de embarcação, revisão de dimensionamento de bateria, planejamento de redução de emissões ou suporte à viabilidade híbrida, entre em contato com a equipe de suporte de engenharia da Battery Calculators.</p>
+    </div>
+    <a href="/marine/#marine-advisory" class="btn-primary text-xs px-6 py-3 shrink-0 whitespace-nowrap">Solicitar Suporte de Engenharia</a>
+  </div>
+
+  <script>
+    import { calculateFerryBatterySizing } from '../../../utils/calculators';
+
+    const routeDistanceInput = document.getElementById('route-distance') as HTMLInputElement;
+    const tripsPerDayInput = document.getElementById('trips-per-day') as HTMLInputElement;
+    const avgSpeedInput = document.getElementById('avg-speed') as HTMLInputElement;
+    const propPowerInput = document.getElementById('prop-power') as HTMLInputElement;
+    const hotelLoadInput = document.getElementById('hotel-load') as HTMLInputElement;
+    const chargingOppInput = document.getElementById('charging-opportunity') as HTMLSelectElement;
+    const reserveMarginInput = document.getElementById('reserve-margin') as HTMLInputElement;
+    const batteryChemInput = document.getElementById('battery-chemistry') as HTMLSelectElement;
+
+    function getResultElements(id: string) {
+      const box = document.getElementById(id);
+      return {
+        value: box?.querySelector('.text-display-md, .text-title-lg') as HTMLElement,
+        suffix: box?.querySelector('.text-caption') as HTMLElement,
+      };
+    }
+
+    const energyPerTrip = getResultElements('result-energy-per-trip');
+    const dailyEnergy = getResultElements('result-daily-energy');
+    const usableCapacity = getResultElements('result-usable-capacity');
+    const installedCapacity = getResultElements('result-installed-capacity');
+    const batteryWeight = getResultElements('result-battery-weight');
+    const batteryVolume = getResultElements('result-battery-volume');
+    const chargingPower = getResultElements('result-charging-power');
+    const chargingWindow = getResultElements('result-charging-window');
+    const chargingAssessmentEl = document.getElementById('charging-assessment');
+
+    function fmt(n: number, decimals = 0): string {
+      return n.toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+    }
+
+    function updateCalculations() {
+      const routeDistance = parseFloat(routeDistanceInput.value) || 15;
+      const tripsPerDay = parseFloat(tripsPerDayInput.value) || 8;
+      const avgSpeed = parseFloat(avgSpeedInput.value) || 18;
+      const propPower = parseFloat(propPowerInput.value) || 500;
+      const hotelLoad = parseFloat(hotelLoadInput.value) || 200;
+      const chargingOpp = chargingOppInput.value as 'end_of_day' | 'terminal' | 'opportunity';
+      const reserveMargin = parseFloat(reserveMarginInput.value) || 20;
+      const batteryChem = batteryChemInput.value as 'lfp' | 'nmc';
+
+      const result = calculateFerryBatterySizing({
+        routeDistanceKm: routeDistance,
+        tripsPerDay,
+        averageSpeedKmh: avgSpeed,
+        propulsionPowerKw: propPower,
+        hotelLoadKw: hotelLoad,
+        chargingOpportunity: chargingOpp,
+        reserveMarginPercent: reserveMargin,
+        batteryChemistry: batteryChem,
+      });
+
+      if (energyPerTrip.value) energyPerTrip.value.textContent = `${fmt(result.energyPerTripKwh)} kWh`;
+      if (energyPerTrip.suffix) energyPerTrip.suffix.textContent = 'Propulsão + hotel para travessia individual';
+      if (dailyEnergy.value) dailyEnergy.value.textContent = `${fmt(result.dailyEnergyDemandKwh)} kWh`;
+      if (dailyEnergy.suffix) dailyEnergy.suffix.textContent = 'Total de energia elétrica diária necessária';
+      if (usableCapacity.value) usableCapacity.value.textContent = `${fmt(result.usableCapacityKwh)} kWh`;
+      if (usableCapacity.suffix) usableCapacity.suffix.textContent = 'Energia utilizável por ciclo de carga';
+      if (installedCapacity.value) installedCapacity.value.textContent = `${fmt(result.installedCapacityKwh)} kWh`;
+      if (installedCapacity.suffix) installedCapacity.suffix.textContent = 'Considerando DoD e margem de reserva';
+      if (batteryWeight.value) batteryWeight.value.textContent = `${fmt(result.batteryWeightKg)} kg`;
+      if (batteryWeight.suffix) batteryWeight.suffix.textContent = 'Peso total do pacote de bateria instalado';
+      if (batteryVolume.value) batteryVolume.value.textContent = `${fmt(result.batteryVolumeM3, 1)} m³`;
+      if (batteryVolume.suffix) batteryVolume.suffix.textContent = 'Espaço necessário para instalação da bateria';
+      if (chargingPower.value) chargingPower.value.textContent = `${fmt(result.suggestedChargingPowerKw)} kW`;
+      if (chargingPower.suffix) chargingPower.suffix.textContent = 'Capacidade de carregamento costeira necessária';
+      if (chargingWindow.value) chargingWindow.value.textContent = `${fmt(result.chargingWindowMinutes)} min`;
+      if (chargingWindow.suffix) chargingWindow.suffix.textContent = 'Tempo disponível para recarga da bateria';
+      if (chargingAssessmentEl) chargingAssessmentEl.textContent = result.chargingAssessment;
+
+      const chartContainer = document.getElementById('energy-breakdown-chart');
+      if (chartContainer) {
+        const routeDistance = parseFloat(routeDistanceInput.value) || 15;
+        const avgSpeed = parseFloat(avgSpeedInput.value) || 18;
+        const propPower = parseFloat(propPowerInput.value) || 500;
+        const hotelLoad = parseFloat(hotelLoadInput.value) || 200;
+        const tripTime = routeDistance / avgSpeed;
+        const propulsionEnergy = propPower * tripTime * 0.85;
+        const hotelEnergy = hotelLoad * tripTime;
+        const tripEnergy = propulsionEnergy + hotelEnergy;
+        const maxTripEnergy = Math.max(tripEnergy, 1);
+
+        chartContainer.innerHTML = `
+          <div class="flex flex-col gap-2">
+            <div class="flex items-center gap-2">
+              <span class="text-caption text-muted w-20 text-right shrink-0">Viagem ${fmt(tripTime * 60, 0)} min</span>
+              <div class="flex-1 h-6 bg-surface-soft border border-hairline relative overflow-hidden flex">
+                <div class="h-full bg-m-blue-light transition-all duration-300" style="width: ${(propulsionEnergy / maxTripEnergy) * 100}%"></div>
+                <div class="h-full bg-m-blue-dark transition-all duration-300" style="width: ${(hotelEnergy / maxTripEnergy) * 100}%"></div>
+              </div>
+              <span class="text-caption text-primary font-mono w-20 shrink-0">${fmt(tripEnergy)} kWh</span>
+            </div>
+          </div>
+          <div class="grid grid-cols-3 gap-4 mt-4 text-caption text-muted">
+            <div>
+              <span class="text-[10px] text-label-uppercase block mb-1">Propulsão / Viagem</span>
+              <span class="text-primary font-mono">${fmt(propulsionEnergy)} kWh</span>
+            </div>
+            <div>
+              <span class="text-[10px] text-label-uppercase block mb-1">Hotel / Viagem</span>
+              <span class="text-primary font-mono">${fmt(hotelEnergy)} kWh</span>
+            </div>
+            <div>
+              <span class="text-[10px] text-label-uppercase block mb-1">Total Diário</span>
+              <span class="text-primary font-mono">${fmt(tripEnergy * (parseFloat(tripsPerDayInput.value) || 8))} kWh</span>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    [routeDistanceInput, tripsPerDayInput, avgSpeedInput, propPowerInput, hotelLoadInput, chargingOppInput, reserveMarginInput, batteryChemInput].forEach(el => {
+      el.addEventListener('input', updateCalculations);
+    });
+
+    updateCalculations();
+  </script>
+
+</CalculatorLayout>

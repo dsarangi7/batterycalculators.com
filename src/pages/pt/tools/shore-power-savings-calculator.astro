@@ -1,0 +1,635 @@
+---
+import CalculatorLayout from '../../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import InputField from '../../../components/InputField.astro';
+import ResultBox from '../../../components/ResultBox.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import RelatedTools from '../../../components/RelatedTools.astro';
+import WorkedExample from '../../../components/WorkedExample.astro';
+import ComparisonTable from '../../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../../components/EngineeringDiagram.astro';
+
+const whatIs = `O Calculador de Economia de Energia de Costa estima a redução de emissões e economia nos custos operacionais obtidas quando embarcações se conectam à energia de costa (cold ironing) em vez de manter geradores diesel a bordo durante estadias no porto. Quantifica a evitação de combustível, diferenciais de custo, reduções de CO₂, NOx e SOx usando fatores de emissão padrão da indústria. Esta ferramenta ajuda proprietários de embarcações, autoridades portuárias e gestores ambientais a avaliar o caso econômico e ambiental para adoção de energia de costa nas operações anuais de porto de uma frota.`;
+
+const whyItMatters = [
+  "Geradores de embarcação em operação no cais consomem 5.000–50.000+ litros de combustível anualmente por embarcação — a energia de costa elimina essa combustão completamente.",
+  "Emissões portuárias são uma grande fonte de poluição do ar costeiro — NOx e SOx de geradores afetam diretamente comunidades portuárias e conformidade regulatória.",
+  "O regulamento FuelEU Maritime da UE e o framework CII da OMI incentivam a adoção de energia de costa através de créditos de redução de emissões e descontos em tarifas portuárias.",
+  "A energia de costa tipicamente custa 30–60% menos do que a operação com geradores diesel quando a eletricidade da rede é precificada de forma competitiva contra combustível marítimo.",
+  "Quantificar as economias de energia de costa é essencial para decisões de investimento em infraestrutura portuária e planejamento de frota por operadores."
+];
+
+const practicalApplications = [
+  { title: "Investimento em Infraestrutura Portuária", description: "Construa o caso de negócio para instalação de energia de costa quantificando economias anuais de combustível e reduções de emissões nas chamadas de embarcações." },
+  { title: "Planejamento de Energia de Costa de Frota", description: "Avalie quais embarcações de uma frota oferecem maiores economias de energia de costa com base na frequência de chamadas de porto e tempo de cais." },
+  { title: "Otimização de Tarifa Portuária Verde", description: "Quantifique o benefício financeiro da adoção de energia de costa para se qualificar para descontos de 10–30% em tarifas portuárias verdes." },
+  { title: "Estratégia de Conformidade de Emissões", description: "Modele a contribuição da energia de costa para melhoria da classificação CII e conformidade com ECAs (Áreas de Controle de Emissões)." }
+];
+
+const expertNotes: { title: string; variant: 'warning' | 'engineering' | 'info'; content: string }[] = [
+  {
+    title: "Fator de Carga do Gerador",
+    variant: "engineering",
+    content: "Este calculador assume que os geradores operam em carga moderada (60–80% da capacidade nominal) durante estadias no cais, o que é típico para fornecimento de carga hotel. Em cargas menores, o consumo de combustível por kWh aumenta e a eficiência de combustão diminui. A taxa de consumo de combustível padrão do gerador de 200 L/hora representa um diesel auxiliar de média velocidade produzindo aproximadamente 800–1.000 kW de potência elétrica."
+  },
+  {
+    title: "Variabilidade da Intensidade de Carbono da Rede",
+    variant: "info",
+    content: "As reduções de emissões por energia de costa dependem fortemente da intensidade de carbono da rede local. Portos nórdicos com redes hidroelétricas (20–50 g CO₂/kWh) alcançam emissões quase zero com energia de costa. Redes pesadas de carvão (800–1.000 g CO₂/kWh) podem produzir mais CO₂ do que geradores a bordo eficientes. O padrão de 400 g CO₂/kWh representa uma rede global média mista."
+  },
+  {
+    title: "Limitações",
+    variant: "warning",
+    content: "Esta ferramenta fornece apenas estimativas educacionais. Não considera estruturas tarifárias específicas de portos (encargos de demanda, precificação por período de uso), tempo de conexão/desconexão de energia de costa, cargas parasitas de sistemas auxiliares ou o impacto de emissões da construção da infraestrutura de energia de costa. Para relatórios oficiais de emissões, use ferramentas de cálculo certificadas aprovadas pela sua sociedade classificadora."
+  }
+];
+
+const trustSection = {
+  text: "Os fatores de emissão são provenientes do Quarto Estudo de Gases de Efeito Estufa da OMI (2020) e literatura revisada por pares sobre emissões marítimas. Todas as fórmulas e premissas estão documentadas abaixo.",
+  link: { label: "Veja nossa metodologia e derivações de fórmulas", href: "/methodology/" }
+};
+
+const references = [
+  { title: "Quarto Estudo de GEE da OMI 2020", url: "https://www.imo.org/en/OurWork/Environment/Pages/Fourth-IMO-Greenhouse-Gas-Study-2020.aspx", source: "Organização Marítima Internacional" },
+  { title: "IEA — Fatores de Emissão de Rede por País", url: "https://www.iea.org/data-and-statistics/charts/grid-emission-factors-for-electricity-generation", source: "Agência Internacional de Energia" },
+  { title: "Regulamento FuelEU Maritime da UE", url: "https://transport.ec.europa.eu/transport-themes/maritime-transport/fuelEU-maritime_en", source: "Comissão Europeia" },
+  { title: "DNV — Avaliação de Tecnologia de Energia de Costa", url: "https://www.dnv.com/maritime/", source: "DNV" }
+];
+
+const faqItems = [
+  {
+    question: "Quanto combustível os geradores de embarcação consomem no cais?",
+    answer: "Geradores auxiliares típicos consomem 150–400 litros por hora de combustível marítimo dependendo do tamanho do motor e carga elétrica. Uma embarcação atracada 8 horas por chamada com um gerador de 200 L/hora consome 1.600 litros por chamada. Ao longo de 200 chamadas anuais de porto, isso totaliza 320.000 litros — representando tanto um custo significativo quanto uma fonte de emissões que a energia de costa elimina."
+  },
+  {
+    question: "Quando a energia de costa faz sentido econômico?",
+    answer: "A energia de costa é economicamente favorável quando o custo da eletricidade da rede por kWh é menor do que o custo equivalente de combustível por kWh da operação do gerador. Para MGO a US$0,75/L com conteúdo energético de 10 kWh/L e 40% de eficiência do gerador, o custo efetivo da eletricidade do diesel é aproximadamente US$0,19/kWh. Abaixo desse limite, a energia de costa economiza dinheiro. Acima dele, o benefício se desloca para redução de emissões e conformidade regulatória."
+  },
+  {
+    question: "Quais reduções de NOx e SOx a energia de costa fornece?",
+    answer: "A energia de costa elimina 100% das emissões de NOx e SOx relacionadas à combustão a bordo durante estadias no porto. As reduções de NOx variam de 500–5.000 kg/ano por embarcação dependendo das horas de cais e tamanho do gerador. Reduções de SOx seguem o teor de enxofre do combustível — MGO com 0,1% de enxofre produz menos SOx do que HFO, mas a energia de costa elimina todo o SOx independentemente do tipo de combustível. Essas reduções melhoram diretamente a qualidade do ar nas comunidades portuárias."
+  },
+  {
+    question: "Como a intensidade de carbono da rede afeta os benefícios da energia de costa?",
+    answer: "A intensidade de carbono da rede determina o benefício líquido de CO₂ da energia de costa. Uma embarcação que muda de geradores diesel (3,206 kg CO₂/litro MGO, 40% eficiente) para uma rede de 400 g CO₂/kWh alcança aproximadamente 60% de redução de CO₂. Se a rede estiver em 100 g CO₂/kWh (renováveis), a redução excede 90%. Se a rede exceder 800 g CO₂/kWh (pesada de carvão), a energia de costa pode produzir mais CO₂ do que geradores — embora a qualidade do ar local ainda melhore com a eliminação da combustão no lado do porto."
+  },
+  {
+    question: "Quais são as tarifas típicas de energia de costa?",
+    answer: "As tarifas de energia de costa variam significativamente por região: Noruega US$0,08–0,12/kWh (hidroelétrica), Norte da Europa US$0,10–0,18/kWh, Costa Oeste dos EUA US$0,15–0,22/kWh, Ásia US$0,08–0,25/kWh. Alguns portos oferecem tarifas preferenciais para embarcações que se conectam fora do horário de pico. Encargos de demanda e taxas de conexão podem se aplicar além das tarifas de energia."
+  },
+  {
+    question: "Quais embarcações se beneficiam mais da energia de costa?",
+    answer: "Embarcações com frequentes chamadas de porto e longos tempos de cais se beneficiam mais: navios de cruzeiro (8–12 horas no cais, grandes cargas hotel), navios de contêineres (6–24 horas no cais) e ferrys de passageiros (30–60 minutos por chamada, mas muito frequentes). Embarcações com estadias curtas no porto (< 1 hora) podem não conseguir tempo de conexão suficiente para compensar custos de conexão."
+  },
+  {
+    question: "E os custos de infraestrutura de energia de costa?",
+    answer: "A infraestrutura de energia de costa do lado do porto custa US$2–10 milhões por cais dependendo da capacidade de energia e requisitos de conexão da rede local. Os custos de retrofit do lado da embarcação custam US$200.000–1 milhão por embarcação para quadros de comutação, cabos e sistemas de controle. Esses custos de capital não estão incluídos neste calculador, que foca nas economias operacionais anuais. Uma análise de investimento completa deve usar a metodologia do Calculador de ROI de Embarcação Híbrida."
+  },
+  {
+    question: "Posso usar este calculador para conformidade regulatória?",
+    answer: "Esta ferramenta fornece estimativas educacionais para planejamento e análise de viabilidade. Não é um substituto para cálculos de emissões certificados. Para relatórios oficiais de CII da OMI, conformidade MRV da UE ou inventários de emissões de autoridades portuárias, use ferramentas de cálculo aprovadas pela sua sociedade classificadora e estado pavilhão."
+  }
+];
+
+const relatedArticles = [
+  { title: "Energia de Costa vs Geradores Diesel", href: "/learn/shore-power-vs-diesel-generators/" },
+  { title: "O Que é Eletrificação Marítima?", href: "/learn/what-is-marine-electrification/" },
+];
+
+const commonMistakes = [
+  "Usar intensidade de carbono média global da rede em vez da rede local real — redes nórdicas hidroelétricas (20–50 g/kWh) vs redes pesadas de carvão (800+ g/kWh) produzem benefícios de CO₂ vastamente diferentes.",
+  "Ignorar encargos de demanda e taxas de conexão — o custo da eletricidade de energia de costa não é apenas a tarifa de energia; encargos de demanda podem dobrar o custo efetivo por kWh.",
+  "Assumir 100% de disponibilidade de energia de costa — interrupções de infraestrutura portuária, incompatibilidades de tensão e atrasos de conexão reduzem a utilização real para 70–85%.",
+  "Não considerar o tempo de conexão e desconexão da energia de costa — cada conexão leva 15–30 minutos, reduzindo as horas efetivas de cais para chamadas curtas de porto.",
+  "Usar a capacidade nominal do gerador em vez da carga real do cais — geradores no cais tipicamente operam a 60–80% de carga, não na capacidade nominal total.",
+  "Comparar custo de combustível sem incluir a amortização da infraestrutura de energia de costa — uma instalação de US$5M amortizada ao longo de 20 anos adiciona um custo fixo significativo.",
+  "Ignorar descontos em tarifas portuárias verdes — muitos portos oferecem reduções de 10–30% nas taxas de cais para usuários de energia de costa, melhorando o caso econômico além das economias brutas de energia.",
+  "Usar consumo anual de combustível em vez de consumo específico do porto — nem todo combustível da embarcação é consumido no cais; apenas o combustível do tempo de cais é relevante."
+];
+
+const relatedCalculators = [
+  { href: "/tools/marine-co2-reduction-calculator/", title: "Calculador de Redução de CO₂ Marítimo", description: "Quantifique reduções de emissões por hibridização e adoção de energia de costa." },
+  { href: "/tools/hybrid-vessel-roi-calculator/", title: "Calculador de ROI de Embarcação Híbrida", description: "Avalie o retorno financeiro sobre investimento em propulsão híbrida." },
+  { href: "/marine/", title: "Hub de Eletrificação Marítima", description: "Explore todas as ferramentas e recursos de descarbonização marítima." },
+];
+---
+
+<CalculatorLayout
+  title="Calculador de Economia de Energia de Costa | Battery Calculators"
+  description="Estime economias de combustível, redução de CO₂ e benefícios nos custos operacionais ao conectar embarcações à energia de costa em vez de manter geradores no cais."
+  faqItems={faqItems}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+  relatedCalculators={relatedCalculators}
+  commonMistakes={commonMistakes}
+  relatedArticles={relatedArticles}
+  lang="pt"
+>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+
+    <!-- Input Form -->
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Operações Portuárias</h3>
+      <div class="flex flex-col gap-6">
+
+        <InputField
+          id="port-calls"
+          label="Chamadas de Porto por Ano"
+          value={200}
+          min={1}
+          max={1000}
+          step={10}
+          unit="chamadas/ano"
+          helperText="Total de chamadas anuais de porto em todos os destinos."
+        />
+
+        <InputField
+          id="hours-at-berth"
+          label="Horas no Cais por Chamada"
+          value={8}
+          min={0.5}
+          max={72}
+          step={0.5}
+          unit="hrs/chamada"
+          helperText="Tempo médio que a embarcação permanece no cais por chamada."
+        />
+
+        <InputField
+          id="aux-load"
+          label="Carga Auxiliar"
+          value={800}
+          min={10}
+          max={5000}
+          step={10}
+          unit="kW"
+          helperText="Carga elétrica fornecida por geradores no cais."
+        />
+
+        <InputField
+          id="gen-fuel-rate"
+          label="Consumo de Combustível do Gerador"
+          value={200}
+          min={10}
+          max={1000}
+          step={5}
+          unit="L/hr"
+          helperText="Taxa de consumo de combustível dos geradores auxiliares na carga do cais."
+        />
+
+        <InputField
+          id="fuel-cost"
+          label="Custo do Combustível"
+          value={0.75}
+          min={0.01}
+          max={5}
+          step={0.05}
+          unit="$/L"
+          helperText="Preço do combustível marítimo por litro (MGO/MDO típico)."
+        />
+
+        <InputField
+          id="elec-cost"
+          label="Custo da Eletricidade da Rede"
+          value={0.15}
+          min={0.01}
+          max={1}
+          step={0.01}
+          unit="$/kWh"
+          helperText="Tarifa de energia de costa."
+        />
+
+        <InputField
+          id="grid-carbon"
+          label="Intensidade de Carbono da Rede"
+          value={400}
+          min={0}
+          max={1200}
+          step={10}
+          unit="kg CO₂/MWh"
+          helperText="Fator de emissão da rede local (padrão 400 = média global)."
+        />
+
+      </div>
+    </CalculatorCard>
+
+    <!-- Results -->
+    <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Economias de Energia de Costa</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <ResultBox
+            label="Combustível Evitado Anual do Gerador"
+            value="320.000 L"
+            suffix="litros de combustível marítimo economizados"
+            variant="primary"
+            id="result-fuel-avoided"
+          />
+          <ResultBox
+            label="Custo de Combustível Evitado Anual"
+            value="$240.000"
+            suffix="Despesa de combustível do gerador eliminada"
+            id="result-fuel-cost"
+          />
+          <ResultBox
+            label="Custo Anual de Energia de Costa"
+            value="$192.000"
+            suffix="Custo da eletricidade da rede"
+            id="result-shore-cost"
+          />
+          <ResultBox
+            label="Economia Líquida Anual"
+            value="$48.000"
+            suffix="Economia de combustível menos custo de eletricidade"
+            id="result-net-savings"
+          />
+          <ResultBox
+            label="Redução Anual de CO₂"
+            value="409,6 t"
+            suffix="toneladas de CO₂ eliminadas"
+            id="result-co2"
+          />
+          <ResultBox
+            label="Redução Anual de NOx"
+            value="18.880 kg"
+            suffix="kg de NOx eliminados"
+            id="result-nox"
+          />
+          <ResultBox
+            label="Redução Anual de SOx"
+            value="640 kg"
+            suffix="kg de SOx eliminados"
+            id="result-sox"
+          />
+          <ResultBox
+            label="Carros Equivalentes Removidos"
+            value="89"
+            suffix="veículos de passageiros fora da estrada"
+            id="result-cars"
+          />
+        </div>
+      </div>
+
+      <div class="border-t border-hairline pt-6">
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">Avaliação de Energia de Costa</h4>
+        <p class="text-body-sm text-muted" id="summary-el">
+          Conectar à energia de costa por 1.600 horas anualmente elimina 320.000 litros de combustível de gerador, economizando $48.000 após custos de eletricidade.
+        </p>
+      </div>
+    </CalculatorCard>
+
+  </div>
+
+  <!-- Generator vs Shore Power Comparison Chart -->
+  <section class="mb-16">
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-4 uppercase tracking-wider">Comparação Modo Gerador vs Energia de Costa</h3>
+      <p class="text-body-sm text-muted mb-6">Comparação anual de custos e emissões entre operação com geradores a bordo e uso de energia de costa no cais.</p>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div>
+          <span class="text-label-uppercase text-primary text-[10px] block mb-2">CO₂ (toneladas/ano)</span>
+          <div id="chart-co2" class="flex flex-col gap-2"></div>
+        </div>
+        <div>
+          <span class="text-label-uppercase text-primary text-[10px] block mb-2">Custo Anual ($)</span>
+          <div id="chart-cost" class="flex flex-col gap-2"></div>
+        </div>
+        <div>
+          <span class="text-label-uppercase text-primary text-[10px] block mb-2">NOx (kg/ano)</span>
+          <div id="chart-nox" class="flex flex-col gap-2"></div>
+        </div>
+      </div>
+      <div class="flex items-center gap-4 mt-6 text-caption text-muted">
+        <span class="flex items-center gap-1.5"><span class="w-3 h-3 bg-m-blue-light inline-block"></span> Modo Gerador</span>
+        <span class="flex items-center gap-1.5"><span class="w-3 h-3 bg-green-600 inline-block"></span> Energia de Costa</span>
+      </div>
+    </CalculatorCard>
+  </section>
+
+  <section class="mb-16">
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-4 uppercase tracking-wider">Detalhamento dos Custos Operacionais Anuais</h3>
+      <p class="text-body-sm text-muted mb-6">Custo de combustível do gerador versus custo de eletricidade de energia de costa na frequência atual de chamadas de porto.</p>
+      <div id="cost-breakdown-chart" class="flex flex-col gap-3"></div>
+    </CalculatorCard>
+  </section>
+
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">Fórmulas e Exemplos Resolvidos</h2>
+    <FormulaBox title="Fórmulas Matemáticas">
+      <p>As economias de energia de costa são calculadas comparando o consumo de combustível do gerador com o custo da eletricidade da rede:</p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Horas do Gerador = Chamadas de Porto × Horas no Cais</div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Combustível Evitado = Horas do Gerador × Taxa de Combustível (L/hr)</div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Custo Combustível Evitado = Combustível Evitado × Custo Combustível ($/L)</div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Custo Energia de Costa = Horas do Gerador × Carga Aux (kW) × Tarifa Elétrica ($/kWh)</div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Economia Líquida = Custo Combustível Evitado − Custo Energia de Costa</div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Redução CO₂ = (Combustível Evitado × 3,206) − (kWh Costa × IC Rede) / 1000</div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Carros Removidos = Redução CO₂ (t) / 4,6</div>
+      <p class="mt-4">Fator CO₂ do MGO: 3,206 kg/litro (Quarto Estudo de GEE da OMI 2020)<br/>Fator NOx: 0,059 kg/litro | Fator SOx: 0,002 kg/litro<br/>Equivalências EPA: 4,6 t CO₂/carro/ano</p>
+    </FormulaBox>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample
+        number={1}
+        title="Iate Pequeno — Energia de Costa vs Gerador Diesel"
+        scenario="Um iate de cruzeiro de 20m tipicamente roda seu gerador de 2 kW a bordo por 10 horas cada noite no marina para alimentar luzes, refrigeração e ar-condicionado. A energia de costa elimina ruído do gerador, consumo de combustível e emissões de exaustão."
+        inputs={[
+          { label: "Carga Hotel", value: "2 kW" },
+          { label: "Horas Atracado por Dia", value: "10 hrs" },
+          { label: "Custo Eletricidade da Rede", value: "$0,30/kWh" },
+          { label: "Custo do Diesel", value: "$2/L" },
+        ]}
+        steps={[
+          { label: "Horas diárias do gerador", formula: "10 horas/dia", result: "10 hrs/dia" },
+          { label: "Consumo diesel a 2 kW", formula: "2 kW × 10 hrs ÷ 10 kWh/L ÷ 0,35 eficiência ≈ 5,71 L/dia", result: "5,71 L/dia" },
+          { label: "Custo diário de diesel", formula: "5,71 L × $2/L", result: "$11,43/dia" },
+          { label: "Custo diário de energia de costa", formula: "2 kW × 10 hrs × $0,30/kWh", result: "$6,00/dia" },
+          { label: "Economia diária", formula: "$11,43 − $6,00", result: "$5,43/dia" },
+          { label: "Economia anual (365 dias)", formula: "$5,43 × 365", result: "$1.982/ano" },
+        ]}
+        answer="A energia de costa economiza aproximadamente $1.982 por ano em um iate pequeno com carga hotel de 2 kW, ao mesmo tempo em que elimina ~2.083 L de consumo de diesel anualmente."
+        interpretation="Mesmo cargas hotel modestas de iate se beneficiam da energia de costa. As economias são pequenas em termos absolutos, mas significativas para orçamentos operacionais, e a eliminação do ruído do gerador melhora a experiência na marina."
+        variant="marine"
+      />
+
+      <WorkedExample
+        number={2}
+        title="Embarcação Comercial — Energia de Costa no Porto"
+        scenario="Uma embarcação comercial de carga com carga hotel de 500 kW permanece 12 horas por chamada de porto, 150 vezes por ano. A embarcação opera geradores auxiliares continuamente para alimentar acomodações da tripulação, bombas de carga e sistemas de navegação."
+        inputs={[
+          { label: "Carga Hotel", value: "500 kW" },
+          { label: "Horas no Porto por Estadia", value: "12 hrs" },
+          { label: "Chamadas de Porto por Ano", value: "150" },
+          { label: "Custo Eletricidade da Rede", value: "$0,15/kWh" },
+          { label: "Custo Combustível MGO", value: "$0,75/L" },
+          { label: "Taxa Combustível do Gerador", value: "130 L/hr a 500 kW" },
+        ]}
+        steps={[
+          { label: "Total de Horas Anuais no Porto", formula: "150 chamadas × 12 hrs", result: "1.800 hrs/ano" },
+          { label: "Combustível Evitado Anual", formula: "1.800 hrs × 130 L/hr", result: "234.000 L/ano" },
+          { label: "Custo de Combustível Evitado Anual", formula: "234.000 L × $0,75/L", result: "$175.500/ano" },
+          { label: "Custo Anual de Energia de Costa", formula: "1.800 hrs × 500 kW × $0,15/kWh", result: "$135.000/ano" },
+          { label: "Economia Líquida Anual", formula: "$175.500 − $135.000", result: "$40.500/ano" },
+          { label: "Redução de CO₂", formula: "(234.000 × 3,206 − 1.800 × 500 × 0,400) ÷ 1000", result: "389,8 toneladas CO₂/ano" },
+        ]}
+        answer="A energia de costa economiza $40.500 anualmente enquanto reduz CO₂ em 390 toneladas — equivalente a remover 85 carros de passageiros da estrada."
+        interpretation="Embarcações comerciais com altas cargas hotel e frequentes chamadas de porto representam o ponto ideal para a economia da energia de costa. A redução de CO₂ também melhora a classificação CII da embarcação."
+        variant="marine"
+      />
+
+      <WorkedExample
+        number={3}
+        title="Navio de Cruzeiro — Energia de Costa vs GNL no Porto"
+        scenario="Um grande navio de cruzeiro com carga hotel de 10 MW compara energia de costa com continuar operando geradores GNL enquanto atracado. O GNL é mais limpo que diesel, mas ainda produz emissões locais. O navio faz 250 chamadas de porto por ano com 10 horas cada."
+        inputs={[
+          { label: "Carga Hotel", value: "10 MW (10.000 kW)" },
+          { label: "Horas no Porto por Estadia", value: "10 hrs" },
+          { label: "Chamadas de Porto por Ano", value: "250" },
+          { label: "Custo Eletricidade da Rede", value: "$0,12/kWh" },
+          { label: "Custo GNL", value: "$0,60/kWh equivalente" },
+          { label: "Intensidade de Carbono da Rede", value: "200 g CO₂/kWh (rede nórdica)" },
+        ]}
+        steps={[
+          { label: "Total de Horas Anuais no Porto", formula: "250 chamadas × 10 hrs", result: "2.500 hrs/ano" },
+          { label: "Consumo Total de Energia de Costa", formula: "2.500 hrs × 10.000 kW", result: "25.000 MWh/ano" },
+          { label: "Custo do Gerador GNL", formula: "25.000.000 kWh × $0,60/kWh", result: "$15.000.000/ano" },
+          { label: "Custo da Energia de Costa", formula: "25.000.000 kWh × $0,12/kWh", result: "$3.000.000/ano" },
+          { label: "Economia Líquida Anual", formula: "$15.000.000 − $3.000.000", result: "$12.000.000/ano" },
+          { label: "Redução de CO₂", formula: "GNL IC ≈ 500 g/kWh → 25.000 t vs Costa = 200 g/kWh → 5.000 t", result: "20.000 toneladas CO₂/ano" },
+        ]}
+        answer="A energia de costa economiza $12 milhões anualmente comparado a geradores GNL, ao mesmo tempo em que elimina 20.000 toneladas de CO₂ — um impacto transformador para a pegada de carbono de uma companhia de cruzeiros."
+        interpretation="Navios de cruzeiro representam as maiores economias absolutas de energia de costa devido às suas enormes cargas hotel. Portos nórdicos com redes de baixo carbono fornecem a maior redução de CO₂, tornando a energia de costa uma pedra angular da descarbonização da indústria de cruzeiros."
+        variant="marine"
+      />
+    </div>
+  </section>
+
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Premissas e Limitações</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <CalculatorCard>
+        <h4 class="text-primary font-bold text-sm mb-3">Premissas Operacionais</h4>
+        <ul class="text-body-sm text-muted flex flex-col gap-2">
+          <li class="flex gap-2"><span class="text-m-blue-light shrink-0">→</span> Gerador opera a 60–80% da carga nominal durante estadias no cais</li>
+          <li class="flex gap-2"><span class="text-m-blue-light shrink-0">→</span> Fator de emissão MGO: 3.206 kg CO₂/litro (Quarto Estudo OMI GEE)</li>
+          <li class="flex gap-2"><span class="text-m-blue-light shrink-0">→</span> Fator NOx: 0,059 kg/litro em carga moderada do motor</li>
+          <li class="flex gap-2"><span class="text-m-blue-light shrink-0">→</span> Fator SOx: 0,002 kg/litro para MGO com 0,1% de enxofre</li>
+          <li class="flex gap-2"><span class="text-m-blue-light shrink-0">→</span> Intensidade de carbono da rede padrão: 400 g CO₂/kWh (média global)</li>
+        </ul>
+      </CalculatorCard>
+      <CalculatorCard>
+        <h4 class="text-primary font-bold text-sm mb-3">O Que Este Calculador Não Inclui</h4>
+        <ul class="text-body-sm text-muted flex flex-col gap-2">
+          <li class="flex gap-2"><span class="text-m-red shrink-0">✗</span> Custos de capital da infraestrutura de energia de costa</li>
+          <li class="flex gap-2"><span class="text-m-red shrink-0">✗</span> Custos de retrofit da embarcação (quadros, cabos, controles)</li>
+          <li class="flex gap-2"><span class="text-m-red shrink-0">✗</span> Encargos de demanda ou precificação de eletricidade por período</li>
+          <li class="flex gap-2"><span class="text-m-red shrink-0">✗</span> Tempo de conexão/desconexão e custos de mão de obra</li>
+          <li class="flex gap-2"><span class="text-m-red shrink-0">✗</span> Descontos em tarifas portuárias verdes pelo uso de energia de costa</li>
+        </ul>
+      </CalculatorCard>
+    </div>
+  </section>
+
+  <EngineeringDiagram
+    title="Sistema de Conexão de Energia de Costa"
+    description="Embarcação conecta-se à eletricidade da rede, desligando geradores diesel enquanto está no porto"
+    variant="system"
+    steps={[
+      { label: "Rede Costeira", icon: "charge" },
+      { label: "Conexão de Energia", icon: "cable" },
+      { label: "Distribuição da Embarcação", icon: "inverter" },
+      { label: "Cargas Hotel", icon: "load" },
+    ]}
+  />
+
+  <ComparisonTable
+    title="Economia de Energia de Costa por Tamanho de Embarcação"
+    headers={["Embarcação", "Carga Hotel", "Horas Porto/Dia", "Custo Diesel", "Custo Energia Costa", "Economia Anual"]}
+    rows={[
+      ["Iate Pequeno", "5 kW", "16 h", "$4,50/L", "$0,25/kWh", "$2.000–5.000"],
+      ["Navio de Cruzeiro", "10 MW", "10 h", "$600/tonelada", "$0,12/kWh", "$1–3 milhões"],
+      ["Navio de Contêineres", "1 MW", "24 h", "$500/tonelada", "$0,10/kWh", "$200–500 mil"],
+      ["Ferry", "200 kW", "8 h", "$1,80/L", "$0,15/kWh", "$30.000–80.000"],
+    ]}
+    caption="As economias de energia de costa dependem dos preços locais de eletricidade versus custos de combustível"
+  />
+
+  <FAQSection items={faqItems} />
+  <RelatedTools tools={relatedCalculators} />
+
+  <div class="bg-surface-card border border-hairline p-6 mt-8 mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div class="max-w-xl">
+      <h3 class="text-title-sm text-primary mb-1">Precisa de uma revisão de engenharia mais aprofundada?</h3>
+      <p class="text-body-sm text-muted font-light">
+        Use este calculador para estimativas preliminares. Para análise específica de embarcação, revisão de dimensionamento de bateria, planejamento de redução de emissões ou suporte à viabilidade híbrida, entre em contato com a equipe de suporte de engenharia da Battery Calculators.
+      </p>
+    </div>
+    <a href="/marine/#marine-advisory" class="btn-primary text-xs px-6 py-3 shrink-0 whitespace-nowrap">Solicitar Suporte de Engenharia</a>
+  </div>
+
+  <script>
+    import { calculateShorePowerSavings } from '../../../utils/calculators';
+
+    const portCallsInput = document.getElementById('port-calls') as HTMLInputElement;
+    const hoursAtBerthInput = document.getElementById('hours-at-berth') as HTMLInputElement;
+    const auxLoadInput = document.getElementById('aux-load') as HTMLInputElement;
+    const genFuelRateInput = document.getElementById('gen-fuel-rate') as HTMLInputElement;
+    const fuelCostInput = document.getElementById('fuel-cost') as HTMLInputElement;
+    const elecCostInput = document.getElementById('elec-cost') as HTMLInputElement;
+    const gridCarbonInput = document.getElementById('grid-carbon') as HTMLInputElement;
+
+    function getResultElements(id: string) {
+      const box = document.getElementById(id);
+      return {
+        value: box?.querySelector('.text-display-md, .text-title-lg') as HTMLElement,
+        suffix: box?.querySelector('.text-caption') as HTMLElement,
+      };
+    }
+
+    const fuelAvoided = getResultElements('result-fuel-avoided');
+    const fuelCost = getResultElements('result-fuel-cost');
+    const shoreCost = getResultElements('result-shore-cost');
+    const netSavings = getResultElements('result-net-savings');
+    const co2Result = getResultElements('result-co2');
+    const noxResult = getResultElements('result-nox');
+    const soxResult = getResultElements('result-sox');
+    const carsResult = getResultElements('result-cars');
+    const summaryEl = document.getElementById('summary-el');
+
+    function fmt(n: number, decimals = 1): string {
+      return n.toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+    }
+
+    function updateBarChart(containerId: string, generatorVal: number, shoreVal: number, unit: string) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      const maxVal = Math.max(generatorVal, 0.001);
+      const genPct = (generatorVal / maxVal) * 100;
+      const shorePct = (shoreVal / maxVal) * 100;
+      const reduction = maxVal > 0 ? ((generatorVal - shoreVal) / generatorVal) * 100 : 0;
+
+      container.innerHTML = `
+        <div class="flex flex-col gap-1">
+          <div class="flex items-center gap-2">
+            <span class="text-caption text-muted w-16 text-right shrink-0">Gerador</span>
+            <div class="flex-1 h-5 bg-surface-soft border border-hairline relative overflow-hidden">
+              <div class="h-full bg-m-blue-light transition-all duration-300" style="width: ${genPct}%"></div>
+            </div>
+            <span class="text-caption text-primary font-mono w-20 shrink-0">${fmt(generatorVal)}${unit}</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-caption text-muted w-16 text-right shrink-0">Costa</span>
+            <div class="flex-1 h-5 bg-surface-soft border border-hairline relative overflow-hidden">
+              <div class="h-full bg-green-600 transition-all duration-300" style="width: ${shorePct}%"></div>
+            </div>
+            <span class="text-caption text-primary font-mono w-20 shrink-0">${fmt(shoreVal)}${unit}</span>
+          </div>
+          <span class="text-caption text-green-500 font-mono text-[10px]">↓ ${fmt(reduction)}% redução</span>
+        </div>
+      `;
+    }
+
+    function updateCalculations() {
+      const portCalls = parseFloat(portCallsInput.value) || 200;
+      const hoursAtBerth = parseFloat(hoursAtBerthInput.value) || 8;
+      const auxLoad = parseFloat(auxLoadInput.value) || 800;
+      const genFuelRate = parseFloat(genFuelRateInput.value) || 200;
+      const fuelCostPerLiter = parseFloat(fuelCostInput.value) || 0.75;
+      const elecCostPerKwh = parseFloat(elecCostInput.value) || 0.15;
+      const gridCarbon = parseFloat(gridCarbonInput.value) || 400;
+
+      const result = calculateShorePowerSavings({
+        portCallsPerYear: portCalls,
+        hoursAtBerthPerCall: hoursAtBerth,
+        auxiliaryLoadKw: auxLoad,
+        generatorFuelConsumptionLPerHour: genFuelRate,
+        fuelCostPerLiter: fuelCostPerLiter,
+        gridElectricityCostPerKwh: elecCostPerKwh,
+        gridCarbonIntensityKgPerKwh: gridCarbon / 1000,
+      });
+
+      if (fuelAvoided.value) fuelAvoided.value.textContent = `${Math.round(result.annualGeneratorFuelLiters).toLocaleString()} L`;
+      if (fuelAvoided.suffix) fuelAvoided.suffix.textContent = 'litros de combustível marítimo economizados';
+
+      if (fuelCost.value) fuelCost.value.textContent = `$${Math.round(result.annualGeneratorFuelCost).toLocaleString()}`;
+      if (fuelCost.suffix) fuelCost.suffix.textContent = 'Despesa de combustível do gerador eliminada';
+
+      if (shoreCost.value) shoreCost.value.textContent = `$${Math.round(result.annualShorePowerCost).toLocaleString()}`;
+      if (shoreCost.suffix) shoreCost.suffix.textContent = 'Custo da eletricidade da rede';
+
+      if (netSavings.value) netSavings.value.textContent = `$${Math.round(result.annualNetSavings).toLocaleString()}`;
+      if (netSavings.suffix) netSavings.suffix.textContent = result.annualNetSavings >= 0 ? 'Economia de combustível menos custo de eletricidade' : 'Custo líquido — energia de costa excede custo do gerador';
+
+      if (co2Result.value) co2Result.value.textContent = `${fmt(result.annualCo2ReductionTonnes)} t`;
+      if (co2Result.suffix) co2Result.suffix.textContent = 'toneladas de CO₂ eliminadas';
+
+      if (noxResult.value) noxResult.value.textContent = `${Math.round(result.annualNoxReductionKg).toLocaleString()} kg`;
+      if (noxResult.suffix) noxResult.suffix.textContent = 'kg de NOx eliminados';
+
+      if (soxResult.value) soxResult.value.textContent = `${Math.round(result.annualSoxReductionKg).toLocaleString()} kg`;
+      if (soxResult.suffix) soxResult.suffix.textContent = 'kg de SOx eliminados';
+
+      if (carsResult.value) carsResult.value.textContent = `${Math.round(result.equivalentCarsRemoved)}`;
+      if (carsResult.suffix) carsResult.suffix.textContent = 'veículos de passageiros fora da estrada';
+
+      if (summaryEl) {
+        const hoursText = Math.round(result.annualGeneratorHours).toLocaleString();
+        const fuelText = Math.round(result.annualGeneratorFuelLiters).toLocaleString();
+        const savingsText = Math.abs(Math.round(result.annualNetSavings)).toLocaleString();
+        if (result.annualNetSavings >= 0) {
+          summaryEl.textContent = `Conectar à energia de costa por ${hoursText} horas anualmente elimina ${fuelText} litros de combustível de gerador, economizando $${savingsText} após custos de eletricidade.`;
+        } else {
+          summaryEl.textContent = `Conectar à energia de costa por ${hoursText} horas elimina ${fuelText} litros de combustível de gerador, mas os custos de energia de costa excedem as economias de combustível em $${savingsText} nas tarifas atuais de eletricidade.`;
+        }
+      }
+
+      updateBarChart('chart-co2', result.baselineCo2Tonnes, result.shorePowerCo2Tonnes, 't');
+      updateBarChart('chart-cost', result.annualGeneratorFuelCost, result.annualShorePowerCost, '');
+      updateBarChart('chart-nox', result.annualNoxReductionKg + (result.annualNoxReductionKg * 0.01), result.annualNoxReductionKg * 0.01, 'kg');
+
+      const costContainer = document.getElementById('cost-breakdown-chart');
+      if (costContainer) {
+        const totalCost = Math.max(result.annualGeneratorFuelCost, result.annualShorePowerCost, 1);
+        const genPct = (result.annualGeneratorFuelCost / totalCost) * 100;
+        const shorePct = (result.annualShorePowerCost / totalCost) * 100;
+
+        costContainer.innerHTML = `
+          <div class="flex flex-col gap-2">
+            <div class="flex items-center gap-3">
+              <span class="text-caption text-muted w-24 text-right shrink-0">Gerador</span>
+              <div class="flex-1 h-8 bg-surface-soft border border-hairline relative overflow-hidden">
+                <div class="h-full bg-m-blue-light transition-all duration-300 flex items-center pl-2" style="width: ${genPct}%">
+                  <span class="text-caption text-primary font-mono text-[10px] whitespace-nowrap">$${Math.round(result.annualGeneratorFuelCost).toLocaleString()}</span>
+                </div>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="text-caption text-muted w-24 text-right shrink-0">Energia Costa</span>
+              <div class="flex-1 h-8 bg-surface-soft border border-hairline relative overflow-hidden">
+                <div class="h-full bg-green-600 transition-all duration-300 flex items-center pl-2" style="width: ${shorePct}%">
+                  <span class="text-caption text-primary font-mono text-[10px] whitespace-nowrap">$${Math.round(result.annualShorePowerCost).toLocaleString()}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="mt-2 text-caption text-muted">
+            <span class="text-primary font-bold">Economia/custo anual líquido:</span> $${Math.abs(Math.round(result.annualNetSavings)).toLocaleString()}
+          </div>
+        `;
+      }
+    }
+
+    [portCallsInput, hoursAtBerthInput, auxLoadInput, genFuelRateInput, fuelCostInput, elecCostInput, gridCarbonInput].forEach(el => {
+      el.addEventListener('input', updateCalculations);
+    });
+
+    updateCalculations();
+  </script>
+
+</CalculatorLayout>

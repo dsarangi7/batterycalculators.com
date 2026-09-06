@@ -1,0 +1,453 @@
+---
+import CalculatorLayout from '../../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import InputField from '../../../components/InputField.astro';
+import ResultBox from '../../../components/ResultBox.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import WorkedExample from '../../../components/WorkedExample.astro';
+import ComparisonTable from '../../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../../components/EngineeringDiagram.astro';
+
+const whatIs = `Um calculador de dimensionamento de bateria marítima determina a capacidade correta do banco de baterias para alimentar as cargas hotel de um navio — eletrônicos de navegação, iluminação da cabine, refrigeração, bombas de água doce e sistemas auxiliares — enquanto estiver ancorado ou em trânsito. O dimensionamento correto garante energia confiável durante cruzeiros prolongados sem energia de terra, evitando baterias descarregadas no meio da viagem. Os sistemas elétricos marítimos enfrentam restrições únicas: vibração, exposição à umidade, limites de carga do alternador e a necessidade de reservar potência de partida para a arranque do motor. Este calculador aplica limites de profundidade de descarga e fatores de eficiência do sistema específicos para o ambiente marítimo, em conformidade com os padrões ISO 13297 de instalação elétrica de iates.`;
+
+const whyItMatters = [
+  "Bancos de baterias marítimas subdimensionados deixam você sem luzes de navegação ou energia para piloto automático durante passagens noturnas — um sério risco à segurança no mar.",
+  "Bancos superdimensionados adicionam peso e custo desnecessários; em um veleiro de 10,7m, cada 100Ah de capacidade LFP adiciona aproximadamente 12 kg a um casco sensível ao peso.",
+  "Pressupostos incorretos de DoD aceleram a degradação da bateria — descarregar chumbo-ácido abaixo de 50% de DoD pode reduzir pela metade sua vida útil de 500 para menos de 250 ciclos.",
+  "Ignorar os limites de carga do alternador significa que seu motor não consegue repor o banco rapidamente, deixando você progressivamente descarregado em cruzeiros de vários dias.",
+  "Não considerar os perfis de carga hotel durante a ancoragem versus a navegação leva a déficits de autonomia exatamente quando você mais precisa de energia."
+];
+
+const practicalApplications = [
+  { title: "Ancoragem Noturna", description: "Dimensione seu banco doméstico para 12–16 horas de cargas hotel enquanto estiver ancorado sem carga do motor ou energia de terra." },
+  { title: "Cruzeiro Oceânico Prolongado", description: "Projete para 24–72 horas de autonomia ao navegar em passagens remotas com tempo limitado de funcionamento do alternador por dia." },
+  { title: "Sistemas de Barco-Casa para Moradia", description: "Calcule as necessidades diárias contínuas de energia para moradia a bordo com refrigeração, dessalinizadores e cargas de entretenimento." },
+  { title: "Auxiliares de Traler e Iate a Motor", description: "Separe o banco doméstico da bateria de partida para garantir que as cargas hotel nunca comprometam a capacidade de arranque do motor." }
+];
+
+const expertNotes: { title: string; variant: 'warning' | 'engineering'; content: string }[] = [
+  {
+    title: "Limites de Profundidade de Descarga Marítima",
+    variant: "warning",
+    content: "Baterias LFP em aplicações marítimas devem visar 80% de DoD máximo para compensar o estresse das células em ambiente de alta vibração. Bancos de chumbo-ácido não devem exceder 50% de DoD — considere 40% para ancoragem em águas turbulentas onde ocorrem picos de carga induzidos por ondas. Sempre reserve 20% da capacidade como margem de segurança para eletrônicos de emergência (EPIRB, VHF-DSC)."
+  },
+  {
+    title: "12V vs 24V para Sistemas Marítimos",
+    variant: "engineering",
+    content: "Para barcos abaixo de 12m com cargas inferiores a 500W, sistemas de 12V são mais simples e compatíveis com eletrônicos marítimos padrão. Para navios acima de 12m ou cargas superiores a 500W, sistemas de 24V ou 48V reduzem pela metade a corrente, diminuindo os requisitos de calibre de cabos e queda de tensão. Um sistema de 48V carregando um banco doméstico de 12V via conversor DC-DC é uma abordagem moderna e eficiente para iates maiores."
+  }
+];
+
+const trustSection = {
+  text: "Este calculador utiliza fórmulas transparentes alinhadas com padrões elétricos marítimos ISO 13297 e diretrizes ABYC E-11. Todos os fatores de dimensionamento — limites de DoD, redução de eficiência e pressupostos de queda de tensão — são documentados para que você possa verificar os cálculos independentemente.",
+  link: { label: "Ver nossa metodologia e derivação de fórmulas", href: "/methodology/" }
+};
+
+const references = [
+  { title: "ISO 13297:2014 — Instalações elétricas em pequenas embarcações", url: "https://www.iso.org/standard/65870.html", source: "Organização Internacional de Padronização" },
+  { title: "ABYC E-11 — Sistemas Elétricos AC e DC em Barcos", url: "https://abycinc.org/standards", source: "Conselho Americano de Barcos e Iates" },
+  { title: "Cruisers Forum — Guia de Dimensionamento de Bancos de Baterias Marítimas", url: "https://www.cruisersforum.com/forums/f48/marine-battery-bank-sizing.html", source: "Comunidade Cruisers Forum" },
+  { title: "Victron Energy — Projeto de Sistemas de Baterias Marítimas", url: "https://www.victronenergy.com/learn/battery-bank-design", source: "Biblioteca Técnica Victron Energy" }
+];
+
+const faqItems = [
+  {
+    question: "Quais são as cargas hotel típicas em um iate de cruzeiro?",
+    answer: "As cargas hotel variam conforme o tamanho do barco e os equipamentos. Um cruzeiro de 12m consome tipicamente 150–250W para navegação e eletrônicos, 50–100W para iluminação, 80–150W para refrigeração e 20–60W para bombas e outros auxiliares. As cargas hotel totais frequentemente variam de 300–600W.",
+  },
+  {
+    question: "Quantas horas de uso devo considerar no dimensionamento?",
+    answer: "Para ancoragem noturna sem carga do motor, dimensione para 12–16 horas de uso. Para cruzeiro prolongado sem energia de terra, 24 horas proporcionam uma margem confortável. Para backup de emergência, 48–72 horas garantem resiliência em mau tempo.",
+  },
+  {
+    question: "Qual profundidade de descarga é segura para baterias marítimas?",
+    answer: "Baterias LFP (LiFePO4) podem ser descarregadas com segurança até 80–90% de DoD. Chumbo-ácido (AGM/Gel) não devem exceder 50% de DoD para vida útil aceitável. Chumbo-ácido de ciclo profundo é avaliado em 200 ciclos a 50% de DoD; LFP pode fornecer mais de 3000 ciclos a 80% de DoD.",
+  },
+  {
+    question: "Devo usar 12V ou 24V para meu banco de baterias marítimo?",
+    answer: "12V é o padrão para a maioria dos barcos de recreio abaixo de 15m devido à ampla compatibilidade com equipamentos de 12V. Sistemas de 24V ou 48V reduzem a corrente de fiação para navios maiores com cargas mais altas, diminuindo custos de cabos e queda de tensão. Conversores estão disponíveis para ambas as configurações.",
+  },
+  {
+    question: "Como os limites de carga do alternador afetam o tamanho do meu banco?",
+    answer: "A maioria dos alternadores marítimos produz 50–100A. Um banco LFP de 200Ah a 50% de estado de carga precisa de 100Ah para recarregar — o que leva 1–2 horas com o alternador em potência total. Se sua carga hotel diária exceder o que o alternador pode repor durante o funcionamento do motor, você precisa de um banco maior ou suporte solar.",
+  },
+  {
+    question: "Posso misturar baterias de chumbo-ácido e lítio em um sistema marítimo?",
+    answer: "<span class=\"text-primary font-bold\">Nunca misture químicas em paralelo.</span> Baterias de chumbo-ácido e lítio têm curvas de carga, resistências internas e limites de DoD diferentes. Carregá-las juntas faz com que uma química seja sobrecarregada ou a outra subcarregada, criando riscos de segurança e reduzindo a vida útil.",
+  },
+  {
+    question: "Qual é a diferença entre carga de ancoragem e carga de cruzeiro?",
+    answer: "A carga de ancoragem é a energia consumida parado — tipicamente luzes de navegação, instrumentos, refrigeração e iluminação da cabine (300–500W). A carga de cruzeiro adiciona piloto automático, sobreposição de radar, ecob Finder e instrumentos de vento (500–900W). Dimensione seu banco para a carga de cruzeiro mais alta se planeja uso em trânsito sem suporte do alternador.",
+  },
+  {
+    question: "Como a vibração afeta a seleção de baterias marítimas?",
+    answer: "Ambientes marítimos produzem vibração constante do motor, ondas e flexão do casco. Baterias LFP com células prismáticas seladas são resistentes à vibração. Baterias de chumbo-ácido inundadas podem vazar eletrólito sob forte vibração. AGM e Gel são seladas, mas ainda estão sujeitas a danos internos nas placas. Instale todas as baterias marítimas com suportes de amortecimento de vibração.",
+  },
+  {
+    question: "Devo instalar um monitor de bateria para meu banco marítimo?",
+    answer: "Sim — altamente recomendado. Um monitor de bateria com shunt mede o fluxo real de corrente, rastreia o estado de carga, estima o tempo restante de uso e registra o histórico de uso. Unidades Victron BMV ou similares fornecem visibilidade em tempo real que leituras simples de tensão não podem fornecer, especialmente sob carga.",
+  },
+  {
+    question: "Preciso de bancos separados para partida do motor e cargas hotel?",
+    answer: "A melhor prática é usar uma bateria de partida dedicada e um banco doméstico separado, conectados via isolador ou chave de bateria dupla. Isso impede que as cargas hotel drenem sua reserva de partida do motor. Para veleiros com guindastes elétricos, considere um terceiro banco dedicado para propulsor/guindaste.",
+  },
+  {
+    question: "Como o tempo frio afeta o dimensionamento de baterias marítimas?",
+    answer: "Abaixo de 0°C (32°F), a capacidade LFP cai 5–10% e a carga deve ser limitada para evitar deposição de lítio. A capacidade de chumbo-ácido cai 20–30% a -10°C. Se você cruza em climas frios, sobredimensione o banco em 15–25% e considere aquecedores de bateria ou caixas de bateria isoladas.",
+  },
+  {
+    question: "Qual é o papel do solar nos sistemas de baterias marítimas?",
+    answer: "Painéis solares em um bimini ou teto duro podem complementar a carga do alternador, fornecendo 100–400W durante as horas de luz do dia. Isso estende o tempo de ancoragem sem o motor funcionando. O solar deve ser visto como um carregador de manutenção, e não como fonte primária — compensa as cargas hotel, mas raramente recarrega completamente um grande banco em um dia.",
+  },
+];
+
+const relatedArticles = [
+  { title: "O que é Eletrificação Marítima?", href: "/learn/what-is-marine-electrification/" },
+  { title: "Sistemas de Armazenamento de Energia para Navios Explicados", href: "/learn/vessel-energy-storage-systems-explained/" },
+];
+
+const commonMistakes = [
+  "Usar baterias automotivas para bancos domésticos marítimos — baterias de carro são projetadas para arranque, não para ciclo profundo; elas falharão rapidamente a 50% de DoD.",
+  "Ignorar a corrosão de água salgada em terminais e conexões — ambientes marítimos requerem cobre estanhado, conexões com termorretrátil e graxa dielétrica.",
+  "Misturar baterias de chumbo-ácido e lítio em paralelo — curvas de carga diferentes fazem com que uma química seja sobrecarregada enquanto a outra subcarrega.",
+  "Omitir suportes de isolamento de vibração — a vibração constante induzida por ondas pode danificar placas de bateria e conexões internas sem fixação adequada.",
+  "Não separar o banco doméstico da bateria de partida do motor — as cargas hotel podem drenar a bateria de partida, deixando você incapaz de ligar o motor.",
+  "Ignorar os limites de carga do alternador — um alternador padrão de 50A não consegue repor um banco de 200Ah de 50% de DoD em um tempo de funcionamento do motor razoável.",
+  "Usar leitura de estado de carga apenas por tensão para lítio — a curva de descarga plana da LFP torna o SOC baseado em tensão não confiável; use um monitor baseado em shunt.",
+  "Esquecer que o tempo frio reduz a capacidade em 10–30% — o cruzeiro de inverno em águas do norte requer sobredimensionamento do banco ou adição de aquecimento de bateria."
+];
+
+const relatedCalculators = [
+  { href: "/tools/runtime-calculator/", title: "Calculadora de Autonomia", description: "Estime quanto tempo sua bateria alimenta cargas específicas." },
+  { href: "/tools/voltage-drop-calculator/", title: "Calculadora de Queda de Tensão", description: "Garanta que as instalações de cabos atendam aos requisitos de queda de tensão marítima." },
+  { href: "/tools/battery-sizing-calculator/", title: "Calculadora de Dimensionamento de Bateria", description: "Dimensionamento geral de banco de baterias com redução de temperatura." },
+  { href: "/tools/c-rate-calculator/", title: "Calculadora de Taxa C", description: "Verifique os limites de corrente de carga para seu banco marítimo." },
+  { href: "/tools/energy-conversion-calculator/", title: "Conversão de Energia", description: "Converta entre Ah e Wh na tensão do seu sistema." },
+  { href: "/tools/home-backup-battery-calculator/", title: "Calculadora de Backup Residencial", description: "Compare o dimensionamento marítimo com abordagens de backup residencial." },
+];
+---
+
+<CalculatorLayout
+  title="Calculadora de Dimensionamento de Bateria Marítima | Battery Calculators"
+  description="Dimensione seu banco de baterias domésticas marítimo com base em cargas hotel, horas de uso, tensão da bateria e profundidade de descarga para energia confiável de cruzeiro."
+  lang="pt"
+  faqItems={faqItems}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+  relatedCalculators={relatedCalculators}
+  commonMistakes={commonMistakes}
+  relatedArticles={relatedArticles}
+>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+
+    <!-- Formulário de Entrada -->
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Perfil de Carga Hotel</h3>
+      <div class="flex flex-col gap-6">
+
+        <InputField id="nav-load" label="Carga de Navegação / Eletrônicos" value={180} min={0} step={10} unit="W" helperText="Cartógrafo, radar, AIS, VHF, instrumentos." />
+
+        <InputField id="lighting-load" label="Carga de Iluminação" value={80} min={0} step={10} unit="W" helperText="Luzes internas, luz de ancora, luzes de navegação." />
+
+        <InputField id="refrigeration-load" label="Carga de Refrigeração" value={100} min={0} step={10} unit="W" helperText="Geladeira e freezer marítimos (média do ciclo do compressor)." />
+
+        <InputField id="pumps-load" label="Carga de Bombas / Auxiliares" value={40} min={0} step={10} unit="W" helperText="Bomba de sentina, bomba de água doce, guincho de âncora (média)." />
+
+        <InputField id="other-load" label="Outra Carga Hotel" value={30} min={0} step={10} unit="W" helperText="Entretenimento, carregamento USB, ventiladores da cabine, instrumentos." />
+
+        <InputField id="usage-hours" label="Horas de Uso Diário" value={14} min={1} max={24} step={1} unit="hours" helperText="Horas que o banco de baterias deve fornecer energia por dia." />
+
+        <InputField id="battery-voltage" label="Tensão do Sistema de Bateria" value={12} min={12} step={1} unit="V" helperText="12V padrão para barcos pequenos, 24V para iates maiores." />
+
+        <InputField id="usable-dod" label="Profundidade de Descarga Utilizável" value={80} min={20} max={100} step={1} unit="%" helperText="LFP: 80–90%, Chumbo-Ácido: 50% recomendado." />
+
+        <InputField id="system-efficiency" label="Eficiência do Sistema" value={90} min={70} max={100} step={1} unit="%" helperText="Compensa perdas na fiação e sobrecarga do BMS." />
+
+      </div>
+    </CalculatorCard>
+
+    <!-- Resultados -->
+    <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Resultados do Dimensionamento</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <ResultBox
+            label="Carga Hotel Total"
+            value="430 W"
+            suffix="Média diária combinada"
+            variant="primary"
+            id="result-total-load"
+          />
+          <ResultBox
+            label="Demanda Energética Diária"
+            value="6.020 Wh"
+            suffix="6,02 kWh por dia"
+            id="result-daily-energy"
+          />
+          <ResultBox
+            label="Energia Total da Bateria"
+            value="8.361 Wh"
+            suffix="Energia total necessária do banco de baterias"
+            id="result-usable-energy"
+          />
+          <ResultBox
+            label="Capacidade Recomendada"
+            value="696,8 Ah"
+            suffix="Em tensão nominal de 12V"
+            id="result-capacity"
+          />
+          <ResultBox
+            label="Tamanho do Banco Recomendado"
+            value="10,03 kWh"
+            suffix="Energia total da bateria"
+            id="result-bank-energy"
+          />
+        </div>
+      </div>
+
+      <div class="border-t border-hairline pt-6">
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">Recomendação do Banco</h4>
+        <p class="text-body-sm text-muted" id="bank-recommendation">
+          Para uma carga hotel de 430W por 14 horas a 12V, um banco LFP de 12V 700Ah (8,4 kWh) fornece aproximadamente 14 horas de autonomia.
+        </p>
+      </div>
+    </CalculatorCard>
+
+  </div>
+
+  <!-- Fórmulas e Exemplos Resolvidos -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">Fórmulas e Exemplos Resolvidos</h2>
+
+    <FormulaBox title="Fórmulas Matemáticas">
+      <p>
+        O dimensionamento de bateria marítima soma todas as cargas hotel, multiplica pelo tempo de uso e ajusta para profundidade de descarga e perdas do sistema:
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Carga Total = Navegação + Iluminação + Refrigeração + Bombas + Outros
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Energia Diária = Carga Total × Horas de Uso
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Energia Necessária = Energia Diária / (DoD% × Eficiência%)
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Ah Necessários = Energia Necessária / Tensão da Bateria
+      </div>
+      <p>
+        Os fatores de DoD e eficiência garantem que o banco de baterias seja dimensionado de forma conservadora para condições reais.
+      </p>
+    </FormulaBox>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample
+        number={1}
+        title="Cruzeiro Diurno — Ancoragem Noturna"
+        scenario="Um cruzeiro diurno de 8,5m está ancorado durante a noite. O proprietário precisa de luzes de navegação, ecobfinder, rádio VHF, iluminação da cabine e uma pequena geladeira funcionando por 8 horas antes que o motor seja ligado ao amanhecer."
+        inputs={[
+          { label: "Luzes de navegação", value: "20W" },
+          { label: "Ecobfinder", value: "15W" },
+          { label: "Rádio VHF (em espera)", value: "5W" },
+          { label: "Luzes da cabine", value: "30W" },
+          { label: "Geladeira compacta", value: "45W" },
+          { label: "Duração do uso", value: "8 horas" },
+          { label: "Tensão do sistema", value: "12V" },
+          { label: "Limite de DoD", value: "80% (LFP)" },
+          { label: "Eficiência do sistema", value: "90%" },
+        ]}
+        steps={[
+          "Somar todas as cargas: 20 + 15 + 5 + 30 + 45 = 115W",
+          "Demanda energética diária: 115W × 8h = 920 Wh",
+          "Ajustar para DoD e eficiência: 920 / (0,80 × 0,90) = 1.278 Wh",
+          "Converter para Ampères-hora: 1.278 Wh / 12V = 106,5 Ah",
+        ]}
+        answer="É recomendado um banco de baterias LFP de 12V 120Ah (1,44 kWh)."
+        interpretation="Isso fornece 8 horas de cargas hotel noturnas com uma margem de segurança de 13% acima do mínimo calculado. O banco pesa aproximadamente 14 kg — gerenciável para um pequeno cruzeiro. Ligando o motor ao amanhecer por 1–2 horas, o banco será reposto via alternador."
+        variant="marine"
+      />
+
+      <WorkedExample
+        number={2}
+        title="Iate de Cruzeiro — Cargas Hotel de 24 Horas"
+        scenario="Um iate de cruzeiro de 13,7m ancorado opera cargas hotel extensas: cartógrafo, sobreposição de radar, iluminação LED completa, refrigeração, dessalinizador e sistemas de entretenimento. O proprietário deseja autonomia total de 24 horas sem carga do motor."
+        inputs={[
+          { label: "Cartógrafo + radar", value: "120W" },
+          { label: "Transponder AIS", value: "30W" },
+          { label: "Iluminação LED (todas as zonas)", value: "90W" },
+          { label: "Refrigeração + freezer", value: "180W" },
+          { label: "Dessalinizador", value: "250W" },
+          { label: "Entretenimento + USB", value: "60W" },
+          { label: "Bombas + auxiliares", value: "50W" },
+          { label: "Duração do uso", value: "24 horas" },
+          { label: "Tensão do sistema", value: "24V" },
+          { label: "Limite de DoD", value: "80% (LFP)" },
+          { label: "Eficiência do sistema", value: "92%" },
+        ]}
+        steps={[
+          "Somar todas as cargas: 120 + 30 + 90 + 180 + 250 + 60 + 50 = 780W",
+          "Demanda energética diária: 780W × 24h = 18.720 Wh",
+          "Ajustar para DoD e eficiência: 18.720 / (0,80 × 0,92) = 25.435 Wh",
+          "Converter para Ampères-hora: 25.435 Wh / 24V = 1.059,8 Ah",
+        ]}
+        answer="É recomendado um banco de baterias LFP de 24V 1.100Ah (26,4 kWh)."
+        interpretation="Isso atende à autonomia de 24 horas para um perfil completo de cargas hotel. O banco pesa aproximadamente 195 kg, exigindo fixação estrutural adequada abaixo da linha de flutuação. Painéis solares (300W+) no bimini poderiam compensar 2–3 kWh diários, reduzindo os requisitos de tamanho do banco."
+        variant="marine"
+      />
+
+      <WorkedExample
+        number={3}
+        title="Motor de Arraste — Análise de Alta Descarga"
+        scenario="Um barco de pesca de 6m usa um motor de arraste de 36kg de empuxo consumindo 46A a 12V. O pescador deseja pescar por 6 horas continuamente, operando o motor em velocidade média (60% do acelerador) com ecobfinder intermitente e luzes de navegação."
+        inputs={[
+          { label: "Motor de arraste (60% acelerador)", value: "27,6A × 12V = 331W" },
+          { label: "Ecobfinder", value: "15W" },
+          { label: "Luzes de navegação", value: "20W" },
+          { label: "Duração do uso", value: "6 horas" },
+          { label: "Tensão do sistema", value: "12V" },
+          { label: "Limite de DoD", value: "80% (LFP)" },
+          { label: "Eficiência do sistema", value: "88%" },
+        ]}
+        steps={[
+          "Somar todas as cargas: 331 + 15 + 20 = 366W",
+          "Corrente consumida a 12V: 366W / 12V = 30,5A",
+          "Demanda energética diária: 366W × 6h = 2.196 Wh",
+          "Ajustar para DoD e eficiência: 2.196 / (0,80 × 0,88) = 3.120 Wh",
+          "Converter para Ampères-hora: 3.120 Wh / 12V = 260 Ah",
+        ]}
+        answer="É recomendado um banco de baterias LFP de 12V 260Ah (3,12 kWh)."
+        interpretation="Com uma corrente contínua de 30,5A, um banco de 260Ah fornece 6 horas com uma pequena margem de segurança. Observe: em altas taxas de descarga, a queda de tensão da bateria torna-se significativa — LFP mantém a tensão melhor que chumbo-ácido sob essa carga. Um banco de 300Ah fornece margem confortável para dias de pesca mais longos."
+        variant="marine"
+      />
+    </div>
+  </section>
+
+  <section class="mb-16">
+    <EngineeringDiagram
+      title="Sistema Elétrico Marítimo"
+      description="Configuração de banco de bateria dupla com carga do alternador e distribuição de carga"
+      variant="system"
+      steps={[
+        { label: "Alternador", icon: "charge" },
+        { label: "Banco Doméstico", icon: "battery" },
+        { label: "Banco de Partida", icon: "battery" },
+        { label: "Cargas Marítimas", icon: "load" },
+      ]}
+    />
+  </section>
+
+  <section class="mb-16">
+    <ComparisonTable
+      title="Padrões de Baterias Marítimas"
+      headers={["Padrão", "Escopo", "Requisitos Principais", "Limite de Queda de Tensão"]}
+      rows={[
+        ["ISO 13297", "Instalação elétrica marítima", "Dimensionamento de cabos, fusíveis, sinalização", "3% crítico / 10% não crítico"],
+        ["ABYC E-11", "Sistemas AC/DC em barcos", "Codificação de cores de fios, proteção contra sobrecorrente", "3% para instrumentos do leme"],
+        ["USCG 33 CFR 183", "Sistemas elétricos em barcos", "Proteção contra ignição, ligação de tanques de combustível", "N/A (focado em segurança)"],
+        ["IEC 60092", "Instalações elétricas marítimas", "Fiação a bordo, quadros de comando", "Varia por tipo de circuito"],
+      ]}
+      caption="Principais padrões elétricos marítimos que regem o projeto de sistemas de bateria"
+    />
+  </section>
+
+  <FAQSection items={faqItems} />
+
+  <!-- CTA de Suporte de Engenharia -->
+  <div class="bg-surface-card border border-hairline p-6 mt-8 mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div class="max-w-xl">
+      <h3 class="text-title-sm text-primary mb-1">Precisa de uma revisão de engenharia mais aprofundada?</h3>
+      <p class="text-body-sm text-muted font-light">
+        Use esta calculadora para estimativas preliminares. Para análise específica do navio, revisão de dimensionamento de bateria, planejamento de redução de emissões ou suporte à viabilidade de sistemas híbridos, entre em contato com a equipe de suporte de engenharia da Battery Calculators.
+      </p>
+    </div>
+    <a href="/marine/#marine-advisory" class="btn-primary text-xs px-6 py-3 shrink-0 whitespace-nowrap">Solicitar Suporte de Engenharia</a>
+  </div>
+
+  <!-- Script de Cálculo -->
+  <script>
+    import { calculateMarineBatterySizing } from '../../../utils/calculators';
+
+    const navLoadInput = document.getElementById('nav-load') as HTMLInputElement;
+    const lightingLoadInput = document.getElementById('lighting-load') as HTMLInputElement;
+    const refrigerationLoadInput = document.getElementById('refrigeration-load') as HTMLInputElement;
+    const pumpsLoadInput = document.getElementById('pumps-load') as HTMLInputElement;
+    const otherLoadInput = document.getElementById('other-load') as HTMLInputElement;
+    const usageHoursInput = document.getElementById('usage-hours') as HTMLInputElement;
+    const batteryVoltageInput = document.getElementById('battery-voltage') as HTMLInputElement;
+    const usableDodInput = document.getElementById('usable-dod') as HTMLInputElement;
+    const systemEfficiencyInput = document.getElementById('system-efficiency') as HTMLInputElement;
+
+    const resultTotalLoadBox = document.getElementById('result-total-load');
+    const resultTotalLoadValue = resultTotalLoadBox?.querySelector('.text-display-md') as HTMLElement;
+    const resultTotalLoadSuffix = resultTotalLoadBox?.querySelector('.text-caption') as HTMLElement;
+
+    const resultDailyEnergyBox = document.getElementById('result-daily-energy');
+    const resultDailyEnergyValue = resultDailyEnergyBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultDailyEnergySuffix = resultDailyEnergyBox?.querySelector('.text-caption') as HTMLElement;
+
+    const resultUsableEnergyBox = document.getElementById('result-usable-energy');
+    const resultUsableEnergyValue = resultUsableEnergyBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultUsableEnergySuffix = resultUsableEnergyBox?.querySelector('.text-caption') as HTMLElement;
+
+    const resultCapacityBox = document.getElementById('result-capacity');
+    const resultCapacityValue = resultCapacityBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultCapacitySuffix = resultCapacityBox?.querySelector('.text-caption') as HTMLElement;
+
+    const resultBankEnergyBox = document.getElementById('result-bank-energy');
+    const resultBankEnergyValue = resultBankEnergyBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultBankEnergySuffix = resultBankEnergyBox?.querySelector('.text-caption') as HTMLElement;
+
+    const bankRecommendationEl = document.getElementById('bank-recommendation');
+
+    function updateCalculations() {
+      const navLoad = parseFloat(navLoadInput.value) || 0;
+      const lightingLoad = parseFloat(lightingLoadInput.value) || 0;
+      const refrigerationLoad = parseFloat(refrigerationLoadInput.value) || 0;
+      const pumpsLoad = parseFloat(pumpsLoadInput.value) || 0;
+      const otherLoad = parseFloat(otherLoadInput.value) || 0;
+      const usageHours = parseFloat(usageHoursInput.value) || 14;
+      const batteryVoltage = parseFloat(batteryVoltageInput.value) || 12;
+      const usableDod = parseFloat(usableDodInput.value) || 80;
+      const systemEfficiency = parseFloat(systemEfficiencyInput.value) || 90;
+
+      const results = calculateMarineBatterySizing(
+        navLoad, lightingLoad, refrigerationLoad, pumpsLoad, otherLoad,
+        usageHours, batteryVoltage, usableDod, systemEfficiency
+      );
+
+      if (resultTotalLoadValue) resultTotalLoadValue.textContent = `${Math.round(results.totalLoadW)} W`;
+      if (resultTotalLoadSuffix) resultTotalLoadSuffix.textContent = 'Média diária combinada';
+
+      if (resultDailyEnergyValue) resultDailyEnergyValue.textContent = `${Math.round(results.dailyEnergyWh).toLocaleString()} Wh`;
+      if (resultDailyEnergySuffix) resultDailyEnergySuffix.textContent = `${results.dailyEnergyKwh.toFixed(2)} kWh por dia`;
+
+      if (resultUsableEnergyValue) resultUsableEnergyValue.textContent = `${Math.round(results.totalBatteryEnergyWh).toLocaleString()} Wh`;
+      if (resultUsableEnergySuffix) resultUsableEnergySuffix.textContent = 'Energia total necessária do banco de baterias';
+
+      if (resultCapacityValue) resultCapacityValue.textContent = `${results.requiredCapacityAh.toFixed(1)} Ah`;
+      if (resultCapacitySuffix) resultCapacitySuffix.textContent = `Em ${batteryVoltage}V nominal`;
+
+      if (resultBankEnergyValue) resultBankEnergyValue.textContent = `${results.requiredEnergyKwh.toFixed(2)} kWh`;
+      if (resultBankEnergySuffix) resultBankEnergySuffix.textContent = 'Energia total da bateria';
+
+      if (bankRecommendationEl) {
+        const recommendedAh = Math.ceil(results.requiredCapacityAh / 10) * 10;
+        bankRecommendationEl.textContent = `Para uma carga hotel de ${Math.round(results.totalLoadW)}W por ${usageHours} horas a ${batteryVoltage}V, um banco LFP de ${batteryVoltage}V ${recommendedAh}Ah (${(recommendedAh * batteryVoltage / 1000).toFixed(1)} kWh) fornece aproximadamente ${usageHours} horas de autonomia.`;
+      }
+    }
+
+    [navLoadInput, lightingLoadInput, refrigerationLoadInput, pumpsLoadInput, otherLoadInput, usageHoursInput, batteryVoltageInput, usableDodInput, systemEfficiencyInput].forEach(el => {
+      el.addEventListener('input', updateCalculations);
+    });
+
+    updateCalculations();
+  </script>
+
+</CalculatorLayout>

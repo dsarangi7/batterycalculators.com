@@ -1,12 +1,65 @@
 ---
+import { t, type Locale, getLocalePrefix } from '../utils/i18n';
+
+interface Props {
+  lang?: Locale;
+}
+
+const { lang = 'en' } = Astro.props as Props;
+const prefix = getLocalePrefix(lang);
+
+const finderStrings = {
+  title: t('components.calculator_finder.title', lang),
+  subtitle: t('components.calculator_finder.subtitle', lang),
+  step1Label: t('components.calculator_finder.step1_label', lang),
+  step2Label: t('components.calculator_finder.step2_label', lang),
+  back: t('components.calculator_finder.back', lang),
+  resultsLabel: t('components.calculator_finder.results_label', lang),
+  open: t('components.calculator_finder.open', lang),
+  categorySolar: t('components.calculator_finder.category_solar', lang),
+  categoryHomeBackup: t('components.calculator_finder.category_home_backup', lang),
+  categoryRv: t('components.calculator_finder.category_rv', lang),
+  categoryMarine: t('components.calculator_finder.category_marine', lang),
+  categoryEv: t('components.calculator_finder.category_ev', lang),
+  categoryBess: t('components.calculator_finder.category_bess', lang),
+  categoryGeneral: t('components.calculator_finder.category_general', lang),
+  goalSizingSolar: t('components.calculator_finder.goal_sizing_solar', lang),
+  goalRuntimeSolar: t('components.calculator_finder.goal_runtime_solar', lang),
+  goalChargingSolar: t('components.calculator_finder.goal_charging_solar', lang),
+  goalDegradationSolar: t('components.calculator_finder.goal_degradation_solar', lang),
+  goalSizingHome: t('components.calculator_finder.goal_sizing_home', lang),
+  goalInverterHome: t('components.calculator_finder.goal_inverter_home', lang),
+  goalRuntimeHome: t('components.calculator_finder.goal_runtime_home', lang),
+  goalDegradationHome: t('components.calculator_finder.goal_degradation_home', lang),
+  goalSizingRv: t('components.calculator_finder.goal_sizing_rv', lang),
+  goalInverterRv: t('components.calculator_finder.goal_inverter_rv', lang),
+  goalRuntimeRv: t('components.calculator_finder.goal_runtime_rv', lang),
+  goalChargingRv: t('components.calculator_finder.goal_charging_rv', lang),
+  goalSizingMarine: t('components.calculator_finder.goal_sizing_marine', lang),
+  goalCableMarine: t('components.calculator_finder.goal_cable_marine', lang),
+  goalRuntimeMarine: t('components.calculator_finder.goal_runtime_marine', lang),
+  goalChargingMarine: t('components.calculator_finder.goal_charging_marine', lang),
+  goalPackEv: t('components.calculator_finder.goal_pack_ev', lang),
+  goalCableEv: t('components.calculator_finder.goal_cable_ev', lang),
+  goalCrateEv: t('components.calculator_finder.goal_crate_ev', lang),
+  goalConversionEv: t('components.calculator_finder.goal_conversion_ev', lang),
+  goalRoiBess: t('components.calculator_finder.goal_roi_bess', lang),
+  goalSizingBess: t('components.calculator_finder.goal_sizing_bess', lang),
+  goalConversionBess: t('components.calculator_finder.goal_conversion_bess', lang),
+  goalDegradationBess: t('components.calculator_finder.goal_degradation_bess', lang),
+  goalSizingGeneral: t('components.calculator_finder.goal_sizing_general', lang),
+  goalRuntimeGeneral: t('components.calculator_finder.goal_runtime_general', lang),
+  goalConversionGeneral: t('components.calculator_finder.goal_conversion_general', lang),
+  goalCrateGeneral: t('components.calculator_finder.goal_crate_general', lang),
+};
 ---
-<div class="bg-surface-card border border-hairline p-6 md:p-8" id="calculator-finder">
+<div class="bg-surface-card border border-hairline p-6 md:p-8" id="calculator-finder" data-finder-strings={JSON.stringify(finderStrings)} data-prefix={prefix}>
   <!-- Step 1: Category Selection -->
   <div id="cf-step1">
-    <h2 class="text-title-lg text-primary mb-1">Find the Right Calculator</h2>
-    <p class="text-body-sm text-muted mb-6">Answer two quick questions to get a recommendation.</p>
+    <h2 class="text-title-lg text-primary mb-1" id="cf-title"></h2>
+    <p class="text-body-sm text-muted mb-6" id="cf-subtitle"></p>
 
-    <p class="text-label-uppercase text-m-blue-light text-[10px] block mb-3">WHAT ARE YOU WORKING ON?</p>
+    <p class="text-label-uppercase text-m-blue-light text-[10px] block mb-3" id="cf-step1-label"></p>
     <div class="flex flex-wrap gap-2" role="radiogroup" aria-label="Application category">
       <button
         type="button"
@@ -14,62 +67,62 @@
         data-category="solar"
         role="radio"
         aria-checked="false"
-      >Solar / Off-grid</button>
+      ></button>
       <button
         type="button"
         class="cf-option bg-surface-elevated border border-hairline text-body-strong text-body-sm px-4 py-2 hover:border-primary hover:text-primary transition-colors cursor-pointer"
         data-category="home-backup"
         role="radio"
         aria-checked="false"
-      >Home Backup</button>
+      ></button>
       <button
         type="button"
         class="cf-option bg-surface-elevated border border-hairline text-body-strong text-body-sm px-4 py-2 hover:border-primary hover:text-primary transition-colors cursor-pointer"
         data-category="rv"
         role="radio"
         aria-checked="false"
-      >RV / Camper</button>
+      ></button>
       <button
         type="button"
         class="cf-option bg-surface-elevated border border-hairline text-body-strong text-body-sm px-4 py-2 hover:border-primary hover:text-primary transition-colors cursor-pointer"
         data-category="marine"
         role="radio"
         aria-checked="false"
-      >Marine / Boat</button>
+      ></button>
       <button
         type="button"
         class="cf-option bg-surface-elevated border border-hairline text-body-strong text-body-sm px-4 py-2 hover:border-primary hover:text-primary transition-colors cursor-pointer"
         data-category="ev"
         role="radio"
         aria-checked="false"
-      >EV / Battery Pack</button>
+      ></button>
       <button
         type="button"
         class="cf-option bg-surface-elevated border border-hairline text-body-strong text-body-sm px-4 py-2 hover:border-primary hover:text-primary transition-colors cursor-pointer"
         data-category="bess"
         role="radio"
         aria-checked="false"
-      >BESS / Commercial</button>
+      ></button>
       <button
         type="button"
         class="cf-option bg-surface-elevated border border-hairline text-body-strong text-body-sm px-4 py-2 hover:border-primary hover:text-primary transition-colors cursor-pointer"
         data-category="general"
         role="radio"
         aria-checked="false"
-      >General Calculation</button>
+      ></button>
     </div>
   </div>
 
   <!-- Step 2: Goal Selection (hidden until step 1 completes) -->
   <div id="cf-step2" class="hidden mt-6 pt-6 border-t border-hairline">
     <div class="flex items-center justify-between mb-3">
-      <p class="text-label-uppercase text-m-blue-light text-[10px]" id="cf-step2-label">WHAT DO YOU WANT TO CALCULATE?</p>
+      <p class="text-label-uppercase text-m-blue-light text-[10px]" id="cf-step2-label"></p>
       <button
         type="button"
         id="cf-back-btn"
         class="text-label-uppercase text-muted text-[10px] hover:text-primary transition-colors cursor-pointer"
         aria-label="Go back to category selection"
-      >← BACK</button>
+      ></button>
     </div>
     <div class="flex flex-wrap gap-2" id="cf-goals" role="radiogroup" aria-label="Calculation goal">
     </div>
@@ -77,7 +130,7 @@
 
   <!-- Results -->
   <div id="cf-results" class="hidden mt-6 pt-6 border-t border-hairline">
-    <p class="text-label-uppercase text-m-blue-light text-[10px] block mb-4">RECOMMENDED CALCULATORS</p>
+    <p class="text-label-uppercase text-m-blue-light text-[10px] block mb-4" id="cf-results-label"></p>
     <ul class="space-y-2" id="cf-results-list" role="list">
     </ul>
   </div>
@@ -85,187 +138,246 @@
 
 <script>
 (function() {
+  const finder = document.getElementById('calculator-finder');
+  const strings = JSON.parse(finder?.getAttribute('data-finder-strings') || '{}');
+  const prefix = finder?.getAttribute('data-prefix') || '';
+
+  const categoryLabels: Record<string, string> = {
+    'solar': strings.categorySolar || 'Solar / Off-grid',
+    'home-backup': strings.categoryHomeBackup || 'Home Backup',
+    'rv': strings.categoryRv || 'RV / Camper',
+    'marine': strings.categoryMarine || 'Marine / Boat',
+    'ev': strings.categoryEv || 'EV / Battery Pack',
+    'bess': strings.categoryBess || 'BESS / Commercial',
+    'general': strings.categoryGeneral || 'General Calculation',
+  };
+
+  const goalLabels: Record<string, Record<string, string>> = {
+    'solar': {
+      sizing: strings.goalSizingSolar || 'Size a battery bank for solar storage',
+      runtime: strings.goalRuntimeSolar || 'Estimate runtime from solar loads',
+      charging: strings.goalChargingSolar || 'Calculate solar charging time',
+      degradation: strings.goalDegradationSolar || 'Estimate battery degradation over time',
+    },
+    'home-backup': {
+      sizing: strings.goalSizingHome || 'Size a backup battery system',
+      inverter: strings.goalInverterHome || 'Match battery to inverter / AC load',
+      runtime: strings.goalRuntimeHome || 'Estimate backup runtime for essentials',
+      degradation: strings.goalDegradationHome || 'Estimate battery degradation over time',
+    },
+    'rv': {
+      sizing: strings.goalSizingRv || 'Size batteries for van / camper life',
+      inverter: strings.goalInverterRv || 'Match battery to inverter / AC appliances',
+      runtime: strings.goalRuntimeRv || 'Estimate off-grid runtime',
+      charging: strings.goalChargingRv || 'Calculate alternator / solar charging time',
+    },
+    'marine': {
+      sizing: strings.goalSizingMarine || 'Size a marine battery bank',
+      cable: strings.goalCableMarine || 'Calculate cable loss or voltage drop',
+      runtime: strings.goalRuntimeMarine || 'Estimate hotel-load runtime',
+      charging: strings.goalChargingMarine || 'Calculate shore / alternator charge time',
+    },
+    'ev': {
+      pack: strings.goalPackEv || 'Design a battery pack (series / parallel)',
+      cable: strings.goalCableEv || 'Calculate wiring losses or voltage drop',
+      crate: strings.goalCrateEv || 'Determine safe C-rate / current limits',
+      conversion: strings.goalConversionEv || 'Convert between Ah, Wh, and energy units',
+    },
+    'bess': {
+      roi: strings.goalRoiBess || 'Evaluate ROI and payback period',
+      sizing: strings.goalSizingBess || 'Size a BESS for peak shaving or TOU',
+      conversion: strings.goalConversionBess || 'Convert energy units or capacity',
+      degradation: strings.goalDegradationBess || 'Estimate battery life and degradation',
+    },
+    'general': {
+      sizing: strings.goalSizingGeneral || 'Size a battery bank',
+      runtime: strings.goalRuntimeGeneral || 'Estimate runtime from load',
+      conversion: strings.goalConversionGeneral || 'Convert between Ah, Wh, and units',
+      crate: strings.goalCrateGeneral || 'Calculate C-rate or safe current',
+    },
+  };
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const rules: Record<string, { goals: { id: string; label: string }[]; recommendations: Record<string, { name: string; href: string }[]> }> = {
     'solar': {
       goals: [
-        { id: 'sizing', label: 'Size a battery bank for solar storage' },
-        { id: 'runtime', label: 'Estimate runtime from solar loads' },
-        { id: 'charging', label: 'Calculate solar charging time' },
-        { id: 'degradation', label: 'Estimate battery degradation over time' },
+        { id: 'sizing', label: goalLabels.solar.sizing },
+        { id: 'runtime', label: goalLabels.solar.runtime },
+        { id: 'charging', label: goalLabels.solar.charging },
+        { id: 'degradation', label: goalLabels.solar.degradation },
       ],
       recommendations: {
         sizing: [
-          { name: 'Solar Battery Sizing Calculator', href: '/tools/solar-battery-sizing-calculator/' },
-          { name: 'Battery Sizing Calculator', href: '/tools/battery-sizing-calculator/' },
+          { name: 'Solar Battery Sizing Calculator', href: `${prefix}/tools/solar-battery-sizing-calculator/` },
+          { name: 'Battery Sizing Calculator', href: `${prefix}/tools/battery-sizing-calculator/` },
         ],
         runtime: [
-          { name: 'Runtime Calculator', href: '/tools/runtime-calculator/' },
-          { name: 'Energy Conversion Calculator', href: '/tools/energy-conversion-calculator/' },
+          { name: 'Runtime Calculator', href: `${prefix}/tools/runtime-calculator/` },
+          { name: 'Energy Conversion Calculator', href: `${prefix}/tools/energy-conversion-calculator/` },
         ],
         charging: [
-          { name: 'Charging Time Calculator', href: '/tools/charging-time-calculator/' },
-          { name: 'C-Rate Calculator', href: '/tools/c-rate-calculator/' },
+          { name: 'Charging Time Calculator', href: `${prefix}/tools/charging-time-calculator/` },
+          { name: 'C-Rate Calculator', href: `${prefix}/tools/c-rate-calculator/` },
         ],
         degradation: [
-          { name: 'Battery Degradation Estimator', href: '/tools/battery-degradation-estimator/' },
-          { name: 'SOC Estimator', href: '/tools/soc-estimator/' },
+          { name: 'Battery Degradation Estimator', href: `${prefix}/tools/battery-degradation-estimator/` },
+          { name: 'SOC Estimator', href: `${prefix}/tools/soc-estimator/` },
         ],
       },
     },
     'home-backup': {
       goals: [
-        { id: 'sizing', label: 'Size a backup battery system' },
-        { id: 'inverter', label: 'Match battery to inverter / AC load' },
-        { id: 'runtime', label: 'Estimate backup runtime for essentials' },
-        { id: 'degradation', label: 'Estimate battery degradation over time' },
+        { id: 'sizing', label: goalLabels['home-backup'].sizing },
+        { id: 'inverter', label: goalLabels['home-backup'].inverter },
+        { id: 'runtime', label: goalLabels['home-backup'].runtime },
+        { id: 'degradation', label: goalLabels['home-backup'].degradation },
       ],
       recommendations: {
         sizing: [
-          { name: 'Home Backup Battery Calculator', href: '/tools/home-backup-battery-calculator/' },
-          { name: 'Battery Sizing Calculator', href: '/tools/battery-sizing-calculator/' },
+          { name: 'Home Backup Battery Calculator', href: `${prefix}/tools/home-backup-battery-calculator/` },
+          { name: 'Battery Sizing Calculator', href: `${prefix}/tools/battery-sizing-calculator/` },
         ],
         inverter: [
-          { name: 'Inverter Battery Calculator', href: '/tools/inverter-battery-calculator/' },
-          { name: 'Energy Conversion Calculator', href: '/tools/energy-conversion-calculator/' },
+          { name: 'Inverter Battery Calculator', href: `${prefix}/tools/inverter-battery-calculator/` },
+          { name: 'Energy Conversion Calculator', href: `${prefix}/tools/energy-conversion-calculator/` },
         ],
         runtime: [
-          { name: 'Runtime Calculator', href: '/tools/runtime-calculator/' },
-          { name: 'C-Rate Calculator', href: '/tools/c-rate-calculator/' },
+          { name: 'Runtime Calculator', href: `${prefix}/tools/runtime-calculator/` },
+          { name: 'C-Rate Calculator', href: `${prefix}/tools/c-rate-calculator/` },
         ],
         degradation: [
-          { name: 'Battery Degradation Estimator', href: '/tools/battery-degradation-estimator/' },
-          { name: 'SOC Estimator', href: '/tools/soc-estimator/' },
+          { name: 'Battery Degradation Estimator', href: `${prefix}/tools/battery-degradation-estimator/` },
+          { name: 'SOC Estimator', href: `${prefix}/tools/soc-estimator/` },
         ],
       },
     },
     'rv': {
       goals: [
-        { id: 'sizing', label: 'Size batteries for van / camper life' },
-        { id: 'inverter', label: 'Match battery to inverter / AC appliances' },
-        { id: 'runtime', label: 'Estimate off-grid runtime' },
-        { id: 'charging', label: 'Calculate alternator / solar charging time' },
+        { id: 'sizing', label: goalLabels.rv.sizing },
+        { id: 'inverter', label: goalLabels.rv.inverter },
+        { id: 'runtime', label: goalLabels.rv.runtime },
+        { id: 'charging', label: goalLabels.rv.charging },
       ],
       recommendations: {
         sizing: [
-          { name: 'RV Battery Calculator', href: '/tools/rv-battery-calculator/' },
-          { name: 'Battery Sizing Calculator', href: '/tools/battery-sizing-calculator/' },
+          { name: 'RV Battery Calculator', href: `${prefix}/tools/rv-battery-calculator/` },
+          { name: 'Battery Sizing Calculator', href: `${prefix}/tools/battery-sizing-calculator/` },
         ],
         inverter: [
-          { name: 'Inverter Battery Calculator', href: '/tools/inverter-battery-calculator/' },
-          { name: 'Parallel String Calculator', href: '/tools/parallel-string-calculator/' },
+          { name: 'Inverter Battery Calculator', href: `${prefix}/tools/inverter-battery-calculator/` },
+          { name: 'Parallel String Calculator', href: `${prefix}/tools/parallel-string-calculator/` },
         ],
         runtime: [
-          { name: 'Runtime Calculator', href: '/tools/runtime-calculator/' },
-          { name: 'Energy Conversion Calculator', href: '/tools/energy-conversion-calculator/' },
+          { name: 'Runtime Calculator', href: `${prefix}/tools/runtime-calculator/` },
+          { name: 'Energy Conversion Calculator', href: `${prefix}/tools/energy-conversion-calculator/` },
         ],
         charging: [
-          { name: 'Charging Time Calculator', href: '/tools/charging-time-calculator/' },
-          { name: 'C-Rate Calculator', href: '/tools/c-rate-calculator/' },
+          { name: 'Charging Time Calculator', href: `${prefix}/tools/charging-time-calculator/` },
+          { name: 'C-Rate Calculator', href: `${prefix}/tools/c-rate-calculator/` },
         ],
       },
     },
     'marine': {
       goals: [
-        { id: 'sizing', label: 'Size a marine battery bank' },
-        { id: 'cable', label: 'Calculate cable loss or voltage drop' },
-        { id: 'runtime', label: 'Estimate hotel-load runtime' },
-        { id: 'charging', label: 'Calculate shore / alternator charge time' },
+        { id: 'sizing', label: goalLabels.marine.sizing },
+        { id: 'cable', label: goalLabels.marine.cable },
+        { id: 'runtime', label: goalLabels.marine.runtime },
+        { id: 'charging', label: goalLabels.marine.charging },
       ],
       recommendations: {
         sizing: [
-          { name: 'Marine Battery Sizing Calculator', href: '/tools/marine-battery-sizing-calculator/' },
-          { name: 'Battery Sizing Calculator', href: '/tools/battery-sizing-calculator/' },
+          { name: 'Marine Battery Sizing Calculator', href: `${prefix}/tools/marine-battery-sizing-calculator/` },
+          { name: 'Battery Sizing Calculator', href: `${prefix}/tools/battery-sizing-calculator/` },
         ],
         cable: [
-          { name: 'DC Cable Loss Calculator', href: '/tools/dc-cable-loss-calculator/' },
-          { name: 'Voltage Drop Calculator', href: '/tools/voltage-drop-calculator/' },
+          { name: 'DC Cable Loss Calculator', href: `${prefix}/tools/dc-cable-loss-calculator/` },
+          { name: 'Voltage Drop Calculator', href: `${prefix}/tools/voltage-drop-calculator/` },
         ],
         runtime: [
-          { name: 'Runtime Calculator', href: '/tools/runtime-calculator/' },
-          { name: 'Inverter Battery Calculator', href: '/tools/inverter-battery-calculator/' },
+          { name: 'Runtime Calculator', href: `${prefix}/tools/runtime-calculator/` },
+          { name: 'Inverter Battery Calculator', href: `${prefix}/tools/inverter-battery-calculator/` },
         ],
         charging: [
-          { name: 'Charging Time Calculator', href: '/tools/charging-time-calculator/' },
-          { name: 'C-Rate Calculator', href: '/tools/c-rate-calculator/' },
+          { name: 'Charging Time Calculator', href: `${prefix}/tools/charging-time-calculator/` },
+          { name: 'C-Rate Calculator', href: `${prefix}/tools/c-rate-calculator/` },
         ],
       },
     },
     'ev': {
       goals: [
-        { id: 'pack', label: 'Design a battery pack (series / parallel)' },
-        { id: 'cable', label: 'Calculate wiring losses or voltage drop' },
-        { id: 'crate', label: 'Determine safe C-rate / current limits' },
-        { id: 'conversion', label: 'Convert between Ah, Wh, and energy units' },
+        { id: 'pack', label: goalLabels.ev.pack },
+        { id: 'cable', label: goalLabels.ev.cable },
+        { id: 'crate', label: goalLabels.ev.crate },
+        { id: 'conversion', label: goalLabels.ev.conversion },
       ],
       recommendations: {
         pack: [
-          { name: 'Battery Pack Calculator', href: '/tools/battery-pack-calculator/' },
-          { name: 'Parallel String Calculator', href: '/tools/parallel-string-calculator/' },
+          { name: 'Battery Pack Calculator', href: `${prefix}/tools/battery-pack-calculator/` },
+          { name: 'Parallel String Calculator', href: `${prefix}/tools/parallel-string-calculator/` },
         ],
         cable: [
-          { name: 'DC Cable Loss Calculator', href: '/tools/dc-cable-loss-calculator/' },
-          { name: 'Voltage Drop Calculator', href: '/tools/voltage-drop-calculator/' },
+          { name: 'DC Cable Loss Calculator', href: `${prefix}/tools/dc-cable-loss-calculator/` },
+          { name: 'Voltage Drop Calculator', href: `${prefix}/tools/voltage-drop-calculator/` },
         ],
         crate: [
-          { name: 'C-Rate Calculator', href: '/tools/c-rate-calculator/' },
-          { name: 'Battery Pack Calculator', href: '/tools/battery-pack-calculator/' },
+          { name: 'C-Rate Calculator', href: `${prefix}/tools/c-rate-calculator/` },
+          { name: 'Battery Pack Calculator', href: `${prefix}/tools/battery-pack-calculator/` },
         ],
         conversion: [
-          { name: 'Energy Conversion Calculator', href: '/tools/energy-conversion-calculator/' },
-          { name: 'SOC Estimator', href: '/tools/soc-estimator/' },
+          { name: 'Energy Conversion Calculator', href: `${prefix}/tools/energy-conversion-calculator/` },
+          { name: 'SOC Estimator', href: `${prefix}/tools/soc-estimator/` },
         ],
       },
     },
     'bess': {
       goals: [
-        { id: 'roi', label: 'Evaluate ROI and payback period' },
-        { id: 'sizing', label: 'Size a BESS for peak shaving or TOU' },
-        { id: 'conversion', label: 'Convert energy units or capacity' },
-        { id: 'degradation', label: 'Estimate battery life and degradation' },
+        { id: 'roi', label: goalLabels.bess.roi },
+        { id: 'sizing', label: goalLabels.bess.sizing },
+        { id: 'conversion', label: goalLabels.bess.conversion },
+        { id: 'degradation', label: goalLabels.bess.degradation },
       ],
       recommendations: {
         roi: [
-          { name: 'BESS ROI Calculator', href: '/tools/bess-roi-calculator/' },
-          { name: 'Energy Conversion Calculator', href: '/tools/energy-conversion-calculator/' },
+          { name: 'BESS ROI Calculator', href: `${prefix}/tools/bess-roi-calculator/` },
+          { name: 'Energy Conversion Calculator', href: `${prefix}/tools/energy-conversion-calculator/` },
         ],
         sizing: [
-          { name: 'Battery Sizing Calculator', href: '/tools/battery-sizing-calculator/' },
-          { name: 'Inverter Battery Calculator', href: '/tools/inverter-battery-calculator/' },
+          { name: 'Battery Sizing Calculator', href: `${prefix}/tools/battery-sizing-calculator/` },
+          { name: 'Inverter Battery Calculator', href: `${prefix}/tools/inverter-battery-calculator/` },
         ],
         conversion: [
-          { name: 'Energy Conversion Calculator', href: '/tools/energy-conversion-calculator/' },
-          { name: 'SOC Estimator', href: '/tools/soc-estimator/' },
+          { name: 'Energy Conversion Calculator', href: `${prefix}/tools/energy-conversion-calculator/` },
+          { name: 'SOC Estimator', href: `${prefix}/tools/soc-estimator/` },
         ],
         degradation: [
-          { name: 'Battery Degradation Estimator', href: '/tools/battery-degradation-estimator/' },
-          { name: 'BESS ROI Calculator', href: '/tools/bess-roi-calculator/' },
+          { name: 'Battery Degradation Estimator', href: `${prefix}/tools/battery-degradation-estimator/` },
+          { name: 'BESS ROI Calculator', href: `${prefix}/tools/bess-roi-calculator/` },
         ],
       },
     },
     'general': {
       goals: [
-        { id: 'sizing', label: 'Size a battery bank' },
-        { id: 'runtime', label: 'Estimate runtime from load' },
-        { id: 'conversion', label: 'Convert between Ah, Wh, and units' },
-        { id: 'crate', label: 'Calculate C-rate or safe current' },
+        { id: 'sizing', label: goalLabels.general.sizing },
+        { id: 'runtime', label: goalLabels.general.runtime },
+        { id: 'conversion', label: goalLabels.general.conversion },
+        { id: 'crate', label: goalLabels.general.crate },
       ],
       recommendations: {
         sizing: [
-          { name: 'Battery Sizing Calculator', href: '/tools/battery-sizing-calculator/' },
-          { name: 'Parallel String Calculator', href: '/tools/parallel-string-calculator/' },
+          { name: 'Battery Sizing Calculator', href: `${prefix}/tools/battery-sizing-calculator/` },
+          { name: 'Parallel String Calculator', href: `${prefix}/tools/parallel-string-calculator/` },
         ],
         runtime: [
-          { name: 'Runtime Calculator', href: '/tools/runtime-calculator/' },
-          { name: 'Charging Time Calculator', href: '/tools/charging-time-calculator/' },
+          { name: 'Runtime Calculator', href: `${prefix}/tools/runtime-calculator/` },
+          { name: 'Charging Time Calculator', href: `${prefix}/tools/charging-time-calculator/` },
         ],
         conversion: [
-          { name: 'Energy Conversion Calculator', href: '/tools/energy-conversion-calculator/' },
-          { name: 'SOC Estimator', href: '/tools/soc-estimator/' },
+          { name: 'Energy Conversion Calculator', href: `${prefix}/tools/energy-conversion-calculator/` },
+          { name: 'SOC Estimator', href: `${prefix}/tools/soc-estimator/` },
         ],
         crate: [
-          { name: 'C-Rate Calculator', href: '/tools/c-rate-calculator/' },
-          { name: 'Battery Pack Calculator', href: '/tools/battery-pack-calculator/' },
+          { name: 'C-Rate Calculator', href: `${prefix}/tools/c-rate-calculator/` },
+          { name: 'Battery Pack Calculator', href: `${prefix}/tools/battery-pack-calculator/` },
         ],
       },
     },
@@ -280,6 +392,30 @@
   const resultsContainer = document.getElementById('cf-results') as HTMLElement | null;
   const resultsList = document.getElementById('cf-results-list') as HTMLElement | null;
   const backBtn = document.getElementById('cf-back-btn') as HTMLElement | null;
+
+  // Populate translated text
+  const titleEl = document.getElementById('cf-title');
+  const subtitleEl = document.getElementById('cf-subtitle');
+  const step1LabelEl = document.getElementById('cf-step1-label');
+  const step2LabelEl = document.getElementById('cf-step2-label');
+  const backBtnEl = document.getElementById('cf-back-btn');
+  const resultsLabelEl = document.getElementById('cf-results-label');
+
+  if (titleEl) titleEl.textContent = strings.title || 'Find the Right Calculator';
+  if (subtitleEl) subtitleEl.textContent = strings.subtitle || '';
+  if (step1LabelEl) step1LabelEl.textContent = strings.step1Label || '';
+  if (step2LabelEl) step2LabelEl.textContent = strings.step2Label || '';
+  if (backBtnEl) backBtnEl.textContent = `← ${strings.back || 'BACK'}`;
+  if (resultsLabelEl) resultsLabelEl.textContent = strings.resultsLabel || '';
+
+  // Populate category button labels
+  const categoryBtns = step1?.querySelectorAll('.cf-option');
+  categoryBtns?.forEach((btn) => {
+    const cat = btn.getAttribute('data-category');
+    if (cat && categoryLabels[cat]) {
+      btn.textContent = categoryLabels[cat];
+    }
+  });
 
   function emitFinderEvent(category: string, goal: string) {
     if (typeof window !== 'undefined' && window.dataLayer) {
@@ -302,7 +438,7 @@
       const a = document.createElement('a');
       a.href = rec.href;
       a.className = 'flex items-center justify-between bg-surface-elevated border border-hairline p-4 text-primary hover:border-primary transition-colors group';
-      a.innerHTML = '<span class="text-title-sm text-primary group-hover:text-m-blue-light transition-colors">' + rec.name + '</span><span class="text-label-uppercase text-muted text-[10px] group-hover:text-primary transition-colors">OPEN →</span>';
+      a.innerHTML = '<span class="text-title-sm text-primary group-hover:text-m-blue-light transition-colors">' + rec.name + '</span><span class="text-label-uppercase text-muted text-[10px] group-hover:text-primary transition-colors">' + (strings.open || 'OPEN') + ' →</span>';
       li.appendChild(a);
       if (resultsList) resultsList.appendChild(li);
     });

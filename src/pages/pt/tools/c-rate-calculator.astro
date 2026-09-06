@@ -1,0 +1,379 @@
+---
+import CalculatorLayout from '../../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import InputField from '../../../components/InputField.astro';
+import ResultBox from '../../../components/ResultBox.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import WorkedExample from '../../../components/WorkedExample.astro';
+import ComparisonTable from '../../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../../components/EngineeringDiagram.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import RelatedTools from '../../../components/RelatedTools.astro';
+
+const modeOptions = [
+  { label: "Resolver para Taxa C (Corrente Conhecida)", value: "solve-c" },
+  { label: "Resolver para Corrente (Taxa C Conhecida)", value: "solve-current" },
+];
+
+const whatIs = `A taxa C é uma medida normalizada da corrente de carga ou descarga em relação à capacidade total de uma bateria. Uma taxa C de 1C significa que a corrente carregará ou descará a bateria completamente em exatamente uma hora. Uma taxa de 0,5C leva duas horas; uma taxa de 2C leva 30 minutos. A taxa C é a linguagem universal para especificar o desempenho de baterias — permite aos engenheiros comparar células de diferentes capacidades em pé de igualdade. Entender a taxa C é essencial para dimensionar carregadores, selecionar correntes de descarga apropriadas, prever autonomia e evitar condições que aceleram a degradação ou causam corrida térmica.`;
+
+const whyItMatters = [
+  "Carregar acima da taxa C recomendada causa deposição de lítio no ânodo, reduzindo permanentemente a capacidade e criando riscos de segurança.",
+  "Descarregar a altas taxas C reduz a capacidade utilizável devido à queda de tensão e perdas por resistência interna — uma bateria de 100Ah pode entregar apenas 80Ah a 2C.",
+  "Baterias de chumbo-ácido sofrem perdas severas de Peukert acima de 0,2C, tornando o entendimento da taxa C crítico para previsões precisas de autonomia.",
+  "Taxas C incompatíveis entre carregador e bateria levam a cargas perigosamente rápidas ou tempos de carga desnecessariamente lentos.",
+  "A taxa C se correlaciona diretamente com a geração de calor (perdas I²R) — exceder os limites térmicos aciona proteção do BMS e desligamentos.",
+];
+
+const practicalApplications = [
+  { title: "Dimensionamento de Carregador", description: "Selecionar a corrente do carregador para corresponder aos limites da química da bateria — 0,5C para longevidade LFP, 1C para carga rápida NMC." },
+  { title: "Análise de Carga", description: "Determinar se a corrente da carga excede os limites seguros de descarga contínua para sua configuração de bateria." },
+  { title: "Estimativa de Autonomia", description: "Converter a potência da carga em taxa C para avaliar rapidamente se uma bateria pode sustentar um perfil de carga determinado." },
+  { title: "Dimensionamento de Trem de Força de VE", description: "Corresponder a extração de corrente do motor à capacidade de taxa C do pacote de baterias para aceleração de pico e frenagem regenerativa." },
+  { title: "Projeto de Backup de Telecomunicações", description: "Dimensionar bancos de baterias para que as cargas de backup extraiam em taxas C seguras durante apagões prolongados na rede." },
+];
+
+const expertNotes = [
+  { title: 'Taxas C de LFP vs NMC', variant: 'engineering', content: 'Células LiFePO4 são geralmente otimizadas para taxas contínuas de 0,5C–1C, com picos até 3C. Células NMC podem suportar taxas contínuas mais altas (1–2C) mas com vida útil em ciclos mais curta em taxas elevadas. Sempre verifique as folhas de dados do fabricante para limites específicos de taxa C.' },
+  { title: 'Peukert de Chumbo-Ácido', variant: 'warning', content: 'Sistemas pesados de ciclo profundo de chumbo-ácido devem ser limitados a 0,1C–0,2C para evitar redução severa de capacidade. A 1C, uma bateria de chumbo-ácido pode entregar apenas 50–60% de sua capacidade nominal devido ao efeito Peukert.' },
+] as const;;
+
+const trustSection = {
+  text: "A taxa C é um conceito universalmente definido na engenharia de baterias (IEC 62660). As fórmulas usadas aqui — C = I/Capacidade, Tempo = 1/C — são definições padrão da indústria. Todos os cálculos são transparentes e exibidos passo a passo.",
+  link: { label: "Ver nossa metodologia completa", href: "/methodology/" },
+};
+
+const references = [
+  { title: "Battery University — O Que é Taxa C?", url: "https://batteryuniversity.com/article/bu-402-what-is-the-peukert-effect", source: "Battery University / Cadex Electronics" },
+  { title: "IEC 62660-1 — Células secundárias de lítio para VE", url: "https://webstore.iec.ch/en/publication/26272", source: "International Electrotechnical Commission" },
+  { title: "Victron Energy — Taxas de Carga e Descarga de Bateria", url: "https://www.victronenergy.com/help-center", source: "Victron Energy" },
+];
+
+const faqItems = [
+  {
+    question: "O que \"1C\" significa em termos práticos?",
+    answer: "Uma taxa C de 1C significa que a corrente de carga ou descarga esvaziará ou encherá a bateria completamente em exatamente 1 hora. Para um pacote de 100 Ah, uma taxa C de 1C é uma corrente de 100 A. Uma taxa de 2C (200 A) o esvaziaria em 30 minutos, enquanto uma taxa de 0,5C (50 A) o esvaziaria em 2 horas.",
+  },
+  {
+    question: "Por que baterias de chumbo-ácido perdem capacidade a altas taxas C?",
+    answer: "Baterias de chumbo-ácido dependem da difusão química do ácido no material ativo das placas. A altas correntes (ex: >0,2C), o ácido próximo às placas é consumido mais rápido do que pode difundir do eletrólito em massa, causando queda rápida de tensão de terminal e acionamento prematuro de desconexões de baixa tensão.",
+  },
+  {
+    question: "Como a taxa C se correlaciona com a degradação?",
+    answer: "Operar a altas taxas C (especialmente carregar acima de 1C) gera estresse térmico significativo (calor I²R) e acelera a deposição de lítio em químicas de íon-lítio. Ambos os fatores levam a queda acelerada de capacidade e podem reduzir ciclos de vida pela metade.",
+  },
+  {
+    question: "A taxa C de carga é a mesma que a de descarga?",
+    answer: "Não. Na maioria das especificações de bateria, a taxa C máxima de descarga contínua é significativamente maior que a taxa C de carga. Por exemplo, uma célula LFP de qualidade pode suportar 1C de descarga contínua, mas apenas limites de 0,5C de carga.",
+  },
+  {
+    question: "Qual é uma taxa C segura para baterias LiFePO4?",
+    answer: "Células LFP padrão suportam 0,5C–1C de descarga contínua e 0,2C–0,5C de carga para vida útil ótima em ciclos. Algumas células LFP de alta potência suportam até 3C de descarga em picos. Sempre verifique a folha de dados do fabricante para limites específicos.",
+  },
+  {
+    question: "Como a taxa C afeta a autonomia da bateria?",
+    answer: "Taxas C mais altas reduzem a capacidade utilizável devido a perdas por resistência interna. Uma bateria de 100Ah a 0,1C entrega cerca de 100Ah, mas a 2C pode entregar apenas 80–85Ah. Isso é especialmente pronunciado em baterias de chumbo-ácido devido ao efeito Peukert.",
+  },
+  {
+    question: "Posso carregar uma bateria a uma taxa C maior que a especificada?",
+    answer: "Exceder a taxa C de carga recomendada pelo fabricante arrisca deposição de lítio, corrida térmica e garantias invalidadas. Embora algumas células tolerem cargas de alta taxa breves, a carga sustentada acima da especificação acelera a degradação significativamente.",
+  },
+  {
+    question: "Qual taxa C devo usar para carga solar?",
+    answer: "Controladores de carga solar normalmente carregam a 0,2C–0,5C dependendo do tamanho do arranjo solar e da capacidade da bateria. Um banco LFP de 200Ah pareado com um carregador de 100A carrega a 0,5C, o que é aceitável para a maioria das químicas LFP.",
+  },
+  {
+    question: "Como converter watts em taxa C?",
+    answer: "Divida a potência da carga (watts) pela tensão da bateria para obter a corrente (amperes), depois divida pela capacidade (Ah). Fórmula: Taxa C = Potência (W) / (Tensão (V) × Capacidade (Ah)). Por exemplo, 250W em uma bateria de 12,8V 100Ah = 250/(12,8×100) = 0,195C.",
+  },
+  {
+    question: "O que acontece se eu descarregar a uma taxa C muito alta?",
+    answer: "Taxas C de descarga excessivas causam queda de tensão, capacidade utilizável reduzida, superaquecimento e potencial desligamento do BMS. Em casos extremos, pode causar dano permanente às células por dissolução de cobre ou curto-circuitos internos.",
+  },
+  {
+    question: "0,5C é considerada carga rápida ou lenta?",
+    answer: "0,5C é moderada — carrega completamente uma bateria em cerca de 2 horas (considerando a fase CV). Para LFP, isso é considerado o limite superior da carga ótima. Para NMC, é padrão. A carga rápida é geralmente considerada 1C ou acima.",
+  },
+];
+
+const commonMistakes = [
+  "Confundir taxas C de carga e descarga — a taxa máxima de carga é tipicamente muito menor que a de descarga. Uma célula que suporta 1C de descarga pode carregar com segurança apenas a 0,3C.",
+  "Ignorar a taxa C ao dimensionar carregadores — um carregador muito potente para a química da bateria pode causar deposição de lítio, corrida térmica e garantias invalidadas.",
+  "Usar Ah para comparar baterias de diferentes tensões — a taxa C normaliza o desempenho pela capacidade, mas a energia total (Wh) também deve ser considerada para comparações justas.",
+  "Assumir descarga linear a altas taxas C — perdas por resistência interna (I²R) aumentam quadraticamente com a corrente, reduzindo a capacidade utilizável mais do que o esperado.",
+  "Ignorar efeitos da temperatura na taxa C — temperaturas baixas aumentam a resistência interna, reduzindo efetivamente a taxa C máxima segura. Uma bateria com taxa nominal de 1C a 25°C pode suportar apenas 0,5C com segurança a 0°C.",
+  "Superdimensionar a taxa C do carregador por velocidade — carregar a 1C ou acima gera calor significativo e acelera a degradação. O uso diário deve ficar entre 0,2C–0,5C para longevidade.",
+  "Não considerar o efeito Peukert em chumbo-ácido — a altas taxas C, baterias de chumbo-ácido perdem 30–50% da capacidade nominal. Sempre use valores ajustados pelo Peukert para cálculos de chumbo-ácido.",
+  "Usar tempo teórico de descarga para estimativas de autonomia — 1/C fornece tempo teórico a 100% DoD. A autonomia real é menor devido a limites de DoD, perdas de eficiência e queda de tensão.",
+  "Ignorar limites de taxa C do BMS — o BMS pode impor um limite de taxa C menor que o especificado pelo fabricante da célula. Sempre verifique a folha de dados do BMS, não apenas da célula.",
+  "Misturar células com diferentes capacidades de taxa C em paralelo — a string com menor resistência interna carregará corrente desproporcional, causando desequilíbrio e superaquecimento.",
+];
+
+const relatedTools = [
+  { href: "/tools/runtime-calculator/", title: "Calculadora de Autonomia", description: "Calcular autonomia a partir de carga em Watts diretamente." },
+  { href: "/tools/charging-time-calculator/", title: "Tempo de Carga", description: "Estimar durações de carga CC-CV." },
+  { href: "/tools/battery-degradation-estimator/", title: "Estimador de Degradação", description: "Modelar decaimento do estado de saúde ao longo do tempo." },
+  { href: "/tools/battery-sizing-calculator/", title: "Ferramenta de Dimensionamento", description: "Determinar requisitos de dimensionamento por consumo diário." },
+  { href: "/tools/soc-estimator/", title: "Estimador de SOC", description: "Interpolar Estado de Carga a partir da tensão." },
+  { href: "/tools/energy-conversion-calculator/", title: "Conversão de Energia", description: "Converter entre capacidade Ah e energia Wh." },
+  { href: "/tools/battery-pack-calculator/", title: "Calculadora de Pacote de Bateria", description: "Projetar configurações de células série/paralelo." },
+  { href: "/tools/c-rate-calculator/", title: "Calculadora de Taxa C", description: "Calcular taxas de corrente de carga e descarga." },
+];
+---
+
+<CalculatorLayout
+  title="Calculadora de Taxa C de Bateria | Calculadoras de Bateria"
+  description="Converta entre corrente de descarga, capacidade da bateria e taxa C. Estime tempos de carga/descarga com fórmulas transparentes."
+  faqItems={faqItems}
+  commonMistakes={commonMistakes}
+  relatedCalculators={relatedTools}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+  lang="pt"
+>
+
+  <!-- Main Calculator Grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+
+    <!-- Input Form -->
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Parâmetros</h3>
+      <div class="flex flex-col gap-6">
+        <InputField id="mode" label="Objetivo do Cálculo" type="select" options={modeOptions} value="solve-c" />
+        <InputField id="capacity" label="Capacidade da Bateria (Ah)" value={100} min={0.1} step="any" />
+
+        <!-- Dynamic Input (Current or C-rate) -->
+        <div class="flex flex-col gap-2" id="input-current-wrapper">
+          <label for="input-val" class="text-label-uppercase text-xs text-primary" id="dynamic-label">Corrente Contínua (Amperes)</label>
+          <input type="number" id="input-val" value="50" class="text-input" min="0.01" step="any" />
+        </div>
+
+      </div>
+    </CalculatorCard>
+
+    <!-- Calculation Results -->
+    <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Saídas Estimadas</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <!-- Main Output 1 -->
+          <ResultBox
+            id="result-val-1-box"
+            label=""
+            value="0,50 C"
+            variant="primary"
+          >
+            <span class="text-label-uppercase text-muted text-[10px] block mb-1" id="out-label-1">Taxa C Calculada</span>
+            <span class="text-caption text-muted block mt-1" id="out-desc-1">Relação Corrente/Capacidade</span>
+          </ResultBox>
+
+          <!-- Main Output 2 -->
+          <ResultBox
+            id="result-val-2-box"
+            label="Duração da Descarga"
+            value="2h 00m"
+          >
+            <span class="text-caption text-muted block mt-1" id="result-hours-decimal">2,00 horas</span>
+          </ResultBox>
+        </div>
+      </div>
+
+      <!-- Action Area -->
+      <div class="border-t border-hairline pt-6">
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">Diretrizes de Taxa C (Lítio vs Chumbo-Ácido)</h4>
+        <p class="text-body-sm text-muted">
+          Células LiFePO4 são geralmente otimizadas para taxas contínuas de 0,5C–1C, com picos até 3C. Sistemas pesados de ciclo profundo de chumbo-ácido devem ser limitados a 0,1C–0,2C para evitar redução severa de capacidade.
+        </p>
+      </div>
+    </CalculatorCard>
+
+  </div>
+
+  <!-- Formulas and Worked Examples -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">Fórmulas e Exemplos Práticos</h2>
+
+    <FormulaBox title="Fórmulas Matemáticas">
+      <p>
+        A Taxa C representa a velocidade na qual uma bateria é carregada ou descarregada em relação à sua capacidade máxima.
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Taxa C (h⁻¹) = Corrente (A) / Capacidade (Ah)
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Corrente de Descarga (A) = Capacidade (Ah) × Taxa C (h⁻¹)
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Tempo Teórico (Horas) = 1 / Taxa C
+      </div>
+    </FormulaBox>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample
+        number={1}
+        title="Calcular Taxa C a partir da Corrente"
+        scenario="Uma bateria LiFePO4 de 200Ah está descarregando a 100A de corrente contínua. Qual é a taxa C e a autonomia teórica?"
+        inputs={[
+          { label: "Capacidade da Bateria", value: "200 Ah" },
+          { label: "Corrente de Descarga", value: "100 A" },
+        ]}
+        steps={[
+          { label: "Passo 1: Calcular taxa C", formula: "C = I / Capacidade = 100 A / 200 Ah", result: "0,50 C" },
+          { label: "Passo 2: Calcular tempo teórico de descarga", formula: "T = 1 / Taxa C = 1 / 0,50", result: "2,00 horas" },
+          { label: "Passo 3: Aplicar limite de 80% DoD", formula: "T_real = 2,00 h × 0,80", result: "1,60 horas (1h 36m)" },
+        ]}
+        answer="Taxa C = 0,50C, autonomia teórica = 2,00 horas (1,60 horas a 80% DoD)"
+        interpretation="A 0,5C, esta bateria LFP está dentro de sua faixa ótima de descarga. O ajuste de 80% DoD considera os limites recomendados de profundidade de descarga para preservar a vida útil dos ciclos."
+        variant="default"
+      />
+
+      <WorkedExample
+        number={2}
+        title="Calcular Corrente a partir da Taxa C"
+        scenario="Você quer descarregar uma bateria NMC de 100Ah a 0,5C. Qual corrente deve extrair e quanto tempo durará?"
+        inputs={[
+          { label: "Capacidade da Bateria", value: "100 Ah" },
+          { label: "Taxa C Alvo", value: "0,5 C" },
+        ]}
+        steps={[
+          { label: "Passo 1: Calcular corrente de descarga", formula: "I = Capacidade × Taxa C = 100 Ah × 0,5", result: "50 A" },
+          { label: "Passo 2: Calcular autonomia teórica", formula: "T = 1 / Taxa C = 1 / 0,5", result: "2,00 horas" },
+        ]}
+        answer="Corrente de descarga = 50 A, autonomia = 2,00 horas"
+        interpretation="Uma taxa de 0,5C é moderada para química NMC — equilibra desempenho com longevidade. Carregar nesta taxa levaria aproximadamente 2,5 horas considerando a fase CV."
+      />
+
+      <WorkedExample
+        number={3}
+        title="Comparação de Chumbo-Ácido a Alta Taxa C"
+        scenario="Uma bateria de chumbo-ácido de 100Ah é descarregada a 50A (0,5C). Compare a capacidade utilizável com um equivalente de lítio."
+        inputs={[
+          { label: "Capacidade da Bateria", value: "100 Ah (ambas)" },
+          { label: "Corrente de Descarga", value: "50 A (0,5C)" },
+          { label: "Química", value: "Chumbo-Ácido vs LFP" },
+        ]}
+        steps={[
+          { label: "Chumbo-Ácido a 0,5C", formula: "Capacidade utilizável ≈ 100 Ah × 0,60 (Peukert)", result: "60 Ah entregues" },
+          { label: "LFP a 0,5C", formula: "Capacidade utilizável ≈ 100 Ah × 0,95", result: "95 Ah entregues" },
+          { label: "Diferença de capacidade", formula: "95 Ah - 60 Ah", result: "35 Ah a mais do LFP" },
+        ]}
+        answer="Chumbo-Ácido entrega ~60Ah, LFP entrega ~95Ah a 0,5C — uma vantagem de 58% para o lítio"
+        interpretation="O efeito Peukert do chumbo-ácido causa perda severa de capacidade a taxas C mais altas. A 0,5C, o chumbo-ácido perde ~40% da capacidade nominal enquanto o lítio retém quase toda."
+        variant="default"
+      />
+    </div>
+  </section>
+
+  <EngineeringDiagram
+    title="Fluxo do Sistema de Taxa C"
+    description="Como capacidade da bateria, corrente e taxa C se relacionam em um sistema de descarga"
+    variant="flow"
+    steps={[
+      { label: "Banco de Baterias", icon: "battery" },
+      { label: "Extração de Corrente", icon: "cable" },
+      { label: "Carga Conectada", icon: "load" },
+      { label: "Saída de Autonomia", icon: "chart" },
+    ]}
+  />
+
+  <ComparisonTable
+    title="Taxa C por Química — Limites Recomendados"
+    headers={["Química", "Descarga Contínua Máx.", "Carga Recomendada", "Descarga em Pico", "Impacto na Vida Útil"]}
+    rows={[
+      ["LiFePO4 (LFP)", "1C", "0,5C", "3C", "Mínimo a ≤1C"],
+      ["NMC (Li-ion)", "2C", "0,7C", "3C", "Moderado a >1C"],
+      ["Chumbo-Ácido (AGM)", "0,2C", "0,1C", "0,5C", "Perda severa de Peukert"],
+      ["Chumbo-Ácido (Inundado)", "0,1C", "0,1C", "0,3C", "Perda severa de Peukert"],
+      ["Célula Gel", "0,2C", "0,1C", "0,5C", "Perda moderada de Peukert"],
+    ]}
+    caption="Taxas C contínuas recomendadas para vida útil ótima em ciclos. Exceder esses limites acelera a degradação."
+  />
+
+  <FAQSection items={faqItems} />
+
+  <!-- Calculation Script -->
+  <script>
+    import { calculateCRate } from '../../../../utils/calculators';
+
+    const modeSelect = document.getElementById('mode') as HTMLSelectElement;
+    const capacityInput = document.getElementById('capacity') as HTMLInputElement;
+    const dynamicLabel = document.getElementById('dynamic-label');
+    const inputVal = document.getElementById('input-val') as HTMLInputElement;
+
+    // Outputs
+    const outLabel1 = document.getElementById('out-label-1');
+    const outDesc1 = document.getElementById('out-desc-1');
+    const resultVal1Box = document.getElementById('result-val-1-box');
+    const resultVal1 = resultVal1Box?.querySelector('.text-display-md') as HTMLElement;
+    const resultVal2Box = document.getElementById('result-val-2-box');
+    const resultVal2 = resultVal2Box?.querySelector('.text-title-lg') as HTMLElement;
+    const resultHoursDecimal = document.getElementById('result-hours-decimal');
+
+    function updateLabels() {
+      const mode = modeSelect.value;
+      if (mode === 'solve-c') {
+        if (dynamicLabel) dynamicLabel.textContent = 'Corrente Contínua (Amperes)';
+        if (outLabel1) outLabel1.textContent = 'Taxa C Calculada';
+        if (outDesc1) outDesc1.textContent = 'Relação Corrente/Capacidade';
+      } else {
+        if (dynamicLabel) dynamicLabel.textContent = 'Taxa C Alvo (h⁻¹)';
+        if (outLabel1) outLabel1.textContent = 'Corrente Calculada';
+        if (outDesc1) outDesc1.textContent = 'Corrente necessária em Amperes';
+      }
+      updateCalculations();
+    }
+
+    function updateCalculations() {
+      const mode = modeSelect.value;
+      const capacity = parseFloat(capacityInput.value) || 100;
+      const val = parseFloat(inputVal.value) || 0;
+
+      const calcTarget = mode === 'solve-c' ? 'current' : 'time';
+      const calcVal = calcTarget === 'current' ? val : (val > 0 ? 1 / val : 0);
+
+      const results = calculateCRate(capacity, calcTarget, calcVal);
+
+      if (mode === 'solve-c') {
+        if (resultVal1) resultVal1.textContent = `${results.cRate.toFixed(2)} C`;
+
+        if (results.timeHours <= 0) {
+          if (resultVal2) resultVal2.textContent = '0h 00m';
+          if (resultHoursDecimal) resultHoursDecimal.textContent = '0,00 horas';
+        } else {
+          const totalMins = Math.round(results.timeHours * 60);
+          const hours = Math.floor(totalMins / 60);
+          const mins = totalMins % 60;
+          if (resultVal2) resultVal2.textContent = `${hours}h ${mins < 10 ? '0' : ''}${mins}m`;
+          if (resultHoursDecimal) resultHoursDecimal.textContent = `${results.timeHours.toFixed(2)} horas`;
+        }
+      } else {
+        if (resultVal1) resultVal1.textContent = `${results.currentA.toFixed(1)} A`;
+
+        const timeHours = val > 0 ? 1 / val : 0;
+        if (timeHours <= 0) {
+          if (resultVal2) resultVal2.textContent = '0h 00m';
+          if (resultHoursDecimal) resultHoursDecimal.textContent = '0,00 horas';
+        } else {
+          const totalMins = Math.round(timeHours * 60);
+          const hours = Math.floor(totalMins / 60);
+          const mins = totalMins % 60;
+          if (resultVal2) resultVal2.textContent = `${hours}h ${mins < 10 ? '0' : ''}${mins}m`;
+          if (resultHoursDecimal) resultHoursDecimal.textContent = `${timeHours.toFixed(2)} horas`;
+        }
+      }
+    }
+
+    modeSelect.addEventListener('change', updateLabels);
+    [capacityInput, inputVal].forEach(el => {
+      el.addEventListener('input', updateCalculations);
+    });
+
+    // Run on boot
+    updateLabels();
+  </script>
+</CalculatorLayout>

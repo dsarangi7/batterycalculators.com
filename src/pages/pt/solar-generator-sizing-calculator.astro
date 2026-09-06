@@ -1,0 +1,222 @@
+---
+import CalculatorLayout from '../../layouts/CalculatorLayout.astro';
+import FormulaBox from '../../components/FormulaBox.astro';
+import FAQSection from '../../components/FAQSection.astro';
+import PowerOutageForm from '../../components/PowerOutageForm.astro';
+import WorkedExample from '../../components/WorkedExample.astro';
+import ComparisonTable from '../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../components/EngineeringDiagram.astro';
+
+const whatIs = "Uma calculadora de dimensionamento de gerador solar determina a capacidade da bateria, a potência dos painéis solares, o tamanho do controlador de carga e os requisitos do inversor para um sistema completo de backup movido a solar. Diferente de geradores a gasolina, geradores solares se recarregam da luz solar — proporcionando tempo ilimitado de funcionamento enquanto o sol brilhar. Esta calculadora dimensiona o sistema completo: banco de baterias para armazenamento noturno, painéis solares para recarga diurna e inversor para cargas CA de eletrodomésticos.";
+
+const whyItMatters = [
+  "Geradores solares requerem combinação de três componentes: capacidade da bateria, potência dos painéis solares e tamanho do inversor. Componentes incompatíveis desperdiçam dinheiro ou não conseguem alimentar suas cargas.",
+  "A capacidade da bateria determina o tempo noturno de funcionamento — quantas horas você pode rodar cargas quando o sol não está brilhando.",
+  "A potência dos painéis solares determina a velocidade de recarga — o quão rápido a bateria se repõe durante as horas de luz do dia.",
+  "As horas de sol pico variam dramaticamente por localização e estação: 4–6 horas no verão, 2–3 horas no inverno. O dimensionamento deve considerar as condições piores.",
+  "Um gerador solar adequadamente dimensionado pode fornecer energia de backup indefinida durante apagões prolongados — ao contrário de geradores a gasolina limitados em combustível."
+];
+
+const practicalApplications = [
+  { title: "Energia para Cabana Off-Grid", description: "Dimensione um sistema completo de gerador solar para cabanas remotas, casas pequenas ou vida off-grid onde conexão à rede não está disponível." },
+  { title: "Backup de Emergência para Toda a Casa", description: "Projete um sistema de backup solar que se recarrega diariamente da luz solar, fornecendo energia indefinida durante apagões de vários dias na rede." },
+  { title: "Acampamento e Overlanding", description: "Dimensione painéis solares portáteis e armazenamento de bateria para acampamentos prolongados, vida em van ou aventuras de overlanding." },
+  { title: "Canteiros de Obras e Locais Remotos", description: "Alimente ferramentas, iluminação e equipamentos em canteiros de obras sem acesso à rede usando sistemas de bateria carregados por solar." },
+];
+
+const expertNotes: { title: string; variant: 'engineering' | 'tip' | 'warning'; content: string }[] = [
+  { title: "Recarga Solar Deve Exceder Consumo Diário", variant: "engineering", content: "Para operação off-grid indefinida, a geração solar diária deve exceder o consumo diário. Se você usa 2.000Wh/dia, precisa de 2.000Wh+ de produção solar diária. Em 4 horas de sol pico, isso é 500W+ de painéis (antes de perdas)." },
+  { title: "Dimensionamento de Bateria para Período Noturno", variant: "tip", content: "Dimensione a bateria para lidar com toda sua carga noturna mais 20% de margem de segurança. Os painéis solares se recarregam durante o dia. Não economize na capacidade da bateria — é seu buffer para dias nublados." },
+  { title: "MPPT vs PWM para Controladores de Carga", variant: "warning", content: "Controladores MPPT são 15–30% mais eficientes que PWM, especialmente com painéis de voltagem mais alta. Para qualquer sistema acima de 200W, MPPT é fortemente recomendado. A diferença de eficiência afeta diretamente a velocidade de recarga." }
+];
+
+const trustSection = {
+  text: "Esta calculadora usa fórmulas padrão de engenharia solar. Todos os cálculos assumem controladores de carga MPPT e eficiência padrão de painéis. A performance real varia por localização, clima e qualidade do equipamento.",
+  link: { label: "Veja nossa metodologia", href: "/methodology/" }
+};
+
+const references = [
+  { title: "NREL — Dados de Recursos Solares", url: "https://developer.nrel.gov/docs/solar/pvwatts/v8/", source: "Laboratório Nacional de Energia Renovável" },
+  { title: "DOE — Escritório de Tecnologias de Energia Solar", url: "https://www.energy.gov/eere/solar/solar-energy-technologies-office", source: "Departamento de Energia dos EUA" },
+  { title: "Sandia National Labs — Modelagem de Performance PV", url: "https://pvlib.readthedocs.io/", source: "Laboratórios Nacionais Sandia" },
+];
+
+const faqItems = [
+  { question: "Quantos painéis solares preciso para um gerador solar?", answer: "Para um sistema rodando 1.500Wh/dia, você precisa de aproximadamente 400–500W de painéis solares em 4 horas de sol pico. No inverno (2–3 horas de sol pico), precisaria de 700–800W para manter a mesma recarga diária." },
+  { question: "Qual tamanho de bateria para um gerador solar?", answer: "Dimensione a bateria para 1–2 dias de autonomia. Se o consumo diário é 2.000Wh, um banco de baterias de 4.000Wh (4 kWh) fornece 2 dias de backup sem nenhuma recarga solar. Use LiFePO4 para 80–100% de capacidade utilizável." },
+  { question: "Um gerador solar pode alimentar uma casa?", answer: "Um gerador solar adequadamente dimensionado (bateria 5–15 kWh, solar 1–3 kW) pode alimentar cargas domésticas essenciais indefinidamente. Rodar tudo (ar-condicionado, forno, secadora) requer um sistema de 20+ kWh com 5–10 kW de painéis solares." },
+  { question: "Quanto tempo um gerador solar leva para carregar?", answer: "O tempo de carga depende da potência dos painéis e da exposição ao sol. Um sistema de painéis de 400W em 5 horas de sol pico gera ~2.000Wh. Uma bateria de 2.000Wh carrega de vazio a cheio em cerca de 5 horas de sol pico. A maioria dos sistemas leva 4–8 horas." },
+];
+
+const commonMistakes = [
+  "Usar horas de sol pico do verão para dimensionar para operação o ano todo — horas de sol do inverno (2–3h) são 50% menores que as do verão (4–6h), exigindo matrizes de painéis maiores.",
+  "Superdimensionar a bateria sem combinar com potência dos painéis solares — uma bateria grande sem painéis suficientes nunca se recarrega durante as horas de luz do dia.",
+  "Ignorar perdas de eficiência do controlador de carga — controladores PWM perdem 10–20% vs MPPT, reduzindo diretamente a produção solar diária.",
+  "Assumir que painéis solares produzem potência nominal continuamente — a produção real depende do ângulo do sol, temperatura, sombreamento e orientação do painel.",
+  "Não considerar limites de DoD da bateria — uma bateria de 4.000Wh a 80% de DoD fornece apenas 3.200Wh utilizáveis, não a capacidade total nominal.",
+  "Usar consumo doméstico (10–30 kWh/dia) para dimensionar um sistema solar portátil — isso requer matrizes de painéis impraticavelmente grandes (3–10 kW).",
+  "Ignorar consumo em standby do inversor — muitos inversores consomem 5–15W continuamente, adicionando 120–360Wh/dia ao seu consumo diário.",
+  "Esquecer que dias nublados reduzem a produção solar em 50–80% — o dimensionamento do sistema deve considerar condições de clima piores."
+];
+
+const relatedArticles = [
+  { title: "Guia de Backup de Bateria Solar", href: "/learn/solar-battery-backup-guide/" },
+  { title: "Como Dimensionar um Banco de Bateria Solar", href: "/learn/how-to-size-solar-battery-bank/" },
+  { title: "Melhor Química de Bateria para Solar", href: "/learn/best-battery-chemistry-for-solar/" },
+  { title: "Quantas Baterias para Solar", href: "/learn/how-many-batteries-for-solar/" },
+];
+
+const relatedCalculators = [
+  { href: "/home-power-outage-battery-backup-calculator/", title: "Calculadora de Bateria de Backup para Cortes de Energia", description: "Calculadora completa de energia de backup para todos os eletrodomésticos domésticos." },
+  { href: "/fridge-battery-backup-calculator/", title: "Calculadora de Bateria para Geladeira", description: "Dimensionamento de bateria para backup de geladeira durante apagões." },
+  { href: "/cpap-battery-backup-calculator/", title: "Calculadora de Bateria para CPAP", description: "Dimensione baterias para energia noturna de CPAP." },
+  { href: "/sump-pump-battery-backup-calculator/", title: "Calculadora de Bateria para Bomba d'Agua", description: "Mantenha sua bomba d'agua funcionando durante apagoes." },
+  { href: "/portable-power-station-runtime-calculator/", title: "Calculadora de Tempo de Estacao de Energia Portatil", description: "Veja quanto tempo uma estacao de energia portatil roda suas cargas." },
+  { href: "/tools/runtime-calculator/", title: "Calculadora de Tempo de Bateria", description: "Estime o tempo de descarga a partir da capacidade e carga." },
+  { href: "/tools/battery-sizing-calculator/", title: "Calculadora de Dimensionamento de Bateria", description: "Dimensionamento completo de banco de baterias com degradacao por temperatura." },
+  { href: "/tools/solar-battery-sizing-calculator/", title: "Calculadora de Bateria Solar", description: "Dimensione baterias pareadas com matrizes de paineis solares." },
+  { href: "/tools/energy-conversion-calculator/", title: "Calculadora de Conversao de Energia", description: "Converta entre Ah, Wh e kWh em qualquer voltagem." },
+  { href: "/tools/charging-time-calculator/", title: "Calculadora de Tempo de Carga", description: "Estime o tempo de carga a partir de solar ou rede eletrica." },
+  { href: "/tools/voltage-drop-calculator/", title: "Calculadora de Queda de Voltagem", description: "Dimensione extensoes de fio para minimizar queda de voltagem." },
+  { href: "/tools/dc-cable-loss-calculator/", title: "Calculadora de Perda em Cabo DC", description: "Calcule perdas de fiacao em conexoes DC." },
+];
+
+const presetAppliances = [
+  { name: "Refrigerator", runningW: 150, surgeW: 600 }, { name: "Freezer", runningW: 120, surgeW: 500 },
+  { name: "Wi-Fi Router", runningW: 12, surgeW: 12 }, { name: "LED Light", runningW: 10, surgeW: 10 },
+  { name: "Laptop", runningW: 60, surgeW: 90 }, { name: "TV", runningW: 100, surgeW: 150 },
+  { name: "CPAP Machine", runningW: 40, surgeW: 80 }, { name: "Fan", runningW: 50, surgeW: 75 },
+  { name: "Sump Pump", runningW: 800, surgeW: 2000 }, { name: "Microwave", runningW: 1000, surgeW: 1500 },
+];
+---
+
+<CalculatorLayout
+  title="Calculadora de Dimensionamento de Gerador Solar | Battery Calculators"
+  description="Calcule a capacidade da bateria, potência dos painéis solares e componentes do sistema necessários para um gerador solar completo. Dimensione seu sistema de backup solar para vida off-grid, preparação de emergência ou acampamento."
+  faqItems={faqItems}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+  relatedCalculators={relatedCalculators}
+  commonMistakes={commonMistakes}
+  relatedArticles={relatedArticles}
+  lang="pt"
+>
+  <PowerOutageForm
+    presetAppliances={presetAppliances}
+    defaultBackupHours={12}
+    defaultVoltage="24"
+    defaultLoadsDescription="Cargas comuns de gerador solar pré-carregadas. Adicione seus dispositivos e ative a recarga solar para dimensionar um sistema completo."
+    defaultLoads={[{ name: "Refrigerator", quantity: 1 }, { name: "Freezer", quantity: 1 }, { name: "Wi-Fi Router", quantity: 1 }]}
+  />
+
+  <section class="mb-16 border-t border-hairline pt-12">
+    <FormulaBox title="Fórmulas Matemáticas">
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Total Funcionamento W = Σ (Eletrodoméstico Funcionamento W × Quantidade)</div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Energia Necessária (Wh) = (Funcionamento W × Horas) / Eficiência do Inversor × (1 + Margem de Segurança)</div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Bateria Ah = Wh Necessários / (Voltagem da Bateria × Profundidade de Descarga)</div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Produção Solar Diária = Painéis Solares (W) × Horas de Sol Pico × Eficiência do Controlador</div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Tamanho Painel (W) = Consumo Diário (Wh) / (Horas de Sol Pico × Eficiência do Controlador)</div>
+      <p class="text-xs text-muted mt-4">Para operação off-grid indefinida, a produção solar diária deve exceder o consumo diário. Dimensione os painéis para a estação pior.</p>
+    </FormulaBox>
+
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">Fórmulas e Exemplos Resolvidos</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample
+        number={1}
+        title="Configuração para Fim de Semana de Acampamento"
+        scenario="Alimentar uma geladeira portátil, luzes LED e carregar dispositivos durante um acampamento de 3 dias com 4 horas de sol pico."
+        inputs={[
+          { label: "Geladeira Portátil", value: "60W" },
+          { label: "Luzes LED ×2", value: "20W total" },
+          { label: "Telefone + Câmera Carregando", value: "30W média" },
+          { label: "Uso Diário", value: "12 horas" },
+        ]}
+        steps={[
+          { label: "Passo 1: Consumo diário", formula: "110W × 12h = 1.320 Wh/dia", result: "1.320 Wh/dia" },
+          { label: "Passo 2: Bateria (2 dias autonomia, LFP 24V 80% DoD)", formula: "1.320 × 2 / (24 × 0,80)", result: "137,5 Ah → 24V 150Ah (3,6 kWh)" },
+          { label: "Passo 3: Painéis solares (4h sol pico, 95% controlador)", formula: "1.320 / (4 × 0,95)", result: "347W → 400W de painéis" },
+        ]}
+        answer="400W de painéis solares + bateria LFP 24V 150Ah + inversor de 1.000W para um fim de semana de acampamento confortável."
+        interpretation="Cargas de acampamento são modestas — uma matriz portátil de 400W recarrega a bateria diariamente com margem."
+      />
+      <WorkedExample
+        number={2}
+        title="Backup Doméstico de Emergência (72h)"
+        scenario="Manter geladeira, freezer, Wi-Fi e luzes funcionando por 3 dias com recarga solar diária no inverno (3 horas de sol pico)."
+        inputs={[
+          { label: "Geladeira + Freezer", value: "270W combinados" },
+          { label: "Wi-Fi + Roteador", value: "12W" },
+          { label: "Luzes LED ×3", value: "30W" },
+          { label: "Uso Diário", value: "24 horas" },
+        ]}
+        steps={[
+          { label: "Passo 1: Consumo diário", formula: "312W × 24h = 7.488 Wh/dia", result: "7.488 Wh/dia" },
+          { label: "Passo 2: Bateria (1 dia autonomia, LFP 48V 80% DoD)", formula: "7.488 / (48 × 0,80)", result: "195 Ah → 48V 200Ah (9,6 kWh)" },
+          { label: "Passo 3: Painéis solares (3h sol inverno, 95% ef)", formula: "7.488 / (3 × 0,95)", result: "2.627W → 2.800W de painéis" },
+        ]}
+        answer="2.800W de painéis solares + bateria LFP 48V 200Ah + inversor de 4.000W para sobreviver a apagões de inverno de vários dias."
+        interpretation="Solar de inverno requer matrizes de painéis significativamente maiores — sistemas de verão podem ser metade deste tamanho."
+      />
+      <WorkedExample
+        number={3}
+        title="Cabana Off-Grid (Tempo Integral)"
+        scenario="Alimentar uma pequena cabana off-grid com geladeira, luzes, bomba de poço e eletrodomésticos básicos o ano todo."
+        inputs={[
+          { label: "Geladeira", value: "150W" },
+          { label: "Bomba de Poço", value: "750W (intermitente)" },
+          { label: "Luzes + Eletrônicos", value: "100W" },
+          { label: "Uso Diário", value: "24 horas" },
+        ]}
+        steps={[
+          { label: "Passo 1: Consumo diário médio", formula: "~1.500Wh (geladeira ciclando) + 500Wh (bomba) + 2.400Wh (eletrônicos)", result: "4.400 Wh/dia média" },
+          { label: "Passo 2: Bateria (3 dias autonomia, LFP 48V 80% DoD)", formula: "4.400 × 3 / (48 × 0,80)", result: "344 Ah → 48V 400Ah (19,2 kWh)" },
+          { label: "Passo 3: Painéis solares (5h sol pico, 95% ef)", formula: "4.400 / (5 × 0,95)", result: "926W → 1.000W de painéis" },
+        ]}
+        answer="1.000W de painéis solares + bateria LFP 48V 400Ah + inversor de 3.000W para energia de cabana off-grid tempo integral."
+        interpretation="Cabanhas off-grid precisam de armazenamento sério de bateria para autonomia em dias nublados — 3+ dias previnem baterias descarregadas durante tempestades."
+      />
+    </div>
+  </section>
+
+  <EngineeringDiagram
+    title="Fluxo de Recarga do Gerador Solar"
+    description="A energia flui dos painéis solares através do controlador de carga para o banco de baterias, depois através do inversor para alimentar cargas CA."
+    steps={[
+      { label: "Painéis Solares", icon: "solar" },
+      { label: "Controlador de Carga", icon: "charge" },
+      { label: "Banco de Baterias", icon: "battery" },
+      { label: "Inversor", icon: "inverter" },
+      { label: "Cargas CA", icon: "load" },
+    ]}
+    variant="flow"
+  />
+
+  <ComparisonTable
+    title="Guia de Combinação Painel + Bateria para Gerador Solar"
+    headers={["Tamanho do Sistema", "Bateria (LFP)", "Painéis Solares", "Produção Diária", "Ideal Para", "Inverno Adequado?"]}
+    rows={[
+      ["Pequeno Portátil", "24V 50Ah (1,2 kWh)", "200W", "800–1.000 Wh", "Telefones, luzes, geladeira pequena", "Apenas verão"],
+      ["Acampamento Padrão", "24V 100Ah (2,4 kWh)", "400W", "1.600–2.000 Wh", "Geladeira, luzes, dispositivos", "Sim (clima ameno)"],
+      ["Backup de Fim de Semana", "24V 200Ah (4,8 kWh)", "600W", "2.400–3.000 Wh", "Geladeira + freezer + Wi-Fi", "Sim"],
+      ["Emergência Doméstica", "48V 200Ah (9,6 kWh)", "1.200W", "4.800–6.000 Wh", "Cargas domésticas essenciais", "Sim"],
+      ["Toda a Casa", "48V 400Ah (19,2 kWh)", "2.400W", "9.600–12.000 Wh", "Backup doméstico completo", "Sim"],
+      ["Cabana Off-Grid", "48V 600Ah (28,8 kWh)", "3.600W", "14.400–18.000 Wh", "Vida off-grid tempo integral", "Sim"],
+    ]}
+    caption="Produção de inverno assume 3 horas de sol pico. Produção de verão com 5–6 horas de sol pico é aproximadamente 60–100% maior."
+  />
+
+  <FAQSection items={faqItems} />
+</CalculatorLayout>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const solarCheckbox = document.getElementById('solar-enabled') as HTMLInputElement | null;
+    if (solarCheckbox && !solarCheckbox.checked) {
+      solarCheckbox.click();
+    }
+  });
+</script>

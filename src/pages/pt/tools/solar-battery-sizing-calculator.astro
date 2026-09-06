@@ -1,0 +1,242 @@
+---
+import CalculatorLayout from '../../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import InputField from '../../../components/InputField.astro';
+import ResultBox from '../../../components/ResultBox.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import RelatedTools from '../../../components/RelatedTools.astro';
+import MiniSimulationChart from '../../../components/MiniSimulationChart.astro';
+import WorkedExample from '../../../components/WorkedExample.astro';
+import ComparisonTable from '../../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../../components/EngineeringDiagram.astro';
+
+const whatIs = `O dimensionamento de baterias solares determina a capacidade total de energia que um banco de baterias deve armazenar para alimentar uma casa ou instalação durante períodos sem produção solar — noites, dias nublados e períodos de baixa luminosidade sazonal. O cálculo integra <strong>consumo diário de energia</strong> da residência, <strong>dias de autonomia</strong> para superar períodos sem sol, <strong>química da bateria</strong> (que determina a profundidade de descarga segura) e <strong>tensão do sistema</strong>. Diferente do dimensionamento geral de baterias, o dimensionamento solar específico deve considerar o ciclo de produção solar, a variação sazonal nas horas de luz e a interação entre a taxa de carga e a taxa de descarga.`;
+
+const whyItMatters = [
+  "Baterias solares subdimensionadas causam descargas profundas frequentes em períodos nublados, acelerando a degradação e reduzindo a vida útil do sistema.",
+  "Bancos superdimensionados desperdiçam capital em células de lítio que ficam sem uso durante meses ensolarados quando a produção solar excede o consumo.",
+  "Ignorar a variação sazonal — um sistema dimensionado para o verão pode falhar no inverno quando a produção solar cai 50–70%.",
+  "Escolher a química errada — chumbo-ácido a 50% DoD requer o dobro da capacidade de LFP a 80% DoD para a mesma energia utilizável.",
+  "Não corresponder tensão do inversor e da bateria pode forçar substituições caras de equipamentos ou limitar a expansão futura.",
+];
+
+const practicalApplications = [
+  { title: "Solar Conectado à Rede + Bateria", description: "Dimensionar armazenamento de baterias para otimização de autoconsumo solar e arbitragem por faixa de preço em residências conectadas." },
+  { title: "Sistemas Solares Fora da Rede", description: "Determinar a capacidade do banco de baterias para casas e chalés completamente desconectados da rede elétrica." },
+  { title: "Solar + Backup Híbrido", description: "Dimensionar baterias para residências conectadas à rede que desejam backup durante apagões com capacidade de recarga solar." },
+  { title: "Armazenamento Solar Comercial", description: "Dimensionar sistemas de baterias para instalações comerciais que buscam maximizar o autoconsumo solar e minimizar taxas de demanda." },
+  { title: "Solar Comunitário + Armazenamento", description: "Dimensionar sistemas de baterias compartilhados para projetos solares comunitários servindo múltiplas residências." },
+];
+
+const expertNotes = [
+  { title: 'Planejamento Sazonal', variant: 'warning', content: 'Sistemas de baterias solares dimensionados apenas para condições de verão falharão durante os meses de inverno. Em latitudes setentrionais (acima de 40°N), a produção solar de inverno pode ser 50–70% menor que no verão. Dimensione para o pior mês, não para a média anual.' },
+  { title: 'Seleção de Química', variant: 'engineering', content: 'LFP (LiFePO4) é a química recomendada para aplicações solares devido à sua vida útil de 5.000+ ciclos, 80–90% DoD utilizável e estabilidade térmica. NMC oferece maior densidade de energia mas vida útil em ciclos menor. Chumbo-ácido é mais barato no início mas requer limitação a 50% DoD e substituição a cada 3–5 anos.' },
+];
+
+const trustSection = {
+  text: "Esta calculadora utiliza metodologia padrão de dimensionamento de engenharia solar. O modelo considera escalação de energia por autonomia, redução por limites de profundidade de descarga e restrições específicas da química. Todos os valores intermediários são exibidos para verificação independente. Nossas fórmulas seguem práticas da indústria da NREL, DOE e principais fabricantes de inversores.",
+  link: { label: "Ver nossa metodologia completa", href: "/methodology/" },
+};
+
+const references = [
+  { title: "NREL — Guia de Dimensionamento Solar + Armazenamento", url: "https://www.nrel.gov/solar/solar-plus-storage-sizing.html", source: "National Renewable Energy Laboratory" },
+  { title: "US DOE — Visão Geral de Armazenamento Solar", url: "https://www.energy.gov/eere/solar/solar-plus-storage", source: "U.S. Department of Energy" },
+  { title: "Battery University — Baterias para Armazenamento Solar", url: "https://batteryuniversity.com/article/bu-402-what-is-the-peukert-effect", source: "Battery University" },
+  { title: "SEIA — Diretrizes de Armazenamento", url: "https://www.seia.org/solar-plus-storage", source: "Solar Energy Industries Association" },
+  { title: "Victron Energy — Dimensionamento Solar", url: "https://www.victronenergy.com/help-center", source: "Victron Energy" },
+];
+
+const faqItems = [
+  { question: "Como estimar meu consumo diário de energia solar?", answer: "Some a potência de todos os eletrodomésticos usados diariamente e multiplique pelas horas de uso. Exemplo: 5 lâmpadas LED (10W cada × 6 horas) = 300 Wh, geladeira (150W × 8 horas) = 1.200 Wh, TV (100W × 4 horas) = 400 Wh. Total: 1.900 Wh ou 1,9 kWh." },
+  { question: "Qual química de bateria é melhor para solar?", answer: "LFP (LiFePO4) é recomendado para a maioria das instalações solares devido à longa vida útil (5.000+ ciclos), segurança e alto DoD utilizável (90%). NMC oferece maior densidade de energia mas vida útil menor. Chumbo-ácido é mais barato no início mas requer limitação a 50% DoD e substituição frequente." },
+  { question: "Quantos dias de autonomia preciso?", answer: "Sistemas conectados à rede com backup de bateria normalmente precisam de 1–2 dias. Sistemas fora da rede precisam de 2–4 dias dependendo do clima e recurso solar. Mais autonomia significa mais capacidade de bateria e maior custo, mas maior resiliência em períodos nublados." },
+  { question: "O que é Profundidade de Descarga (DoD)?", answer: "DoD é a porcentagem da capacidade da bateria que pode ser usada com segurança antes da recarga. Descarregar além do DoD recomendado encurta a vida útil da bateria. Baterias LFP permitem 80–90% DoD, NMC permite 70–80%, e chumbo-ácido deve ficar acima de 50% DoD." },
+  { question: "Quantas baterias preciso para um sistema solar de 5kW?", answer: "Um sistema de 5kW produzindo 20 kWh/dia com 2 dias de autonomia a 80% DoD precisa de: (20.000 × 2) / 0,80 = 50.000 Wh = 50 kWh de banco de baterias. A 48V, são aproximadamente 1.042 Ah — equivalente a 4 grandes baterias LFP de 280Ah em configuração 48V." },
+  { question: "Devo sobredimensionar meu banco de baterias solar?", answer: "Uma margem de 15–20% acima do mínimo calculado fornece segurança para redução por temperatura, envelhecimento da bateria e variação sazonal. Sobredimensionamento excessivo desperdiça capital. Projete para expansão modular se esperar crescimento de carga." },
+  { question: "Posso expandir meu banco de baterias solar depois?", answer: "A maioria dos sistemas modernos de baterias de lítio suporta expansão modular adicionando strings paralelas. No entanto, todas as strings devem ter a mesma química, idade e capacidade. Planeje a expansão desde o início escolhendo uma plataforma de baterias escalável." },
+  { question: "Como o inverno afeta o dimensionamento solar?", answer: "A produção solar de inverno pode ser 50–70% menor que no verão. Sistemas fora da rede devem ser dimensionados para os dias mais curtos. Sistemas conectados com backup podem precisar de mais autonomia durante períodos nublados de inverno. Considere a variação sazonal." },
+  { question: "Qual é a diferença entre armazenamento solar acoplado CC e CA?", answer: "Sistemas acoplados CC conectam baterias diretamente ao controlador de carga solar, com maior eficiência (sem dupla conversão). Sistemas acoplados CA conectam baterias através de um inversor, oferecendo mais flexibilidade mas eficiência ligeiramente menor. Ambos são viáveis; acoplado CC é mais eficiente para novas instalações." },
+  { question: "Como calcular a produção solar para dimensionamento?", answer: "Estime a produção diária multiplicando o tamanho do sistema (kW) pelas horas de pico de sol da sua localização. Um sistema de 5kW em uma área com 4 horas de pico de sol produz aproximadamente 20 kWh/dia antes das perdas. Aplique um fator de eficiência do sistema de 0,75–0,85." },
+  { question: "Baterias solares podem alimentar minha casa à noite?", answer: "Sim. Baterias solares armazenam a produção excedente do dia para uso à noite. A bateria descarrega durante as horas da noite e depois recarrega dos painéis solares no dia seguinte. Dimensionamento adequado garante energia armazenada suficiente para o consumo noturno." },
+  { question: "O que acontece durante prolongados períodos nublados?", answer: "Durante períodos nublados de vários dias, o banco de baterias deve alimentar as cargas da energia armazenada. Com 2 dias de autonomia, o sistema pode sustentar cargas por 2 dias sem entrada solar. Além dos limites de autonomia, as cargas devem ser reduzidas ou o backup da rede ativado." },
+];
+
+const relatedTools = [
+  { href: "/tools/runtime-calculator/", title: "Calculadora de Autonomia", description: "Verificar quanto tempo um banco de baterias alimentará sua carga." },
+  { href: "/tools/energy-conversion-calculator/", title: "Conversão de Energia", description: "Converter entre Ah e Wh em qualquer tensão." },
+  { href: "/tools/parallel-string-calculator/", title: "Ferramenta de String Paralela", description: "Configurar pacotes série/paralelo para corresponder ao seu alvo." },
+  { href: "/tools/battery-sizing-calculator/", title: "Ferramenta de Dimensionamento", description: "Dimensionamento geral de baterias por consumo e autonomia." },
+  { href: "/tools/home-backup-battery-calculator/", title: "Calculadora de Backup Residencial", description: "Dimensionar backup residencial para cargas críticas." },
+  { href: "/home-power-outage-battery-backup-calculator/", title: "Calculadora de Backup para Apagões", description: "Dimensionar bateria e inversor para apagões de tempestade e emergência." },
+  { href: "/tools/battery-degradation-estimator/", title: "Estimador de Degradação", description: "Estimar como a capacidade da bateria diminui ao longo do tempo." },
+  { href: "/tools/soc-estimator/", title: "Estimador de SOC", description: "Interpolar Estado de Carga a partir da tensão." },
+  { href: "/tools/charging-time-calculator/", title: "Calculadora de Tempo de Carga", description: "Estimar durações de carga a partir da produção solar." },
+];
+
+const commonMistakes = [
+  "Usar consumo médio residencial em vez de dados medidos reais — verifique sua conta de energia para o consumo real diário em kWh ao invés de estimar a partir de potências individuais de eletrodomésticos.",
+  "Dimensionar apenas para dias ensolarados — solar fora da rede deve considerar dias nublados consecutivos. Em muitas regiões, 3–4 dias de autonomia são necessários para energia confiável.",
+  "Ignorar limites de DoD — descarregar chumbo-ácido abaixo de 50% ou lítio abaixo de 80% reduz significativamente a vida útil. Dimensione o banco para que o uso normal fique dentro dos limites seguros de DoD.",
+  "Esquecer perdas do inversor e fiação — a bateria deve fornecer mais energia do que as cargas consomem porque a eficiência do inversor (88–96%) e perdas na fiação reduzem a energia utilizável.",
+  "Não considerar variação sazonal — a produção solar de inverno é 50–70% menor que no verão. Dimensione a autonomia para o pior mês, não a média anual.",
+  "Escolher tensão de sistema errada — sistemas de 12V requerem cabos extremamente grossos para cargas acima de 1kW. Use 48V para sistemas solares residenciais para minimizar perdas na fiação.",
+  "Misturar baterias antigas e novas — nunca adicione baterias novas a um banco existente degradado. Resistência interna incompatível causa carregamento desigual e degradação acelerada.",
+];
+
+const relatedArticles = [
+  { href: "/learn/how-to-size-solar-battery-bank/", title: "Como Dimensionar um Banco de Baterias Solar" },
+  { href: "/learn/how-many-batteries-for-solar/", title: "Quantas Baterias para Solar?" },
+  { href: "/learn/how-much-battery-storage-do-i-need/", title: "Quanto Armazenamento de Bateria Preciso?" },
+  { href: "/learn/solar-storage-sizing-guide/", title: "Guia de Dimensionamento de Armazenamento Solar" },
+];
+---
+
+<CalculatorLayout
+  title="Calculadora de Dimensionamento de Bateria Solar | Calculadoras de Bateria"
+  description="Dimensione seu banco de baterias solar com base em consumo diário de energia, dias de autonomia, química da bateria e profundidade de descarga."
+  faqItems={faqItems}
+  commonMistakes={commonMistakes}
+  relatedCalculators={relatedTools}
+  relatedArticles={relatedArticles}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+  lang="pt"
+>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Entradas do Sistema Solar</h3>
+      <div class="flex flex-col gap-6">
+        <InputField id="daily-consumption" label="Consumo Diário de Energia" value={5} min={0.1} step="any" unit="kWh/dia" helperText="Consumo energético total da residência por dia. Verifique sua conta de energia. Nota: Wh/dia = kWh/dia × 1.000" />
+        <InputField id="autonomy" label="Dias de Autonomia" value={2} min={1} max={7} step={1} helperText="Quantos dias a bateria deve alimentar sua casa sem entrada solar." />
+        <InputField id="voltage" label="Tensão do Sistema de Bateria" value={48} min={12} step={1} unit="V" helperText="Comum: 12V, 24V ou 48V para sistemas residenciais." />
+        <InputField id="chemistry" label="Química da Bateria" type="select" value="lfp" helperText="LFP recomendado para solar: maior vida útil e mais seguro." options={[{ label: "LFP (LiFePO4)", value: "lfp" }, { label: "NMC (Níquel-Manganês-Cobalto de Lítio)", value: "nmc" }, { label: "Chumbo-Ácido (AGM/Gel)", value: "lead-acid" }]} />
+        <InputField id="dod" label="Profundidade Máxima de Descarga" value={80} min={10} max={100} step={1} unit="%" helperText="Limite seguro. LFP: 90%, NMC: 80%, Chumbo-Ácido: 50%." />
+      </div>
+    </CalculatorCard>
+
+    <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Resultados do Dimensionamento</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <ResultBox label="Energia Necessária da Bateria" value="12.500 Wh" suffix="12,50 kWh capacidade total" variant="primary" id="result-energy" />
+          <ResultBox label="Capacidade Recomendada" value="260,4 Ah" suffix="A 48V nominal" id="result-capacity" />
+          <ResultBox label="Capacidade Utilizável" value="10.000 Wh" suffix="10,00 kWh após DoD" id="result-usable" />
+          <ResultBox label="Meta de Recarga Diária" value="12.500 Wh/dia" suffix="12,50 kWh/dia" helperText="Energia média necessária por dia para restaurar completamente o banco de baterias." id="result-daily" />
+        </div>
+        <MiniSimulationChart title="Autonomia vs Tamanho da Bateria" description="Capacidade necessária para diferentes períodos de autonomia" xLabel="Dias de Autonomia" yLabel="Tamanho da Bateria (kWh)" chartId="chart-solar" />
+      </div>
+      <div class="border-t border-hairline pt-6">
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">Notas de Projeto</h4>
+        <p class="text-body-sm text-muted" id="design-notes">
+          Para uma carga diária de 5 kWh com 2 dias de autonomia a 48V LFP, você precisa de aproximadamente 12,5 kWh de capacidade total com 260 Ah a 48V.
+        </p>
+      </div>
+    </CalculatorCard>
+  </div>
+
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">Fórmulas e Exemplos Práticos</h2>
+    <FormulaBox title="Fórmulas Matemáticas">
+      <p>A capacidade de energia necessária da bateria é calculada escalando o consumo diário pelos dias de autonomia e dividindo pelo DoD:</p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Energia Necessária (Wh) = (Consumo Diário × Dias de Autonomia) / DoD%</div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Capacidade (Ah) = Energia Necessária (Wh) / Tensão do Sistema (V)</div>
+      <p>A capacidade utilizável é a energia que você pode efetivamente extrair:</p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Energia Utilizável = Consumo Diário × Dias de Autonomia</div>
+      <p class="text-xs text-muted mt-4"><strong>Variáveis:</strong> Consumo Diário em kWh ou Wh, Autonomia em dias, DoD como porcentagem, Tensão em V. Premissas: carga diária constante, curvas de descarga padrão, sem ajuste sazonal (aplique manualmente para fora da rede).</p>
+    </FormulaBox>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample number={1} title="Pequeno Chalé — 3 kWh/dia, 4 Horas de Sol Pico"
+        scenario="Um pequeno chalé fora da rede consome 3 kWh/dia e recebe em média 4 horas de sol pico. Dimensione um banco LFP 48V com 2 dias de autonomia a 80% DoD."
+        inputs={[{ label: "Consumo Diário", value: "3 kWh/dia" }, { label: "Horas de Sol Pico", value: "4 horas" }, { label: "Autonomia", value: "2 dias" }, { label: "Tensão do Sistema", value: "48V" }, { label: "Química", value: "LFP (LiFePO4)" }, { label: "DoD Máx.", value: "80%" }]}
+        steps={[{ label: "Energia utilizável", formula: "3.000 × 2", result: "6.000 Wh" }, { label: "Capacidade total", formula: "6.000 / 0,80", result: "7.500 Wh (7,5 kWh)" }, { label: "Ampère-horas", formula: "7.500 / 48", result: "156,3 Ah" }, { label: "Arranjo solar necessário", formula: "3.000 / (4 × 0,80)", result: "938 W" }]}
+        answer="7.500 Wh (156,3 Ah a 48V) — um arranjo solar de 1.000W é recomendado" interpretation="Com 4 horas de sol pico, o chalé precisa de cerca de 938W de painéis solares para recarregar o banco em um dia." variant="solar" />
+      <WorkedExample number={2} title="Casa Fora da Rede — 10 kWh/dia, Buffer para Dia Nublado"
+        scenario="Uma casa fora da rede usa 10 kWh/dia. A região tem em média 3,5 horas de sol pico no inverno. Considere 3 dias nublados consecutivos dimensionando para 4 dias de autonomia com 85% DoD em LFP 48V."
+        inputs={[{ label: "Consumo Diário", value: "10 kWh/dia" }, { label: "Horas de Sol Pico (inverno)", value: "3,5 horas" }, { label: "Autonomia (buffer nublado)", value: "4 dias" }, { label: "Tensão do Sistema", value: "48V" }, { label: "Química", value: "LFP (LiFePO4)" }, { label: "DoD Máx.", value: "85%" }]}
+        steps={[{ label: "Energia utilizável", formula: "10.000 × 4", result: "40.000 Wh" }, { label: "Capacidade total", formula: "40.000 / 0,85", result: "47.059 Wh (47,1 kWh)" }, { label: "Ampère-horas", formula: "47.059 / 48", result: "980,4 Ah" }, { label: "Arranjo solar necessário", formula: "10.000 / (3,5 × 0,80)", result: "3.571 W" }]}
+        answer="47.059 Wh (980,4 Ah a 48V) — um arranjo solar de 3.600W é recomendado" interpretation="A produção de inverno é o gargalo. Com apenas 3,5 horas de sol pico, você precisa de um arranjo grande para recarregar 47 kWh em um único dia." variant="solar" />
+      <WorkedExample number={3} title="RV com Solar Variável — 2 kWh/dia"
+        scenario="Um RV consome 2 kWh/dia com entrada solar variável. Use um sistema LFP 12V com 2 dias de autonomia a 80% DoD."
+        inputs={[{ label: "Consumo Diário", value: "2 kWh/dia" }, { label: "Horas de Sol Pico (faixa)", value: "2–6 horas" }, { label: "Autonomia", value: "2 dias" }, { label: "Tensão do Sistema", value: "12V" }, { label: "Química", value: "LFP (LiFePO4)" }, { label: "DoD Máx.", value: "80%" }]}
+        steps={[{ label: "Energia utilizável", formula: "2.000 × 2", result: "4.000 Wh" }, { label: "Capacidade total", formula: "4.000 / 0,80", result: "5.000 Wh (5,0 kWh)" }, { label: "Ampère-horas", formula: "5.000 / 12,8", result: "390,6 Ah" }, { label: "Solar (pior caso, 2h)", formula: "2.000 / (2 × 0,80)", result: "1.250 W" }]}
+        answer="5.000 Wh (390,6 Ah a 12V) — requer 2 baterias LFP de 200Ah em paralelo" interpretation="A entrada solar variável significa que você deve planejar para o pior caso. Em áreas florestais com apenas 2 horas de sol pico, um painel portátil de 1.250W mantém as baterias carregadas." variant="solar" />
+    </div>
+  </section>
+
+  <EngineeringDiagram title="Sistema de Carga de Bateria Solar" description="Painéis solares → controlador de carga → banco de baterias → inversor → cargas" variant="system" steps={[{ label: "Painéis Solares", icon: "solar" }, { label: "Controlador MPPT", icon: "charge" }, { label: "Banco de Baterias", icon: "battery" }, { label: "Inversor + Cargas", icon: "inverter" }]} />
+
+  <ComparisonTable title="Dimensionamento Solar por Horas de Sol Pico" headers={["Localização", "Horas de Sol Pico", "Solar Necessário (3kWh/dia)", "Autonomia da Bateria", "Arranjo de Painéis"]} rows={[["Arizona, EUA", "6,5 h", "462 W", "2 dias", "600W recomendado"], ["Londres, UK", "2,5 h", "1.200 W", "4 dias", "1.500W recomendado"], ["Bombaim, Índia", "5,0 h", "600 W", "2 dias", "800W recomendado"], ["Oslo, Noruega", "2,0 h", "1.500 W", "5 dias", "2.000W recomendado"], ["Sydney, Austrália", "5,5 h", "545 W", "2 dias", "700W recomendado"]]} caption="O dimensionamento do arranjo solar varia dramaticamente por localização — as horas de sol pico são o principal fator de projeto" />
+
+  <FAQSection items={faqItems} />
+  <RelatedTools tools={relatedTools} />
+
+  <script>
+    import { calculateSolarBatterySizing } from '../../../../utils/calculators';
+    import { renderBarChart, clearChart } from '../../../../utils/charting';
+
+    const consumptionInput = document.getElementById('daily-consumption') as HTMLInputElement;
+    const autonomyInput = document.getElementById('autonomy') as HTMLInputElement;
+    const voltageInput = document.getElementById('voltage') as HTMLInputElement;
+    const chemistrySelect = document.getElementById('chemistry') as HTMLSelectElement;
+    const dodInput = document.getElementById('dod') as HTMLInputElement;
+
+    const resultEnergyBox = document.getElementById('result-energy');
+    const resultEnergyValue = resultEnergyBox?.querySelector('.text-display-md') as HTMLElement;
+    const resultEnergyKwh = resultEnergyBox?.querySelector('.text-caption') as HTMLElement;
+    const resultCapacityBox = document.getElementById('result-capacity');
+    const resultCapacityValue = resultCapacityBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultCapacityRef = resultCapacityBox?.querySelector('.text-caption') as HTMLElement;
+    const resultUsableBox = document.getElementById('result-usable');
+    const resultUsableValue = resultUsableBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultUsableKwh = resultUsableBox?.querySelector('.text-caption') as HTMLElement;
+    const resultDailyBox = document.getElementById('result-daily');
+    const resultDailyValue = resultDailyBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultDailyKwh = resultDailyBox?.querySelector('.text-caption') as HTMLElement;
+    const designNotes = document.getElementById('design-notes');
+    const chartSvg = document.getElementById('chart-solar') as unknown as SVGElement;
+
+    function updateCalculations() {
+      const consumption = parseFloat(consumptionInput.value) || 5;
+      const autonomy = parseFloat(autonomyInput.value) || 2;
+      const voltage = parseFloat(voltageInput.value) || 48;
+      const chemistry = chemistrySelect.value as "lfp" | "nmc" | "lead-acid";
+      const dod = parseFloat(dodInput.value) || 80;
+
+      const results = calculateSolarBatterySizing(consumption, autonomy, voltage, chemistry, dod);
+
+      if (resultEnergyValue) resultEnergyValue.textContent = `${Math.round(results.requiredEnergyWh).toLocaleString()} Wh`;
+      if (resultEnergyKwh) resultEnergyKwh.textContent = `${(results.requiredEnergyWh / 1000).toFixed(2)} kWh total capacity`;
+      if (resultCapacityValue) resultCapacityValue.textContent = `${results.requiredCapacityAh.toFixed(1)} Ah`;
+      if (resultCapacityRef) resultCapacityRef.textContent = `At ${voltage}V nominal`;
+      if (resultUsableValue) resultUsableValue.textContent = `${Math.round(results.usableCapacityWh).toLocaleString()} Wh`;
+      if (resultUsableKwh) resultUsableKwh.textContent = `${(results.usableCapacityWh / 1000).toFixed(2)} kWh after DoD`;
+      if (resultDailyValue) resultDailyValue.textContent = `${Math.round(results.dailyProductionNeededWh).toLocaleString()} Wh/day`;
+      if (resultDailyKwh) resultDailyKwh.textContent = `${(results.dailyProductionNeededWh / 1000).toFixed(2)} kWh/day`;
+
+      if (designNotes) {
+        const chemistryName = chemistry === "lfp" ? "LFP" : chemistry === "nmc" ? "NMC" : "Lead-Acid";
+        designNotes.textContent = `For a ${consumption} kWh daily load with ${autonomy} day${autonomy > 1 ? 's' : ''} autonomy at ${voltage}V ${chemistryName}, you need approximately ${(results.requiredEnergyWh / 1000).toFixed(1)} kWh of total battery capacity with ${results.requiredCapacityAh.toFixed(0)} Ah at ${voltage}V.`;
+      }
+
+      if (chartSvg && consumption > 0) {
+        const pts: { x: number; y: number; label: string }[] = [];
+        for (let days = 1; days <= 5; days++) {
+          const r = calculateSolarBatterySizing(consumption, days, voltage, chemistry, dod);
+          pts.push({ x: days, y: r.requiredEnergyWh / 1000, label: String(days) });
+        }
+        renderBarChart(chartSvg, pts, { width: 320, height: 160, xLabel: 'Autonomy Days', yLabel: 'Battery Size (kWh)', yMin: 0 });
+      } else if (chartSvg) clearChart(chartSvg);
+    }
+
+    [consumptionInput, autonomyInput, voltageInput, chemistrySelect, dodInput].forEach(el => { el.addEventListener('input', updateCalculations); });
+    updateCalculations();
+  </script>
+
+</CalculatorLayout>

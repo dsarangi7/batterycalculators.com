@@ -3,6 +3,7 @@ import '../styles/global.css';
 import Header from '../components/Header.astro';
 import HeadSEO from '../components/HeadSEO.astro';
 import Analytics from '../components/Analytics.astro';
+import { t, type Locale } from '../utils/i18n';
 
 interface Props {
   title?: string;
@@ -16,6 +17,7 @@ interface Props {
   schemaUrl?: string;
   faqItems?: Array<{ question: string; answer: string }>;
   breadcrumbs?: Array<{ label: string; href?: string }>;
+  lang?: Locale;
 }
 
 const { 
@@ -30,10 +32,16 @@ const {
   schemaUrl,
   faqItems,
   breadcrumbs,
+  lang = 'en',
 } = Astro.props;
+
+const currentPath = Astro.url.pathname;
+const isPt = lang === 'pt';
+const enPath = isPt ? currentPath.replace('/pt/', '/') : currentPath;
+const ptPath = isPt ? currentPath : '/pt' + currentPath;
 ---
 <!doctype html>
-<html lang="en">
+<html lang={lang}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -73,6 +81,11 @@ const {
       breadcrumbs={breadcrumbs}
     />
 
+    <!-- Hreflang alternate links -->
+    <link rel="alternate" hreflang="en" href={`https://batterycalculators.com${enPath}`} />
+    <link rel="alternate" hreflang="pt" href={`https://batterycalculators.com${ptPath}`} />
+    <link rel="alternate" hreflang="x-default" href={`https://batterycalculators.com${enPath}`} />
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -86,7 +99,7 @@ const {
   </head>
   <body class="bg-canvas text-body min-h-screen flex flex-col font-body overflow-x-hidden w-full max-w-full">
 
-    <Header />
+    <Header lang={lang} />
 
     <!-- Main Content Area -->
     <main class="flex-grow w-full max-w-7xl mx-auto px-4 md:px-8 pt-6 pb-8 md:pt-8 md:pb-16">
@@ -101,22 +114,22 @@ const {
   <!-- Row 1: Brand + Statistics -->
   <div class="max-w-7xl mx-auto px-4 md:px-8 py-6 grid md:grid-cols-3 gap-6 items-center">
     <div class="col-span-2 flex flex-col gap-1">
-      <h2 class="text-lg font-bold text-primary">Battery Calculators</h2>
+      <h2 class="text-lg font-bold text-primary">{t('site.name', lang)}</h2>
       <p class="text-body-sm text-muted max-w-prose">
-        Engineering-grade battery sizing, runtime, SOC, degradation, and energy storage tools for solar, marine, RV, EV, and BESS applications.
+        {t('footer.brand_description', lang)}
       </p>
     </div>
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-2 text-center text-body-sm text-muted">
       <div class="flex flex-col">
-        <span class="text-label-uppercase text-primary text-xs font-bold">Calculators</span>
+        <span class="text-label-uppercase text-primary text-xs font-bold">{t('footer.calculators_label', lang)}</span>
         <span class="text-lg font-semibold text-primary">30</span>
       </div>
       <div class="flex flex-col">
-        <span class="text-label-uppercase text-primary text-xs font-bold">Guides</span>
+        <span class="text-label-uppercase text-primary text-xs font-bold">{t('footer.guides_label', lang)}</span>
         <span class="text-lg font-semibold text-primary">94</span>
       </div>
       <div class="flex flex-col">
-        <span class="text-label-uppercase text-primary text-xs font-bold">Categories</span>
+        <span class="text-label-uppercase text-primary text-xs font-bold">{t('footer.categories_label', lang)}</span>
         <span class="text-lg font-semibold text-primary">7</span>
       </div>
     </div>
@@ -125,56 +138,56 @@ const {
   <!-- Row 2: Navigation Columns -->
   <div class="max-w-7xl mx-auto px-4 md:px-8 py-6 grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 border-t border-hairline">
     <div class="flex flex-col gap-2">
-      <span class="text-label-uppercase text-primary text-xs font-bold">Calculators</span>
+      <span class="text-label-uppercase text-primary text-xs font-bold">{t('footer.calculators_label', lang)}</span>
       <ul class="flex flex-col gap-1 text-body-sm text-muted">
-<li><a href="/tools/runtime-calculator/" class="hover:text-primary transition-colors">Runtime Calculator</a></li>
-        <li><a href="/tools/battery-sizing-calculator/" class="hover:text-primary transition-colors">Battery Sizing Calculator</a></li>
-        <li><a href="/tools/solar-battery-sizing-calculator/" class="hover:text-primary transition-colors">Solar Battery Sizing</a></li>
-        <li><a href="/tools/battery-pack-calculator/" class="hover:text-primary transition-colors">Battery Pack Calculator</a></li>
-        <li><a href="/tools/soc-estimator/" class="hover:text-primary transition-colors">SOC Estimator</a></li>
-        <li><a href="/tools/" class="hover:text-primary transition-colors">View All →</a></li>
+        <li><a href={`${prefix}/tools/runtime-calculator/`} class="hover:text-primary transition-colors">Runtime Calculator</a></li>
+        <li><a href={`${prefix}/tools/battery-sizing-calculator/`} class="hover:text-primary transition-colors">Battery Sizing Calculator</a></li>
+        <li><a href={`${prefix}/tools/solar-battery-sizing-calculator/`} class="hover:text-primary transition-colors">Solar Battery Sizing</a></li>
+        <li><a href={`${prefix}/tools/battery-pack-calculator/`} class="hover:text-primary transition-colors">Battery Pack Calculator</a></li>
+        <li><a href={`${prefix}/tools/soc-estimator/`} class="hover:text-primary transition-colors">SOC Estimator</a></li>
+        <li><a href={`${prefix}/tools/`} class="hover:text-primary transition-colors">{t('footer.view_all', lang)} →</a></li>
       </ul>
     </div>
     <div class="flex flex-col gap-2">
-      <span class="text-label-uppercase text-primary text-xs font-bold">Learning Center</span>
+      <span class="text-label-uppercase text-primary text-xs font-bold">{t('footer.learning_center_label', lang)}</span>
       <ul class="flex flex-col gap-1 text-body-sm text-muted">
-        <li><a href="/learn/" class="hover:text-primary transition-colors">Runtime Guides</a></li>
-        <li><a href="/learn/" class="hover:text-primary transition-colors">Sizing Guides</a></li>
-        <li><a href="/learn/" class="hover:text-primary transition-colors">SOC &amp; SOH Guides</a></li>
-        <li><a href="/learn/" class="hover:text-primary transition-colors">BESS Guides</a></li>
-        <li><a href="/news/" class="hover:text-primary transition-colors">News &amp; Insights</a></li>
-        <li><a href="/learn/" class="hover:text-primary transition-colors">Reference Charts</a></li>
-        <li><a href="/learn/" class="hover:text-primary transition-colors">View All →</a></li>
+        <li><a href={`${prefix}/learn/`} class="hover:text-primary transition-colors">{t('footer.runtime_guides', lang)}</a></li>
+        <li><a href={`${prefix}/learn/`} class="hover:text-primary transition-colors">{t('footer.sizing_guides', lang)}</a></li>
+        <li><a href={`${prefix}/learn/`} class="hover:text-primary transition-colors">{t('footer.soc_soh_guides', lang)}</a></li>
+        <li><a href={`${prefix}/learn/`} class="hover:text-primary transition-colors">{t('footer.bess_guides', lang)}</a></li>
+        <li><a href={`${prefix}/news/`} class="hover:text-primary transition-colors">{t('footer.news_insights', lang)}</a></li>
+        <li><a href={`${prefix}/learn/`} class="hover:text-primary transition-colors">{t('footer.reference_charts', lang)}</a></li>
+        <li><a href={`${prefix}/learn/`} class="hover:text-primary transition-colors">{t('footer.view_all', lang)} →</a></li>
       </ul>
     </div>
     <div class="flex flex-col gap-2">
-      <span class="text-label-uppercase text-primary text-xs font-bold">Categories</span>
+      <span class="text-label-uppercase text-primary text-xs font-bold">{t('footer.categories_label', lang)}</span>
       <ul class="flex flex-col gap-1 text-body-sm text-muted">
-        <li><a href="/solar/" class="hover:text-primary transition-colors">Solar</a></li>
-        <li><a href="/home-backup/" class="hover:text-primary transition-colors">Home Backup</a></li>
-        <li><a href="/rv/" class="hover:text-primary transition-colors">RV</a></li>
-        <li><a href="/marine/" class="hover:text-primary transition-colors">Marine</a></li>
-        <li><a href="/ev/" class="hover:text-primary transition-colors">EV</a></li>
-        <li><a href="/bess/" class="hover:text-primary transition-colors">BESS</a></li>
+        <li><a href={`${prefix}/solar/`} class="hover:text-primary transition-colors">{t('nav.solar', lang)}</a></li>
+        <li><a href={`${prefix}/home-backup/`} class="hover:text-primary transition-colors">{t('footer.home_backup', lang)}</a></li>
+        <li><a href={`${prefix}/rv/`} class="hover:text-primary transition-colors">{t('nav.rv', lang)}</a></li>
+        <li><a href={`${prefix}/marine/`} class="hover:text-primary transition-colors">{t('nav.marine', lang)}</a></li>
+        <li><a href={`${prefix}/ev/`} class="hover:text-primary transition-colors">{t('footer.ev', lang)}</a></li>
+        <li><a href={`${prefix}/bess/`} class="hover:text-primary transition-colors">{t('footer.bess', lang)}</a></li>
       </ul>
     </div>
     <div class="flex flex-col gap-2">
-      <span class="text-label-uppercase text-primary text-xs font-bold">Company</span>
+      <span class="text-label-uppercase text-primary text-xs font-bold">{t('footer.company_label', lang)}</span>
       <ul class="flex flex-col gap-1 text-body-sm text-muted">
-        <li><a href="/about/" class="hover:text-primary transition-colors">About</a></li>
-        <li><a href="/contact/" class="hover:text-primary transition-colors">Contact</a></li>
-        <li><a href="/methodology/" class="hover:text-primary transition-colors">Methodology</a></li>
-        <li><a href="/privacy/" class="hover:text-primary transition-colors">Privacy Policy</a></li>
-        <li><a href="/terms/" class="hover:text-primary transition-colors">Terms of Service</a></li>
-        <li><a href="/disclaimer/" class="hover:text-primary transition-colors">Disclaimer</a></li>
+        <li><a href={`${prefix}/about/`} class="hover:text-primary transition-colors">{t('nav.about', lang)}</a></li>
+        <li><a href={`${prefix}/contact/`} class="hover:text-primary transition-colors">{t('footer.contact', lang)}</a></li>
+        <li><a href={`${prefix}/methodology/`} class="hover:text-primary transition-colors">{t('footer.methodology', lang)}</a></li>
+        <li><a href={`${prefix}/privacy/`} class="hover:text-primary transition-colors">{t('footer.privacy_policy', lang)}</a></li>
+        <li><a href={`${prefix}/terms/`} class="hover:text-primary transition-colors">{t('footer.terms_of_service', lang)}</a></li>
+        <li><a href={`${prefix}/disclaimer/`} class="hover:text-primary transition-colors">{t('footer.disclaimer', lang)}</a></li>
       </ul>
     </div>
   </div>
 
   <!-- Row 3: Search -->
   <div class="max-w-7xl mx-auto px-4 md:px-8 py-5 flex justify-center border-t border-hairline">
-    <form action="/search/" method="GET" class="relative w-full max-w-md">
-      <input type="text" name="q" placeholder="Search calculators, guides, and reference charts..." class="w-full border border-hairline rounded-md py-2 pl-3 pr-10 text-body-sm bg-canvas text-muted focus:outline-none focus:border-primary" />
+    <form action={`${prefix}/search/`} method="GET" class="relative w-full max-w-md">
+      <input type="text" name="q" placeholder={t('footer.search_placeholder', lang)} class="w-full border border-hairline rounded-md py-2 pl-3 pr-10 text-body-sm bg-canvas text-muted focus:outline-none focus:border-primary" />
       <button type="submit" class="absolute right-2 top-1/2 -translate-y-1/2 text-primary hover:text-primary/80 transition-colors">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><circle cx="11" cy="11" r="8" stroke-width="2"/><line x1="21" y1="21" x2="16.65" y2="16.65" stroke-width="2" stroke-linecap="round"/></svg>
       </button>
@@ -183,28 +196,28 @@ const {
 
   <!-- Row 4: Reference Center -->
   <div class="max-w-7xl mx-auto px-4 md:px-8 py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-t border-hairline">
-    <span class="text-label-uppercase text-primary text-xs font-bold whitespace-nowrap">Battery Reference Center</span>
+    <span class="text-label-uppercase text-primary text-xs font-bold whitespace-nowrap">{t('footer.battery_reference_center', lang)}</span>
     <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-body-sm text-muted">
-      <a href="/learn/lifepo4-voltage-chart/" class="hover:text-primary transition-colors">Voltage Charts</a>
-      <a href="/learn/lifepo4-soc-chart/" class="hover:text-primary transition-colors">SOC Tables</a>
-      <a href="/learn/battery-c-rate-reference/" class="hover:text-primary transition-colors">C-Rate Reference</a>
-      <a href="/learn/battery-sizing-reference/" class="hover:text-primary transition-colors">DoD Charts</a>
-      <a href="/resources/" class="text-primary hover:text-muted transition-colors ml-2">Browse Reference Center →</a>
+      <a href={`${prefix}/learn/lifepo4-voltage-chart/`} class="hover:text-primary transition-colors">{t('footer.voltage_charts', lang)}</a>
+      <a href={`${prefix}/learn/lifepo4-soc-chart/`} class="hover:text-primary transition-colors">{t('footer.soc_tables', lang)}</a>
+      <a href={`${prefix}/learn/battery-c-rate-reference/`} class="hover:text-primary transition-colors">{t('footer.c_rate_reference', lang)}</a>
+      <a href={`${prefix}/learn/battery-sizing-reference/`} class="hover:text-primary transition-colors">{t('footer.dod_charts', lang)}</a>
+      <a href={`${prefix}/resources/`} class="text-primary hover:text-muted transition-colors ml-2">{t('footer.browse_reference_center', lang)} →</a>
     </div>
   </div>
 
   <!-- Row 5: Bottom Bar -->
   <div class="border-t border-hairline py-4">
     <div class="max-w-7xl mx-auto px-4 md:px-8 flex flex-col md:flex-row items-center justify-between gap-2 text-caption text-muted">
-      <p class="m-0">© {new Date().getFullYear()} Battery Calculators. Independent open utilities.</p>
+      <p class="m-0">© {new Date().getFullYear()} {t('site.name', lang)}. {t('footer.copyright', lang)}</p>
       <div class="flex flex-wrap items-center gap-2">
-        <a href="/sitemap-index.xml" class="hover:text-primary transition-colors">Sitemap</a>
+        <a href="/sitemap-index.xml" class="hover:text-primary transition-colors">{t('footer.sitemap', lang)}</a>
         <span class="text-hairline">|</span>
-        <a href="/privacy/" class="hover:text-primary transition-colors">Privacy</a>
+        <a href={`${prefix}/privacy/`} class="hover:text-primary transition-colors">{t('footer.privacy', lang)}</a>
         <span class="text-hairline">|</span>
-        <a href="/terms/" class="hover:text-primary transition-colors">Terms</a>
+        <a href={`${prefix}/terms/`} class="hover:text-primary transition-colors">{t('footer.terms', lang)}</a>
         <span class="text-hairline">|</span>
-        <a href="/contact/" class="hover:text-primary transition-colors">Contact</a>
+        <a href={`${prefix}/contact/`} class="hover:text-primary transition-colors">{t('footer.contact', lang)}</a>
       </div>
     </div>
     </div>

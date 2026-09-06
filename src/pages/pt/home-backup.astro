@@ -1,0 +1,198 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import CategoryToolGrid from '../../components/CategoryToolGrid.astro';
+import FAQSection from '../../components/FAQSection.astro';
+
+const tools = [
+  {
+    name: "Calculadora de Backup Residencial",
+    href: "/pt/tools/home-backup-battery-calculator/",
+    description: "Calcule o tamanho da bateria para backup residencial durante apagões. Dimensione cobertura de cargas essenciais para 8–48 horas.",
+    available: true,
+  },
+  {
+    name: "Calculadora Bateria-Inversor",
+    href: "/pt/tools/inverter-battery-calculator/",
+    description: "Calcule a capacidade da bateria para cargas de inversor AC com ajustes de DoD e eficiência.",
+    available: true,
+  },
+  {
+    name: "Calculadora de Autonomia de Bateria",
+    href: "/pt/tools/runtime-calculator/",
+    description: "Estime quanto tempo sua bateria residencial alimentará cargas essenciais durante um apagão.",
+    available: true,
+  },
+  {
+    name: "Calculadora de Backup para Apagões",
+    href: "/pt/home-power-outage-battery-backup-calculator/",
+    description: "Calcule tamanho da bateria, inversor e sistema de backup para tempestades, furacões e falhas na rede.",
+    available: true,
+  },
+  {
+    name: "Calculadora de Tempo de Carga",
+    href: "/pt/tools/charging-time-calculator/",
+    description: "Calcule quanto tempo leva para carregar sua bateria residencial de uma faixa SOC para a SOC alvo.",
+    available: true,
+  },
+  {
+    name: "Calculadora de Backup para Geladeira",
+    href: "/pt/fridge-battery-backup-calculator/",
+    description: "Dimensione uma bateria para manter sua geladeira funcionando durante um apagão. Previna a deterioração de alimentos.",
+    available: true,
+  },
+  {
+    name: "Calculadora de Backup para CPAP",
+    href: "/pt/cpap-battery-backup-calculator/",
+    description: "Dimensione uma bateria para alimentar sua máquina CPAP durante a noite em um apagão.",
+    available: true,
+  },
+  {
+    name: "Calculadora de Backup para Bomba de Esgoto",
+    href: "/pt/sump-pump-battery-backup-calculator/",
+    description: "Dimensione uma bateria para manter sua bomba de esgoto funcionando durante apagões relacionados a tempestades.",
+    available: true,
+  },
+  {
+    name: "Calculadora de Autonomia de Estação Portátil",
+    href: "/pt/portable-power-station-runtime-calculator/",
+    description: "Veja quanto tempo uma estação de energia portátil executará seus aparelhos essenciais durante um apagão.",
+    available: true,
+  },
+  {
+    name: "Calculadora de Dimensionamento de Gerador Solar",
+    href: "/pt/solar-generator-sizing-calculator/",
+    description: "Dimensione um sistema completo de backup solar com bateria, painéis e inversor.",
+    available: true,
+  },
+];
+
+const learnArticles = [
+  { title: "Guia de Planejamento de Backup Residencial", href: "/pt/learn/home-battery-backup-planning/" },
+  { title: "Quantos kWh Preciso para Minha Casa?", href: "/pt/learn/how-many-kwh-do-i-need-for-my-house/" },
+  { title: "Guia de Bateria para Apagões", href: "/pt/learn/power-outage-battery-guide/" },
+  { title: "Backup de Bateria para Toda a Casa", href: "/pt/learn/whole-house-battery-backup/" },
+  { title: "Gerador vs Backup de Bateria", href: "/pt/learn/generator-vs-battery-backup/" },
+  { title: "Guia de Autonomia de Backup Residencial", href: "/pt/learn/home-backup-runtime-guide/" },
+  { title: "Guia de Dimensionamento de Bateria Residencial", href: "/pt/learn/home-battery-sizing-guide/" },
+  { title: "Como Dimensionar um Banco de Baterias", href: "/pt/learn/how-to-size-a-battery-bank/" },
+  { title: "Referência de Dimensionamento de Bateria", href: "/pt/learn/battery-sizing-reference/" },
+  { title: "Gráfico de Profundidade de Descarga", href: "/pt/learn/battery-depth-of-discharge-chart/" },
+  { title: "LiFePO4 vs Chumbo-Ácido", href: "/pt/learn/lifepo4-vs-lead-acid/" },
+  { title: "Referência de Tamanhos Comuns de Bateria", href: "/pt/learn/common-battery-sizes-reference/" },
+];
+
+const faqItems = [
+  {
+    question: "Quanto de bateria preciso para backup residencial?",
+    answer: "O tamanho da bateria depende de quais cargas você deseja fazer backup e por quanto tempo. Uma residência típica fazendo backup de cargas essenciais (geladeira, luzes, internet, dispositivos médicos) por 24 horas precisa de aproximadamente 10–15 kWh de capacidade utilizável de bateria. Fazer backup de toda a casa por 24 horas pode exigir 30–50 kWh ou mais.",
+  },
+  {
+    question: "Quanto tempo uma bateria residencial durará durante um apagão?",
+    answer: "A autonomia depende da capacidade da bateria e das cargas que você está usando. Uma bateria de 10 kWh utilizável alimentando cargas essenciais a 1,5 kW durará aproximadamente 6,7 horas. Rodando apenas uma geladeira e algumas luzes a 500W pode estender a autonomia para 20 horas. Use nossa Calculadora de Autonomia para estimativas precisas baseadas no seu perfil de carga específico.",
+  },
+  {
+    question: "Quais cargas devo priorizar para backup?",
+    answer: "Cargas críticas incluem tipicamente geladeira/congelador, equipamentos médicos, roteador de internet, carregamento de telefone, algumas luzes e bombas de poço. Cargas de alto consumo como ar-condicionado, aquecedores de água elétricos e fogões elétricos geralmente devem ser excluídas do backup, a menos que você tenha um banco de baterias muito grande.",
+  },
+  {
+    question: "Preciso de um inversor especial para backup residencial?",
+    answer: "Sim. Backup residencial exige um inversor híbrido ou um inversor-cargador baseado em bateria que possa operar independentemente da rede. Inversores solares padrão conectados à rede desligam durante apagões por segurança (anti-ilha). Um inversor híbrido com capacidade de backup pode isolar suas cargas essenciais e alimentá-las da bateria durante apagões.",
+  },
+  {
+    question: "Posso adicionar baterias ao meu sistema solar existente?",
+    answer: "Sim, mas a abordagem depende do seu inversor atual. Se você tem um inversor padrão conectado à rede, precisará substituí-lo por um inversor híbrido ou adicionar um sistema de bateria acoplado à AC com seu próprio inversor. Algumas fabricantes oferecem kits de retrofit de bateria para suas plataformas de inversor existentes.",
+  },
+];
+
+const relatedCategories = [
+  { href: "/pt/solar/", title: "Solar", description: "Dimensionamento de bateria solar e planejamento off-grid" },
+  { href: "/pt/engineering/", title: "Engenharia", description: "Ferramentas de C-rate, SOC, queda de tensão e perda em cabos" },
+  { href: "/pt/bess/", title: "BESS e Comercial", description: "Análise de ROI de armazenamento de energia comercial" },
+];
+
+const breadcrumbItems = [
+  { label: "Backup Residencial" },
+];
+---
+
+<Layout
+  title="Calculadoras de Backup Residencial | Calculadoras de Bateria"
+  description="Calculadoras gratuitas de backup residencial para planejamento de apagões, dimensionamento de cargas essenciais e estimativa de autonomia de bateria."
+  schema="website"
+  schemaName="Calculadoras de Backup Residencial"
+  schemaDescription="Calculadoras de bateria de nível de engenharia para sistemas de backup residencial e planejamento de apagões."
+  breadcrumbs={[{ label: 'Backup Residencial' }]}
+  lang="pt"
+>
+  <Breadcrumb items={breadcrumbItems} />
+
+  <section class="mb-12 md:mb-16 border-b border-hairline pb-12">
+    <div class="max-w-4xl">
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">BACKUP RESIDENCIAL</span>
+      <h1 class="text-display-md text-primary mb-6">Calculadoras de Backup Residencial</h1>
+      <p class="text-body-md text-body max-w-2xl font-light">
+        Planeje seu sistema de backup residencial com calculadoras de nível de engenharia. Dimensione sua bateria para cargas essenciais, estime a autonomia durante apagões e calcule tempos de carga.
+      </p>
+    </div>
+  </section>
+
+  <section class="mb-16">
+    <div class="max-w-4xl text-body-md text-body font-light flex flex-col gap-6">
+      <p>
+        Sistemas de backup residencial fornecem independência elétrica durante apagões na rede. Diferente de sistemas solares conectados à rede que desligam quando a rede falha, um sistema com backup de bateria pode transicionar suavemente para modo ilha, mantendo suas cargas essenciais funcionando sem interrupção.
+      </p>
+      <p>
+        A base de qualquer sistema de backup residencial é uma análise adequada de cargas. Você precisa identificar quais aparelhos e circuitos são essenciais durante um apagão, determinar seu consumo de energia e dimensionar a bateria para cobrir essas cargas pela duração desejada do backup. Uma residência fazendo backup apenas de uma geladeira, roteador de internet e algumas luzes consome aproximadamente 500–800 watts. Adicionar uma bomba de poço, equipamentos médicos ou um mini-split pode elevar a carga para 2–4 kW.
+      </p>
+      <p>
+        A seleção da química da bateria afeta tanto a capacidade utilizável quanto o custo do sistema. Baterias de Lithium Iron Phosphate (LiFePO4) podem ser descarregadas até 80–90% DoD diariamente, significando que uma bateria de 10 kWh fornece 8–9 kWh de energia utilizável. Baterias de chumbo-ácido são limitadas a 50% DoD, então o mesmo banco de 10 kWh classificado fornece apenas 5 kWh utilizáveis.
+      </p>
+      <p>
+        A tensão do sistema é outra decisão crítica de design. Sistemas de 12V funcionam para configurações pequenas de backup abaixo de 2 kW. Sistemas de 24V lidam com cargas moderadas até 5 kW de forma eficiente. Sistemas de 48V são padrão para backup de toda a casa, reduzindo o consumo de corrente e permitindo fiação mais fina e menos cara.
+      </p>
+    </div>
+  </section>
+
+  <section class="mb-16">
+    <h2 class="text-title-lg text-primary mb-6">Calculadoras Disponíveis</h2>
+    <CategoryToolGrid tools={tools} />
+  </section>
+
+  {learnArticles.length > 0 && (
+    <section class="mb-16 border-t border-hairline pt-12">
+      <h2 class="text-title-lg text-primary mb-6">Guias de Backup Residencial</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {learnArticles.map((article) => (
+          <a href={article.href} class="bg-surface-card border border-hairline p-4 hover:border-primary transition-colors">
+            <span class="text-label-uppercase text-muted text-[10px] block mb-2">CENTRO DE APRENDIZAGEM</span>
+            <h3 class="text-title-sm text-primary">{article.title}</h3>
+          </a>
+        ))}
+      </div>
+    </section>
+  )}
+
+  <FAQSection items={faqItems} />
+
+  {relatedCategories.length > 0 && (
+    <section class="mb-16 border-t border-hairline pt-12">
+      <h2 class="text-title-lg text-primary mb-6">Categorias Relacionadas</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {relatedCategories.map((cat) => (
+          <a href={cat.href} class="bg-surface-card border border-hairline p-6 hover:border-primary transition-colors block">
+            <h3 class="text-title-md text-primary mb-2">{cat.title}</h3>
+            <p class="text-body-sm text-muted">{cat.description}</p>
+          </a>
+        ))}
+      </div>
+    </section>
+  )}
+
+  <section class="bg-surface-soft border border-hairline p-6 text-caption text-muted mb-8">
+    <span class="text-primary font-bold text-[10px] tracking-wider uppercase border border-hairline px-1.5 py-0.5 mr-2 inline-block mb-3">
+      Aviso de Engenharia
+    </span>
+    Todas as calculadoras fornecem apenas estimativas de dimensionamento. A duração real do backup depende da química da bateria, temperatura, perfil de cargas e perdas do sistema. Consulte um eletricista certificado para sistemas de backup críticos.
+  </section>
+</Layout>

@@ -1,4 +1,6 @@
 ---
+import { t, type Locale } from '../utils/i18n';
+
 export interface Props {
   number: number;
   title: string;
@@ -8,6 +10,7 @@ export interface Props {
   answer: string;
   interpretation?: string;
   variant?: 'default' | 'home' | 'rv' | 'marine' | 'solar' | 'industrial';
+  lang?: Locale;
 }
 
 const {
@@ -19,6 +22,7 @@ const {
   answer,
   interpretation,
   variant = 'default',
+  lang = 'en',
 } = Astro.props as Props;
 
 const borderColors: Record<string, string> = {
@@ -33,11 +37,11 @@ const borderColor = borderColors[variant] || borderColors.default;
 ---
 
 <div class={`border-l-2 ${borderColor} pl-4 md:pl-5`}>
-  <p class="font-bold text-primary mb-2">Example {number}: {title}</p>
+  <p class="font-bold text-primary mb-2">{t('components.worked_example.example_prefix', lang)} {number}: {title}</p>
   <p class="text-body-sm text-muted mb-3">{scenario}</p>
 
   <div class="mb-3">
-    <p class="text-label-uppercase text-[10px] text-muted tracking-wider mb-1">Given Values</p>
+    <p class="text-label-uppercase text-[10px] text-muted tracking-wider mb-1">{t('components.worked_example.given_values', lang)}</p>
     <ul class="list-disc pl-5 flex flex-col gap-1 text-body-sm text-muted">
       {inputs.map((input) => (
         <li><strong>{input.label}:</strong> {input.value}</li>
@@ -58,7 +62,7 @@ const borderColor = borderColors[variant] || borderColors.default;
   </div>
 
   <div class="bg-surface-soft border border-hairline p-3 mt-2">
-    <p class="text-label-uppercase text-[10px] text-primary tracking-wider mb-1">Final Answer</p>
+    <p class="text-label-uppercase text-[10px] text-primary tracking-wider mb-1">{t('components.worked_example.final_answer', lang)}</p>
     <p class="font-mono text-primary text-sm">{answer}</p>
   </div>
 

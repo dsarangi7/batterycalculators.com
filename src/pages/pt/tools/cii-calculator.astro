@@ -1,0 +1,534 @@
+---
+import CalculatorLayout from '../../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import InputField from '../../../components/InputField.astro';
+import ResultBox from '../../../components/ResultBox.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import RelatedTools from '../../../components/RelatedTools.astro';
+import WorkedExample from '../../../components/WorkedExample.astro';
+import ComparisonTable from '../../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../../components/EngineeringDiagram.astro';
+
+const whatIs = `O Calculador CII fornece uma estimativa educacional da classificação do Indicador de Intensidade de Carbono de uma embarcação com base no framework de emissões de gases de efeito estufa da OMI. Calcula emissões estimadas de CO₂, trabalho de transporte, valor CII atingido e faixa de classificação indicativa (A até E). Esta ferramenta é projetada para avaliação preliminar e modelagem de cenários de melhoria — NÃO é um calculador oficial de conformidade da OMI. Classificações CII reais dependem de parâmetros específicos da embarcação, verificação de dados DCS e metodologias de cálculo aprovadas pela OMI.`;
+
+const whyItMatters = [
+  "O mandato CII da OMI exige que embarcações de 5.000 TG e acima alcancem uma classificação mínima C — embarcações classificadas D por três anos consecutivos ou E em qualquer ano devem apresentar planos de ação corretiva.",
+  "As classificações CII afetam diretamente o valor comercial da embarcação — classificações ruins podem restringir comércio em regiões com requisitos ambientais mais rigorosos e reduzir atratividade de afretamento.",
+  "Compreender sua posição atual de CII permite planejamento proativo de melhoria em vez de conformidade reativa — ação antecipada é sempre mais econômica.",
+  "Hibridização, energia de costa e melhorias de eficiência operacional podem cada uma contribuir com 5–15% de melhoria no CII — quantificar esses caminhos é essencial para decisões de investimento.",
+  "O framework CII se aperta anualmente até 2030 — uma embarcação classificada C hoje pode ser classificada D até 2027 sem medidas contínuas de melhoria."
+];
+
+const practicalApplications = [
+  { title: "Avaliação CII de Linha de Base", description: "Estime a classificação CII atual com base no consumo anual de combustível, distância e peso morto para entender sua posição de conformidade." },
+  { title: "Modelagem de Cenários de Melhoria", description: "Avalie o impacto no CII de hibridização, adoção de energia de costa, otimização de velocidade e medidas de eficiência operacional." },
+  { title: "Benchmarking de CII de Frota", description: "Compare classificações CII em uma frota para priorizar investimentos de melhoria nas embarcações com piores classificações." },
+  { title: "Planejamento Pré-DCS", description: "Prepare-se para submissões anuais do DCS (Sistema de Coleta de Dados) compreendendo a relação entre consumo de combustível, distância e classificação CII." }
+];
+
+const expertNotes: { title: string; variant: 'warning' | 'engineering' | 'info'; content: string }[] = [
+  {
+    title: "NÃO É um Calculador Oficial da OMI",
+    variant: "warning",
+    content: "Esta é apenas uma ferramenta de estimativa educacional. Classificações CII oficiais são calculadas usando a própria metodologia da OMI (MEPC.328(74) conforme emendado), verificadas por submissão de dados DCS e aprovadas pelos estados pavilhão. Cálculos CII reais exigem parâmetros específicos da embarcação (tipo de navio, peso morto, tonelagem bruta, capacidade de carga, fatores de emissão de CO₂ específicos por tipo de combustível) e devem seguir rigorosamente as fórmulas prescritas pela OMI."
+  },
+  {
+    title: "Linha de Referência e Faixas de Classificação",
+    variant: "engineering",
+    content: "A classificação CII é determinada comparando o CII atingido de uma embarcação com uma linha de referência operacional CII anual específica para seu tipo e tamanho. As faixas de classificação são definidas como: A (maior superior) = abaixo de 80% da referência, B (menor superior) = 80–90%, C (moderado) = 90–100%, D (inferior) = 100–110%, E (significativamente inferior) = acima de 110%. Este calculador usa uma linha de referência simplificada para fins educacionais."
+  },
+  {
+    title: "Premissas dos Cenários de Melhoria",
+    variant: "info",
+    content: "Os cenários de melhoria usam médias representativas da indústria: hibridização reduz consumo de combustível em 15%, energia de costa elimina 5% do combustível anual (no cais), e eficiência operacional (otimização de velocidade, limpeza de casco, roteamento meteorológico) reduz consumo em 10%. O potencial real de melhoria varia significativamente por tipo de embarcação, rota e perfil operacional."
+  }
+];
+
+const trustSection = {
+  text: "A metodologia CII é baseada na OMI MEPC.328(74) conforme emendado. As definições de faixas de classificação seguem a análise de dados DCS da OMI. Esta ferramenta fornece estimativas educacionais — consulte sua sociedade classificadora para cálculos oficiais.",
+  link: { label: "Veja nossa metodologia e derivações de fórmulas", href: "/methodology/" }
+};
+
+const references = [
+  { title: "Diretrizes CII da OMI (MEPC.328(74))", url: "https://www.imo.org/en/OurWork/Environment/Pages/Carbon-Intensity-Indicator-(CII).aspx", source: "Organização Marítima Internacional" },
+  { title: "Quarto Estudo de GEE da OMI 2020", url: "https://www.imo.org/en/OurWork/Environment/Pages/Fourth-IMO-Greenhouse-Gas-Study-2020.aspx", source: "Organização Marítima Internacional" },
+  { title: "DNV — Avaliação e Classificação CII", url: "https://www.dnv.com/maritime/", source: "DNV" },
+  { title: "Dados DCS da OMI — Linhas de Referência CII", url: "https://www.imo.org/en/OurWork/Environment/Pages/Initial-IMO-GHG-Strategy.aspx", source: "Organização Marítima Internacional" }
+];
+
+const faqItems = [
+  {
+    question: "O que é o Indicador de Intensidade de Carbono (CII)?",
+    answer: "O CII é uma medida da OMI que classifica navios de A a E com base em sua intensidade de carbono operacional — medida em gramas de CO₂ emitidas por tonelada-milha de trabalho de transporte de carga. Aplica-se a embarcações de 5.000 TG e acima em viagens internacionais. Navios classificados D por três anos consecutivos ou E em qualquer ano devem apresentar um plano de ação corretiva como parte de seu Plano de Gestão de Eficiência Energética do Navio (SEEMP)."
+  },
+  {
+    question: "Como o CII é calculado?",
+    answer: "CII Atingido = Emissões Anuais de CO₂ (toneladas) / (Peso Morto × Distância Percorrida em milhas náuticas). O resultado é comparado a uma linha de referência operacional CII anual específica para o tipo e tamanho do navio. A classificação é determinada pela posição do CII atingido em relação a essa linha de referência: A é abaixo de 80% da referência, B é 80–90%, C é 90–100%, D é 100–110% e E é acima de 110%."
+  },
+  {
+    question: "O que cada classificação CII significa?",
+    answer: "A (Maior Superior): Supera significativamente os requisitos de eficiência. B (Menor Superior): Atende e supera os requisitos. C (Moderado): Atende aos requisitos mínimos — esta é a faixa operacional alvo da OMI. D (Inferior): Abaixo dos requisitos — ação corretiva necessária se sustentado por 3 anos consecutivos. E (Significativamente Inferior): Bem abaixo dos requisitos — plano de ação corretiva obrigatório imediatamente."
+  },
+  {
+    question: "Como posso melhorar minha classificação CII?",
+    answer: "Principais caminhos de melhoria incluem: otimização de velocidade (10–20% de melhoria), limpeza de casco e hélice (5–10%), roteamento meteorológico e otimização de viagem (3–8%), hibridização ou sistemas elétricos a bateria (10–15%), energia de costa no cais (3–8%), propulsão assistida por vento (5–15%) e GNL ou combustíveis alternativos (10–20%). Uma combinação de medidas operacionais e técnicas normalmente alcança os melhores resultados."
+  },
+  {
+    question: "Este calculador substitui a conformidade oficial da OMI?",
+    answer: "Não. Esta ferramenta fornece estimativas educacionais para avaliação preliminar e modelagem de cenários de melhoria. Classificações CII oficiais são determinadas pelo Sistema de Coleta de DCS da OMI, verificadas pelos estados pavilhão e devem seguir exatamente a metodologia prescrita na MEPC.328(74) conforme emendado. Use sempre as ferramentas aprovadas da sua sociedade classificadora para conformidade regulatória."
+  },
+  {
+    question: "Quais embarcações são afetadas pelo CII?",
+    answer: "O CII se aplica a navios de carga, cruzeiro e petroleiro de 5.000 TG e acima em viagens internacionais. Isso inclui graneleiros, navios de contêineres, petroleiros, navios de gás, navios de carga Ro-Ro e navios de cruzeiro. Não se aplica a embarcações de suporte offshore, embarcações de pesca ou navios não envolvidos em viagens internacionais. O escopo pode se expandir em futuras emendas da OMI."
+  },
+  {
+    question: "Como a hibridização afeta o CII?",
+    answer: "A hibridização reduz o consumo anual de combustível em 15–25% por operação elétrica a bateria durante períodos de baixa carga, nivelamento de carga e otimização da carga do motor. Como o CII é diretamente proporcional às emissões de CO₂ (que derivam do consumo de combustível), uma redução de 15% no combustível se traduz em aproximadamente 15% de melhoria no CII. Isso pode mudar uma embarcação de classificação D para C ou de C para B."
+  },
+  {
+    question: "Com que frequência o CII é reavaliado?",
+    answer: "O CII é avaliado anualmente como parte da coleta de dados DCS da OMI. A cada ano, as embarcações submetem consumo de combustível, distância percorrida e dados de carga ao seu estado pavilhão. O CII atingido é calculado e comparado à linha de referência para determinar a classificação anual. O histórico acumulado de classificações importa — classificações D por 3 anos consecutivos disparam requisitos de ação corretiva."
+  }
+];
+
+const relatedArticles = [
+  { title: "Compreendendo as Classificações CII e a Intensidade de Carbono de Embarcações", href: "/learn/understanding-cii-ratings/" },
+  { title: "Roteiro de Descarbonização Marítima", href: "/learn/maritime-decarbonization-roadmap/" },
+];
+
+const commonMistakes = [
+  "Usar uma linha de referência simplificada em vez da linha de referência da OMI específica por tipo de navio — linhas de referência reais variam significativamente por categoria de embarcação e DWT.",
+  "Ignorar requisitos de verificação de dados DCS — cálculos CII devem usar dados anuais verificados de consumo de combustível e distância submetidos pelo DCS da OMI.",
+  "Aplicar porcentagens de melhoria aditivamente em vez de multiplicativamente — 15% de hibridização + 10% de energia de costa + 10% de eficiência operacional não é 35% de melhoria total.",
+  "Assumir que a classificação CII de um único ano determina conformidade — a OMI avalia o CII ao longo de vários anos; três classificações D consecutivas disparam ação corretiva.",
+  "Usar consumo de combustível estimado em vez de registros de combustível embarcado — o DCS da OMI exige registros reais de compra e consumo de combustível, não estimativas.",
+  "Esquecer que as linhas de referência CII se apertam anualmente até 2030 — uma embarcação classificada C hoje pode cair para D sem medidas adicionais de melhoria.",
+  "Não considerar variações na distância navegada — viagens em lastro e reposicionamento afetam os cálculos anuais de distância e trabalho de transporte.",
+  "Aplicar metodologia CII a embarcações abaixo de 5.000 TG — o CII só se aplica a navios de carga, cruzeiro e petroleiro de 5.000 TG e acima em viagens internacionais."
+];
+
+const relatedCalculators = [
+  { href: "/tools/marine-co2-reduction-calculator/", title: "Calculador de Redução de CO₂ Marítimo", description: "Quantifique reduções de emissões por hibridização e adoção de energia de costa." },
+  { href: "/tools/shore-power-savings-calculator/", title: "Calculador de Economia de Energia de Costa", description: "Estime economias de combustível e reduções de emissões por conexão de energia de costa." },
+  { href: "/marine/", title: "Hub de Eletrificação Marítima", description: "Explore todas as ferramentas e recursos de descarbonização marítima." },
+];
+
+const fuelOptions = [
+  { label: 'Óleo de Gás Marítimo (MGO)', value: 'mgo' },
+  { label: 'Óleo Diesel Marítimo (MDO)', value: 'mdo' },
+  { label: 'Óleo Pesado (HFO)', value: 'hfo' },
+  { label: 'GNL', value: 'lng' },
+];
+---
+
+<CalculatorLayout
+  title="Calculador CII | Battery Calculators"
+  description="Estime a classificação do Indicador de Intensidade de Carbono (CII) da sua embarcação e modele cenários de melhoria para conformidade da OMI. Ferramenta educacional — não é calculador oficial da OMI."
+  faqItems={faqItems}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+  relatedCalculators={relatedCalculators}
+  commonMistakes={commonMistakes}
+  relatedArticles={relatedArticles}
+  lang="pt"
+>
+
+  <div class="bg-m-red/10 border border-m-red/30 p-4 mb-8 flex items-start gap-3">
+    <svg class="w-5 h-5 text-m-red shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z" />
+    </svg>
+    <div>
+      <h3 class="text-primary font-bold text-sm mb-1">Ferramenta Educacional — Não é Calculador Oficial de Conformidade da OMI</h3>
+      <p class="text-body-sm text-muted">Este calculador fornece estimativas preliminares para planejamento e aprendizado. Classificações CII reais são determinadas pelo Sistema de Coleta de Dados da OMI (DCS) e devem ser verificadas pelo seu estado pavilhão e sociedade classificadora usando metodologias aprovadas pela OMI.</p>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Parâmetros da Embarcação</h3>
+      <div class="flex flex-col gap-6">
+        <InputField id="annual-fuel" label="Consumo Anual de Combustível" value={5000} min={100} max={100000} step={100} unit="toneladas/ano" helperText="Total de combustível consumido por ano em toneladas métricas." />
+        <InputField id="fuel-type" label="Tipo de Combustível" type="select" value="mgo" options={fuelOptions} helperText="Combustível principal usado pela embarcação." />
+        <InputField id="distance-travelled" label="Distância Percorrida" value={50000} min={1000} max={500000} step={1000} unit="mn/ano" helperText="Total de milhas náuticas navegadas por ano." />
+        <InputField id="dwt" label="Peso Morto (DWT)" value={50000} min={5000} max={500000} step={1000} unit="DWT" helperText="Peso morto da embarcação em toneladas métricas (≥5.000 para aplicabilidade do CII)." />
+      </div>
+    </CalculatorCard>
+
+    <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">Avaliação CII</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <ResultBox label="Emissões Anuais Estimadas de CO₂" value="16.030 t" suffix="toneladas CO₂ por ano" variant="primary" id="result-co2-emissions" />
+          <ResultBox label="Trabalho de Transporte" value="2,5 B tnm" suffix="DWT × milhas náuticas" id="result-transport-work" />
+          <ResultBox label="CII Atingido Estimado" value="6,41" suffix="g CO₂ / DWT-mn" id="result-attained-cii" />
+          <ResultBox label="Faixa de Classificação Indicativa" value="C" suffix="Moderado — atende requisitos mínimos" id="result-rating-band" />
+        </div>
+      </div>
+      <div class="border-t border-hairline pt-6">
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">Avaliação CII</h4>
+        <p class="text-body-sm text-muted" id="summary-el">Com base em 5.000 toneladas de combustível e 50.000 mn de distância, esta embarcação alcança um CII estimado de 6,41 g CO₂/DWT-mn, situando-se na faixa de classificação C.</p>
+      </div>
+    </CalculatorCard>
+  </div>
+
+  <section class="mb-16">
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-4 uppercase tracking-wider">Faixas de Classificação CII</h3>
+      <p class="text-body-sm text-muted mb-6">Posição atual da embarcação em relação aos limites de classificação da OMI (referência educacional).</p>
+      <div id="rating-bands-chart" class="flex flex-col gap-3"></div>
+      <div class="flex items-center gap-4 mt-4 text-caption text-muted flex-wrap">
+        <span class="flex items-center gap-1.5"><span class="w-3 h-3 inline-block" style="background-color: #0fa336"></span> A — Maior Superior</span>
+        <span class="flex items-center gap-1.5"><span class="w-3 h-3 inline-block" style="background-color: #16a34a"></span> B — Menor Superior</span>
+        <span class="flex items-center gap-1.5"><span class="w-3 h-3 inline-block" style="background-color: #f4b400"></span> C — Moderado</span>
+        <span class="flex items-center gap-1.5"><span class="w-3 h-3 inline-block" style="background-color: #ea580c"></span> D — Inferior</span>
+        <span class="flex items-center gap-1.5"><span class="w-3 h-3 inline-block" style="background-color: #e22718"></span> E — Significativamente Inferior</span>
+      </div>
+    </CalculatorCard>
+  </section>
+
+  <section class="mb-16">
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-4 uppercase tracking-wider">CII Atual vs CII Melhorado</h3>
+      <p class="text-body-sm text-muted mb-6">Melhoria estimada do CII com medidas combinadas de hibridização, energia de costa e eficiência operacional.</p>
+      <div id="improvement-chart" class="flex flex-col gap-4"></div>
+    </CalculatorCard>
+  </section>
+
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">Fórmulas e Exemplos Resolvidos</h2>
+    <FormulaBox title="Fórmulas Matemáticas">
+      <p>O CII é calculado como a razão das emissões anuais de CO₂ ao trabalho de transporte:</p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Emissões CO₂ = Combustível Consumido × Fator CO₂</div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Trabalho de Transporte = DWT × Distância (mn)</div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">CII Atingido = CO₂ (toneladas) × 1.000.000 / Trabalho de Transporte</div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Faixas de Classificação CII (vs linha de referência R):</div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2 text-[12px] leading-relaxed">
+        A: &lt; 0,80 × R<br/>
+        B: 0,80 × R até &lt; 0,90 × R<br/>
+        C: 0,90 × R até &lt; 1,00 × R<br/>
+        D: 1,00 × R até &lt; 1,10 × R<br/>
+        E: ≥ 1,10 × R
+      </div>
+      <p class="mt-4">Fatores CO₂ (toneladas CO₂/tonelada combustível): MGO 3,206, MDO 3,206, HFO 3,114, GNL 2,750<br/>Linha de referência R = 5,0 g CO₂/DWT-mn (benchmark simplificado educacional)<br/>Dados DCS da OMI mostram que linhas de referência típicas variam por tipo de navio e DWT</p>
+    </FormulaBox>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample
+        number={1}
+        title="Graneleiro — Classificação CII Anual"
+        scenario="Um graneleiro opera o ano todo em rotas do Pacífico transportando minério de ferro e carvão. Precisamos determinar sua classificação CII anual a partir do consumo de combustível, distância navegada e peso morto."
+        inputs={[
+          { label: "Consumo Anual de Combustível", value: "4.200 toneladas MGO" },
+          { label: "Distância Navegada", value: "55.000 mn" },
+          { label: "Peso Morto", value: "82.000 DWT" },
+          { label: "Fator CO₂ (MGO)", value: "3,206 t CO₂/t combustível" },
+        ]}
+        steps={[
+          "Calcular emissões anuais de CO₂: 4.200 × 3,206 = 13.465 toneladas CO₂",
+          "Calcular trabalho de transporte: 82.000 × 55.000 = 4,51 × 10⁹ DWT-mn",
+          "Calcular CII atingido: (13.465 × 1.000.000) / 4.510.000.000 = 2,99 g CO₂/DWT-mn",
+          "Comparar com linha de referência R = 5,0: razão = 2,99 / 5,0 = 0,598",
+          "Razão &lt; 0,80 → Classificação: A (Maior Superior)",
+        ]}
+        answer="CII = 2,99 g CO₂/DWT-mn — Classificação: A (Maior Superior)"
+        interpretation="As operações eficientes deste graneleiro — grandes volumes de carga em longas distâncias — produzem um CII baixo, bem abaixo da linha de referência. Uma classificação A coloca a embarcação no top 20% de sua classe, sem necessidade de ação corretiva e elegibilidade para programas de financiamento verde."
+        variant="marine"
+      />
+
+      <WorkedExample
+        number={2}
+        title="Navio de Contêineres — Implicações da Faixa de Classificação"
+        scenario="Dois navios de contêineres idênticos (12.000 TEU, 85.000 DWT) operam em velocidades de serviço diferentes. O Navio A navega a 18 nós enquanto o Navio E opera a 24 nós o ano todo. Ambos queimam o mesmo tipo de combustível, mas em taxas diferentes."
+        inputs={[
+          { label: "Consumo Combustível Navio A", value: "180 toneladas/dia × 280 dias = 50.400 toneladas HFO" },
+          { label: "Consumo Combustível Navio E", value: "260 toneladas/dia × 280 dias = 72.800 toneladas HFO" },
+          { label: "Distância Anual (ambos)", value: "65.000 mn" },
+          { label: "Peso Morto", value: "85.000 DWT" },
+          { label: "Fator CO₂ (HFO)", value: "3,114 t CO₂/t combustível" },
+        ]}
+        steps={[
+          "CO₂ Navio A: 50.400 × 3,114 = 156.946 t | CO₂ Navio E: 72.800 × 3,114 = 226.699 t",
+          "Trabalho de transporte (ambos): 85.000 × 65.000 = 5,525 × 10⁹ DWT-mn",
+          "CII Navio A: 156.946 × 10⁶ / 5,525 × 10⁹ = 2,84 g CO₂/DWT-mn",
+          "CII Navio E: 226.699 × 10⁶ / 5,525 × 10⁹ = 4,10 g CO₂/DWT-mn",
+          "Razão A = 2,84 / 5,0 = 0,568 → Classificação: A | Razão E = 4,10 / 5,0 = 0,820 → Classificação: B",
+        ]}
+        answer="Navio A: 2,84 g CO₂/DWT-mn → Classificação A | Navio E: 4,10 g CO₂/DWT-mn → Classificação B"
+        interpretation="Apesar de embarcações idênticas, a diferença de 33% na velocidade produz uma diferença completa de faixa de classificação. O Navio A se qualifica para financiamento verde; o Navio B atende aos requisitos, mas sem a vantagem competitiva. Reduzir a velocidade do Navio E em apenas 2 nós o mudaria de B para A — uma demonstração poderosa de que decisões operacionais determinam diretamente os resultados do CII."
+        variant="marine"
+      />
+
+      <WorkedExample
+        number={3}
+        title="Petroleiro — Impacto do Slow Steaming"
+        scenario="Um petroleiro MR de produtos opera atualmente na velocidade de serviço. A equipe operacional propõe reduzir a velocidade em 20% nos trechos em lastro e 10% nos trechos carregados. Modelamos a melhoria do CII com essa estratégia de slow steaming."
+        inputs={[
+          { label: "Consumo Atual de Combustível", value: "38 toneladas/dia (média)" },
+          { label: "Dias de Operação", value: "320 dias/ano" },
+          { label: "Distância Anual", value: "48.000 mn" },
+          { label: "Peso Morto", value: "45.000 DWT" },
+          { label: "Redução de Velocidade", value: "~15% média no perfil de viagem" },
+          { label: "Fator CO₂ (MGO)", value: "3,206 t CO₂/t combustível" },
+        ]}
+        steps={[
+          "Combustível atual: 38 × 320 = 12.160 toneladas → CO₂ = 12.160 × 3,206 = 38.985 t",
+          "Trabalho de transporte atual: 45.000 × 48.000 = 2,16 × 10⁹ DWT-mn",
+          "CII atual: 38.985 × 10⁶ / 2,16 × 10⁹ = 18,05 g CO₂/DWT-mn",
+          "Combustível reduzido (economia de 15%): 12.160 × 0,85 = 10.336 toneladas → CO₂ = 33.137 t",
+          "CO₂ melhorado: 10.336 × 3,206 = 33.137 t → CII melhorado: 15,34 g CO₂/DWT-mn",
+          "Redução do CII: (18,05 - 15,34) / 18,05 = 15% de melhoria",
+          "Mudança de classificação: E (18,05/5,0 = 3,61) → D (15,34/5,0 = 3,07)",
+        ]}
+        answer="CII reduzido de 18,05 para 15,34 g CO₂/DWT-mn — Classificação melhora de E para D"
+        interpretation="Slow steaming sozinho entrega 15% de melhoria no CII, movendo este petroleiro de classificação E para D. Embora ainda exija plano de ação corretiva sob D, a embarcação evita a melhoria imediata obrigatória para embarcações classificadas E. Combinar slow steaming com limpeza de casco e roteamento meteorológico poderia empurrar a embarcação para C, eliminando completamente as obrigações de ação corretiva."
+        variant="marine"
+      />
+    </div>
+  </section>
+
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Efeitos dos Cenários de Melhoria</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <CalculatorCard>
+        <h4 class="text-primary font-bold text-sm mb-3">Efeito da Hibridização</h4>
+        <p class="text-body-sm text-muted mb-2">Reduz o consumo de combustível em 15% por operação elétrica a bateria durante períodos de baixa carga e otimização da carga do motor.</p>
+        <p class="text-caption text-m-blue-light font-mono">Redução CII: 15%</p>
+      </CalculatorCard>
+      <CalculatorCard>
+        <h4 class="text-primary font-bold text-sm mb-3">Efeito da Energia de Costa</h4>
+        <p class="text-body-sm text-muted mb-2">Elimina 5% do consumo anual de combustível substituindo operação do gerador no cais por eletricidade da rede.</p>
+        <p class="text-caption text-m-blue-light font-mono">Redução CII: 5%</p>
+      </CalculatorCard>
+      <CalculatorCard>
+        <h4 class="text-primary font-bold text-sm mb-3">Eficiência Operacional</h4>
+        <p class="text-body-sm text-muted mb-2">Otimização de velocidade, limpeza de casco, roteamento meteorológico e planejamento de viagem reduzem consumo em 10%.</p>
+        <p class="text-caption text-m-blue-light font-mono">Redução CII: 10%</p>
+      </CalculatorCard>
+    </div>
+  </section>
+
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Premissas e Limitações</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <CalculatorCard>
+        <h4 class="text-primary font-bold text-sm mb-3">Premissas de Cálculo</h4>
+        <ul class="text-body-sm text-muted flex flex-col gap-2">
+          <li class="flex gap-2"><span class="text-m-blue-light shrink-0">→</span> Linha de referência simplificada: 5,0 g CO₂/DWT-mn (educacional)</li>
+          <li class="flex gap-2"><span class="text-m-blue-light shrink-0">→</span> Fatores CO₂ do Quarto Estudo de GEE da OMI (2020)</li>
+          <li class="flex gap-2"><span class="text-m-blue-light shrink-0">→</span> Faixas de classificação seguem proporções da análise de dados DCS da OMI</li>
+          <li class="flex gap-2"><span class="text-m-blue-light shrink-0">→</span> Porcentagens de melhoria baseadas em estudos de caso publicados</li>
+        </ul>
+      </CalculatorCard>
+      <CalculatorCard>
+        <h4 class="text-primary font-bold text-sm mb-3">O Que Este Calculador Não Inclui</h4>
+        <ul class="text-body-sm text-muted flex flex-col gap-2">
+          <li class="flex gap-2"><span class="text-m-red shrink-0">✗</span> Linhas de referência específicas por tipo de navio (varia por categoria de embarcação)</li>
+          <li class="flex gap-2"><span class="text-m-red shrink-0">✗</span> Ajustes de capacidade de carga</li>
+          <li class="flex gap-2"><span class="text-m-red shrink-0">✗</span> Correções de clima e estado do mar</li>
+          <li class="flex gap-2"><span class="text-m-red shrink-0">✗</span> Verificação de dados DCS e aprovação do estado pavilhão</li>
+          <li class="flex gap-2"><span class="text-m-red shrink-0">✗</span> Ajustes anuais de linha de referência conforme emendas da OMI</li>
+        </ul>
+      </CalculatorCard>
+    </div>
+  </section>
+
+  <EngineeringDiagram title="Sistema de Classificação CII" description="Dados operacionais anuais são inseridos na fórmula do CII para produzir uma classificação A–E" variant="flow" steps={[{ label: "Consumo Combustível", icon: "charge" }, { label: "Distância Navegada", icon: "cable" }, { label: "Fórmula CII", icon: "chart" }, { label: "Classificação A–E", icon: "chart" }]} />
+
+  <ComparisonTable title="Faixas de Classificação CII e Implicações" headers={["Classificação", "Faixa CII", "Ação Necessária", "Status", "Consequência"]} rows={[["A", "Melhores 20%", "Nenhuma — exemplar", "Verde", "Elegibilidade financiamento verde"], ["B", "Próximos 20%", "Nenhuma — boa posição", "Verde", "Sem ação corretiva"], ["C", "Meio 40%", "Nenhuma — médio", "Amarelo", "Monitorar e melhorar"], ["D", "Próximos 15%", "Plano de ação corretiva", "Laranja", "Deve apresentar plano em 12 meses"], ["E", "Piores 5%", "Melhoria imediata", "Vermelho", "Ação corretiva obrigatória"]]} caption="Limites de classificação CII baseados nas regulamentações da OMI 2023" />
+
+  <FAQSection items={faqItems} />
+  <RelatedTools tools={relatedCalculators} />
+
+  <div class="bg-surface-card border border-hairline p-6 mt-8 mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div class="max-w-xl">
+      <h3 class="text-title-sm text-primary mb-1">Precisa de uma revisão de engenharia mais aprofundada?</h3>
+      <p class="text-body-sm text-muted font-light">Use este calculador para estimativas preliminares. Para análise específica de embarcação, revisão de dimensionamento de bateria, planejamento de redução de emissões ou suporte à viabilidade híbrida, entre em contato com a equipe de suporte de engenharia da Battery Calculators.</p>
+    </div>
+    <a href="/marine/#marine-advisory" class="btn-primary text-xs px-6 py-3 shrink-0 whitespace-nowrap">Solicitar Suporte de Engenharia</a>
+  </div>
+
+  <script>
+    import { calculateCii } from '../../../utils/calculators';
+
+    const annualFuelInput = document.getElementById('annual-fuel') as HTMLInputElement;
+    const fuelTypeInput = document.getElementById('fuel-type') as HTMLSelectElement;
+    const distanceInput = document.getElementById('distance-travelled') as HTMLInputElement;
+    const dwtInput = document.getElementById('dwt') as HTMLInputElement;
+
+    function getResultElements(id: string) {
+      const box = document.getElementById(id);
+      return {
+        value: box?.querySelector('.text-display-md, .text-title-lg') as HTMLElement,
+        suffix: box?.querySelector('.text-caption') as HTMLElement,
+      };
+    }
+
+    const co2Emissions = getResultElements('result-co2-emissions');
+    const transportWork = getResultElements('result-transport-work');
+    const attainedCii = getResultElements('result-attained-cii');
+    const ratingBand = getResultElements('result-rating-band');
+    const summaryEl = document.getElementById('summary-el');
+
+    function fmt(n: number, decimals = 1): string {
+      return n.toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+    }
+
+    function updateRatingBandsChart(attainedCiiValue: number) {
+      const container = document.getElementById('rating-bands-chart');
+      if (!container) return;
+
+      const reference = 5.0;
+      const ratio = attainedCiiValue / reference;
+      const maxScale = 8;
+      const markerPos = Math.min((attainedCiiValue / maxScale) * 100, 100);
+
+      container.innerHTML = `
+        <div class="relative">
+          <div class="flex h-10 border border-hairline overflow-hidden">
+            <div class="flex-[0.8] flex items-center justify-center" style="background-color: #0fa336; opacity: 0.3">
+              <span class="text-[10px] font-bold text-primary">A</span>
+            </div>
+            <div class="flex-[0.1] flex items-center justify-center" style="background-color: #16a34a; opacity: 0.3">
+              <span class="text-[10px] font-bold text-primary">B</span>
+            </div>
+            <div class="flex-[0.1] flex items-center justify-center" style="background-color: #f4b400; opacity: 0.3">
+              <span class="text-[10px] font-bold text-primary">C</span>
+            </div>
+            <div class="flex-[0.1] flex items-center justify-center" style="background-color: #ea580c; opacity: 0.3">
+              <span class="text-[10px] font-bold text-primary">D</span>
+            </div>
+            <div class="flex-[0.9] flex items-center justify-center" style="background-color: #e22718; opacity: 0.3">
+              <span class="text-[10px] font-bold text-primary">E</span>
+            </div>
+          </div>
+          <div class="relative h-4 mt-1">
+            <div class="absolute top-0 w-0.5 h-4 bg-primary transition-all duration-300" style="left: ${markerPos}%"></div>
+            <div class="absolute -top-1 transition-all duration-300" style="left: ${markerPos}%; transform: translateX(-50%)">
+              <div class="w-0 h-0 border-l-4 border-r-4 border-t-6 border-l-transparent border-r-transparent border-t-primary"></div>
+            </div>
+          </div>
+          <div class="flex justify-between text-[10px] text-muted mt-1">
+            <span>0</span>
+            <span>1,0R</span>
+            <span>2,0R</span>
+            <span>3,0R</span>
+            <span>4,0R</span>
+          </div>
+          <div class="mt-2 text-caption text-muted">
+            <span class="text-primary font-bold">CII da Embarcação:</span> ${fmt(attainedCiiValue)} g CO₂/DWT-mn
+            <span class="text-m-blue-light ml-2">|</span>
+            <span class="ml-2"><span class="text-primary font-bold">Razão:</span> ${fmt(ratio, 2)}× referência</span>
+          </div>
+        </div>
+      `;
+    }
+
+    function updateImprovementChart(attainedCiiValue: number) {
+      const container = document.getElementById('improvement-chart');
+      if (!container) return;
+
+      const hybridCii = attainedCiiValue * 0.85;
+      const shoreCii = hybridCii * 0.95;
+      const opsCii = shoreCii * 0.90;
+      const maxVal = Math.max(attainedCiiValue, 0.001);
+
+      container.innerHTML = `
+        <div class="flex flex-col gap-3">
+          <div class="flex items-center gap-3">
+            <span class="text-caption text-muted w-32 text-right shrink-0">Atual</span>
+            <div class="flex-1 h-6 bg-surface-soft border border-hairline relative overflow-hidden">
+              <div class="h-full bg-m-red transition-all duration-300" style="width: ${(attainedCiiValue / maxVal) * 100}%"></div>
+            </div>
+            <span class="text-caption text-primary font-mono w-16 shrink-0">${fmt(attainedCiiValue)}</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="text-caption text-muted w-32 text-right shrink-0">+ Hibridização</span>
+            <div class="flex-1 h-6 bg-surface-soft border border-hairline relative overflow-hidden">
+              <div class="h-full bg-m-blue-light transition-all duration-300" style="width: ${(hybridCii / maxVal) * 100}%"></div>
+            </div>
+            <span class="text-caption text-primary font-mono w-16 shrink-0">${fmt(hybridCii)}</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="text-caption text-muted w-32 text-right shrink-0">+ Energia Costa</span>
+            <div class="flex-1 h-6 bg-surface-soft border border-hairline relative overflow-hidden">
+              <div class="h-full bg-m-blue-dark transition-all duration-300" style="width: ${(shoreCii / maxVal) * 100}%"></div>
+            </div>
+            <span class="text-caption text-primary font-mono w-16 shrink-0">${fmt(shoreCii)}</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="text-caption text-muted w-32 text-right shrink-0">+ Eficiência Oper.</span>
+            <div class="flex-1 h-6 bg-surface-soft border border-hairline relative overflow-hidden">
+              <div class="h-full bg-green-600 transition-all duration-300" style="width: ${(opsCii / maxVal) * 100}%"></div>
+            </div>
+            <span class="text-caption text-primary font-mono w-16 shrink-0">${fmt(opsCii)}</span>
+          </div>
+        </div>
+        <div class="mt-3 text-caption text-muted flex gap-6">
+          <span><span class="text-m-red font-bold">Atual:</span> ${fmt(attainedCiiValue)} g CO₂/DWT-mn</span>
+          <span><span class="text-green-500 font-bold">Melhorado:</span> ${fmt(opsCii)} g CO₂/DWT-mn</span>
+          <span><span class="text-primary font-bold">Redução:</span> ${fmt(((attainedCiiValue - opsCii) / attainedCiiValue) * 100, 0)}%</span>
+        </div>
+      `;
+    }
+
+    function updateCalculations() {
+      const annualFuel = parseFloat(annualFuelInput.value) || 5000;
+      const fuelType = fuelTypeInput.value as 'mgo' | 'mdo' | 'hfo' | 'lng';
+      const distance = parseFloat(distanceInput.value) || 50000;
+      const dwt = parseFloat(dwtInput.value) || 50000;
+
+      const result = calculateCii({
+        annualFuelConsumptionTonnes: annualFuel,
+        fuelType,
+        distanceTravelledNm: distance,
+        deadweightTonnage: dwt,
+      });
+
+      if (co2Emissions.value) co2Emissions.value.textContent = `${Math.round(result.annualCo2EmissionsTonnes).toLocaleString()} t`;
+      if (co2Emissions.suffix) co2Emissions.suffix.textContent = 'toneladas CO₂ por ano';
+
+      if (transportWork.value) {
+        const tnmBillions = result.transportWorkTnm / 1000000000;
+        transportWork.value.textContent = `${fmt(tnmBillions, 1)}B tnm`;
+      }
+      if (transportWork.suffix) transportWork.suffix.textContent = 'DWT × milhas náuticas';
+
+      if (attainedCii.value) attainedCii.value.textContent = `${fmt(result.attainedCii)}`;
+      if (attainedCii.suffix) attainedCii.suffix.textContent = 'g CO₂ / DWT-mn';
+
+      if (ratingBand.value) {
+        ratingBand.value.textContent = result.ratingBand;
+        ratingBand.value.style.color = result.ratingColor;
+      }
+      if (ratingBand.suffix) {
+        const descriptions: Record<string, string> = {
+          'A': 'Maior superior — supera requisitos de eficiência',
+          'B': 'Menor superior — atende e supera requisitos',
+          'C': 'Moderado — atende requisitos mínimos',
+          'D': 'Inferior — ação corretiva pode ser necessária',
+          'E': 'Significativamente inferior — ação corretiva necessária',
+        };
+        ratingBand.suffix.textContent = descriptions[result.ratingBand] || '';
+      }
+
+      if (summaryEl) {
+        summaryEl.textContent = `Com base em ${annualFuel.toLocaleString()} toneladas de ${fuelType.toUpperCase()} e ${distance.toLocaleString()} mn de distância, esta embarcação alcança um CII estimado de ${fmt(result.attainedCii)} g CO₂/DWT-mn, situando-se na faixa de classificação ${result.ratingBand}. ${result.improvementNote}`;
+      }
+
+      updateRatingBandsChart(result.attainedCii);
+      updateImprovementChart(result.attainedCii);
+    }
+
+    [annualFuelInput, fuelTypeInput, distanceInput, dwtInput].forEach(el => {
+      el.addEventListener('input', updateCalculations);
+    });
+
+    updateCalculations();
+  </script>
+
+</CalculatorLayout>

@@ -1,0 +1,86 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import CalculatorCard from '../../components/CalculatorCard.astro';
+import CalculatorFinder from '../../components/CalculatorFinder.astro';
+
+const tools = [
+  { name: "Calculadora de Autonomia", path: "/pt/tools/runtime-calculator/", category: "Célula e Pack", input: "Capacidade Ah/Wh, carga W", output: "Horas de descarga" },
+  { name: "Calculadora de C-Rate", path: "/pt/tools/c-rate-calculator/", category: "Célula e Pack", input: "Capacidade Ah, corrente A", output: "C-rate, duração" },
+  { name: "Tempo de Carga", path: "/pt/tools/charging-time-calculator/", category: "Célula e Pack", input: "Capacidade, corrente, faixa SOC", output: "Duração carga CC-CV" },
+  { name: "Calculadora de Pack de Baterias", path: "/pt/tools/battery-pack-calculator/", category: "Célula e Pack", input: "Tensão/Ah da célula, série/paralelo", output: "Tensão, capacidade, energia do pack" },
+  { name: "Conversão de Energia", path: "/pt/tools/energy-conversion-calculator/", category: "Elétrico", input: "Capacidade (Ah/Wh), tensão", output: "Ah/Wh convertido" },
+  { name: "Queda de Tensão DC", path: "/pt/tools/voltage-drop-calculator/", category: "Elétrico", input: "Tensão, corrente, AWG/mm², distância", output: "Queda de tensão (V e %)" },
+  { name: "Perda em Cabo DC", path: "/pt/tools/dc-cable-loss-calculator/", category: "Elétrico", input: "Corrente, espessura do fio, comprimento", output: "Perda resistiva em W" },
+  { name: "Dimensionamento de Bateria", path: "/pt/tools/battery-sizing-calculator/", category: "Elétrico", input: "Energia diária, autonomia, DoD, temp", output: "Capacidade alvo do pack" },
+  { name: "Dimensionamento Marítimo", path: "/pt/tools/marine-battery-sizing-calculator/", category: "Elétrico", input: "Cargas hotel, horas de uso, tensão", output: "Capacidade bancada Ah/kWh" },
+  { name: "Calculadora Bateria-Inversor", path: "/pt/tools/inverter-battery-calculator/", category: "Elétrico", input: "Carga AC, autonomia, eficiência inversor", output: "Capacidade DC da bateria Ah/kWh" },
+  { name: "String Paralela", path: "/pt/tools/parallel-string-calculator/", category: "Elétrico", input: "Tensão/Ah alvo, tensão/Ah célula", output: "Configuração série/paralelo" },
+  { name: "Calculadora ROI BESS", path: "/pt/tools/bess-roi-calculator/", category: "ROI e Vida Útil", input: "CAPEX/OPEX, desvio diário, tarifas", output: "VPL, payback vitalício" },
+  { name: "Estimador de Degradação", path: "/pt/tools/battery-degradation-estimator/", category: "ROI e Vida Útil", input: "Ciclos, DoD, temperatura, idade", output: "Estado de Saúde (SOH) %" },
+  { name: "Estimador de SOC", path: "/pt/tools/soc-estimator/", category: "ROI e Vida Útil", input: "Tensão circuito aberto, química", output: "Estado de Carga %" },
+  { name: "Gerador de Passaporte", path: "/pt/battery-passport-generator/", category: "Engenharia", input: "Identidade, SOH, dados de ciclo", output: "Relatório de prontidão" },
+  { name: "Backup para Apagões", path: "/pt/home-power-outage-battery-backup-calculator/", category: "Elétrico", input: "Cargas de aparelhos, duração, tensão", output: "Dimensionamento bateria + inversor" },
+  { name: "Backup para Geladeira", path: "/pt/fridge-battery-backup-calculator/", category: "Elétrico", input: "Potência da geladeira, sobrecarga, duração", output: "Bateria + inversor para geladeira" },
+  { name: "Backup para CPAP", path: "/pt/cpap-battery-backup-calculator/", category: "Elétrico", input: "Potência CPAP, horas, tensão", output: "Dimensionamento bateria noturna" },
+  { name: "Backup para Bomba de Esgoto", path: "/pt/sump-pump-battery-backup-calculator/", category: "Elétrico", input: "Potência da bomba, sobrecarga, duração", output: "Bateria + inversor para bomba" },
+  { name: "Autonomia Estação Portátil", path: "/pt/portable-power-station-runtime-calculator/", category: "Elétrico", input: "Cargas de aparelhos, capacidade estação", output: "Autonomia em horas" },
+  { name: "Dimensionamento Gerador Solar", path: "/pt/solar-generator-sizing-calculator/", category: "Elétrico", input: "Cargas, painéis solares, horas de sol", output: "Dimensionamento bateria + painel" }
+];
+---
+
+<Layout
+  title="Índice de Calculadoras | Calculadoras de Bateria"
+  description="Navegue por nosso conjunto de ferramentas de engenharia elétrica para dimensionamento de armazenamento de baterias, cálculos de autonomia, perdas em cabos e estimativa de vida útil."
+  lang="pt"
+>
+  <div class="mb-12">
+    <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">DIRETÓRIO DE MANUAL DE ENGENHARIA</span>
+    <h1 class="text-display-md text-primary mb-6">Índice de Calculadoras</h1>
+    <p class="text-body-md text-body max-w-2xl font-light">
+      Uma visão tabular de todas as calculadoras. Clique em qualquer linha para abrir a ferramenta.
+    </p>
+  </div>
+
+  <div class="mb-10">
+    <CalculatorFinder lang="pt" />
+  </div>
+
+  <CalculatorCard class="overflow-x-auto p-0 border border-hairline bg-surface-soft">
+    <table class="w-full text-left border-collapse min-w-[580px]">
+      <thead>
+        <tr class="border-b border-hairline bg-surface-card">
+          <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Nome da Ferramenta</th>
+          <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Categoria</th>
+          <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Entradas Principais</th>
+          <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Saída Alvo</th>
+          <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider text-right">Ação</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-hairline">
+        {tools.map(tool => (
+          <tr class="hover:bg-surface-card transition-colors group">
+            <td class="p-4 font-bold text-primary">
+              <a href={tool.path} class="block hover:underline">{tool.name}</a>
+            </td>
+            <td class="p-4 text-body-sm">
+              <span class={`inline-block px-2 py-0.5 text-[10px] uppercase font-bold tracking-wider border rounded-none ${
+                tool.category === "Célula e Pack" ? "border-m-blue-light text-m-blue-light" :
+                tool.category === "Elétrico" ? "border-m-blue-dark text-m-blue-dark" :
+                tool.category === "Engenharia" ? "border-m-teal text-m-teal" : "border-m-red text-m-red"
+              }`}>
+                {tool.category}
+              </span>
+            </td>
+            <td class="p-4 text-body-sm font-light text-body">{tool.input}</td>
+            <td class="p-4 text-body-sm font-light text-body">{tool.output}</td>
+            <td class="p-4 text-right">
+              <a href={tool.path} class="text-label-uppercase text-xs text-primary group-hover:text-m-blue-dark transition-colors inline-flex items-center gap-1">
+                ABRIR FERRAMENTA <span class="group-hover:translate-x-1 transition-transform inline-block">→</span>
+              </a>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </CalculatorCard>
+</Layout>
