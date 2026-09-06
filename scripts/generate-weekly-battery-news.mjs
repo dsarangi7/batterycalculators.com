@@ -270,6 +270,15 @@ function selectTopStories(stories, count = 10) {
     // Boost for source diversity
     if (['PV Magazine', 'Energy Storage News', 'DNV', 'IMO'].includes(story.source)) score += 3;
 
+    // Boost for conference/event stories
+    const eventWords = ['conference', 'summit', 'trade fair', 'exhibition', 'smm', 'trade show', 'congress', 'expo'];
+    for (const w of eventWords) {
+      if (text.includes(w)) score += 5;
+    }
+
+    // Boost for manual/curated sources
+    if (story.source === 'Manual') score += 4;
+
     // Boost for recency (stories with dates)
     if (story.pubDate) score += 1;
 
@@ -301,21 +310,6 @@ function generateArticlePage(data) {
 
   const readingTime = Math.max(10, Math.round(topStories.length * 2 + 4));
 
-  const faqItems = [
-    {
-      question: 'What is the Battery Industry Weekly?',
-      answer: 'A short editorial digest covering the most important battery industry news each week — EV batteries, grid-scale storage, regulation, manufacturing, and research.',
-    },
-    {
-      question: 'How are stories selected?',
-      answer: 'The generator fetches RSS feeds from trusted sources, deduplicates similar stories, scores them by relevance, and selects the top stories for the week.',
-    },
-    {
-      question: 'When is the digest published?',
-      answer: 'A new edition is generated every Friday covering the current week.',
-    },
-  ];
-
   const storySections = topStories.map((s, i) => {
     const cat = categorized[s.title] || s.category;
     const catLabel = cat.toUpperCase().replace('BEV', 'EV BATTERIES').replace('PASSPORT', 'REGULATION');
@@ -341,7 +335,6 @@ function generateArticlePage(data) {
   const page = `---
 import Layout from '../../layouts/Layout.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
-import FAQSection from '../../components/FAQSection.astro';
 
 const title = "${escapeJSX(metaTitle)}";
 const description = "${escapeJSX(metaDescription)}";
@@ -349,8 +342,6 @@ const canonical = "${canonical}";
 const publishDate = "${todayStr}";
 const lastUpdated = "${todayStr}";
 const readingTime = ${readingTime};
-
-const faqItems = ${JSON.stringify(faqItems, null, 2)};
 
 const breadcrumbs = [
   { label: 'News', href: '/news' },
@@ -366,7 +357,6 @@ const breadcrumbs = [
   schema="webApplication"
   schemaName="${escapeJSX(title)}"
   schemaDescription={description}
-  faqItems={faqItems}
   breadcrumbs={breadcrumbs}
 >
   <article class="max-w-3xl mx-auto">
@@ -431,9 +421,6 @@ ${sourcesList || '        <li>Sources could not be fetched for this edition. Ver
       </ul>
     </section>
 
-    <!-- FAQ -->
-    <FAQSection items={faqItems} />
-
     <!-- Disclaimer -->
     <section class="mb-16 border-t border-hairline pt-12">
       <div class="bg-surface-elevated border border-hairline p-6">
@@ -462,6 +449,13 @@ function escapeJSX(str) {
     .replace(/\n/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
+}
+
+// ─── RSS Date Parsing ───
+function parseRSSDate(dateStr) {
+  if (!dateStr) return null;
+  const d = new Date(dateStr);
+  return isNaN(d.getTime()) ? null : d;
 }
 
 // ─── Main ───
@@ -519,14 +513,41 @@ async function main() {
   const uniqueStories = deduplicateStories(allStories);
   console.log(`📊 After deduplication: ${uniqueStories.length}`);
 
+  // Filter stories by target week date range
+  const weekStart = new Date(dateRange.start);
+  weekStart.setUTCHours(0, 0, 0, 0);
+  const weekEnd = new Date(dateRange.end);
+  weekEnd.setUTCHours(23, 59, 59, 999);
+
+  const withinWeek = uniqueStories.filter(s => {
+    if (!s.pubDate) return false;
+    const d = parseRSSDate(s.pubDate);
+    if (!d) return false;
+    return d >= weekStart && d <= weekEnd;
+  });
+
+  // Fallback: include stories up to 7 days after the week end
+  const extendedEnd = new Date(weekEnd);
+  extendedEnd.setDate(extendedEnd.getDate() + 7);
+  const recentFallback = uniqueStories.filter(s => {
+    if (!s.pubDate) return true;
+    const d = parseRSSDate(s.pubDate);
+    if (!d) return true;
+    return d <= extendedEnd;
+  });
+
+  const filteredStories = withinWeek.length >= 5 ? withinWeek : recentFallback;
+  console.log(`📊 Stories within week range: ${withinWeek.length}`);
+  console.log(`📊 Stories used (filtered): ${filteredStories.length}`);
+
   // Categorize
   const categorized = {};
-  for (const story of uniqueStories) {
+  for (const story of filteredStories) {
     categorized[story.title] = categorizeStory(story);
   }
 
   // Select top stories
-  const topStories = selectTopStories(uniqueStories, 10);
+  const topStories = selectTopStories(filteredStories, 10);
   console.log(`📊 Top stories selected: ${topStories.length}`);
 
   if (topStories.length === 0) {

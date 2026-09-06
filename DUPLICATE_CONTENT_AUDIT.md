@@ -1,9 +1,9 @@
 # Duplicate Content Audit Report
 
-**Date:** 2026-06-14
+**Date:** 2026-06-14 (Updated: 2026-07-18)
 **Site:** batterycalculators.com
-**Pages Audited:** 126 public routes
-**Build:** 129 pages, 5.42s build time
+**Pages Audited:** 178 public routes
+**Build:** 178 pages, static output
 
 ---
 
@@ -26,12 +26,15 @@
 | Group | Count | Notes |
 |-------|-------|-------|
 | Home page | 1 | |
-| Calculator pages (`/tools/`) | 19 | 18 calculators + index |
+| Calculator pages (`/tools/`) | 30 | 29 calculators + index |
 | SEO/Landing pages (top-level) | 8 | about, contact, cookies, disclaimer, methodology, privacy, resources, terms |
 | Category pages | 7 | bess, engineering, ev, home-backup, marine, rv, solar |
 | SEO Calculator Landing Pages | 6 | fridge, cpap, sump-pump, portable-power-station, solar-generator-sizing, home-power-outage |
-| Learn articles (`/learn/`) | 82 | 81 articles + index |
-| **Total** | **126** | |
+| Learn articles (`/learn/`) | 97 | 96 articles + index |
+| News pages (`/news/`) | 2 | weekly editions + index |
+| Reference pages (`/reference/`) | 13 | 12 reference pages + index |
+| Troubleshooting pages (`/troubleshooting/`) | 10 | 9 guides + index |
+| **Total** | **178** | |
 
 All pages have: SEO title, meta description, H1, canonical URL, FAQPage schema (where applicable).
 
@@ -285,4 +288,7 @@ No calculator or learn pages are thin (all 400+ words). Only 5 utility pages are
 | 5 SEO pages cross-linked to each other | DONE — each page's relatedCalculators updated |
 | Fridge page FAQ answers rewritten | DONE — 5 answers rewritten with unique fridge-specific depth |
 | "Does voltage matter?" FAQ deduplication | DONE — removed from 50Ah and 400Ah pages (kept on 200Ah) |
-| Build verification | DONE — 129 pages built successfully |
+| Build verification | DONE — 178 pages built successfully |
+| News section added | DONE — weekly battery industry news with auto-generation workflow |
+| Reference section added | DONE — 12 reference pages (AWG chart, chemistry comparison, formulas, etc.) |
+| Troubleshooting section added | DONE — 9 troubleshooting guides (battery dies fast, not charging, etc.) |
