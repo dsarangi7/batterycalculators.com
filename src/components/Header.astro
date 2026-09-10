@@ -9,6 +9,15 @@ interface Props {
 const { lang = 'en' } = Astro.props as Props;
 const currentPath = Astro.url.pathname;
 const prefix = getLocalePrefix(lang);
+
+// Strip /pt or /zh prefix to get the language-neutral path, then rebuild per locale.
+const basePath = currentPath.replace(/^\/pt(?=\/|$)/, '').replace(/^\/zh(?=\/|$)/, '') || '/';
+const normalizedBase = basePath.startsWith('/') ? basePath : `/${basePath}`;
+const enHref = normalizedBase;
+const ptHref = normalizedBase === '/' ? '/pt/' : `/pt${normalizedBase}`;
+const zhHref = normalizedBase === '/' ? '/zh/' : `/zh${normalizedBase}`;
+
+const localeShort: Record<Locale, string> = { en: 'EN', pt: 'PT', zh: '中文' };
 ---
 
 <!-- M-Stripe Accent -->
@@ -20,7 +29,7 @@ const prefix = getLocalePrefix(lang);
 <header
   class="relative bg-surface-elevated border border-hairline/50 shadow-[0_4px_24px_rgba(0,0,0,0.5),0_1px_3px_rgba(0,0,0,0.3)]"
 >
-  <div class="max-w-7xl mx-auto px-4 md:px-8 h-[72px] md:h-[80px] flex items-center justify-between overflow-hidden">
+  <div class="max-w-7xl mx-auto px-4 md:px-8 h-[72px] md:h-[80px] flex items-center justify-between">
 
     <!-- Brand Block -->
     <a href={`${prefix}/`} class="flex items-center gap-3 hover:opacity-90 transition-opacity min-w-0 shrink-0">
@@ -28,7 +37,7 @@ const prefix = getLocalePrefix(lang);
       <img src="/favicon.svg" alt={t('site.name', lang)} class="w-7 h-7 shrink-0" />
       <!-- Name + Tagline -->
       <div class="flex flex-col min-w-0">
-        <span class="text-label-uppercase text-primary font-bold tracking-[2px] leading-none truncate">
+        <span class="text-label-uppercase text-primary font-bold tracking-[2px] leading-tight truncate py-px">
           {t('site.name', lang)}
         </span>
         <span class="text-[10px] text-muted tracking-[1px] uppercase mt-0.5 hidden sm:block">
@@ -38,34 +47,64 @@ const prefix = getLocalePrefix(lang);
     </a>
 
     <!-- Desktop Navigation -->
-    <nav class="hidden md:flex items-center gap-7">
-      <a href={`${prefix}/`} class="text-nav-link text-body hover:text-primary transition-colors py-2">{t('nav.home', lang)}</a>
-      <a href={`${prefix}/tools/`} class="text-nav-link text-body hover:text-primary transition-colors py-2">{t('nav.tools', lang)}</a>
-      <a href={`${prefix}/learn/`} class="text-nav-link text-body hover:text-primary transition-colors py-2">{t('nav.learn', lang)}</a>
-      <a href={`${prefix}/solar/`} class="text-nav-link text-body hover:text-primary transition-colors py-2">{t('nav.solar', lang)}</a>
-      <a href={`${prefix}/rv/`} class="text-nav-link text-body hover:text-primary transition-colors py-2">{t('nav.rv', lang)}</a>
-      <a href={`${prefix}/marine/`} class="text-nav-link text-body hover:text-primary transition-colors py-2">{t('nav.marine', lang)}</a>
-      <a href={`${prefix}/engineering/`} class="text-nav-link text-body hover:text-primary transition-colors py-2">{t('nav.engineering', lang)}</a>
-      <a href={`${prefix}/resources/`} class="text-nav-link text-body hover:text-primary transition-colors py-2">{t('nav.resources', lang)}</a>
-      <a href={`${prefix}/news/`} class="text-nav-link text-body hover:text-primary transition-colors py-2">{t('nav.news', lang)}</a>
+    <nav class="hidden lg:flex items-center gap-5 xl:gap-7 shrink-0" aria-label="Primary">
+      <a href={`${prefix}/`} class="text-nav-link text-body hover:text-primary transition-colors py-2 whitespace-nowrap shrink-0">{t('nav.home', lang)}</a>
+      <a href={`${prefix}/tools/`} class="text-nav-link text-body hover:text-primary transition-colors py-2 whitespace-nowrap shrink-0">{t('nav.tools', lang)}</a>
+      <a href={`${prefix}/learn/`} class="text-nav-link text-body hover:text-primary transition-colors py-2 whitespace-nowrap shrink-0">{t('nav.learn', lang)}</a>
+      <a href={`${prefix}/solar/`} class="text-nav-link text-body hover:text-primary transition-colors py-2 whitespace-nowrap shrink-0">{t('nav.solar', lang)}</a>
+      <a href={`${prefix}/rv/`} class="text-nav-link text-body hover:text-primary transition-colors py-2 whitespace-nowrap shrink-0">{t('nav.rv', lang)}</a>
+      <a href={`${prefix}/marine/`} class="text-nav-link text-body hover:text-primary transition-colors py-2 whitespace-nowrap shrink-0">{t('nav.marine', lang)}</a>
+      <a href={`${prefix}/engineering/`} class="text-nav-link text-body hover:text-primary transition-colors py-2 whitespace-nowrap shrink-0">{t('nav.engineering', lang)}</a>
+      <a href={`${prefix}/resources/`} class="text-nav-link text-body hover:text-primary transition-colors py-2 whitespace-nowrap shrink-0">{t('nav.resources', lang)}</a>
+      <a href={`${prefix}/news/`} class="text-nav-link text-body hover:text-primary transition-colors py-2 whitespace-nowrap shrink-0">{t('nav.news', lang)}</a>
     </nav>
 
     <!-- Right Controls -->
     <div class="flex items-center gap-2">
-      <!-- Language Switcher -->
-      <a
-        href={lang === 'en' ? `/pt${currentPath}` : currentPath.replace('/pt/', '/')}
-        class="hidden md:flex items-center justify-center w-10 h-10 border border-hairline bg-transparent text-body hover:text-primary hover:border-primary transition-colors text-[11px] font-bold tracking-wider"
-        aria-label={lang === 'en' ? 'Mudar para Português' : 'Switch to English'}
-      >
-        {lang === 'en' ? 'PT' : 'EN'}
-      </a>
+      <!-- Language Switcher (globe dropdown) -->
+      <div class="hidden lg:block relative" id="lang-switcher">
+        <button
+          id="lang-btn"
+          type="button"
+          aria-label={t('header.select_language', lang)}
+          aria-haspopup="true"
+          aria-expanded="false"
+          class="flex items-center gap-1.5 h-10 px-2.5 border border-hairline bg-transparent text-body hover:text-primary hover:border-primary transition-colors text-[11px] font-bold tracking-wider"
+        >
+          <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8" aria-hidden="true">
+            <circle cx="12" cy="12" r="10" />
+            <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+          </svg>
+          <span>{localeShort[lang]}</span>
+          <svg class="w-3 h-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
+            <path d="M6 9l6 6 6-6" />
+          </svg>
+        </button>
+        <div
+          id="lang-menu"
+          class="hidden absolute right-0 top-full mt-1 min-w-[160px] bg-surface-elevated border border-hairline shadow-[0_8px_28px_rgba(0,0,0,0.55)] z-50"
+          role="menu"
+        >
+          <a href={enHref} role="menuitem" class={`flex items-center justify-between px-4 py-3 text-nav-link transition-colors hover:bg-surface-card ${lang === 'en' ? 'text-primary' : 'text-body hover:text-primary'}`}>
+            <span>English</span>
+            <span class="text-[10px] tracking-wider opacity-70">EN</span>
+          </a>
+          <a href={ptHref} role="menuitem" class={`flex items-center justify-between px-4 py-3 text-nav-link border-t border-hairline-strong transition-colors hover:bg-surface-card ${lang === 'pt' ? 'text-primary' : 'text-body hover:text-primary'}`}>
+            <span>Português</span>
+            <span class="text-[10px] tracking-wider opacity-70">PT</span>
+          </a>
+          <a href={zhHref} role="menuitem" class={`flex items-center justify-between px-4 py-3 text-nav-link border-t border-hairline-strong transition-colors hover:bg-surface-card ${lang === 'zh' ? 'text-primary' : 'text-body hover:text-primary'}`}>
+            <span>中文(简体)</span>
+            <span class="text-[10px] tracking-wider opacity-70">中文</span>
+          </a>
+        </div>
+      </div>
 
       <!-- Search Button (desktop) -->
       <a
         href={`${prefix}/search/`}
         aria-label={t('nav.search', lang)}
-        class="hidden md:flex items-center justify-center w-10 h-10 border border-hairline bg-transparent text-body hover:text-primary hover:border-primary transition-colors"
+        class="hidden lg:flex items-center justify-center w-10 h-10 border border-hairline bg-transparent text-body hover:text-primary hover:border-primary transition-colors"
       >
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
           <circle cx="11" cy="11" r="8" />
@@ -78,7 +117,7 @@ const prefix = getLocalePrefix(lang);
         id="theme-toggle"
         type="button"
         aria-label={t('header.toggle_theme_light', lang)}
-        class="hidden md:flex items-center justify-center w-10 h-10 border border-hairline bg-transparent text-body hover:text-primary hover:border-primary transition-colors"
+        class="hidden lg:flex items-center justify-center w-10 h-10 border border-hairline bg-transparent text-body hover:text-primary hover:border-primary transition-colors"
       >
         <svg class="w-4 h-4 theme-icon-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
           <circle cx="12" cy="12" r="5" />
@@ -93,7 +132,7 @@ const prefix = getLocalePrefix(lang);
       <a
         href={`${prefix}/search/`}
         aria-label={t('nav.search', lang)}
-        class="md:hidden flex items-center justify-center w-10 h-10 text-body hover:text-primary transition-colors"
+        class="lg:hidden flex items-center justify-center w-10 h-10 text-body hover:text-primary transition-colors"
       >
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
           <circle cx="11" cy="11" r="8" />
@@ -102,7 +141,7 @@ const prefix = getLocalePrefix(lang);
       </a>
 
       <!-- Mobile Menu Button -->
-      <button id="menu-btn" aria-label={t('header.toggle_nav', lang)} class="md:hidden text-primary p-2 hover:bg-surface-card transition-colors">
+      <button id="menu-btn" aria-label={t('header.toggle_nav', lang)} class="lg:hidden text-primary p-2 hover:bg-surface-card transition-colors">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
           <path stroke-linecap="square" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
         </svg>
@@ -111,7 +150,7 @@ const prefix = getLocalePrefix(lang);
   </div>
 
   <!-- Mobile Dropdown Menu -->
-  <div id="mobile-menu" class="hidden md:hidden bg-surface-elevated border-t border-hairline/50 w-full px-4 py-4 flex flex-col gap-0 overflow-hidden">
+  <div id="mobile-menu" class="hidden lg:hidden bg-surface-elevated border-t border-hairline/50 w-full px-4 py-4 flex flex-col gap-0 overflow-hidden">
     <a href={`${prefix}/search/`} class="text-nav-link text-primary hover:opacity-80 py-3 border-b border-hairline-strong min-h-[44px] flex items-center">{t('nav.search', lang)}</a>
     <a href={`${prefix}/`} class="text-nav-link text-primary hover:opacity-80 py-3 border-b border-hairline-strong min-h-[44px] flex items-center">{t('nav.home', lang)}</a>
     <a href={`${prefix}/tools/`} class="text-nav-link text-primary hover:opacity-80 py-3 border-b border-hairline-strong min-h-[44px] flex items-center">{t('nav.tools', lang)}</a>
@@ -124,12 +163,29 @@ const prefix = getLocalePrefix(lang);
     <a href={`${prefix}/news/`} class="text-nav-link text-primary hover:opacity-80 py-3 border-b border-hairline-strong min-h-[44px] flex items-center">{t('nav.news', lang)}</a>
     <a href={`${prefix}/about/`} class="text-nav-link text-primary hover:opacity-80 py-3 min-h-[44px] flex items-center">{t('nav.about', lang)}</a>
     <!-- Language Switcher (mobile) -->
-    <a
-      href={lang === 'en' ? `/pt${currentPath}` : currentPath.replace('/pt/', '/')}
-      class="text-nav-link text-primary hover:opacity-80 py-3 border-t border-hairline-strong min-h-[44px] flex items-center"
-    >
-      {lang === 'en' ? 'Português (PT)' : 'English (EN)'}
-    </a>
+    <div class="border-t border-hairline-strong pt-1 mt-1">
+      <span class="text-label-uppercase text-muted text-[10px] tracking-wider block py-2">{t('header.language', lang)}</span>
+      <div class="flex gap-2 pb-2">
+        <a
+          href={enHref}
+          class={`flex-1 text-center text-nav-link py-3 min-h-[44px] flex items-center justify-center border transition-colors ${lang === 'en' ? 'text-primary border-primary' : 'text-body border-hairline hover:text-primary'}`}
+        >
+          EN
+        </a>
+        <a
+          href={ptHref}
+          class={`flex-1 text-center text-nav-link py-3 min-h-[44px] flex items-center justify-center border transition-colors ${lang === 'pt' ? 'text-primary border-primary' : 'text-body border-hairline hover:text-primary'}`}
+        >
+          PT
+        </a>
+        <a
+          href={zhHref}
+          class={`flex-1 text-center text-nav-link py-3 min-h-[44px] flex items-center justify-center border transition-colors ${lang === 'zh' ? 'text-primary border-primary' : 'text-body border-hairline hover:text-primary'}`}
+        >
+          中文
+        </a>
+      </div>
+    </div>
     <!-- Theme Toggle (mobile) -->
     <button
       id="theme-toggle-mobile"
@@ -156,6 +212,28 @@ const prefix = getLocalePrefix(lang);
   const mobileMenu = document.getElementById('mobile-menu');
   menuBtn?.addEventListener('click', () => {
     mobileMenu?.classList.toggle('hidden');
+  });
+
+  // Language dropdown (globe switcher)
+  const langBtn = document.getElementById('lang-btn');
+  const langMenu = document.getElementById('lang-menu');
+  const langSwitcher = document.getElementById('lang-switcher');
+  langBtn?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isHidden = langMenu?.classList.toggle('hidden');
+    langBtn?.setAttribute('aria-expanded', isHidden ? 'false' : 'true');
+  });
+  document.addEventListener('click', (e) => {
+    if (langSwitcher && !langSwitcher.contains(e.target as Node)) {
+      langMenu?.classList.add('hidden');
+      langBtn?.setAttribute('aria-expanded', 'false');
+    }
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      langMenu?.classList.add('hidden');
+      langBtn?.setAttribute('aria-expanded', 'false');
+    }
   });
 
   // Theme toggle
