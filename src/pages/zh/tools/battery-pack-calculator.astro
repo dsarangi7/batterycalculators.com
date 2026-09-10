@@ -1,0 +1,376 @@
+---
+import CalculatorLayout from '../../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import InputField from '../../../components/InputField.astro';
+import ResultBox from '../../../components/ResultBox.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import RelatedTools from '../../../components/RelatedTools.astro';
+import WorkedExample from '../../../components/WorkedExample.astro';
+import ComparisonTable from '../../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../../components/EngineeringDiagram.astro';
+
+const whatIs = `电池组计算器根据单体电芯的串并联配置，设计出满足目标电压、容量与电流规格的电池组。<strong>串联</strong>提升电压（电芯首尾相接），<strong>并联</strong>提升容量（电芯并排连接）。SxP标记法（如8S4P）描述配置：S = 串联数（决定电压），P = 并联数（决定容量）。本工具根据单体规格计算整组电压、总容量（Ah）、能量（Wh/kWh）与最大持续电流。电池组设计是电动车模组、户用储能系统、DIY充电墙、船舶推进电池组及便携电源方案的基础。`;
+
+const whyItMatters = [
+  "串联数错误会导致整组电压不对——电芯太少逆变器无法工作，太多则有过压损坏风险。",
+  "并联数不足会使整组无法输出所需的持续电流，带载时触发BMS关机。",
+  "混用不同批次或厂家的电芯会导致失衡、加速衰减，甚至安全隐患。",
+  "整组偏小会陷入深度放电循环、缩短寿命，偏大则浪费资金。",
+  "理解整组配置是选BMS的前提，因为BMS按串数与化学体系划分规格。",
+];
+
+const practicalApplications = [
+  { title: "电动车电池模组", description: "按特定电压与容量要求，为电动车设计电池模组。" },
+  { title: "DIY户用储能", description: "用方形或圆柱单体，为户用储能配置锂电池组。" },
+  { title: "船舶推进电池组", description: "为电动船舶推进系统设计大容量、大电流电池组。" },
+  { title: "便携储能电源", description: "为露营、应急与移动用电设计小巧的电池组。" },
+  { title: "通信基站备电", description: "用单体电芯为通信铁塔配置48V备电电池组。" },
+  { title: "机器人与无人机", description: "为机器人与无人机设计轻量、高倍率电池组。" },
+];
+
+const expertNotes = [
+  { title: '电芯一致性', variant: 'warning', content: '切勿在同一组内混用不同化学体系、容量或新旧程度的电芯。混用电芯会导致充电不均、性能下降、安全隐患与加速衰减。请使用同一厂家、同一批次的相同电芯。' },
+  { title: 'BMS兼容性', variant: 'engineering', content: '确认BMS支持当前配置的串数与化学体系。4串BMS保护不了8串电池组，且BMS按化学体系区分——LFP的BMS与NMC的BMS电压阈值不同。' },
+];
+
+const commonMistakes = [
+  "混用不同厂家或批次的电芯——内阻不一致导致电流分配不均、加速衰减，甚至安全隐患。",
+  "忽视BMS串数上限——4串BMS保护不了8串电池组。购买电芯前务必确认BMS与串数配置兼容。",
+  "并联数不满足电流需求——整组最大持续电流 = 单体最大电流 × 并联数。并联不够，带载即触发BMS关机。",
+  "用错化学体系的单体电压——把3.7V（NMC）当成3.2V（LFP）计算，整组电压全错，导致逆变器或控制器不兼容。",
+  "忽视汇流排与线缆规格——大电流整组需要足够规格的汇流排与线缆，规格不足会产生热点与压降。",
+  "不做热管理规划——大倍率整组发热显著，散热不足会使电芯温度超出安全限值。",
+  "以为并联电芯可永久自均衡——并联初期虽能均衡，但制造差异会在数百次循环后逐渐累积失衡。",
+  "忽视电芯配组要求——为保证整组性能与寿命，电芯容量差异应在2%以内、内阻差异应在5%以内。",
+  "忽视总电芯数预算——大整组（如16串4并 = 64节）投入巨大，采购电芯须提前规划以保证批次一致。",
+  "不计BMS待机功耗——BMS持续消耗10–50mA，在低负载应用中一个月可耗电7–36Ah。",
+];
+
+const relatedArticles = [
+  { href: "/learn/battery-pack-design-basics/", title: "电池组设计基础" },
+  { href: "/learn/how-to-build-a-battery-pack/", title: "如何组装电池组" },
+  { href: "/learn/lifepo4-pack-design/", title: "磷酸铁锂电池组设计" },
+  { href: "/learn/series-vs-parallel-batteries/", title: "电池串联与并联对比" },
+];
+
+const trustSection = {
+  text: "整组配置公式（V整组 = V单体 × S，Ah整组 = Ah单体 × P，Wh = V × Ah）是基本的电气工程关系。所有计算透明公开，遵循电池组设计的行业标准惯例。",
+  link: { label: "查看完整计算方法", href: "/zh/methodology/" },
+};
+
+const references = [
+  { title: "Battery University — 电池组的组装", url: "https://batteryuniversity.com/article/bu-104-1a-electrical-connections-in-packs", source: "Battery University / Cadex Electronics" },
+  { title: "JBD BMS — 串并联配置指南", url: "https://www.jbdbms.com/", source: "JBD BMS Manufacturer" },
+  { title: "EVE Energy — 电芯规格与电池组设计", url: "https://www.evebattery.com/", source: "EVE Energy Co., Ltd" },
+];
+
+const faqItems = [
+  {
+    question: "单体串联与并联有何区别？",
+    answer: "串联将电芯首尾相接以提升电压（如8 × 3.2V = 25.6V）；并联将电芯并排连接以提升容量（如4 × 100Ah = 400Ah）。电池组通常两者兼用：串联定电压，并联定容量。",
+  },
+  {
+    question: "如何为电池组选择合适的电芯？",
+    answer: "选择标称电压在串联后与目标整组电压匹配的电芯。常见选择：LFP（3.2V标称）安全性和循环寿命好，NMC（3.7V标称）能量密度更高。同时确认电芯最大持续放电电流满足负载需求。",
+  },
+  {
+    question: "SxP标记是什么意思？",
+    answer: "SxP标记描述电池组的配置。S = 串联电芯数（决定电压），P = 并联路数（决定容量）。例如8S4P表示8串4并，共32节电芯。",
+  },
+  {
+    question: "可以在同一组内混用不同电芯吗？",
+    answer: "不可以。切勿在同一组内混用不同化学体系、容量或新旧程度的电芯。混用电芯会导致充电不均、性能下降、安全隐患与加速衰减。请使用同一厂家、同一批次的相同电芯。",
+  },
+  {
+    question: "48V电池需要多少节电芯？",
+    answer: "LFP（3.2V标称）：16串 = 51.2V标称（48V系统常用）。NMC（3.7V标称）：13串 = 48.1V或14串 = 51.8V。具体串数取决于化学体系与逆变器电压范围。",
+  },
+  {
+    question: "总电芯数公式是什么？",
+    answer: "总电芯数 = 串联数 × 并联数。例如8S4P共32节；16S2P同样32节，但电压翻倍、并联容量减半。",
+  },
+  {
+    question: "并联数如何影响最大电流？",
+    answer: "整组最大电流 = 单体最大电流 × 并联数。每节支持50A持续，4并即支持200A，这是整组的持续放电安全上限。",
+  },
+  {
+    question: "应该先串后并，还是先并后串？",
+    answer: "先串后并（先S后P）是多数应用的标准做法——先组成高压串，再并联扩容量。先并后串在大电流应用中可能更安全，但对汇流排规格要求更高。",
+  },
+  {
+    question: "我的应用应选多高电压？",
+    answer: "12V：小型便携系统；24V：中型离网、房车；48V：户用光伏、通信及多数现代逆变器。功率相同时电压越高电流越小，可用更细线缆、损耗更低。",
+  },
+  {
+    question: "如何考虑BMS自身耗电？",
+    answer: "BMS持续消耗10–50mA用于监测与均衡，一个月可耗电7–36Ah。在极低负载或长备电应用中需计入BMS待机功耗。",
+  },
+];
+---
+
+<CalculatorLayout
+  title="电池组计算器｜锂电池串联并联设计｜电池计算器"
+  description="电池组计算器：输入单体电压与容量、串联数与并联数，一键算出整组电压、容量与能量Wh/kWh，支持磷酸铁锂与三元串并联设计，公式全公开。"
+  faqItems={faqItems}
+  commonMistakes={commonMistakes}
+  relatedArticles={relatedArticles}
+  relatedCalculators={[
+    { href: "/zh/tools/runtime-calculator/", title: "电池续航时间计算器", description: "直接根据瓦特负载计算续航时间。" },
+    { href: "/zh/tools/battery-sizing-calculator/", title: "电池容量计算器", description: "根据日耗电量确定所需电池容量。" },
+    { href: "/zh/tools/solar-battery-sizing-calculator/", title: "太阳能蓄电池计算器", description: "根据日耗电与备电天数确定太阳能蓄电池容量。" },
+    { href: "/zh/tools/home-backup-battery-calculator/", title: "家庭备用电池计算器", description: "计算停电期间家庭备用电源所需容量。" },
+    { href: "/zh/tools/rv-battery-calculator/", title: "房车电池计算器", description: "估算房车日常用电与所需电池容量。" },
+    { href: "/zh/tools/c-rate-calculator/", title: "C率计算器", description: "计算充放电电流倍率。" },
+  ]}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+  lang="zh"
+>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+
+    <!-- Input Form -->
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">单体参数</h3>
+      <div class="flex flex-col gap-6">
+
+        <InputField id="cell-voltage" label="单体标称电压" value={3.2} min={1} max={5} step={0.1} unit="V" helperText="LFP：3.2V，NMC：3.7V，NCA：3.6V，铅酸：2.0V" />
+
+        <InputField id="cell-capacity" label="单体容量" value={100} min={1} step={1} unit="Ah" helperText="单节电芯的安时容量。" />
+
+        <InputField id="series-count" label="串联数" value={8} min={1} max={200} step={1} helperText="决定整组电压：8 × 3.2V = 25.6V（24V标称系统）。" />
+
+        <InputField id="parallel-count" label="并联数" value={4} min={1} max={200} step={1} helperText="决定整组容量：4 × 100Ah = 400Ah整组容量。" />
+
+        <InputField id="cell-max-current" label="单体最大持续电流" value={50} min={1} step={1} unit="A" helperText="单节电芯安全持续放电电流上限。" />
+
+      </div>
+    </CalculatorCard>
+
+    <!-- Results -->
+    <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">整组规格</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <ResultBox
+            label="整组标称电压"
+            value="25.6 V"
+            suffix="8S 配置"
+            variant="primary"
+            id="result-voltage"
+          />
+          <ResultBox
+            label="整组容量"
+            value="400 Ah"
+            suffix="4P 配置"
+            id="result-capacity"
+          />
+          <ResultBox
+            label="整组能量"
+            value="10,240 Wh"
+            suffix="10.24 kWh"
+            id="result-energy"
+          />
+          <ResultBox
+            label="最大持续电流"
+            value="200 A"
+            suffix="整组放电上限"
+            id="result-max-current"
+          />
+        </div>
+      </div>
+
+      <div class="border-t border-hairline pt-6">
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">配置汇总</h4>
+        <p class="text-body-sm text-muted" id="config-summary">
+          8S4P — 共32节电芯（8串 × 4并）
+        </p>
+      </div>
+    </CalculatorCard>
+
+  </div>
+
+  <!-- Formulas and Worked Examples -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">公式与计算示例</h2>
+
+    <FormulaBox title="数学公式">
+      <p>
+        电池组的电气特性由串联数与并联数决定：
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        整组电压 = 单体电压 × 串联数
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        整组容量 = 单体容量 × 并联数
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        整组能量 = 整组电压 × 整组容量
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        整组最大电流 = 单体最大电流 × 并联数
+      </div>
+      <p>
+        总电芯数 = 串联数 × 并联数，所有电芯的化学体系、容量与新旧程度必须一致。
+      </p>
+    </FormulaBox>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample
+        number={1}
+        title="3.2V 100Ah电芯做48V 200Ah磷酸铁锂组"
+        scenario="家用光伏需要48V标称电池组，使用LFP方形电芯，单体3.2V标称、100Ah容量。"
+        inputs={[
+          { label: "单体电压", value: "3.2V (LFP)" },
+          { label: "单体容量", value: "100Ah" },
+          { label: "目标整组电压", value: "48V 标称" },
+          { label: "目标整组容量", value: "200Ah" },
+        ]}
+        steps={[
+          { label: "步骤1：按48V定串数", formula: "S = 48V ÷ 3.2V = 15 → 取整16串", result: "16串 × 3.2V = 51.2V标称" },
+          { label: "步骤2：按200Ah定并数", formula: "P = 200Ah ÷ 100Ah = 2并", result: "2并 × 100Ah = 200Ah" },
+          { label: "步骤3：总电芯数", formula: "16 × 2 = 32节", result: "需要32节电芯" },
+          { label: "步骤4：整组能量", formula: "51.2V × 200Ah = 10,240 Wh", result: "10.24 kWh" },
+        ]}
+        answer="16串2并：51.2V、200Ah、10.24 kWh，共32节100Ah磷酸铁锂电芯。"
+        interpretation="这是标准的户用光伏配置。16串LFP是最常见的48V标称形式，兼容多数48V逆变器与控制器。"
+        variant="solar"
+      />
+
+      <WorkedExample
+        number={2}
+        title="NMC电芯做12V 50Ah启动电池"
+        scenario="船用12V启动电池，使用3.7V单体5Ah的NMC圆柱电芯。"
+        inputs={[
+          { label: "单体电压", value: "3.7V (NMC)" },
+          { label: "单体容量", value: "5Ah" },
+          { label: "目标整组电压", value: "12V 标称" },
+          { label: "目标整组容量", value: "50Ah" },
+        ]}
+        steps={[
+          { label: "步骤1：按12V定串数", formula: "S = 12V ÷ 3.7V = 3.24 → 取整4串", result: "4串 × 3.7V = 14.8V标称" },
+          { label: "步骤2：按50Ah定并数", formula: "P = 50Ah ÷ 5Ah = 10并", result: "10并 × 5Ah = 50Ah" },
+          { label: "步骤3：总电芯数", formula: "4 × 10 = 40节", result: "需要40节电芯" },
+          { label: "步骤4：整组能量", formula: "14.8V × 50Ah = 740 Wh", result: "740 Wh" },
+        ]}
+        answer="4串10并：14.8V、50Ah、740 Wh，共40节5Ah NMC电芯。"
+        interpretation="4串NMC标称14.8V，可作为“12V”启动电池使用——电压范围（12.0–16.8V）匹配标准12V充电曲线。"
+        variant="marine"
+      />
+
+      <WorkedExample
+        number={3}
+        title="24V组加串扩到48V"
+        scenario="现有24V（8串）LFP组，2并（8串2并，200Ah），拟每串再加8节串联升压至48V。"
+        inputs={[
+          { label: "现有配置", value: "8串2并 LFP（3.2V 100Ah电芯）" },
+          { label: "当前整组电压", value: "25.6V" },
+          { label: "目标整组电压", value: "51.2V（16串）" },
+          { label: "整组容量（不变）", value: "200Ah" },
+        ]}
+        steps={[
+          { label: "步骤1：当前整组规格", formula: "8串 × 3.2V = 25.6V | 2并 × 100Ah = 200Ah", result: "25.6V、200Ah、5,120 Wh" },
+          { label: "步骤2：每串加8节串联", formula: "8串 → 16串 | 16 × 3.2V = 51.2V", result: "新电压：51.2V" },
+          { label: "步骤3：容量不变（并数相同）", formula: "2并 × 100Ah = 200Ah", result: "容量保持200Ah" },
+          { label: "步骤4：新能量", formula: "51.2V × 200Ah = 10,240 Wh", result: "由5,120 Wh翻倍至10,240 Wh" },
+        ]}
+        answer="8串2并 → 16串2并：51.2V、200Ah、10.24 kWh，串联新增16节使能量翻倍。"
+        interpretation="多数DIY玩家就是这样升压的：在原有串上加串。新增电芯必须与原电芯完全一致，并需更换16串规格的新BMS。"
+        variant="home"
+      />
+    </div>
+  </section>
+
+  <EngineeringDiagram
+    title="电池组串并联结构"
+    description="电芯串联升压、并联扩容"
+    variant="system"
+    steps={[
+      { label: "单体电芯", icon: "battery" },
+      { label: "串联串", icon: "battery" },
+      { label: "并联组", icon: "battery" },
+      { label: "整组输出", icon: "inverter" },
+    ]}
+  />
+
+  <ComparisonTable
+    title="电池组配置影响"
+    headers={["配置", "电压", "容量", "能量", "适用场景"]}
+    rows={[
+      ["8串1并 (LFP)", "25.6V", "100 Ah", "2,560 Wh", "房车、小型光伏"],
+      ["16串1并 (LFP)", "51.2V", "100 Ah", "5,120 Wh", "户用光伏"],
+      ["16串2并 (LFP)", "51.2V", "200 Ah", "10,240 Wh", "全屋备电"],
+      ["7串3并 (NMC)", "25.9V", "300 Ah", "7,770 Wh", "船用生活电池组"],
+      ["14串1并 (NMC)", "51.8V", "100 Ah", "5,180 Wh", "通信备电"],
+    ]}
+    caption="不同应用的常用LFP与NMC电池组配置"
+  />
+
+  <FAQSection items={faqItems} />
+
+  <!-- Calculation Script -->
+  <script>
+    import { calculateBatteryPack } from '../../../utils/calculators';
+
+    const cellVoltageInput = document.getElementById('cell-voltage') as HTMLInputElement;
+    const cellCapacityInput = document.getElementById('cell-capacity') as HTMLInputElement;
+    const seriesCountInput = document.getElementById('series-count') as HTMLInputElement;
+    const parallelCountInput = document.getElementById('parallel-count') as HTMLInputElement;
+    const cellMaxCurrentInput = document.getElementById('cell-max-current') as HTMLInputElement;
+
+    const resultVoltageBox = document.getElementById('result-voltage');
+    const resultVoltageValue = resultVoltageBox?.querySelector('.text-display-md') as HTMLElement;
+    const resultVoltageSuffix = resultVoltageBox?.querySelector('.text-caption') as HTMLElement;
+
+    const resultCapacityBox = document.getElementById('result-capacity');
+    const resultCapacityValue = resultCapacityBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultCapacitySuffix = resultCapacityBox?.querySelector('.text-caption') as HTMLElement;
+
+    const resultEnergyBox = document.getElementById('result-energy');
+    const resultEnergyValue = resultEnergyBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultEnergySuffix = resultEnergyBox?.querySelector('.text-caption') as HTMLElement;
+
+    const resultMaxCurrentBox = document.getElementById('result-max-current');
+    const resultMaxCurrentValue = resultMaxCurrentBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultMaxCurrentSuffix = resultMaxCurrentBox?.querySelector('.text-caption') as HTMLElement;
+
+    const configSummaryEl = document.getElementById('config-summary');
+
+    function updateCalculations() {
+      const cellVoltage = parseFloat(cellVoltageInput.value) || 3.2;
+      const cellCapacity = parseFloat(cellCapacityInput.value) || 100;
+      const seriesCount = parseInt(seriesCountInput.value) || 8;
+      const parallelCount = parseInt(parallelCountInput.value) || 4;
+      const cellMaxCurrent = parseFloat(cellMaxCurrentInput.value) || 50;
+
+      const results = calculateBatteryPack(cellVoltage, cellCapacity, seriesCount, parallelCount, cellMaxCurrent);
+
+      if (resultVoltageValue) resultVoltageValue.textContent = `${results.packVoltageV.toFixed(1)} V`;
+      if (resultVoltageSuffix) resultVoltageSuffix.textContent = `${seriesCount}S 配置`;
+
+      if (resultCapacityValue) resultCapacityValue.textContent = `${results.packCapacityAh.toFixed(0)} Ah`;
+      if (resultCapacitySuffix) resultCapacitySuffix.textContent = `${parallelCount}P 配置`;
+
+      if (resultEnergyValue) resultEnergyValue.textContent = `${Math.round(results.packEnergyWh).toLocaleString()} Wh`;
+      if (resultEnergySuffix) resultEnergySuffix.textContent = `${results.packEnergyKwh.toFixed(2)} kWh`;
+
+      if (resultMaxCurrentValue) resultMaxCurrentValue.textContent = `${results.maxContinuousCurrentA.toFixed(0)} A`;
+      if (resultMaxCurrentSuffix) resultMaxCurrentSuffix.textContent = '整组放电上限';
+
+      if (configSummaryEl) configSummaryEl.textContent = results.configSummary;
+    }
+
+    [cellVoltageInput, cellCapacityInput, seriesCountInput, parallelCountInput, cellMaxCurrentInput].forEach(el => {
+      el.addEventListener('input', updateCalculations);
+    });
+
+    updateCalculations();
+  </script>
+
+</CalculatorLayout>

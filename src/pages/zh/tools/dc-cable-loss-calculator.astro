@@ -1,0 +1,403 @@
+---
+import CalculatorLayout from '../../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import InputField from '../../../components/InputField.astro';
+import ResultBox from '../../../components/ResultBox.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import RelatedTools from '../../../components/RelatedTools.astro';
+import WorkedExample from '../../../components/WorkedExample.astro';
+import ComparisonTable from '../../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../../components/EngineeringDiagram.astro';
+
+const wireSizes = [
+  { label: "16 AWG (1.31 mm²)", value: 1.31 },
+  { label: "14 AWG (2.08 mm²)", value: 2.08 },
+  { label: "12 AWG (3.31 mm²)", value: 3.31 },
+  { label: "10 AWG (5.26 mm²)", value: 5.26 },
+  { label: "8 AWG (8.37 mm²)", value: 8.37 },
+  { label: "6 AWG (13.3 mm²)", value: 13.3 },
+  { label: "4 AWG (21.15 mm²)", value: 21.15 },
+  { label: "2 AWG (33.6 mm²)", value: 33.6 },
+  { label: "1/0 AWG (53.5 mm²)", value: 53.5 },
+  { label: "2/0 AWG (67.4 mm²)", value: 67.4 },
+  { label: "4/0 AWG (107 mm²)", value: 107 },
+  { label: "Custom Metric Size (mm²)", value: "-1" },
+];
+
+const materialOptions = [
+  { label: "铜", value: "copper" },
+  { label: "铝", value: "aluminum" },
+];
+
+const whatIs = `直流线缆功率损耗是电流流经导体固有电阻时以热量形式耗散的电能。它通过<strong>I²R公式</strong>计算——功率损耗等于电流的平方乘以电阻。与电压降（影响设备运行）不同，线缆功率损耗代表<strong>直接的能量浪费</strong>——已付费但从未到达负载的能量。在电池系统中，线缆损耗会减少有效续航时间、降低往返效率，并产生热量导致导线绝缘层随时间老化。对于50A系统、0.008Ω回路电阻，线缆损耗持续浪费20W——足以每天耗尽480 Wh。`;
+
+const whyItMatters = [
+  "线缆损耗直接减少电池续航时间——5%的线缆损耗意味着5%的能量无法到达负载。",
+  "I²R损耗随电流的平方增长——相同线缆下，电流加倍使功率损耗增至四倍。",
+  "线缆损耗产生的热量在密闭空间中可能超过导线绝缘层额定温度，引发火灾隐患。",
+  "在太阳能系统中，线缆损耗减少了从电池板到电池的有效传输能量。",
+  "电池与逆变器之间的长距离线缆是意外效率损失的最常见原因。",
+];
+
+const practicalApplications = [
+  { title: "太阳能光伏系统", description: "计算从太阳能电池板到充电控制器和电池的直流线路功率损耗。" },
+  { title: "电池到逆变器布线", description: "为电池组与逆变器之间的线缆选型，以最小化I²R损耗。" },
+  { title: "船用电力分配", description: "评估长距离船用直流电力系统中的线缆损耗。" },
+  { title: "电动汽车充电设施", description: "计算大电流直流充电连接中的线缆损耗。" },
+  { title: "通信直流电源", description: "评估48V直流配电到通信设备的线缆损耗。" },
+];
+
+const expertNotes = [
+  { title: '热反馈循环', variant: 'warning', content: '大电流加热导线，导致温度升高。温度升高增加电阻，从而增大功率损耗（I²R）并引起进一步发热。这种正反馈循环在电缆选型不足时可能导致热失控。确保正确选型以保持低散热。' },
+  { title: '每日能量影响', variant: 'engineering', content: '20W线缆损耗每天运行8小时浪费160 Wh——相当于一个小电器运行全天。一年累计浪费58.4 kWh能量，在典型电价下价值$5-$15。' },
+];
+
+const commonMistakes = [
+  "完全忽略线缆损耗——5%的线缆损耗意味着5%的能量无法到达负载，直接减少电池续航时间和系统效率。",
+  "使用电压降代替功率损耗——电压降影响设备运行，但功率损耗（I²R）代表以热量形式直接浪费的能量。两者都必须检查。",
+  "未考虑温度效应——导线电阻随温度升高而增加。按25°C选型的线缆在60°C密闭环境中可能超出安全限值。",
+  "使用标称容量而非实际电流——始终使用实际负载电流（而非电池最大放电额定值）进行线缆损耗计算。",
+  "忽略回路路径——线缆电阻同时作用于供电和回流导体。计算回路电阻时务必将单程距离乘以2。",
+  "长距离线缆选型不足——线缆损耗随距离线性增加。相同线径下，10米敷设的损耗是5米的两倍。",
+  "未考虑每日能量影响——20W线缆损耗每天运行8小时浪费160 Wh，按典型电价每年相当于58.4 kWh。",
+  "忽略铝的较高电阻——铝在相同截面积下比铜高60%的电阻。需要使用1.6倍截面积的铝缆才能达到相同性能。",
+  "使用平均电流而非峰值电流——线缆损耗按I²增长，峰值电流导致不成比例的更高损耗。应按最坏情况电流选型。",
+  "忘记往返效率中的线缆损耗——充电和放电线缆损耗共同降低系统总往返效率，等于两者损耗之和。",
+];
+
+const relatedArticles = [
+  { href: "/zh/learn/voltage-drop-explained/", title: "电压降详解" },
+  { href: "/zh/learn/battery-voltage-systems/", title: "电池电压系统" },
+];
+
+const trustSection = {
+  text: "本计算器采用标准I²R功率损耗模型，包含铜和铝导体的温度修正电阻率。所有公式均遵循IEEE导体选型标准，并分步显示以便验证。",
+  link: { label: "查看完整计算方法", href: "/zh/methodology/" },
+};
+
+const references = [
+  { title: "NEC 第9章 — 导体电阻表", url: "https://www.nfpa.org/codes-and-standards/nfpa-70-standard-for-electrical-safety-in-the-workplace", source: "NFPA / National Electrical Code" },
+  { title: "Copper Development Association — 电阻表", url: "https://www.copper.org/", source: "Copper Development Association" },
+  { title: "IEEE 141 — 直流电力系统设计", url: "https://standards.ieee.org/", source: "IEEE Standards Association" },
+];
+
+const faqItems = [
+  {
+    question: "电阻损耗与电压降有什么区别？",
+    answer: "电压降表示负载端子处的电位降低（伏特），可能导致电子设备故障。电阻线缆损耗表示实际转换为热量的功率（瓦特），代表直接的效率损失和安装中的热应力。",
+  },
+  {
+    question: "连续线缆功率损耗的安全上限是多少？",
+    answer: "没有单一限制，但经验法则是将功率损耗控制在系统总功率的2%至3%以下。如果线缆损耗超过5%，则线缆选型对能效而言不足，应分析导线加热以确保安全。",
+  },
+  {
+    question: "导线材料如何影响发热？",
+    answer: "铝在相同截面积下比铜高约60%的电阻。这意味着相同厚度的铝线在承载相同电流时比铜线多散发60%的热量。铝需要更粗的线径来控制发热。",
+  },
+  {
+    question: "持续加热会增加电阻吗？",
+    answer: "是的，这是一个危险的正反馈循环。大电流加热导线，导致温度升高。温度升高增加电阻，从而增大功率损耗（I²R）并引起进一步发热。确保正确选型以保持低散热。",
+  },
+  {
+    question: "如何计算我系统中的线缆损耗？",
+    answer: "测量或计算回路电阻（R = ρ × 2L / A），然后使用P_loss = I² × R。例如，50A通过0.008Ω回路电阻 = 50² × 0.008 = 20W连续损耗。",
+  },
+  {
+    question: "可接受的线缆损耗百分比是多少？",
+    answer: "对于电池系统：<2%为优秀，2-3%可接受，3-5%为临界，>5%表示线缆选型不足。对于关键或大功率系统，目标<1.5%线缆损耗。",
+  },
+  {
+    question: "线缆损耗如何影响电池续航时间？",
+    answer: "线缆损耗减少到达负载的有效能量。5%的线缆损耗意味着电池能量的95%到达负载，直接减少5%的续航时间。对于提供4小时续航的电池，5%线缆损耗将其减少至3.84小时。",
+  },
+  {
+    question: "可以通过并联导线来减少线缆损耗吗？",
+    answer: "可以。并联两根相同线缆使有效电阻减半，I²R损耗降至四分之一（电阻降低2倍同时每根线缆电流也降低2倍）。这是在不更换更粗单根线缆的情况下有效减少损耗的方法。",
+  },
+  {
+    question: "12V和48V系统的线缆损耗有什么区别？",
+    answer: "480W负载在12V下抽取40A，在48V下仅抽取10A。由于I²R损耗随电流的平方增长，相同线缆下12V系统的线缆损耗是48V系统的16倍。更高电压显著减少线缆损耗。",
+  },
+  {
+    question: "线缆损耗的年度成本是多少？",
+    answer: "20W线缆损耗、每天运行8小时、电价$0.12/kWh：20W × 8h × 365天 = 58.4 kWh/年 = $7.01/年。对于损耗100W以上的大系统，年度成本可达$50-$200。",
+  },
+  {
+    question: "线缆损耗影响往返效率吗？",
+    answer: "是的。充电和放电线缆损耗共同降低往返效率。如果线缆在充电时损耗3%、放电时损耗3%，总往返线缆损耗约为6%，必须纳入系统效率计算。",
+  },
+];
+---
+
+<CalculatorLayout
+  title="直流线缆功率损耗计算器 | 电池计算器"
+  description="估算直流电池传输线缆的电功率损耗（I²R）和每日热能损耗，公式完全公开透明。"
+  faqItems={faqItems}
+  commonMistakes={commonMistakes}
+  relatedArticles={relatedArticles}
+  relatedCalculators={[
+    { href: "/zh/tools/voltage-drop-calculator/", title: "直流电压降", description: "计算线路沿线的端子电压降。" },
+    { href: "/zh/tools/battery-sizing-calculator/", title: "电池容量计算器", description: "估算日耗电量选型需求。" },
+    { href: "/zh/tools/energy-conversion-calculator/", title: "能量换算", description: "在容量Ah和能量Wh之间换算。" },
+    { href: "/zh/tools/runtime-calculator/", title: "续航时间计算器", description: "根据负载瓦数计算续航时间。" },
+    { href: "/zh/tools/battery-pack-calculator/", title: "电池组计算器", description: "设计串并联电芯配置方案。" },
+  ]}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+  lang="zh"
+>
+
+  <!-- Main Calculator Grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+
+    <!-- Input Form -->
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">线缆参数</h3>
+      <div class="flex flex-col gap-6">
+        <InputField id="current" label="持续电流（安培）" value={50} min={0.1} step="any" />
+        <InputField id="length" label="单程敷设距离（米）" value={3} min={0.1} step="any" helperText="计算器会自动乘以2，计入正极和回流导体。" />
+        <InputField id="wire-dropdown" label="导体截面积" type="select" options={wireSizes} value="13.3" />
+        <InputField id="custom-area" label="自定义截面积（mm²）" value={13.3} min={0.01} step="any" wrapperId="custom-area-wrapper" />
+        <InputField id="material" label="导体材料" type="select" options={materialOptions} value="copper" />
+        <InputField id="temperature" label="工作温度（°C）" value={25} min={-40} max={200} />
+        <InputField id="runtime" label="每日负载运行时间（小时/天）" value={4} min={0.1} max={24} step="any" />
+        <InputField id="total-power" label="总负载功率（瓦特）" value={600} min={1} step="any" helperText="用于计算效率损耗百分比。" />
+      </div>
+    </CalculatorCard>
+
+    <!-- Calculation Results -->
+    <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">预计输出</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8" id="results-grid">
+          <ResultBox
+            label="连续线缆功率损耗"
+            value="19.78 W"
+            suffix="占总负载功率的3.30%以热量形式耗散"
+            variant="primary"
+            id="result-status-card"
+          />
+          <ResultBox
+            label="每日能量损耗"
+            value="79.1 Wh"
+            suffix="每24小时耗散"
+            id="result-energy-loss-box"
+          />
+          <ResultBox
+            label="回路电阻"
+            value="0.0079 Ω"
+            suffix="双向电阻"
+            id="result-resistance-box"
+          />
+        </div>
+      </div>
+
+      <!-- Action Area -->
+      <div class="border-t border-hairline pt-6">
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">导体加热危害提示</h4>
+        <p class="text-body-sm text-muted">
+          传输线缆内损失的所有电能都转化为热量。密闭空间（如电池盒或线槽）中的高损耗会升高导线温度、降低绝缘层性能，并产生严重的火灾隐患。
+        </p>
+      </div>
+    </CalculatorCard>
+
+  </div>
+
+  <!-- Formulas and Worked Examples -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">公式与计算示例</h2>
+
+    <FormulaBox title="数学公式">
+      <p>功率损耗P_loss由电流通过导线回路的平方决定（I²R）：</p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        线缆电阻 (R) = ρ(T) × (2 × 距离) / 截面积
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        功率损耗 (W) = 电流² (A) × 线缆电阻 (Ω)
+      </div>
+      <p>能量损耗E_loss和效率损耗百分比按以下公式计算：</p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        能量损耗 (Wh) = 功率损耗 (W) × 运行时间 (小时)
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        效率损耗 (%) = (功率损耗 (W) / 负载功率 (W)) × 100
+      </div>
+    </FormulaBox>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample
+        number={1}
+        title="30A、5m、10mm²铜缆I²R损耗"
+        scenario="30A负载通过5米10mm²铜缆在25°C下从电池取电。计算连续I²R功率损耗。"
+        inputs={[
+          "电流 (I) = 30 A",
+          "单程距离 = 5 m（10 m回路）",
+          "导体截面积 = 10 mm²",
+          "材料 = 铜",
+          "温度 = 25°C",
+        ]}
+        steps={[
+          "温度修正电阻率：ρ = 1.72 × 10⁻⁸ × (1 + 0.00393 × (25 − 20)) = 1.7538 × 10⁻⁸ Ω·m",
+          "回路电阻：R = ρ × 2L / A = 1.7538 × 10⁻⁸ × 10 / (10 × 10⁻⁶) = 0.01754 Ω",
+          "功率损耗：P_loss = I² × R = 30² × 0.01754 = 900 × 0.01754 = 15.79 W",
+        ]}
+        answer="15.79 W连续功率以热量形式耗散在线缆中"
+        interpretation="这代表以热量形式浪费的能量。对于2kW负载，约0.79%的损耗——短距离敷设可接受，但全天累积则意义重大。"
+      />
+
+      <WorkedExample
+        number={2}
+        title="2kW负载下12V与48V功率损耗对比"
+        scenario="比较在12V和48V系统中通过5米10mm²铜缆传输2kW时的I²R线缆损耗。"
+        inputs={[
+          "负载功率 = 2000 W",
+          "线缆 = 5米单程、10mm²铜",
+          "回路电阻（已计算）= 0.01754 Ω",
+          "12V系统电流 = 2000 / 12 = 166.7 A",
+          "48V系统电流 = 2000 / 48 = 41.7 A",
+        ]}
+        steps={[
+          "12V功率损耗：P = 166.7² × 0.01754 = 27789 × 0.01754 = 487.5 W",
+          "48V功率损耗：P = 41.7² × 0.01754 = 1739 × 0.01754 = 30.5 W",
+          "比值：487.5 / 30.5 = 48V下损耗减少16倍",
+          "12V效率损耗：487.5 / 2000 × 100 = 24.4%（不可接受）",
+          "48V效率损耗：30.5 / 2000 × 100 = 1.53%（可接受）",
+        ]}
+        answer="12V：487.5 W (24.4%) 对比 48V：30.5 W (1.5%)——48V系统线缆损耗减少16倍"
+        interpretation="更高电压系统显著减少线缆损耗。12V系统在此功率水平下完全不实用，近四分之一的能量以热量形式浪费。"
+      />
+
+      <WorkedExample
+        number={3}
+        title="60°C下温度对线缆损耗的影响"
+        scenario="当相同的30A、5m、10mm²铜缆从25°C改为60°C运行时，线缆损耗如何变化？"
+        inputs={[
+          "电流 (I) = 30 A",
+          "单程距离 = 5 m（10 m回路）",
+          "导体截面积 = 10 mm²",
+          "材料 = 铜",
+          "基准温度 = 25°C",
+          "工作温度 = 60°C",
+        ]}
+        steps={[
+          "25°C电阻率：ρ₂₅ = 1.72 × 10⁻⁸ × (1 + 0.00393 × 5) = 1.7538 × 10⁻⁸ Ω·m",
+          "60°C电阻率：ρ₆₀ = 1.72 × 10⁻⁸ × (1 + 0.00393 × 40) = 1.9878 × 10⁻⁸ Ω·m",
+          "25°C回路电阻：R₂₅ = 1.7538 × 10⁻⁸ × 10 / 10⁻⁵ = 0.01754 Ω",
+          "60°C回路电阻：R₆₀ = 1.9878 × 10⁻⁸ × 10 / 10⁻⁵ = 0.01988 Ω",
+          "25°C损耗：P = 900 × 0.01754 = 15.79 W",
+          "60°C损耗：P = 900 × 0.01988 = 17.89 W",
+          "增加：(17.89 − 15.79) / 15.79 × 100 = 13.3%更多损耗",
+        ]}
+        answer="线缆损耗从15.79 W增加到17.89 W——由于温度导致13.3%的增加"
+        interpretation="更高的工作温度提高了铜的电阻率，增加I²R损耗并产生更多热量。在密闭安装中必须考虑这种正反馈循环。"
+      />
+    </div>
+  </section>
+
+  <EngineeringDiagram
+    title="直流线缆损耗流程"
+    description="直流线缆功率损耗遵循欧姆定律——I²R损耗随电流的平方增长"
+    variant="flow"
+    steps={[
+      { label: "电池输出", icon: "battery" },
+      { label: "线缆电阻", icon: "cable" },
+      { label: "热损耗 (I²R)", icon: "chart" },
+      { label: "负载接收减少", icon: "load" },
+    ]}
+  />
+
+  <ComparisonTable
+    title="按电压系统的功率损耗"
+    headers={["系统", "2kW时电流", "5m 10mm²铜线损耗", "损耗%", "所需线缆"]}
+    rows={[
+      ["12V", "167 A", "48.6 W", "2.43%", "2/0 AWG (67 mm²)"],
+      ["24V", "83 A", "12.1 W", "0.61%", "6 AWG (13.3 mm²)"],
+      ["48V", "42 A", "3.0 W", "0.15%", "10 AWG (5.3 mm²)"],
+      ["96V", "21 A", "0.75 W", "0.04%", "14 AWG (2.1 mm²)"],
+    ]}
+    caption="更高电压系统在相同功率下显著减少线缆损耗"
+  />
+
+  <FAQSection items={faqItems} />
+
+  <!-- Calculation Script -->
+  <script>
+    import { calculateDcCableLoss } from '../../../utils/calculators';
+
+    const currentInput = document.getElementById('current') as HTMLInputElement;
+    const lengthInput = document.getElementById('length') as HTMLInputElement;
+    const wireDropdown = document.getElementById('wire-dropdown') as HTMLSelectElement;
+    const customAreaWrapper = document.getElementById('custom-area-wrapper');
+    const customAreaInput = document.getElementById('custom-area') as HTMLInputElement;
+    const materialSelect = document.getElementById('material') as HTMLSelectElement;
+    const temperatureInput = document.getElementById('temperature') as HTMLInputElement;
+    const runtimeInput = document.getElementById('runtime') as HTMLInputElement;
+    const totalPowerInput = document.getElementById('total-power') as HTMLInputElement;
+
+    // Outputs
+    const resultStatusCard = document.getElementById('result-status-card');
+    const resultPowerLoss = resultStatusCard?.querySelector('.text-display-md') as HTMLElement;
+    const resultLossPercent = resultStatusCard?.querySelector('.text-caption') as HTMLElement;
+    const resultEnergyLoss = document.getElementById('result-energy-loss-box')?.querySelector('.text-title-lg') as HTMLElement;
+    const resultResistance = document.getElementById('result-resistance-box')?.querySelector('.text-title-lg') as HTMLElement;
+
+    function toggleCustomArea() {
+      const isCustom = wireDropdown.value === "-1";
+      if (isCustom) {
+        customAreaWrapper?.classList.remove('hidden');
+      } else {
+        customAreaWrapper?.classList.add('hidden');
+      }
+      updateCalculations();
+    }
+
+    function updateCalculations() {
+      const current = parseFloat(currentInput.value) || 0;
+      const length = parseFloat(lengthInput.value) || 0;
+      const material = materialSelect.value as "copper" | "aluminum";
+      const temperature = parseFloat(temperatureInput.value) || 25;
+      const runtime = parseFloat(runtimeInput.value) || 0;
+      const totalPower = parseFloat(totalPowerInput.value) || 1;
+
+      const dropdownArea = parseFloat(wireDropdown.value);
+      const wireSize = dropdownArea === -1 ? (parseFloat(customAreaInput.value) || 0.1) : dropdownArea;
+
+      const results = calculateDcCableLoss(current, length, wireSize, material, temperature, runtime, totalPower);
+
+      // Render Outputs
+      if (resultPowerLoss) resultPowerLoss.textContent = `${results.powerLossW.toFixed(2)} W`;
+      if (resultLossPercent) resultLossPercent.textContent = `${results.lossPercent.toFixed(2)}% of total load power lost as heat`;
+
+      // Energy loss format
+      if (resultEnergyLoss) {
+        if (results.energyLossWh >= 1000) {
+          resultEnergyLoss.textContent = `${(results.energyLossWh / 1000).toFixed(2)} kWh`;
+        } else {
+          resultEnergyLoss.textContent = `${results.energyLossWh.toFixed(1)} Wh`;
+        }
+      }
+
+      if (resultResistance) resultResistance.textContent = `${results.resistanceOhm.toFixed(4)} Ω`;
+
+      // Status Card color code border
+      if (resultStatusCard) {
+        resultStatusCard.className = "bg-surface-soft p-6 border col-span-1 md:col-span-2 " +
+          (results.lossPercent > 5 ? "border-red-600" :
+           results.lossPercent > 3 ? "border-yellow-500" : "border-hairline");
+      }
+    }
+
+    wireDropdown.addEventListener('change', toggleCustomArea);
+    [currentInput, lengthInput, customAreaInput, materialSelect, temperatureInput, runtimeInput, totalPowerInput].forEach(el => {
+      el.addEventListener('input', updateCalculations);
+    });
+
+    // Run on boot
+    toggleCustomArea();
+  </script>
+</CalculatorLayout>

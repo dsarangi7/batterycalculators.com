@@ -1,0 +1,463 @@
+---
+import CalculatorLayout from '../../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import InputField from '../../../components/InputField.astro';
+import ResultBox from '../../../components/ResultBox.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import MiniSimulationChart from '../../../components/MiniSimulationChart.astro';
+import WorkedExample from '../../../components/WorkedExample.astro';
+import ComparisonTable from '../../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../../components/EngineeringDiagram.astro';
+
+const whatIs = `家庭备用电池计算器用于确定在电网停电期间为家庭关键负载供电所需的蓄电池组容量。它把关键负载（冰箱、照明、医疗设备、通信设备）与非关键负载（空调、电灶等）区分开来，并计入逆变器效率损耗、不同化学体系的放电深度限制以及目标备用时长。无论是为风暴季做准备，还是建设整屋光伏 + 储能系统，本工具都能帮你选出在长时间停电中保障舒适与安全的电池容量。`;
+
+const whyItMatters = [
+  "家庭电池系统选小了，在多天停电中冰箱会断电，一冰箱食物变质可能损失 300–600 美元。",
+  "系统选大了会不必要地增加成本，每多 5 kWh 磷酸铁锂容量，安装成本就增加 2,000–4,000 美元，却不能延长关键负载的续航。",
+  "忽略逆变器待机功耗（持续 5–20W），电池会比计算更快耗尽，尤其是在夜间低负载的长时间段。",
+  "不区分关键负载和非关键负载，要么关键设备备用不足，要么按整屋供电选型，容量需求会变成 3–5 倍。",
+  "不考虑电池随时间的衰减，3–5 年后容量比标称下降 15–20%，系统可能达不到当初的续航目标。",
+];
+
+const practicalApplications = [
+  { title: "风暴与飓风应急", description: "为沿海和乡村地区常见的 24–72 小时停电配置维持关键负载的电池系统。" },
+  { title: "光伏 + 储能备用", description: "计算并网或离网家庭把光伏能量存起来、供夜间和阴天使用的电池容量。" },
+  { title: "关键医疗设备备用", description: "为制氧机、呼吸机、透析设备等维持生命的医疗设备保证足够的电池续航。" },
+  { title: "分时电价优化", description: "配置电池容量，在电价便宜的谷时段存入电网电量，在昂贵的峰时段使用，降低每月电费。" },
+];
+
+const expertNotes: { title: string; variant: 'engineering' | 'tip'; content: string }[] = [
+  {
+    title: "户内安装的化学体系选择",
+    variant: "engineering",
+    content: "磷酸铁锂（LiFePO4）是唯一推荐用于户内安装的锂电体系：热稳定性好，没有热失控风险。三元锂需要通风和防火 enclosure（防火电气柜）。铅酸充电时会释放氢气，需要专用的通风电池间。车库或居住空间安装请首选磷酸铁锂，大多数地区要求户内电池安装通过 UL 9540 认证。"
+  },
+  {
+    title: "模块化扩容策略",
+    variant: "tip",
+    content: "先按关键负载 8–12 小时配置电池容量，再规划模块化扩容。大多数现代家用磷酸铁锂电池（Tesla Powerwall、Enphase、Sol-Ark）都支持并联扩容，以后需求增长或电价变化时再加模块。这样既避免前期过度投入，又保留升级灵活性。"
+  }
+];
+
+const trustSection = {
+  text: "本计算器采用与 UL 9540 储能系统指南和 IEEE 2800 并网标准一致的家用能量选型方法。所有公式来自厂商性能数据和住宅负载画像研究，数学过程完全透明、可独立验证。",
+  link: { label: "查看完整计算方法", href: "/zh/methodology/" }
+};
+
+const references = [
+  { title: "UL 9540：储能系统与设备", url: "https://www.ul.com/resources/ul-9540-energy-storage-systems-and-equipment", source: "Underwriters Laboratories" },
+  { title: "IEEE 2800：分布式电源并网标准", url: "https://standards.ieee.org/ieee/2800/11054/", source: "IEEE Standards Association" },
+  { title: "NREL：住宅储能选型分析", url: "https://www.nrel.gov/docs/fy23osti/85472.pdf", source: "National Renewable Energy Laboratory" },
+  { title: "Energy Sage：家庭备用电池选型指南", url: "https://www.energysage.com/home-batteries/", source: "Energy Sage Marketplace" }
+];
+
+const faqItems = [
+  {
+    question: "停电时哪些算关键负载？",
+    answer: "关键负载是停电期间必需的设备：冰箱/冰柜、照明、手机充电、医疗设备、污水泵和路由器。空调、电灶、洗衣机等非关键负载一般不计入备用选型。",
+  },
+  {
+    question: "家庭备用电池应该能撑多长时间？",
+    answer: "大多数家庭备用系统按 8–24 小时续航设计。应对夜间停电，8–12 小时比较常见。风暴多发地区配 24–48 小时更有韧性。备用时间越长，电池容量越大、成本越高。",
+  },
+  {
+    question: "逆变器效率按多少估算？",
+    answer: "现代混合逆变器效率一般为 90–95%。保守选型建议按 90% 估算，以计入变换损耗、待机功耗和实际运行条件。正弦波逆变器的效率高于修正弦波逆变器。",
+  },
+  {
+    question: "可以用光伏板延长备用时间吗？",
+    answer: "可以，只要是混合逆变器系统。光伏板可以在白天给电池充电，只要有日照，备用时间就可以一直延长。这是住宅备用电源最常见的配置。",
+  },
+  {
+    question: "如何统计家里负载才能算准？",
+    answer: "把停电期间想用的电器逐个走查一遍。查看每台设备的功率铭牌，用电流 × 电压换算成功率。还要考虑工作周期：冰箱压缩机虽然 24 小时通电，但实际只有 30–50% 的时间在运转。",
+  },
+  {
+    question: "应该按整屋还是只按关键负载选型？",
+    answer: "大多数家庭只按关键负载选型（冰箱、照明、路由器、医疗设备、手机充电），24 小时一般需要 3–8 kWh。按整屋选型（含空调、烘干机、电灶）需要 30–60+ kWh，做得到，但贵得多。",
+  },
+  {
+    question: "什么是电池的分时电价（TOU）优化？",
+    answer: "分时优化是指在谷时段（电价便宜，例如深夜）充电，在峰时段（电价最高，例如 16–21 点）放电。根据你所在电力公司的电价结构和电池容量，每年可节省 200–600 美元。",
+  },
+  {
+    question: "电池衰减对备用计划有什么影响？",
+    answer: "磷酸铁锂约 6,000 次循环或约 15 年后剩余约 80% 容量。三元锂约 3,000 次循环后剩余 80%。请按系统寿命内衰减 15–20% 规划：今天需要 10 kWh，10 年后电池只能给出约 8 kWh。",
+  },
+  {
+    question: "电池备用需要转换开关吗？",
+    answer: "需要。停电时必须用手动或自动转换开关与电网安全断开，防止倒送电危及检修人员。大多数现代电池系统内置的混合逆变器已带自动转换开关功能。",
+  },
+  {
+    question: "以后可以加电池吗？",
+    answer: "大多数现代家用电池系统支持模块化扩容。Tesla Powerwall、Enphase 和 Sol-Ark 系统都允许并联追加模块。初期规划时就要留好扩容能力，确认逆变器和配电箱能容纳以后增加的电池。",
+  },
+  {
+    question: "连续多天停电会怎样？",
+    answer: "没有光伏补电时，电池会按续航计算逐渐耗尽。如果有光伏板，5 kW 阵列在天气好时每天可发电 15–25 kWh，足够给常规家用电池充电并带关键负载，天气允许的话可以长期维持。",
+  },
+  {
+    question: "家用电池系统有税收优惠吗？",
+    answer: "有。美国联邦投资税收抵免（ITC）在配光伏安装时可覆盖储能系统成本的 30%。很多州和电力公司还有额外补贴（例如加州 SGIP、纽约 NY-Sun）。请在 dsireusa.org 查询你所在地区的补贴。",
+  },
+];
+
+const commonMistakes = [
+  "忽略逆变器效率：90% 效率的逆变器有 10% 电池能量变成热量损耗。选型时一定要计入逆变器效率。",
+  "按总负载而不是关键负载选型：把家里所有电器都算进去会让系统过大、过贵。停电场景请聚焦关键负载。",
+  "忽略浪涌功率：冰箱、污水泵、空调的电机启动功率是运行功率的 3–5 倍。电池和逆变器必须扛住这些峰值。",
+  "忘记温度降额：锂电池在寒冷环境下容量下降 10–30%。请按最差运行温度选型，而不是按实验室条件。",
+  "不考虑放电深度限制：锂电池放到 0% 电量会加速衰减。磷酸铁锂和三元锂选型都建议按 80% 放电深度计算。",
+  "忽略电池到逆变器之间的线缆损耗：线缆过长会带来压降，减少实际送到逆变器的能量。",
+  "留过大的虚假安全余量：动辄加 50% 以上的降额系数会让电池组过大、过贵。一般 15–20% 余量就合适。",
+  "新旧电池混用：不要把不同年限或不同体系的电池放在同一组。内阻不一致会导致负载不均。",
+  "忽略多天停电中的自放电：2–3 天里电池自放电（锂电池每月 1–5%）会减少可用能量。",
+  "不规划补电：按 3 天备用配的电池组，用完后必须补电。请提前规划光伏、发电机或电网充电能力。",
+];
+
+const relatedArticles = [
+  { href: "/learn/home-battery-backup-planning/", title: "家庭备用电池规划" },
+  { href: "/learn/home-backup-runtime-guide/", title: "家庭备用续航指南" },
+  { href: "/learn/home-battery-sizing-guide/", title: "家用电池容量选型指南" },
+  { href: "/learn/power-outage-battery-guide/", title: "停电电池指南" },
+  { href: "/learn/whole-house-battery-backup/", title: "整屋电池备用" },
+];
+
+const relatedCalculators = [
+  { href: "/zh/tools/runtime-calculator/", title: "电池续航时间计算器", description: "根据容量与负载估算放电续航时间。" },
+  { href: "/zh/tools/battery-sizing-calculator/", title: "电池容量计算器", description: "含温度降额的完整电池组选型。" },
+  { href: "/zh/tools/c-rate-calculator/", title: "C率计算器", description: "计算充放电倍率与可持续时间。" },
+  { href: "/zh/tools/solar-battery-sizing-calculator/", title: "太阳能蓄电池计算器", description: "根据日耗电量计算太阳能蓄电池与光伏配置。" },
+  { href: "/zh/tools/rv-battery-calculator/", title: "房车电池计算器", description: "汇总房车电器负载规划离网电池容量。" },
+  { href: "/zh/tools/battery-pack-calculator/", title: "电池组计算器", description: "设计串联并联电池组的电压与容量。" },
+];
+---
+
+<CalculatorLayout
+  title="家庭备用电池计算器｜停电续航与逆变器选型｜电池计算器"
+  description="家庭备用电池计算器：汇总关键家电负载与备用时长，一键算出备用电池Ah/kWh与逆变器功率，停电应急选型，公式全公开。"
+  faqItems={faqItems}
+  commonMistakes={commonMistakes}
+  relatedArticles={relatedArticles}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+  relatedCalculators={relatedCalculators}
+  lang="zh"
+>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+
+    <!-- Input Form -->
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">备用需求</h3>
+      <div class="flex flex-col gap-6">
+
+        <InputField id="critical-load" label="关键负载功率" value={2000} min={100} step={100} unit="W" helperText="关键负载的总功率（冰箱、照明、风扇、医疗设备、网络设备等）" />
+
+        <InputField id="backup-duration" label="备用时长" value={12} min={1} max={72} step={1} unit="小时" helperText="停电期间需要供电的时间。" />
+
+        <InputField id="voltage" label="电池系统电压" value={48} min={12} step={1} unit="V" helperText="常用：小系统 12V，中型系统 24V，整屋系统 48V。" />
+
+        <InputField
+          id="chemistry"
+          label="电池化学体系"
+          type="select"
+          value="lfp"
+          helperText="推荐磷酸铁锂：循环寿命最长，户内安装最安全。"
+          options={[
+            { label: "磷酸铁锂 (LiFePO4)", value: "lfp" },
+            { label: "三元锂 (镍钴锰)", value: "nmc" },
+            { label: "铅酸蓄电池 (AGM/胶体)", value: "lead-acid" },
+          ]}
+        />
+
+        <InputField id="inverter-efficiency" label="逆变器效率" value={90} min={70} max={100} step={1} unit="%" helperText="现代混合逆变器：90–95%。保守选型建议按 90% 计算。" />
+
+      </div>
+    </CalculatorCard>
+
+    <!-- Results -->
+    <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">选型结果</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <ResultBox
+            label="电池总能量"
+            value="26,667 Wh"
+            suffix="26.67 kWh（实际需要购买的容量）"
+            variant="primary"
+            id="result-energy"
+          />
+          <ResultBox
+            label="电池可用能量"
+            value="24,000 Wh"
+            suffix="计入放电深度限制后"
+            id="result-usable"
+          />
+          <ResultBox
+            label="系统可供能量"
+            value="21,600 Wh"
+            suffix="计入逆变器损耗后可供负载使用"
+            id="result-delivered"
+          />
+          <ResultBox
+            label="推荐容量"
+            value="555.6 Ah"
+            suffix="按 48V 标称电压"
+            id="result-capacity"
+          />
+          <ResultBox
+            label="续航时间预估"
+            value="12.0 小时"
+            suffix="按 2,000W 关键负载"
+            id="result-runtime"
+          />
+          <p class="text-[11px] text-muted col-span-1 md:col-span-2 -mt-4">
+            续航时间 = 系统可供能量 / 负载。电池总能量已含放电深度与效率余量。
+          </p>
+        </div>
+
+        <MiniSimulationChart
+          title="续航灵敏度"
+          description="负载变化时备用续航的变化"
+          xLabel="负载 (W)"
+          yLabel="续航时间 (小时)"
+          chartId="chart-home-backup"
+        />
+      </div>
+
+      <div class="border-t border-hairline pt-6">
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">系统说明</h4>
+        <p class="text-body-sm text-muted" id="system-notes">
+          关键负载 2,000W、备用 12 小时、48V 磷酸铁锂系统，大约需要 26.67 kWh 电池容量（48V 下 555.6 Ah）。
+        </p>
+      </div>
+    </CalculatorCard>
+
+  </div>
+
+  <!-- Formulas and Worked Examples -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">公式与计算示例</h2>
+
+    <FormulaBox title="数学公式">
+      <p>
+        所需电池能量要计入逆变器损耗和安全的放电深度限制：
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        所需能量 (Wh) =（负载功率 × 备用时长）/（放电深度% × 逆变器效率%）
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        容量 (Ah) = 所需能量 (Wh) / 系统电压 (V)
+      </div>
+      <p>
+        各体系放电深度限制：磷酸铁锂 90%，三元锂 80%，铅酸 50%。
+      </p>
+    </FormulaBox>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample
+        number={1}
+        title="关键负载备用"
+        scenario="在 8 小时夜间停电期间，为冰箱、照明和路由器供电"
+        inputs={[
+          { label: "冰箱", value: "150W" },
+          { label: "LED 灯（×4）", value: "200W" },
+          { label: "路由器", value: "20W" },
+          { label: "手机充电", value: "30W" },
+          { label: "总负载", value: "400W" },
+          { label: "备用时长", value: "8 小时" },
+          { label: "电池电压", value: "48V 磷酸铁锂" },
+          { label: "逆变器效率", value: "90%" },
+        ]}
+        steps={[
+          "原始需能量：400W × 8h = 3,200 Wh",
+          "计入放电深度（90%）和逆变器（90%）：3,200 / (0.90 × 0.90) = 3,951 Wh",
+          "换算成安时：3,951 Wh / 48V = 82.3 Ah",
+        ]}
+        answer="48V 85 Ah 磷酸铁锂电池（约 4.0 kWh）可为夜间关键负载提供 8 小时以上备用。"
+        interpretation="冰箱是间歇工作的，实际耗电比连续标称功率低，压缩机约 40% 时间运转。实际续航可能延长到 10–12 小时。"
+        variant="home"
+      />
+
+      <WorkedExample
+        number={2}
+        title="整屋备用：24 小时"
+        scenario="一整天的中等家庭负载，包括冰箱、照明、电视、网络和洗衣"
+        inputs={[
+          { label: "冰箱", value: "150W" },
+          { label: "照明", value: "300W" },
+          { label: "电视", value: "120W" },
+          { label: "网络 + 路由器", value: "40W" },
+          { label: "手机/电脑充电", value: "100W" },
+          { label: "洗衣机", value: "500W（2h）" },
+          { label: "平均合计", value: "1,200W" },
+          { label: "备用时长", value: "24 小时" },
+          { label: "电池电压", value: "48V 磷酸铁锂" },
+          { label: "逆变器效率", value: "90%" },
+        ]}
+        steps={[
+          "全天总能量：(150×24) + (300×10) + (120×6) + (40×24) + (100×4) + (500×2) = 3,600 + 3,000 + 720 + 960 + 400 + 1,000 = 9,680 Wh",
+          "计入放电深度和逆变器损耗：9,680 / (0.90 × 0.90) = 11,951 Wh",
+          "换算成安时：11,951 / 48 = 249.0 Ah",
+        ]}
+        answer="48V 250 Ah 磷酸铁锂电池组（约 12.0 kWh）可为中等家庭提供完整 24 小时备用。"
+        interpretation="计入工作周期和非连续负载后，12 kWh 可以覆盖常规一天。没有光伏补电的阴天建议按 15 kWh 留余量。"
+        variant="home"
+      />
+
+      <WorkedExample
+        number={3}
+        title="关键医疗设备：48 小时"
+        scenario="2 天停电期间，为制氧机、呼吸机、安防系统和通信设备供电"
+        inputs={[
+          { label: "制氧机", value: "350W" },
+          { label: "呼吸机", value: "100W" },
+          { label: "安防系统", value: "50W" },
+          { label: "路由器 + 光猫", value: "40W" },
+          { label: "应急照明", value: "100W" },
+          { label: "手机充电", value: "30W" },
+          { label: "总负载", value: "670W" },
+          { label: "备用时长", value: "48 小时" },
+          { label: "电池电压", value: "48V 磷酸铁锂" },
+          { label: "逆变器效率", value: "90%" },
+        ]}
+        steps={[
+          "原始能量：670W × 48h = 32,160 Wh",
+          "计入放电深度（90%）和逆变器（90%）：32,160 / (0.90 × 0.90) = 39,704 Wh",
+          "换算成安时：39,704 / 48 = 827.2 Ah",
+        ]}
+        answer="48V 830 Ah 磷酸铁锂电池组（约 39.8 kWh）可为关键医疗设备提供 48 小时续航。"
+        interpretation="医疗负载是连续且不可中断的。40 kWh 系统（或两台并联的 Powerwall 级别储能）才能保证维持生命的设备在长时间停电中不断电。"
+        variant="home"
+      />
+    </div>
+  </section>
+
+  <EngineeringDiagram
+    title="家庭电池备用系统"
+    description="光伏板给电池充电，电池通过逆变器为家庭关键负载供电"
+    variant="system"
+    steps={[
+      { label: "光伏板", icon: "solar" },
+      { label: "充电控制器", icon: "charge" },
+      { label: "蓄电池组", icon: "battery" },
+      { label: "逆变器 + 负载", icon: "inverter" },
+    ]}
+  />
+
+  <ComparisonTable
+    title="家庭备用：负载优先级分级"
+    headers={["分级", "负载", "典型功率", "续航目标", "电池容量"]}
+    rows={[
+      ["关键级", "冰箱、医疗、安防、通信", "500–800W", "24–72 小时", "5–15 kWh"],
+      ["必需级", "加照明、网络、手机充电", "1,000–1,500W", "12–24 小时", "10–25 kWh"],
+      ["舒适级", "加电视、洗衣机、做饭", "2,000–4,000W", "8–12 小时", "20–40 kWh"],
+      ["整屋级", "除大功率暖通外的全部回路", "5,000–8,000W", "8–24 小时", "30–60 kWh"],
+    ]}
+    caption="家庭电池备用选型的分级方法"
+  />
+
+  <FAQSection items={faqItems} />
+
+  <!-- Calculation Script -->
+  <script>
+    import { calculateHomeBackupBattery } from '../../../utils/calculators';
+    import { renderLineChart, clearChart } from '../../../utils/charting';
+
+    const loadInput = document.getElementById('critical-load') as HTMLInputElement;
+    const durationInput = document.getElementById('backup-duration') as HTMLInputElement;
+    const voltageInput = document.getElementById('voltage') as HTMLInputElement;
+    const chemistrySelect = document.getElementById('chemistry') as HTMLSelectElement;
+    const efficiencyInput = document.getElementById('inverter-efficiency') as HTMLInputElement;
+
+    const resultEnergyBox = document.getElementById('result-energy');
+    const resultEnergyValue = resultEnergyBox?.querySelector('.text-display-md') as HTMLElement;
+    const resultEnergyKwh = resultEnergyBox?.querySelector('.text-caption') as HTMLElement;
+
+    const resultUsableBox = document.getElementById('result-usable');
+    const resultUsableValue = resultUsableBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultUsableRef = resultUsableBox?.querySelector('.text-caption') as HTMLElement;
+
+    const resultDeliveredBox = document.getElementById('result-delivered');
+    const resultDeliveredValue = resultDeliveredBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultDeliveredRef = resultDeliveredBox?.querySelector('.text-caption') as HTMLElement;
+
+    const resultCapacityBox = document.getElementById('result-capacity');
+    const resultCapacityValue = resultCapacityBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultCapacityRef = resultCapacityBox?.querySelector('.text-caption') as HTMLElement;
+
+    const resultRuntimeBox = document.getElementById('result-runtime');
+    const resultRuntimeValue = resultRuntimeBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultRuntimeRef = resultRuntimeBox?.querySelector('.text-caption') as HTMLElement;
+
+    const systemNotes = document.getElementById('system-notes');
+
+    const chartSvg = document.getElementById('chart-home-backup') as unknown as SVGElement;
+
+    function updateCalculations() {
+      const load = parseFloat(loadInput.value) || 2000;
+      const duration = parseFloat(durationInput.value) || 12;
+      const voltage = parseFloat(voltageInput.value) || 48;
+      const chemistry = chemistrySelect.value as "lfp" | "nmc" | "lead-acid";
+      const efficiency = parseFloat(efficiencyInput.value) || 90;
+
+      const results = calculateHomeBackupBattery(load, duration, voltage, chemistry, efficiency);
+
+      if (resultEnergyValue) resultEnergyValue.textContent = `${Math.round(results.totalEnergyWh).toLocaleString()} Wh`;
+      if (resultEnergyKwh) resultEnergyKwh.textContent = `${(results.totalEnergyWh / 1000).toFixed(2)} kWh（实际需要购买的容量）`;
+
+      if (resultUsableValue) resultUsableValue.textContent = `${Math.round(results.usableEnergyWh).toLocaleString()} Wh`;
+      if (resultUsableRef) resultUsableRef.textContent = `计入放电深度限制后`;
+
+      if (resultDeliveredValue) resultDeliveredValue.textContent = `${Math.round(results.deliveredEnergyWh).toLocaleString()} Wh`;
+      if (resultDeliveredRef) resultDeliveredRef.textContent = `计入逆变器损耗后可供负载使用`;
+
+      if (resultCapacityValue) resultCapacityValue.textContent = `${results.recommendedCapacityAh.toFixed(1)} Ah`;
+      if (resultCapacityRef) resultCapacityRef.textContent = `按 ${voltage}V 标称电压`;
+
+      if (resultRuntimeValue) resultRuntimeValue.textContent = `${results.runtimeHours.toFixed(1)} 小时`;
+      if (resultRuntimeRef) resultRuntimeRef.textContent = `按 ${load.toLocaleString()}W 关键负载`;
+
+      if (systemNotes) {
+        const chemistryName = chemistry === "lfp" ? "磷酸铁锂" : chemistry === "nmc" ? "三元锂" : "铅酸";
+        systemNotes.textContent = `关键负载 ${load.toLocaleString()}W、备用 ${duration} 小时、${voltage}V ${chemistryName}系统，大约需要 ${(results.totalEnergyWh / 1000).toFixed(1)} kWh 电池容量（${voltage}V 下 ${results.recommendedCapacityAh.toFixed(0)} Ah）。`;
+      }
+
+      if (chartSvg && results.totalEnergyWh > 0 && load > 0) {
+        const dodLimits: Record<string, number> = { lfp: 90, nmc: 80, 'lead-acid': 50 };
+        const dodFrac = (dodLimits[chemistry] || 80) / 100;
+        const effFrac = efficiency / 100;
+        const batteryWh = results.totalEnergyWh;
+
+        const pts: { x: number; y: number }[] = [];
+        const percents = [50, 64, 79, 93, 107, 121, 136, 150];
+        for (const pct of percents) {
+          const testLoad = load * pct / 100;
+          const runtime = testLoad > 0 ? (batteryWh * dodFrac * effFrac) / testLoad : 0;
+          pts.push({ x: testLoad, y: runtime });
+        }
+        renderLineChart(chartSvg, pts, {
+          width: 320, height: 160,
+          xLabel: '负载 (W)', yLabel: '续航时间 (小时)',
+          yMin: 0,
+        });
+      } else if (chartSvg) {
+        clearChart(chartSvg);
+      }
+    }
+
+    [loadInput, durationInput, voltageInput, chemistrySelect, efficiencyInput].forEach(el => {
+      el.addEventListener('input', updateCalculations);
+    });
+
+    updateCalculations();
+  </script>
+
+</CalculatorLayout>

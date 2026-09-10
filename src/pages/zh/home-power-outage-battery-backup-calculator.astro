@@ -1,0 +1,898 @@
+---
+import CalculatorLayout from '../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../components/CalculatorCard.astro';
+import InputField from '../../components/InputField.astro';
+import ResultBox from '../../components/ResultBox.astro';
+import FormulaBox from '../../components/FormulaBox.astro';
+import FAQSection from '../../components/FAQSection.astro';
+import WorkedExample from '../../components/WorkedExample.astro';
+import ComparisonTable from '../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../components/EngineeringDiagram.astro';
+
+const whatIs = `家庭停电电池备用计算器帮助您估算在电网停电期间保持关键电器运行所需的电池容量、逆变器尺寸和整体备用电力系统。无论您是在为飓风季、山火停电、冬季暴风还是突发停电做准备，本工具根据您需要供电的具体设备——冰箱、CPAP呼吸机、排水泵、Wi-Fi路由器、照明等——来设计电池组尺寸。它考虑逆变器转换损耗、电池化学类型放电深度限制和可配置的安全裕度，为您提供工程级的精确估算。`;
+
+const whyItMatters = [
+  "美国停电在过去十年增加了67%——暴风雨、山火和电网压力使备用电力在许多地区成为实际必需。",
+  "电池系统过小会导致多天停电中无法冷藏食物或为医疗设备供电。满载冰箱食物变质需花费300-600美元重新购置。",
+  "系统过大浪费资金——每多余的5kWh LFP容量增加2,000-4,000美元成本。合理设计可节省数千美元。",
+  "忽略排水泵和冰箱等电器的浪涌负载会在最糟糕的时刻使逆变器跳闸——合理的浪涌设计可防止停电中途故障。",
+  "未规划极端温度意味着电池容量在低温下降低10-30%，在冬季暴风最需要备用时出现不足。"
+];
+
+const practicalApplications = [
+  { title: "飓风与暴风备灾", description: "设计电池系统以在飓风、东北风暴和强雷暴常见的24-72小时停电中维持关键负载。" },
+  { title: "山火公共安全停电", description: "为高火险期间的计划电网停电做准备。加州和美国西部公用事业公司经常断电以防止起火。" },
+  { title: "医疗设备备用电力", description: "确保CPAP呼吸机、制氧机、雾化器和其他维持生命的医疗设备有足够的电池续航。" },
+  { title: "冬季暴风与冰暴备用", description: "在冰暴和暴风雪导致数天断电时保持加热控制、排水泵、冷藏和通信设备运行。" },
+  { title: "便携式电源站选型", description: "在购买前使用本计算器将便携式电源站或太阳能发电机与您的具体应急负载需求匹配。" },
+  { title: "冰箱与冷冻柜保护", description: "精确计算电池可保持冰箱和冷冻柜运行多长时间，防止长时间停电中的食物变质。" }
+];
+
+const expertNotes: { title: string; variant: 'engineering' | 'tip' | 'warning'; content: string }[] = [
+  {
+    title: "电器工作周期很重要",
+    variant: "engineering",
+    content: "冰箱在压缩机运行时消耗150W，但循环开停——通常运行30-50%的时间。本计算器使用连续运行功率进行保守设计。对于冰箱和冷冻柜等循环负载，实际续航可能比计算值长40-60%。"
+  },
+  {
+    title: "LiFePO4 vs 铅酸用于应急备用",
+    variant: "tip",
+    content: "LiFePO4（LFP）电池提供80-100%可用容量，重量轻60%，循环寿命长10倍，且无需维护。铅酸电池放电深度限制50%，且低温下容量快速下降。对于可靠性至关重要的应急备用，LFP是明确推荐。"
+  },
+  {
+    title: "浪涌负载可使逆变器跳闸",
+    variant: "warning",
+    content: "排水泵、冰箱和微波炉启动时消耗运行功率的2-3倍。如果逆变器浪涌额定值过低，会在您最需要时关机。务必为最差启动场景设计逆变器浪涌容量。"
+  }
+];
+
+const trustSection = {
+  text: "本计算器使用标准电气工程公式进行电池系统尺寸设计，符合UL 1741逆变器标准和IEEE 1547互联指南。所有计算透明，源自公开的电器功率数据和制造商规格。数学公式完全可验证。",
+  link: { label: "查看我们的方法论和公式推导", href: "/zh/methodology/" }
+};
+
+const references = [
+  { title: "美国EIA — 住宅用电数据", url: "https://www.eia.gov/electricity/monthly/", source: "U.S. Energy Information Administration" },
+  { title: "UL 1741 — 分布式能源逆变器标准", url: "https://www.ul.com/resources/ul-1741-edition-3", source: "Underwriters Laboratories" },
+  { title: "FEMA — 应急备用电力指南", url: "https://www.fema.gov/emergency-managers/risk-management/power/guidance", source: "Federal Emergency Management Agency" },
+  { title: "NREL — 住宅应用电池储能设计", url: "https://www.nrel.gov/docs/fy23osti/85472.pdf", source: "National Renewable Energy Laboratory" }
+];
+
+const faqItems = [
+  {
+    question: "停电需要多大的电池？",
+    answer: "基本网络和手机备用（Wi-Fi路由器+笔记本+照明8小时）约需300-500Wh。食物保护（冰箱+冷冻柜12小时）建议2,000-4,000Wh。包含医疗设备的全面应急备用，3,000-8,000Wh可覆盖大多数关键家用负载24小时。",
+  },
+  {
+    question: "100Ah电池能为冰箱供电多长时间？",
+    answer: "12V 100Ah LiFePO4电池（1,280Wh）可运行标准冰箱约8-12小时。冰箱压缩机循环开停，实际续航取决于环境温度、冰箱效率和开门频率。高温频繁开门时约6-8小时。",
+  },
+  {
+    question: "LiFePO4比铅酸更适合家庭备用吗？",
+    answer: "是的，对于应急备用电力。LiFePO4提供80-100%可用放电深度（铅酸50%），循环寿命3,000-6,000次（铅酸300-500次），充电更快，重量轻60%，无需维护。初始成本较高但每次循环的生命周期成本显著更低。",
+  },
+  {
+    question: "冰箱需要多大的逆变器？",
+    answer: "标准冰箱需要1,500-2,000W连续逆变器，至少3,000W浪涌容量。运行负载通常150W，但压缩机启动浪涌可达600W或更高。如运行额外电器，将其运行功率和最大单个浪涌负载相加来设计逆变器。",
+  },
+  {
+    question: "便携式电源站能运行冰箱吗？",
+    answer: "可以，标称1,500W+连续、3,000W+浪涌的便携式电源站可运行标准冰箱。需要至少1,000-1,500Wh容量以获得8-12小时备用。热门选择包括EcoFlow Delta 2（1,024Wh）、Bluetti AC200MAX（2,048Wh）和Goal Zero Yeti 1500X（1,516Wh）。",
+  },
+  {
+    question: "CPAP需要多少电池备用？",
+    answer: "典型CPAP带加湿器功耗30-60W（不带10-30W）。8小时睡眠需240-480Wh。12V 50Ah LiFePO4电池（640Wh）提供整夜CPAP供电。不带加湿器，12V 20Ah电池（256Wh）可维持一晚。",
+  },
+  {
+    question: "家庭备用应该用12V、24V还是48V？",
+    answer: "超过1,000W的家庭备用系统使用24V或48V。更高电压减小电流，允许更细的线缆和更低的损耗。48V适合3,000W以上的系统，是现代家庭电池系统的标准。12V仅适用于1,000W以下的小型便携设置。",
+  },
+  {
+    question: "太阳能板能在停电期间为电池充电吗？",
+    answer: "可以，如果有带电池输入的混合逆变器。400W太阳能板阵列在4-5小时峰值日照下每天可产生1,600-2,000Wh——足以部分充电家用电池或显著延长备用续航。这是多天停电生存的最有效策略。",
+  },
+  {
+    question: "为什么我的电池没有计算器说的那么久？",
+    answer: "常见原因：电池老化和退化（容量数年内下降20-30%），低温使容量降低10-30%，实际浪涌高于额定值，线路损耗，逆变器待机功耗，以及与假设不同的电器循环模式。本计算器提供保守估算——实际结果会有差异。",
+  },
+  {
+    question: "应避免在电池备用上运行哪些电器？",
+    answer: "避免高功耗电阻负载：空调（1,500-5,000W）、电炉（2,000-5,000W）、电热水器（4,500W）、衣物烘干机（2,500-5,000W）和取暖器（1,500W）。这些快速耗尽电池，需要不切实际的大型系统。专注于关键负载：冷藏、照明、医疗设备、通信和小型电子设备。",
+  },
+];
+
+const commonMistakes = [
+  "逆变器对浪涌负载设计不足——排水泵、冰箱和微波炉启动时消耗运行功率的2-3倍，使廉价逆变器跳闸。",
+  "忽略逆变器效率损耗——10-15%的直流到交流转换损耗意味着1,000Wh电池仅提供850-900Wh的可用交流能量。",
+  "按运行功率设计而未考虑电器工作周期——冰箱30-50%的时间循环运行，连续运行估算偏保守。",
+  "铅酸电池使用全额定容量——铅酸不应超过50% DoD，需要LiFePO4的双倍标称容量。",
+  "忘记电池老化和温度的安全裕度——低温使容量降低10-30%，且电池寿命内容量退化20-30%。",
+  "未规划转换开关安装——将电池系统连接到家庭线路而无转换开关可能电死电力公司工作人员。",
+  "电池组过大而无充电策略——10kWh电池若无太阳能或发电机充电是一次性系统。",
+  "从电池运行高功耗电阻负载——空调、电炉和热水器（1,500-5,000W）数小时内耗尽电池。"
+];
+
+const relatedArticles = [
+  { title: "家庭电池备用规划", href: "/zh/learn/home-battery-backup-planning/" },
+  { title: "家庭备用续航指南", href: "/zh/learn/home-backup-runtime-guide/" },
+  { title: "LiFePO4 vs 铅酸电池", href: "/zh/learn/lifepo4-vs-lead-acid/" },
+  { title: "全屋电池备用", href: "/zh/learn/whole-house-battery-backup/" },
+  { title: "停电电池指南", href: "/zh/learn/power-outage-battery-guide/" },
+];
+
+const relatedCalculators = [
+  { href: "/zh/fridge-battery-backup-calculator/", title: "冰箱电池备用计算器", description: "专为停电期间冰箱备用设计的电池尺寸计算。" },
+  { href: "/zh/cpap-battery-backup-calculator/", title: "CPAP电池备用计算器", description: "为CPAP整夜运行设计电池尺寸。" },
+  { href: "/zh/sump-pump-battery-backup-calculator/", title: "排水泵电池备用计算器", description: "确保排水泵在暴风停电期间持续运行。" },
+  { href: "/zh/portable-power-station-runtime-calculator/", title: "便携式电源站续航计算器", description: "查看便携式电源站可为您的负载供电多长时间。" },
+  { href: "/zh/solar-generator-sizing-calculator/", title: "太阳能发电机尺寸计算器", description: "设计含面板和电池的完整太阳能备用系统。" },
+  { href: "/zh/tools/runtime-calculator/", title: "电池续航计算器", description: "根据容量和负载估算放电时间。" },
+  { href: "/zh/tools/battery-sizing-calculator/", title: "电池尺寸计算器", description: "含温度降额的完整电池组尺寸设计。" },
+  { href: "/zh/tools/solar-battery-sizing-calculator/", title: "太阳能电池尺寸计算器", description: "设计与太阳能板阵列配套的电池尺寸。" },
+  { href: "/zh/tools/energy-conversion-calculator/", title: "能量转换计算器", description: "在任意电压下转换Ah、Wh和kWh。" },
+  { href: "/zh/tools/charging-time-calculator/", title: "充电时间计算器", description: "估算太阳能或电网充电时间。" },
+  { href: "/zh/tools/voltage-drop-calculator/", title: "电压降计算器", description: "设计线径以最小化电压降。" },
+  { href: "/zh/tools/dc-cable-loss-calculator/", title: "直流电缆损耗计算器", description: "计算直流连接中的线路损耗。" },
+];
+
+const appliancePresets = [
+  { name: "Refrigerator", runningW: 150, surgeW: 600 },
+  { name: "Freezer", runningW: 120, surgeW: 500 },
+  { name: "Wi-Fi Router", runningW: 12, surgeW: 12 },
+  { name: "LED Light", runningW: 10, surgeW: 10 },
+  { name: "Laptop", runningW: 60, surgeW: 90 },
+  { name: "TV", runningW: 100, surgeW: 150 },
+  { name: "CPAP Machine", runningW: 40, surgeW: 80 },
+  { name: "Fan", runningW: 50, surgeW: 75 },
+  { name: "Sump Pump", runningW: 800, surgeW: 2000 },
+  { name: "Microwave", runningW: 1000, surgeW: 1500 },
+];
+---
+
+<CalculatorLayout
+  lang="zh"
+  title="家庭停电电池备用计算器 | Battery Calculators"
+  description="计算在停电、暴风雨、飓风、山火停电或紧急电网故障期间运行关键电器所需的电池尺寸、逆变器尺寸和备用电力系统。"
+  faqItems={faqItems}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+  relatedCalculators={relatedCalculators}
+  commonMistakes={commonMistakes}
+  relatedArticles={relatedArticles}
+>
+
+  <!-- Calculator Grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+
+    <!-- Input Form -->
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">电器负载</h3>
+      <div class="flex flex-col gap-5" id="appliance-list">
+        <div class="flex flex-col gap-2">
+          <label class="text-label-uppercase text-xs text-primary">添加电器</label>
+          <div class="relative flex items-center">
+            <select id="appliance-select" class="select-input w-full">
+              <option value="">选择电器...</option>
+              {appliancePresets.map((a) => (
+                <option value={a.name} class="bg-surface-card">{a.name} ({a.runningW}W / {a.surgeW}W浪涌)</option>
+              ))}
+              <option value="custom" class="bg-surface-card">自定义负载...</option>
+            </select>
+          </div>
+          <p class="text-caption text-muted">选择电器将其添加到备用计划中。</p>
+        </div>
+
+        <div id="custom-load-fields" class="hidden flex-col gap-4 p-4 bg-surface-soft border border-hairline">
+          <div class="flex flex-col gap-2">
+            <label for="custom-name" class="text-label-uppercase text-xs text-primary">自定义电器名称</label>
+            <input id="custom-name" type="text" class="text-input w-full" placeholder="例如：水泵" />
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div class="flex flex-col gap-2">
+              <label for="custom-running" class="text-label-uppercase text-xs text-primary">运行功率</label>
+              <input id="custom-running" type="number" class="text-input w-full" value={500} min={1} />
+            </div>
+            <div class="flex flex-col gap-2">
+              <label for="custom-surge" class="text-label-uppercase text-xs text-primary">浪涌功率</label>
+              <input id="custom-surge" type="number" class="text-input w-full" value={750} min={1} />
+            </div>
+          </div>
+          <button id="add-custom-btn" type="button" class="btn-primary w-full">添加自定义负载</button>
+        </div>
+
+        <div id="selected-appliances" class="flex flex-col gap-2"></div>
+      </div>
+
+      <div class="border-t border-hairline mt-6 pt-6 flex flex-col gap-5">
+        <h3 class="text-title-lg text-primary uppercase tracking-wider">备用设置</h3>
+
+        <InputField id="backup-hours" label="备用时长" value={8} min={0.5} max={72} step={0.5} unit="小时" helperText="停电期间您需要备用电力的时长。" />
+
+        <InputField
+          id="battery-voltage"
+          label="电池系统电压"
+          type="select"
+          value="24"
+          helperText="12V用于小型便携设置，24V用于中型，48V用于全屋。"
+          options={[
+            { label: "12 V", value: "12" },
+            { label: "24 V", value: "24" },
+            { label: "48 V", value: "48" },
+          ]}
+        />
+
+        <InputField
+          id="battery-chemistry"
+          label="电池化学类型"
+          type="select"
+          value="lifepo4"
+          helperText="推荐LiFePO4：最安全、寿命最长、放电最深。"
+          options={[
+            { label: "LiFePO4", value: "lifepo4" },
+            { label: "AGM / 密封铅酸", value: "agm" },
+            { label: "富液式铅酸", value: "flooded" },
+          ]}
+        />
+
+        <InputField id="dod-percent" label="放电深度" value={80} min={10} max={100} step={1} unit="%" helperText="由化学类型自动设置。LiFePO4：80%，铅酸：50%。可手动覆盖。" />
+
+        <InputField id="inverter-efficiency" label="逆变器效率" value={90} min={80} max={98} step={1} unit="%" helperText="现代纯正弦波逆变器：90-95%。保守设计用90%。" />
+
+        <InputField id="safety-margin" label="安全裕度" value={20} min={0} max={50} step={1} unit="%" helperText="温度、老化和意外负载的额外容量缓冲。" />
+      </div>
+
+      <div class="border-t border-hairline mt-6 pt-6 flex flex-col gap-5">
+        <div class="flex items-center gap-3">
+          <input type="checkbox" id="solar-enabled" class="w-4 h-4 accent-m-blue-light" />
+          <label for="solar-enabled" class="text-label-uppercase text-xs text-primary cursor-pointer">启用太阳能充电</label>
+        </div>
+
+        <div id="solar-fields" class="hidden flex-col gap-5">
+          <InputField id="solar-watts" label="太阳能板功率" value={400} min={50} max={10000} step={50} unit="W" helperText="连接到充电控制器的太阳能板总功率。" />
+
+          <InputField id="peak-sun-hours" label="峰值日照时数" value={5} min={1} max={10} step={0.5} unit="小时" helperText="您所在地区的平均每日峰值日照时数。美国平均：4-6小时。" />
+
+          <InputField id="charge-controller-efficiency" label="充电控制器效率" value={95} min={80} max={99} step={1} unit="%" helperText="MPPT控制器：95-98%。PWM控制器：80-90%。" />
+        </div>
+      </div>
+    </CalculatorCard>
+
+    <!-- Results -->
+    <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">备用系统结果</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <ResultBox
+            label="所需电池能量"
+            value="0 Wh"
+            suffix="总计电池组 kWh"
+            variant="primary"
+            id="result-battery-wh"
+          />
+          <ResultBox
+            label="电池容量"
+            value="0 Ah"
+            suffix="标称电压下"
+            id="result-battery-ah"
+          />
+          <ResultBox
+            label="总运行负载"
+            value="0 W"
+            suffix="连续功耗"
+            id="result-running-w"
+          />
+          <ResultBox
+            label="估算浪涌"
+            value="0 W"
+            suffix="启动峰值"
+            id="result-surge-w"
+          />
+          <ResultBox
+            label="逆变器连续功率"
+            value="0 W"
+            suffix="建议最低值"
+            id="result-inverter-cont"
+          />
+          <ResultBox
+            label="逆变器浪涌额定值"
+            value="0 W"
+            suffix="建议最低值"
+            id="result-inverter-surge"
+          />
+        </div>
+
+        <div class="bg-surface-soft border border-hairline p-4 mb-6">
+          <h4 class="text-label-uppercase text-primary text-[10px] mb-3">建议电池配置</h4>
+          <div class="grid grid-cols-2 gap-3 text-body-sm text-muted">
+            <div class="flex justify-between"><span>12V 100Ah电池数量：</span> <span class="text-primary font-bold" id="result-bat-12v100">0</span></div>
+            <div class="flex justify-between"><span>12V 200Ah电池数量：</span> <span class="text-primary font-bold" id="result-bat-12v200">0</span></div>
+            <div class="flex justify-between"><span>24V 100Ah电池数量：</span> <span class="text-primary font-bold" id="result-bat-24v100">0</span></div>
+            <div class="flex justify-between"><span>48V 100Ah电池数量：</span> <span class="text-primary font-bold" id="result-bat-48v100">0</span></div>
+          </div>
+        </div>
+
+        <div id="solar-results" class="hidden bg-surface-soft border border-hairline p-4 mb-6">
+          <h4 class="text-label-uppercase text-primary text-[10px] mb-3">太阳能充电估算</h4>
+          <div class="flex flex-col gap-2 text-body-sm text-muted">
+            <div class="flex justify-between"><span>每日太阳能能量：</span> <span class="text-primary font-bold" id="result-solar-daily">0 Wh</span></div>
+            <div class="flex justify-between"><span>充满电时间：</span> <span class="text-primary font-bold" id="result-solar-recharge">0 小时</span></div>
+            <div class="flex justify-between"><span>太阳能满足每日使用：</span> <span class="text-primary font-bold" id="result-solar-sufficient">—</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="border-t border-hairline pt-6">
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">规划说明</h4>
+        <p class="text-body-sm text-muted" id="planning-notes">
+          在上方添加电器以计算备用电力需求。调整输入时结果即时更新。
+        </p>
+      </div>
+    </CalculatorCard>
+  </div>
+
+  <!-- Formulas + Worked Examples -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <FormulaBox title="数学公式">
+      <p>计算遵循从负载到电池组的标准能量链方法：</p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Total Running W = Σ (Appliance Running W × Quantity)
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Surge W = Highest Single Appliance Surge + Other Running W
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Energy Required (Wh) = (Running W × Hours) / Inverter Efficiency × (1 + Safety Margin)
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Battery Ah = Required Wh / (Battery Voltage × Depth of Discharge)
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Inverter Continuous = Running W × 1.25
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        Inverter Surge = Surge W × 1.10
+      </div>
+      <p>浪涌计算为最大单个电器启动浪涌加上所有其他电器的运行负载——而非所有浪涌同时叠加。</p>
+    </FormulaBox>
+
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">公式与计算示例</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample
+        number={1}
+        title="基本负载 — 8小时停电"
+        scenario="在8小时过夜停电中保持Wi-Fi、手机充电、几盏灯和笔记本运行。"
+        inputs={[
+          { label: "Wi-Fi路由器", value: "12W" },
+          { label: "笔记本电脑", value: "60W" },
+          { label: "LED灯 ×2", value: "20W" },
+          { label: "手机充电器", value: "15W" },
+          { label: "备用时长", value: "8小时" },
+        ]}
+        steps={[
+          { label: "步骤1：总运行负载", formula: "12 + 60 + 20 + 15", result: "107W" },
+          { label: "步骤2：8小时能量", formula: "107W × 8h", result: "856 Wh" },
+          { label: "步骤3：考虑逆变器效率（90%）", formula: "856 / 0.90", result: "951 Wh" },
+          { label: "步骤4：加上20%裕度", formula: "951 × 1.20", result: "1,141 Wh" },
+          { label: "步骤5：电池（12V LFP, 80% DoD）", formula: "1,141 / (12 × 0.80)", result: "119 Ah → 12V 120Ah LFP" },
+        ]}
+        answer="12V 120Ah LiFePO4电池（1,536Wh）以舒适裕度覆盖基本过夜负载。"
+        interpretation="基本负载备用成本不高——单个12V电池即可轻松应对。"
+      />
+      <WorkedExample
+        number={2}
+        title="全屋备用 — 24小时停电"
+        scenario="在24小时全天停电中保持冰箱、冷冻柜、Wi-Fi、照明、排水泵和手机充电运行。"
+        inputs={[
+          { label: "冰箱+冷冻柜", value: "270W（循环平均~110W）" },
+          { label: "Wi-Fi路由器", value: "12W" },
+          { label: "LED灯 ×4", value: "40W" },
+          { label: "排水泵（间歇）", value: "800W（平均~50W）" },
+          { label: "手机+笔记本", value: "75W" },
+          { label: "备用时长", value: "24小时" },
+        ]}
+        steps={[
+          { label: "步骤1：平均运行负载", formula: "110 + 12 + 40 + 50 + 75", result: "平均287W" },
+          { label: "步骤2：24小时能量", formula: "287W × 24h", result: "6,888 Wh" },
+          { label: "步骤3：考虑逆变器效率（90%）", formula: "6,888 / 0.90", result: "7,653 Wh" },
+          { label: "步骤4：加上20%裕度", formula: "7,653 × 1.20", result: "9,184 Wh" },
+          { label: "步骤5：电池（48V LFP, 80% DoD）", formula: "9,184 / (48 × 0.80)", result: "239 Ah → 48V 250Ah LFP" },
+        ]}
+        answer="48V 250Ah LiFePO4电池组（12kWh）覆盖全屋基本负载24小时。"
+        interpretation="全天备用需要大容量——48V系统对此规模负载最高效。"
+      />
+      <WorkedExample
+        number={3}
+        title="关键医疗 — 48小时停电"
+        scenario="在整整2天中为CPAP呼吸机、制氧机、手机、Wi-Fi和几盏灯供电。"
+        inputs={[
+          { label: "CPAP呼吸机", value: "40W" },
+          { label: "制氧机", value: "300W" },
+          { label: "Wi-Fi路由器", value: "12W" },
+          { label: "LED灯 ×2", value: "20W" },
+          { label: "手机充电器", value: "15W" },
+          { label: "备用时长", value: "48小时" },
+        ]}
+        steps={[
+          { label: "步骤1：总运行负载", formula: "40 + 300 + 12 + 20 + 15", result: "387W" },
+          { label: "步骤2：48小时能量", formula: "387W × 48h", result: "18,576 Wh" },
+          { label: "步骤3：考虑逆变器效率（90%）", formula: "18,576 / 0.90", result: "20,640 Wh" },
+          { label: "步骤4：加上20%裕度", formula: "20,640 × 1.20", result: "24,768 Wh" },
+          { label: "步骤5：电池（48V LFP, 80% DoD）", formula: "24,768 / (48 × 0.80)", result: "645 Ah → 48V 650Ah LFP" },
+        ]}
+        answer="48V 650Ah LiFePO4电池组（31.2kWh）为关键医疗设备供电48小时。"
+        interpretation="医疗设备需要大容量——太阳能充电对多天医疗备用至关重要。"
+      />
+    </div>
+  </section>
+
+  <!-- U.S. Power Outage Planning Examples -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">美国停电规划示例</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+      <CalculatorCard>
+        <h4 class="text-primary font-bold text-sm mb-3">基本网络备用</h4>
+        <p class="text-body-sm text-muted mb-3">停电期间保持家庭网络连接。</p>
+        <ul class="text-body-sm text-muted flex flex-col gap-1 mb-3">
+          <li>• Wi-Fi路由器：12W</li>
+          <li>• 笔记本电脑：60W</li>
+          <li>• LED灯 ×2：20W</li>
+        </ul>
+        <div class="bg-surface-soft p-3 border border-hairline">
+          <p class="text-caption text-muted">总计：92W运行8小时 = <span class="text-primary font-bold">736 Wh → 12V 80Ah LFP电池</span></p>
+        </div>
+      </CalculatorCard>
+
+      <CalculatorCard>
+        <h4 class="text-primary font-bold text-sm mb-3">食物保护备用</h4>
+        <p class="text-body-sm text-muted mb-3">长时间停电中保持冰箱和冷冻柜冷藏。</p>
+        <ul class="text-body-sm text-muted flex flex-col gap-1 mb-3">
+          <li>• 冰箱：150W</li>
+          <li>• 冷冻柜：120W</li>
+          <li>• Wi-Fi路由器：12W</li>
+        </ul>
+        <div class="bg-surface-soft p-3 border border-hairline">
+          <p class="text-caption text-muted">总计：282W运行12小时 = <span class="text-primary font-bold">3,760 Wh → 24V 200Ah LFP电池</span></p>
+        </div>
+      </CalculatorCard>
+
+      <CalculatorCard>
+        <h4 class="text-primary font-bold text-sm mb-3">医疗设备备用</h4>
+        <p class="text-body-sm text-muted mb-3">整夜为CPAP和基本通信供电。</p>
+        <ul class="text-body-sm text-muted flex flex-col gap-1 mb-3">
+          <li>• CPAP呼吸机：40W</li>
+          <li>• Wi-Fi路由器：12W</li>
+          <li>• 手机充电器：15W</li>
+          <li>• LED灯：10W</li>
+        </ul>
+        <div class="bg-surface-soft p-3 border border-hairline">
+          <p class="text-caption text-muted">总计：77W运行10小时 = <span class="text-primary font-bold">963 Wh → 12V 100Ah LFP电池</span></p>
+        </div>
+      </CalculatorCard>
+
+      <CalculatorCard>
+        <h4 class="text-primary font-bold text-sm mb-3">暴风应急备用</h4>
+        <p class="text-body-sm text-muted mb-3">恶劣天气事件的全面备用。</p>
+        <ul class="text-body-sm text-muted flex flex-col gap-1 mb-3">
+          <li>• 冰箱：150W</li>
+          <li>• 冷冻柜：120W</li>
+          <li>• 排水泵：800W</li>
+          <li>• LED灯 ×3：30W</li>
+          <li>• Wi-Fi路由器：12W</li>
+        </ul>
+        <div class="bg-surface-soft p-3 border border-hairline">
+          <p class="text-caption text-muted">总计：1,112W运行12小时 = <span class="text-primary font-bold">16,680 Wh → 48V 440Ah LFP系统</span></p>
+        </div>
+      </CalculatorCard>
+
+    </div>
+  </section>
+
+  <!-- Appliance Wattage Reference Table -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">电器功率参考表</h2>
+    <div class="overflow-x-auto">
+      <table class="w-full text-body-sm text-muted border border-hairline">
+        <thead>
+          <tr class="border-b border-hairline">
+            <th class="text-left p-3 text-label-uppercase text-primary text-[10px]">电器</th>
+            <th class="text-right p-3 text-label-uppercase text-primary text-[10px]">运行功率</th>
+            <th class="text-right p-3 text-label-uppercase text-primary text-[10px]">浪涌功率</th>
+            <th class="text-right p-3 text-label-uppercase text-primary text-[10px]">备注</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="border-b border-hairline"><td class="p-3">冰箱</td><td class="p-3 text-right">150 W</td><td class="p-3 text-right">600 W</td><td class="p-3 text-right text-muted">30-50%时间循环</td></tr>
+          <tr class="border-b border-hairline"><td class="p-3">冷冻柜</td><td class="p-3 text-right">120 W</td><td class="p-3 text-right">500 W</td><td class="p-3 text-right text-muted">30-40%时间循环</td></tr>
+          <tr class="border-b border-hairline"><td class="p-3">Wi-Fi路由器</td><td class="p-3 text-right">12 W</td><td class="p-3 text-right">12 W</td><td class="p-3 text-right text-muted">连续功耗</td></tr>
+          <tr class="border-b border-hairline"><td class="p-3">LED灯泡</td><td class="p-3 text-right">10 W</td><td class="p-3 text-right">10 W</td><td class="p-3 text-right text-muted">每个灯泡</td></tr>
+          <tr class="border-b border-hairline"><td class="p-3">笔记本电脑</td><td class="p-3 text-right">60 W</td><td class="p-3 text-right">90 W</td><td class="p-3 text-right text-muted">充电+运行</td></tr>
+          <tr class="border-b border-hairline"><td class="p-3">电视（LED/LCD）</td><td class="p-3 text-right">100 W</td><td class="p-3 text-right">150 W</td><td class="p-3 text-right text-muted">55"典型</td></tr>
+          <tr class="border-b border-hairline"><td class="p-3">CPAP呼吸机</td><td class="p-3 text-right">40 W</td><td class="p-3 text-right">80 W</td><td class="p-3 text-right text-muted">带加湿器</td></tr>
+          <tr class="border-b border-hairline"><td class="p-3">箱式风扇</td><td class="p-3 text-right">50 W</td><td class="p-3 text-right">75 W</td><td class="p-3 text-right text-muted">20"箱式风扇</td></tr>
+          <tr class="border-b border-hairline"><td class="p-3">排水泵</td><td class="p-3 text-right">800 W</td><td class="p-3 text-right">2,000 W</td><td class="p-3 text-right text-muted">½马力典型</td></tr>
+          <tr class="border-b border-hairline"><td class="p-3">微波炉</td><td class="p-3 text-right">1,000 W</td><td class="p-3 text-right">1,500 W</td><td class="p-3 text-right text-muted">1,000W型号</td></tr>
+          <tr class="border-b border-hairline"><td class="p-3">手机充电器</td><td class="p-3 text-right">15 W</td><td class="p-3 text-right">15 W</td><td class="p-3 text-right text-muted">USB-C快充</td></tr>
+          <tr class="p-3"><td class="p-3">咖啡机</td><td class="p-3 text-right">900 W</td><td class="p-3 text-right">1,200 W</td><td class="p-3 text-right text-muted">滴滤12杯</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- LiFePO4 vs Lead-Acid Comparison -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">备用电力LiFePO4 vs 铅酸对比</h2>
+    <div class="overflow-x-auto">
+      <table class="w-full text-body-sm text-muted border border-hairline">
+        <thead>
+          <tr class="border-b border-hairline">
+            <th class="text-left p-3 text-label-uppercase text-primary text-[10px]">特性</th>
+            <th class="text-center p-3 text-label-uppercase text-primary text-[10px]">LiFePO4</th>
+            <th class="text-center p-3 text-label-uppercase text-primary text-[10px]">AGM / 密封</th>
+            <th class="text-center p-3 text-label-uppercase text-primary text-[10px]">富液式铅酸</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="border-b border-hairline"><td class="p-3">可用放电深度</td><td class="p-3 text-center font-bold text-primary">80-100%</td><td class="p-3 text-center">50%</td><td class="p-3 text-center">50%</td></tr>
+          <tr class="border-b border-hairline"><td class="p-3">循环寿命</td><td class="p-3 text-center font-bold text-primary">3,000-6,000</td><td class="p-3 text-center">300-500</td><td class="p-3 text-center">200-400</td></tr>
+          <tr class="border-b border-hairline"><td class="p-3">重量</td><td class="p-3 text-center font-bold text-primary">最轻</td><td class="p-3 text-center">重</td><td class="p-3 text-center">最重</td></tr>
+          <tr class="border-b border-hairline"><td class="p-3">维护</td><td class="p-3 text-center font-bold text-primary">无需</td><td class="p-3 text-center">无需</td><td class="p-3 text-center">加水</td></tr>
+          <tr class="border-b border-hairline"><td class="p-3">低温性能</td><td class="p-3 text-center font-bold text-primary">良好</td><td class="p-3 text-center">差</td><td class="p-3 text-center">差</td></tr>
+          <tr class="border-b border-hairline"><td class="p-3">室内安装</td><td class="p-3 text-center font-bold text-primary">安全</td><td class="p-3 text-center">需通风</td><td class="p-3 text-center">需通风</td></tr>
+          <tr class="border-b border-hairline"><td class="p-3">初始成本</td><td class="p-3 text-center">较高</td><td class="p-3 text-center">较低</td><td class="p-3 text-center">最低</td></tr>
+          <tr class="p-3"><td class="p-3">每次循环生命周期成本</td><td class="p-3 text-center font-bold text-primary">最低</td><td class="p-3 text-center">较高</td><td class="p-3 text-center">最高</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Safety Notes -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">安全说明</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <CalculatorCard>
+        <p class="text-body-sm text-muted flex gap-3">
+          <span class="text-m-red shrink-0 mt-0.5">⚠</span>
+          <span>切勿在无适当转换开关的情况下将便携式发电机或电池系统连接到家庭线路。反向馈电可能电死恢复供电的电力公司工作人员。</span>
+        </p>
+      </CalculatorCard>
+      <CalculatorCard>
+        <p class="text-body-sm text-muted flex gap-3">
+          <span class="text-m-red shrink-0 mt-0.5">⚠</span>
+          <span>锂电池应按当地消防规范安装在远离生活区的位置。LiFePO4是最安全的锂电池化学类型，但始终遵循制造商安装指南。</span>
+        </p>
+      </CalculatorCard>
+      <CalculatorCard>
+        <p class="text-body-sm text-muted flex gap-3">
+          <span class="text-m-red shrink-0 mt-0.5">⚠</span>
+          <span>不要超过逆变器的连续或浪涌额定值。过载逆变器可能过热、关机或引起火灾。连续负载估算增加25%余量。</span>
+        </p>
+      </CalculatorCard>
+      <CalculatorCard>
+        <p class="text-body-sm text-muted flex gap-3">
+          <span class="text-m-red shrink-0 mt-0.5">⚠</span>
+          <span>铅酸电池充电时释放氢气。安装在通风良好、远离点火源的位置。切勿给冻结的铅酸电池充电。</span>
+        </p>
+      </CalculatorCard>
+    </div>
+  </section>
+
+  <EngineeringDiagram
+    title="家庭备用电力系统流程"
+    description="电网或太阳能为电池组充电，电池组通过逆变器经转换开关为家庭关键电路供电。"
+    steps={[
+      { label: "电网/太阳能", icon: "solar" },
+      { label: "充电控制器", icon: "charge" },
+      { label: "电池组", icon: "battery" },
+      { label: "逆变器", icon: "inverter" },
+      { label: "转换开关", icon: "cable" },
+      { label: "家庭负载", icon: "load" },
+    ]}
+    variant="system"
+  />
+
+  <ComparisonTable
+    title="家庭停电备用场景对比"
+    headers={["场景", "关键负载", "时长", "平均功耗", "电池尺寸", "估算成本"]}
+    rows={[
+      ["基本8小时", "Wi-Fi、照明、手机、笔记本", "8小时", "~110W", "12V 120Ah (1.5 kWh)", "$800–$1,200"],
+      ["食物保护24小时", "冰箱、冷冻柜、Wi-Fi、照明", "24小时", "~290W", "24V 200Ah (4.8 kWh)", "$2,500–$3,500"],
+      ["关键医疗48小时", "CPAP、制氧机、Wi-Fi、照明", "48小时", "~390W", "48V 650Ah (31 kWh)", "$12,000–$18,000"],
+      ["暴风应急12小时", "冰箱、排水泵、Wi-Fi、照明", "12小时", "~350W", "24V 250Ah (6 kWh)", "$3,500–$5,000"],
+      ["全屋24小时", "所有基本电路", "24小时", "~1,500W", "48V 500Ah (24 kWh)", "$10,000–$15,000"],
+      ["多天+太阳能", "基本负载含每日充电", "72+小时", "~300W", "48V 200Ah + 1,200W太阳能", "$8,000–$12,000"],
+    ]}
+    caption="成本为LiFePO4电池系统含逆变器的近似值。价格因品牌和安装复杂度差异很大。"
+  />
+
+  <FAQSection items={faqItems} />
+
+  <!-- Calculation Script -->
+  <script>
+    import { calculatePowerOutageBackup } from '../../utils/calculators';
+
+    interface ApplianceEntry {
+      id: string;
+      name: string;
+      runningW: number;
+      surgeW: number;
+      quantity: number;
+    }
+
+    const appliancePresets: Record<string, { runningW: number; surgeW: number }> = {
+      "Refrigerator": { runningW: 150, surgeW: 600 },
+      "Freezer": { runningW: 120, surgeW: 500 },
+      "Wi-Fi Router": { runningW: 12, surgeW: 12 },
+      "LED Light": { runningW: 10, surgeW: 10 },
+      "Laptop": { runningW: 60, surgeW: 90 },
+      "TV": { runningW: 100, surgeW: 150 },
+      "CPAP Machine": { runningW: 40, surgeW: 80 },
+      "Fan": { runningW: 50, surgeW: 75 },
+      "Sump Pump": { runningW: 800, surgeW: 2000 },
+      "Microwave": { runningW: 1000, surgeW: 1500 },
+    };
+
+    let appliances: ApplianceEntry[] = [];
+    let nextId = 1;
+
+    const applianceSelect = document.getElementById('appliance-select') as HTMLSelectElement;
+    const customLoadFields = document.getElementById('custom-load-fields') as HTMLDivElement;
+    const addCustomBtn = document.getElementById('add-custom-btn') as HTMLButtonElement;
+    const selectedAppliancesDiv = document.getElementById('selected-appliances') as HTMLDivElement;
+
+    const backupHoursInput = document.getElementById('backup-hours') as HTMLInputElement;
+    const batteryVoltageSelect = document.getElementById('battery-voltage') as HTMLSelectElement;
+    const batteryChemistrySelect = document.getElementById('battery-chemistry') as HTMLSelectElement;
+    const dodInput = document.getElementById('dod-percent') as HTMLInputElement;
+    const inverterEfficiencyInput = document.getElementById('inverter-efficiency') as HTMLInputElement;
+    const safetyMarginInput = document.getElementById('safety-margin') as HTMLInputElement;
+
+    const solarEnabledCheckbox = document.getElementById('solar-enabled') as HTMLInputElement;
+    const solarFields = document.getElementById('solar-fields') as HTMLDivElement;
+    const solarWattsInput = document.getElementById('solar-watts') as HTMLInputElement;
+    const peakSunHoursInput = document.getElementById('peak-sun-hours') as HTMLInputElement;
+    const chargeControllerEffInput = document.getElementById('charge-controller-efficiency') as HTMLInputElement;
+
+    const solarResultsDiv = document.getElementById('solar-results') as HTMLDivElement;
+
+    const chemistryDodMap: Record<string, number> = {
+      lifepo4: 80,
+      agm: 50,
+      flooded: 50,
+    };
+
+    function addAppliance(name: string, runningW: number, surgeW: number) {
+      const id = `appliance-${nextId++}`;
+      appliances.push({ id, name, runningW, surgeW, quantity: 1 });
+      renderAppliances();
+      updateCalculations();
+    }
+
+    function removeAppliance(id: string) {
+      appliances = appliances.filter(a => a.id !== id);
+      renderAppliances();
+      updateCalculations();
+    }
+
+    function updateQuantity(id: string, qty: number) {
+      const appliance = appliances.find(a => a.id === id);
+      if (appliance) {
+        appliance.quantity = Math.max(1, Math.min(20, qty));
+        updateCalculations();
+      }
+    }
+
+    function renderAppliances() {
+      if (!selectedAppliancesDiv) return;
+      selectedAppliancesDiv.innerHTML = '';
+
+      if (appliances.length === 0) return;
+
+      const header = document.createElement('div');
+      header.className = 'flex items-center justify-between mb-1';
+      header.innerHTML = `<span class="text-label-uppercase text-muted text-[10px]">已选电器</span><span class="text-caption text-muted">${appliances.length}个</span>`;
+      selectedAppliancesDiv.appendChild(header);
+
+      for (const appliance of appliances) {
+        const row = document.createElement('div');
+        row.className = 'flex items-center gap-3 bg-surface-soft border border-hairline p-3';
+
+        row.innerHTML = `
+          <div class="flex-1 min-w-0">
+            <span class="text-primary font-bold text-sm block truncate">${appliance.name}</span>
+            <span class="text-caption text-muted">${appliance.runningW}W运行 / ${appliance.surgeW}W浪涌</span>
+          </div>
+          <div class="flex items-center gap-2 shrink-0">
+            <label class="text-caption text-muted">数量：</label>
+            <input type="number" class="text-input w-16 h-8 text-center text-sm" value="${appliance.quantity}" min="1" max="20" data-id="${appliance.id}" />
+          </div>
+          <button type="button" class="text-m-red hover:text-primary text-lg font-bold px-2 h-8 flex items-center justify-center border border-hairline hover:border-primary transition-colors shrink-0" data-remove="${appliance.id}">✕</button>
+        `;
+
+        const qtyInput = row.querySelector('input') as HTMLInputElement;
+        qtyInput.addEventListener('input', () => {
+          updateQuantity(appliance.id, parseInt(qtyInput.value) || 1);
+        });
+
+        const removeBtn = row.querySelector('[data-remove]') as HTMLButtonElement;
+        removeBtn.addEventListener('click', () => {
+          removeAppliance(appliance.id);
+        });
+
+        selectedAppliancesDiv.appendChild(row);
+      }
+    }
+
+    applianceSelect?.addEventListener('change', () => {
+      const val = applianceSelect.value;
+      if (!val) return;
+
+      if (val === 'custom') {
+        customLoadFields?.classList.remove('hidden');
+        customLoadFields?.classList.add('flex');
+      } else {
+        customLoadFields?.classList.add('hidden');
+        customLoadFields?.classList.remove('flex');
+        const preset = appliancePresets[val];
+        if (preset) {
+          addAppliance(val, preset.runningW, preset.surgeW);
+        }
+      }
+      applianceSelect.value = '';
+    });
+
+    addCustomBtn?.addEventListener('click', () => {
+      const nameInput = document.getElementById('custom-name') as HTMLInputElement;
+      const runningInput = document.getElementById('custom-running') as HTMLInputElement;
+      const surgeInput = document.getElementById('custom-surge') as HTMLInputElement;
+
+      const name = nameInput?.value.trim() || '自定义负载';
+      const runningW = Math.max(1, parseInt(runningInput?.value) || 500);
+      const surgeW = Math.max(runningW, parseInt(surgeInput?.value) || Math.ceil(runningW * 1.5));
+
+      addAppliance(name, runningW, surgeW);
+
+      if (nameInput) nameInput.value = '';
+    });
+
+    solarEnabledCheckbox?.addEventListener('change', () => {
+      if (solarEnabledCheckbox.checked) {
+        solarFields?.classList.remove('hidden');
+        solarFields?.classList.add('flex');
+        solarResultsDiv?.classList.remove('hidden');
+      } else {
+        solarFields?.classList.add('hidden');
+        solarFields?.classList.remove('flex');
+        solarResultsDiv?.classList.add('hidden');
+      }
+      updateCalculations();
+    });
+
+    batteryChemistrySelect?.addEventListener('change', () => {
+      const chem = batteryChemistrySelect.value;
+      const dod = chemistryDodMap[chem];
+      if (dod && dodInput) {
+        dodInput.value = String(dod);
+      }
+      updateCalculations();
+    });
+
+    function updateCalculations() {
+      const backupHours = parseFloat(backupHoursInput?.value) || 8;
+      const batteryVoltage = parseFloat(batteryVoltageSelect?.value) || 24;
+      const dodPercent = parseFloat(dodInput?.value) || 80;
+      const inverterEfficiency = parseFloat(inverterEfficiencyInput?.value) || 90;
+      const safetyMargin = parseFloat(safetyMarginInput?.value) || 20;
+
+      const solarEnabled = solarEnabledCheckbox?.checked || false;
+      const solarWatts = parseFloat(solarWattsInput?.value) || 400;
+      const peakSunHours = parseFloat(peakSunHoursInput?.value) || 5;
+      const chargeControllerEff = parseFloat(chargeControllerEffInput?.value) || 95;
+
+      const applianceLoads = appliances.map(a => ({
+        name: a.name,
+        runningW: a.runningW,
+        surgeW: a.surgeW,
+        quantity: a.quantity,
+      }));
+
+      const results = calculatePowerOutageBackup(
+        applianceLoads,
+        backupHours,
+        batteryVoltage,
+        dodPercent,
+        inverterEfficiency,
+        safetyMargin,
+        solarEnabled,
+        solarWatts,
+        peakSunHours,
+        chargeControllerEff
+      );
+
+      // Update result displays
+      const batteryWhBox = document.getElementById('result-battery-wh');
+      const batteryWhValue = batteryWhBox?.querySelector('.text-display-md') as HTMLElement;
+      const batteryWhSuffix = batteryWhBox?.querySelector('.text-caption') as HTMLElement;
+      if (batteryWhValue) batteryWhValue.textContent = `${Math.round(results.energyRequiredWh).toLocaleString()} Wh`;
+      if (batteryWhSuffix) batteryWhSuffix.textContent = `${results.energyRequiredKwh.toFixed(1)} kWh总计电池组`;
+
+      const batteryAhBox = document.getElementById('result-battery-ah');
+      const batteryAhValue = batteryAhBox?.querySelector('.text-title-lg') as HTMLElement;
+      const batteryAhSuffix = batteryAhBox?.querySelector('.text-caption') as HTMLElement;
+      if (batteryAhValue) batteryAhValue.textContent = `${Math.round(results.batteryCapacityAh).toLocaleString()} Ah`;
+      if (batteryAhSuffix) batteryAhSuffix.textContent = `标称${batteryVoltage}V下`;
+
+      const runningBox = document.getElementById('result-running-w');
+      const runningValue = runningBox?.querySelector('.text-display-md') as HTMLElement;
+      if (runningValue) runningValue.textContent = `${Math.round(results.totalRunningW).toLocaleString()} W`;
+
+      const surgeBox = document.getElementById('result-surge-w');
+      const surgeValue = surgeBox?.querySelector('.text-display-md') as HTMLElement;
+      if (surgeValue) surgeValue.textContent = `${Math.round(results.estimatedSurgeW).toLocaleString()} W`;
+
+      const inverterContBox = document.getElementById('result-inverter-cont');
+      const inverterContValue = inverterContBox?.querySelector('.text-display-md') as HTMLElement;
+      if (inverterContValue) inverterContValue.textContent = `${Math.round(results.inverterContinuousW).toLocaleString()} W`;
+
+      const inverterSurgeBox = document.getElementById('result-inverter-surge');
+      const inverterSurgeValue = inverterSurgeBox?.querySelector('.text-display-md') as HTMLElement;
+      if (inverterSurgeValue) inverterSurgeValue.textContent = `${Math.round(results.inverterSurgeW).toLocaleString()} W`;
+
+      // Battery configurations
+      const bat12v100 = document.getElementById('result-bat-12v100');
+      const bat12v200 = document.getElementById('result-bat-12v200');
+      const bat24v100 = document.getElementById('result-bat-24v100');
+      const bat48v100 = document.getElementById('result-bat-48v100');
+
+      if (bat12v100) bat12v100.textContent = String(results.suggestedConfigs.bat12v100);
+      if (bat12v200) bat12v200.textContent = String(results.suggestedConfigs.bat12v200);
+      if (bat24v100) bat24v100.textContent = String(results.suggestedConfigs.bat24v100);
+      if (bat48v100) bat48v100.textContent = String(results.suggestedConfigs.bat48v100);
+
+      // Solar results
+      if (solarEnabled && results.solar) {
+        const solarDaily = document.getElementById('result-solar-daily');
+        const solarRecharge = document.getElementById('result-solar-recharge');
+        const solarSufficient = document.getElementById('result-solar-sufficient');
+
+        if (solarDaily) solarDaily.textContent = `${Math.round(results.solar.dailyProductionWh).toLocaleString()} Wh`;
+        if (solarRecharge) solarRecharge.textContent = `${results.solar.rechargeTimeHours.toFixed(1)} 小时`;
+        if (solarSufficient) solarSufficient.textContent = results.solar.isSufficient ? '是' : '否';
+      }
+
+      // Planning notes
+      const planningNotes = document.getElementById('planning-notes');
+      if (planningNotes) {
+        if (appliances.length === 0) {
+          planningNotes.textContent = '在上方添加电器以计算备用电力需求。调整输入时结果即时更新。';
+        } else {
+          const totalW = results.totalRunningW;
+          const totalWh = results.energyRequiredWh;
+          planningNotes.textContent = `${appliances.length}个电器，总运行负载${Math.round(totalW)}W。所需电池容量：${Math.round(totalWh).toLocaleString()}Wh（${results.energyRequiredKwh.toFixed(1)}kWh）。逆变器建议：${Math.round(results.inverterContinuousW)}W连续/${Math.round(results.inverterSurgeW)}W浪涌。`;
+        }
+      }
+    }
+
+    // Set Event Listeners on all controls
+    const allFormControls = [
+      backupHoursInput, batteryVoltageSelect, batteryChemistrySelect,
+      dodInput, inverterEfficiencyInput, safetyMarginInput,
+      solarWattsInput, peakSunHoursInput, chargeControllerEffInput
+    ];
+
+    allFormControls.forEach(ctrl => {
+      if (!ctrl) return;
+      ctrl.addEventListener('input', () => {
+        updateCalculations();
+      });
+    });
+
+    // Run on mount
+    updateCalculations();
+  </script>
+</CalculatorLayout>

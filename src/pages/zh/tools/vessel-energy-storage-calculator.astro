@@ -1,0 +1,575 @@
+---
+import CalculatorLayout from '../../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import InputField from '../../../components/InputField.astro';
+import ResultBox from '../../../components/ResultBox.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import RelatedTools from '../../../components/RelatedTools.astro';
+import WorkedExample from '../../../components/WorkedExample.astro';
+import ComparisonTable from '../../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../../components/EngineeringDiagram.astro';
+
+const whatIs = `船舶储能计算器用于估算船舶混合动力和电力推进系统所需的电池储能容量。该工具考虑了酒店负载、推进功率、峰值需求、运行工况和电池化学体系，以确定可用容量、安装容量、物理尺寸和最优直流系统电压。此工具为船舶设计师、轮机工程师和评估电气化方案的项目经理搭建了负载曲线分析与实际电池系统规格之间的桥梁。`;
+
+const whyItMatters = [
+  "电池系统容量不足会迫使发动机过早启动，从而抵消了混合动力投资原本带来的减排和节油效益。",
+  "过大的电池组会增加不必要的重量、体积和成本——对于快速渡轮和巡逻船等对重量敏感的船舶而言，这是关键制约因素。",
+  "匹配直流系统电压与峰值负载需求可以最大限度降低电缆成本、减少电压降，并确保整个安装过程中的电流水平安全。",
+  "电池化学体系的选择（LFP 与 NMC）从根本上影响循环寿命、热管理需求、安全系统和总拥有成本。",
+  "合理的储能容量设计是可行的混合动力船舶商业案例的基础——它决定了技术可行性和经济回报。"
+];
+
+const practicalApplications = [
+  { title: "渡轮电气化", description: "根据航程距离、班次周转时间和旅客上下船时的酒店负载曲线，为短途渡轮的电池组确定容量。" },
+  { title: "混合动力海洋工程支持船", description: "确定动态定位工况下的储能需求，电池在发动机以最佳效率运行时承担峰值推力器负载。" },
+  { title: "港作船舶和拖轮", description: "计算船舶操纵期间间歇性大功率需求的电池容量，并在操作间隙进行充电。" },
+  { title: "邮轮混合动力化", description: "确定港口停泊期间酒店负载的电池容量，实现在排放控制区和港区的零排放运行。" }
+];
+
+const expertNotes: { title: string; variant: 'warning' | 'engineering' | 'info'; content: string }[] = [
+  {
+    title: "LFP 与 NMC —— 化学体系权衡",
+    variant: "engineering",
+    content: "LFP（磷酸铁锂）在 90% 放电深度下提供 5000 次以上循环寿命，具有出色的热稳定性（270°C 以上不发生热失控），且不依赖钴——使其成为高循环次数船舶应用的首选。NMC（镍锰钴）提供 20-30% 更高的能量密度（安装包级别 5.0 kg/kWh vs 6.5 kg/kWh），但需要更复杂的热管理，且循环寿命较低（80% 放电深度下约 2000 次）。对于重量和体积是关键约束的船舶，NMC 可能更为合理。"
+  },
+  {
+    title: "直流系统电压选择",
+    variant: "engineering",
+    content: "系统电压应根据峰值功率选择，以保持电流可控。500 kW 以下，48V–150V 系统是实用的。500 kW–1 MW，400V–600V 系统可降低电缆规格要求。1 MW 以上，600V–1000V 系统是标准配置。更高电压需要更严格的绝缘监测、高压安全规程，以及符合 IEC 60092 标准的船用电缆系统。"
+  },
+  {
+    title: "安装容量与可用容量",
+    variant: "warning",
+    content: "切勿将电池系统设计为仅满足可用容量极限。安装容量必须超过可用容量，超过量为放电深度分母——对于 90% 放电深度的 LFP，安装容量约为可用容量的 111%。对于 80% 放电深度的 NMC，安装容量为可用容量的 125%。此外，船舶系统需要储备余量（通常为 15–25%），以应对操作灵活性、负载不确定性和电池在船舶使用寿命期间的衰减。"
+  }
+];
+
+const trustSection = {
+  text: "本计算器采用与 IEC 62619（船用二次锂电池）和 DNV 电池符号指南一致的基于物理的容量估算方法。重量和体积估算基于船用电池制造商的代表性安装包密度。",
+  link: { label: "查看我们的方法论和公式推导", href: "/zh/methodology/" }
+};
+
+const references = [
+  { title: "IEC 62619:2022 —— 船用二次锂电池", url: "https://webstore.iec.ch/en/publication/26887", source: "国际电工委员会" },
+  { title: "DNV GL 入级规范 —— 电池系统 (RU-SHIP Part 4 Ch.12)", url: "https://www.dnv.com/maritime/", source: "DNV" },
+  { title: "DNV 电池符号 —— 建议设计原则", url: "https://www.dnv.com/media/assets/attach/3198956/file/Battery-Notation.pdf", source: "DNV" },
+  { title: "ISO 13297:2014 —— 小型船舶电气安装", url: "https://www.iso.org/standard/65870.html", source: "国际标准化组织" }
+];
+
+const faqItems = [
+  {
+    question: "可用容量和安装容量有什么区别？",
+    answer: "可用容量是指在 BMS 达到放电深度限制断开之前，您可以从电池中实际提取的能量。安装容量（或标称容量）是电池中存储的总能量。对于 90% 放电深度的 LFP，1000 kWh 安装容量可提供 900 kWh 可用容量。对于 80% 放电深度的 NMC，同样的 1000 kWh 提供 800 kWh 可用容量。加入储备余量后，差距会进一步增大。"
+  },
+  {
+    question: "如何为我的船舶选择 LFP 还是 NMC？",
+    answer: "如果循环寿命、安全性和总拥有成本是优先考虑因素，则选择 LFP——典型适用于渡轮、港作船舶和每日深度循环的船舶。如果重量和体积是关键约束，则选择 NMC——典型适用于快速渡轮、军用船舶或空间有限的改装项目。由于其安全特性和循环寿命优势，LFP 是船舶应用中的主导化学体系。"
+  },
+  {
+    question: "应使用多少储备余量？",
+    answer: "15–25% 是船舶应用的典型值。15% 的余量适用于负载特征明确且运行稳定的工况（定期航班渡轮）。25% 的余量适用于工况多变的情况（海洋工程支持船、拖轮）或负载不确定性较高时。储备余量还考虑了电池容量在船舶使用寿命期间的衰减——20% 的余量可为 15–20% 的容量衰减提供缓冲。"
+  },
+  {
+    question: "运行时间如何影响电池容量设计？",
+    answer: "运行时间决定了电池必须持续供给酒店和推进组合负载的小时数。对于短途渡轮（1–2 小时航程），电池可按单次航程设计，并在每个码头进行机会充电。对于需要 8 小时以上电力运行的船舶，电池容量与时间成正比增长，显著增加重量和成本。"
+  },
+  {
+    question: "我的船舶适用什么直流电压？",
+    answer: "电压由峰值功率需求决定。峰值功率低于 10 kW：48V 安全且实用。10–100 kW：48V–150V。100–500 kW：150V–400V。500 kW–1 MW：400V–600V。1 MW 以上：600V–1000V+ 是标准配置。更高电压可减小电缆尺寸和损耗，但需要高压安全基础设施、绝缘监测和船员培训。"
+  },
+  {
+    question: "本计算器可用于船级社正式提交吗？",
+    answer: "不可以。本工具提供用于规划和可行性分析的初步工程估算。实际的电池系统设计必须符合 IEC 62619、DNV 电池符号、劳氏船级社规范或适用的船级社要求。最终设计需要详细的热分析、BMS 规格、安全系统设计和船级社审核。"
+  },
+  {
+    question: "电池重量如何影响船舶稳性？",
+    answer: "电池重量是船舶稳性计算中的关键因素。1 MWh 的 LFP 电池系统重量约为 6,500 kg——对重量敏感的船舶而言影响显著。低位安装可通过降低重心来改善稳性。船舶设计师必须按照 SOLAS 和船级社要求，在完整稳性和破损稳性计算中考虑电池重量。"
+  },
+  {
+    question: "电池在船舶使用寿命期间会衰减吗？",
+    answer: "LFP 电池在 90% 放电深度下经过 5000 次以上循环后通常保持 80% 容量。NMC 在 80% 放电深度下经过约 2000 次循环后保持 80% 容量。日历老化也会降低容量——在 25°C 环境下每年约降低 1.5–2%。安装容量设计应包含衰减余量（15–25%），以确保在船舶 15–25 年运行寿命期间有充足的可用容量。"
+  }
+];
+
+const relatedArticles = [
+  { title: "船舶储能系统详解", href: "/zh/learn/vessel-energy-storage-systems-explained/" },
+  { title: "电池动力渡轮：设计考量、优势与挑战", href: "/zh/learn/battery-electric-ferries-explained/" },
+];
+
+const commonMistakes = [
+  "混淆可用容量与安装容量——90% 放电深度的 LFP 意味着安装容量必须约为可用容量的 111%，而非等于可用容量。",
+  "忽略负载不确定性的储备余量——15–25% 的储备余量用于应对操作灵活性和电池在船舶使用寿命期间的衰减。",
+  "根据平均功率而非峰值功率选择直流电压——电压必须确保峰值电流可控，以防止电缆过热。",
+  "混用 LFP 和 NMC 规格——LFP（6.5 kg/kWh，90% 放电深度）和 NMC（5.0 kg/kWh，80% 放电深度）具有根本不同的容量设计参数。",
+  "在高温海洋环境中忽略电池热管理——超过 35°C 的电池需要主动冷却以防止衰减。",
+  "仅按平均负载设计电池容量而不考虑峰值需求——动态定位推力器负载可能达到平均推进功率的 2–3 倍。",
+  "使用电芯级能量密度而非安装包级密度——BMS、热管理和外壳会增加 30–50% 的重量（相比纯电芯）。",
+  "添加电池重量后未验证船舶稳性——1 MWh 的 LFP 系统重约 6,500 kg，会影响重心。"
+];
+
+const relatedCalculators = [
+  { href: "/zh/tools/marine-battery-sizing-calculator/", title: "船用电池容量计算器", description: "为休闲和小型商业船舶的酒店负载确定电池组容量。" },
+  { href: "/zh/tools/marine-co2-reduction-calculator/", title: "船舶 CO₂ 减排计算器", description: "估算船舶混合动力化和岸电供应带来的减排效果。" },
+  { href: "/zh/tools/hybrid-vessel-roi-calculator/", title: "混合动力船舶投资回报计算器", description: "评估混合动力推进投资的财务回报。" },
+  { href: "/marine/", title: "船舶电气化中心", description: "探索所有船舶脱碳工具和资源。" },
+];
+
+const chemistryOptions = [
+  { label: 'LFP (磷酸铁锂)', value: 'lfp' },
+  { label: 'NMC (镍锰钴)', value: 'nmc' },
+];
+---
+
+<CalculatorLayout
+  title="船舶储能计算器 | 电池计算器"
+  description="根据负载曲线、运行时间和电池化学体系，估算船舶混合动力和电力推进系统所需的电池储能容量。"
+  lang="zh"
+  faqItems={faqItems}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+  relatedCalculators={relatedCalculators}
+  commonMistakes={commonMistakes}
+  relatedArticles={relatedArticles}
+>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+
+    <!-- 输入表单 -->
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">船舶负载曲线</h3>
+      <div class="flex flex-col gap-6">
+
+        <InputField
+          id="hotel-load"
+          label="酒店负载"
+          value={200}
+          min={0}
+          step={10}
+          unit="kW"
+          helperText="导航、照明、暖通空调、厨房、酒店服务。"
+        />
+
+        <InputField
+          id="propulsion-load"
+          label="推进负载"
+          value={500}
+          min={0}
+          step={10}
+          unit="kW"
+          helperText="运行期间的平均电力推进功率。"
+        />
+
+        <InputField
+          id="peak-load"
+          label="峰值负载"
+          value={900}
+          min={0}
+          step={10}
+          unit="kW"
+          helperText="最大同时负载（推进 + 酒店 + 推力器）。"
+        />
+
+        <InputField
+          id="operating-time"
+          label="运行时间"
+          value={4}
+          min={0.5}
+          max={24}
+          step={0.5}
+          unit="小时"
+          helperText="每天或每次航程的电力运行小时数。"
+        />
+
+        <InputField
+          id="reserve-margin"
+          label="储备余量"
+          value={20}
+          min={0}
+          max={50}
+          step={1}
+          unit="%"
+          helperText="用于负载不确定性和容量衰减的安全余量（典型值 15–25%）。"
+        />
+
+        <InputField
+          id="battery-chemistry"
+          label="电池化学体系"
+          type="select"
+          value="lfp"
+          options={chemistryOptions}
+          helperText="LFP：循环寿命更长，更安全。NMC：更轻，能量密度更高。"
+        />
+
+      </div>
+    </CalculatorCard>
+
+    <!-- 计算结果 -->
+    <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">储能需求</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <ResultBox
+            label="每日能量需求"
+            value="2,800 kWh"
+            suffix="组合负载 × 运行时间"
+            variant="primary"
+            id="result-daily-energy"
+          />
+          <ResultBox
+            label="所需可用容量"
+            value="3,360 kWh"
+            suffix="包含储备余量"
+            id="result-usable-capacity"
+          />
+          <ResultBox
+            label="建议安装容量"
+            value="3,733 kWh"
+            suffix="考虑放电深度限制"
+            id="result-installed-capacity"
+          />
+          <ResultBox
+            label="预估电池重量"
+            value="24,267 kg"
+            suffix="基于 LFP 安装密度"
+            id="result-weight"
+          />
+          <ResultBox
+            label="预估电池体积"
+            value="25,382 L"
+            suffix="≈ 25.4 m³"
+            id="result-volume"
+          />
+          <ResultBox
+            label="建议直流系统电压"
+            value="400 V"
+            suffix="最大持续电流：2,250 A"
+            id="result-voltage"
+          />
+        </div>
+      </div>
+
+      <div class="border-t border-hairline pt-6">
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">化学体系说明</h4>
+        <p class="text-body-sm text-muted" id="chemistry-note">
+          LFP 提供出色的循环寿命（5000+ 次循环）、热稳定性和 90% 的可用放电深度。适用于需要高循环次数和安全性的船舶应用。
+        </p>
+      </div>
+    </CalculatorCard>
+
+  </div>
+
+  <!-- 容量分解可视化 -->
+  <section class="mb-16">
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-4 uppercase tracking-wider">容量分解</h3>
+      <p class="text-body-sm text-muted mb-6">建议安装电池中可用容量、储备容量和不可用容量的可视化表示。</p>
+      <div id="capacity-breakdown" class="space-y-3"></div>
+    </CalculatorCard>
+  </section>
+
+  <!-- 公式与计算示例 -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">公式与计算示例</h2>
+    <FormulaBox title="数学公式">
+      <p>
+        储能容量设计遵循从负载曲线到安装容量的自下而上方法：
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        每日能量 = (酒店负载 + 推进负载) × 运行时间
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        可用容量 = 每日能量 × (1 + 储备余量%)
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        安装容量 = 可用容量 / (放电深度% / 100)
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        重量 = 安装容量 × 电池组重量系数
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        电压 = f(峰值功率) → I = P / V
+      </div>
+      <p class="mt-4">
+        电池组重量系数：LFP 6.5 kg/kWh，NMC 5.0 kg/kWh（安装包级别，包含 BMS、热管理和外壳）。
+      </p>
+    </FormulaBox>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample
+        number={1}
+        title="带酒店负载的短途渡轮"
+        scenario="一艘 120 名乘客的渡轮进行 8 小时往返航程，酒店负载为 2 MW 持续功率（暖通空调、照明、厨房、旅客服务）。船舶在航程中必须完全依靠电池运行，储备余量为 20%。"
+        inputs={[
+          { label: "酒店负载", value: "2,000 kW" },
+          { label: "推进负载", value: "0 kW（仅酒店模式）" },
+          { label: "峰值负载", value: "2,400 kW" },
+          { label: "运行时间", value: "8 小时" },
+          { label: "储备余量", value: "20%" },
+          { label: "化学体系", value: "LFP（90% 放电深度，6.5 kg/kWh）" },
+        ]}
+        steps={[
+          { label: "步骤 1：每日能量需求", formula: "每日 = 2,000 × 8", result: "16,000 kWh" },
+          { label: "步骤 2：应用储备余量", formula: "可用 = 16,000 × 1.20", result: "19,200 kWh" },
+          { label: "步骤 3：安装容量（LFP 90% 放电深度）", formula: "安装 = 19,200 / 0.90", result: "21,333 kWh" },
+          { label: "步骤 4：电池重量", formula: "重量 = 21,333 × 6.5", result: "138,667 kg ≈ 139 吨" },
+          { label: "步骤 5：直流电压", formula: "峰值 2,400 kW → 600V → I = 4,000 A", result: "600 V DC" },
+        ]}
+        answer="21,333 kWh LFP 系统，约 139 吨，600V DC"
+        interpretation="航程为 8 小时的大型渡轮需要相当大的电池容量。139 吨的电池重量对该级别船舶而言显著但可控。通常需要在航程之间进行岸基快速充电，以在周转时间内完成充电。"
+        variant="marine"
+      />
+
+      <WorkedExample
+        number={2}
+        title="带峰值操纵负载的拖轮"
+        scenario="一艘港口拖轮峰值系柱拉力需求为 500 kW，间歇运行，典型工作周期平均功率为 200 kW。电池必须在船舶操纵期间承担全部峰值负载，并在操作间隙充电。"
+        inputs={[
+          { label: "酒店负载", value: "50 kW" },
+          { label: "平均推进负载", value: "200 kW" },
+          { label: "峰值负载", value: "500 kW" },
+          { label: "运行时间", value: "6 小时/天" },
+          { label: "储备余量", value: "25%" },
+          { label: "化学体系", value: "LFP（90% 放电深度，6.5 kg/kWh）" },
+        ]}
+        steps={[
+          { label: "步骤 1：每日能量需求", formula: "每日 = (50 + 200) × 6", result: "1,500 kWh" },
+          { label: "步骤 2：应用储备余量", formula: "可用 = 1,500 × 1.25", result: "1,875 kWh" },
+          { label: "步骤 3：安装容量（LFP 90% 放电深度）", formula: "安装 = 1,875 / 0.90", result: "2,083 kWh" },
+          { label: "步骤 4：电池重量", formula: "重量 = 2,083 × 6.5", result: "13,542 kg ≈ 13.5 吨" },
+          { label: "步骤 5：直流电压", formula: "峰值 500 kW → 600V → I = 833 A", result: "600 V DC" },
+        ]}
+        answer="2,083 kWh LFP 系统，约 13.5 吨，600V DC"
+        interpretation="拖轮需要较高的功率-能量比。500 kW 峰值功率决定了电压选择而非能量容量。电池按平均负载设计，并为峰值操纵突发需求保留余量。作业间的机会充电使安装容量保持在可控范围内。"
+        variant="marine"
+      />
+
+      <WorkedExample
+        number={3}
+        title="带动态定位的海洋工程船"
+        scenario="一艘海洋工程支持船需要动态定位（DP）能力，同时承担酒店、推进和推力器负载。DP 运行要求高瞬时功率用于定位保持，同时酒店负载保持恒定。"
+        inputs={[
+          { label: "酒店负载", value: "400 kW" },
+          { label: "推进负载", value: "800 kW" },
+          { label: "峰值 DP 负载（推力器）", value: "3,200 kW" },
+          { label: "运行时间", value: "12 小时" },
+          { label: "储备余量", value: "25%" },
+          { label: "化学体系", value: "NMC（80% 放电深度，5.0 kg/kWh）" },
+        ]}
+        steps={[
+          { label: "步骤 1：每日能量需求", formula: "每日 = (400 + 800) × 12", result: "14,400 kWh" },
+          { label: "步骤 2：应用储备余量", formula: "可用 = 14,400 × 1.25", result: "18,000 kWh" },
+          { label: "步骤 3：安装容量（NMC 80% 放电深度）", formula: "安装 = 18,000 / 0.80", result: "22,500 kWh" },
+          { label: "步骤 4：电池重量", formula: "重量 = 22,500 × 5.0", result: "112,500 kg ≈ 112.5 吨" },
+          { label: "步骤 5：直流电压", formula: "峰值 3,200 kW → 1,000V → I = 3,200 A", result: "1,000 V DC" },
+        ]}
+        answer="22,500 kWh NMC 系统，约 112.5 吨，1,000 V DC"
+        interpretation="DP 船舶具有极高的峰值-平均功率比。此处选择 NMC 化学体系是因为其更高的能量密度可以最小化稳性裕度紧张的船舶重量。1,000V DC 系统可处理 3.2 MW 的峰值 DP 负载。发电机在持续 DP 运行期间对电池进行补充。"
+        variant="marine"
+      />
+    </div>
+  </section>
+
+  <!-- 化学体系对比 -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">LFP 与 NMC 对比</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <CalculatorCard>
+        <h4 class="text-primary font-bold text-sm mb-3 flex items-center gap-2">
+          <span class="w-3 h-3 bg-m-blue-light inline-block"></span>
+          LFP（磷酸铁锂）
+        </h4>
+        <ul class="text-body-sm text-muted flex flex-col gap-2">
+          <li class="flex gap-2"><span class="text-m-blue-light shrink-0">→</span> 循环寿命：90% 放电深度下 5,000+ 次</li>
+          <li class="flex gap-2"><span class="text-m-blue-light shrink-0">→</span> 可用放电深度：90%</li>
+          <li class="flex gap-2"><span class="text-m-blue-light shrink-0">→</span> 安装重量：约 6.5 kg/kWh</li>
+          <li class="flex gap-2"><span class="text-m-blue-light shrink-0">→</span> 体积：约 6.8 L/kWh</li>
+          <li class="flex gap-2"><span class="text-m-blue-light shrink-0">→</span> 热失控起始温度：>270°C</li>
+          <li class="flex gap-2"><span class="text-m-blue-light shrink-0">→</span> 无钴——供应链韧性强</li>
+          <li class="flex gap-2"><span class="text-m-blue-light shrink-0">→</span> 最适用于：渡轮、港作船舶、高循环船舶</li>
+        </ul>
+      </CalculatorCard>
+      <CalculatorCard>
+        <h4 class="text-primary font-bold text-sm mb-3 flex items-center gap-2">
+          <span class="w-3 h-3 bg-m-blue-dark inline-block"></span>
+          NMC（镍锰钴）
+        </h4>
+        <ul class="text-body-sm text-muted flex flex-col gap-2">
+          <li class="flex gap-2"><span class="text-m-blue-dark shrink-0">→</span> 循环寿命：80% 放电深度下约 2,000 次</li>
+          <li class="flex gap-2"><span class="text-m-blue-dark shrink-0">→</span> 可用放电深度：80%</li>
+          <li class="flex gap-2"><span class="text-m-blue-dark shrink-0">→</span> 安装重量：约 5.0 kg/kWh</li>
+          <li class="flex gap-2"><span class="text-m-blue-dark shrink-0">→</span> 体积：约 5.2 L/kWh</li>
+          <li class="flex gap-2"><span class="text-m-blue-dark shrink-0">→</span> 热失控起始温度：约 150°C</li>
+          <li class="flex gap-2"><span class="text-m-blue-dark shrink-0">→</span> 需要主动热管理</li>
+          <li class="flex gap-2"><span class="text-m-blue-dark shrink-0">→</span> 最适用于：重量敏感、空间受限的船舶</li>
+        </ul>
+      </CalculatorCard>
+    </div>
+  </section>
+
+  <EngineeringDiagram
+    title="船舶储能架构"
+    description="与船舶配电系统集成的高压电池系统"
+    variant="system"
+    steps={[
+      { label: "岸电/发电机", icon: "charge" },
+      { label: "电池储能系统", icon: "battery" },
+      { label: "电力转换", icon: "inverter" },
+      { label: "船舶负载", icon: "load" },
+    ]}
+  />
+
+  <ComparisonTable
+    title="船用电池技术对比"
+    headers={["技术", "能量密度", "功率密度", "循环寿命", "船舶认证"]}
+    rows={[
+      ["LFP（磷酸铁锂）", "90–120 Wh/kg", "200–400 W/kg", "5,000+", "DNV, Lloyd's, BV"],
+      ["NMC（镍锰钴）", "150–220 Wh/kg", "300–600 W/kg", "2,000", "DNV, Lloyd's"],
+      ["NCA（镍钴铝）", "200–260 Wh/kg", "400–800 W/kg", "1,500", "有限船用认证"],
+      ["钠离子", "100–140 Wh/kg", "150–300 W/kg", "3,000+", "新兴技术"],
+      ["固态电池（未来）", "300–500 Wh/kg", "500–1000 W/kg", "10,000+", "研发中"],
+    ]}
+    caption="船用电池技术格局——LFP 因安全性和循环寿命而占据主导地位"
+  />
+
+  <FAQSection items={faqItems} />
+  <RelatedTools tools={relatedCalculators} />
+
+  <!-- 工程支持 CTA -->
+  <div class="bg-surface-card border border-hairline p-6 mt-8 mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div class="max-w-xl">
+      <h3 class="text-title-sm text-primary mb-1">需要更深入的工程评审？</h3>
+      <p class="text-body-sm text-muted font-light">
+        本计算器用于初步估算。如需船舶特定分析、电池容量评审、减排规划或混合动力可行性支持，请联系电池计算器工程支持团队。
+      </p>
+    </div>
+    <a href="/marine/#marine-advisory" class="btn-primary text-xs px-6 py-3 shrink-0 whitespace-nowrap">申请工程支持</a>
+  </div>
+
+  <!-- 计算脚本 -->
+  <script>
+    import { calculateVesselEnergyStorage } from '../../../utils/calculators';
+
+    const hotelLoadInput = document.getElementById('hotel-load') as HTMLInputElement;
+    const propulsionLoadInput = document.getElementById('propulsion-load') as HTMLInputElement;
+    const peakLoadInput = document.getElementById('peak-load') as HTMLInputElement;
+    const operatingTimeInput = document.getElementById('operating-time') as HTMLInputElement;
+    const reserveMarginInput = document.getElementById('reserve-margin') as HTMLInputElement;
+    const batteryChemistryInput = document.getElementById('battery-chemistry') as HTMLSelectElement;
+
+    function getResultElements(id: string) {
+      const box = document.getElementById(id);
+      return {
+        value: box?.querySelector('.text-display-md, .text-title-lg') as HTMLElement,
+        suffix: box?.querySelector('.text-caption') as HTMLElement,
+      };
+    }
+
+    const dailyEnergy = getResultElements('result-daily-energy');
+    const usableCapacity = getResultElements('result-usable-capacity');
+    const installedCapacity = getResultElements('result-installed-capacity');
+    const weight = getResultElements('result-weight');
+    const volume = getResultElements('result-volume');
+    const voltage = getResultElements('result-voltage');
+    const chemistryNoteEl = document.getElementById('chemistry-note');
+
+    function fmt(n: number, decimals = 1): string {
+      return n.toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+    }
+
+    function updateCapacityBreakdown(usableKwh: number, installedKwh: number, _dodPercent: number, reservePercent: number) {
+      const container = document.getElementById('capacity-breakdown');
+      if (!container) return;
+
+      const usablePct = installedKwh > 0 ? (usableKwh / installedKwh) * 100 : 0;
+      const reserveKwh = usableKwh * (reservePercent / 100);
+      const netUsableKwh = usableKwh - reserveKwh;
+      const unusableKwh = installedKwh - usableKwh;
+      const netPct = installedKwh > 0 ? (netUsableKwh / installedKwh) * 100 : 0;
+      const reservePct = installedKwh > 0 ? (reserveKwh / installedKwh) * 100 : 0;
+      const unusablePct = 100 - usablePct;
+
+      container.innerHTML = `
+        <div class="flex items-center gap-3">
+          <span class="text-caption text-muted w-28 text-right shrink-0">净可用</span>
+          <div class="flex-1 h-6 bg-surface-soft border border-hairline overflow-hidden">
+            <div class="h-full bg-m-blue-light transition-all duration-300" style="width: ${netPct}%"></div>
+          </div>
+          <span class="text-caption text-primary font-mono w-24 shrink-0">${fmt(netUsableKwh)} kWh</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="text-caption text-muted w-28 text-right shrink-0">储备</span>
+          <div class="flex-1 h-6 bg-surface-soft border border-hairline overflow-hidden">
+            <div class="h-full bg-yellow-500 transition-all duration-300" style="width: ${reservePct}%"></div>
+          </div>
+          <span class="text-caption text-primary font-mono w-24 shrink-0">${fmt(reserveKwh)} kWh</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="text-caption text-muted w-28 text-right shrink-0">不可用（放电深度）</span>
+          <div class="flex-1 h-6 bg-surface-soft border border-hairline overflow-hidden">
+            <div class="h-full bg-m-red/60 transition-all duration-300" style="width: ${unusablePct}%"></div>
+          </div>
+          <span class="text-caption text-primary font-mono w-24 shrink-0">${fmt(unusableKwh)} kWh</span>
+        </div>
+        <div class="text-caption text-muted mt-2">
+          可用：${fmt(usablePct)}% | 储备：${fmt(reservePct)}% | 不可用：${fmt(unusablePct)}%，安装容量 ${fmt(installedKwh)} kWh
+        </div>
+      `;
+    }
+
+    function updateCalculations() {
+      const hotelLoad = parseFloat(hotelLoadInput.value) || 0;
+      const propulsionLoad = parseFloat(propulsionLoadInput.value) || 0;
+      const peakLoad = parseFloat(peakLoadInput.value) || 0;
+      const operatingTime = parseFloat(operatingTimeInput.value) || 4;
+      const reserveMargin = parseFloat(reserveMarginInput.value) || 20;
+      const batteryChemistry = batteryChemistryInput.value as 'lfp' | 'nmc';
+
+      const result = calculateVesselEnergyStorage({
+        hotelLoadKw: hotelLoad,
+        propulsionLoadKw: propulsionLoad,
+        peakLoadKw: peakLoad,
+        operatingHours: operatingTime,
+        reserveMarginPercent: reserveMargin,
+        batteryChemistry,
+      });
+
+      if (dailyEnergy.value) dailyEnergy.value.textContent = `${Math.round(result.dailyEnergyDemandKwh).toLocaleString()} kWh`;
+      if (dailyEnergy.suffix) dailyEnergy.suffix.textContent = '组合负载 × 运行时间';
+
+      if (usableCapacity.value) usableCapacity.value.textContent = `${Math.round(result.requiredUsableCapacityKwh).toLocaleString()} kWh`;
+      if (usableCapacity.suffix) usableCapacity.suffix.textContent = '包含储备余量';
+
+      if (installedCapacity.value) installedCapacity.value.textContent = `${Math.round(result.recommendedInstalledCapacityKwh).toLocaleString()} kWh`;
+      if (installedCapacity.suffix) installedCapacity.suffix.textContent = '考虑放电深度限制';
+
+      if (weight.value) weight.value.textContent = `${Math.round(result.estimatedBatteryWeightKg).toLocaleString()} kg`;
+      if (weight.suffix) weight.suffix.textContent = `基于 ${batteryChemistry.toUpperCase()} 安装密度`;
+
+      if (volume.value) {
+        volume.value.textContent = `${Math.round(result.estimatedBatteryVolumeLiters).toLocaleString()} L`;
+      }
+      if (volume.suffix) volume.suffix.textContent = `≈ ${(result.estimatedBatteryVolumeLiters / 1000).toFixed(1)} m³`;
+
+      if (voltage.value) voltage.value.textContent = `${result.suggestedDcVoltage} V`;
+      if (voltage.suffix) voltage.suffix.textContent = `最大持续电流：${Math.round(result.maxContinuousCurrentA).toLocaleString()} A`;
+
+      if (chemistryNoteEl) chemistryNoteEl.textContent = result.chemistryNote;
+
+      const dodPercent = batteryChemistry === 'lfp' ? 90 : 80;
+      updateCapacityBreakdown(result.requiredUsableCapacityKwh, result.recommendedInstalledCapacityKwh, dodPercent, reserveMargin);
+    }
+
+    [hotelLoadInput, propulsionLoadInput, peakLoadInput, operatingTimeInput, reserveMarginInput, batteryChemistryInput].forEach(el => {
+      el.addEventListener('input', updateCalculations);
+    });
+
+    updateCalculations();
+  </script>
+
+</CalculatorLayout>

@@ -1,0 +1,477 @@
+---
+import CalculatorLayout from '../../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import InputField from '../../../components/InputField.astro';
+import ResultBox from '../../../components/ResultBox.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import RelatedTools from '../../../components/RelatedTools.astro';
+import MiniSimulationChart from '../../../components/MiniSimulationChart.astro';
+import WorkedExample from '../../../components/WorkedExample.astro';
+import ComparisonTable from '../../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../../components/EngineeringDiagram.astro';
+
+const whatIs = `电池储能系统（BESS）投资回报率（ROI）计算器用于评估商业和工业电池储能投资的财务可行性。它模拟了<strong>峰谷电价差套利</strong>（在低谷时段低价购电，在高峰时段高价使用或售电）、<strong>需量电费削减</strong>（削峰以降低电力公司的需量费用）以及<strong>长期财务指标</strong>，包括简单投资回收期、净现值（NPV）和内部收益率（IRR）。计算考虑了往返效率损耗、年度电池容量衰减、运营费用以及通过折现现金流分析体现的资金时间价值。BESS投资回报分析对于商业设施、工业厂房、微电网和公用事业级储能项目至关重要。`;
+
+const whyItMatters = [
+  "一个净现值为正的BESS项目每年可产生$10,000–$100,000+的节省，但前提是财务模型准确反映了实际衰减和效率损耗。",
+  "忽略电池容量衰减会导致后期现金流高估20–40%，导致不切实际的回收期预测和糟糕的投资决策。",
+  "10–15%的往返效率损耗直接削减套利利润——纸面上看似有利可图的电价差在扣除往返效率后可能变得微薄。",
+  "在商业应用中，需量电费削减可占BESS总节省的30–50%，但在基础分析中常被忽视。",
+  "折现率的选择显著影响净现值——加权平均资本成本（WACC）2%的差异可能使NPV从正变负。",
+];
+
+const practicalApplications = [
+  { title: "削峰填谷", description: "通过在高峰负荷时段放电来降低设施需量电费，使负荷曲线趋于平稳。" },
+  { title: "峰谷电价套利", description: "在低谷电价时段充电，在高峰电价时段放电，以节省电费。" },
+  { title: "需求响应", description: "通过在电网压力事件期间减少从电网的取电来参与电力公司需求响应项目，获取额外收益。" },
+  { title: "可再生能源集成", description: "存储多余的太阳能或风能发电以供后续使用，减少弃电并最大化可再生能源资产价值。" },
+  { title: "微电网经济性", description: "评估偏远地区或军事应用中离网微电网的电池储能投资回报率。" },
+  { title: "公用事业级储能", description: "评估提供频率调节和容量服务的电网级电池项目的财务可行性。" },
+];
+
+const expertNotes = [
+  { title: '容量衰减建模', variant: 'warning', content: '电池衰减以逐年复利方式降低BESS放电能力。一个年衰减率为2%的系统到第10年仅剩约82%容量。未能建模SOH衰减将导致项目后期现金流被严重高估。' },
+  { title: '需量电费', variant: 'engineering', content: '在许多商业电力费率中，需量电费（基于峰值15分钟平均功率）可占总电费的30–50%。针对需量电费的BESS削峰通常比单纯能源套利回收更快。' },
+  { title: '往返效率影响', variant: 'info', content: '88%的往返效率（RTE）意味着每次充放电循环中有12%的能量损失。对于套利，有效低谷电价为电价_低谷 / RTE，这可能大幅压缩小幅电价差的利润空间。' },
+];
+
+const trustSection = {
+  text: "本计算器使用标准的折现现金流（DCF）分析方法。年度节省按复合衰减建模，运营费用从总节省中扣除，现金流按指定的WACC折现。所有中间值均会展示，方便独立验算。我们的财务模型遵循储能行业分析中使用的标准项目融资实践。",
+  link: { label: "查看完整计算方法", href: "/zh/methodology/" },
+};
+
+const references = [
+  { title: "NREL — BESS经济分析方法", url: "https://www.nrel.gov/analysis/bess-economic-analysis.html", source: "National Renewable Energy Laboratory" },
+  { title: "US DOE — 储能估值框架", url: "https://www.energy.gov/eere/storage/energy-storage-valuation", source: "U.S. Department of Energy" },
+  { title: "IEEE 2800-2022 — 储能互联标准", url: "https://standards.ieee.org/ieee/2800/11000/", source: "IEEE Standards Association" },
+  { title: "Lazard — 储能平准化成本分析", url: "https://www.lazard.com/research-insights/levelized-cost-of-storage/", source: "Lazard Financial Advisory" },
+  { title: "BloombergNEF — 储能市场展望", url: "https://about.bnef.com/energy-storage/", source: "BloombergNEF" },
+];
+
+const faqItems = [
+  {
+    question: "削峰填谷和峰谷电价套利有什么区别？",
+    answer: "峰谷电价套利是在电价便宜的低谷时段充电，在电价昂贵的高峰时段放电。削峰填谷是放电以平抑建筑物整体用电功率的峰值，从而降低电力公司根据每月最高15分钟负荷尖峰收取的「需量电费」。",
+  },
+  {
+    question: "为什么往返效率（RTE）对BESS投资回报率很重要？",
+    answer: "充电消耗的电量多于放电释放的电量。如果系统往返效率为88%，则100 kWh的放电需要从电网抽取114 kWh的电能。这意味着在套利计算中，低谷电价必须除以0.88，从而压缩了电价差。",
+  },
+  {
+    question: "容量衰减如何影响财务回报？",
+    answer: "锂电池每年因化学衰减而容量递减。一个年衰减率为2%的系统到第10年仅剩约82%容量。因此，每天可用于套利的电量逐年减少2%，导致年度现金流持续下降。",
+  },
+  {
+    question: "商业储能项目的合理折现率目标是多少？",
+    answer: "大多数商业项目使用6%到10%的折现率（加权平均资本成本，WACC）来分析储能项目。较高的折现率会惩罚未来现金流，要求更快的回收期才能实现正净现值（NPV > 0）。",
+  },
+  {
+    question: "BESS的典型投资回收期是多久？",
+    answer: "回收期因应用场景而异。高需量电费的商业削峰系统可能实现5–7年回收。单纯峰谷套利通常需要8–12年。结合多种价值流（套利 + 需求响应 + 容量服务）的系统可实现5–8年。",
+  },
+  {
+    question: "BESS容量大小如何影响投资回报率？",
+    answer: "过大的BESS会在未使用的容量上浪费资本支出。过小的BESS无法充分获取节省潜力。最佳容量应匹配每日负荷曲线——BESS应足够大以转移最大可实际转移的负荷，但不应超过每日套利机会所能支持的规模。",
+  },
+  {
+    question: "什么是需量电费？",
+    answer: "需量电费是电力公司根据计费期间最高15分钟平均功率（kW）收取的费用，与用电量（kWh）无关。它们可占商业电费的30–50%。BESS削峰通过在高负荷时段放电来降低需量电费。",
+  },
+  {
+    question: "我应该在投资回报率计算中包含补贴吗？",
+    answer: "是的。联邦投资税收抵免（ITC）、州级激励和电力公司回扣可将有效资本支出降低30–50%。应包含所有适用补贴以获得净投资成本和回收期的准确情况。",
+  },
+  {
+    question: "衰减率如何影响净现值？",
+    answer: "较高的衰减率减少后期现金流，延长回收期并降低净现值。年衰减率1%的系统将比3%衰减率的同一系统拥有显著更高的净现值，因为第5–15年有更多的电量可用于套利。",
+  },
+  {
+    question: "简单回收期和折现回收期有什么区别？",
+    answer: "简单回收期用资本支出除以年度节省，不考虑资金时间价值。折现回收期考虑了未来节省在今天价值较低的事实。折现回收期总是长于简单回收期，是更严格的财务指标。",
+  },
+  {
+    question: "BESS投资回报率会为负吗？",
+    answer: "会。如果电价差过窄、衰减率过高、资本支出过大或折现率过于激进，项目可能永远无法实现正净现值。投资前务必对关键变量进行敏感性分析。",
+  },
+  {
+    question: "应包含哪些运营费用？",
+    answer: "典型的BESS运营费用包括维护检查（$500–$2,000/年）、保险（资本支出的0.5–1%/年）、辅助部件更换和监控系统费用。运营费用通常为资本支出的1–3%/年。",
+  },
+];
+
+const relatedTools = [
+  { href: "/zh/tools/battery-degradation-estimator/", title: "电池衰减估算器", description: "估算电池日历和循环寿命衰减（SOH）。" },
+  { href: "/zh/tools/battery-sizing-calculator/", title: "电池选型计算器", description: "根据用电负荷曲线配置储能容量。" },
+  { href: "/zh/tools/runtime-calculator/", title: "续航时间计算器", description: "验证特定持续功率负载下的续航时间。" },
+  { href: "/zh/tools/solar-battery-sizing-calculator/", title: "太阳能蓄电池计算器", description: "根据日耗电量配置太阳能蓄电池组。" },
+  { href: "/zh/tools/c-rate-calculator/", title: "C率计算器", description: "计算充放电电流倍率。" },
+  { href: "/zh/tools/soc-estimator/", title: "荷电状态估算器", description: "根据电芯电压估算电池荷电状态。" },
+];
+
+const commonMistakes = [
+  "忽略电池衰减——年衰减率2%意味着到第10年容量减少18%。务必在多年现金流预测中建模SOH衰减。",
+  "高估套利电价差——实际电价差因季节而异，可能因市场变化而收窄。使用保守的平均电价差，而非峰值日数据。",
+  "忘记运营费用——维护、保险和监控成本是减少净年度节省的实际支出。将资本支出的1–3%作为年度运营费用。",
+  "使用错误的折现率——折现率过低会使项目看起来比实际更好。使用实际WACC或商业项目最低8%。",
+  "忽略需量电费波动性——需量电费取决于每月最高的单个15分钟峰值。如果负荷峰值具有季节性，节省将逐月变化。",
+  "BESS容量过大——大于每日负荷曲线可利用的系统浪费资本支出。将BESS容量匹配实际每日套利机会。",
+  "未计入补贴——联邦ITC（30%+）、州级激励和电力公司回扣可显著提高投资回报率。务必建模补贴后的净资本支出。",
+];
+
+const relatedArticles = [
+  { href: "/zh/learn/bess-roi-explained/", title: "BESS投资回报率详解" },
+  { href: "/zh/learn/battery-degradation-explained/", title: "电池衰减的财务影响" },
+];
+---
+
+<CalculatorLayout
+  title="BESS投资回报率计算器 | 电池计算器"
+  description="评估商业电池储能系统（BESS）的投资回收期、净现值（NPV）和削峰节省。"
+  faqItems={faqItems}
+  commonMistakes={commonMistakes}
+  relatedCalculators={relatedTools}
+  relatedArticles={relatedArticles}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+  lang="zh"
+>
+
+  <!-- Main Calculator Grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+
+    <!-- Input Form -->
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">财务与容量参数</h3>
+      <div class="flex flex-col gap-6">
+
+        <!-- Capex / Opex -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <InputField id="capex" label="系统资本支出（$）" value={150000} min={0} step="any" />
+          <InputField id="opex" label="年度运营费用（$/年）" value={3000} min={0} step="any" />
+        </div>
+
+        <!-- System Sizing -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <InputField id="capacity" label="BESS容量（kWh）" value={200} min={1} step="any" />
+          <InputField id="daily-shift" label="每日套利转移电量（kWh）" value={180} min={0} step="any" />
+        </div>
+
+        <!-- TOU Tariffs -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <InputField id="peak-tariff" label="高峰电价（$/kWh）" value={0.35} min={0} step={0.01} />
+          <InputField id="offpeak-tariff" label="低谷电价（$/kWh）" value={0.10} min={0} step={0.01} />
+        </div>
+
+        <!-- Demand Charges -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <InputField id="demand-reduction" label="需量削减（kW）" value={50} min={0} step="any" />
+          <InputField id="demand-price" label="需量电费（$/kW/月）" value={15} min={0} step="any" />
+        </div>
+
+        <!-- Lifetime parameters -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <InputField id="rte" label="往返效率（%）" value={88} min={50} max={100} />
+          <InputField id="degradation" label="年衰减率（%）" value={2.0} min={0} max={10} step={0.1} />
+        </div>
+
+        <!-- Discount & Lifetime -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <InputField id="lifetime" label="系统寿命（年）" value={10} min={1} max={25} />
+          <InputField id="discount" label="折现率（%）" value={8.0} min={0} max={25} step={0.1} />
+        </div>
+
+      </div>
+    </CalculatorCard>
+
+    <!-- Calculation Results -->
+    <CalculatorCard class="border-m-red flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">财务输出</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <!-- Main Output 1 -->
+          <ResultBox
+            label="简单投资回收期"
+            value="7.8 年"
+            suffix="回收标准$150k资本支出的时间"
+            variant="primary"
+            id="result-payback"
+          />
+
+          <!-- Main Output 2 (NPV) -->
+          <ResultBox
+            label="净现值（NPV）"
+            value="$12,453"
+            suffix="折现后项目生命周期净收益"
+            variant="primary"
+            id="result-npv-card"
+          />
+
+          <!-- Secondary Savings -->
+          <ResultBox
+            label="第1年套利节省"
+            value="$15,531 / 年"
+            id="result-arbitrage"
+          />
+
+          <ResultBox
+            label="第1年需量节省"
+            value="$9,000 / 年"
+            id="result-demand"
+          />
+        </div>
+
+        <MiniSimulationChart
+          title="累计净节省"
+          description="项目生命周期内预计的节省轨迹"
+          xLabel="年份"
+          yLabel="累计（$）"
+          chartId="chart-bess-roi"
+        />
+      </div>
+
+      <!-- Action Area -->
+      <div class="border-t border-hairline pt-6">
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">BESS投资回报风险提示</h4>
+        <p class="text-body-sm text-muted">
+          衰减以逐年复利方式降低BESS放电能力。未能建模SOH衰减将导致项目后期现金流被严重高估。
+        </p>
+      </div>
+    </CalculatorCard>
+
+  </div>
+
+  <!-- Formulas and Worked Examples -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">公式与计算示例</h2>
+
+    <FormulaBox title="数学公式">
+      <p>
+        年度峰谷电价差套利节省考虑了充电器往返效率（RTE）转换损耗：
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        每日套利（$）= 转移电量 × [电价_高峰 - (电价_低谷 / (RTE% / 100))]
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        年度套利（$）= 每日套利 × 365
+      </div>
+      <p>
+        峰值需量节省代表每月需量电费的减少：
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        年度需量节省（$）= 需量削减kW × 需量电价（$/kW） × 12
+      </div>
+      <p>
+        净现值（NPV）将年度现金流（S_t - 运营费用）相对于资本支出折现：
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        CashFlow_t = (第1年节省 × (1 - 衰减率%)^(t-1)) - 运营费用
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        NPV ($) = Σ [ CashFlow_t / (1 + 折现率%)^t ] - 资本支出
+      </div>
+      <p class="text-xs text-muted mt-4">
+        <strong>变量说明：</strong>电价单位为 $/kWh，RTE 以百分比表示，衰减率以年度百分比表示，折现率为WACC百分比，资本支出/运营费用单位为$。假设条件：每日套利量恒定，线性衰减模型，项目到期即为寿命终止。
+      </p>
+    </FormulaBox>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample
+        number={1}
+        title="住宅峰谷电价套利"
+        scenario="一位房主安装了10 kWh电池，用于转移太阳能自发自用并利用峰谷电价差。"
+        inputs={[
+          { label: "电池容量", value: "10 kWh" },
+          { label: "峰谷电价差", value: "$0.15/kWh" },
+          { label: "年循环次数", value: "300" },
+          { label: "往返效率", value: "90%" },
+        ]}
+        steps={[
+          "每日套利价值 = 10 kWh × $0.15/kWh = $1.50",
+          "年度节省 = $1.50 × 300次循环 = $450/年",
+          "扣除往返效率损耗（10%）后：$450 × 0.90 = $405/年（净）",
+        ]}
+        answer="约 $405/年的净套利节省"
+        interpretation="按约$5,000的安装成本，回收期约为12年。单纯峰谷套利效果有限；结合自发自用可显著提高回报。"
+      />
+
+      <WorkedExample
+        number={2}
+        title="商业需量电费削减"
+        scenario="一家商业设施部署了100 kWh BESS，用于削减峰值负荷尖峰并降低月度需量电费。"
+        inputs={[
+          { label: "BESS容量", value: "100 kWh" },
+          { label: "需量削减", value: "15 kW" },
+          { label: "需量电费", value: "$15/kW/月" },
+        ]}
+        steps={[
+          "月度需量节省 = 15 kW × $15/kW = $225/月",
+          "年度需量节省 = $225 × 12 = $2,700/年",
+          "如适用峰谷套利：90 kWh × $0.12电价差 × 365 = $3,942/年",
+          "第1年总节省：$2,700 + $3,942 = $6,642/年",
+        ]}
+        answer="仅需量电费节省 $2,700/年；合计 $6,642/年"
+        interpretation="仅需量电费削减就可能证明小型BESS的合理性。将套利与需量削减结合可显著加速回收，特别是在需量电费较高的商业费率中。"
+      />
+
+      <WorkedExample
+        number={3}
+        title="太阳能自发自用"
+        scenario="一户安装了屋顶太阳能的家庭配置了15 kWh电池，用于存储白天多余的发电量供晚间使用，减少电网购电。"
+        inputs={[
+          { label: "电池容量", value: "15 kWh" },
+          { label: "每日存储的太阳能余量", value: "12 kWh" },
+          { label: "电网购电电价", value: "$0.25/kWh" },
+          { label: "上网电价", value: "$0.05/kWh" },
+        ]}
+        steps={[
+          "存储太阳能价值 = 12 kWh × ($0.25 - $0.05) = $2.40/天",
+          "年度节省 = $2.40 × 365 = $876/年",
+          "扣除往返效率损耗（10%）后：$876 × 0.90 = $788/年（净）",
+        ]}
+        answer="约 $788/年的电网购电节省"
+        interpretation="自发自用最大化了现有太阳能投资的价值。电网购电电价与上网电价之间的有效价差决定了投资回报率——电价较高的家庭获益最大。"
+      />
+    </div>
+  </section>
+
+  <EngineeringDiagram
+    title="BESS收益来源"
+    description="多种价值流共同贡献电池储能的投资回报"
+    variant="flow"
+    steps={[
+      { label: "峰谷套利", icon: "chart" },
+      { label: "需量削减", icon: "chart" },
+      { label: "太阳能自发自用", icon: "solar" },
+      { label: "净节省", icon: "chart" },
+    ]}
+  />
+
+  <ComparisonTable
+    title="各应用场景的BESS收益来源"
+    headers={["收益来源", "住宅", "商业", "工业", "公用事业"]}
+    rows={[
+      ["峰谷套利", "$50–200/年", "$500–5,000/年", "$5,000–50,000/年", "$10万–100万/年"],
+      ["需量电费", "不适用", "$1,000–10,000/年", "$10,000–100,000/年", "$50万–500万/年"],
+      ["太阳能自发自用", "$200–800/年", "$2,000–20,000/年", "$20,000–200,000/年", "视情况而定"],
+      ["电网服务", "不适用", "有限", "$5,000–30,000/年", "$50万–500万/年"],
+      ["备用电源价值", "$100–500/年", "$1,000–10,000/年", "$10,000–100,000/年", "受监管"],
+    ]}
+    caption="收益潜力因规模和应用场景而异"
+  />
+
+  <FAQSection items={faqItems} />
+  <RelatedTools tools={relatedTools} />
+
+  <!-- Calculation Script -->
+  <script>
+    import { calculateBessRoi } from '../../../utils/calculators';
+    import { renderLineChart, clearChart } from '../../../utils/charting';
+
+    const capexInput = document.getElementById('capex') as HTMLInputElement;
+    const opexInput = document.getElementById('opex') as HTMLInputElement;
+    const capacityInput = document.getElementById('capacity') as HTMLInputElement;
+    const dailyShiftInput = document.getElementById('daily-shift') as HTMLInputElement;
+    const peakTariffInput = document.getElementById('peak-tariff') as HTMLInputElement;
+    const offpeakTariffInput = document.getElementById('offpeak-tariff') as HTMLInputElement;
+    const demandReductionInput = document.getElementById('demand-reduction') as HTMLInputElement;
+    const demandPriceInput = document.getElementById('demand-price') as HTMLInputElement;
+    const rteInput = document.getElementById('rte') as HTMLInputElement;
+    const degradationInput = document.getElementById('degradation') as HTMLInputElement;
+    const lifetimeInput = document.getElementById('lifetime') as HTMLInputElement;
+    const discountInput = document.getElementById('discount') as HTMLInputElement;
+
+    // Outputs - query inner value elements from ResultBox wrappers
+    const resultPaybackCard = document.getElementById('result-payback');
+    const resultPayback = resultPaybackCard?.querySelector('.text-display-md') as HTMLElement;
+    const resultPaybackDesc = resultPaybackCard?.querySelector('.text-caption') as HTMLElement;
+    const resultNpvCard = document.getElementById('result-npv-card');
+    const resultNpv = resultNpvCard?.querySelector('.text-display-md') as HTMLElement;
+    const resultArbitrageCard = document.getElementById('result-arbitrage');
+    const resultArbitrage = resultArbitrageCard?.querySelector('.text-title-lg') as HTMLElement;
+    const resultDemandCard = document.getElementById('result-demand');
+    const resultDemand = resultDemandCard?.querySelector('.text-title-lg') as HTMLElement;
+
+    const chartSvg = document.getElementById('chart-bess-roi') as unknown as SVGElement;
+
+    function updateCalculations() {
+      const capex = parseFloat(capexInput.value) || 0;
+      const opex = parseFloat(opexInput.value) || 0;
+      const capacity = parseFloat(capacityInput.value) || 0;
+      const dailyShift = parseFloat(dailyShiftInput.value) || 0;
+      const peakTariff = parseFloat(peakTariffInput.value) || 0;
+      const offpeakTariff = parseFloat(offpeakTariffInput.value) || 0;
+      const demandReduction = parseFloat(demandReductionInput.value) || 0;
+      const demandPrice = parseFloat(demandPriceInput.value) || 0;
+      const rte = parseFloat(rteInput.value) || 90;
+      const degradation = parseFloat(degradationInput.value) || 0;
+      const lifetime = parseFloat(lifetimeInput.value) || 10;
+      const discount = parseFloat(discountInput.value) || 0;
+
+      const results = calculateBessRoi(
+        capex, opex, capacity, dailyShift, peakTariff, offpeakTariff,
+        demandReduction, demandPrice, rte, degradation, lifetime, discount
+      );
+
+      // Render Payback
+      if (results.paybackYears < 0) {
+        if (resultPayback) resultPayback.textContent = '> 超过寿命';
+        if (resultPaybackDesc) resultPaybackDesc.textContent = `${lifetime}年内无法收回投资。`;
+      } else {
+        if (resultPayback) resultPayback.textContent = `${results.paybackYears.toFixed(1)} 年`;
+        if (resultPaybackDesc) resultPaybackDesc.textContent = `回收$${Math.round(capex).toLocaleString()}资本支出的时间`;
+      }
+
+      // Render NPV
+      if (resultNpv) {
+        const sign = results.npv < 0 ? "-" : "";
+        resultNpv.textContent = `${sign}$${Math.abs(Math.round(results.npv)).toLocaleString()}`;
+      }
+
+      if (resultNpvCard) {
+        resultNpvCard.className = "bg-surface-soft p-6 border col-span-1 md:col-span-2 " +
+          (results.npv >= 0 ? "border-green-600" : "border-red-800");
+      }
+
+      // Secondary
+      if (resultArbitrage) resultArbitrage.textContent = `$${Math.round(results.annualSavingsArbitrage).toLocaleString()} / 年`;
+      if (resultDemand) resultDemand.textContent = `$${Math.round(results.annualSavingsDemand).toLocaleString()} / 年`;
+
+      if (chartSvg && capex > 0 && lifetime > 0) {
+        const totalSavingsYr1 = results.annualSavingsArbitrage + results.annualSavingsDemand;
+        const cumPts: { x: number; y: number }[] = [];
+        let cumulative = -capex;
+        cumPts.push({ x: 0, y: -capex });
+
+        for (let year = 1; year <= lifetime; year++) {
+          const degMult = Math.pow(1 - degradation / 100, year - 1);
+          cumulative += totalSavingsYr1 * degMult - opex;
+          cumPts.push({ x: year, y: cumulative });
+        }
+
+        renderLineChart(chartSvg, cumPts, {
+          width: 320, height: 160,
+          xLabel: 'Year', yLabel: 'Cumulative ($)',
+          xMin: 0, xMax: lifetime,
+        });
+      } else if (chartSvg) {
+        clearChart(chartSvg);
+      }
+    }
+
+    [
+      capexInput, opexInput, capacityInput, dailyShiftInput, peakTariffInput, offpeakTariffInput,
+      demandReductionInput, demandPriceInput, rteInput, degradationInput, lifetimeInput, discountInput
+    ].forEach(el => {
+      el.addEventListener('input', updateCalculations);
+    });
+
+    // Run on boot
+    updateCalculations();
+  </script>
+</CalculatorLayout>

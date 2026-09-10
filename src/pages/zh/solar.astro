@@ -1,0 +1,174 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import CategoryToolGrid from '../../components/CategoryToolGrid.astro';
+import FAQSection from '../../components/FAQSection.astro';
+
+const tools = [
+  {
+    name: "太阳能蓄电池选容计算器",
+    href: "/zh/tools/solar-battery-sizing-calculator/",
+    description: "根据日耗电量、备用天数、电池化学体系和放电深度，为您的太阳能蓄电池组选容。",
+    available: true,
+  },
+  {
+    name: "离网电池续航计算器",
+    href: "/zh/tools/runtime-calculator/",
+    description: "根据电池容量、电压和放电限制，估算您的离网负载电池组的续航时间。",
+    available: true,
+  },
+  {
+    name: "能量换算计算器（Ah ↔ Wh）",
+    href: "/zh/tools/energy-conversion-calculator/",
+    description: "在任意标称电压下将安时转换为瓦时。太阳能板输出与电池容量匹配的必备工具。",
+    available: true,
+  },
+  {
+    name: "太阳能发电机选容计算器",
+    href: "/zh/solar-generator-sizing-calculator/",
+    description: "选配完整的太阳能备用系统：电池容量、太阳能电池板 wattage 和逆变器需求。",
+    available: true,
+  },
+  {
+    name: "便携式电站续航计算器",
+    href: "/zh/portable-power-station-runtime-calculator/",
+    description: "估算太阳能充电的便携式电站在停电期间为关键电器提供的续航时间。",
+    available: true,
+  },
+];
+
+const learnArticles = [
+  { title: "如何为太阳能蓄电池组选容", href: "/zh/learn/how-to-size-solar-battery-bank/" },
+  { title: "太阳能需要多少电池？", href: "/zh/learn/how-many-batteries-for-solar/" },
+  { title: "我需要多少电池储能？", href: "/zh/learn/how-much-battery-storage-do-i-need/" },
+  { title: "太阳能蓄电池备用指南", href: "/zh/learn/solar-battery-backup-guide/" },
+  { title: "离网电池规划", href: "/zh/learn/off-grid-battery-planning/" },
+  { title: "太阳能储能选容指南", href: "/zh/learn/solar-storage-sizing-guide/" },
+  { title: "我的太阳能电池能持续多久？", href: "/zh/learn/how-long-will-my-solar-battery-last/" },
+  { title: "如何为电池组选容", href: "/zh/learn/how-to-size-a-battery-bank/" },
+  { title: "如何计算电池续航时间", href: "/zh/learn/how-to-calculate-battery-runtime/" },
+  { title: "电池选容参考", href: "/zh/learn/battery-sizing-reference/" },
+];
+
+const faqItems = [
+  {
+    question: "如何估算我的每日太阳能用电量？",
+    answer: "把每天使用的每个电器的功率与使用小时数相乘后加总。例如：5 盏 LED 灯（每盏 10W × 6 小时）= 300 瓦时，冰箱（150W × 8 小时）= 1200 瓦时，电视（100W × 4 小时）= 400 瓦时。合计：1900 瓦时，即 1.9 千瓦时。",
+  },
+  {
+    question: "太阳能场景哪种电池化学体系最好？",
+    answer: "磷酸铁锂（LiFePO4）是最推荐的太阳能储能化学体系：循环寿命长（5000 次以上）、安全性好、可用放电深度高（90%）。三元锂（NMC）能量密度更高，但循环寿命较短。铅酸电池初期最便宜，但只能按 50% 放电深度使用，且需要频繁更换。",
+  },
+  {
+    question: "我需要几天的备用天数？",
+    answer: "带电池备用的并网系统通常需要 1–2 天。离网系统根据气候和太阳能资源需要 2–4 天。备用天数越多，电池容量越大、成本越高，但在阴天期间的韧性也越强。",
+  },
+  {
+    question: "什么是放电深度（DoD）？",
+    answer: "放电深度是指充电前可以安全使用的电池容量百分比。超过推荐放电深度会缩短电池寿命。磷酸铁锂允许 80–90% 放电深度，三元锂允许 70–80%，铅酸应保持在 50% 放电深度以内。",
+  },
+  {
+    question: "5kW 光伏系统需要配多少电池？",
+    answer: "一套每天发电 20 千瓦时的 5kW 光伏系统，按 2 天备用、80% 放电深度计算：(20000 × 2) / 0.80 = 50000 瓦时 = 50 千瓦时的蓄电池组。按 48V 计算约为 1042 安时，相当于 4 块大容量 280Ah 磷酸铁锂电池组成 48V 系统。",
+  },
+  {
+    question: "太阳能蓄电池组应该选大一些吗？",
+    answer: "在计算最小值基础上留出 15–20% 余量，可以应对温度降额、电池老化和季节变化。过度选大会浪费资金。如果预计负载会增长，建议按可模块化扩容的方向设计。",
+  },
+];
+
+const relatedCategories = [
+  { href: "/zh/home-backup/", title: "家庭备用", description: "停电和关键负载的电池备用" },
+  { href: "/zh/engineering/", title: "工程", description: "C率、SOC、压降和电缆损耗工具" },
+  { href: "/zh/bess/", title: "BESS 与商用", description: "商用电池储能 ROI 分析" },
+];
+
+const breadcrumbItems = [
+  { label: "太阳能与家庭储能" },
+];
+---
+
+<Layout
+  title="太阳能与家庭储能计算器 | 电池计算器"
+  description="免费太阳能蓄电池选容计算器、离网电池工具和能量换算计算器，适用于房户和太阳能安装人员。"
+  schema="website"
+  schemaName="太阳能与家庭储能计算器"
+  schemaDescription="面向太阳能储能、离网系统和家庭备用电源的工程级电池计算器。"
+  breadcrumbs={[{ label: '太阳能与家庭储能' }]}
+  lang="zh"
+>
+  <Breadcrumb items={breadcrumbItems} lang="zh" />
+
+  <section class="mb-12 md:mb-16 border-b border-hairline pb-12">
+    <div class="max-w-4xl">
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">太阳能与家庭储能</span>
+      <h1 class="text-display-md text-primary mb-6">太阳能与家庭储能计算器</h1>
+      <p class="text-body-md text-body max-w-2xl font-light">
+        工程级电池计算器：太阳能储能、离网系统和家庭备用电源。为您的蓄电池组选容、估算续航时间并换算能量单位，所有公式均公开透明。
+      </p>
+    </div>
+  </section>
+
+  <!-- Authority Introduction -->
+  <section class="mb-16">
+    <div class="max-w-4xl text-body-md text-body font-light flex flex-col gap-6">
+      <p>
+        太阳能储电池是现代居住能源系统的核心。无论您是为离网小屋设计储能系统，为并网太阳能安装添加电池备用，还是优化自发自用以降低电费，正确的电池选容决定了您的系统是否满足能耗需求。
+      </p>
+      <p>
+        太阳能储电池设计的核心挑战在于平衡三个相互竞衡的因素：足够的存储容量以应对无日照时段的用电需求，基于电池化学体系的放电深度限制，以及与逆变器和充电控制器的系统电压兼容性。任何一项把握不准，都会导致超支购买不必要的容量或遭遇意外的电力短缺。
+      </p>
+      <p>
+        我们的太阳能储电池计算器采用标准的电气工程公式，帮助您在这些权衡中做出决策。太阳能蓄电池选容计算器根据您的日均能耗、所需备用天数、电池化学体系和温度条件，计算您所需的准确蓄电池组容量。续航计算器估算您的蓄电池组在特定负载下的续航时间，考虑逆变器效率、放电深度和电压下降。
+      </p>
+      <p>
+        对于离网太阳能安装，蓄电池选容尤为关键。没有电网作为后盾，您的蓄电池组必须存储足够的能量，以应对连续多日无太阳能发电的情况。标准方法是根据当地太阳能资源和天气变化状况，选配 2–5 天的备用天数。我们的计算器帮助您根据具体条件确定所需的准确容量。
+      </p>
+      <p>
+        并网太阳能系统+电池备用采用不同的设计理念。在这里，电池主要用于存储多余的太阳能发电，在�晓高峰时段使用，或在电网故障时提供备用电源。由于电网作为二级电源，蓄电池组可以更小一些。我们的工具帮助您针对自发自用目标和备用需求优化电池容量。
+      </p>
+    </div>
+  </section>
+
+  <section class="mb-16">
+    <h2 class="text-title-lg text-primary mb-6">可用计算器</h2>
+    <CategoryToolGrid tools={tools} lang="zh" />
+  </section>
+
+  {learnArticles.length > 0 && (
+    <section class="mb-16 border-t border-hairline pt-12">
+      <h2 class="text-title-lg text-primary mb-6">太阳能指南</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {learnArticles.map((article) => (
+          <a href={article.href} class="bg-surface-card border border-hairline p-4 hover:border-primary transition-colors">
+            <span class="text-label-uppercase text-muted text-[10px] block mb-2">学习中心</span>
+            <h3 class="text-title-sm text-primary">{article.title}</h3>
+          </a>
+        ))}
+      </div>
+    </section>
+  )}
+
+  <FAQSection items={faqItems} lang="zh" />
+
+  {relatedCategories.length > 0 && (
+    <section class="mb-16 border-t border-hairline pt-12">
+      <h2 class="text-title-lg text-primary mb-6">相关分类</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {relatedCategories.map((cat) => (
+          <a href={cat.href} class="bg-surface-card border border-hairline p-6 hover:border-primary transition-colors block">
+            <h3 class="text-title-md text-primary mb-2">{cat.title}</h3>
+            <p class="text-body-sm text-muted">{cat.description}</p>
+          </a>
+        ))}
+      </div>
+    </section>
+  )}
+
+  <section class="bg-surface-soft border border-hairline p-6 text-caption text-muted mb-8">
+    <span class="text-primary font-bold text-[10px] tracking-wider uppercase border border-hairline px-1.5 py-0.5 mr-2 inline-block mb-3">
+      工程免责声明
+    </span>
+    所有计算器仅提供选容估算。实际性能可能因温度、电池化学体系、接线和负载特性而异。在安装之前请咨询持证的工程师。
+  </section>
+</Layout>

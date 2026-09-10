@@ -1,0 +1,198 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import CategoryToolGrid from '../../components/CategoryToolGrid.astro';
+import FAQSection from '../../components/FAQSection.astro';
+
+const tools = [
+  {
+    name: "家庭备用电池计算器",
+    href: "/zh/tools/home-backup-battery-calculator/",
+    description: "计算停电期间家庭备用电源所需的电池尺寸。为8–48小时的关键负载配置容量。",
+    available: true,
+  },
+  {
+    name: "逆变器电池计算器",
+    href: "/zh/tools/inverter-battery-calculator/",
+    description: "考虑放电深度和效率调整，计算交流逆变器负载所需的电池容量。",
+    available: true,
+  },
+  {
+    name: "电池运行时间计算器",
+    href: "/zh/tools/runtime-calculator/",
+    description: "估算家庭电池在停电期间为关键负载供电的时长。",
+    available: true,
+  },
+  {
+    name: "家庭停电电池备用计算器",
+    href: "/home-power-outage-battery-backup-calculator/",
+    description: "为暴风雨、飓风和电网故障计算电池尺寸、逆变器尺寸和备用系统。",
+    available: true,
+  },
+  {
+    name: "充电时间计算器",
+    href: "/zh/tools/charging-time-calculator/",
+    description: "计算从给定SOC充电到目标SOC所需的时间。",
+    available: true,
+  },
+  {
+    name: "冰箱电池备用计算器",
+    href: "/fridge-battery-backup-calculator/",
+    description: "配置在停电期间保持冰箱运行的电池尺寸。防止食物变质。",
+    available: true,
+  },
+  {
+    name: "CPAP电池备用计算器",
+    href: "/cpap-battery-backup-calculator/",
+    description: "配置在停电期间整夜为CPAP呼吸机供电的电池尺寸。",
+    available: true,
+  },
+  {
+    name: "水泵电池备用计算器",
+    href: "/sump-pump-battery-backup-calculator/",
+    description: "配置在暴风雨导致停电期间保持水泵运行的电池尺寸。",
+    available: true,
+  },
+  {
+    name: "便携式电站运行时间计算器",
+    href: "/portable-power-station-runtime-calculator/",
+    description: "查看便携式电站在停电期间为关键电器供电的时长。",
+    available: true,
+  },
+  {
+    name: "太阳能发电机尺寸计算器",
+    href: "/solar-generator-sizing-calculator/",
+    description: "配置包含电池、光伏板和逆变器的完整太阳能备用系统。",
+    available: true,
+  },
+];
+
+const learnArticles = [
+  { title: "家庭电池备用规划指南", href: "/learn/home-battery-backup-planning/" },
+  { title: "我的房子需要多少kWh？", href: "/learn/how-many-kwh-do-i-need-for-my-house/" },
+  { title: "停电电池指南", href: "/learn/power-outage-battery-guide/" },
+  { title: "全屋电池备用", href: "/learn/whole-house-battery-backup/" },
+  { title: "发电机与电池备用对比", href: "/learn/generator-vs-battery-backup/" },
+  { title: "家庭备用运行时间指南", href: "/learn/home-backup-runtime-guide/" },
+  { title: "家庭电池尺寸指南", href: "/learn/home-battery-sizing-guide/" },
+  { title: "如何配置电池组尺寸", href: "/learn/how-to-size-a-battery-bank/" },
+  { title: "电池尺寸参考", href: "/learn/battery-sizing-reference/" },
+  { title: "电池放电深度图表", href: "/learn/battery-depth-of-discharge-chart/" },
+  { title: "LiFePO4与铅酸电池对比", href: "/learn/lifepo4-vs-lead-acid/" },
+  { title: "常见电池尺寸参考", href: "/learn/common-battery-sizes-reference/" },
+];
+
+const faqItems = [
+  {
+    question: "家庭备用需要多大的电池？",
+    answer: "电池尺寸取决于您想要备份哪些负载以及备份多长时间。典型的家庭备份基本负载（冰箱、照明、网络、医疗设备）24小时大约需要10–15kWh的可用电池容量。全屋备份24小时可能需要30–50kWh或更多。",
+  },
+  {
+    question: "停电期间家庭电池能用多久？",
+    answer: "运行时间取决于电池容量和所运行的负载。10kWh可用电池以1.5kW功率供电基本负载可运行约6.7小时。仅以500W运行冰箱和几盏灯可将运行时间延长至20小时。使用我们的运行时间计算器根据您的具体负载情况进行精确估算。",
+  },
+  {
+    question: "我应该优先备份哪些负载？",
+    answer: "关键负载通常包括冰箱/冰柜、医疗设备、网络路由器、手机充电、几盏灯和井泵。高功耗负载如空调、电热水器和电炉通常应排除在备用之外，除非您有非常大的电池组。",
+  },
+  {
+    question: "家庭电池备用需要特殊的逆变器吗？",
+    answer: "是的。家庭电池备用需要混合逆变器或基于电池的逆变充电一体机，能在电网断电时独立运行。标准并网太阳能逆变器在电网停电时会出于安全考虑（防孤岛保护）停止工作。具有备用功能的混合逆变器可以在停电时隔离您的关键负载并用电池为其供电。",
+  },
+  {
+    question: "我可以为现有太阳能系统添加电池吗？",
+    answer: "可以，但方法取决于您当前的逆变器。如果您有标准并网逆变器，需要将其更换为混合逆变器或添加带有独立逆变器的交流耦合电池系统。一些制造商为其现有逆变器平台提供电池改装套件。",
+  },
+];
+
+const relatedCategories = [
+  { href: "/zh/solar/", title: "太阳能", description: "太阳能电池尺寸和离网规划" },
+  { href: "/zh/engineering/", title: "工程工具", description: "C倍率、SOC、电压降和线缆损耗工具" },
+  { href: "/zh/bess/", title: "BESS与商用", description: "商用电池储能投资回报分析" },
+];
+
+const breadcrumbItems = [
+  { label: "家庭备用" },
+];
+---
+
+<Layout
+  title="家庭备用电池计算器 | Battery Calculators"
+  description="免费的家庭备用电池计算器，用于停电规划、基本负载配置和电池运行时间估算。"
+  schema="website"
+  schemaName="家庭备用电池计算器"
+  schemaDescription="用于家庭备用电源系统和停电规划的工程级电池计算器。"
+  breadcrumbs={[{ label: '家庭备用' }]}
+  lang="zh"
+>
+  <Breadcrumb items={breadcrumbItems} />
+
+  <section class="mb-12 md:mb-16 border-b border-hairline pb-12">
+    <div class="max-w-4xl">
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">家庭备用</span>
+      <h1 class="text-display-md text-primary mb-6">家庭备用电池计算器</h1>
+      <p class="text-body-md text-body max-w-2xl font-light">
+        使用工程级计算器规划家庭电池备用系统。为基本负载配置电池尺寸，估算停电运行时间，计算充电时间。
+      </p>
+    </div>
+  </section>
+
+  <section class="mb-16">
+    <div class="max-w-4xl text-body-md text-body font-light flex flex-col gap-6">
+      <p>
+        家庭电池备用系统在电网停电时提供电力独立性。与仅依赖电网的太阳能系统（电网断电时会停止工作）不同，带有电池备用的系统可以无缝切换到孤岛模式，不间断地为您的关键负载供电。
+      </p>
+      <p>
+        任何备用系统的基础是正确的负载分析。您需要确定停电期间哪些电器和回路是必需的，确定其功耗，并将电池尺寸配置为在您期望的备用时间内覆盖这些负载。仅备份冰箱、网络路由器和几盏灯的家庭大约消耗500–800瓦。加上井泵、医疗设备或迷你分体空调可能将负载推至2–4kW。
+      </p>
+      <p>
+        电池化学体系的选择影响可用容量和系统成本。磷酸铁锂（LiFePO4）电池每天可放电至80–90%放电深度，这意味着10kWh电池可提供8–9kWh可用能量。铅酸电池限制在50%放电深度，因此同样10kWh额定电池组仅提供5kWh可用能量。这使得锂电池尽管初始价格更高，但每可用千瓦时更具成本效益。
+      </p>
+      <p>
+        系统电压是另一个关键设计决策。12V系统适用于2kW以下的小型备用装置。24V系统可高效处理5kW以下的中等负载。48V系统是全屋备用的标准，减少电流并允许使用更细、更便宜的线缆。我们的计算器帮助您评估每种配置选项。
+      </p>
+    </div>
+  </section>
+
+  <section class="mb-16">
+    <h2 class="text-title-lg text-primary mb-6">可用计算器</h2>
+    <CategoryToolGrid tools={tools} />
+  </section>
+
+  {learnArticles.length > 0 && (
+    <section class="mb-16 border-t border-hairline pt-12">
+      <h2 class="text-title-lg text-primary mb-6">家庭备用指南</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {learnArticles.map((article) => (
+          <a href={article.href} class="bg-surface-card border border-hairline p-4 hover:border-primary transition-colors">
+            <span class="text-label-uppercase text-muted text-[10px] block mb-2">学习中心</span>
+            <h3 class="text-title-sm text-primary">{article.title}</h3>
+          </a>
+        ))}
+      </div>
+    </section>
+  )}
+
+  <FAQSection items={faqItems} />
+
+  {relatedCategories.length > 0 && (
+    <section class="mb-16 border-t border-hairline pt-12">
+      <h2 class="text-title-lg text-primary mb-6">相关分类</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {relatedCategories.map((cat) => (
+          <a href={cat.href} class="bg-surface-card border border-hairline p-6 hover:border-primary transition-colors block">
+            <h3 class="text-title-md text-primary mb-2">{cat.title}</h3>
+            <p class="text-body-sm text-muted">{cat.description}</p>
+          </a>
+        ))}
+      </div>
+    </section>
+  )}
+
+  <section class="bg-surface-soft border border-hairline p-6 text-caption text-muted mb-8">
+    <span class="text-primary font-bold text-[10px] tracking-wider uppercase border border-hairline px-1.5 py-0.5 mr-2 inline-block mb-3">
+      工程免责声明
+    </span>
+    所有计算器仅提供尺寸估算。实际备用时间取决于电池化学体系、温度、负载特性和系统损耗。关键备用系统请咨询持证电工。
+  </section>
+</Layout>

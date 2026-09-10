@@ -1,0 +1,163 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import CategoryToolGrid from '../../components/CategoryToolGrid.astro';
+import FAQSection from '../../components/FAQSection.astro';
+
+const tools = [
+  {
+    name: "电池包计算器",
+    href: "/zh/tools/battery-pack-calculator/",
+    description: "从单体电芯设计电池包。计算任意串并联配置的电池包电压、容量、能量和最大电流。",
+    available: true,
+  },
+  {
+    name: "并联串计算器",
+    href: "/zh/tools/parallel-string-calculator/",
+    description: "配置电芯的串联和并联串，构建目标电压和容量的电池包。",
+    available: true,
+  },
+  {
+    name: "电池电压计算器",
+    href: "/zh/tools/energy-conversion-calculator/",
+    description: "在任意标称电压下进行安时与瓦时的换算，了解电池包的能量密度。",
+    available: true,
+  },
+  {
+    name: "C倍率计算器",
+    href: "/zh/tools/c-rate-calculator/",
+    description: "计算EV电池电芯和电池包的充电和放电C倍率。",
+    available: true,
+  },
+];
+
+const learnArticles = [
+  { title: "电池包设计基础", href: "/learn/battery-pack-design-basics/" },
+  { title: "串联与并联电池对比", href: "/learn/series-vs-parallel-batteries/" },
+  { title: "电池电压系统", href: "/learn/battery-voltage-systems/" },
+  { title: "如何组装电池包", href: "/learn/how-to-build-a-battery-pack/" },
+  { title: "LiFePO4电池包设计", href: "/learn/lifepo4-pack-design/" },
+  { title: "什么是电池C倍率？", href: "/learn/what-is-battery-c-rate/" },
+  { title: "LiFePO4电压表", href: "/learn/lifepo4-voltage-chart/" },
+  { title: "电池C倍率参考", href: "/learn/battery-c-rate-reference/" },
+  { title: "LiFePO4与NMC对比", href: "/learn/lifepo4-vs-nmc/" },
+  { title: "电池能量密度图表", href: "/learn/battery-energy-density-chart/" },
+];
+
+const faqItems = [
+  {
+    question: "串联和并联电池连接有什么区别？",
+    answer: "串联连接在保持容量不变的情况下提高电压。将两个3.2V 100Ah的电芯串联可得到6.4V 100Ah的电池包。并联连接在保持电压不变的情况下提高容量。将两个3.2V 100Ah的电芯并联可得到3.2V 200Ah的电池包。串并联组合可以同时实现目标电压和容量。",
+  },
+  {
+    question: "如何确定电池包所需的电芯数量？",
+    answer: "用目标电池包电压除以单体电芯电压，得到串联电芯数（S数）。用目标容量除以单体电芯容量，并联串数（P数）。例如，要使用3.2V 100Ah电芯构建48V 200Ah电池包，需要16S（48V ÷ 3.2V）和2P（200Ah ÷ 100Ah），总共32个电芯。",
+  },
+  {
+    question: "什么是C倍率？为什么它对电池包设计很重要？",
+    answer: "C倍率表示相对于电池容量的充电或放电电流。100Ah电池的1C倍率意味着100A电流。电池包设计必须确保电芯能承受预期的最大电流。超过额定C倍率会导致过热、加速老化和潜在的安全隐患。应将电芯C倍率额定值与应用的峰值电流需求相匹配。",
+  },
+  {
+    question: "我的电池包需要BMS（电池管理系统）吗？",
+    answer: "是的。电池管理系统（BMS）对于锂电池包至关重要。它监测单体电芯电压，防止过充和过放，均衡电芯容量，监测温度，并提供短路保护。在没有BMS的情况下使用锂电池电芯，存在因过充或深度放电而导致电芯损坏、起火或爆炸的风险。",
+  },
+  {
+    question: "我的EV项目应该选择什么电压系统？",
+    answer: "常见的EV电压有48V（轻型EV、高尔夫球车、电动自行车）、72V–96V（摩托车、小型汽车）和300V–400V+（全尺寸EV）。更高电压在相同功率下降低电流，允许使用更细的线缆和更小的元件。但高压系统需要专业的安全设备和知识。建议从48V开始学习，中型项目使用72V–96V。",
+  },
+];
+
+const relatedCategories = [
+  { href: "/zh/engineering/", title: "工程工具", description: "C倍率、SOC、电压降和线缆损耗工具" },
+  { href: "/zh/bess/", title: "BESS与商用", description: "商用电池储能投资回报分析" },
+  { href: "/zh/solar/", title: "太阳能", description: "太阳能电池尺寸和离网规划" },
+];
+
+const breadcrumbItems = [
+  { label: "EV与电池包" },
+];
+---
+
+<Layout
+  title="EV与电池包计算器 | Battery Calculators"
+  description="免费的EV电池计算器，用于电池包设计、串并联配置、电压计算和C倍率分析。"
+  schema="website"
+  schemaName="EV与电池包计算器"
+  schemaDescription="用于EV电池包设计、电芯配置和电压规划的工程级电池计算器。"
+  breadcrumbs={[{ label: 'EV与电池包' }]}
+  lang="zh"
+>
+  <Breadcrumb items={breadcrumbItems} />
+
+  <section class="mb-12 md:mb-16 border-b border-hairline pb-12">
+    <div class="max-w-4xl">
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">EV与电池包</span>
+      <h1 class="text-display-md text-primary mb-6">EV与电池包计算器</h1>
+      <p class="text-body-md text-body max-w-2xl font-light">
+        使用工程级计算器设计EV电池包。配置电芯串并联排列，计算电池包电压，分析充放电C倍率。
+      </p>
+    </div>
+  </section>
+
+  <section class="mb-16">
+    <div class="max-w-4xl text-body-md text-body font-light flex flex-col gap-6">
+      <p>
+        电池包设计是将单体电芯组合成满足特定电压、容量和电流要求的配置装配的过程。无论您是为电动汽车、太阳能储能系统、电动工具还是定制能源项目构建电池，串并联配置的基本原理都是适用的。
+      </p>
+      <p>
+        串联连接提高电池包电压。当电芯正负极依次串联时，电压叠加而容量保持单串不变。将16个LiFePO4电芯（每个3.2V）串联可产生51.2V标称电压电池包。这是太阳能储能、轻型EV和船舶应用中48V系统的标准配置。
+      </p>
+      <p>
+        并联连接提高电池包容量。当相同电芯正极与正极、负极与负极连接时，容量叠加而电压保持不变。两个100Ah电芯并联可在相同电压下产生200Ah电池包。并联数量（P数）决定电池包可存储和输出的能量。
+      </p>
+      <p>
+        P数还决定最大放电电流。如果每个电芯额定为1C连续放电，则2P配置的100Ah电芯可连续输出200A。4P配置可输出400A。将电池包的电流能力与应用的峰值需求匹配对安全性和使用寿命至关重要。
+      </p>
+      <p>
+        电芯选择是电池包设计中最重要的决策。LiFePO4电芯在大多数应用中提供了安全性、循环寿命和成本的最佳平衡。NMC电芯为重量敏感的EV应用提供更高能量密度。LTO电芯提供极速充电和低温性能但成本更高。我们的计算器帮助您评估任何电芯化学体系的配置。
+      </p>
+    </div>
+  </section>
+
+  <section class="mb-16">
+    <h2 class="text-title-lg text-primary mb-6">可用计算器</h2>
+    <CategoryToolGrid tools={tools} />
+  </section>
+
+  {learnArticles.length > 0 && (
+    <section class="mb-16 border-t border-hairline pt-12">
+      <h2 class="text-title-lg text-primary mb-6">电池包指南</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {learnArticles.map((article) => (
+          <a href={article.href} class="bg-surface-card border border-hairline p-4 hover:border-primary transition-colors">
+            <span class="text-label-uppercase text-muted text-[10px] block mb-2">学习中心</span>
+            <h3 class="text-title-sm text-primary">{article.title}</h3>
+          </a>
+        ))}
+      </div>
+    </section>
+  )}
+
+  <FAQSection items={faqItems} />
+
+  {relatedCategories.length > 0 && (
+    <section class="mb-16 border-t border-hairline pt-12">
+      <h2 class="text-title-lg text-primary mb-6">相关分类</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {relatedCategories.map((cat) => (
+          <a href={cat.href} class="bg-surface-card border border-hairline p-6 hover:border-primary transition-colors block">
+            <h3 class="text-title-md text-primary mb-2">{cat.title}</h3>
+            <p class="text-body-sm text-muted">{cat.description}</p>
+          </a>
+        ))}
+      </div>
+    </section>
+  )}
+
+  <section class="bg-surface-soft border border-hairline p-6 text-caption text-muted mb-8">
+    <span class="text-primary font-bold text-[10px] tracking-wider uppercase border border-hairline px-1.5 py-0.5 mr-2 inline-block mb-3">
+      工程免责声明
+    </span>
+    所有计算器仅提供设计估算。EV电池包设计需要考虑BMS要求、热管理和安全认证。生产设计请咨询合格的工程师。
+  </section>
+</Layout>

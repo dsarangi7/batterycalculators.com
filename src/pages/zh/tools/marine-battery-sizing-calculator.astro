@@ -1,0 +1,453 @@
+---
+import CalculatorLayout from '../../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import InputField from '../../../components/InputField.astro';
+import ResultBox from '../../../components/ResultBox.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import WorkedExample from '../../../components/WorkedExample.astro';
+import ComparisonTable from '../../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../../components/EngineeringDiagram.astro';
+
+const whatIs = `船用电池组选型计算器用于确定为船舶酒店负载供电的正确电池组容量——酒店负载包括导航电子设备、舱内照明、冷藏设备、淡水泵和辅助系统——在锚泊或航行期间为这些负载提供可靠电力。合理的选型可确保在无岸电的长途巡航中可靠供电，避免航行途中电池耗尽。船用电气系统面临特殊约束：振动、潮湿环境、发电机充电限制，以及需要为发动机启动保留启动功率。本计算器采用船用环境特有的放电深度限制和系统效率因子，符合ISO 13297游艇电气安装标准。`;
+
+const whyItMatters = [
+  "船用电池组配小会在夜间航行时导致无导航灯或自动驾驶仪电力——这是海上的严重安全隐患。",
+  "配大了会增加不必要的重量和成本；对于35英尺帆船，每100Ah LFP容量约增加12公斤到对重量敏感的船体上。",
+  "不正确的DoD假设会加速电池衰减——铅酸电池放电深度超过50% DoD，循环寿命可能从500次减半至不足250次。",
+  "忽视发电机充电限制意味着发动机无法快速补充电池，导致多日巡航中电量逐步耗尽。",
+  "未考虑锚泊与航行期间的酒店负载用电曲线，会在最需要电力时恰好出现运行时间不足。"
+];
+
+const practicalApplications = [
+  { title: "夜间锚泊", description: "为锚泊时12–16小时酒店负载配置生活电池组，不依赖发动机充电或岸电。" },
+  { title: "远洋长途巡航", description: "在偏远航段航行时，每日有限的发电机运行时间下，设计24–72小时自主供电。" },
+  { title: "全职船居生活", description: "为全职船居生活计算包含冷藏、制水机和娱乐设备在内的持续日用电需求。" },
+  { title: "拖网渔船与机动游艇辅助电源", description: "将生活电池组与启动电池分离，确保酒店负载永远不会影响发动机启动能力。" }
+];
+
+const expertNotes: { title: string; variant: 'warning' | 'engineering'; content: string }[] = [
+  {
+    title: "船用放电深度限制",
+    variant: "warning",
+    content: "船用环境中的LFP电池应以80% DoD为上限，以应对高振动环境下的电芯应力。铅酸电池组不应超过50% DoD——在风浪锚泊中，考虑使用40% DoD以应对波浪引起的负载尖峰。始终预留20%容量作为应急电子设备（EPIRB、VHF-DSC）的安全裕量。"
+  },
+  {
+    title: "12V与24V船用系统选择",
+    variant: "engineering",
+    content: "对于40英尺以下、负载低于500W的船舶，12V系统更简单且与标准船用电子设备兼容。对于40英尺以上或负载超过500W的船舶，24V或48V系统可将电流减半，降低线缆规格要求和压降。48V系统通过DC-DC转换器为12V生活电池组充电，是大型游艇的高效现代方案。"
+  }
+];
+
+const trustSection = {
+  text: "本计算器采用与ISO 13297船用电气标准和ABYC E-11指南一致的公开公式。所有选型因子——DoD限制、效率折减和压降假设——均有记录，方便独立验算。",
+  link: { label: "查看完整计算方法与公式推导", href: "/zh/methodology/" }
+};
+
+const references = [
+  { title: "ISO 13297:2014 — 小型船舶电气安装", url: "https://www.iso.org/standard/65870.html", source: "国际标准化组织" },
+  { title: "ABYC E-11 — 船用交流与直流电气系统", url: "https://abycinc.org/standards", source: "美国船舶与游艇委员会" },
+  { title: "Cruisers Forum — 船用电池组选型指南", url: "https://www.cruisersforum.com/forums/f48/marine-battery-bank-sizing.html", source: "Cruisers Forum社区" },
+  { title: "Victron Energy — 船用电池系统设计", url: "https://www.victronenergy.com/learn/battery-bank-design", source: "Victron Energy技术库" }
+];
+
+const faqItems = [
+  {
+    question: "巡航游艇的典型酒店负载是多少？",
+    answer: "酒店负载因船型和设备而异。40英尺巡航艇的导航和电子设备通常消耗150–250W，照明50–100W，冷藏80–150W，水泵及辅助设备20–60W。酒店总负载通常在300–600W之间。",
+  },
+  {
+    question: "应按多少小时使用时间设计？",
+    answer: "锚泊过夜不依赖发动机充电时，按12–16小时使用设计。无岸电长途巡航时，24小时可提供舒适裕量。应急备用时，48–72小时可确保恶劣天气下的韧性。",
+  },
+  {
+    question: "船用电池的安全放电深度是多少？",
+    answer: "LFP（磷酸铁锂）电池可安全放电至80–90% DoD。铅酸（AGM/胶体）为保证循环寿命不应超过50% DoD。深循环铅酸在50% DoD下额定200次循环；LFP在80% DoD下可提供3,000次以上循环。",
+  },
+  {
+    question: "船用电池组应选12V还是24V？",
+    answer: "12V是大多数50英尺以下休闲船舶的标准，因12V设备兼容性广泛。24V或48V系统可降低大型船舶的线路电流，减少线缆成本和压降。两种配置均可使用转换器。",
+  },
+  {
+    question: "发电机充电限制如何影响电池组大小？",
+    answer: "大多数船用发电机输出50–100A。200Ah LFP电池组在50%荷电状态下需100Ah充电——以满功率发电机输出需1–2小时。如果每日酒店负载超过发电机运行期间可补充电量，则需要更大电池组或太阳能支持。",
+  },
+  {
+    question: "船用系统中能否混用铅酸和锂电池？",
+    answer: "<span class=\"text-primary font-bold\">绝对不要并联混用不同化学体系电池。</span>铅酸和锂电池具有不同的充电曲线、内阻和安全DoD限制。混用会导致一种电池过充或另一种欠充，带来安全风险并缩短寿命。",
+  },
+  {
+    question: "锚泊负载与巡航负载有何区别？",
+    answer: "锚泊负载是静止时的用电——通常包括导航灯、仪表、冷藏和舱内照明（300–500W）。巡航负载增加自动驾驶仪、雷达叠加显示、探鱼器和风速仪（500–900W）。若计划在无发电机支持下航行使用，请按较高的巡航负载选型。",
+  },
+  {
+    question: "振动如何影响船用电池选型？",
+    answer: "船用环境因发动机、波浪和船体形变产生持续振动。采用密封方形电芯的LFP电池抗振性能良好。富液式铅酸电池在剧烈振动下可能泄漏电解液。AGM和胶体电池为密封型，但仍可能受内部极板损伤。所有船用电池应使用减振支架安装。",
+  },
+  {
+    question: "是否应为船用电池组安装电池监测器？",
+    answer: "是的——强烈推荐。带分流器的电池监测器可测量实际电流流动、追踪荷电状态、估算剩余运行时间并记录历史用电。Victron BMV或类似设备可提供简单电压表在负载下无法实现的实时可视化。",
+  },
+  {
+    question: "发动机启动电池与生活电池组是否需要分开？",
+    answer: "最佳实践是使用专用启动电池和独立生活电池组，通过隔离器或双电池开关连接。这可防止酒店负载耗尽启动储备电量。对于配备电动绞盘的帆船，建议增加第三个专用推进器/绞盘电池组。",
+  },
+  {
+    question: "寒冷天气如何影响船用电池选型？",
+    answer: "0°C以下时，LFP容量下降5–10%，充电需限制以防止锂枝晶。铅酸在-10°C时容量下降20–30%。在寒冷气候巡航时，电池组应增大15–25%，并考虑电池加热器或隔热电池箱。",
+  },
+  {
+    question: "太阳能在船用电池系统中扮演什么角色？",
+    answer: "遮阳篷或硬顶上的太阳能板可在白天补充发电机充电，提供100–400W。这可延长不启动发动机的锚泊时间。太阳能最好视为维护性充电器而非主电源——它可抵消酒店负载，但很少能在一天内完全充满大容量电池组。",
+  },
+];
+
+const relatedArticles = [
+  { title: "什么是船用电气化？", href: "/zh/learn/what-is-marine-electrification/" },
+  { title: "船舶储能系统详解", href: "/zh/learn/vessel-energy-storage-systems-explained/" },
+];
+
+const commonMistakes = [
+  "使用汽车电池作为船用生活电池组——汽车电池设计用于启动而非深循环，在50% DoD下会快速失效。",
+  "忽视端子和连接处的盐水腐蚀——船用环境要求镀锡铜、热缩连接和介电脂。",
+  "并联混用铅酸和锂电池——不同的充电曲线会导致一种电池过充而另一种欠充。",
+  "省略减振安装支架——持续的波浪振动可能损坏电池极板和内部连接。",
+  "未将生活电池组与发动机启动电池分离——酒店负载可能耗尽启动电池，导致无法启动发动机。",
+  "忽视发电机充电限制——标准50A发电机无法在合理发动机运行时间内将200Ah电池组从50% DoD充满。",
+  "仅用电压读数判断锂电池荷电状态——LFP平坦的放电曲线使电压法不可靠；请使用分流器式监测器。",
+  "忘记寒冷天气会使容量降低10–30%——北方水域冬季巡航需增大电池组或增加电池加热。"
+];
+
+const relatedCalculators = [
+  { href: "/zh/tools/runtime-calculator/", title: "续航时间计算器", description: "估算电池在特定负载下的持续供电时间。" },
+  { href: "/zh/tools/voltage-drop-calculator/", title: "压降计算器", description: "确保线缆满足船用电压降要求。" },
+  { href: "/zh/tools/battery-sizing-calculator/", title: "电池容量计算器", description: "通用电池组选型与温度折减计算。" },
+  { href: "/zh/tools/c-rate-calculator/", title: "C率计算器", description: "验证船用电池组的充电电流限制。" },
+  { href: "/zh/tools/energy-conversion-calculator/", title: "能量单位换算", description: "在系统电压下进行Ah与Wh换算。" },
+  { href: "/zh/tools/home-backup-battery-calculator/", title: "家庭备用电池计算器", description: "将船用选型与家庭备用方案进行对比。" },
+];
+---
+
+<CalculatorLayout
+  title="船用电池组选型计算器｜电池计算器"
+  description="根据酒店负载、使用时间、电池电压和放电深度，为船用生活电池组选型，确保可靠的巡航供电。"
+  faqItems={faqItems}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+  relatedCalculators={relatedCalculators}
+  commonMistakes={commonMistakes}
+  relatedArticles={relatedArticles}
+  lang="zh"
+>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+
+    <!-- Input Form -->
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">酒店负载用电</h3>
+      <div class="flex flex-col gap-6">
+
+        <InputField id="nav-load" label="导航 / 电子设备负载" value={180} min={0} step={10} unit="W" helperText="海图仪、雷达、AIS、VHF、仪表。" />
+
+        <InputField id="lighting-load" label="照明负载" value={80} min={0} step={10} unit="W" helperText="舱内灯、锚灯、航行灯。" />
+
+        <InputField id="refrigeration-load" label="冷藏负载" value={100} min={0} step={10} unit="W" helperText="船用冰箱和冷柜（压缩机循环平均值）。" />
+
+        <InputField id="pumps-load" label="水泵 / 辅助负载" value={40} min={0} step={10} unit="W" helperText="舱底泵、淡水泵、锚机（平均值）。" />
+
+        <InputField id="other-load" label="其他酒店负载" value={30} min={0} step={10} unit="W" helperText="娱乐设备、USB充电、舱内风扇、仪表。" />
+
+        <InputField id="usage-hours" label="每日使用时间" value={14} min={1} max={24} step={1} unit="hours" helperText="电池组每日必须供电的小时数。" />
+
+        <InputField id="battery-voltage" label="电池系统电压" value={12} min={12} step={1} unit="V" helperText="12V为小型船舶标准，24V用于大型游艇。" />
+
+        <InputField id="usable-dod" label="可用放电深度" value={80} min={20} max={100} step={1} unit="%" helperText="LFP：80–90%，铅酸：建议50%。" />
+
+        <InputField id="system-efficiency" label="系统综合效率" value={90} min={70} max={100} step={1} unit="%" helperText="计入线缆损耗和BMS开销。" />
+
+      </div>
+    </CalculatorCard>
+
+    <!-- Results -->
+    <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">选型结果</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <ResultBox
+            label="酒店总负载"
+            value="430 W"
+            suffix="日均综合平均值"
+            variant="primary"
+            id="result-total-load"
+          />
+          <ResultBox
+            label="日需能量"
+            value="6,020 Wh"
+            suffix="6.02 kWh/天"
+            id="result-daily-energy"
+          />
+          <ResultBox
+            label="所需电池组能量"
+            value="8,361 Wh"
+            suffix="所需电池组总能量"
+            id="result-usable-energy"
+          />
+          <ResultBox
+            label="推荐容量"
+            value="696.8 Ah"
+            suffix="标称12V"
+            id="result-capacity"
+          />
+          <ResultBox
+            label="推荐电池组"
+            value="10.03 kWh"
+            suffix="电池组总能量"
+            id="result-bank-energy"
+          />
+        </div>
+      </div>
+
+      <div class="border-t border-hairline pt-6">
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">电池组推荐方案</h4>
+        <p class="text-body-sm text-muted" id="bank-recommendation">
+          430W酒店负载运行14小时、12V系统，建议配置12V 700Ah LFP电池组（8.4 kWh），可提供约14小时运行时间。
+        </p>
+      </div>
+    </CalculatorCard>
+
+  </div>
+
+  <!-- Formulas and Worked Examples -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">公式与计算示例</h2>
+
+    <FormulaBox title="数学公式">
+      <p>
+        船用电池选型将所有酒店负载求和，乘以使用时间，并考虑放电深度和系统损耗进行调整：
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        总负载 = 导航 + 照明 + 冷藏 + 水泵 + 其他
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        日需能量 = 总负载 × 使用时间
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        所需能量 = 日需能量 / (DoD% × 效率%)
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        所需容量(Ah) = 所需能量 / 电池电压
+      </div>
+      <p>
+        DoD和效率因子确保电池组按实际工况保守选型。
+      </p>
+    </FormulaBox>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample
+        number={1}
+        title="日间巡航艇——夜间锚泊"
+        scenario="一艘28英尺日间巡航艇夜间锚泊。船主需要导航灯、探鱼器、VHF无线电、舱内照明和小型冰箱运行8小时，直到黎明启动发动机。"
+        inputs={[
+          { label: "导航灯", value: "20W" },
+          { label: "探鱼器", value: "15W" },
+          { label: "VHF无线电（待机）", value: "5W" },
+          { label: "舱内灯", value: "30W" },
+          { label: "小型冰箱", value: "45W" },
+          { label: "使用时长", value: "8小时" },
+          { label: "系统电压", value: "12V" },
+          { label: "DoD限制", value: "80%（LFP）" },
+          { label: "系统效率", value: "90%" },
+        ]}
+        steps={[
+          "负载求和：20 + 15 + 5 + 30 + 45 = 115W",
+          "日需能量：115W × 8h = 920 Wh",
+          "按DoD和效率调整：920 / (0.80 × 0.90) = 1,278 Wh",
+          "换算为安时：1,278 Wh / 12V = 106.5 Ah",
+        ]}
+        answer="建议配置12V 120Ah LFP电池组（1.44 kWh）。"
+        interpretation="这可在计算最小值之上提供13%安全裕量，满足8小时夜间酒店负载。电池组约重14公斤——对小型巡航艇而言易于管理。黎明启动发动机1–2小时即可通过发电机补充电量。"
+        variant="marine"
+      />
+
+      <WorkedExample
+        number={2}
+        title="巡航游艇——24小时酒店负载"
+        scenario="一艘45英尺巡航游艇锚泊时运行大量酒店负载：海图仪、雷达叠加显示、全船LED照明、冷藏、制水机和娱乐系统。船主希望在不依赖发动机充电的情况下实现完整的24小时自主供电。"
+        inputs={[
+          { label: "海图仪 + 雷达", value: "120W" },
+          { label: "AIS转发器", value: "30W" },
+          { label: "LED照明（全区域）", value: "90W" },
+          { label: "冷藏 + 冷柜", value: "180W" },
+          { label: "制水机", value: "250W" },
+          { label: "娱乐 + USB", value: "60W" },
+          { label: "水泵 + 辅助", value: "50W" },
+          { label: "使用时长", value: "24小时" },
+          { label: "系统电压", value: "24V" },
+          { label: "DoD限制", value: "80%（LFP）" },
+          { label: "系统效率", value: "92%" },
+        ]}
+        steps={[
+          "负载求和：120 + 30 + 90 + 180 + 250 + 60 + 50 = 780W",
+          "日需能量：780W × 24h = 18,720 Wh",
+          "按DoD和效率调整：18,720 / (0.80 × 0.92) = 25,435 Wh",
+          "换算为安时：25,435 Wh / 24V = 1,059.8 Ah",
+        ]}
+        answer="建议配置24V 1,100Ah LFP电池组（26.4 kWh）。"
+        interpretation="船舶标准负载配置实现24小时自主供电。电池组约重195公斤，需在水线以下进行结构安装。遮阳篷上的太阳能板（300W+）可日均抵消2–3 kWh，降低电池组选型需求。"
+        variant="marine"
+      />
+
+<WorkedExample
+        number={3}
+        title="拖钓电机——高放电分析"
+        scenario="一艘20英尺鲈鱼艇使用80磅推力拖钓电机，12V下消耗46A。钓鱼者希望连续钓鱼6小时，电机中速运行（60%油门），间歇使用探鱼器和导航灯。"
+        inputs={[
+          { label: "拖钓电机（60%油门）", value: "27.6A × 12V = 331W" },
+          { label: "探鱼器", value: "15W" },
+          { label: "导航灯", value: "20W" },
+          { label: "使用时长", value: "6小时" },
+          { label: "系统电压", value: "12V" },
+          { label: "DoD限制", value: "80%（LFP）" },
+          { label: "系统效率", value: "88%" },
+        ]}
+        steps={[
+          "负载求和：331 + 15 + 20 = 366W",
+          "12V下电流：366W / 12V = 30.5A",
+          "日需能量：366W × 6h = 2,196 Wh",
+          "按DoD和效率调整：2,196 / (0.80 × 0.88) = 3,120 Wh",
+          "换算为安时：3,120 Wh / 12V = 260 Ah",
+        ]}
+        answer="建议配置12V 260Ah LFP电池组（3.12 kWh）。"
+        interpretation="30.5A持续放电下，260Ah电池组可提供6小时并有少量安全裕量。注意：高放电率下电池电压跌落显著——LFP在此负载下比铅酸保持电压更稳定。300Ah电池组可为更长钓鱼日提供舒适裕量。"
+        variant="marine"
+      />
+    </div>
+  </section>
+
+  <section class="mb-16">
+    <EngineeringDiagram
+      title="船用电气系统"
+      description="双电池组配置，含发电机充电和负载分配"
+      variant="system"
+      steps={[
+        { label: "发电机", icon: "charge" },
+        { label: "生活电池组", icon: "battery" },
+        { label: "启动电池组", icon: "battery" },
+        { label: "船用负载", icon: "load" },
+      ]}
+    />
+  </section>
+
+  <section class="mb-16">
+    <ComparisonTable
+      title="船用电池标准"
+      headers={["标准", "适用范围", "主要要求", "压降限制"]}
+      rows={[
+        ["ISO 13297", "船用电气安装", "线缆选型、熔断、标识", "关键负载3% / 非关键10%"],
+        ["ABYC E-11", "船用交直流系统", "线色编码、过流保护", "舵位仪表3%"],
+        ["USCG 33 CFR 183", "船用电气系统", "点火保护、油箱接地", "N/A（安全导向）"],
+        ["IEC 60092", "船舶电气安装", "船用布线、配电盘", "因回路类型而异"],
+      ]}
+      caption="规范船用电池系统设计的主要电气标准"
+    />
+  </section>
+
+  <FAQSection items={faqItems} />
+
+  <!-- Engineering Support CTA -->
+  <div class="bg-surface-card border border-hairline p-6 mt-8 mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div class="max-w-xl">
+      <h3 class="text-title-sm text-primary mb-1">需要更深入的工程评审？</h3>
+      <p class="text-body-sm text-muted font-light">
+        本计算器用于初步估算。如需针对特定船舶的分析、电池选型评审、减排规划或混合动力可行性支持，请联系Battery Calculators工程支持团队。
+      </p>
+    </div>
+    <a href="/zh/tools/#marine-advisory" class="btn-primary text-xs px-6 py-3 shrink-0 whitespace-nowrap">申请工程支持</a>
+  </div>
+
+  <!-- Calculation Script -->
+  <script>
+    import { calculateMarineBatterySizing } from '../../../utils/calculators';
+
+    const navLoadInput = document.getElementById('nav-load') as HTMLInputElement;
+    const lightingLoadInput = document.getElementById('lighting-load') as HTMLInputElement;
+    const refrigerationLoadInput = document.getElementById('refrigeration-load') as HTMLInputElement;
+    const pumpsLoadInput = document.getElementById('pumps-load') as HTMLInputElement;
+    const otherLoadInput = document.getElementById('other-load') as HTMLInputElement;
+    const usageHoursInput = document.getElementById('usage-hours') as HTMLInputElement;
+    const batteryVoltageInput = document.getElementById('battery-voltage') as HTMLInputElement;
+    const usableDodInput = document.getElementById('usable-dod') as HTMLInputElement;
+    const systemEfficiencyInput = document.getElementById('system-efficiency') as HTMLInputElement;
+
+    const resultTotalLoadBox = document.getElementById('result-total-load');
+    const resultTotalLoadValue = resultTotalLoadBox?.querySelector('.text-display-md') as HTMLElement;
+    const resultTotalLoadSuffix = resultTotalLoadBox?.querySelector('.text-caption') as HTMLElement;
+
+    const resultDailyEnergyBox = document.getElementById('result-daily-energy');
+    const resultDailyEnergyValue = resultDailyEnergyBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultDailyEnergySuffix = resultDailyEnergyBox?.querySelector('.text-caption') as HTMLElement;
+
+    const resultUsableEnergyBox = document.getElementById('result-usable-energy');
+    const resultUsableEnergyValue = resultUsableEnergyBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultUsableEnergySuffix = resultUsableEnergyBox?.querySelector('.text-caption') as HTMLElement;
+
+    const resultCapacityBox = document.getElementById('result-capacity');
+    const resultCapacityValue = resultCapacityBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultCapacitySuffix = resultCapacityBox?.querySelector('.text-caption') as HTMLElement;
+
+    const resultBankEnergyBox = document.getElementById('result-bank-energy');
+    const resultBankEnergyValue = resultBankEnergyBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultBankEnergySuffix = resultBankEnergyBox?.querySelector('.text-caption') as HTMLElement;
+
+    const bankRecommendationEl = document.getElementById('bank-recommendation');
+
+    function updateCalculations() {
+      const navLoad = parseFloat(navLoadInput.value) || 0;
+      const lightingLoad = parseFloat(lightingLoadInput.value) || 0;
+      const refrigerationLoad = parseFloat(refrigerationLoadInput.value) || 0;
+      const pumpsLoad = parseFloat(pumpsLoadInput.value) || 0;
+      const otherLoad = parseFloat(otherLoadInput.value) || 0;
+      const usageHours = parseFloat(usageHoursInput.value) || 14;
+      const batteryVoltage = parseFloat(batteryVoltageInput.value) || 12;
+      const usableDod = parseFloat(usableDodInput.value) || 80;
+      const systemEfficiency = parseFloat(systemEfficiencyInput.value) || 90;
+
+      const results = calculateMarineBatterySizing(
+        navLoad, lightingLoad, refrigerationLoad, pumpsLoad, otherLoad,
+        usageHours, batteryVoltage, usableDod, systemEfficiency
+      );
+
+      if (resultTotalLoadValue) resultTotalLoadValue.textContent = `${Math.round(results.totalLoadW)} W`;
+      if (resultTotalLoadSuffix) resultTotalLoadSuffix.textContent = '日均综合平均值';
+
+      if (resultDailyEnergyValue) resultDailyEnergyValue.textContent = `${Math.round(results.dailyEnergyWh).toLocaleString()} Wh`;
+      if (resultDailyEnergySuffix) resultDailyEnergySuffix.textContent = `${results.dailyEnergyKwh.toFixed(2)} kWh/天`;
+
+      if (resultUsableEnergyValue) resultUsableEnergyValue.textContent = `${Math.round(results.totalBatteryEnergyWh).toLocaleString()} Wh`;
+      if (resultUsableEnergySuffix) resultUsableEnergySuffix.textContent = '所需电池组总能量';
+
+      if (resultCapacityValue) resultCapacityValue.textContent = `${results.requiredCapacityAh.toFixed(1)} Ah`;
+      if (resultCapacitySuffix) resultCapacitySuffix.textContent = `标称${batteryVoltage}V`;
+
+      if (resultBankEnergyValue) resultBankEnergyValue.textContent = `${results.requiredEnergyKwh.toFixed(2)} kWh`;
+      if (resultBankEnergySuffix) resultBankEnergySuffix.textContent = '电池组总能量';
+
+      if (bankRecommendationEl) {
+        const recommendedAh = Math.ceil(results.requiredCapacityAh / 10) * 10;
+        bankRecommendationEl.textContent = `${Math.round(results.totalLoadW)}W酒店负载运行${usageHours}小时、${batteryVoltage}V系统，建议配置${batteryVoltage}V ${recommendedAh}Ah LFP电池组（${(recommendedAh * batteryVoltage / 1000).toFixed(1)} kWh），可提供约${usageHours}小时运行时间。`;
+      }
+    }
+
+    [navLoadInput, lightingLoadInput, refrigerationLoadInput, pumpsLoadInput, otherLoadInput, usageHoursInput, batteryVoltageInput, usableDodInput, systemEfficiencyInput].forEach(el => {
+      el.addEventListener('input', updateCalculations);
+    });
+
+    updateCalculations();
+  </script>
+
+</CalculatorLayout>

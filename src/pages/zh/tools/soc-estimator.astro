@@ -1,0 +1,445 @@
+---
+import CalculatorLayout from '../../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import InputField from '../../../components/InputField.astro';
+import ResultBox from '../../../components/ResultBox.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import RelatedTools from '../../../components/RelatedTools.astro';
+import WorkedExample from '../../../components/WorkedExample.astro';
+import ComparisonTable from '../../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../../components/EngineeringDiagram.astro';
+
+const modeOptions = [
+  { label: "开路电压（OCV）查表法", value: "ocv" },
+  { label: "库仑计数（电流积分法）", value: "coulomb" },
+];
+
+const chemistryOptions = [
+  { label: "磷酸铁锂（LiFePO4 / LFP）", value: "lfp" },
+  { label: "三元锂（镍锰钴 NMC）", value: "nmc" },
+  { label: "深循环铅酸（12V电池组）", value: "lead-acid" },
+];
+
+const durationUnitOptions = [
+  { label: "分钟", value: "minutes" },
+  { label: "秒", value: "seconds" },
+  { label: "小时", value: "hours" },
+];
+
+const whatIs = `荷电状态（SOC）估算是确定电池相对其当前最大容量剩余多少电量的过程。实践中主要使用两种方法：<strong>开路电压（OCV）查表法</strong>，将电池的静置电压与特定化学体系的参考曲线进行对照；以及<strong>库仑计数法</strong>，通过对电流进行时间积分来追踪进出电芯的电荷量。精确的SOC估算对于电池管理系统（BMS）、电动汽车续航预测、光伏储能调度以及防止过放电或过充电损坏电芯至关重要。`;
+
+const whyItMatters = [
+  "错误的SOC读数会导致过放电，永久性损坏锂电芯并缩短电池寿命。",
+  "高估SOC会导致电池在BMS预测之前提前耗尽，引起意外关机。",
+  "磷酸铁锂电池在20%–80% SOC区间电压曲线极为平坦，使得基于电压的估算在无精确测量时不可靠。",
+  "库仑计数漂移随时间累积——若不定期重新校准，数天内SOC误差可增长至5%–15%。",
+  "船舶和房车系统若依赖不准确的SOC，可能在关键操作期间因断电而陷入困境。",
+];
+
+const practicalApplications = [
+  { title: "电池管理系统", description: "BMS利用SOC估算来防止过充和过放，保护电芯化学体系并延长循环寿命。" },
+  { title: "电动汽车", description: "精确的SOC是电动汽车和混合动力汽车续航估算及驾驶员仪表盘显示的基础。" },
+  { title: "光伏储能调度", description: "家用和商用光伏系统利用SOC来决定何时放电、何时保留电量以应对夜间负载。" },
+  { title: "船舶与房车电力管理", description: "离网旅行者利用SOC规划用电，精确掌握充电前剩余电量。" },
+  { title: "通信备电监测", description: "通信运营商监测SOC以确认备用电池已充满电并随时可应对电网中断事件。" },
+  { title: "电网级储能", description: "公用事业级储能系统运营商利用SOC管理充放电调度和电网服务调度。" },
+];
+
+const expertNotes = [
+  { title: '磷酸铁锂的挑战', variant: 'warning', content: '磷酸铁锂（LiFePO4）在20%至80% SOC之间电压曲线极为平坦。电芯电压稳定在3.25V至3.30V之间。负载下噪声或接触压降容易被误判为容量变化，使得纯OCV查表不可靠。大多数磷酸铁锂BMS采用库仑计数，并在满电静置时用OCV值进行校正。' },
+  { title: '库仑计数漂移', variant: 'engineering', content: '库仑计数通过电流对时间积分来工作，但传感器偏移或测量误差会随时间累积。一个微小的0.1A电流传感器漂移在24小时内将累积至2.4 Ah的误差。SOC漂移将持续增长，直到触达100%或0%电压限值时才会重置。' },
+  { title: '静置要求', variant: 'info', content: '为获得准确的OCV测量值，电池在充电或放电后必须静置至少1–2小时。电芯极板附近的化学浓度梯度需要时间才能均衡至真实的开路电压。' },
+];
+
+const trustSection = {
+  text: "本估算器使用公开文献记录的磷酸铁锂、三元锂和铅酸化学体系OCV-SOC参考曲线。库仑计数模型使用标准SI单位对电流进行时间积分。两种方法均为全球电池管理系统中使用的行业标准方法。所有中间值均已显示以供独立验证。",
+  link: { label: "查看完整计算方法", href: "/zh/methodology/" },
+};
+
+const references = [
+  { title: "Battery University — 如何测量荷电状态", url: "https://batteryuniversity.com/article/bu-902-how-to-measure-state-of-charge", source: "Battery University / Cadex Electronics" },
+  { title: "IEEE Std 1188-1996 — 电池监测与诊断", url: "https://standards.ieee.org/ieee/1188/1076/", source: "IEEE Standards Association" },
+  { title: "Texas Instruments — 用于SOC估算的库仑计数", url: "https://www.ti.com/lit/an/slua517/slua517.pdf", source: "Texas Instruments 应用笔记" },
+  { title: "NREL — 荷电状态估算方法", url: "https://www.nrel.gov/analysis/state-of-charge-estimation.html", source: "National Renewable Energy Laboratory" },
+];
+
+const faqItems = [
+  {
+    question: "为什么磷酸铁锂（LiFePO4）化学体系的OCV查表法较难？",
+    answer: "磷酸铁锂在20%至80% SOC之间电压曲线极为平坦。电芯电压稳定在3.25V至3.30V之间。负载下噪声或接触压降容易被误判为容量变化，使得纯OCV查表不可靠。大多数磷酸铁锂BMS采用库仑计数，并在满电静置时用OCV值进行校正。",
+  },
+  {
+    question: "什么是库仑计数漂移？",
+    answer: "库仑计数通过对电流进行时间积分来工作。然而，传感器偏移或测量误差会随时间累积。一个微小的0.1A电流传感器漂移在24小时内将累积至2.4 Ah的误差。SOC漂移将持续增长，直到触达100%或0%电压限值时才会重置。",
+  },
+  {
+    question: "为什么OCV测量必须让电池静置？",
+    answer: "放电或充电会在电芯极板附近触发化学浓度梯度。电压在充电时上升，在负载下下陷。一旦电流停止，电芯化学体系会缓慢均衡至其稳态化学电位（即真实OCV），这需要1到2小时。",
+  },
+  {
+    question: "铅酸OCV曲线有什么不同？",
+    answer: "铅酸电池的电压与SOC关系相对线性（12.72V = 100%，11.63V = 0%），使得基于电压的估算比锂电体系更为可靠。然而，铅酸电池在重载下电压跌落严重，需要负载修正系数。",
+  },
+  {
+    question: "SOC估算的最佳方法是什么？",
+    answer: "最精确的方法是将库仑计数与定期OCV重新校准相结合。库仑计数提供实时SOC跟踪，而在静置点（满电、空电）进行的OCV测量则校正累积漂移。这种混合方法是商用BMS实现中的标准做法。",
+  },
+  {
+    question: "库仑计数的精度如何？",
+    answer: "短期内（数小时），库仑计数精度在1%–3%以内。在未重新校准的情况下持续数天，传感器漂移可累积至5%–15%的误差。高质量电流传感器（霍尔效应或分流器式）配合校准可减少漂移，但基于电压的定期校正仍然必要。",
+  },
+  {
+    question: "电池在负载下能否使用SOC估算？",
+    answer: "基于OCV的SOC仅在电池静置（无电流流动）时才准确。负载下端子电压因内阻而下陷，导致SOC读数失真。库仑计数在负载下仍可工作，但需要精确的电流测量。",
+  },
+  {
+    question: "温度如何影响SOC估算？",
+    answer: "温度同时影响OCV曲线和库仑计数精度。低温增加内阻，导致负载下更大的电压下陷（扭曲OCV）。库仑计数效率在低温下也会降低。温度补偿对于精确SOC估算至关重要。",
+  },
+  {
+    question: "SOC和SOH有什么区别？",
+    answer: "SOC衡量当前电量相对于当前容量的百分比（类似油量表）。SOH衡量剩余最大容量相对于原始设计容量的百分比（类似发动机磨损程度）。一块SOC为50%、SOH为80%的电池，其剩余电量为原始设计容量的40%。",
+  },
+  {
+    question: "如何校准电池SOC表？",
+    answer: "将电池充满至100%并静置2小时以上——这设置上限校准点。然后放电至空（或BMS截止电压）以设置下限。大多数BMS会在满充周期中自动校准。",
+  },
+  {
+    question: "为什么SOC会突然跳变？",
+    answer: "SOC突然跳变通常表明BMS已重新校准。在静置期后，BMS通过将实际OCV与参考曲线比较来校正库仑计数漂移。这是正常行为，表明系统正在自我校正。",
+  },
+];
+
+const relatedTools = [
+  { href: "/zh/tools/battery-degradation-estimator/", title: "电池衰减估算器", description: "估算电池容量衰减与老化状态。" },
+  { href: "/zh/tools/runtime-calculator/", title: "电池续航时间计算器", description: "根据负载瓦特曲线计算续航时间。" },
+  { href: "/zh/tools/charging-time-calculator/", title: "充电时间计算器", description: "估算恒流恒压充电时长。" },
+  { href: "/zh/tools/c-rate-calculator/", title: "C率计算器", description: "计算充放电电流倍率。" },
+  { href: "/zh/tools/battery-sizing-calculator/", title: "电池容量计算器", description: "根据用电负荷确定所需电池容量。" },
+  { href: "/zh/tools/solar-battery-sizing-calculator/", title: "太阳能蓄电池计算器", description: "根据日耗电确定太阳能蓄电池容量。" },
+];
+
+const commonMistakes = [
+  "仅凭电压判断SOC——对于磷酸铁锂，20%–80% SOC区间电压几乎恒定。平坦区域内10mV的测量误差可导致30%的SOC波动。",
+  "忽略OCV测量的静置时间——充电或放电后立即测量电压会产生误导性SOC读数。请等待1–2小时以达到化学均衡。",
+  "不对库仑计数重新校准——传感器漂移每天累积。若不定期基于OCV重新校准，一周内SOC误差可增长至10%–15%。",
+  "使用错误的化学体系曲线——磷酸铁锂、三元锂和铅酸的OCV-SOC曲线完全不同。使用三元锂曲线来估算磷酸铁锂电池会产生严重偏差。",
+  "忽略温度影响——低温增加内阻，扭曲电压测量。库仑计数在低温下效率也会降低。",
+  "在负载下测量SOC——负载下的端子电压包含内阻压降，使基于OCV的SOC不可靠。务必在静置状态下测量OCV。",
+];
+
+const relatedArticles = [
+  { href: "/zh/learn/understanding-state-of-charge/", title: "什么是荷电状态" },
+  { href: "/zh/learn/lifepo4-voltage-chart/", title: "磷酸铁锂电池电压曲线详解" },
+];
+---
+
+<CalculatorLayout
+  title="电池荷电状态（SOC）估算器 | 电池计算器"
+  description="使用开路电压（OCV）插值曲线或库仑计数模拟器估算电池剩余电量。"
+  faqItems={faqItems}
+  commonMistakes={commonMistakes}
+  relatedCalculators={relatedTools}
+  relatedArticles={relatedArticles}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+  lang="zh"
+>
+
+  <!-- Main Calculator Grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+
+    <!-- Input Form -->
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">参数</h3>
+      <div class="flex flex-col gap-6">
+
+        <!-- Mode selection -->
+        <InputField id="mode" label="估算模式" type="select" options={modeOptions} value="ocv" />
+
+        <!-- Chemistry -->
+        <InputField id="chemistry" label="化学体系" type="select" options={chemistryOptions} value="lfp" />
+
+        <!-- OCV Specific Inputs -->
+        <div id="ocv-inputs" class="flex flex-col gap-6">
+          <InputField id="voltage" label="测量的开路电压 (V)" value={13.16} min={0.1} step="any" />
+          <InputField id="nominal" label="电池组标称电压 (V)" value={12.8} min={0.1} step="any" helperText="用于推算串联电芯数量（例如12.8V标称对应4S系统）" />
+        </div>
+
+        <!-- Coulomb Counting Specific Inputs -->
+        <div id="coulomb-inputs" class="flex flex-col gap-6 hidden">
+          <InputField id="initial-soc" label="初始SOC (%)" value={50} min={0} max={100} />
+          <InputField id="current" label="净电流 (安培)" value={-10} step="any" helperText="放电负载用负数（-），充电电流用正数（+）。" />
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <InputField id="duration" label="持续时间" value={60} min={1} step="any" />
+            <InputField id="duration-unit" label="单位" type="select" options={durationUnitOptions} value="minutes" />
+          </div>
+          <InputField id="capacity" label="SOH修正后总容量 (Ah)" value={100} min={0.1} step="any" helperText="考虑衰减后的电池组实际容量。" />
+        </div>
+
+      </div>
+    </CalculatorCard>
+
+    <!-- Calculation Results -->
+    <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">荷电状态输出</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <!-- Main Output -->
+          <ResultBox
+            label="荷电状态（SOC）"
+            value="70.0%"
+            suffix="电池部分放电"
+            variant="primary"
+            id="result-soc"
+          />
+
+          <!-- Secondary Outputs -->
+          <ResultBox
+            label="预估剩余电量"
+            value="896 Wh"
+            suffix="按标称电压计算"
+            id="result-energy-remaining"
+          />
+        </div>
+      </div>
+
+      <!-- Action Area -->
+      <div class="border-t border-hairline pt-6">
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">SOC估算约束条件</h4>
+        <p class="text-body-sm text-muted mb-4">
+          OCV估算仅在电池静置（无充电或放电）至少<span class="text-primary font-bold">1至2小时</span>后才准确。负载下的电压跌落会导致巨大的SOC误差。
+        </p>
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">教育用途声明</h4>
+        <p class="text-body-sm text-muted">
+          本工具仅提供<span class="text-primary font-bold">教育性近似值</span>。结果非诊断结果、非认证电池健康预测，不得作为安全关键决策的唯一依据。请务必使用合格的BMS或认证专业仪器进行验证。
+        </p>
+      </div>
+    </CalculatorCard>
+
+  </div>
+
+  <!-- Formulas and Worked Examples -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">公式与计算示例</h2>
+
+    <FormulaBox title="数学公式">
+      <p>
+        <strong>OCV查表法：</strong>将测量电压归一化至电芯级别（V_cell = V / S），并与标准化学体系参考曲线进行插值：
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2 text-xs">
+        LFP电芯：3.40V (100%), 3.31V (90%), 3.29V (70%), 3.27V (40%), 3.23V (20%), 2.50V (0%)
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2 text-xs">
+        NMC电芯：4.20V (100%), 4.05V (80%), 3.80V (50%), 3.60V (20%), 3.00V (0%)
+      </div>
+      <p>
+        <strong>库仑计数（电流积分法）：</strong>通过累加持续时间内的安培流量来计算电荷容量的变化：
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2 text-xs font-light">
+        SOC_final (%) = SOC_start + [ (电流 (A) × (持续时间 (sec) / 3600)) / 容量 (Ah) ] × 100
+      </div>
+      <p class="text-xs text-muted mt-4">
+        <strong>变量说明：</strong>电压单位V，电流单位A（负值=放电），持续时间单位秒，容量单位Ah（SOH修正后）。假设：OCV测量时电池静置，库仑计数假设恒流，标准温度（25°C）。
+      </p>
+    </FormulaBox>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample
+        number={1}
+        title="磷酸铁锂OCV查表"
+        scenario="你有一组静置的4S磷酸铁锂电池组，测量电芯端电压为3.30V。使用OCV参考曲线确定荷电状态。"
+        inputs={[
+          { label: "电芯电压", value: "3.30 V" },
+          { label: "化学体系", value: "磷酸铁锂（LiFePO4）" },
+          { label: "静置时间", value: "> 2小时" },
+        ]}
+        steps={[
+          "确认化学体系：磷酸铁锂电芯标称电压为3.2V。",
+          "在LFP OCV参考曲线上定位3.30V。该曲线在20%–80% SOC（3.23V–3.31V）区间极为平坦。",
+          "插值计算：3.30V落在平坦区域的上端，对应约**65% SOC**。",
+        ]}
+        answer="SOC ≈ 65%"
+        interpretation="4S电池组电压为3.30 × 4 = 13.20V。电池处于中上水平。由于磷酸铁锂在该区域电压曲线近乎平坦，微小的测量误差（10–20mV）可使SOC估算偏移15%–20%。要获得可靠的磷酸铁锂SOC，需将静置OCV与库仑计数结合使用。"
+        variant="blue"
+      />
+
+      <WorkedExample
+        number={2}
+        title="三元锂OCV插值"
+        scenario="一组10S三元锂电池组已静置3小时。测量电芯电压为3.75V。使用三元锂参考曲线求荷电状态。"
+        inputs={[
+          { label: "电芯电压", value: "3.75 V" },
+          { label: "化学体系", value: "三元锂（镍锰钴 NMC）" },
+          { label: "静置时间", value: "> 2小时" },
+        ]}
+        steps={[
+          "确认化学体系：三元锂电芯标称电压为3.6–3.7V。",
+          "参考曲线：4.20V = 100%, 4.05V = 80%, 3.80V = 50%, 3.60V = 20%, 3.00V = 0%。",
+          "插值计算：3.75V落在50%（3.80V）和20%（3.60V）之间。线性插值得约**44% SOC**。",
+        ]}
+        answer="SOC ≈ 44%"
+        interpretation="10S电池组电压为3.75 × 10 = 37.5V。三元锂化学体系的电压曲线比磷酸铁锂更陡峭，使得基于OCV的SOC估算更为准确。该电池低于标称电量，应尽快充电以获得最佳循环寿命。"
+        variant="blue"
+      />
+
+      <WorkedExample
+        number={3}
+        title="铅酸电池电压法SOC"
+        scenario="一组12V铅酸电池组在无负载静置一夜后测量电压为12.1V。使用铅酸参考曲线估算荷电状态。"
+        inputs={[
+          { label: "电池组电压", value: "12.1 V" },
+          { label: "化学体系", value: "铅酸（6S）" },
+          { label: "静置时间", value: "> 2小时" },
+        ]}
+        steps={[
+          "确认化学体系：铅酸12V标称 = 6节 × 2.1V/节 = 12.6V满电，11.63V = 0%。",
+          "参考曲线：12.72V = 100%, 12.45V = 75%, 12.24V = 50%, 12.06V = 25%, 11.63V = 0%。",
+          "插值计算：12.1V落在50%（12.24V）和25%（12.06V）之间。线性插值得约**35% SOC**。",
+        ]}
+        answer="SOC ≈ 35%"
+        interpretation="铅酸电池的电压与SOC关系相对线性，使得OCV估算比锂电化学体系更为可靠。然而，该电池已明显放电。应至少充电至12.45V（75%）以防止硫酸盐化并维护电池健康。"
+        variant="red"
+      />
+    </div>
+  </section>
+
+  <EngineeringDiagram
+    title="SOC估算方法"
+    description="两种主要方法：基于电压的OCV查表法和库仑计数积分法"
+    variant="flow"
+    steps={[
+      { label: "电池电压", icon: "battery" },
+      { label: "OCV查表", icon: "chart" },
+      { label: "SOC估算值", icon: "chart" },
+    ]}
+  />
+
+  <ComparisonTable
+    title="各方法SOC估算精度对比"
+    headers={["方法", "精度", "要求", "局限性", "适用场景"]}
+    rows={[
+      ["OCV查表法", "±5%", "电压表、OCV表", "必须静置（>2h）", "固定系统"],
+      ["库仑计数", "±2–3%", "电流传感器、计时器", "随时间漂移", "动态系统"],
+      ["阻抗法", "±5–10%", "AC阻抗传感器", "受温度影响大", "BMS集成"],
+      ["混合法（BMS）", "±1–2%", "电压+电流+温度", "算法复杂", "所有锂电体系"],
+    ]}
+    caption="荷电状态估算技术对比"
+  />
+
+  <FAQSection items={faqItems} />
+  <RelatedTools tools={relatedTools} />
+
+  <!-- Calculation Script -->
+  <script>
+    import { estimateSocFromOcv, simulateCoulombCounting } from '../../../utils/calculators';
+
+    const modeSelect = document.getElementById('mode') as HTMLSelectElement;
+    const chemistrySelect = document.getElementById('chemistry') as HTMLSelectElement;
+
+    // Inputs sections
+    const ocvInputs = document.getElementById('ocv-inputs');
+    const coulombInputs = document.getElementById('coulomb-inputs');
+
+    // Inputs elements
+    const voltageInput = document.getElementById('voltage') as HTMLInputElement;
+    const nominalInput = document.getElementById('nominal') as HTMLInputElement;
+    const initialSocInput = document.getElementById('initial-soc') as HTMLInputElement;
+    const currentInput = document.getElementById('current') as HTMLInputElement;
+    const durationInput = document.getElementById('duration') as HTMLInputElement;
+    const durationUnit = document.getElementById('duration-unit') as HTMLSelectElement;
+    const capacityInput = document.getElementById('capacity') as HTMLInputElement;
+
+    // Outputs elements - query inside ResultBox wrappers
+    const resultSocBox = document.getElementById('result-soc');
+    const resultSoc = resultSocBox?.querySelector('.text-display-md') as HTMLElement;
+    const resultStatusDesc = resultSocBox?.querySelector('.text-caption') as HTMLElement;
+    const resultEnergyBox = document.getElementById('result-energy-remaining');
+    const resultEnergyRemaining = resultEnergyBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultEnergyDesc = resultEnergyBox?.querySelector('.text-caption') as HTMLElement;
+
+    function toggleMode() {
+      const mode = modeSelect.value;
+      if (mode === 'ocv') {
+        ocvInputs?.classList.remove('hidden');
+        coulombInputs?.classList.add('hidden');
+      } else {
+        ocvInputs?.classList.add('hidden');
+        coulombInputs?.classList.remove('hidden');
+      }
+      updateCalculations();
+    }
+
+    function updateCalculations() {
+      const mode = modeSelect.value;
+      const chemistry = chemistrySelect.value as "lfp" | "nmc" | "lead-acid";
+
+      let finalSoc = 0;
+      let nominalV = 12.8;
+
+      if (mode === 'ocv') {
+        const voltage = parseFloat(voltageInput.value) || 0;
+        nominalV = parseFloat(nominalInput.value) || 12.8;
+        finalSoc = estimateSocFromOcv(chemistry, voltage, nominalV);
+      } else {
+        const initialSoc = parseFloat(initialSocInput.value) || 50;
+        const current = parseFloat(currentInput.value) || 0;
+        const duration = parseFloat(durationInput.value) || 0;
+        const unit = durationUnit.value;
+        const capacity = parseFloat(capacityInput.value) || 100;
+
+        let durationSec = duration;
+        if (unit === 'minutes') {
+          durationSec = duration * 60;
+        } else if (unit === 'hours') {
+          durationSec = duration * 3600;
+        }
+
+        finalSoc = simulateCoulombCounting(initialSoc, current, durationSec, capacity);
+
+        // Infer nominal voltage for remaining energy output based on chemistry
+        if (chemistry === 'lfp') nominalV = 12.8;
+        else if (chemistry === 'nmc') nominalV = 11.1;
+        else nominalV = 12.0;
+      }
+
+      // Render Outputs
+      if (resultSoc) resultSoc.textContent = `${finalSoc.toFixed(1)}%`;
+
+      let statusStr = "Battery is partially depleted";
+      if (finalSoc >= 95) statusStr = "Battery is fully charged";
+      else if (finalSoc <= 15) statusStr = "Critical: Battery is nearly depleted";
+      if (resultStatusDesc) resultStatusDesc.textContent = statusStr;
+
+      // Estimate Energy Remaining
+      const capacityAh = mode === 'ocv' ? 100 : (parseFloat(capacityInput.value) || 100);
+      const remainingWh = capacityAh * nominalV * (finalSoc / 100);
+
+      if (resultEnergyRemaining) {
+        resultEnergyRemaining.textContent = `${Math.round(remainingWh).toLocaleString()} Wh`;
+      }
+      if (resultEnergyDesc) {
+        resultEnergyDesc.textContent = `Calculated at ${nominalV.toFixed(1)}V nominal and a reference ${capacityAh.toFixed(0)} Ah capacity.`;
+      }
+    }
+
+    modeSelect.addEventListener('change', toggleMode);
+    chemistrySelect.addEventListener('change', updateCalculations);
+
+    [
+      voltageInput, nominalInput, initialSocInput, currentInput,
+      durationInput, durationUnit, capacityInput
+    ].forEach(el => {
+      el.addEventListener('input', updateCalculations);
+    });
+
+    // Run on boot
+    toggleMode();
+  </script>
+</CalculatorLayout>

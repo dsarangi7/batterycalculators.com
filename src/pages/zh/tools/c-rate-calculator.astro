@@ -1,0 +1,381 @@
+---
+import CalculatorLayout from '../../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import InputField from '../../../components/InputField.astro';
+import ResultBox from '../../../components/ResultBox.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import WorkedExample from '../../../components/WorkedExample.astro';
+import ComparisonTable from '../../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../../components/EngineeringDiagram.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import RelatedTools from '../../../components/RelatedTools.astro';
+
+const modeOptions = [
+  { label: "按电流求C率（已知电流）", value: "solve-c" },
+  { label: "按C率求电流（已知C率）", value: "solve-current" },
+];
+
+const whatIs = `C率是相对于电池总容量的充放电电流归一化度量。C率为1C，意味着电流将在恰好一小时内把电池充满或放空；0.5C需要两小时，2C只需30分钟。C率是描述电池性能的通用语言——它让工程师能够在同等基准上比较不同容量的电芯。理解C率对于选择充电器规格、确定合适的放电电流、预测续航时间，以及避开加速衰减或引发热失控的工况至关重要。`;
+
+const whyItMatters = [
+  "充电电流超过推荐C率会导致负极表面析锂，造成容量永久损失并带来安全风险。",
+  "高C率放电会因电压跌落与内阻损耗降低可用容量——一块100Ah电池在2C下可能只能放出80Ah。",
+  "铅酸电池在0.2C以上受严重的佩克特效应影响，因此理解C率对准确预测续航至关重要。",
+  "充电器与电池的C率不匹配，会导致充电过快带来危险，或充电过慢浪费时间。",
+  "C率与发热直接相关（I²R损耗）——超出热极限会触发BMS保护并关机。",
+];
+
+const practicalApplications = [
+  { title: "充电器选型", description: "根据电池化学体系限值选择充电电流——磷酸铁锂长寿命用0.5C，三元快充用1C。" },
+  { title: "负载分析", description: "判断负载电流是否超出当前电池配置的安全持续放电限值。" },
+  { title: "续航估算", description: "将负载功率换算为C率，快速评估电池能否支撑给定的负载曲线。" },
+  { title: "电驱系统选型", description: "使电机电流与电池组C率能力匹配，满足急加速与能量回收需求。" },
+  { title: "通信备电设计", description: "合理配置电池组，使电网长时间中断时备电负载处于安全C率。" },
+];
+
+const expertNotes = [
+  { title: '磷酸铁锂与三元的C率', variant: 'engineering', content: 'LiFePO4电芯通常按0.5C–1C持续倍率优化，短时冲击可达3C。NMC电芯可持续更高倍率（1–2C），但高倍率下循环寿命更短。请务必查阅厂家规格书确认具体C率限值。' },
+  { title: '铅酸佩克特效应', variant: 'warning', content: '重载深循环铅酸系统应限制在0.1C–0.2C，以免容量严重缩水。在1C下，受佩克特效应影响，铅酸电池可能只能放出额定容量的50–60%。' },
+] as const;;
+
+const trustSection = {
+  text: "C率是电池工程领域的通用定义概念（IEC 62660）。本站公式——C = I/容量，时间 = 1/C——均为行业标准定义。所有计算过程透明，并逐步展示。",
+  link: { label: "查看完整计算方法", href: "/zh/methodology/" },
+};
+
+const references = [
+  { title: "Battery University — 什么是C率？", url: "https://batteryuniversity.com/article/bu-402-what-is-the-peukert-effect", source: "Battery University / Cadex Electronics" },
+  { title: "IEC 62660-1 — 电动汽车用二次锂单体电池", url: "https://webstore.iec.ch/en/publication/26272", source: "International Electrotechnical Commission" },
+  { title: "Victron Energy — 蓄电池充放电倍率", url: "https://www.victronenergy.com/help-center", source: "Victron Energy" },
+];
+
+const faqItems = [
+  {
+    question: "“1C”在实际中是什么意思？",
+    answer: "C率为1C，意味着充放电电流将在恰好1小时内把电池充满或放空。对于100Ah电池组，1C对应100A电流；2C（200A）30分钟放空，0.5C（50A）则需2小时。",
+  },
+  {
+    question: "为什么铅酸电池在高C率下容量损失严重？",
+    answer: "铅酸电池依赖酸液向极板活性物质中的化学扩散。大电流（如>0.2C）下，极板附近酸液消耗速度超过本体电解液扩散补充速度，导致端电压迅速下降，提前触发低压断开。",
+  },
+  {
+    question: "C率与衰减有何关系？",
+    answer: "高C率运行（尤其是1C以上充电）会产生显著热应力（I²R发热），并加速锂离子体系的析锂。两者都会加速容量衰减，循环寿命可能减半。",
+  },
+  {
+    question: "充电C率和放电C率一样吗？",
+    answer: "不一样。多数电池规格中，最大持续放电C率明显高于充电C率。例如优质LFP电芯可持续1C放电，但充电限值可能只有0.5C。",
+  },
+  {
+    question: "磷酸铁锂电池的安全C率是多少？",
+    answer: "标准LFP电芯支持0.5C–1C持续放电、0.2C–0.5C充电，以获得最优循环寿命。部分高功率LFP电芯支持最高3C短时放电。请务必查阅厂家规格书确认具体限值。",
+  },
+  {
+    question: "C率如何影响电池续航？",
+    answer: "C率越高，内阻损耗越大，可用容量越低。100Ah电池在0.1C下接近放出100Ah，在2C下可能只能放出80–85Ah。铅酸电池因佩克特效应尤为明显。",
+  },
+  {
+    question: "可以用高于标称的C率充电吗？",
+    answer: "超过厂家推荐充电C率有析锂、热失控风险，且可能失去质保。个别电芯可耐受短暂高倍率充电，但长期超标充电会显著加速衰减。",
+  },
+  {
+    question: "太阳能充电宜用多大C率？",
+    answer: "太阳能控制器充电倍率一般为0.2C–0.5C，取决于光伏阵列功率与电池容量。200Ah磷酸铁锂配100A充电器即0.5C，多数LFP体系可以接受。",
+  },
+  {
+    question: "如何把瓦特换算成C率？",
+    answer: "用负载功率（瓦）除以电池电压得到电流（安），再除以容量（Ah）。公式：C率 = 功率(W) /（电压(V) × 容量(Ah)）。例如12.8V 100Ah电池带250W负载 = 250/(12.8×100) = 0.195C。",
+  },
+  {
+    question: "放电C率过高会怎样？",
+    answer: "放电C率过高会导致电压跌落、可用容量下降、过热，甚至触发BMS关机。极端情况下可能因铜溶解或内部短路造成电芯永久损伤。",
+  },
+];
+
+const commonMistakes = [
+  "混淆充电与放电C率——最大充电倍率通常远低于放电倍率。支持1C放电的电芯，安全充电可能只有0.3C。",
+  "选充电器时忽视C率——功率过大的充电器可能导致析锂、热失控，并使质保失效。",
+  "用Ah比较不同电压的电池——C率按容量归一化了性能，但公平比较还需看总能量（Wh）。",
+  "误以为高C率下放电呈线性——内阻损耗（I²R）随电流平方增长，可用容量下降比预期更多。",
+  "忽视温度对C率的影响——低温下内阻增大，安全最大C率实际降低。25°C下标称1C的电池，在0°C下可能只能安全承受0.5C。",
+  "为求快而盲目加大充电C率——1C及以上充电发热显著、加速衰减。日常使用建议保持0.2C–0.5C以延长寿命。",
+  "铅酸计算不考虑佩克特效应——高C率下铅酸电池会损失30–50%额定容量，铅酸计算务必使用佩克特修正值。",
+  "用理论放电时间估算续航——1/C给出的是100% DoD下的理论时间，实际续航受DoD限制、效率损耗与电压跌落影响会更短。",
+  "忽视BMS的C率限值——BMS施加的C率限制可能低于电芯厂家标称，务必同时查阅BMS规格书，而不仅看电芯规格书。",
+  "将C率能力不同的电芯并联混用——内阻小的串会分担过大电流，导致失衡与过热。",
+];
+
+const relatedTools = [
+  { href: "/zh/tools/runtime-calculator/", title: "电池续航时间计算器", description: "直接根据瓦特负载计算续航时间。" },
+  { href: "/zh/tools/battery-sizing-calculator/", title: "电池容量计算器", description: "根据日耗电量确定所需电池容量。" },
+  { href: "/zh/tools/solar-battery-sizing-calculator/", title: "太阳能蓄电池计算器", description: "根据日耗电与备电天数确定太阳能蓄电池容量。" },
+  { href: "/zh/tools/home-backup-battery-calculator/", title: "家庭备用电池计算器", description: "计算停电期间家庭备用电源所需容量。" },
+  { href: "/zh/tools/rv-battery-calculator/", title: "房车电池计算器", description: "估算房车日常用电与所需电池容量。" },
+  { href: "/zh/tools/battery-pack-calculator/", title: "电池组计算器", description: "设计串联/并联电芯配置。" },
+];
+
+const relatedArticles = [
+  { href: "/learn/what-is-battery-c-rate/", title: "什么是电池C率" },
+  { href: "/learn/battery-c-rate-reference/", title: "电池C率速查表" },
+  { href: "/learn/battery-charging-formula/", title: "电池充电公式详解" },
+  { href: "/learn/lifepo4-vs-nmc/", title: "磷酸铁锂与三元锂对比" },
+];
+---
+
+<CalculatorLayout
+  title="C率计算器｜充放电电流与倍率｜电池计算器"
+  description="C率计算器：输入电池容量Ah与充放电电流A，一键算出C率倍率与理论充放时长，校核锂电池安全电流，公式全公开。"
+  faqItems={faqItems}
+  commonMistakes={commonMistakes}
+  relatedArticles={relatedArticles}
+  relatedCalculators={relatedTools}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+  lang="zh"
+>
+
+  <!-- Main Calculator Grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+
+    <!-- Input Form -->
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">参数</h3>
+      <div class="flex flex-col gap-6">
+        <InputField id="mode" label="计算目标" type="select" options={modeOptions} value="solve-c" />
+        <InputField id="capacity" label="电池容量 (Ah)" value={100} min={0.1} step="any" />
+
+        <!-- Dynamic Input (Current or C-rate) -->
+        <div class="flex flex-col gap-2" id="input-current-wrapper">
+          <label for="input-val" class="text-label-uppercase text-xs text-primary" id="dynamic-label">持续电流（安培）</label>
+          <input type="number" id="input-val" value="50" class="text-input" min="0.01" step="any" />
+        </div>
+
+      </div>
+    </CalculatorCard>
+
+    <!-- Calculation Results -->
+    <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">预计输出</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <!-- Main Output 1 -->
+          <ResultBox
+            id="result-val-1-box"
+            label=""
+            value="0.50 C"
+            variant="primary"
+          >
+            <span class="text-label-uppercase text-muted text-[10px] block mb-1" id="out-label-1">计算得出的C率</span>
+            <span class="text-caption text-muted block mt-1" id="out-desc-1">电流/容量比值</span>
+          </ResultBox>
+
+          <!-- Main Output 2 -->
+          <ResultBox
+            id="result-val-2-box"
+            label="放电时长"
+            value="2h 00m"
+          >
+            <span class="text-caption text-muted block mt-1" id="result-hours-decimal">2.00 小时</span>
+          </ResultBox>
+        </div>
+      </div>
+
+      <!-- Action Area -->
+      <div class="border-t border-hairline pt-6">
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">C率指引（锂电与铅酸）</h4>
+        <p class="text-body-sm text-muted">
+          LiFePO4电芯通常按0.5C–1C持续倍率优化，短时冲击可达3C。重载深循环铅酸系统应限制在0.1C–0.2C，以免容量严重缩水。
+        </p>
+      </div>
+    </CalculatorCard>
+
+  </div>
+
+  <!-- Formulas and Worked Examples -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">公式与计算示例</h2>
+
+    <FormulaBox title="数学公式">
+      <p>
+        C率表示电池相对其最大容量的充电或放电快慢。
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        C率 (h⁻¹) = 电流 (A) / 容量 (Ah)
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        放电电流 (A) = 容量 (Ah) × C率 (h⁻¹)
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        理论时间（小时）= 1 / C率
+      </div>
+    </FormulaBox>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample
+        number={1}
+        title="由电流求C率"
+        scenario="一块200Ah磷酸铁锂电池以100A持续放电，C率与理论续航是多少？"
+        inputs={[
+          { label: "电池容量", value: "200 Ah" },
+          { label: "放电电流", value: "100 A" },
+        ]}
+        steps={[
+          { label: "步骤1：求C率", formula: "C = I / 容量 = 100 A / 200 Ah", result: "0.50 C" },
+          { label: "步骤2：求理论放电时间", formula: "T = 1 / C率 = 1 / 0.50", result: "2.00 小时" },
+          { label: "步骤3：按80% DoD折算", formula: "T实际 = 2.00 h × 0.80", result: "1.60 小时 (1h 36m)" },
+        ]}
+        answer="C率 = 0.50C，理论续航 = 2.00小时（80% DoD下为1.60小时）"
+        interpretation="0.5C下这块LFP电池处于最佳放电区间。80% DoD折算考虑了为保护循环寿命而建议的放电深度限制。"
+        variant="default"
+      />
+
+      <WorkedExample
+        number={2}
+        title="由C率求电流"
+        scenario="一块100Ah三元电池按0.5C放电，应取多大电流、能用多久？"
+        inputs={[
+          { label: "电池容量", value: "100 Ah" },
+          { label: "目标C率", value: "0.5 C" },
+        ]}
+        steps={[
+          { label: "步骤1：求放电电流", formula: "I = 容量 × C率 = 100 Ah × 0.5", result: "50 A" },
+          { label: "步骤2：求理论续航", formula: "T = 1 / C率 = 1 / 0.5", result: "2.00 小时" },
+        ]}
+        answer="放电电流 = 50 A，续航 = 2.00小时"
+        interpretation="0.5C对三元体系属于中等倍率，兼顾性能与寿命。按此倍率充电约需2.5小时（含恒压段）。"
+      />
+
+      <WorkedExample
+        number={3}
+        title="高C率铅酸与锂电对比"
+        scenario="一块100Ah铅酸电池以50A（0.5C）放电，与同规格锂电对比可用容量。"
+        inputs={[
+          { label: "电池容量", value: "100 Ah（两者相同）" },
+          { label: "放电电流", value: "50 A (0.5C)" },
+          { label: "化学体系", value: "铅酸 vs LFP" },
+        ]}
+        steps={[
+          { label: "铅酸0.5C", formula: "可用容量 ≈ 100 Ah × 0.60（佩克特）", result: "放出60 Ah" },
+          { label: "LFP 0.5C", formula: "可用容量 ≈ 100 Ah × 0.95", result: "放出95 Ah" },
+          { label: "容量差", formula: "95 Ah - 60 Ah", result: "LFP多放35 Ah" },
+        ]}
+        answer="0.5C下铅酸约放出60Ah、LFP约放出95Ah——锂电优势达58%"
+        interpretation="铅酸佩克特效应导致高C率下容量严重损失。0.5C时铅酸损失约40%额定容量，而锂电几乎全部保留。"
+        variant="default"
+      />
+    </div>
+  </section>
+
+  <EngineeringDiagram
+    title="C率系统流程"
+    description="电池容量、电流与C率在放电系统中的关系"
+    variant="flow"
+    steps={[
+      { label: "电池组", icon: "battery" },
+      { label: "电流输出", icon: "cable" },
+      { label: "所带负载", icon: "load" },
+      { label: "续航输出", icon: "chart" },
+    ]}
+  />
+
+  <ComparisonTable
+    title="各化学体系C率——推荐限值"
+    headers={["化学体系", "最大持续放电", "推荐充电", "短时冲击放电", "对循环寿命的影响"]}
+    rows={[
+      ["LiFePO4（磷酸铁锂）", "1C", "0.5C", "3C", "≤1C下影响极小"],
+      ["NMC（三元锂）", "2C", "0.7C", "3C", ">1C下影响中等"],
+      ["铅酸（AGM）", "0.2C", "0.1C", "0.5C", "佩克特损失严重"],
+      ["铅酸（富液式）", "0.1C", "0.1C", "0.3C", "佩克特损失严重"],
+      ["胶体电池", "0.2C", "0.1C", "0.5C", "佩克特损失中等"],
+    ]}
+    caption="为保证最优循环寿命的推荐持续C率，超限会加速衰减。"
+  />
+
+  <FAQSection items={faqItems} />
+
+  <!-- Calculation Script -->
+  <script>
+    import { calculateCRate } from '../../../utils/calculators';
+
+    const modeSelect = document.getElementById('mode') as HTMLSelectElement;
+    const capacityInput = document.getElementById('capacity') as HTMLInputElement;
+    const dynamicLabel = document.getElementById('dynamic-label');
+    const inputVal = document.getElementById('input-val') as HTMLInputElement;
+
+    // Outputs
+    const outLabel1 = document.getElementById('out-label-1');
+    const outDesc1 = document.getElementById('out-desc-1');
+    const resultVal1Box = document.getElementById('result-val-1-box');
+    const resultVal1 = resultVal1Box?.querySelector('.text-display-md') as HTMLElement;
+    const resultVal2Box = document.getElementById('result-val-2-box');
+    const resultVal2 = resultVal2Box?.querySelector('.text-title-lg') as HTMLElement;
+    const resultHoursDecimal = document.getElementById('result-hours-decimal');
+
+    function updateLabels() {
+      const mode = modeSelect.value;
+      if (mode === 'solve-c') {
+        if (dynamicLabel) dynamicLabel.textContent = '持续电流（安培）';
+        if (outLabel1) outLabel1.textContent = '计算得出的C率';
+        if (outDesc1) outDesc1.textContent = '电流/容量比值';
+      } else {
+        if (dynamicLabel) dynamicLabel.textContent = '目标C率（h⁻¹）';
+        if (outLabel1) outLabel1.textContent = '计算得出的电流';
+        if (outDesc1) outDesc1.textContent = '所需安培电流';
+      }
+      updateCalculations();
+    }
+
+    function updateCalculations() {
+      const mode = modeSelect.value;
+      const capacity = parseFloat(capacityInput.value) || 100;
+      const val = parseFloat(inputVal.value) || 0;
+
+      const calcTarget = mode === 'solve-c' ? 'current' : 'time';
+      const calcVal = calcTarget === 'current' ? val : (val > 0 ? 1 / val : 0);
+
+      const results = calculateCRate(capacity, calcTarget, calcVal);
+
+      if (mode === 'solve-c') {
+        if (resultVal1) resultVal1.textContent = `${results.cRate.toFixed(2)} C`;
+
+        if (results.timeHours <= 0) {
+          if (resultVal2) resultVal2.textContent = '0h 00m';
+          if (resultHoursDecimal) resultHoursDecimal.textContent = '0.00 小时';
+        } else {
+          const totalMins = Math.round(results.timeHours * 60);
+          const hours = Math.floor(totalMins / 60);
+          const mins = totalMins % 60;
+          if (resultVal2) resultVal2.textContent = `${hours}h ${mins < 10 ? '0' : ''}${mins}m`;
+          if (resultHoursDecimal) resultHoursDecimal.textContent = `${results.timeHours.toFixed(2)} 小时`;
+        }
+      } else {
+        if (resultVal1) resultVal1.textContent = `${results.currentA.toFixed(1)} A`;
+
+        const timeHours = val > 0 ? 1 / val : 0;
+        if (timeHours <= 0) {
+          if (resultVal2) resultVal2.textContent = '0h 00m';
+          if (resultHoursDecimal) resultHoursDecimal.textContent = '0.00 小时';
+        } else {
+          const totalMins = Math.round(timeHours * 60);
+          const hours = Math.floor(totalMins / 60);
+          const mins = totalMins % 60;
+          if (resultVal2) resultVal2.textContent = `${hours}h ${mins < 10 ? '0' : ''}${mins}m`;
+          if (resultHoursDecimal) resultHoursDecimal.textContent = `${timeHours.toFixed(2)} 小时`;
+        }
+      }
+    }
+
+    modeSelect.addEventListener('change', updateLabels);
+    [capacityInput, inputVal].forEach(el => {
+      el.addEventListener('input', updateCalculations);
+    });
+
+    // Run on boot
+    updateLabels();
+  </script>
+</CalculatorLayout>

@@ -1,0 +1,396 @@
+---
+import CalculatorLayout from '../../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import InputField from '../../../components/InputField.astro';
+import ResultBox from '../../../components/ResultBox.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import WorkedExample from '../../../components/WorkedExample.astro';
+import ComparisonTable from '../../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../../components/EngineeringDiagram.astro';
+
+const whatIs = `逆变器电池计算器用于确定通过DC-AC逆变器为交流负载供电所需的直流电池组容量。逆变器将12V、24V或48V电池电力转换为120V/240V家用交流电，但此转换并非100%高效。本计算器考虑了逆变器效率损耗（通常为8–15%）、放电深度限制以及浪涌电流需求。无论您是在为家用电器配置备用系统，还是为离网太阳能装置选型，本工具都能确保电池组在所需时间内持续供电，满足目标交流负载需求，同时避免电池过早失效。`;
+
+const whyItMatters = [
+  "电池组容量不足会导致逆变器在电压跌落至低压保护阈值时自动关机——通常在停电的深夜发生。",
+  "忽略逆变器效率（通常有10–15%的损耗）会导致电池组在纸面上看似足够，实际运行时间却比预期少15%。",
+  "未考虑电机和压缩机的浪涌电流会引起逆变器过载跳闸——冰箱和水泵的启动电流可达运行功率的3–5倍。",
+  "在逆变器系统中将铅酸电池放电超过50% DoD，会造成电压跌落，即使逆变器远未达到额定功率也会触发低电压报警。",
+  "电池电压与逆变器额定值不匹配会迫使过大的直流电流——从12V电池抽取200A需要00号线缆，并产生显著的电阻损耗。",
+];
+
+const practicalApplications = [
+  { title: "家庭停电备用", description: "为停电期间8–48小时持续运行冰箱、照明、路由器、医疗设备等关键交流负载配置电池组容量。" },
+  { title: "离网太阳能储能", description: "计算为离网小屋、微型住宅或偏远设施的夜间交流负载存储太阳能所需的电池容量。" },
+  { title: "工坊与工地供电", description: "为无电网接入区域的电动工具、照明和设备配置便携式逆变器系统。" },
+  { title: "应急与灾害预防", description: "设计电池备用系统，在多日停电期间维持关键通信、冷藏和医疗设备的充足容量。" },
+];
+
+const expertNotes: { title: string; variant: 'engineering' | 'warning'; content: string }[] = [
+  {
+    title: "不同负载水平下的逆变器效率",
+    variant: "engineering",
+    content: "逆变器效率并非恒定——在额定负载10%时，效率可能仅为80–85%；在50–80%负载时，效率达到峰值90–95%。为精确选型，对25–75%逆变器容量范围内的负载，建议使用90%作为保守平均效率。对于极轻负载（待机功率），即使未连接负载，逆变器本身也会消耗5–20W。",
+  },
+  {
+    title: "浪涌功率与持续功率额定值",
+    variant: "warning",
+    content: "逆变器有两个功率额定值：持续功率（持续输出）和浪涌功率（1–10秒峰值）。电机启动时可产生运行电流3–7倍的浪涌电流，持续1–3秒。如果电池组无法在不产生过大电压跌落的情况下提供此浪涌电流，即使持续负载在额定范围内，逆变器也会跳闸。请务必确认电池的最大放电速率与逆变器的浪涌规格匹配。",
+  },
+];
+
+const trustSection = {
+  text: "本计算器采用标准的DC-AC转换效率因子（根据负载水平为88–95%）和特定化学体系的放电深度限制。所有公式均源自厂商数据手册和IEEE电池放电标准。计算过程完全透明，您可以独立验证每一步。",
+  link: { label: "查看完整计算方法与公式推导", href: "/zh/methodology/" },
+};
+
+const references = [
+  { title: "IEEE 1189 — 阀控式铅酸蓄电池选型指南", url: "https://standards.ieee.org/ieee/1189/5989/", source: "IEEE Standards Association" },
+  { title: "NREL — 电池选型逆变器效率曲线", url: "https://www.nrel.gov/docs/fy23osti/85472.pdf", source: "National Renewable Energy Laboratory" },
+  { title: "Victron Energy — 逆变器与电池组选型指南", url: "https://www.victronenergy.com/learn/inverter-battery-sizing", source: "Victron Energy Technical Library" },
+  { title: "Battery University — 电池组选型", url: "https://batteryuniversity.com/article/sizing-the-bank", source: "Battery University (Cadex Electronics)" },
+];
+
+const faqItems = [
+  {
+    question: "应假设多大的逆变器效率？",
+    answer: "现代纯正弦波逆变器的效率为88–95%。保守估计取90%，涵盖典型负载水平下的转换效率损耗。效率在极轻负载（低于额定容量10%）时下降，接近额定负载时上升。",
+  },
+  {
+    question: "逆变器电池的安全放电深度是多少？",
+    answer: "LFP（磷酸铁锂）电池可安全放电至80–90% DoD。铅酸（AGM/GEL）不应超过50% DoD以保证合理的循环寿命。NMC三元锂可使用80% DoD。超过推荐放电深度将显著缩短电池使用寿命。",
+  },
+  {
+    question: "可以用12V、24V或48V电池运行逆变器吗？",
+    answer: "可以，但电池电压影响电流大小。2000W负载在12V电池下抽取约185A电流（需粗线缆），而48V系统仅抽取约46A（线缆更细、损耗更低）。对于2000W以上负载，更高电压系统效率更高。",
+  },
+  {
+    question: "如何计算逆变器下电池的运行时间？",
+    answer: "运行时间 =（电池Wh × DoD% × 逆变器效率）/ 负载功率。例如，一块12V 200Ah LFP电池（2400Wh），80% DoD，逆变器效率90%，运行1000W负载：(2400 × 0.80 × 0.90) / 1000 = 1.73小时。",
+  },
+  {
+    question: "纯正弦波逆变器与修正正弦波逆变器有什么区别？",
+    answer: "纯正弦波逆变器产生与电网电力相同的洁净交流电，兼容所有电器，包括敏感电子设备。修正正弦波逆变器产生阶梯式近似波形，可能损坏电机、产生可闻嗡嗡声并降低效率。医疗设备、冰箱和电子设备请务必使用纯正弦波逆变器。",
+  },
+  {
+    question: "如何考虑电器的浪涌电流？",
+    answer: "电机和压缩机在启动时1–3秒内可产生运行电流3–7倍的浪涌电流。一台500W冰箱压缩机可能瞬间飙升至1500–2000W。请确保逆变器的浪涌功率额定值超过最高启动需求，且电池组能在不产生过大电压跌落至逆变器低压保护阈值的情况下提供浪涌电流。",
+  },
+  {
+    question: "可以用汽车电池配合逆变器使用吗？",
+    answer: "<span class=\"text-primary font-bold\">不建议。</span>汽车启动电池设计用于大电流短时间启动，而非深度放电。将汽车电池放电超过50% DoD运行逆变器，几周内就会损坏电池。请使用专为持续放电设计的深循环AGM、GEL或LFP电池。",
+  },
+  {
+    question: "电池电压如何影响逆变器性能？",
+    answer: "更高的电池电压可在相同交流输出功率下降低直流电流。在12V下，2000W负载抽取约185A电流（需4/0 AWG粗线缆）；在48V下，同样负载仅抽取约46A电流（标准6 AWG线缆）。更低的电流意味着更小的电压降、更细的线缆和更高的效率。对于2000W以上系统，强烈建议使用48V。",
+  },
+  {
+    question: "电池电压过低会发生什么？",
+    answer: "当电池电压跌落至逆变器低压保护阈值以下（12V系统通常为10.5V，24V为21V，48V为42V），逆变器会自动关机以保护电池。对于铅酸电池，深度放电会导致硫化和永久容量损失。LFP电池对低电压的耐受性较好，但仍需要BMS切断保护。",
+  },
+  {
+    question: "逆变器使用是否需要电池管理系统（BMS）？",
+    answer: "是的，锂离子电池（LFP/NMC）必须配备BMS——它提供过放、过充、过流和极端温度保护。铅酸系统使用充电控制器和电压监控。BMS低压切断阈值应设置得高于逆变器的低压切断值，以防止电芯损坏。",
+  },
+  {
+    question: "可以用电池逆变器运行空调吗？",
+    answer: "取决于BTU额定值和电池容量。一台5000 BTU窗式空调运行功耗约500W，但启动浪涌可达1000–1500W。一套48V 200Ah LFP电池组（9.6 kWh）可运行6–8小时。大型空调需要48V系统配合400Ah以上容量。建议考虑能效更高的迷你分体热泵。",
+  },
+  {
+    question: "逆变器使用后电池需要多长时间重新充满？",
+    answer: "充电时间 =（消耗能量 / 充电器功率）/ 效率。如果从电池放电5 kWh，以1 kW功率充电（电网或太阳能），约需5.5小时（按90%充电效率计算）。太阳能充电取决于光伏板功率和日照时数——400W光伏板在平均条件下每天可提供约1.6 kWh。",
+  },
+];
+
+const commonMistakes = [
+  "忽略逆变器效率——一台90%效率的逆变器会浪费10%的电池能量。请将负载功率乘以1/效率得到实际所需的直流功率。",
+  "直接使用交流负载瓦数进行直流电池选型——由于转换损耗，逆变器的输入功率高于输出功率。务必考虑逆变器效率。",
+  "忽略浪涌负载——电器中的电机在启动时需要3–5倍的运行功率。电池和逆变器必须能处理这些峰值而不关机。",
+  "混淆Ah和Wh——一块100Ah 12V电池储存1,280 Wh，而非100 Wh。在计算运行时间前，请务必转换为Wh。",
+  "未考虑放电深度限制——将锂电池放电至0%会加速衰减。计算时请使用80% DoD（LFP）和80% DoD（NMC）。",
+  "忽略电池与逆变器之间的线缆损耗——线缆截面不足会导致电压降，减少到达逆变器输入端的有效能量。",
+  "为电池匹配过大的逆变器——大逆变器配小电池会很快耗尽电池电量。请使逆变器容量与电池容量匹配。",
+  "忽略温度折减——低温会使电池容量降低10–30%。请按最差工况温度选型。",
+  "使用峰值负载代替平均负载——运行时间计算应使用持续平均负载，而非电机启动的瞬时峰值负载。",
+  "未考虑往返效率——电池充放电会损失5–15%的能量。请将此计入系统总效率计算。",
+];
+
+const relatedArticles = [
+  { href: "/zh/learn/inverter-battery-runtime-guide/", title: "逆变器电池运行时间指南" },
+  { href: "/zh/learn/12v-vs-24v-vs-48v-runtime/", title: "12V vs 24V vs 48V运行时间对比" },
+  { href: "/zh/learn/battery-voltage-systems/", title: "电池电压系统" },
+];
+
+const relatedCalculators = [
+  { href: "/zh/tools/runtime-calculator/", title: "运行时间计算器", description: "根据容量和负载计算放电时间。" },
+  { href: "/zh/tools/battery-sizing-calculator/", title: "电池容量计算器", description: "含温度折减的完整电池组选型。" },
+  { href: "/zh/tools/energy-conversion-calculator/", title: "能量单位转换", description: "在任意电压下进行Ah与Wh转换。" },
+  { href: "/zh/tools/parallel-string-calculator/", title: "并联串计算器", description: "设计电池组的串并联电芯配置。" },
+  { href: "/zh/tools/c-rate-calculator/", title: "C率计算器", description: "验证电池放电速率是否匹配逆变器需求。" },
+  { href: "/zh/tools/home-backup-battery-calculator/", title: "家庭备用电池计算器", description: "为关键负载配置完整家庭备用系统。" },
+];
+---
+
+<CalculatorLayout
+  title="逆变器电池计算器｜蓄电池容量选型｜电池计算器"
+  description="逆变器电池计算器：根据交流负载功率、运行时间、逆变器效率和放电深度，计算所需电池容量Ah与kWh。支持12V/24V/48V系统选型，公式全公开。"
+  faqItems={faqItems}
+  commonMistakes={commonMistakes}
+  relatedArticles={relatedArticles}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+  relatedCalculators={relatedCalculators}
+  lang="zh"
+>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+
+    <!-- 输入表单 -->
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">负载参数</h3>
+      <div class="flex flex-col gap-6">
+
+        <InputField id="ac-load" label="交流负载功率" value={2000} min={100} step={100} unit="W" helperText="连接到逆变器的所有交流设备的总功率。" />
+
+        <InputField id="runtime-hours" label="所需运行时间" value={2} min={0.5} max={72} step={0.5} unit="小时" helperText="电池需为交流负载供电的时长。" />
+
+        <InputField id="inverter-efficiency" label="逆变器效率" value={90} min={70} max={100} step={1} unit="%" helperText="纯正弦波：90–95%。保守选型请取90%。" />
+
+        <InputField id="battery-voltage" label="电池系统电压" value={48} min={12} step={1} unit="V" helperText="12V小型、24V中型、48V全屋或大功率系统。" />
+
+        <InputField id="usable-dod" label="可用放电深度" value={80} min={20} max={100} step={1} unit="%" helperText="LFP：80–90%，铅酸：建议50%。" />
+
+      </div>
+    </CalculatorCard>
+
+    <!-- 结果 -->
+    <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">选型结果</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <ResultBox
+            label="所需交流能量"
+            value="4,000 Wh"
+            suffix="负载 × 运行时间"
+            variant="primary"
+            id="result-ac-energy"
+          />
+          <ResultBox
+            label="所需直流电池能量"
+            value="4,444 Wh"
+            suffix="扣除逆变器损耗后"
+            id="result-dc-energy"
+          />
+          <ResultBox
+            label="推荐容量"
+            value="116.1 Ah"
+            suffix="标称48V下"
+            id="result-capacity"
+          />
+          <ResultBox
+            label="推荐电池组容量"
+            value="5.56 kWh"
+            suffix="电池总能量"
+            id="result-bank-size"
+          />
+        </div>
+      </div>
+
+      <div class="border-t border-hairline pt-6">
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">电池推荐</h4>
+        <p class="text-body-sm text-muted" id="battery-recommendation">
+          对于2,000W交流负载在48V下运行2小时，一块48V 120Ah LFP电池（5.76 kWh）即可提供所需备用运行时间。
+        </p>
+      </div>
+    </CalculatorCard>
+
+  </div>
+
+  <!-- 公式与计算示例 -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">公式与计算示例</h2>
+
+    <FormulaBox title="数学公式">
+      <p>
+        逆变器电池选型将交流负载需求反推至直流电池容量，并考虑转换损耗：
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        交流能量 = 负载功率 × 运行时间
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        直流能量 = 交流能量 / 逆变器效率
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        调整后电池能量 = 直流能量 / 放电深度%
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        所需Ah = 调整后电池能量 / 电池电压
+      </div>
+      <p>
+        逆变器效率因子（通常为90%）用于补偿DC-AC转换损耗。放电深度因子确保电池不会过放。
+      </p>
+    </FormulaBox>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample
+        number={1}
+        title="为2000W逆变器选型——12V系统"
+        scenario="设计一套12V电池备用系统，在停电期间为2000W交流负载供电4小时。"
+        inputs={[
+          "交流负载：2,000W",
+          "所需运行时间：4小时",
+          "逆变器效率：90%",
+          "电池电压：12V",
+          "可用放电深度：80%（LFP）",
+        ]}
+        steps={[
+          "交流能量 = 2,000W × 4h = 8,000 Wh",
+          "直流能量 = 8,000 / 0.90 = 8,889 Wh",
+          "电池能量 = 8,889 / 0.80 = 11,111 Wh",
+          "所需Ah = 11,111 / 12 = 925.9 Ah",
+        ]}
+        answer="需要一块12V 950Ah LFP电池组（11.4 kWh）。"
+        interpretation="在12V下，直流电流约185A——必须使用4/0 AWG粗线缆。建议升级至24V或48V以减小线缆截面和电阻损耗。"
+      />
+
+      <WorkedExample
+        number={2}
+        title="为5000W逆变器选型——48V系统"
+        scenario="为5000W工坊负载配置48V电池组，需要2小时运行时间。"
+        inputs={[
+          "交流负载：5,000W",
+          "所需运行时间：2小时",
+          "逆变器效率：90%",
+          "电池电压：48V",
+          "可用放电深度：80%（LFP）",
+        ]}
+        steps={[
+          "交流能量 = 5,000W × 2h = 10,000 Wh",
+          "直流能量 = 10,000 / 0.90 = 11,111 Wh",
+          "电池能量 = 11,111 / 0.80 = 13,889 Wh",
+          "所需Ah = 13,889 / 48 = 289.4 Ah",
+        ]}
+        answer="需要一块48V 300Ah LFP电池组（14.4 kWh）。"
+        interpretation="在48V下，直流电流约115A——使用2 AWG线缆即可。该5kW系统受益于更高电压，直流电流仅为12V方案的一半左右。"
+      />
+
+      <WorkedExample
+        number={3}
+        title="对比12V与48V在3000W负载下的表现"
+        scenario="比较两种电压配置在3000W负载下2小时运行时间的效率差异。"
+        inputs={[
+          "交流负载：3,000W",
+          "所需运行时间：2小时",
+          "逆变器效率：90%",
+          "方案A：12V系统",
+          "方案B：48V系统",
+          "可用放电深度：80%（LFP）",
+        ]}
+        steps={[
+          "交流能量 = 3,000W × 2h = 6,000 Wh",
+          "直流能量 = 6,000 / 0.90 = 6,667 Wh",
+          "电池能量 = 6,667 / 0.80 = 8,333 Wh",
+          "12V：Ah = 8,333 / 12 = 694.4 Ah | 直流电流约278A",
+          "48V：Ah = 8,333 / 48 = 173.6 Ah | 直流电流约69A",
+        ]}
+        answer="两者均需8.33 kWh电池容量。12V需694Ah、电流约278A；48V需174Ah、电流约69A。"
+        interpretation="48V系统电流仅为12V的1/4，可使用更细线缆（6 AWG vs 4/0 AWG），降低电阻损耗，提高输电效率。1500W以上负载强烈建议使用48V。"
+      />
+    </div>
+  </section>
+
+  <EngineeringDiagram
+    title="逆变器-电池系统"
+    description="直流电池电力经逆变器转换为交流电，每个阶段均有损耗"
+    variant="system"
+    steps={[
+      { label: "电池组", icon: "battery" },
+      { label: "直流线缆", icon: "cable" },
+      { label: "逆变器", icon: "inverter" },
+      { label: "交流负载", icon: "load" },
+    ]}
+  />
+
+  <ComparisonTable
+    title="不同负载水平下的逆变器效率"
+    headers={["负载水平", "典型效率", "功率损耗", "发热量", "备注"]}
+    rows={[
+      ["10%（200W）", "82–85%", "30–35W", "中等", "待机损耗占主导"],
+      ["25%（500W）", "88–90%", "60–70W", "中等", "效率良好区间"],
+      ["50%（1kW）", "90–93%", "70–100W", "正常", "最佳工作点"],
+      ["75%（1.5kW）", "91–93%", "110–140W", "正常", "接近峰值效率"],
+      ["100%（2kW）", "89–92%", "160–220W", "较高", "可能出现热降额"],
+    ]}
+    caption="逆变器效率随负载水平显著变化——过度选型会降低轻负载时的效率"
+  />
+
+  <FAQSection items={faqItems} />
+
+  <!-- 计算脚本 -->
+  <script>
+    import { calculateInverterBattery } from '../../../utils/calculators';
+
+    const acLoadInput = document.getElementById('ac-load') as HTMLInputElement;
+    const runtimeHoursInput = document.getElementById('runtime-hours') as HTMLInputElement;
+    const inverterEfficiencyInput = document.getElementById('inverter-efficiency') as HTMLInputElement;
+    const batteryVoltageInput = document.getElementById('battery-voltage') as HTMLInputElement;
+    const usableDodInput = document.getElementById('usable-dod') as HTMLInputElement;
+
+    const resultAcEnergyBox = document.getElementById('result-ac-energy');
+    const resultAcEnergyValue = resultAcEnergyBox?.querySelector('.text-display-md') as HTMLElement;
+    const resultAcEnergySuffix = resultAcEnergyBox?.querySelector('.text-caption') as HTMLElement;
+
+    const resultDcEnergyBox = document.getElementById('result-dc-energy');
+    const resultDcEnergyValue = resultDcEnergyBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultDcEnergySuffix = resultDcEnergyBox?.querySelector('.text-caption') as HTMLElement;
+
+    const resultCapacityBox = document.getElementById('result-capacity');
+    const resultCapacityValue = resultCapacityBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultCapacitySuffix = resultCapacityBox?.querySelector('.text-caption') as HTMLElement;
+
+    const resultBankSizeBox = document.getElementById('result-bank-size');
+    const resultBankSizeValue = resultBankSizeBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultBankSizeSuffix = resultBankSizeBox?.querySelector('.text-caption') as HTMLElement;
+
+    const batteryRecommendationEl = document.getElementById('battery-recommendation');
+
+    function updateCalculations() {
+      const acLoad = parseFloat(acLoadInput.value) || 2000;
+      const runtimeHours = parseFloat(runtimeHoursInput.value) || 2;
+      const inverterEfficiency = parseFloat(inverterEfficiencyInput.value) || 90;
+      const batteryVoltage = parseFloat(batteryVoltageInput.value) || 48;
+      const usableDod = parseFloat(usableDodInput.value) || 80;
+
+      const results = calculateInverterBattery(acLoad, runtimeHours, inverterEfficiency, batteryVoltage, usableDod);
+
+      if (resultAcEnergyValue) resultAcEnergyValue.textContent = `${Math.round(results.acEnergyWh).toLocaleString()} Wh`;
+      if (resultAcEnergySuffix) resultAcEnergySuffix.textContent = 'Load × runtime';
+
+      if (resultDcEnergyValue) resultDcEnergyValue.textContent = `${Math.round(results.dcEnergyWh).toLocaleString()} Wh`;
+      if (resultDcEnergySuffix) resultDcEnergySuffix.textContent = 'After inverter losses';
+
+      if (resultCapacityValue) resultCapacityValue.textContent = `${results.requiredCapacityAh.toFixed(1)} Ah`;
+      if (resultCapacitySuffix) resultCapacitySuffix.textContent = `At ${batteryVoltage}V nominal`;
+
+      if (resultBankSizeValue) resultBankSizeValue.textContent = `${results.adjustedBatteryEnergyKwh.toFixed(2)} kWh`;
+      if (resultBankSizeSuffix) resultBankSizeSuffix.textContent = 'Total battery energy';
+
+      if (batteryRecommendationEl) {
+        const recommendedAh = Math.ceil(results.requiredCapacityAh / 10) * 10;
+        batteryRecommendationEl.textContent = `For a ${acLoad.toLocaleString()}W AC load over ${runtimeHours} hours at ${batteryVoltage}V, a ${batteryVoltage}V ${recommendedAh}Ah LFP battery (${(recommendedAh * batteryVoltage / 1000).toFixed(1)} kWh) provides the required backup runtime.`;
+      }
+    }
+
+    [acLoadInput, runtimeHoursInput, inverterEfficiencyInput, batteryVoltageInput, usableDodInput].forEach(el => {
+      el.addEventListener('input', updateCalculations);
+    });
+
+    updateCalculations();
+  </script>
+
+</CalculatorLayout>

@@ -1,0 +1,211 @@
+---
+import CalculatorLayout from '../../layouts/CalculatorLayout.astro';
+import FormulaBox from '../../components/FormulaBox.astro';
+import FAQSection from '../../components/FAQSection.astro';
+import PowerOutageForm from '../../components/PowerOutageForm.astro';
+import WorkedExample from '../../components/WorkedExample.astro';
+import ComparisonTable from '../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../components/EngineeringDiagram.astro';
+
+const whatIs = `便携式电源站续航计算器用于估算便携式电源站（电池发电机）在停电期间为您的特定电器运行多长时间。与燃气发电机不同，便携式电源站无噪音、零排放且适合室内使用——但容量有限。本计算器根据您的实际负载，精确计算电源站可运行的小时数，帮助您选择合适的尺寸并在长时间停电期间规划用电。`;
+
+const whyItMatters = [
+  "便携式电源站以Wh（瓦时）标定，但实际续航取决于您的具体电器——标称'2,000Wh'并不意味着可以运行2,000W负载1小时。",
+  "逆变器效率损耗（10-15%）会减少可用容量。1,000Wh电源站实际可提供约850-900Wh的输出。",
+  "锂NMC电池不应放电超过80-90%放电深度。LiFePO4设备允许80-100%放电深度。",
+  "较高的放电速率会减少可用容量——在1,000Wh电源站上运行1,500W负载比运行500W耗电更快。",
+  "将负载匹配到电源站的输出额定值至关重要——超过连续输出功率会导致设备关机，即使容量仍有剩余。"
+];
+
+const practicalApplications = [
+  { title: "停电应急备灾", description: "在购买便携式电源站之前，精确计算它在停电期间可为您的关键电器供电多长时间。" },
+  { title: "露营与房车旅行", description: "根据您实际接入的设备——冰箱、照明、手机充电、CPAP——规划便携式电源站容量。" },
+  { title: "工地与远程供电", description: "在无电网接入的偏远地点为工具、照明和设备提供电力。" },
+  { title: "应急包规划", description: "确定适合您家庭关键应急负载需求的便携式电源站尺寸。" },
+];
+
+const expertNotes: { title: string; variant: 'engineering' | 'tip' | 'warning'; content: string }[] = [
+  { title: "连续输出与浪涌输出", variant: "warning", content: "标称'1,500W连续、3,000W浪涌'的电源站可连续运行不超过1,500W的负载。浪涌额定值仅处理短暂的电机启动（1-3秒）。运行1,800W会导致关机，即使低于浪涌容量。" },
+  { title: "逆变器效率很重要", variant: "engineering", content: "便携式电源站在将直流电池电力转换为交流输出时损失10-15%。1,000Wh电源站实际提供约850Wh的可用交流能量。部分制造商引用'直流容量'，不含此损耗。" },
+  { title: "温度影响续航", variant: "tip", content: "低温（低于0°C）使锂电池容量降低10-25%。冬季使用便携式电源站时，应按额定容量的80%规划续航。" }
+];
+
+const trustSection = {
+  text: "本计算器使用标准电气工程公式。续航估算假设85%逆变器效率和标准放电深度限制。",
+  link: { label: "查看我们的方法论", href: "/zh/methodology/" }
+};
+
+const references = [
+  { title: "DOE — 电池储能安全", url: "https://www.energy.gov/eere/solar/battery-safety-and-performance", source: "U.S. Department of Energy" },
+  { title: "UL 2743 — 便携式电源站", url: "https://www.ul.com/resources/ul-2743-standard-safety-portable-lithium-ion-battery", source: "Underwriters Laboratories" },
+];
+
+const faqItems = [
+  { question: "便携式电源站能为冰箱供电多长时间？", answer: "1,000Wh锂电便携式电源站可运行标准冰箱（150W运行功率）约5-6小时。2,000Wh电源站可延长至10-12小时。注意压缩机是间歇运行的，实际续航可能更长。" },
+  { question: "我需要多大容量的便携式电源站？", answer: "对于基本负载（冰箱+Wi-Fi+照明+手机充电，平均约250W），1,000Wh电源站可供电3-4小时。对于整夜备用（8小时），建议2,000-3,000Wh。对于多天停电，考虑3,000Wh以上并配合太阳能充电。" },
+  { question: "便携式电源站能运行微波炉或取暖器吗？", answer: "大多数便携式电源站（1,000-2,000W输出）无法同时运行微波炉（1,000-1,500W）或取暖器（1,500W以上）与其他负载。它们可能单独短暂运行微波炉，但无法持续。" },
+  { question: "便携式电源站不使用时会掉电吗？", answer: "是的，所有锂电池每月自放电1-5%。将便携式电源站储存在50-80%电量、阴凉处。长期储存时每3个月检查一次电量。" },
+];
+
+const commonMistakes = [
+  "比较不同电池化学类型的Wh容量——NMC电源站在80% DoD下提供的可用能量低于同Wh额定的LFP电源站。",
+  "忽略逆变器效率损耗——1,000Wh电源站在直流到交流转换后仅提供850-900Wh的可用交流能量。",
+  "超过连续输出额定值——在1,500W额定电源站上运行1,800W负载会导致关机，即使低于浪涌容量。",
+  "假设制造商Wh额定值包含DoD限制——部分制造商引用的直流容量不含逆变器损耗和DoD降额。",
+  "忘记高放电速率会减少可用容量——1,000Wh电源站为1,000W负载供电比为250W负载供电耗电更快。",
+  "未检查电机驱动电器的浪涌额定值——冰箱和水泵启动时需要3-4倍的运行功率。",
+  "将便携式电源站满电存放数月——锂电池每月自放电1-5%；长期储存应保持50-80%电量。",
+  "忽略温度对续航的影响——0°C以下的低温使锂电池容量降低10-25%。"
+];
+
+const relatedArticles = [
+  { title: "家庭备用续航指南", href: "/zh/learn/home-backup-runtime-guide/" },
+  { title: "LiFePO4 vs 铅酸电池", href: "/zh/learn/lifepo4-vs-lead-acid/" },
+  { title: "电池续航公式", href: "/zh/learn/battery-runtime-formula/" },
+  { title: "停电电池指南", href: "/zh/learn/power-outage-battery-guide/" },
+];
+
+const relatedCalculators = [
+  { href: "/zh/home-power-outage-battery-backup-calculator/", title: "家庭停电电池备用计算器", description: "全屋备用电力计算器，适用于所有家用电器。" },
+  { href: "/zh/fridge-battery-backup-calculator/", title: "冰箱电池备用计算器", description: "专为停电期间冰箱备用设计的电池尺寸计算。" },
+  { href: "/zh/cpap-battery-backup-calculator/", title: "CPAP电池备用计算器", description: "为CPAP整夜运行设计电池尺寸。" },
+  { href: "/zh/sump-pump-battery-backup-calculator/", title: "排水泵电池备用计算器", description: "确保排水泵在暴风停电期间持续运行。" },
+  { href: "/zh/solar-generator-sizing-calculator/", title: "太阳能发电机尺寸计算器", description: "设计含面板和电池的完整太阳能备用系统。" },
+  { href: "/zh/tools/runtime-calculator/", title: "电池续航计算器", description: "根据容量和负载估算放电时间。" },
+  { href: "/zh/tools/battery-sizing-calculator/", title: "电池尺寸计算器", description: "含温度降额的完整电池组尺寸设计。" },
+  { href: "/zh/tools/solar-battery-sizing-calculator/", title: "太阳能电池尺寸计算器", description: "设计与太阳能板阵列配套的电池尺寸。" },
+  { href: "/zh/tools/energy-conversion-calculator/", title: "能量转换计算器", description: "在任意电压下转换Ah、Wh和kWh。" },
+  { href: "/zh/tools/charging-time-calculator/", title: "充电时间计算器", description: "估算太阳能或电网充电时间。" },
+  { href: "/zh/tools/voltage-drop-calculator/", title: "电压降计算器", description: "设计线径以最小化电压降。" },
+  { href: "/zh/tools/dc-cable-loss-calculator/", title: "直流电缆损耗计算器", description: "计算直流连接中的线路损耗。" },
+];
+
+const presetAppliances = [
+  { name: "Refrigerator", runningW: 150, surgeW: 600 }, { name: "Freezer", runningW: 120, surgeW: 500 },
+  { name: "Wi-Fi Router", runningW: 12, surgeW: 12 }, { name: "LED Light", runningW: 10, surgeW: 10 },
+  { name: "Laptop", runningW: 60, surgeW: 90 }, { name: "TV", runningW: 100, surgeW: 150 },
+  { name: "CPAP Machine", runningW: 40, surgeW: 80 }, { name: "Fan", runningW: 50, surgeW: 75 },
+  { name: "Phone Charger", runningW: 15, surgeW: 15 }, { name: "Microwave", runningW: 1000, surgeW: 1500 },
+];
+---
+
+<CalculatorLayout
+  lang="zh"
+  title="便携式电源站续航计算器 | Battery Calculators"
+  description="计算便携式电源站在停电期间可为您的电器供电多长时间。估算续航、比较电源站尺寸，为露营、应急和离网使用规划备用电力。"
+  faqItems={faqItems}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+  relatedCalculators={relatedCalculators}
+  commonMistakes={commonMistakes}
+  relatedArticles={relatedArticles}
+>
+  <PowerOutageForm
+    presetAppliances={presetAppliances}
+    defaultBackupHours={8}
+    defaultVoltage="24"
+    defaultLoadsDescription="已预加载常见的便携式电源站负载。添加您的实际设备以查看精确续航。"
+    defaultLoads={[{ name: "Refrigerator", quantity: 1 }, { name: "Wi-Fi Router", quantity: 1 }, { name: "LED Light", quantity: 2 }]}
+  />
+
+  <section class="mb-16 border-t border-hairline pt-12">
+    <FormulaBox title="数学公式">
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Total Running W = Σ (Appliance Running W × Quantity)</div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Surge W = Highest Single Appliance Surge + Other Running W</div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Energy Required (Wh) = (Running W × Hours) / Inverter Efficiency × (1 + Safety Margin)</div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Battery Ah = Required Wh / (Battery Voltage × Depth of Discharge)</div>
+      <p class="text-xs text-muted mt-4">对于便携式电源站，电池电压和放电深度是内部参数——将所需能量与电源站的可用Wh额定值进行比较。" </p>
+    </FormulaBox>
+
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">公式与计算示例</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample
+        number={1}
+        title="手机充电与小型设备"
+        scenario="在晚间停电（6小时）中为两部手机充电并运行Wi-Fi路由器。"
+        inputs={[
+          { label: "手机充电器 ×2", value: "每台15W = 总计30W" },
+          { label: "Wi-Fi路由器", value: "12W" },
+          { label: "备用时长", value: "6小时" },
+        ]}
+        steps={[
+          { label: "步骤1：总运行负载", formula: "30W + 12W", result: "42W" },
+          { label: "步骤2：6小时所需能量", formula: "42W × 6h = 252 Wh", result: "252 Wh" },
+          { label: "步骤3：考虑逆变器效率（85%）", formula: "252 / 0.85", result: "296 Wh" },
+          { label: "步骤4：加上20%安全裕度", formula: "296 × 1.20", result: "356 Wh" },
+        ]}
+        answer="400Wh便携式电源站可轻松满足6小时晚间停电中的手机充电和Wi-Fi需求。"
+        interpretation="小型设备负载易于备份——即使紧凑型电源站也能轻松应对。"
+      />
+      <WorkedExample
+        number={2}
+        title="笔记本电脑工作配置"
+        scenario="在白天工作停电（4小时）中保持笔记本电脑和台灯运行。"
+        inputs={[
+          { label: "笔记本电脑", value: "60W" },
+          { label: "LED台灯", value: "10W" },
+          { label: "备用时长", value: "4小时" },
+        ]}
+        steps={[
+          { label: "步骤1：总运行负载", formula: "60W + 10W", result: "70W" },
+          { label: "步骤2：4小时所需能量", formula: "70W × 4h = 280 Wh", result: "280 Wh" },
+          { label: "步骤3：考虑逆变器效率（85%）", formula: "280 / 0.85", result: "329 Wh" },
+          { label: "步骤4：加上20%安全裕度", formula: "329 × 1.20", result: "395 Wh" },
+        ]}
+        answer="400-500Wh便携式电源站可满足半天停电中的笔记本电脑工作配置。"
+        interpretation="笔记本电脑属于中等负载——建议至少400Wh以为电池退化留出余量。"
+      />
+      <WorkedExample
+        number={3}
+        title="露营照明与风扇"
+        scenario="在露营过夜（10小时）中为LED串灯和小型风扇供电。"
+        inputs={[
+          { label: "LED串灯 ×2", value: "每条10W = 总计20W" },
+          { label: "便携式风扇", value: "50W" },
+          { label: "备用时长", value: "10小时" },
+        ]}
+        steps={[
+          { label: "步骤1：总运行负载", formula: "20W + 50W", result: "70W" },
+          { label: "步骤2：10小时所需能量", formula: "70W × 10h = 700 Wh", result: "700 Wh" },
+          { label: "步骤3：考虑逆变器效率（85%）", formula: "700 / 0.85", result: "824 Wh" },
+          { label: "步骤4：加上20%安全裕度", formula: "824 × 1.20", result: "988 Wh" },
+        ]}
+        answer="1,000Wh便携式电源站可舒适地为整夜露营的照明和风扇供电。"
+        interpretation="过夜负载会累积——1,000Wh电源站是露营舒适度的最佳选择。"
+      />
+    </div>
+  </section>
+
+  <EngineeringDiagram
+    title="便携式电源站能量流程"
+    description="能量从内部直流电池通过逆变器流向您的交流电器，每一步转换都有损耗。"
+    steps={[
+      { label: "直流电池", icon: "battery" },
+      { label: "BMS保护", icon: "charge" },
+      { label: "直流转交流逆变器", icon: "inverter" },
+      { label: "交流输出", icon: "cable" },
+      { label: "您的电器", icon: "load" },
+    ]}
+    variant="system"
+  />
+
+  <ComparisonTable
+    title="便携式电源站容量对比"
+    headers={["电源站容量", "可用Wh（85%效率）", "冰箱续航", "手机充电次数", "笔记本续航", "适用场景"]}
+    rows={[
+      ["250 Wh", "213 Wh", "1–2 小时", "~14次", "~3.5小时", "手机与设备充电"],
+      ["500 Wh", "425 Wh", "2–3 小时", "~28次", "~7小时", "小型设备+照明"],
+      ["1,000 Wh", "850 Wh", "5–6 小时", "~56次", "~14小时", "冰箱+设备过夜"],
+      ["1,500 Wh", "1,275 Wh", "8–10 小时", "~85次", "~21小时", "冰箱+照明+Wi-Fi"],
+      ["2,000 Wh", "1,700 Wh", "10–12 小时", "~113次", "~28小时", "全部基本负载12小时"],
+      ["2,500 Wh", "2,125 Wh", "13–15 小时", "~142次", "~35小时", "延长停电备用"],
+    ]}
+    caption="续航基于标准冰箱循环（30-50%工作周期）。手机充电按每次15Wh计算。笔记本续航按60W连续计算。"
+  />
+
+  <FAQSection items={faqItems} />
+</CalculatorLayout>

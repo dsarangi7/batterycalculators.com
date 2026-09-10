@@ -1,0 +1,348 @@
+---
+import CalculatorLayout from '../../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import InputField from '../../../components/InputField.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import RelatedTools from '../../../components/RelatedTools.astro';
+import WorkedExample from '../../../components/WorkedExample.astro';
+import ComparisonTable from '../../../components/ComparisonTable.astro';
+
+const directionOptions = [
+  { label: "安时(Ah) → 瓦时(Wh)", value: "ahToWh" },
+  { label: "瓦时(Wh) → 安时(Ah)", value: "whToAh" },
+];
+
+const whatIs = `安时(Ah)与瓦时(Wh)之间的能量转换是电池工程中最基础的计算。<strong>安时衡量电荷容量</strong>——即电池在给定电压下可释放的总电荷量。<strong>瓦时衡量总能量</strong>——即电池实际能做功的大小。转换需要一个额外变量：<strong>标称电压</strong>。一个12V标称电压的100Ah电池存储1,200 Wh，而同样100Ah在48V下存储4,800 Wh——电荷容量相同，能量却相差四倍。理解这一区别对于跨电压系统比较电池、确定备用电源容量以及设计储能系统至关重要。`;
+
+const whyItMatters = [
+  "仅凭安时比较电池具有误导性——一块100Ah 12V电池的总能量只有100Ah 48V电池的三分之一。",
+  "负载计算需要瓦时而非安时——500W负载在1,200 Wh下可运行2.4小时，必须使用正确的单位。",
+  "不同电压的电池不能用安时比较——只有瓦时才能提供公平的能量对比。",
+  "太阳能与备用电源系统均以瓦时/千瓦时为单位设计——将安时转换为瓦时是容量计算的第一步。",
+  "充电器规格常混用安时和瓦时——混淆会导致充电系统偏小或偏大。",
+];
+
+const practicalApplications = [
+  { title: "电池选购比较", description: "将不同电压和化学体系的电池统一换算为瓦时进行同等基准比较。" },
+  { title: "系统容量设计", description: "将安时额定值换算为瓦时，用于基于负载的储能容量计算。" },
+  { title: "太阳能系统设计", description: "将电池安时额定值换算为瓦时，与每日光伏发电量和用电量匹配。" },
+  { title: "续航时间估算", description: "将安时换算为瓦时，计算电池在给定功率负载下的持续时间。" },
+  { title: "电动汽车续航计算", description: "将电池组容量从安时换算为瓦时，用于续航里程估算与能耗分析。" },
+];
+
+const expertNotes = [
+  { title: '标称电压的选取', variant: 'engineering', content: '应始终使用电池组的平均标称电压，而非峰值充电截止电压或低放电截止电压。例如，单个磷酸铁锂(LFP)电芯标称电压为3.2V（峰值3.65V，截止2.5V）。对于4S系统，标称电压为12.8V。' },
+  { title: '温度效应', variant: 'warning', content: '低温会降低电芯内部的化学反应动力学，导致内阻增大、放电过程中输出电压曲线下降。由于瓦时 = 安时 × 电压，电压降低直接导致实际输出的总瓦时减少。' },
+];
+
+const trustSection = {
+  text: "转换公式（瓦时 = 安时 × 电压，安时 = 瓦时 / 电压）是基本的电学关系。所有计算过程透明，使用标准国际单位制。",
+  link: { label: "查看完整计算方法", href: "/zh/methodology/" },
+};
+
+const references = [
+  { title: "Battery University — 如何测量容量", url: "https://batteryuniversity.com/article/bu-901-how-to-measure-capacity", source: "Battery University / Cadex Electronics" },
+  { title: "IEC 61960 — 便携式应用二次锂电池", url: "https://webstore.iec.ch/en/publication/25543", source: "International Electrotechnical Commission" },
+];
+
+const faqItems = [
+  {
+    question: "安时与瓦时有什么区别？",
+    answer: "安时(Ah)衡量电荷容量（流过某一点的电子总量）。瓦时(Wh)衡量总电能容量（电子总量乘以电场力，即电压）。瓦时才是能量潜力的实际度量。",
+  },
+  {
+    question: "标称电压应该取什么值？",
+    answer: "应始终使用电池组的平均标称电压，而非峰值充电截止电压或低放电截止电压。例如，单个磷酸铁锂电芯标称电压为3.2V（峰值3.65V，截止2.5V）。对于4S系统，标称电压为12.8V。",
+  },
+  {
+    question: "为什么容量有时用安时而不是瓦时？",
+    answer: "历史上铅酸电池标准化为6V或12V输出，安时成为方便的快捷比较方式。然而，现代多电压锂电池架构（12V、24V、48V、400V、800V）需要使用瓦时进行安全比较。",
+  },
+  {
+    question: "温度如何影响瓦时容量？",
+    answer: "低温会降低电芯内部的化学反应动力学，导致内阻增大、放电过程中输出电压曲线下降。由于瓦时 = 安时 × 电压，电压降低直接导致实际输出的总瓦时减少。",
+  },
+  {
+    question: "如何比较12V 200Ah电池和48V 100Ah电池？",
+    answer: "将两者都换算为瓦时：12V × 200Ah = 2,400 Wh。48V × 100Ah = 4,800 Wh。尽管安时额定值减半，48V电池存储的能量却是前者的两倍。应始终以瓦时进行公平比较。",
+  },
+  {
+    question: "可以用安时计算续航时间吗？",
+    answer: "只有当负载以安培指定时才可以。如果负载以瓦特（更常见的情况）指定，需先换算为瓦时，再除以负载功率。公式：续航时间（小时）= (安时 × 电压 × DoD) / (负载功率W / 效率)。",
+  },
+  {
+    question: "安时、瓦时和千瓦时之间的关系是什么？",
+    answer: "安时 × 电压 = 瓦时。瓦时 / 1000 = 千瓦时。例如，51.2V标称电压下200Ah电池 = 10,240 Wh = 10.24 kWh。千瓦时只是瓦时以千为单位的表达，适用于大型系统。",
+  },
+  {
+    question: "为什么有些电池只标安时，有些只标瓦时？",
+    answer: "安时是铅酸和部分锂电池厂商的传统标注方式。瓦时越来越受青睐，因为它直接反映能量含量。比较时务必确认标注的安时是否基于电池组的标称电压。",
+  },
+  {
+    question: "安时容量会随放电倍率变化吗？",
+    answer: "会的。更高的放电倍率因内阻损耗会降低可用安时。铅酸电池尤为明显（佩克特效应）。一块100Ah铅酸电池在1C倍率下可能只放出60Ah。LFP受影响较小，但在高C率下仍有一定容量缩减。",
+  },
+  {
+    question: "DoD如何影响安时与瓦时的比较？",
+    answer: "DoD限制对安时和瓦时的可用容量按相同比例缩减。100Ah电池在80% DoD下提供80Ah可用容量，即(80Ah × V) Wh可用。安时与瓦时之间的转换关系不受DoD影响——DoD只是按比例缩放两者。",
+  },
+  {
+    question: "瓦时是比较所有电池的最佳指标吗？",
+    answer: "瓦时是比较总能量含量的最佳指标。但对于需要大电流的应用，还需考虑最大持续放电电流(A)和C率。两块瓦时相同的电池，电流输出能力可能差异很大。",
+  },
+];
+
+const commonMistakes = [
+  "仅凭安时比较电池而不考虑电压——100Ah 48V电池存储的能量是100Ah 12V电池的4倍。应始终换算为瓦时进行公平比较。",
+  "使用峰值充电电压而非标称电压——瓦时计算必须使用标称电压（如LFP取3.2V，NMC取3.7V），而非峰值充电电压（3.65V或4.2V）。",
+  "转换时忽略DoD——100Ah电池在80% DoD下仅提供80Ah可用容量。应使用可用安时而非额定总安时进行续航计算。",
+  "混淆瓦时与安时进行负载计算——负载以瓦特而非安培指定。计算续航时务必先将电池容量换算为瓦时，再除以负载功率。",
+  "忘记系统效率——100Ah 12.8V电池存储1,280 Wh，但经逆变器损耗（90%效率）后，仅1,152 Wh到达负载。",
+  "假设安时与放电倍率无关——更高的C率因内阻损耗会降低可用安时，铅酸电池尤为明显（佩克特效应）。",
+  "对小型电池使用千瓦时——千瓦时适用于大型系统，但瓦时对5 kWh以下的小型电池提供更直观的分辨率。",
+  "计算中混用单位——切勿在同一公式中混用安时和瓦时而不做转换。安时 × 电压 = 瓦时；瓦时 / 电压 = 安时。",
+  "忽略温度降额——低温同时降低安时和瓦时容量。在25°C下额定100Ah的电池，在0°C下可能只放出85Ah。",
+  "未核实标称电压——务必查阅厂家标称电压规格。LFP使用12V而非12.8V会引入6.25%的误差。",
+];
+
+const relatedArticles = [
+  { href: "/zh/learn/lifepo4-voltage-chart/", title: "磷酸铁锂电压曲线图" },
+  { href: "/zh/learn/battery-voltage-systems/", title: "电池电压系统" },
+  { href: "/zh/learn/lifepo4-vs-lead-acid/", title: "磷酸铁锂与铅酸对比" },
+  { href: "/zh/learn/battery-efficiency-reference/", title: "电池效率参考" },
+];
+
+---
+
+<CalculatorLayout
+  title="电池容量安时转瓦时换算器｜电池计算器"
+  description="安时(Ah)与瓦时(Wh)之间的电池容量换算器，使用标称电压快速、透明地计算能量与电荷容量。公式全公开。"
+  faqItems={faqItems}
+  commonMistakes={commonMistakes}
+  relatedArticles={relatedArticles}
+  relatedCalculators={[
+    { href: "/zh/tools/runtime-calculator/", title: "续航时间计算器", description: "根据瓦特负载估算备用时长。" },
+    { href: "/zh/tools/c-rate-calculator/", title: "C率计算器", description: "分析电池负载速率参数。" },
+    { href: "/zh/tools/battery-sizing-calculator/", title: "电池容量计算器", description: "根据日耗电量确定所需电池容量。" },
+    { href: "/zh/tools/solar-battery-sizing-calculator/", title: "太阳能蓄电池计算器", description: "根据日耗电与备电天数确定太阳能蓄电池容量。" },
+    { href: "/zh/tools/battery-pack-calculator/", title: "电池组计算器", description: "设计串联/并联电芯配置。" },
+  ]}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+  lang="zh"
+>
+
+  <!-- Main Calculator Grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+
+    <!-- Input Form -->
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">参数</h3>
+      <div class="flex flex-col gap-6">
+
+        <!-- Direction -->
+        <InputField id="direction" label="转换类型" type="select" options={directionOptions} value="ahToWh" />
+
+        <!-- Input Capacity (raw HTML for dynamic label) -->
+        <div class="flex flex-col gap-2">
+          <label for="input-val" class="text-label-uppercase text-xs text-primary" id="value-label">容量 (Ah)</label>
+          <input type="number" id="input-val" value="100" class="text-input" min="0.1" step="any" />
+        </div>
+
+        <!-- Voltage -->
+        <InputField id="voltage" label="标称电压 (V)" value={12.8} min={0.1} step="any" helperText="电芯组或模组的标称电压" />
+
+      </div>
+    </CalculatorCard>
+
+    <!-- Calculation Results -->
+    <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">预计输出</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <!-- Main Output -->
+          <div class="bg-surface-soft p-6 border border-hairline col-span-1 md:col-span-2">
+            <span class="text-label-uppercase text-muted text-[10px] block mb-1" id="out-label">等效能量</span>
+            <div class="text-display-md text-primary font-bold animate-pulse-once" id="result-converted">1,280 Wh</div>
+            <span class="text-caption text-muted block mt-1" id="result-kwh">1.28 kWh</span>
+          </div>
+
+          <!-- Secondary Context -->
+          <div class="bg-surface-soft p-6 border border-hairline col-span-1 md:col-span-2">
+            <span class="text-label-uppercase text-muted text-[10px] block mb-1">标准参考对比</span>
+            <p class="text-body-sm text-body mt-2 font-light" id="result-ref">
+              1.28 kWh电池组在90%系统效率下可为100W负载供电约11.5小时。
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Area -->
+      <div class="border-t border-hairline pt-6">
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">标称电压的重要性</h4>
+        <p class="text-body-sm text-muted">
+          两块安时容量均为100 Ah的电池，总能量可能差异巨大。100 Ah 12V电池组存储1.2 kWh，而100 Ah 48V电池组存储4.8 kWh。总能量容量才是比较的正确指标。
+        </p>
+      </div>
+    </CalculatorCard>
+
+  </div>
+
+  <!-- Formulas and Worked Examples -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">公式与计算示例</h2>
+
+    <FormulaBox title="数学公式">
+      <p>
+        电荷容量(Ah)与总能量容量(Wh)之间的转换基于欧姆定律，是直接的对应关系：
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        瓦时 (Wh) = 安时 (Ah) × 标称电压 (V)
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        安时 (Ah) = 瓦时 (Wh) / 标称电压 (V)
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        千瓦时 (kWh) = 瓦时 (Wh) / 1000
+      </div>
+    </FormulaBox>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample
+        number={1}
+        title="将200Ah 12.8V换算为瓦时"
+        scenario="你有一块200Ah磷酸铁锂电池，标称电压12.8V，需要求出其总瓦时能量。"
+        inputs={[
+          { label: "容量", value: "200 Ah" },
+          { label: "标称电压", value: "12.8 V" },
+        ]}
+        steps={[
+          "Wh = Ah × V",
+          "Wh = 200 Ah × 12.8 V",
+          "Wh = 2,560 Wh",
+        ]}
+        answer="2,560 Wh"
+        interpretation="200Ah电池在12.8V下存储2,560 Wh（2.56 kWh）总能量——足以驱动256W负载运行10小时。"
+      />
+
+      <WorkedExample
+        number={2}
+        title="将5kWh换算为48V下的安时"
+        scenario="你正在设计一个48V电池组，需要确定5 kWh可用能量所需的安时容量。"
+        inputs={[
+          { label: "能量", value: "5 kWh (5,000 Wh)" },
+          { label: "标称电压", value: "48 V" },
+        ]}
+        steps={[
+          "Ah = Wh / V",
+          "Ah = 5,000 Wh / 48 V",
+          "Ah ≈ 104.17 Ah",
+        ]}
+        answer="≈ 104.17 Ah"
+        interpretation="在48V下，5 kWh电池组约需104.17 Ah容量。在16S LFP 48V配置下，约等于3.3个105Ah电芯。"
+      />
+
+      <WorkedExample
+        number={3}
+        title="将500Wh换算为焦耳和千瓦时"
+        scenario="你有一台额定500Wh的便携式储能电源，需要将其容量以焦耳（国际单位制）和千瓦时两种单位表示以便比较。"
+        inputs={[
+          { label: "能量", value: "500 Wh" },
+        ]}
+        steps={[
+          "焦耳：J = Wh × 3,600",
+          "J = 500 × 3,600 = 1,800,000 J",
+          "千瓦时：kWh = Wh / 1,000",
+          "kWh = 500 / 1,000 = 0.5 kWh",
+        ]}
+        answer="1,800,000 J (1.8 MJ) 或 0.5 kWh"
+        interpretation="500 Wh等于180万焦耳或0.5 kWh。作为参考，0.5 kWh可以驱动50W冰箱运行10小时，或为智能手机充电约40次。"
+      />
+    </div>
+  </section>
+
+  <ComparisonTable
+    title="能量单位换算参考"
+    headers={["从", "到", "公式", "示例"]}
+    rows={[
+      ["Ah → Wh", "乘以电压", "Wh = Ah × V", "100Ah × 12.8V = 1,280 Wh"],
+      ["Wh → Ah", "除以电压", "Ah = Wh / V", "1,280 Wh / 12.8V = 100 Ah"],
+      ["Wh → kWh", "除以1000", "kWh = Wh / 1000", "1,280 Wh = 1.28 kWh"],
+      ["kWh → Wh", "乘以1000", "Wh = kWh × 1000", "1.28 kWh = 1,280 Wh"],
+      ["Wh → Joules", "乘以3600", "J = Wh × 3600", "1,280 Wh = 4,608,000 J"],
+      ["Wh → BTU", "乘以3.412", "BTU = Wh × 3.412", "1,280 Wh = 4,367 BTU"],
+    ]}
+    caption="电池计算常用能量单位换算"
+  />
+
+  <FAQSection items={faqItems} />
+
+  <!-- Calculation Script -->
+  <script>
+    import { calculateEnergyConversion } from '../../../utils/calculators';
+
+    const directionSelect = document.getElementById('direction') as HTMLSelectElement;
+    const inputValElement = document.getElementById('input-val') as HTMLInputElement;
+    const valueLabel = document.getElementById('value-label');
+    const voltageInput = document.getElementById('voltage') as HTMLInputElement;
+
+    // Outputs
+    const outLabel = document.getElementById('out-label');
+    const resultConverted = document.getElementById('result-converted');
+    const resultKwh = document.getElementById('result-kwh');
+    const resultRef = document.getElementById('result-ref');
+
+    function updateLabels() {
+      const dir = directionSelect.value;
+      if (dir === 'ahToWh') {
+        if (valueLabel) valueLabel.textContent = '容量 (安时, Ah)';
+        if (outLabel) outLabel.textContent = '等效能量 (瓦时)';
+      } else {
+        if (valueLabel) valueLabel.textContent = '能量 (瓦时, Wh)';
+        if (outLabel) outLabel.textContent = '等效容量 (安时)';
+      }
+      updateCalculations();
+    }
+
+    function updateCalculations() {
+      const dir = directionSelect.value as "ahToWh" | "whToAh";
+      const val = parseFloat(inputValElement.value) || 0;
+      const voltage = parseFloat(voltageInput.value) || 12.8;
+
+      const converted = calculateEnergyConversion(val, dir, voltage);
+
+      if (dir === 'ahToWh') {
+        if (resultConverted) resultConverted.textContent = `${Math.round(converted).toLocaleString()} Wh`;
+        const kwh = converted / 1000;
+        if (resultKwh) resultKwh.textContent = `${kwh.toFixed(2)} kWh`;
+
+        // Runtime simulation for 100W load at 90% efficiency
+        const runtimeHours = (converted * 0.90) / 100;
+        if (resultRef) {
+          resultRef.textContent = `${kwh.toFixed(2)} kWh电池组在90%系统效率下可为100W负载供电约${runtimeHours.toFixed(1)}小时。`;
+        }
+      } else {
+        if (resultConverted) resultConverted.textContent = `${converted.toFixed(2)} Ah`;
+        if (resultKwh) resultKwh.textContent = `${(val / 1000).toFixed(2)} kWh 能量源`;
+
+        if (resultRef) {
+          resultRef.textContent = `在${voltage.toFixed(1)}V标称电压下，${converted.toFixed(1)} Ah容量相当于${val.toLocaleString()} Wh的电池储能系统。`;
+        }
+      }
+    }
+
+    directionSelect.addEventListener('change', updateLabels);
+    [inputValElement, voltageInput].forEach(el => {
+      el.addEventListener('input', updateCalculations);
+    });
+
+    // Run on boot
+    updateLabels();
+  </script>
+</CalculatorLayout>

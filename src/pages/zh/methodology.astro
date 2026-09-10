@@ -1,0 +1,190 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import CalculatorCard from '../../components/CalculatorCard.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import FormulaBox from '../../components/FormulaBox.astro';
+import FAQSection from '../../components/FAQSection.astro';
+import MStripe from '../../components/MStripe.astro';
+
+const faqItems = [
+  {
+    question: '这些计算器是认证工程工具吗？',
+    answer: '不是。所有计算器提供教育性估算，不应替代认证工程分析。它们设计为电池系统规划的初步选型辅助工具。',
+  },
+  {
+    question: '我可以将这些结果用于生产电池设计吗？',
+    answer: '您可将结果用作起点，但所有生产设计必须由合格电池工程师验证，使用制造商特定数据表、热建模和安全测试。',
+  },
+  {
+    question: '为什么公式公开显示？',
+    answer: '透明是核心原则。每个公式都展示，以便工程师可以验证、审计和调整计算以满足其特定需求。隐藏逻辑无法建立信任。',
+  },
+  {
+    question: '计算器多久更新一次？',
+    answer: '公式遵循不改变的成熟电气工程原理。参考数据（线规、化学规格）定期审核。任何更新记录在仓库中。',
+  },
+];
+---
+
+<Layout
+  title="方法论与工程透明度 | 电池计算器"
+  description="了解电池计算器背后的公式、假设和工程原理。完全透明，用于教育和专业用途。"
+  canonical="https://batterycalculators.com/zh/methodology/"
+  lang="zh"
+  schema="website"
+  schemaName="方法论与工程透明度"
+  schemaDescription="解释电池计算器的公开公式、工程假设和局限性。"
+  faqItems={faqItems}
+>
+  <Breadcrumb items={[{ label: '方法论' }]} />
+
+  <div class="mb-12 border-b border-hairline pb-12">
+    <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">透明度</span>
+    <h1 class="text-display-md text-primary mb-4">方法论与工程透明度</h1>
+    <p class="text-body-md text-muted max-w-2xl font-light">
+      本网站的每个计算器都建立在公开、可审计的公式基础上。本页面解释我们计算什么、采用什么假设以及在线估算工具的局限性。
+    </p>
+  </div>
+
+  <div class="flex flex-col gap-16">
+
+    <!-- Core Principle -->
+    <section>
+      <h2 class="text-title-lg text-primary mb-4 uppercase tracking-wider">核心原则</h2>
+      <p class="text-body-md text-muted mb-6">
+        电池计算器旨在使标准电气工程公式对设计师、安装人员和工程师可访问。我们不使用专有模型、隐藏校正因子或黑箱算法。每个计算都可追溯到已发布的工程来源。
+      </p>
+    </section>
+
+    <MStripe />
+
+    <!-- Formulas Are Public -->
+    <section>
+      <h2 class="text-title-lg text-primary mb-4 uppercase tracking-wider">公式是公开的</h2>
+      <p class="text-body-md text-muted mb-6">
+        每个计算器页面在其专门部分展示其公式。这些是标准电气工程方程——不是近似值或商业机密。
+      </p>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <CalculatorCard>
+          <h3 class="text-primary font-bold mb-2">续航计算</h3>
+          <p class="text-body-sm text-muted mb-3">将可用能量除以效率调整后的负载功率。</p>
+          <FormulaBox title="续航公式">
+            <div class="bg-surface-soft p-3 font-mono text-primary border border-hairline">
+              T = (Ah × V × DoD) / (负载 / η)
+            </div>
+          </FormulaBox>
+        </CalculatorCard>
+
+        <CalculatorCard>
+          <h3 class="text-primary font-bold mb-2">C-Rate 计算</h3>
+          <p class="text-body-sm text-muted mb-3">将电流表示为相对于电芯容量的比率。</p>
+          <FormulaBox title="C-Rate 公式">
+            <div class="bg-surface-soft p-3 font-mono text-primary border border-hairline">
+              C-rate = I / 容量(Ah)
+            </div>
+          </FormulaBox>
+        </CalculatorCard>
+
+        <CalculatorCard>
+          <h3 class="text-primary font-bold mb-2">电压降</h3>
+          <p class="text-body-sm text-muted mb-3">使用导体特性进行标准电阻损耗计算。</p>
+          <FormulaBox title="电压降公式">
+            <div class="bg-surface-soft p-3 font-mono text-primary border border-hairline">
+              V_drop = I × R × 2L
+            </div>
+          </FormulaBox>
+        </CalculatorCard>
+
+        <CalculatorCard>
+          <h3 class="text-primary font-bold mb-2">BESS ROI</h3>
+          <p class="text-body-sm text-muted mb-3">使用标准 DCF 方法进行净现值和回收期分析。</p>
+          <FormulaBox title="NPV 公式">
+            <div class="bg-surface-soft p-3 font-mono text-primary border border-hairline">
+              NPV = Σ [CF_t / (1+r)^t] − C₀
+            </div>
+          </FormulaBox>
+        </CalculatorCard>
+      </div>
+    </section>
+
+    <MStripe />
+
+    <!-- Engineering Assumptions -->
+    <section>
+      <h2 class="text-title-lg text-primary mb-4 uppercase tracking-wider">工程假设</h2>
+      <p class="text-body-md text-muted mb-6">
+        当计算器需要默认值时，我们使用保守的行业标准假设。用户可以覆盖所有默认值。
+      </p>
+
+      <div class="flex flex-col gap-4">
+        <CalculatorCard>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <h3 class="text-primary font-bold mb-1">温度</h3>
+              <p class="text-body-sm text-muted">标准环境温度假定为 25°C，除非另有说明。寒冷条件下应用容量降额。</p>
+            </div>
+            <div>
+              <h3 class="text-primary font-bold mb-1">逆变器效率</h3>
+              <p class="text-body-sm text-muted">默认 90% 代表典型中端逆变器。高端单元可达 96%；低端可能为 85%。</p>
+            </div>
+            <div>
+              <h3 class="text-primary font-bold mb-1">DoD 限制</h3>
+              <p class="text-body-sm text-muted">默认限制反映制造商循环寿命建议：LFP 80%、NMC 80%、铅酸 50%。</p>
+            </div>
+          </div>
+        </CalculatorCard>
+      </div>
+    </section>
+
+    <MStripe />
+
+    <!-- Limitations -->
+    <section>
+      <h2 class="text-title-lg text-primary mb-4 uppercase tracking-wider">局限性</h2>
+      <div class="flex flex-col gap-4 text-body-sm text-muted">
+        <CalculatorCard>
+          <h3 class="text-primary font-bold mb-2">无实时数据</h3>
+          <p>计算器使用静态公式，不考虑实时电池状态、温度传感器或动态负载曲线。</p>
+        </CalculatorCard>
+        <CalculatorCard>
+          <h3 class="text-primary font-bold mb-2">化学简化</h3>
+          <p>锂和铅酸化学使用简化曲线建模。真实电芯行为因制造商、批次、年龄和热历史而异。</p>
+        </CalculatorCard>
+        <CalculatorCard>
+          <h3 class="text-primary font-bold mb-2">无安全认证</h3>
+          <p>结果是工程估算，不是认证安全分析。关键应用需要根据 UL、IEC 或当地标准进行专业验证。</p>
+        </CalculatorCard>
+        <CalculatorCard>
+          <h3 class="text-primary font-bold mb-2">无制造公差</h3>
+          <p>不模拟电芯间差异、容量衰减和生产公差。对于生产规格，请使用制造商数据表。</p>
+        </CalculatorCard>
+      </div>
+    </section>
+
+    <MStripe />
+
+    <!-- Educational Use Statement -->
+    <section>
+      <h2 class="text-title-lg text-primary mb-4 uppercase tracking-wider">教育用途</h2>
+      <p class="text-body-md text-muted mb-4">
+        这些工具提供给教育和初步设计目的。它们适用于：
+      </p>
+      <ul class="text-body-sm text-muted flex flex-col gap-2 mb-6">
+        <li class="flex gap-2"><span class="text-m-blue-light">—</span> 学习电池工程基础概念</li>
+        <li class="flex gap-2"><span class="text-m-blue-light">—</span> 详细设计前的快速初步选型</li>
+        <li class="flex gap-2"><span class="text-m-blue-light">—</span> 比较配置选项和权衡</li>
+        <li class="flex gap-2"><span class="text-m-blue-light">—</span> 验证手工计算和电子表格模型</li>
+        <li class="flex gap-2"><span class="text-m-blue-light">—</span> 教授和培训电池系统设计</li>
+      </ul>
+      <p class="text-body-sm text-muted">
+        它们不能替代专业工程判断、制造商数据表或认证测试。
+      </p>
+    </section>
+
+    <MStripe />
+
+    <FAQSection items={faqItems} />
+
+  </div>
+</Layout>

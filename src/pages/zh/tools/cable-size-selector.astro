@@ -1,0 +1,542 @@
+---
+import CalculatorLayout from '../../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import InputField from '../../../components/InputField.astro';
+import ResultBox from '../../../components/ResultBox.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import WorkedExample from '../../../components/WorkedExample.astro';
+import ComparisonTable from '../../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../../components/EngineeringDiagram.astro';
+
+const whatIs = `直流电力系统的电缆选型确定满足<strong>载流量</strong>（热电流承载能力）和<strong>电压降</strong>限值的最小导体截面积。载流量由IEC/国家电气规范标准控制，防止电阻发热导致绝缘层熔化。电压降取决于电流、电缆长度、导体材料和截面积——必须保持在应用特定的阈值以下（船舶关键负载3%，太阳能直流布线2%）。正确的电缆尺寸是两个最小值中较大的那个：载流量最小值和电压降最小值。电缆选型过小会导致过热、设备故障以及I²R损耗造成的能量浪费。`;
+
+const whyItMatters = [
+  "电缆选型过小会导致电压降，触发BMS低压断开和逆变器停机。",
+  "符合载流量标准的电缆在长距离线路上仍可能产生不可接受的电压降。",
+  "在12V系统中，0.5V压降代表4%的损耗——足以使灯光变暗并导致电子设备故障。",
+  "较高的系统电压（48V对比12V）在相同功率下降低电流，从而大幅减少电缆规格要求。",
+  "铜的电阻率每°C增加0.393%——高温环境需要更大规格的电缆。",
+];
+
+const practicalApplications = [
+  { title: "船舶电气系统", description: "为导航和推进系统匹配电池电缆，以满足ISO 13297电压降限值。" },
+  { title: "太阳能光伏直流布线", description: "计算从充电控制器到电池组的导线尺寸。" },
+  { title: "汽车与房车", description: "为12V和24V大电流系统匹配电池至逆变器电缆。" },
+  { title: "离网小屋布线", description: "为远程电池组与负载之间的长距离线路选择电缆尺寸。" },
+  { title: "电信直流配电", description: "验证向电信设备供电的48V直流配电电缆尺寸。" },
+];
+
+const expertNotes = [
+  { title: '双标准选型', variant: 'engineering', content: '必须同时检查载流量和电压降。电缆在热安全方面可能合格（载流量满足），但在长距离线路上仍可能出现过大的电压降。最终电缆尺寸取两个最小值中的较大者。' },
+  { title: '温度降额', variant: 'warning', content: '铜的电阻率每°C增加0.393%。在60°C（发动机舱）时，电缆电阻比20°C时高15.7%。必须考虑实际工作温度，而非环境室温。' },
+];
+
+const trustSection = {
+  text: "本计算器采用标准的基于电阻率的电压降模型，并包含温度修正系数。载流量值遵循IEC 60364和NEC第3章表格。所有公式和中间值均已显示，以便独立验证。",
+  link: { label: "查看完整计算方法", href: "/zh/methodology/" },
+};
+
+const references = [
+  { title: "IEC 60364 — 低压电气装置", url: "https://www.iec.ch/", source: "国际电工委员会" },
+  { title: "NEC第3章 — 布线方法与材料", url: "https://www.nfpa.org/codes-and-standards/nfpa-70-standard-for-electrical-safety-in-the-workplace", source: "NFPA / 国家电气规范" },
+  { title: "ISO 13297 — 船舶电气装置", url: "https://www.iso.org/standard/68333.html", source: "国际标准化组织" },
+  { title: "铜业发展协会 — 导线规格表", url: "https://www.copper.org/", source: "铜业发展协会" },
+];
+
+const faqItems = [
+  {
+    question: "载流量选型与电压降选型有什么区别？",
+    answer: "载流量是电缆在不过热的情况下所能承载的最大电流（消防安全）。电压降是沿电缆长度损失的电压（性能）。必须同时满足两个标准——选择较大的电缆尺寸。",
+  },
+  {
+    question: "为什么电压降在12V系统中更为关键？",
+    answer: "400W负载在12V下需要33A电流，而在48V下仅需8.3A。在12V时，0.5V压降占4.2%的损耗。在48V时，相同电缆仅产生0.12V压降（0.25%）。更高的电压可以大幅降低电缆规格要求。",
+  },
+  {
+    question: "5米距离、30安培电流需要多大AWG导线？",
+    answer: "在12V系统中，5米距离、30A电流、最大3%压降：需要6 AWG（13.3 mm²）铜线。在48V时，10 AWG（5.26 mm²）即可满足。同时必须验证载流量——10 AWG在自由空气中额定载流量为30A。",
+  },
+  {
+    question: "应该使用铜缆还是铝缆？",
+    answer: "大多数电池/太阳能安装优先使用铜缆：电阻更低、柔韧性更好、无氧化问题。铝缆更轻、更便宜，但需要1.6倍的截面积，且连接处需要使用抗氧化剂。",
+  },
+  {
+    question: "可接受的电压降百分比是多少？",
+    answer: "直流电力系统：关键负载（导航、安全）最大3%，一般负载5%，非关键照明10%。太阳能直流布线目标为充电控制器至电池之间≤2%。",
+  },
+  {
+    question: "电缆长度如何影响电压降？",
+    answer: "电压降与长度成正比。电缆距离加倍，压降也加倍。5米电缆产生0.5V压降，10米电缆在相同电流和导线尺寸下将产生1.0V压降。",
+  },
+  {
+    question: "载流量合格但电压降不合格的电缆能用吗？",
+    answer: "不能。电缆在热安全方面合格，但设备会因电压不足而出现故障。电压降选型是性能要求，而不仅仅是建议。",
+  },
+  {
+    question: "温度如何影响电缆选型？",
+    answer: "温度升高会增加导体电阻（铜为0.393%/°C）。额定在20°C下承载30A的电缆在60°C下可能仅能承载25A。必须根据实际工作温度对载流量进行降额。",
+  },
+  {
+    question: "什么是回路电阻？",
+    answer: "回路电阻是正极和回流导体的总电阻。由于电流流出并返回，总电缆长度为单程距离的2倍。回路电阻 = ρ × (2 × 距离) / 截面积。",
+  },
+  {
+    question: "如何测量实际电压降？",
+    answer: "在负载条件下测量电池端子电压，然后在相同负载条件下测量负载端子电压。两者的差值即为电压降。将其百分比与系统限值进行比较。",
+  },
+];
+
+const commonMistakes = [
+  "使用单程距离而非回路距离——电压降适用于供电和回流导体。必须将单程距离加倍。",
+  "仅检查载流量而不检查电压降——符合热安全标准的电缆在长距离线路上仍可能导致设备故障。",
+  "忽略温度影响——在60°C时，铜的电阻率比20°C时高15.7%。高温环境需要更大规格的电缆。",
+  "使用标称电压而非实际电池电压——12.8V时0.5V压降为3.9%，但在12.0V时为4.2%。",
+  "忽略连接电阻——腐蚀的端子和松动的螺栓会增加显著的电阻，这在仅计算电缆电阻时未被计入。",
+  "未增大截面积就使用铝缆——铝需要1.6倍于铜的截面积才能达到相同的电压降。",
+  "不考虑峰值电流与平均电流——电压降与电流成正比。峰值负载会导致瞬态电压跌落，触发BMS故障。",
+  "假设所有电压下电缆尺寸相同——2kW负载在12V时需要167A，而在48V时仅需42A，电缆规格差异巨大。",
+];
+
+const relatedArticles = [
+  { href: "/zh/learn/voltage-drop-explained/", title: "电压降详解" },
+  { href: "/zh/learn/awg-wire-size-chart/", title: "DC电缆选型指南" },
+  { href: "/zh/learn/marine-electrical-standards/", title: "船舶导线选型" },
+];
+---
+
+<CalculatorLayout
+  title="电缆尺寸选择器 | 电池计算器"
+  description="根据电压降限值、载流量和导体材料，为您的直流系统选择正确的电缆尺寸。"
+  lang="zh"
+  faqItems={faqItems}
+  commonMistakes={commonMistakes}
+  relatedArticles={relatedArticles}
+  relatedCalculators={[
+    { href: "/zh/tools/voltage-drop-calculator/", title: "电压降计算器", description: "计算特定电缆的电压降。" },
+    { href: "/zh/tools/dc-cable-loss-calculator/", title: "直流电缆损耗", description: "直接计算电阻功率损耗。" },
+    { href: "/zh/tools/battery-sizing-calculator/", title: "电池容量匹配工具", description: "确定每日消耗量的电池容量要求。" },
+    { href: "/zh/tools/parallel-string-calculator/", title: "并联电池串工具", description: "配置串联和并联电池串布局。" },
+    { href: "/zh/tools/runtime-calculator/", title: "运行时间计算器", description: "根据负载功率曲线计算运行时间。" },
+    { href: "/zh/tools/battery-pack-calculator/", title: "电池组计算器", description: "设计串联/并联电芯配置。" },
+  ]}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+>
+
+  <!-- 主计算网格 -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+
+    <!-- 输入表单 -->
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">系统参数</h3>
+      <div class="flex flex-col gap-6">
+        <InputField id="voltage" label="系统直流电压 (V)" value={12.8} min={1} step="any" helperText="标称电池电压。常见值：12.8V、25.6V、51.2V。" />
+        <InputField id="power" label="负载功率 (瓦特)" value={500} min={1} step="any" helperText="从电池吸取的总持续功率。" />
+        <InputField id="distance" label="单程电缆距离 (米)" value={5} min={0.1} step="any" helperText="从电池到负载的距离。计算器会自动加倍计算回路距离。" />
+        <InputField
+          id="material"
+          label="导体材料"
+          type="select"
+          value="copper"
+          options={[
+            { label: "铜（高导电性）", value: "copper" },
+            { label: "铝（成本更低、重量更轻）", value: "aluminum" },
+          ]}
+        />
+        <InputField id="temperature" label="工作温度 (°C)" value={30} min={-40} max={200} helperText="电缆安装处的环境温度。影响电阻。" />
+        <InputField id="max-drop" label="最大允许电压降 (%)" value={3} min={0.5} max={10} step={0.5} helperText="船舶关键负载：3%，太阳能直流：2%，一般负载：5%，非关键负载：10%。" />
+      </div>
+    </CalculatorCard>
+
+    <!-- 计算结果 -->
+    <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">电缆推荐</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <ResultBox
+            label="推荐电缆尺寸"
+            value="6 AWG"
+            suffix="13.3 mm² 铜"
+            variant="primary"
+            id="result-cable"
+          />
+          <ResultBox
+            label="电压降"
+            value="2.48%"
+            suffix="回路压降 0.32V"
+            id="result-drop"
+          />
+          <ResultBox
+            label="负载电流"
+            value="39.1 A"
+            suffix="持续电流"
+            id="result-current"
+          />
+          <ResultBox
+            label="电缆功率损耗"
+            value="12.4 W"
+            suffix="占负载功率 2.48%"
+            id="result-loss"
+          />
+        </div>
+      </div>
+
+      <!-- 操作区域 -->
+      <div class="border-t border-hairline pt-6">
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">电缆选型说明</h4>
+        <p class="text-body-sm text-muted" id="cable-notes">
+          在12.8V下，推荐的电缆同时满足电压降限值和载流量要求。请在选择前验证两个标准。
+        </p>
+      </div>
+    </CalculatorCard>
+
+  </div>
+
+  <!-- AWG电压降表 -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-title-lg text-primary uppercase mb-6 tracking-wider">各AWG尺寸电压降对比</h2>
+    <p class="text-body-sm text-muted mb-8">基于您的系统参数进行交互式电压降对比。高亮行表示满足您电压降限值的推荐规格。</p>
+
+    <div class="overflow-x-auto">
+      <table class="w-full border-collapse">
+        <thead>
+          <tr class="border-b border-hairline">
+            <th class="text-label-uppercase text-xs text-primary p-3 text-left">AWG尺寸</th>
+            <th class="text-label-uppercase text-xs text-primary p-3 text-left">截面积 (mm²)</th>
+            <th class="text-label-uppercase text-xs text-primary p-3 text-left">载流量 (A)</th>
+            <th class="text-label-uppercase text-xs text-primary p-3 text-left">电压降 (%)</th>
+            <th class="text-label-uppercase text-xs text-primary p-3 text-left">功率损耗 (W)</th>
+            <th class="text-label-uppercase text-xs text-primary p-3 text-left">状态</th>
+          </tr>
+        </thead>
+        <tbody id="awg-table-body">
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 公式与计算实例 -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">公式与计算实例</h2>
+    <FormulaBox title="数学公式">
+      <p>
+        电缆选型需要满足两个独立标准——载流量和电压降：
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        负载电流 (A) = 功率 (W) / 系统电压 (V)
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        回路电阻 (Ω) = ρ(T) × (2 × 距离) / 截面积
+      </div>
+      <p>
+        其中ρ(T)为温度修正后的电阻率：
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        ρ(T) = ρ(20°C) × [1 + α × (T - 20)]
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        电压降 (%) = (I × R_回路 / V_电源) × 100
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        满足压降的最小截面积 = ρ(T) × 2L / R_max
+        其中 R_max = (V × 最大压降%) / (100 × I)
+      </div>
+    </FormulaBox>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample
+        number={1}
+        title="12V船舶导航电路 — 30A, 5m"
+        scenario="为12.8V系统、25°C环境下的30A导航灯电路匹配铜缆，单程距离5m，最大3%电压降。"
+        inputs={[
+          { label: "系统电压", value: "12.8 V" },
+          { label: "负载电流", value: "30 A" },
+          { label: "单程距离", value: "5 m（10 m回路）" },
+          { label: "导体", value: "铜 25°C" },
+          { label: "最大压降", value: "3%" },
+        ]}
+        steps={[
+          { label: "第1步：最大允许电阻", formula: "R_max = (12.8 × 0.03) / 30", result: "0.0128 Ω" },
+          { label: "第2步：所需电缆截面积", formula: "A = 1.72×10⁻⁸ × 10 / 0.0128", result: "13.44 mm²" },
+          { label: "第3步：选择AWG规格", formula: "13.44 mm² → 6 AWG (13.3 mm²)", result: "6 AWG" },
+          { label: "第4步：实际电压降", formula: "V_drop = 30 × (1.72e-8 × 10 / 13.3e-6)", result: "0.388V (3.03%)" },
+        ]}
+        answer="6 AWG (13.3 mm²) 铜缆——满足3%电压降限值。"
+        interpretation="在3.03%时，刚好处于限值边缘。为了留有安全裕度，4 AWG (21.15 mm²) 可将压降降至1.9%。对于关键导航应用，应始终留有裕度。"
+        variant="marine"
+      />
+
+      <WorkedExample
+        number={2}
+        title="48V太阳能系统 — 20A充电控制器, 15m"
+        scenario="48V太阳能系统，20A充电控制器输出，15m电缆距离，35°C环境温度。太阳能直流布线目标≤2%压降。"
+        inputs={[
+          { label: "系统电压", value: "51.2 V" },
+          { label: "充电电流", value: "20 A" },
+          { label: "单程距离", value: "15 m（30 m回路）" },
+          { label: "导体", value: "铜 35°C" },
+          { label: "最大压降", value: "2%" },
+        ]}
+        steps={[
+          { label: "第1步：温度修正电阻率", formula: "ρ(35°C) = 1.72×10⁻⁸ × [1 + 0.00393 × 15]", result: "1.82×10⁻⁸ Ω·m" },
+          { label: "第2步：最大允许电阻", formula: "R_max = (51.2 × 0.02) / 20", result: "0.0512 Ω" },
+          { label: "第3步：所需电缆截面积", formula: "A = 1.82×10⁻⁸ × 30 / 0.0512", result: "10.66 mm²" },
+          { label: "第4步：选择AWG规格", formula: "10.66 mm² → 8 AWG (8.37) 或 6 AWG (13.3)", result: "推荐6 AWG" },
+        ]}
+        answer="6 AWG (13.3 mm²) 铜缆——电压降为1.44%，远低于2%目标。"
+        interpretation="更高的系统电压（48V对比12V）保持电流较低。在15m距离下，6 AWG在2%太阳能直流目标值以下有充足的安全裕度。"
+        variant="solar"
+      />
+
+      <WorkedExample
+        number={3}
+        title="12V房车逆变器 — 2000W, 1m"
+        scenario="2000W逆变器从12V电池吸取167A电流。为1m距离匹配电缆，要求≤3%压降。"
+        inputs={[
+          { label: "逆变器功率", value: "2000 W" },
+          { label: "系统电压", value: "12.8 V" },
+          { label: "负载电流", value: "167 A" },
+          { label: "单程距离", value: "1 m（2 m回路）" },
+          { label: "最大压降", value: "3%" },
+        ]}
+        steps={[
+          { label: "第1步：最大允许电阻", formula: "R_max = (12.8 × 0.03) / 167", result: "0.0023 Ω" },
+          { label: "第2步：所需电缆截面积", formula: "A = 1.72×10⁻⁸ × 2 / 0.0023", result: "14.96 mm²" },
+          { label: "第3步：选择AWG规格", formula: "14.96 mm² → 4 AWG (21.15 mm²)", result: "4 AWG" },
+        ]}
+        answer="4 AWG (21.15 mm²) 铜缆——电压降为1.38%。"
+        interpretation="大电流12V系统需要非常粗的电缆。这就是为什么2kW以上的负载优先选用24V或48V系统——它们可以大幅降低电缆规格要求。"
+        variant="rv"
+      />
+    </div>
+  </section>
+
+  <EngineeringDiagram
+    title="DC电缆选型系统"
+    description="从电池经电缆到负载，展示电压损失位置和电流限制"
+    variant="circuit"
+    steps={[
+      { label: "电池电源", icon: "battery" },
+      { label: "正极电缆", icon: "cable" },
+      { label: "连接负载", icon: "load" },
+      { label: "回流电缆", icon: "cable" },
+    ]}
+  />
+
+  <ComparisonTable
+    title="各应用场景可接受的电压降"
+    headers={["应用场景", "最大压降", "标准", "目标值", "说明"]}
+    rows={[
+      ["船舶关键负载", "3%", "ISO 13297", "建议1%", "导航、舱底泵、电子设备"],
+      ["太阳能直流布线", "2%", "NEC 690", "1%", "充电控制器至电池"],
+      ["汽车", "2%", "SAE J1127", "1%", "电池至起动机、点火"],
+      ["电信48V", "1%", "ITU-T", "0.5%", "直流配电"],
+      ["一般直流系统", "3%", "IEEE", "1%", "电池至负载系统"],
+      ["非关键照明", "10%", "ISO 13297", "5%", "舱室照明、家用负载"],
+    ]}
+    caption="直流系统最大允许电压降的行业标准"
+  />
+
+  <ComparisonTable
+    title="铜缆与铝缆对比——电缆选型"
+    headers={["参数", "铜", "铝", "比值"]}
+    rows={[
+      ["电阻率 (Ω·m)", "1.72×10⁻⁸", "2.82×10⁻⁸", "1.64×"],
+      ["相同压降所需截面积", "1.0×", "1.6×", "铝需增加60%"],
+      ["每米重量", "1.0×", "0.5×", "铝轻50%"],
+      ["单位载流量成本", "1.0×", "0.6×", "铝便宜40%"],
+      ["氧化风险", "低", "高", "铝需要抗氧化剂"],
+      ["柔韧性", "高", "低", "铜更适合狭窄布线"],
+    ]}
+    caption="直流电力导体材料对比"
+  />
+
+  <FAQSection items={faqItems} />
+
+  <!-- 计算脚本 -->
+  <script>
+    const voltageInput = document.getElementById('voltage') as HTMLInputElement;
+    const powerInput = document.getElementById('power') as HTMLInputElement;
+    const distanceInput = document.getElementById('distance') as HTMLInputElement;
+    const materialSelect = document.getElementById('material') as HTMLSelectElement;
+    const temperatureInput = document.getElementById('temperature') as HTMLInputElement;
+    const maxDropInput = document.getElementById('max-drop') as HTMLInputElement;
+
+    // Result elements
+    const resultCableBox = document.getElementById('result-cable');
+    const resultCableValue = resultCableBox?.querySelector('.text-display-md') as HTMLElement;
+    const resultCableNote = resultCableBox?.querySelector('.text-caption') as HTMLElement;
+
+    const resultDropBox = document.getElementById('result-drop');
+    const resultDropValue = resultDropBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultDropNote = resultDropBox?.querySelector('.text-caption') as HTMLElement;
+
+    const resultCurrentBox = document.getElementById('result-current');
+    const resultCurrentValue = resultCurrentBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultCurrentNote = resultCurrentBox?.querySelector('.text-caption') as HTMLElement;
+
+    const resultLossBox = document.getElementById('result-loss');
+    const resultLossValue = resultLossBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultLossNote = resultLossBox?.querySelector('.text-caption') as HTMLElement;
+
+    const cableNotes = document.getElementById('cable-notes');
+    const awgTableBody = document.getElementById('awg-table-body');
+
+    const AWG_SIZES = [
+      { awg: '18', areaMm2: 0.823, ampacityA: 10 },
+      { awg: '16', areaMm2: 1.31, ampacityA: 15 },
+      { awg: '14', areaMm2: 2.08, ampacityA: 20 },
+      { awg: '12', areaMm2: 3.31, ampacityA: 25 },
+      { awg: '10', areaMm2: 5.26, ampacityA: 35 },
+      { awg: '8', areaMm2: 8.37, ampacityA: 50 },
+      { awg: '6', areaMm2: 13.3, ampacityA: 65 },
+      { awg: '4', areaMm2: 21.15, ampacityA: 85 },
+      { awg: '2', areaMm2: 33.6, ampacityA: 115 },
+      { awg: '1/0', areaMm2: 53.5, ampacityA: 150 },
+      { awg: '2/0', areaMm2: 67.4, ampacityA: 175 },
+      { awg: '4/0', areaMm2: 107.0, ampacityA: 230 },
+    ];
+
+    const COPPER_RESISTIVITY = 1.72e-8;
+    const ALUMINUM_RESISTIVITY = 2.82e-8;
+    const TEMP_COEF = 0.00393;
+
+    function calculateCableMetrics(
+      voltage: number, power: number, distance: number,
+      material: string, temperature: number, areaMm2: number
+    ): { dropPct: number; dropV: number; current: number; lossW: number } {
+      const current = power / voltage;
+      const rho20 = material === 'copper' ? COPPER_RESISTIVITY : ALUMINUM_RESISTIVITY;
+      const rhoT = rho20 * (1 + TEMP_COEF * (temperature - 20));
+      const loopLength = 2 * distance;
+      const areaM2 = areaMm2 * 1e-6;
+      const loopR = rhoT * loopLength / areaM2;
+      const dropV = current * loopR;
+      const dropPct = (dropV / voltage) * 100;
+      const lossW = current * current * loopR;
+      return { dropPct, dropV, current, lossW };
+    }
+
+    function getRecommendedAWG(
+      voltage: number, power: number, distance: number,
+      material: string, temperature: number, maxDropPct: number
+    ): { awg: string; areaMm2: number; dropPct: number; meetsAmpacity: boolean } {
+      const current = power / voltage;
+      const rho20 = material === 'copper' ? COPPER_RESISTIVITY : ALUMINUM_RESISTIVITY;
+      const rhoT = rho20 * (1 + TEMP_COEF * (temperature - 20));
+      const loopLength = 2 * distance;
+
+      // Min area for voltage drop
+      const rMax = (voltage * maxDropPct / 100) / current;
+      const minAreaForDrop = rhoT * loopLength / rMax;
+
+      // Min area for ampacity
+      let minAreaForAmpacity = 0;
+      for (const awg of AWG_SIZES) {
+        if (awg.ampacityA >= current) {
+          minAreaForAmpacity = awg.areaMm2;
+          break;
+        }
+      }
+      if (minAreaForAmpacity === 0) minAreaForAmpacity = AWG_SIZES[AWG_SIZES.length - 1].areaMm2;
+
+      const minArea = Math.max(minAreaForDrop, minAreaForAmpacity);
+
+      // Find smallest AWG that meets both criteria
+      let best = AWG_SIZES[AWG_SIZES.length - 1];
+      for (const awg of AWG_SIZES) {
+        if (awg.areaMm2 >= minArea) {
+          best = awg;
+          break;
+        }
+      }
+
+      const metrics = calculateCableMetrics(voltage, power, distance, material, temperature, best.areaMm2);
+      return { awg: best.awg, areaMm2: best.areaMm2, dropPct: metrics.dropPct, meetsAmpacity: best.ampacityA >= current };
+    }
+
+    function updateCalculations() {
+      const voltage = parseFloat(voltageInput.value) || 12.8;
+      const power = parseFloat(powerInput.value) || 500;
+      const distance = parseFloat(distanceInput.value) || 5;
+      const material = materialSelect.value;
+      const temperature = parseFloat(temperatureInput.value) || 30;
+      const maxDrop = parseFloat(maxDropInput.value) || 3;
+
+      const rec = getRecommendedAWG(voltage, power, distance, material, temperature, maxDrop);
+      const metrics = calculateCableMetrics(voltage, power, distance, material, temperature, rec.areaMm2);
+      const current = power / voltage;
+
+      // Render cable
+      if (resultCableValue) resultCableValue.textContent = `${rec.awg} AWG`;
+      if (resultCableNote) resultCableNote.textContent = `${rec.areaMm2} mm² ${material}`;
+
+      // Render drop
+      if (resultDropValue) resultDropValue.textContent = `${metrics.dropPct.toFixed(2)}%`;
+      if (resultDropNote) resultDropNote.textContent = `${metrics.dropV.toFixed(3)}V along loop`;
+
+      // Render current
+      if (resultCurrentValue) resultCurrentValue.textContent = `${current.toFixed(1)} A`;
+      if (resultCurrentNote) resultCurrentNote.textContent = 'Continuous draw';
+
+      // Render loss
+      if (resultLossValue) resultLossValue.textContent = `${metrics.lossW.toFixed(1)} W`;
+      if (resultLossNote) resultLossNote.textContent = `${metrics.dropPct.toFixed(1)}% of load power`;
+
+      // Render notes
+      if (cableNotes) {
+        if (current > 100) {
+          cableNotes.textContent = `High-current 12V system. Consider upgrading to 48V to reduce current and cable requirements. At ${current.toFixed(0)}A, cable thickness is substantial.`;
+        } else if (metrics.dropPct > maxDrop) {
+          cableNotes.textContent = `Warning: No standard AWG size meets the ${maxDrop}% drop limit at this distance. Consider shorter cable runs, higher system voltage, or accepting higher drop.`;
+        } else if (!rec.meetsAmpacity) {
+          cableNotes.textContent = `The cable meets voltage drop limits but may not meet ampacity requirements at ${current.toFixed(0)}A continuous. Verify ampacity for your installation.`;
+        } else {
+          cableNotes.textContent = `At ${voltage}V with ${current.toFixed(0)}A load current, ${rec.awg} AWG copper meets both the ${maxDrop}% voltage drop limit and ampacity requirements.`;
+        }
+      }
+
+      // Render AWG table
+      if (awgTableBody) {
+        awgTableBody.innerHTML = '';
+        for (const awg of AWG_SIZES) {
+          const m = calculateCableMetrics(voltage, power, distance, material, temperature, awg.areaMm2);
+          const meetsDrop = m.dropPct <= maxDrop;
+          const meetsAmp = awg.ampacityA >= current;
+          const isRecommended = awg.awg === rec.awg;
+
+          const row = document.createElement('tr');
+          row.className = `border-b border-hairline ${isRecommended ? 'bg-surface-elevated' : ''}`;
+          row.innerHTML = `
+            <td class="p-3 text-body-sm text-primary font-mono">${isRecommended ? '→ ' : ''}${awg.awg} AWG</td>
+            <td class="p-3 text-body-sm text-muted">${awg.areaMm2}</td>
+            <td class="p-3 text-body-sm text-muted">${awg.ampacityA}</td>
+            <td class="p-3 text-body-sm ${meetsDrop ? 'text-success' : 'text-red-500'}">${m.dropPct.toFixed(2)}%</td>
+            <td class="p-3 text-body-sm text-muted">${m.lossW.toFixed(1)} W</td>
+            <td class="p-3 text-body-sm ${meetsDrop && meetsAmp ? 'text-success' : 'text-red-500'}">${meetsDrop && meetsAmp ? '✓ OK' : meetsDrop ? 'Ampacity low' : 'Drop too high'}</td>
+          `;
+          awgTableBody.appendChild(row);
+        }
+      }
+
+      // Update drop box border color
+      if (resultDropBox) {
+        resultDropBox.className = "bg-surface-soft p-6 border col-span-1 md:col-span-2 " +
+          (metrics.dropPct > 10 ? "border-red-600" :
+           metrics.dropPct > maxDrop ? "border-yellow-500" : "border-hairline");
+      }
+    }
+
+    [voltageInput, powerInput, distanceInput, materialSelect, temperatureInput, maxDropInput].forEach(el => {
+      el.addEventListener('input', updateCalculations);
+    });
+
+    updateCalculations();
+  </script>
+</CalculatorLayout>

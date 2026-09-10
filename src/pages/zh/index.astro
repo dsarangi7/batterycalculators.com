@@ -1,0 +1,404 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import CalculatorCard from "../../components/CalculatorCard.astro";
+import CategoryCard from "../../components/CategoryCard.astro";
+import CalculatorFinder from "../../components/CalculatorFinder.astro";
+import FAQSection from "../../components/FAQSection.astro";
+import FormulaBox from "../../components/FormulaBox.astro";
+
+const categories = [
+  {
+    href: "/zh/tools/solar-battery-sizing-calculator/",
+    title: "太阳能",
+    description: "太阳能蓄电池容量计算、离网选型与光伏+储能规划",
+    calculatorCount: 2,
+  },
+  {
+    href: "/zh/tools/home-backup-battery-calculator/",
+    title: "家庭备用",
+    description: "关键负载、备用续航规划与停电应急准备",
+    calculatorCount: 1,
+  },
+  {
+    href: "/zh/tools/rv-battery-calculator/",
+    title: "房车",
+    description: "房车用电规划、续航估算与逆变器匹配",
+    calculatorCount: 1,
+  },
+  {
+    href: "/zh/tools/battery-sizing-calculator/",
+    title: "电池选型",
+    description: "船用、房车与家庭储能的蓄电池容量计算",
+    calculatorCount: 3,
+  },
+  {
+    href: "/zh/tools/battery-pack-calculator/",
+    title: "电池组",
+    description: "锂电池组设计、串联/并联配置与电压规划",
+    calculatorCount: 1,
+  },
+  {
+    href: "/zh/tools/c-rate-calculator/",
+    title: "工程",
+    description: "C率、SOC/SOH、压降与线缆损耗分析",
+    calculatorCount: 2,
+  },
+];
+
+const featuredCalculators = [
+  {
+    name: "电池续航时间计算器",
+    href: "/zh/tools/runtime-calculator/",
+    category: "电芯与电池组",
+    description: "由容量、负载与效率估算电池放电续航时间。",
+  },
+  {
+    name: "电池容量计算器",
+    href: "/zh/tools/battery-sizing-calculator/",
+    category: "电气",
+    description: "由日耗电量、备用天数与温度选配电池组容量。",
+  },
+  {
+    name: "C率计算器",
+    href: "/zh/tools/c-rate-calculator/",
+    category: "电芯与电池组",
+    description: "计算充放电电流与C率倍率。",
+  },
+  {
+    name: "太阳能蓄电池计算器",
+    href: "/zh/tools/solar-battery-sizing-calculator/",
+    category: "太阳能",
+    description: "由日耗电量计算太阳能蓄电池与光伏配置。",
+  },
+  {
+    name: "家庭备用电池计算器",
+    href: "/zh/tools/home-backup-battery-calculator/",
+    category: "家庭备用",
+    description: "为关键负载选配家庭备用电池与逆变器。",
+  },
+  {
+    name: "房车电池计算器",
+    href: "/zh/tools/rv-battery-calculator/",
+    category: "房车",
+    description: "规划房车露营离网用电与续航。",
+  },
+];
+
+const faqItems = [
+  {
+    question: "电池续航时间怎么计算？",
+    answer: "续航时间（小时）= 可用能量（Wh）÷ 负载功率（W）。可用能量 = 容量（Ah）× 标称电压（V）× 放电深度（DoD）× 系统效率。例如 100Ah 12.8V 磷酸铁锂电池按 80% 放电深度、90% 效率带 250W 负载，续航约 3 小时 41 分钟。本站每款电池计算器都会展示完整公式，可自行验算。",
+  },
+  {
+    question: "蓄电池容量（Ah）与能量（Wh）怎么换算？",
+    answer: "能量 Wh = 容量 Ah × 电压 V。100Ah 12V 蓄电池储能 1200Wh，同为 100Ah 的 48V 电池则储能 4800Wh。比较不同电压电池或计算带载续航时，一律先换算成 Wh，再除以负载瓦数，可使用本站能量换算与电池容量计算器一键换算。",
+  },
+  {
+    question: "太阳能蓄电池容量怎么选？",
+    answer: "先统计日耗电量（kWh/天），再乘以无日照备用天数，除以放电深度与系统效率，并考虑温度修正。例如日耗 3kWh、备用 2 天、磷酸铁锂按 80% 放电深度计算，至少需要约 8.3kWh 可用储能。使用太阳能蓄电池计算器输入日负载、备用天数与电池电压即可得出 Ah 与 kWh 推荐值。",
+  },
+  {
+    question: "磷酸铁锂电池放电深度（DoD）多少合适？",
+    answer: "磷酸铁锂（LiFePO4）常规按 80%–90% 放电深度使用，三元（NMC）建议不超过 80%，铅酸电池建议仅用 50%。放电越深循环寿命衰减越快，选型时不要按 100% 放空计算，本站计算器默认给出保守的工程建议值。",
+  },
+  {
+    question: "C率是什么意思？",
+    answer: "C率表示充放电相对容量的快慢：1C 即一小时放空标称容量，0.5C 约两小时放空。100Ah 电池以 50A 放电就是 0.5C。大电流放电内阻发热增加、可用能量下降，铅酸电池还存在显著的 Peukert 效应。用 C率计算器可校核电流是否超出电芯与线缆安全范围。",
+  },
+  {
+    question: "房车电池需要多大？",
+    answer: "把车上所有电器功率×使用小时换算成每日 Wh，再除以系统电压得到 Ah 需求，并留出 1–2 天备用与 80% 放电深度余量。一台 45W 车载冰箱 24 小时约耗电 1080Wh，约需 12V 120Ah 磷酸铁锂。房车电池计算器可按电器清单自动汇总并给出推荐容量。",
+  },
+  {
+    question: "这些电池计算器的公式可靠吗？",
+    answer: "所有公式均基于公开的电气工程原理：可用能量 Ah×V×DoD、效率修正负载 W/η、串并联电压容量叠加等，无黑箱算法，每个中间值都可复核。涉及人身与财产安全的设计，请务必经持证电气工程师核验。",
+  },
+  {
+    question: "有英文与葡萄牙语版本吗？",
+    answer: "有。点击右上角地球图标即可切换 English、Português 与中文（简体），同一工具在三个语言版本下计算逻辑完全一致，公式透明可查。",
+  },
+];
+---
+
+<Layout
+  title="电池计算器｜太阳能/房车/船用/电动汽车电池容量与续航计算工具"
+  description="免费工程级电池计算器：电池续航时间计算、蓄电池容量选型、太阳能蓄电池计算、房车电池、锂电池C率、家庭备用电源与储能系统选型，公式全公开。"
+  schema="website"
+  schemaName="电池计算器"
+  schemaDescription="工程级电池计算器：太阳能、家庭备用电源、房车、船用、电动汽车与储能系统的电池容量、续航时间、C率与选型工具。"
+  faqItems={faqItems}
+  lang="zh"
+>
+  <!-- Hero Section -->
+  <section class="border-b border-hairline pb-6 md:pb-8">
+    <div class="grid grid-cols-1 md:grid-cols-[1.1fr_0.9fr] gap-8 md:gap-10 min-h-[28vh] md:min-h-[34vh] items-center">
+      <!-- Left column: copy + CTAs + pills -->
+      <div class="max-w-[700px]">
+        <div class="mb-3">
+          <span
+            class="text-label-uppercase text-m-blue-light text-[11px] block mb-2"
+            >工程实用工具平台</span
+          >
+          <h1 class="text-display-md text-primary leading-tight mb-3">
+            电池计算器与工程工具
+          </h1>
+          <p class="text-body-md text-body font-light max-w-[650px]">
+            免费电池计算器：太阳能蓄电池、家庭备用电源、房车电池、船用电池、电动汽车电池组与储能系统——续航时间、容量选型、C率一键计算，公式全公开。
+          </p>
+        </div>
+
+        <!-- CTA row -->
+        <div class="mt-5 flex flex-col sm:flex-row gap-3">
+          <a
+            href="/zh/tools/"
+            class="btn-primary-outline text-xs text-center sm:text-sm inline-flex flex-1 h-11 items-center justify-center"
+          >
+            浏览计算器
+          </a>
+          <a
+            href="/zh/tools/runtime-calculator/"
+            class="btn-secondary text-xs text-center sm:text-sm inline-flex flex-1 h-11 items-center justify-center"
+          >
+            计算续航时间
+          </a>
+        </div>
+
+        <!-- Quick category pills -->
+        <div class="mt-5 flex flex-wrap gap-2">
+          {
+            [
+              { label: "太阳能", href: "/zh/tools/solar-battery-sizing-calculator/" },
+              { label: "家庭备用", href: "/zh/tools/home-backup-battery-calculator/" },
+              { label: "房车", href: "/zh/tools/rv-battery-calculator/" },
+              { label: "电池选型", href: "/zh/tools/battery-sizing-calculator/" },
+              { label: "电池组", href: "/zh/tools/battery-pack-calculator/" },
+              { label: "C率", href: "/zh/tools/c-rate-calculator/" },
+            ].map((pill) => (
+              <a
+                href={pill.href}
+                class="text-label-uppercase text-muted text-[10px] border border-hairline px-3 py-2 hover:border-primary transition-colors bg-transparent"
+              >
+                {pill.label}
+              </a>
+            ))
+          }
+        </div>
+      </div>
+
+      <!-- Right column: Popular Battery Tools panel -->
+      <div class="bg-surface-card border border-hairline">
+        <div class="border-b border-hairline px-6 py-4">
+          <h2 class="text-title-sm text-primary font-bold">热门电池工具</h2>
+        </div>
+        <div class="divide-y divide-hairline">
+          {
+            [
+              {
+                name: "电池续航时间计算器",
+                desc: "容量 Ah/Wh + 负载 W 算续航",
+                href: "/zh/tools/runtime-calculator/",
+              },
+              {
+                name: "电池容量计算器",
+                desc: "日耗电 + 备用天数选容量",
+                href: "/zh/tools/battery-sizing-calculator/",
+              },
+              {
+                name: "太阳能蓄电池计算器",
+                desc: "光伏 + 储能联合选型",
+                href: "/zh/tools/solar-battery-sizing-calculator/",
+              },
+              {
+                name: "家庭备用电池计算器",
+                desc: "停电备用续航规划",
+                href: "/zh/tools/home-backup-battery-calculator/",
+              },
+              {
+                name: "房车电池计算器",
+                desc: "露营离网用电规划",
+                href: "/zh/tools/rv-battery-calculator/",
+              },
+              {
+                name: "电池组计算器",
+                desc: "串联并联设计",
+                href: "/zh/tools/battery-pack-calculator/",
+              },
+              {
+                name: "C率计算器",
+                desc: "充放电电流安全校核",
+                href: "/zh/tools/c-rate-calculator/",
+              },
+            ].map((tool) => (
+              <a
+                href={tool.href}
+                class="block px-6 py-4 hover:bg-surface-elevated transition-colors group"
+              >
+                <span class="text-title-sm text-primary group-hover:text-m-blue-light transition-colors block">
+                  {tool.name}
+                </span>
+                <span class="text-body-sm text-muted text-[13px]">
+                  {tool.desc}
+                </span>
+              </a>
+            ))
+          }
+        </div>
+        <div class="border-t border-hairline px-6 py-3">
+          <a
+            href="/zh/tools/"
+            class="text-label-uppercase text-m-blue-light text-[10px] hover:text-primary transition-colors"
+          >
+            查看全部工具
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Category Cards Section -->
+  <section class="pt-6 md:pt-8 pb-12">
+    <div class="flex items-center justify-between mb-5">
+      <h2 class="text-title-lg text-primary">按分类浏览</h2>
+      <a
+        href="/zh/tools/"
+        class="text-label-uppercase text-muted text-[10px] hover:text-primary transition-colors"
+        >查看全部工具 →</a
+      >
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {categories.map((cat) => <CategoryCard {...cat} />)}
+    </div>
+
+    <!-- Calculator Finder -->
+    <div class="mt-8">
+      <CalculatorFinder lang="zh" />
+    </div>
+  </section>
+
+  <!-- Featured Calculators Section -->
+  <section class="mb-16">
+    <div class="flex items-center justify-between mb-8">
+      <h2 class="text-title-lg text-primary">精选计算器</h2>
+      <a
+        href="/zh/tools/"
+        class="text-label-uppercase text-muted text-[10px] hover:text-primary transition-colors"
+        >查看全部 →</a
+      >
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {
+        featuredCalculators.map((calc) => (
+          <a href={calc.href} class="block group">
+            <CalculatorCard class="h-full flex flex-col justify-between">
+              <div>
+                <span class="text-label-uppercase text-m-blue-light text-[10px] block mb-2">
+                  {calc.category}
+                </span>
+                <h3 class="text-title-lg text-primary mb-2 group-hover:text-m-blue-light transition-colors">
+                  {calc.name}
+                </h3>
+                <p class="text-body-sm text-muted mb-6">{calc.description}</p>
+              </div>
+              <span class="btn-primary-outline text-xs text-center py-3 w-full">
+                打开计算器
+              </span>
+            </CalculatorCard>
+          </a>
+        ))
+      }
+    </div>
+  </section>
+
+  <!-- Core formulas SEO section -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-title-lg text-primary mb-6">电池计算核心公式（续航 / 容量 / C率）</h2>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+      <div>
+        <p class="text-body-sm text-muted leading-relaxed mb-4">
+          无论选太阳能蓄电池、房车电池还是家庭备用电源，底层都是同一套能量账：先把容量换算成能量（Wh），再按放电深度与效率打折，最后除以负载功率得到续航；反过来由每日耗电与备用天数倒推所需容量。磷酸铁锂（LiFePO4）、三元与铅酸的区别主要在可用放电深度与温度修正系数上。
+        </p>
+        <p class="text-body-sm text-muted leading-relaxed">
+          本站中文电池计算器覆盖<strong class="text-body-strong">电池续航时间计算、蓄电池容量选型、太阳能蓄电池计算、房车电池计算、电池组串并联设计、C率计算</strong>等高频需求，每个工具均公开公式、给出分步算例，方便对照复核。
+        </p>
+      </div>
+      <FormulaBox title="常用公式速查">
+        <div class="bg-surface-soft p-3 md:p-4 font-mono text-primary border border-hairline my-2 overflow-x-auto whitespace-nowrap md:whitespace-normal text-xs md:text-sm">
+          总能量 Wh = 容量 Ah × 标称电压 V
+        </div>
+        <div class="bg-surface-soft p-3 md:p-4 font-mono text-primary border border-hairline my-2 overflow-x-auto whitespace-nowrap md:whitespace-normal text-xs md:text-sm">
+          可用能量 Wh = 总能量 × 放电深度 DoD% × 系统效率 η%
+        </div>
+        <div class="bg-surface-soft p-3 md:p-4 font-mono text-primary border border-hairline my-2 overflow-x-auto whitespace-nowrap md:whitespace-normal text-xs md:text-sm">
+          续航时间 h = 可用能量 Wh ÷ 负载功率 W
+        </div>
+        <div class="bg-surface-soft p-3 md:p-4 font-mono text-primary border border-hairline my-2 overflow-x-auto whitespace-nowrap md:whitespace-normal text-xs md:text-sm">
+          所需容量 Ah = 日耗电 Wh × 备用天数 ÷ (电压 V × DoD% × η%)
+        </div>
+        <div class="bg-surface-soft p-3 md:p-4 font-mono text-primary border border-hairline my-2 overflow-x-auto whitespace-nowrap md:whitespace-normal text-xs md:text-sm">
+          C率 = 放电电流 A ÷ 标称容量 Ah
+        </div>
+      </FormulaBox>
+    </div>
+  </section>
+
+  <FAQSection items={faqItems} lang="zh" />
+
+  <!-- Trust Section -->
+  <section class="bg-surface-card border border-hairline p-8 md:p-12 mb-16">
+    <h2 class="text-title-lg text-primary mb-8 text-center">
+      可信的计算，为工程而生
+    </h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+      <div class="text-center">
+        <svg class="mx-auto mb-4 opacity-90" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--color-body-strong)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 4h12l-4 4 4 4H4" />
+          <path d="M12 12h8" />
+        </svg>
+        <h3 class="text-title-sm text-primary mb-2">公式透明</h3>
+        <p class="text-body-sm text-muted">
+          所有公式与假设全部公开。
+        </p>
+      </div>
+      <div class="text-center">
+        <svg class="mx-auto mb-4 opacity-90" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--color-body-strong)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8" />
+        </svg>
+        <h3 class="text-title-sm text-primary mb-2">即时计算</h3>
+        <p class="text-body-sm text-muted">
+          在浏览器中即时得出结果。
+        </p>
+      </div>
+      <div class="text-center">
+        <svg class="mx-auto mb-4 opacity-90" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--color-body-strong)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="5" y="11" width="14" height="10" rx="0" />
+          <path d="M7 11V7a5 5 0 0 1 9.9-1" />
+        </svg>
+        <h3 class="text-title-sm text-primary mb-2">无需注册</h3>
+        <p class="text-body-sm text-muted">
+          无需创建账户即可使用全部工具。
+        </p>
+      </div>
+      <div class="text-center">
+        <svg class="mx-auto mb-4 opacity-90" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--color-body-strong)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+          <polyline points="14 2 14 8 20 8" />
+          <line x1="9" y1="13" x2="15" y2="13" />
+          <line x1="9" y1="17" x2="13" y2="17" />
+        </svg>
+        <h3 class="text-title-sm text-primary mb-2">工程依据</h3>
+        <p class="text-body-sm text-muted">
+          基于成熟的电气工程原理。
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Disclaimer -->
+  <section class="border border-hairline bg-surface-soft p-6 text-caption text-muted mb-4">
+    <span class="text-primary font-bold text-[10px] tracking-wider uppercase border border-hairline px-1.5 py-0.5 mr-2 inline-block mb-3">
+      工程免责声明
+    </span>
+    本工具仅提供选型估算。实际续航会因温度、内阻、接线损耗、电芯老化与负载波动而变化，涉及安全的设计请经持证专业人员核验。
+  </section>
+</Layout>

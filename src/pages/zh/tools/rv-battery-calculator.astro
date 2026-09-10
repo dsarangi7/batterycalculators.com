@@ -1,0 +1,548 @@
+---
+import CalculatorLayout from '../../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import InputField from '../../../components/InputField.astro';
+import ResultBox from '../../../components/ResultBox.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import WorkedExample from '../../../components/WorkedExample.astro';
+import ComparisonTable from '../../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../../components/EngineeringDiagram.astro';
+
+const whatIs = `房车电池计算器通过汇总所有电器的负载、乘以每天的使用小时数，并计入不同化学体系的放电深度限制，来确定离网露营所需的蓄电池组容量。房车电源系统有其特殊约束：空间和重量受限、原生 12V 直流系统、行车时可用发电机（启动机）充电，还要在容量和载重之间取得平衡。无论是周末营地短途，还是长期离网旅居，本计算器都能帮你配出不断电的电池组，不用每天启动发电机或接营地电源。`;
+
+const whyItMatters = [
+  "房车电池组选小了，半夜冰箱和照明就没电，只能提前结束露营，或紧急购买发电机。",
+  "电池组选大了，会占用宝贵的载重和储物空间。在 B 型房车上，每 100Ah 磷酸铁锂容量约占用 30cm × 20cm × 20cm 的柜体空间。",
+  "忽略行车充电的限制，开一整天车也充不满电池：50A 充电机从 50% 放电深度充满 200Ah 需要 4 小时以上。",
+  "铅酸电池长期按 80% 放电深度使用，循环寿命会从 500 次掉到不足 100 次，换电池的钱比一开始就升级磷酸铁锂还贵。",
+  "不统计待机功耗（一氧化碳报警器、冰箱控制板、暗电流），即使所有电器都关了，一夜也可能耗掉 20–40Ah。",
+];
+
+const practicalApplications = [
+  { title: "周末露营", description: "为 2–3 天离网露营配 200–400Ah 磷酸铁锂电池组，带冰箱、照明和设备充电，不接营地电源。" },
+  { title: "长期离网旅居", description: "为长期住在房车里、带电磁炉、微波炉、咖啡机等大功率电器的生活方式计算 600–1000Ah 以上的电池组。" },
+  { title: "光伏辅助房车系统", description: "规划白天用光伏发电、夜间用电池的容量，减少对行车充电和发电机的依赖。" },
+  { title: "厢式改装与床车搭建", description: "为 B 型房车设计紧凑轻量的电池系统，每一公斤和每一立方厘米都关系到载重和操控。" },
+];
+
+const expertNotes: { title: string; variant: 'engineering' | 'tip'; content: string }[] = [
+  {
+    title: "房车系统选 12V 还是 24V",
+    variant: "engineering",
+    content: "大多数房车用 12V 系统，因为房车电器（冰箱、水泵、照明）原生就是 12V 直流。总负载 2000W 以内时，12V 简单实用。大功率配置（电磁炉、家用微波炉、分体空调）建议用 24V，电流减半，线可以更细、压降更小。A 型房车和大五轮拖挂可以用 24V 系统再加 DC-DC 降到 12V 带电器，这是目前高效的主流做法。"
+  },
+  {
+    title: "便携电源还是一体固定安装",
+    variant: "tip",
+    content: "便携储能电源（EcoFlow、Goal Zero 等）适合偶尔周末露营：不用布线，即插即用。固定安装（Victron、Battleborn、Renogy 等）容量更大、每度电更便宜，还能整合行车充电和光伏。如果你一年露营超过 10 个周末或长期住在房车里，固定磷酸铁锂系统 2–3 年就能比便携电源回本。"
+  }
+];
+
+const trustSection = {
+  text: "本计算器采用 Airstream、Winnebago 以及定制改装厂通用的房车电气设计方法。负载画像基于厂商标称功率和房车行业调研的典型使用习惯，所有公式透明、可独立验证。",
+  link: { label: "查看完整计算方法", href: "/zh/methodology/" }
+};
+
+const references = [
+  { title: "美国房车工业协会技术标准", url: "https://www.rvia.org/", source: "RVIA Technical Standards" },
+  { title: "Victron Energy：移动电源系统设计指南", url: "https://www.victronenergy.com/learn/mobile-power", source: "Victron Energy Technical Library" },
+  { title: "Battleborn Batteries：房车电池选型指南", url: "https://battlebornbatteries.com/rv-battery-sizing/", source: "Battleborn Batteries" },
+  { title: "Expedition Portal：穿越车电气系统", url: "https://expeditionportal.com/", source: "Expedition Portal Community" }
+];
+
+const faqItems = [
+  {
+    question: "如何统计房车里的电器负载？",
+    answer: "查看每个电器的标称功率，或用电流 × 电压换算。常见房车负载：LED 灯（每盏 10W）、冰箱（运行时 150W）、笔记本电脑（60W）、手机充电器（10W）、水泵（60W）、换气扇（20W）。逐个乘以每天使用小时数。",
+  },
+  {
+    question: "房车用哪种电池化学体系最好？",
+    answer: "磷酸铁锂（LiFePO4）是房车场景的最佳选择：重量轻、可用放电深度 80%、循环寿命 5,000 次以上、密闭空间使用安全。AGM 铅酸是预算选择，但只能按 50% 放电深度使用且更重。三元锂更轻，但比磷酸铁锂贵。",
+  },
+  {
+    question: "露营天数按几天规划？",
+    answer: "周末出行（2–3 天）配中等容量电池组即可。长期离网（5–7 天）需要大得多的容量，或有补电手段（光伏、发电机、营地电源）。大多数房车玩家按 2–4 天加补电能力规划。",
+  },
+  {
+    question: "应该按 12V 还是 24V 选型？",
+    answer: "大多数房车用 12V 系统。如果大功率需求多（空调、电磁炉），可以考虑 24V 系统加逆变器。同等功率下 24V 系统线缆更细、电流损耗更小。",
+  },
+  {
+    question: "房车冰箱的耗电怎么算？",
+    answer: "油电两用冰箱耗电池很少（控制板 2–5W）。12V 压缩机冰箱（Dometic、Isotherm 等）压缩机运行时 40–80W，按 30–50% 工作周期折算，平均 20–40W。家用样式冰箱加逆变器要 100–150W，需要配更大的电池组。",
+  },
+  {
+    question: "哪些待机功耗要算进去？",
+    answer: "即使全关了，房车也有暗电流：一氧化碳/烟雾报警器（每个 1–2W）、冰箱控制板（2–5W）、热水器待机（3–5W）、音响记忆（1W）、光伏控制器待机（0.5W）。合计持续 15–40W，停着不动每天也要耗 360–960Wh。",
+  },
+  {
+    question: "开车时能给房车电池充电吗？",
+    answer: "可以。车辆发电机通过房车充电系统或 DC-DC 充电器给生活区电池充电。标准 50A 发电机开一小时约充 50Ah。专用 DC-DC 充电器（例如 Victron Orion）可提供 20–60A 可控充电，同时保护启动电池和生活区电池。",
+  },
+  {
+    question: "低温对房车电池有什么影响？",
+    answer: "磷酸铁锂在 0°C 以下容量下降 10–15%，-10°C 以下不建议直接充电，需要电池加热。铅酸在 -10°C 容量下降 20–30%。冬季露营请给电池舱保温，并设置低温充电保护。AGM 比富液铅酸更耐寒。",
+  },
+  {
+    question: "A、B、C 型房车的电池需求有什么区别？",
+    answer: "B 型厢式房车空间有限（常见 200–400Ah 磷酸铁锂）。C 型房车可装更大电池组（400–800Ah）。A 型大巴士可装 800–1200Ah 以上多组电池。容量与可用储物空间以及各车型的典型用电需求相匹配。",
+  },
+  {
+    question: "房车需要装电池监测器吗？",
+    answer: "强烈建议。带分流器的电池监测器（Victron BMV-712、Renogy 500A 等）可以给出准确的剩余电量、剩余续航预估和历史用电数据。锂电池放电曲线太平，只看电压估算电量不可靠。",
+  },
+  {
+    question: "如何降低房车用电量？",
+    answer: "全车换 LED 照明（比白炽灯省 80%）。用 12V 压缩机冰箱代替油电两用冰箱。设备尽量用 12V 直流直接充，避免经过逆变器（可省 10–15% 变换损耗）。驻车时关掉待机负载。换气扇加定时器。",
+  },
+  {
+    question: "房车电池能带空调吗？",
+    answer: "带 13,500 BTU 房车空调需要持续约 1,500W（启动约 3,500W）。48V 400Ah 磷酸铁锂组（19.2 kWh）可运行 6–8 小时。这需要大容量逆变器和可观的电池投入。对大多数玩家，200–400W 便携蒸发冷风机更现实。",
+  },
+];
+
+const commonMistakes = [
+  "忽略行车充电限制：50A 充电机从 50% 放电深度充满 200Ah 需要 4 小时以上，而不是很多人以为的 1 小时。",
+  "只算连续负载、忘记待机功耗：一氧化碳报警器、冰箱控制板和暗电流一夜可耗 20–40Ah。",
+  "铅酸电池按 80% 放电深度使用：循环寿命会从 500 次掉到不足 100 次，铅酸请保持在 50% 放电深度以内。",
+  "只加大电池不看载重：每 100Ah 磷酸铁锂增重约 12 kg，B 型房车上影响很大。",
+  "忽略温度降额：磷酸铁锂在 0°C 以下容量下降 10–15%，-10°C 以下无加热不应充电。",
+  "逆变器配小了带不动大功率电器：微波炉、电磁炉需要 2,000W 以上持续功率，光有电池容量不够。",
+  "不同化学体系电池并联混用：铅酸和锂电池充电曲线不同，混用有安全风险。",
+  "不考虑长线缆压降：12V 系统 3 米线跑 100A 可能掉 0.5V，有效容量直接打折。",
+  "以为光伏每天都能充满：200W 板按 4 小时峰值日照每天只发 800Wh，带不动 2,000Wh 的日负载。",
+  "忘记逆变器待机功耗：很多逆变器持续耗 5–15W，一天就是 120–360Wh。",
+];
+
+const relatedArticles = [
+  { title: "房车电池选型指南", href: "/learn/rv-battery-sizing-guide/" },
+  { title: "房车最佳电池化学体系", href: "/learn/best-battery-chemistry-for-rv/" },
+  { title: "房车 12V 与 24V 电池对比", href: "/learn/12v-vs-24v-rv-batteries/" },
+  { title: "房车需要配多少块电池", href: "/learn/how-many-batteries-for-rv/" },
+  { title: "厢式旅居电池规划", href: "/learn/van-life-battery-planning/" },
+];
+
+const relatedCalculators = [
+  { href: "/zh/tools/runtime-calculator/", title: "电池续航时间计算器", description: "验证电池组可以使用多长时间。" },
+  { href: "/zh/tools/battery-sizing-calculator/", title: "电池容量计算器", description: "含温度降额的完整电池组选型。" },
+  { href: "/zh/tools/c-rate-calculator/", title: "C率计算器", description: "计算充放电倍率与可持续时间。" },
+  { href: "/zh/tools/solar-battery-sizing-calculator/", title: "太阳能蓄电池计算器", description: "根据日耗电量计算太阳能蓄电池与光伏配置。" },
+  { href: "/zh/tools/home-backup-battery-calculator/", title: "家庭备用电池计算器", description: "为关键负载选配家庭备用电池与逆变器。" },
+  { href: "/zh/tools/battery-pack-calculator/", title: "电池组计算器", description: "设计串联并联电池组的电压与容量。" },
+];
+---
+
+<CalculatorLayout
+  title="房车电池计算器｜露营离网用电规划｜电池计算器"
+  description="房车电池计算器：按电器功率与使用小时汇总每日耗电，一键算出房车电池Ah/kWh与续航，支持磷酸铁锂离网选型，公式全公开。"
+  faqItems={faqItems}
+  commonMistakes={commonMistakes}
+  relatedArticles={relatedArticles}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+  relatedCalculators={relatedCalculators}
+  lang="zh"
+>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+
+    <!-- Input Form -->
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">房车负载配置</h3>
+      <div class="flex flex-col gap-6">
+
+        <div id="appliance-list" class="flex flex-col gap-4">
+          <div class="appliance-row flex flex-col gap-3 p-3 bg-surface-soft border border-hairline rounded" data-index="0">
+            <div class="flex items-center justify-between">
+              <span class="text-label-uppercase text-xs text-primary">电器 1</span>
+              <button type="button" class="remove-row text-caption text-red-600 hover:text-red-400 cursor-pointer hidden" aria-label="删除电器行">✕</button>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div class="flex flex-col gap-1">
+                <label for="appliance-name-0" class="text-label-uppercase text-[10px] text-muted">名称</label>
+                <input id="appliance-name-0" type="text" class="text-input w-full" value="冰箱" aria-label="电器 1 名称" />
+              </div>
+              <div class="flex flex-col gap-1">
+                <label for="appliance-power-0" class="text-label-uppercase text-[10px] text-muted">功率 (W)</label>
+                <input id="appliance-power-0" type="number" class="text-input w-full" value={150} min={0} step={10} aria-label="电器 1 功率（瓦）" />
+              </div>
+              <div class="flex flex-col gap-1">
+                <label for="appliance-hours-0" class="text-label-uppercase text-[10px] text-muted">每天使用小时</label>
+                <input id="appliance-hours-0" type="number" class="text-input w-full" value={8} min={0} max={24} step={0.5} aria-label="电器 1 每天使用小时数" />
+              </div>
+            </div>
+          </div>
+
+          <div class="appliance-row flex flex-col gap-3 p-3 bg-surface-soft border border-hairline rounded" data-index="1">
+            <div class="flex items-center justify-between">
+              <span class="text-label-uppercase text-xs text-primary">电器 2</span>
+              <button type="button" class="remove-row text-caption text-red-600 hover:text-red-400 cursor-pointer hidden" aria-label="删除电器行">✕</button>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div class="flex flex-col gap-1">
+                <label for="appliance-name-1" class="text-label-uppercase text-[10px] text-muted">名称</label>
+                <input id="appliance-name-1" type="text" class="text-input w-full" value="LED 灯" aria-label="电器 2 名称" />
+              </div>
+              <div class="flex flex-col gap-1">
+                <label for="appliance-power-1" class="text-label-uppercase text-[10px] text-muted">功率 (W)</label>
+                <input id="appliance-power-1" type="number" class="text-input w-full" value={100} min={0} step={10} aria-label="电器 2 功率（瓦）" />
+              </div>
+              <div class="flex flex-col gap-1">
+                <label for="appliance-hours-1" class="text-label-uppercase text-[10px] text-muted">每天使用小时</label>
+                <input id="appliance-hours-1" type="number" class="text-input w-full" value={6} min={0} max={24} step={0.5} aria-label="电器 2 每天使用小时数" />
+              </div>
+            </div>
+          </div>
+
+          <div class="appliance-row flex flex-col gap-3 p-3 bg-surface-soft border border-hairline rounded" data-index="2">
+            <div class="flex items-center justify-between">
+              <span class="text-label-uppercase text-xs text-primary">电器 3</span>
+              <button type="button" class="remove-row text-caption text-red-600 hover:text-red-400 cursor-pointer hidden" aria-label="删除电器行">✕</button>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div class="flex flex-col gap-1">
+                <label for="appliance-name-2" class="text-label-uppercase text-[10px] text-muted">名称</label>
+                <input id="appliance-name-2" type="text" class="text-input w-full" value="笔记本电脑" aria-label="电器 3 名称" />
+              </div>
+              <div class="flex flex-col gap-1">
+                <label for="appliance-power-2" class="text-label-uppercase text-[10px] text-muted">功率 (W)</label>
+                <input id="appliance-power-2" type="number" class="text-input w-full" value={60} min={0} step={10} aria-label="电器 3 功率（瓦）" />
+              </div>
+              <div class="flex flex-col gap-1">
+                <label for="appliance-hours-2" class="text-label-uppercase text-[10px] text-muted">每天使用小时</label>
+                <input id="appliance-hours-2" type="number" class="text-input w-full" value={4} min={0} max={24} step={0.5} aria-label="电器 3 每天使用小时数" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button type="button" id="add-appliance" class="w-full py-2 px-4 border border-dashed border-m-blue-light text-m-blue-light hover:bg-m-blue-light hover:text-on-primary rounded cursor-pointer text-caption font-bold uppercase tracking-wider transition-colors">
+          + 添加电器
+        </button>
+
+        <div class="border-t border-hairline pt-6">
+          <InputField id="voltage" label="电池系统电压" value={12} min={12} max={48} step={12} unit="V" helperText="大多数房车用 12V。大功率配置可考虑 24V。" />
+
+          <InputField id="camping-days" label="露营天数" value={3} min={1} max={14} step={1} unit="天" helperText="两次充电之间露营的天数。" />
+
+          <InputField
+            id="chemistry"
+            label="电池化学体系"
+            type="select"
+            value="lfp"
+            helperText="推荐磷酸铁锂：重量轻，可用放电深度 80%。"
+            options={[
+              { label: "磷酸铁锂 (LiFePO4)", value: "lfp" },
+              { label: "三元锂 (镍钴锰)", value: "nmc" },
+              { label: "铅酸蓄电池 (AGM/胶体)", value: "lead-acid" },
+            ]}
+          />
+        </div>
+
+      </div>
+    </CalculatorCard>
+
+    <!-- Results -->
+    <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">选型结果</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <ResultBox
+            label="日耗电量"
+            value="1,820 Wh"
+            suffix="每天 1.82 kWh"
+            variant="primary"
+            id="result-daily"
+          />
+          <ResultBox
+            label="所需容量"
+            value="455.0 Ah"
+            suffix="按 12V 标称电压"
+            id="result-capacity"
+          />
+          <ResultBox
+            label="推荐电池组"
+            value="460 Ah"
+            suffix="按实用规格取整"
+            id="result-recommended"
+          />
+        </div>
+      </div>
+
+      <div class="border-t border-hairline pt-6">
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">系统说明</h4>
+        <p class="text-body-sm text-muted" id="system-notes">
+          日耗电 1,820 Wh、12V 磷酸铁锂、离网 3 天，需要 460 Ah 电池组。
+        </p>
+      </div>
+    </CalculatorCard>
+
+  </div>
+
+  <!-- Formulas and Worked Examples -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">公式与计算示例</h2>
+
+    <FormulaBox title="数学公式">
+      <p>
+        日耗电量是所有电器负载乘以各自使用小时数后的总和：
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        日耗电量 (Wh) = Σ（电器功率 × 使用小时数）
+      </div>
+      <p>
+        所需容量要计入放电深度限制和露营天数：
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        容量 (Ah) =（日耗电量 × 天数）/（放电深度% × 电压）
+      </div>
+      <p>
+        放电深度限制：磷酸铁锂 80%，三元锂 80%，铅酸 50%。
+      </p>
+    </FormulaBox>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample
+        number={1}
+        title="周末露营：冰箱、照明、水泵"
+        scenario="一对情侣去州立公园营地过周末。2 天无营地电源，需要带冰箱、LED 灯和水泵。"
+        inputs={[
+          { label: "冰箱", value: "150W × 8h/天" },
+          { label: "LED 灯", value: "40W × 6h/天" },
+          { label: "水泵", value: "60W × 1h/天" },
+          { label: "系统电压", value: "12V" },
+          { label: "化学体系", value: "磷酸铁锂（80% 放电深度）" },
+          { label: "出行时长", value: "2 天" },
+        ]}
+        steps={[
+          "日负载 = (150×8) + (40×6) + (60×1) = 1,200 + 240 + 60 = 1,500 Wh/天",
+          "全程总能量 = 1,500 Wh × 2 天 = 3,000 Wh",
+          "所需安时 = 3,000 / (0.80 × 12) = 312.5 Ah",
+        ]}
+        answer="12V 350 Ah 磷酸铁锂电池组（按实用规格取整）可提供 4,200 Wh，覆盖 3,000 Wh 的周末需求且有舒适余量。"
+        interpretation="这个配置在第二天结束时还剩约 30% 余量，可以应对突发负载或深夜冰箱启动。350 Ah 磷酸铁锂组约重 35 kg，大多数皮卡房车都能接受。"
+        variant="rv"
+      />
+
+      <WorkedExample
+        number={2}
+        title="长期旅居：多负载 + 光伏"
+        scenario="一位全职旅居者开着 C 型房车远程办公。系统有 400W 光伏板，白天发电补充电池，减少夜间所需的储能量。"
+        inputs={[
+          { label: "冰箱", value: "80W × 12h/天（含压缩机间歇）" },
+          { label: "笔记本 + 显示器", value: "200W × 8h/天" },
+          { label: "LED 照明", value: "60W × 5h/天" },
+          { label: "水泵", value: "60W × 1h/天" },
+          { label: "路由器 + 卫星网络", value: "75W × 24h/天" },
+          { label: "换气扇", value: "20W × 10h/天" },
+          { label: "手机/平板充电", value: "30W × 3h/天" },
+          { label: "系统电压", value: "12V" },
+          { label: "化学体系", value: "磷酸铁锂（80% 放电深度）" },
+          { label: "光伏发电", value: "约 1,600 Wh/天（400W × 4 小时峰值日照）" },
+        ]}
+        steps={[
+          "日负载 = (80×12) + (200×8) + (60×5) + (60×1) + (75×24) + (20×10) + (30×3) = 960 + 1,600 + 300 + 60 + 1,800 + 200 + 90 = 5,010 Wh/天",
+          "夜间净需求 = 5,010 − 1,600（光伏）= 3,410 Wh（光伏覆盖白天负载）",
+          "所需安时 = 3,410 / (0.80 × 12) = 355.2 Ah",
+          "按 1 天备用余量：3,410 × 2 / (0.80 × 12) = 710.4 Ah",
+        ]}
+        answer="12V 750 Ah 磷酸铁锂电池组可提供 9,000 Wh。400W 光伏每天补约 1,600 Wh，晴天基本可以收支平衡。"
+        interpretation="长期旅居对电依赖大，远程办公更离不开电，所以电池组要大。光伏阵列很关键，没有它需要 1,100+ Ah。阴天光伏打 4–6 折，建议备发电机。"
+        variant="rv"
+      />
+
+      <WorkedExample
+        number={3}
+        title="无光伏离网：最大化续航"
+        scenario="一位皮卡房车玩家想要 4 天完全能源独立：无光伏、无行车充电、无发电机。目标是出发后尽量久不充电。"
+        inputs={[
+          { label: "12V 压缩机冰箱", value: "60W × 10h/天（50% 工作周期）" },
+          { label: "LED 筒灯", value: "20W × 5h/天" },
+          { label: "水泵", value: "50W × 0.5h/天" },
+          { label: "设备充电", value: "40W × 3h/天" },
+          { label: "系统电压", value: "12V" },
+          { label: "化学体系", value: "磷酸铁锂（80% 放电深度）" },
+          { label: "备用目标", value: "4 天" },
+        ]}
+        steps={[
+          "日负载 = (60×10) + (20×5) + (50×0.5) + (40×3) = 600 + 100 + 25 + 120 = 845 Wh/天",
+          "4 天总能量 = 845 × 4 = 3,380 Wh",
+          "所需安时 = 3,380 / (0.80 × 12) = 352.1 Ah",
+          "实用电池组规格：400 Ah（按标准 4×100Ah 磷酸铁锂模块取整）",
+        ]}
+        answer="12V 400 Ah 磷酸铁锂电池组（4,800 Wh）可提供完整 4 天用电，还剩 1,420 Wh（29.6%）应急余量。"
+        interpretation="没有充电来源，每 Wh 都要精打细算。这个配置假设用电自律，没有浪费性负载。建议备一块 200W 折叠光伏板应急，哪怕只有零星日照，每天多 200–400 Wh 也能把续航延长到 5–6 天。"
+        variant="rv"
+      />
+    </div>
+  </section>
+
+  <EngineeringDiagram
+    title="房车电源系统架构"
+    description="行车充电、光伏输入和蓄电池组共同为房车负载供电"
+    variant="system"
+    steps={[
+      { label: "发电机/光伏", icon: "solar" },
+      { label: "充电控制器", icon: "charge" },
+      { label: "蓄电池组", icon: "battery" },
+      { label: "房车负载", icon: "load" },
+    ]}
+  />
+
+  <ComparisonTable
+    title="房车电池化学体系对比"
+    headers={["特性", "磷酸铁锂", "AGM 铅酸", "胶体电池"]}
+    rows={[
+      ["重量（100Ah）", "12 kg", "30 kg", "28 kg"],
+      ["可用容量", "80–90 Ah", "50 Ah", "50 Ah"],
+      ["循环寿命", "5,000+", "500–1,000", "1,000"],
+      ["充电倍率", "0.5–1C", "0.1C", "0.1C"],
+      ["价格（100Ah 12V）", "$800–1,200", "$200–300", "$250–350"],
+      ["自放电", "每月 1–3%", "每月 3–5%", "每月 2–4%"],
+      ["维护", "免维护", "检查补水", "免维护"],
+    ]}
+    caption="磷酸铁锂初期贵，但全寿命周期在房车场景更划算"
+  />
+
+  <FAQSection items={faqItems} />
+
+  <!-- Calculation Script -->
+  <script>
+    import { calculateRVBattery } from '../../../utils/calculators';
+
+    const applianceList = document.getElementById('appliance-list') as HTMLElement;
+    const addApplianceBtn = document.getElementById('add-appliance') as HTMLButtonElement;
+    const voltageInput = document.getElementById('voltage') as HTMLInputElement;
+    const campingDays = document.getElementById('camping-days') as HTMLInputElement;
+    const chemistrySelect = document.getElementById('chemistry') as HTMLSelectElement;
+
+    const resultDailyBox = document.getElementById('result-daily');
+    const resultDailyValue = resultDailyBox?.querySelector('.text-display-md') as HTMLElement;
+    const resultDailyKwh = resultDailyBox?.querySelector('.text-caption') as HTMLElement;
+
+    const resultCapacityBox = document.getElementById('result-capacity');
+    const resultCapacityValue = resultCapacityBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultCapacityRef = resultCapacityBox?.querySelector('.text-caption') as HTMLElement;
+
+    const resultRecommendedBox = document.getElementById('result-recommended');
+    const resultRecommendedValue = resultRecommendedBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultRecommendedRef = resultRecommendedBox?.querySelector('.text-caption') as HTMLElement;
+
+    const systemNotes = document.getElementById('system-notes');
+
+    let rowIndex = 3;
+
+    function createApplianceRow(index: number): HTMLElement {
+      const row = document.createElement('div');
+      row.className = 'appliance-row flex flex-col gap-3 p-3 bg-surface-soft border border-hairline rounded';
+      row.dataset.index = String(index);
+      row.innerHTML = `
+        <div class="flex items-center justify-between">
+          <span class="text-label-uppercase text-xs text-primary">电器 ${index + 1}</span>
+          <button type="button" class="remove-row text-caption text-red-600 hover:text-red-400 cursor-pointer" aria-label="删除电器行">✕</button>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div class="flex flex-col gap-1">
+            <label for="appliance-name-${index}" class="text-label-uppercase text-[10px] text-muted">名称</label>
+            <input id="appliance-name-${index}" type="text" class="text-input w-full" value="新电器" aria-label="电器 ${index + 1} 名称" />
+          </div>
+          <div class="flex flex-col gap-1">
+            <label for="appliance-power-${index}" class="text-label-uppercase text-[10px] text-muted">功率 (W)</label>
+            <input id="appliance-power-${index}" type="number" class="text-input w-full" value={0} min={0} step={10} aria-label="电器 ${index + 1} 功率（瓦）" />
+          </div>
+          <div class="flex flex-col gap-1">
+            <label for="appliance-hours-${index}" class="text-label-uppercase text-[10px] text-muted">每天使用小时</label>
+            <input id="appliance-hours-${index}" type="number" class="text-input w-full" value={0} min={0} max={24} step={0.5} aria-label="电器 ${index + 1} 每天使用小时数" />
+          </div>
+        </div>
+      `;
+      return row;
+    }
+
+    function updateRemoveButtons() {
+      const rows = applianceList.querySelectorAll('.appliance-row');
+      const removeBtns = applianceList.querySelectorAll('.remove-row');
+      removeBtns.forEach(btn => {
+        if (rows.length <= 1) {
+          (btn as HTMLElement).classList.add('hidden');
+        } else {
+          (btn as HTMLElement).classList.remove('hidden');
+        }
+      });
+    }
+
+    function updateCalculations() {
+      const rows = applianceList.querySelectorAll('.appliance-row');
+      const loads: number[] = [];
+      const hours: number[] = [];
+
+      rows.forEach(row => {
+        const powerInput = row.querySelector('[id^="appliance-power-"]') as HTMLInputElement;
+        const hoursInput = row.querySelector('[id^="appliance-hours-"]') as HTMLInputElement;
+        loads.push(parseFloat(powerInput?.value) || 0);
+        hours.push(parseFloat(hoursInput?.value) || 0);
+      });
+
+      const voltage = parseFloat(voltageInput.value) || 12;
+      const days = parseFloat(campingDays.value) || 3;
+      const chemistry = chemistrySelect.value as "lfp" | "nmc" | "lead-acid";
+
+      const results = calculateRVBattery(loads, hours, voltage, days, chemistry);
+
+      if (resultDailyValue) resultDailyValue.textContent = `${Math.round(results.dailyConsumptionWh).toLocaleString()} Wh`;
+      if (resultDailyKwh) resultDailyKwh.textContent = `${(results.dailyConsumptionWh / 1000).toFixed(2)} kWh / 天`;
+
+      if (resultCapacityValue) resultCapacityValue.textContent = `${results.requiredCapacityAh.toFixed(1)} Ah`;
+      if (resultCapacityRef) resultCapacityRef.textContent = `按 ${voltage}V 标称电压`;
+
+      if (resultRecommendedValue) resultRecommendedValue.textContent = `${results.recommendedBankSizeAh} Ah`;
+      if (resultRecommendedRef) resultRecommendedRef.textContent = `按实用规格取整`;
+
+      if (systemNotes) {
+        const chemistryName = chemistry === "lfp" ? "磷酸铁锂" : chemistry === "nmc" ? "三元锂" : "铅酸";
+        systemNotes.textContent = `日耗电 ${Math.round(results.dailyConsumptionWh).toLocaleString()} Wh、${voltage}V ${chemistryName}、离网 ${days} 天，需要 ${results.recommendedBankSizeAh} Ah 电池组。`;
+      }
+    }
+
+    addApplianceBtn.addEventListener('click', () => {
+      const row = createApplianceRow(rowIndex);
+      applianceList.appendChild(row);
+      rowIndex++;
+      updateRemoveButtons();
+      row.querySelectorAll('input').forEach(input => {
+        input.addEventListener('input', updateCalculations);
+      });
+      row.querySelector('.remove-row')?.addEventListener('click', () => {
+        row.remove();
+        updateRemoveButtons();
+        updateCalculations();
+      });
+      updateCalculations();
+    });
+
+    applianceList.querySelectorAll('.appliance-row').forEach(row => {
+      row.querySelectorAll('input').forEach(input => {
+        input.addEventListener('input', updateCalculations);
+      });
+      row.querySelector('.remove-row')?.addEventListener('click', () => {
+        row.remove();
+        updateRemoveButtons();
+        updateCalculations();
+      });
+    });
+
+    [voltageInput, campingDays, chemistrySelect].forEach(el => {
+      el.addEventListener('input', updateCalculations);
+    });
+
+    updateRemoveButtons();
+    updateCalculations();
+  </script>
+
+</CalculatorLayout>

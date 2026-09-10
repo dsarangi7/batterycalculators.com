@@ -1,0 +1,630 @@
+---
+import CalculatorLayout from '../../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import ResultBox from '../../../components/ResultBox.astro';
+import ComparisonTable from '../../../components/ComparisonTable.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import RelatedTools from '../../../components/RelatedTools.astro';
+
+const whatIs = `电池化学选择器是一个交互式助手，引导您为特定应用选择最佳电池化学技术。它评估<strong>应用类型</strong>、<strong>性能优先级</strong>和<strong>预算限制</strong>，以推荐最佳技术——包括 LFP（LiFePO4）、NMC（镍锰钴）、NCA（镍钴铝）、铅酸（AGM/Gel/ Flooded）、LTO（钛酸锂）或钠离子。每种化学技术在能量密度、循环寿命、安全性、成本和温度性能方面都有不同的权衡。`;
+
+const whyItMatters = [
+  "选择错误的化学技术可能会使系统寿命减半——太阳能应用中每天循环的铅酸电池可能3年就需要更换，而LFP可使用10年以上。",
+  "安全性特征差异显著——LFP热稳定性达270°C，而NMC在150°C可能发生热失控。",
+  "初始成本vs生命周期成本——铅酸看似便宜，但全生命周期每循环成本是LFP的3–4倍。",
+  "极端温度会淘汰某些化学技术——标准锂电无法在0°C以下充电，铅酸在低温下容量损失超20%。",
+  "应用不匹配导致过早失效——在高频循环的电信应用中使用高密度NMC会浪费其优势并暴露其弱点。",
+];
+
+const practicalApplications = [
+  { title: "太阳能离网", description: "每日循环，需要5000+次循环，中等温度，生命周期预算敏感。" },
+  { title: "房车与船舶", description: "抗振动，宽温度范围，重量重要，中等放电深度。" },
+  { title: "电动车牵引", description: "最大能量密度，快速充电，重量关键，高放电率。" },
+  { title: "电信备用", description: "长浮充寿命，宽温度耐受，高可靠性，10+年设计寿命。" },
+  { title: "便携电子设备", description: "每公斤最大能量密度，轻量化，中等循环寿命可接受。" },
+  { title: "电网级储能", description: "生命周期更低$/kWh，安全性 paramount，15+年设计寿命，大规模。" },
+];
+
+const expertNotes = [
+  { title: '化学选择规则', variant: 'engineering', content: '始终将化学技术与主要用例匹配。如果每天循环（太阳能、电动车），优先考虑循环寿命和DoD。如果浮充充电（电信、UPS），优先考虑浮充寿命和温度范围。如果重量关键（便携、无人机），优先考虑能量密度。没有哪种化学在所有维度上都胜出。' },
+  { title: '安全警告', variant: 'warning', content: 'NMC和NCA需要复杂的BMS进行热管理。LFP因其橄榄石晶体结构而 inherently 更安全，可抵抗氧气释放。在非受控环境（远程电信、户外），强烈推荐LFP。' },
+];
+
+const trustSection = {
+  text: "此选择器使用来自IEEE、IEC和制造商数据手册的公开文档化电池化学规格。推荐基于您声明的优先级与记录特征的加权评分。所示所有规格为典型值——实际性能因制造商和电池设计而异。",
+  link: { label: "查看我们的方法论", href: "/zh/methodology/" },
+};
+
+const references = [
+  { title: "Battery University — 比较电池化学", url: "https://batteryuniversity.com/article/bu-103-comparison-practical-batteries", source: "Battery University / Cadex Electronics" },
+  { title: "IEC 62619 — 锂电池安全标准", url: "https://webstore.iec.ch/en/publication/26133", source: "IEC Standards" },
+  { title: "DOE — 电池技术概述", url: "https://www.energy.gov/eere/vehiclebatteries/battery-technology", source: "U.S. Department of Energy" },
+  { title: "Sandia National Labs — 电池滥用测试", url: "https://www.sandia.gov/ess-ssl/battery-abuse-testing/", source: "Sandia National Laboratories" },
+];
+
+const faqItems = [
+  {
+    question: "哪种电池化学最适合太阳能储能？",
+    answer: "LFP（LiFePO4）是大多数太阳能应用推荐的化学技术。在80% DoD下提供5000+次循环寿命，优异的热稳定性，无热失控风险。虽然NMC能量密度更高，但太阳能储能优先考虑循环寿命和安全性而非重量。",
+  },
+  {
+    question: "为什么LFP初始成本更高，但长期更便宜？",
+    answer: "LFP每kWh初始成本是铅酸的2–3倍，但提供5000+次循环vs铅酸500–1000次。在10年每日循环应用中，铅酸需要3–4次更换而LFP无需更换。全生命周期成本显著有利于LFP。",
+  },
+  {
+    question: "NMC电池可用于住宅太阳能储能吗？",
+    answer: "可以，但有注意事项。NMC能量密度更高（空间有限时有用），但循环寿命更短（2000 vs 5000+），需要更复杂的热管理。对于大多数空间不受限的住宅太阳能安装，LFP因安全性和长寿命而更受青睐。",
+  },
+  {
+    question: "哪种化学在极寒下表现更好？",
+    answer: "LTO（钛酸锂）在-30°C下表现良好，可在-10°C充电而不损坏。标准锂电（LFP/NMC）在无加热情况下无法在0°C以下充电。铅酸在-10°C以下容量损失20–40%。在寒冷气候中，推荐LTO或带加热器的LFP。",
+  },
+  {
+    question: "钠离子与锂电如何比较？",
+    answer: "钠离子成本更低，使用丰富材料，但当前能量密度更低（100–150 Wh/kg vs锂电150–250），循环寿命更短（2000–3000），更适合重量不关键的固定式储能。",
+  },
+  {
+    question: "铅酸是否已完全淘汰？",
+    answer: "否。铅酸仍适用于浮充应用（UPS、应急照明），电池很少循环。其低初始成本和经过验证的可靠性使其适用于预算有限、循环次数少的应用。在每日循环应用中已过时。",
+  },
+  {
+    question: "哪种电池化学最安全？",
+    answer: "LFP（LiFePO4）普遍被认为是锂电中最安全的，因其橄榄石晶体结构在热滥用时抵抗氧气释放。在270°C以下不发生热失控。NMC和NCA热稳定性较差。铅酸不可燃但充电时产生氢气。",
+  },
+  {
+    question: "我可以在同一电池组中混合不同化学？",
+    answer: "切勿在同一电池组中混合化学。不同充放电曲线、电压曲线和内阻导致充电不平衡、加速退化及潜在安全风险。始终在同一电池组中使用相同化学、相同年龄和相同容量的电池。",
+  },
+  {
+    question: "哪种化学同等能量下最轻？",
+    answer: "NMC和NCA提供最高能量密度（150–250 Wh/kg），适用于重量关键的电动车和便携应用。LFP更重（90–160 Wh/kg），但更安全。铅酸最重（30–50 Wh/kg），重量关键应用中不适用。",
+  },
+  {
+    question: "如何为电动车在LFP和NMC之间选择？",
+    answer: "LFP适合标准续航电动车，优先考虑安全性、寿命和成本。NMC适合长续航电动车，其中更高能量密度（每公斤更多续航）值得更高成本和更短循环寿命。特斯拉在标准续航Model 3/Y使用LFP，长续航使用NMC。",
+  },
+];
+
+const relatedTools = [
+  { href: "/zh/tools/battery-sizing-calculator/", title: "电池容量计算器", description: "根据负载和续航要求选型电池组。" },
+  { href: "/zh/tools/battery-degradation-estimator/", title: "电池退化估算器", description: "基于DoD和温度估算电池寿命。" },
+  { href: "/zh/tools/charging-time-calculator/", title: "充电时间计算器", description: "计算不同化学体系和C率的充电时间。" },
+  { href: "/zh/tools/battery-pack-calculator/", title: "电池组计算器", description: "设计串联/并联电池配置。" },
+  { href: "/zh/tools/solar-battery-sizing-calculator/", title: "太阳能蓄电池计算器", description: "使用化学体系特定DoD选型太阳能电池组。" },
+];
+
+const commonMistakes = [
+  "仅凭初始成本选择——铅酸看似便宜，但全生命周期每循环成本是LFP的3–4倍。",
+  "忽略温度限制——标准锂电无法在0°C以下充电。寒冷气候安装需要LTO或加热系统。",
+  "为高频循环固定储能选择NMC——NMC的2000次循环寿命不适合太阳能或电信的每日循环。",
+  "忘记安全要求——NMC/NCA需要复杂BMS。在非受控环境中，LFP是唯一安全选择。",
+  "在同一电池组中混合化学——始终使用相同电池。不同电压曲线导致不平衡和加速退化。",
+  "忽略移动应用的重量——铅酸30–50 Wh/kg使系统重量翻倍或三倍vs锂电100–250 Wh/kg。",
+  "不考虑寿命终点——锂电在标称循环寿命后保留70–80%容量。铅酸退化更急剧。",
+  "将便携电池化学用于固定储能——高能量密度电池针对重量优化，而非循环寿命。",
+];
+
+const relatedArticles = [
+  { href: "/learn/lifepo4-vs-nmc/", title: "LFP vs NMC：完整对比" },
+  { href: "/reference/battery-chemistry-comparison/", title: "电池化学指南" },
+];
+---
+
+<CalculatorLayout
+  title="电池化学选择器 | 电池计算器"
+  description="交互式助手，根据您的应用、优先级和预算选择最佳电池化学技术——LFP、NMC、铅酸、LTO或钠离子。"
+  lang="zh"
+  faqItems={faqItems}
+  commonMistakes={commonMistakes}
+  relatedCalculators={relatedTools}
+  relatedArticles={relatedArticles}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+>
+
+  <!-- Wizard Steps -->
+  <div class="mb-16">
+
+    <!-- Step Indicator -->
+    <div class="flex items-center gap-3 mb-8">
+      <span class="step-indicator active" id="step-dot-1">1</span>
+      <span class="step-line" id="step-line-1"></span>
+      <span class="step-indicator" id="step-dot-2">2</span>
+      <span class="step-line" id="step-line-2"></span>
+      <span class="step-indicator" id="step-dot-3">3</span>
+      <span class="step-line"></span>
+      <span class="step-indicator" id="step-dot-r">R</span>
+    </div>
+
+    <!-- Step 1: Application -->
+    <div id="step-1" class="wizard-step">
+      <CalculatorCard>
+        <h3 class="text-title-lg text-primary mb-2 uppercase tracking-wider">步骤1：应用</h3>
+        <p class="text-body-sm text-muted mb-6">此电池系统将用于什么？</p>
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          <button class="app-btn selected" data-app="solar">
+            <span class="text-2xl mb-1">☀️</span>
+            <span class="text-label-uppercase text-[10px]">太阳能/离网</span>
+          </button>
+          <button class="app-btn" data-app="rv">
+            <span class="text-2xl mb-1">🚐</span>
+            <span class="text-label-uppercase text-[10px]">房车/露营</span>
+          </button>
+          <button class="app-btn" data-app="marine">
+            <span class="text-2xl mb-1">⛵</span>
+            <span class="text-label-uppercase text-[10px]">船舶</span>
+          </button>
+          <button class="app-btn" data-app="ev">
+            <span class="text-2xl mb-1">🚗</span>
+            <span class="text-label-uppercase text-[10px]">电动车</span>
+          </button>
+          <button class="app-btn" data-app="telecom">
+            <span class="text-2xl mb-1">📡</span>
+            <span class="text-label-uppercase text-[10px]">电信/UPS</span>
+          </button>
+          <button class="app-btn" data-app="portable">
+            <span class="text-2xl mb-1">🔋</span>
+            <span class="text-label-uppercase text-[10px]">便携</span>
+          </button>
+        </div>
+        <div class="mt-6 flex justify-end">
+          <button id="next-1" class="btn-primary">下一步 →</button>
+        </div>
+      </CalculatorCard>
+    </div>
+
+    <!-- Step 2: Priority -->
+    <div id="step-2" class="wizard-step hidden">
+      <CalculatorCard>
+        <h3 class="text-title-lg text-primary mb-2 uppercase tracking-wider">步骤2：优先级</h3>
+        <p class="text-body-sm text-muted mb-6">此应用最重要的是什么？</p>
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          <button class="prio-btn" data-prio="cycle-life">
+            <span class="text-2xl mb-1">♻️</span>
+            <span class="text-label-uppercase text-[10px]">循环寿命</span>
+          </button>
+          <button class="prio-btn" data-prio="cost">
+            <span class="text-2xl mb-1">💰</span>
+            <span class="text-label-uppercase text-[10px]">低成本</span>
+          </button>
+          <button class="prio-btn" data-prio="weight">
+            <span class="text-2xl mb-1">⚖️</span>
+            <span class="text-label-uppercase text-[10px]">轻重量</span>
+          </button>
+          <button class="prio-btn selected" data-prio="safety">
+            <span class="text-2xl mb-1">🛡️</span>
+            <span class="text-label-uppercase text-[10px]">安全性</span>
+          </button>
+          <button class="prio-btn" data-prio="temperature">
+            <span class="text-2xl mb-1">🌡️</span>
+            <span class="text-label-uppercase text-[10px]">温度范围</span>
+          </button>
+          <button class="prio-btn" data-prio="energy-density">
+            <span class="text-2xl mb-1">⚡</span>
+            <span class="text-label-uppercase text-[10px]">能量密度</span>
+          </button>
+        </div>
+        <div class="mt-6 flex justify-between">
+          <button id="back-2" class="btn-outline">← 返回</button>
+          <button id="next-2" class="btn-primary">下一步 →</button>
+        </div>
+      </CalculatorCard>
+    </div>
+
+    <!-- Step 3: Budget -->
+    <div id="step-3" class="wizard-step hidden">
+      <CalculatorCard>
+        <h3 class="text-title-lg text-primary mb-2 uppercase tracking-wider">步骤3：预算</h3>
+        <p class="text-body-sm text-muted mb-6">电池系统的预算范围是多少？</p>
+        <div class="flex flex-col gap-3">
+          <button class="budget-btn" data-budget="low">
+            <div class="flex justify-between items-center">
+              <span class="text-label-uppercase text-primary">经济型/预算</span>
+              <span class="text-caption text-muted">&lt; $200/kWh</span>
+            </div>
+            <span class="text-body-sm text-muted">铅酸、淹没式——初始成本最低，寿命最短</span>
+          </button>
+          <button class="budget-btn selected" data-budget="mid">
+            <div class="flex justify-between items-center">
+              <span class="text-label-uppercase text-primary">中等范围</span>
+              <span class="text-caption text-muted">$200–400/kWh</span>
+            </div>
+            <span class="text-body-sm text-muted">LFP、AGM/Gel——成本与寿命最佳平衡</span>
+          </button>
+          <button class="budget-btn" data-budget="high">
+            <div class="flex justify-between items-center">
+              <span class="text-label-uppercase text-primary">高端</span>
+              <span class="text-caption text-muted">$400–800/kWh</span>
+            </div>
+            <span class="text-body-sm text-muted">NMC、NCA——更高能量密度，先进技术</span>
+          </button>
+          <button class="budget-btn" data-budget="unlimited">
+            <div class="flex justify-between items-center">
+              <span class="text-label-uppercase text-primary">无预算限制</span>
+              <span class="text-caption text-muted">$800+/kWh</span>
+            </div>
+            <span class="text-body-sm text-muted">LTO、固态——顶尖性能</span>
+          </button>
+        </div>
+        <div class="mt-6 flex justify-between">
+          <button id="back-3" class="btn-outline">← 返回</button>
+          <button id="calculate-btn" class="btn-primary">获取推荐 →</button>
+        </div>
+      </CalculatorCard>
+    </div>
+
+    <!-- Results -->
+    <div id="step-result" class="wizard-step hidden">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-8">
+        <!-- Top Recommendation -->
+        <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+          <div>
+            <h3 class="text-label-uppercase text-m-blue-light text-[10px] tracking-wider mb-2">推荐化学</h3>
+            <h2 class="text-display-sm text-primary mb-4" id="result-name">LFP (LiFePO4)</h2>
+            <p class="text-body-sm text-muted mb-6" id="result-summary">最适合您的离网太阳能应用，安全为主要优先级的最佳匹配。</p>
+            <div class="grid grid-cols-2 gap-3 mb-6">
+              <ResultBox label="循环寿命" value="5.000+" id="rc-cycle" />
+              <ResultBox label="成本范围" value="$250–350/kWh" id="rc-cost" />
+              <ResultBox label="能量密度" value="90–160 Wh/kg" id="rc-density" />
+              <ResultBox label="安全等级" value="优秀" id="rc-safety" />
+            </div>
+          </div>
+          <div class="border-t border-hairline pt-4">
+            <h4 class="text-label-uppercase text-primary text-[10px] mb-2">优势</h4>
+            <ul class="text-body-sm text-muted flex flex-col gap-1" id="result-pros">
+              <li>→ 卓越的循环寿命（5000+次循环）</li>
+              <li>→ 固有安全——无热失控</li>
+              <li>→ 80–90%可用放电深度</li>
+              <li>→ 宽工作温度范围</li>
+            </ul>
+            <h4 class="text-label-uppercase text-primary text-[10px] mb-2 mt-3">劣势</h4>
+            <ul class="text-body-sm text-muted flex flex-col gap-1" id="result-cons">
+              <li>→ 比NMC/NCA更重</li>
+              <li>→ 能量密度低于NMC</li>
+              <li>→ 无加热时无法在0°C以下充电</li>
+            </ul>
+          </div>
+        </CalculatorCard>
+
+        <!-- Second and Third Recommendations -->
+        <div class="flex flex-col gap-6">
+          <CalculatorCard>
+            <h3 class="text-label-uppercase text-muted text-[10px] tracking-wider mb-2">第二名</h3>
+            <h4 class="text-title-lg text-primary mb-2" id="result2-name">NMC</h4>
+            <p class="text-body-sm text-muted mb-3" id="result2-summary">更高能量密度，但循环寿命更短。</p>
+            <div class="grid grid-cols-3 gap-2">
+              <ResultBox label="循环" value="2.000" id="rc2-cycle" />
+              <ResultBox label="成本" value="$350–500/kWh" id="rc2-cost" />
+              <ResultBox label="密度" value="150–220 Wh/kg" id="rc2-density" />
+            </div>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h3 class="text-label-uppercase text-muted text-[10px] tracking-wider mb-2">预算选项</h3>
+            <h4 class="text-title-lg text-primary mb-2" id="result3-name">铅酸 AGM</h4>
+            <p class="text-body-sm text-muted mb-3" id="result3-summary">初始成本最低，适用于浮充应用。</p>
+            <div class="grid grid-cols-3 gap-2">
+              <ResultBox label="循环" value="500–1.000" id="rc3-cycle" />
+              <ResultBox label="成本" value="$100–200/kWh" id="rc3-cost" />
+              <ResultBox label="密度" value="30–50 Wh/kg" id="rc3-density" />
+            </div>
+          </CalculatorCard>
+          <div class="flex justify-start">
+            <button id="restart-btn" class="btn-outline">↺ 重新开始</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Comparison Table -->
+  <ComparisonTable
+    title="电池化学比较"
+    headers={["化学", "能量密度", "循环寿命", "成本 ($/kWh)", "安全性", "温度范围", "最佳用途"]}
+    rows={[
+      ["LFP (LiFePO4)", "90–160 Wh/kg", "5.000–10.000", "$250–350", "优秀", "-20 至 60°C", "太阳能、电信、家用储能"],
+      ["NMC", "150–220 Wh/kg", "1.000–2.000", "$350–500", "良好", "-20 至 55°C", "电动车、便携、高密度"],
+      ["NCA", "200–260 Wh/kg", "500–1.000", "$400–600", "中等", "-20 至 55°C", "电动车、电动工具"],
+      ["LTO", "50–80 Wh/kg", "10.000–20.000", "$800–1.200", "优秀", "-30 至 65°C", "寒冷气候、快速充电"],
+      ["铅酸 (AGM)", "30–50 Wh/kg", "500–1.000", "$100–200", "不可燃", "-20 至 50°C", "UPS、浮充、预算"],
+      ["钠离子", "100–150 Wh/kg", "2.000–3.000", "$80–150", "良好", "-30 至 55°C", "电网储能、固定式"],
+    ]}
+    caption="典型规格——实际值因制造商和电池设计而异"
+  />
+
+  <FAQSection items={faqItems} />
+  <RelatedTools tools={relatedTools} />
+
+  <style>
+    .step-indicator {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      border: 1px solid var(--color-hairline);
+      color: var(--color-muted);
+      background: var(--color-surface-card);
+      transition: all 0.2s;
+    }
+    .step-indicator.active {
+      border-color: var(--color-m-blue-light);
+      color: var(--color-primary);
+      background: var(--color-surface-soft);
+    }
+    .step-line {
+      flex: 1;
+      height: 1px;
+      background: var(--color-hairline);
+    }
+    .app-btn, .prio-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 16px 12px;
+      border: 1px solid var(--color-hairline);
+      background: var(--color-surface-card);
+      color: var(--color-body);
+      cursor: pointer;
+      transition: all 0.15s;
+      text-align: center;
+    }
+    .app-btn:hover, .prio-btn:hover {
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+    }
+    .app-btn.selected, .prio-btn.selected {
+      border-color: var(--color-m-blue-light);
+      color: var(--color-primary);
+      background: var(--color-surface-soft);
+    }
+    .budget-btn {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 16px;
+      border: 1px solid var(--color-hairline);
+      background: var(--color-surface-card);
+      cursor: pointer;
+      transition: all 0.15s;
+      text-align: left;
+    }
+    .budget-btn:hover {
+      border-color: var(--color-primary);
+    }
+    .budget-btn.selected {
+      border-color: var(--color-m-blue-light);
+      background: var(--color-surface-soft);
+    }
+    .btn-primary {
+      padding: 12px 24px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      border: 1px solid var(--color-primary);
+      background: var(--color-canvas);
+      color: var(--color-primary);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-primary:hover {
+      background: var(--color-primary);
+      color: var(--color-canvas);
+    }
+    .btn-outline {
+      padding: 12px 24px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      border: 1px solid var(--color-hairline);
+      background: transparent;
+      color: var(--color-muted);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-outline:hover {
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+    }
+    .hidden { display: none; }
+  </style>
+
+  <script>
+    const appBtns = document.querySelectorAll('.app-btn');
+    const prioBtns = document.querySelectorAll('.prio-btn');
+    const budgetBtns = document.querySelectorAll('.budget-btn');
+
+    let selectedApp = 'solar';
+    let selectedPrio = 'safety';
+    let selectedBudget = 'mid';
+
+    const chemData: Record<string, {
+      name: string; summary: string;
+      cycle: string; cost: string; density: string; safety: string;
+      pros: string[]; cons: string[];
+    }> = {
+      lfp: {
+        name: 'LFP (LiFePO4)',
+        summary: '固定式应用和船舶每日循环的最佳选择。',
+        cycle: '5.000+', cost: '$250–350/kWh', density: '90–160 Wh/kg', safety: '优秀',
+        pros: ['卓越的循环寿命（5000+次循环）', '固有安全——无热失控', '80–90%可用DoD', '宽工作温度范围'],
+        cons: ['比NMC/NCA更重', '能量密度低于NMC', '无加热时无法在0°C以下充电'],
+      },
+      nmc: {
+        name: 'NMC (镍锰钴)',
+        summary: '最高锂电能量密度——重量关键应用的理想选择。',
+        cycle: '1.000–2.000', cost: '$350–500/kWh', density: '150–220 Wh/kg', safety: '良好',
+        pros: ['常规化学最高能量密度', '中等温度性能良好', '优质电动车电池广泛可用'],
+        cons: ['循环寿命短于LFP', '需要复杂BMS', '150°C以上热失控风险', '每kWh成本高于LFP'],
+      },
+      nca: {
+        name: 'NCA (镍钴铝)',
+        summary: '超高能量密度——高端电动车应用。',
+        cycle: '500–1.000', cost: '$400–600/kWh', density: '200–260 Wh/kg', safety: '中等',
+        pros: ['可用的最高能量密度', '重量关键电动车的最佳选择', '优异的功率输出'],
+        cons: ['所有锂电中循环寿命最短', '关键热管理要求', '最贵的锂电化学', '不推荐固定式储能'],
+      },
+      lto: {
+        name: 'LTO (钛酸锂)',
+        summary: '超长寿命和极端温度性能——严酷环境的高端选择。',
+        cycle: '10.000–20.000', cost: '$800–1.200/kWh', density: '50–80 Wh/kg', safety: '优秀',
+        pros: ['所有锂电中最长循环寿命', '可在-30°C运行', '低温下可安全充电', '极快的充电能力'],
+        cons: ['成本非常高', '锂电中最低能量密度', '商业可用性有限', '对大多数应用过度设计'],
+      },
+      lead: {
+        name: '铅酸 (AGM/Gel)',
+        summary: '最低初始成本——适用于浮充和预算有限的应用。',
+        cycle: '500–1.000', cost: '$100–200/kWh', density: '30–50 Wh/kg', safety: '不可燃',
+        pros: ['最低初始成本', '经过数十年验证的技术', '无需BMS', '完全可回收'],
+        cons: ['50% DoD限制——可用容量减半', '沉重且体积大', '需要通风（氢气释放）', '循环应用需每3–5年更换'],
+      },
+      sodium: {
+        name: '钠离子',
+        summary: '低成本新兴技术——重量不关键的固定式储能。',
+        cycle: '2.000–3.000', cost: '$80–150/kWh', density: '100–150 Wh/kg', safety: '良好',
+        pros: ['每kWh最低成本', '使用丰富材料', '寒冷气候性能良好', '可选不可燃电解质'],
+        cons: ['能量密度低于锂电', '商业可用性有限', '循环寿命短于LFP', '新兴技术——现场数据较少'],
+      },
+    };
+
+    const appScores: Record<string, Record<string, number>> = {
+      solar:    { lfp: 10, nmc: 6, nca: 3, lto: 7, lead: 5, sodium: 8 },
+      rv:       { lfp: 9, nmc: 7, nca: 5, lto: 6, lead: 4, sodium: 3 },
+      marine:   { lfp: 10, nmc: 6, nca: 4, lto: 7, lead: 5, sodium: 3 },
+      ev:       { lfp: 7, nmc: 10, nca: 9, lto: 5, lead: 1, sodium: 2 },
+      telecom:  { lfp: 9, nmc: 5, nca: 3, lto: 8, lead: 7, sodium: 6 },
+      portable: { lfp: 5, nmc: 9, nca: 10, lto: 3, lead: 1, sodium: 2 },
+    };
+
+    const prioScores: Record<string, Record<string, number>> = {
+      'cycle-life':     { lfp: 10, nmc: 5, nca: 3, lto: 10, lead: 3, sodium: 5 },
+      'cost':           { lfp: 6, nmc: 5, nca: 3, lto: 1, lead: 10, sodium: 8 },
+      'weight':         { lfp: 5, nmc: 9, nca: 10, lto: 3, lead: 1, sodium: 4 },
+      'safety':         { lfp: 10, nmc: 6, nca: 4, lto: 10, lead: 7, sodium: 7 },
+      'temperature':    { lfp: 7, nmc: 6, nca: 5, lto: 10, lead: 4, sodium: 7 },
+      'energy-density': { lfp: 5, nmc: 9, nca: 10, lto: 3, lead: 1, sodium: 4 },
+    };
+
+    const budgetFilter: Record<string, string[]> = {
+      low:      ['lead', 'sodium'],
+      mid:      ['lfp', 'lead', 'sodium'],
+      high:     ['lfp', 'nmc', 'nca'],
+      unlimited: ['lfp', 'nmc', 'nca', 'lto', 'sodium'],
+    };
+
+    function selectBtns(btns: NodeListOf<Element>, key: string, val: string) {
+      btns.forEach(b => {
+        b.classList.remove('selected');
+        if ((b as HTMLElement).dataset[key] === val) b.classList.add('selected');
+      });
+    }
+
+    appBtns.forEach(b => b.addEventListener('click', () => {
+      selectedApp = (b as HTMLElement).dataset.app!;
+      selectBtns(appBtns, 'app', selectedApp);
+    }));
+    prioBtns.forEach(b => b.addEventListener('click', () => {
+      selectedPrio = (b as HTMLElement).dataset.prio!;
+      selectBtns(prioBtns, 'prio', selectedPrio);
+    }));
+    budgetBtns.forEach(b => b.addEventListener('click', () => {
+      selectedBudget = (b as HTMLElement).dataset.budget!;
+      selectBtns(budgetBtns, 'budget', selectedBudget);
+    }));
+
+    function showStep(n: number | string) {
+      document.querySelectorAll('.wizard-step').forEach(s => s.classList.add('hidden'));
+      if (n === 'result') {
+        document.getElementById('step-result')!.classList.remove('hidden');
+        [1,2,3].forEach(i => {
+          document.getElementById(`step-dot-${i}`)!.classList.add('active');
+        });
+        document.getElementById('step-dot-r')!.classList.add('active');
+      } else {
+        const el = document.getElementById(`step-${n}`);
+        if (el) el.classList.remove('hidden');
+        [1,2,3,'r'].forEach(i => {
+          const dot = document.getElementById(`step-dot-${i}`);
+          if (!dot) return;
+          dot.classList.remove('active');
+          if (typeof i === 'number' && i <= n) dot.classList.add('active');
+        });
+      }
+    }
+
+    document.getElementById('next-1')!.addEventListener('click', () => showStep(2));
+    document.getElementById('back-2')!.addEventListener('click', () => showStep(1));
+    document.getElementById('next-2')!.addEventListener('click', () => showStep(3));
+    document.getElementById('back-3')!.addEventListener('click', () => showStep(2));
+
+    document.getElementById('calculate-btn')!.addEventListener('click', () => {
+      const allowed = budgetFilter[selectedBudget] || Object.keys(chemData);
+      const scores: Record<string, number> = {};
+      const appS = appScores[selectedApp] || {};
+      const prioS = prioScores[selectedPrio] || {};
+
+      for (const chem of allowed) {
+        scores[chem] = (appS[chem] || 5) * 0.5 + (prioS[chem] || 5) * 0.5;
+      }
+
+      const ranked = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+      const top3 = ranked.slice(0, 3);
+
+      if (top3[0]) {
+        const d = chemData[top3[0][0]];
+        document.getElementById('result-name')!.textContent = d.name;
+        document.getElementById('result-summary')!.textContent = d.summary;
+        document.getElementById('rc-cycle')!.querySelector('.text-title-lg')!.textContent = d.cycle;
+        document.getElementById('rc-cost')!.querySelector('.text-title-lg')!.textContent = d.cost;
+        document.getElementById('rc-density')!.querySelector('.text-title-lg')!.textContent = d.density;
+        document.getElementById('rc-safety')!.querySelector('.text-title-lg')!.textContent = d.safety;
+        const prosEl = document.getElementById('result-pros')!;
+        const consEl = document.getElementById('result-cons')!;
+        prosEl.innerHTML = d.pros.map(p => `<li>→ ${p}</li>`).join('');
+        consEl.innerHTML = d.cons.map(c => `<li>→ ${c}</li>`).join('');
+      }
+
+      if (top3[1]) {
+        const d = chemData[top3[1][0]];
+        document.getElementById('result2-name')!.textContent = d.name;
+        document.getElementById('result2-summary')!.textContent = d.summary;
+        document.getElementById('rc2-cycle')!.querySelector('.text-title-lg')!.textContent = d.cycle;
+        document.getElementById('rc2-cost')!.querySelector('.text-title-lg')!.textContent = d.cost;
+        document.getElementById('rc2-density')!.querySelector('.text-title-lg')!.textContent = d.density;
+      }
+
+      if (top3[2]) {
+        const d = chemData[top3[2][0]];
+        document.getElementById('result3-name')!.textContent = d.name;
+        document.getElementById('result3-summary')!.textContent = d.summary;
+        document.getElementById('rc3-cycle')!.querySelector('.text-title-lg')!.textContent = d.cycle;
+        document.getElementById('rc3-cost')!.querySelector('.text-title-lg')!.textContent = d.cost;
+        document.getElementById('rc3-density')!.querySelector('.text-title-lg')!.textContent = d.density;
+      }
+
+      showStep('result');
+    });
+
+    document.getElementById('restart-btn')!.addEventListener('click', () => {
+      selectedApp = 'solar';
+      selectedPrio = 'safety';
+      selectedBudget = 'mid';
+      selectBtns(appBtns, 'app', selectedApp);
+      selectBtns(prioBtns, 'prio', selectedPrio);
+      selectBtns(budgetBtns, 'budget', selectedBudget);
+      showStep(1);
+    });
+  </script>
+
+</CalculatorLayout>

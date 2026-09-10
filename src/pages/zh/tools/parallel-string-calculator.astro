@@ -1,0 +1,396 @@
+---
+import CalculatorLayout from '../../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import InputField from '../../../components/InputField.astro';
+import ResultBox from '../../../components/ResultBox.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import WorkedExample from '../../../components/WorkedExample.astro';
+import ComparisonTable from '../../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../../components/EngineeringDiagram.astro';
+
+const whatIs = `并联串计算器用于确定单体电芯或电池模组的最优串联（S）和并联（P）配置，以实现目标电池包电压和容量。在电池包设计中，串联电芯增加电压，并联电芯增加容量——本工具可精确计算所需的SxP排列方案。无论您是为电动汽车、太阳能储能还是船舶应用组装定制锂电池包，正确的串配置对于BMS兼容性、均衡电流分配以及满足充电控制器和逆变器的电压阈值至关重要。`;
+
+const whyItMatters = [
+  "串联数量不正确会导致电池包电压超出充电控制器或逆变器的工作窗口——无法正常充电或触发故障代码。",
+  "过多并联支路会增加环流风险——支路间内阻不一致导致电流分配不均、局部过热，甚至损坏电芯。",
+  "在同一电池包中混用不同容量或不同使用年限的电芯，可用容量将受限于最弱电芯，浪费其他优质电芯的价值。",
+  "超出BMS最大电芯数量（例如多数LFP BMS为16S）需要昂贵的多级均衡硬件，且可能不适用于您的应用场景。",
+  "低估电芯总数量会导致采购错误——精准电芯匹配要求所有电芯来自同一生产批次，以保证阻抗一致性。"
+];
+
+const practicalApplications = [
+  { title: "定制电动汽车电池包", description: "为需要48V–400V电池系统且具有特定能量密度目标的电动汽车改装项目配置串并联方案。" },
+  { title: "太阳能离网电池组", description: "使用标准3.2V电芯设计48V LFP电池组，匹配太阳能充电控制器的输入电压窗口和逆变器直流要求。" },
+  { title: "通信与UPS电池系统", description: "使用3.2V LFP或2V铅酸电芯计算48V通信电池配置，满足精确的浮充电压规格。" },
+  { title: "家庭储能DIY", description: "使用回收或全新的18650/21700电芯规划家庭电池项目的并串联布局，实现目标kWh容量。" }
+];
+
+const expertNotes: { title: string; variant: 'engineering' | 'tip'; content: string }[] = [
+  {
+    title: "串联优先 vs 并联优先拓扑",
+    variant: "engineering",
+    content: "并联优先（P组串联连接，例如4P16S）是行业标准，因为并联电芯会自动均衡至相同电压，减少BMS通道数量。串联优先（S串并联）需要对每个串联支路进行单独监控和匹配——仅适用于4S及以下的小型电池包。对于超过100个电芯的电池包，并联优先拓扑可显著简化BMS架构并提高可靠性。"
+  },
+  {
+    title: "BMS通道数量与电芯匹配",
+    variant: "tip",
+    content: "16S LFP电池包需要具有16个电芯监控通道的BMS。增加并联支路不会增加通道数量——16S4P电池包仍使用16通道BMS。但每个并联组必须由容量匹配（偏差在2%以内）、内阻匹配（偏差在5%以内）且来自同一生产日期的电芯组成，以确保均衡的电流分配。"
+  }
+];
+
+const trustSection = {
+  text: "本计算器使用向上取整函数计算整数电芯数量，并根据最终配置计算实际电压/容量。公式遵循BMS数据手册和电芯制造商应用说明中使用的标准电池包设计方法。所有计算透明且可验证。",
+  link: { label: "查看我们的方法论和公式推导", href: "/zh/methodology/" }
+};
+
+const references = [
+  { title: "三星SDI — 电池包设计指南", url: "https://www.samsungsdi.com/battery-library/detail.html?id=52986", source: "Samsung SDI 技术文档" },
+  { title: "亿纬锂能 — LFP电芯串并联配置", url: "https://www.evebatteries.com/technical-documents", source: "亿纬锂能技术库" },
+  { title: "德州仪器 — 串联电芯均衡技术", url: "https://www.ti.com/lit/an/slua749a/slua749a.pdf", source: "Texas Instruments 应用报告" },
+  { title: "精博电子 — BMS接线与串配置", url: "https://www.jbdms.com/technical-documents", source: "精博BMS技术文档" }
+];
+
+const faqItems = [
+  {
+    question: "电芯应该采用并联优先还是串联优先配置？",
+    answer: "并联优先配置（例如1S4P模块串联连接，记作4P16S）是大型电池包的行业标准。此配置可减少BMS所需的电压监控通道数量，因为并联组会自动均衡至相同电压水平。",
+  },
+  {
+    question: "为什么有些48V锂电池设计使用15S或16S配置？",
+    answer: "15S LFP电池包标称电压为48.0V（充电峰值54.75V）。16S电池包标称电压为51.2V（充电峰值58.4V）。许多通信系统的额定电压恰好为48V，因此15S较为常见。太阳能离网逆变器通常倾向于16S配置，因为它在48V逆变器限制下性能最优。",
+  },
+  {
+    question: "并联电池支路中的环流是什么？",
+    answer: "当具有不同内阻或温度的并联支路进行充放电时，电流不会均匀分配。内阻较低的支路承担更大的电流份额。在严重失配的情况下，这会导致局部热过载。建议为每个并联支路配置保险丝。",
+  },
+  {
+    question: "能否在串联中混用不同容量的电芯？",
+    answer: "<span class=\"text-primary font-bold\">切勿在串联中混用不同容量的电芯。</span>串联支路的总可用容量受限于最弱电芯。容量最低的电芯会最先放完电，触发低压限制，而其他电芯仍有剩余电量，导致BMS关闭整个电池包。",
+  },
+  {
+    question: "SxP表示法是什么？如何解读？",
+    answer: "SxP表示法描述电池包拓扑结构。'S'（串联）是端对端连接以倍增电压的电芯数量。'P'（并联）是以并联方式分组以倍增容量的电芯数量。16S4P电池包包含16个串联电芯和4个并联支路——共计64个电芯。示例：16 × 3.2V = 51.2V，4 × 100Ah = 400Ah。",
+  },
+  {
+    question: "并联支路最多可以有多少个？",
+    answer: "多数BMS制造商建议最大4–6个并联支路。超过此数量，支路间环流变得显著，实际收益递减——增加第7或第8个并联支路仅带来边际容量增益，却增加了复杂性和故障点。",
+  },
+  {
+    question: "每个并联支路是否需要安装保险丝？",
+    answer: "<span class=\"text-primary font-bold\">是的——这是安全要求。</span>每个并联支路应安装一个保险丝，额定电流为支路最大预期电流的1.5–2倍。如果某个支路发生短路，保险丝可防止其他并联支路向故障点馈入故障电流，避免热失控。",
+  },
+  {
+    question: "如果我的串联数与BMS不匹配会怎样？",
+    answer: "多数BMS支持固定的串联数量（例如LFP为16S，NMC为14S）。如果目标电压需要非标准串联数，您可能需要选择不同的BMS型号或不同的电芯化学体系。例如，48V通信系统通常使用15S LFP或14S NMC——请在购买电芯前确认BMS兼容性。",
+  },
+  {
+    question: "能否以后向现有电池包添加并联支路？",
+    answer: "仅当新支路使用同一生产批次、容量和阻抗匹配的电芯时才可以。失配的支路会导致电流分配不均。新支路在并联连接前还必须预充至与现有电池包相同的荷电状态，以避免大的均衡电流。",
+  },
+  {
+    question: "温度如何影响并联支路均衡？",
+    answer: "并联支路间的温差会导致电流不平衡——温度较高的支路内阻较低，在充电时吸取更多电流。通过将所有支路安装在同一外壳中并确保足够气流来维持均匀温度。避免将支路放置在热源附近。",
+  },
+  {
+    question: "最小的实际电芯数量是多少？",
+    answer: "对于多数应用，4S（12V LFP）或7S（24V NMC）是最小的实际电池包规模。低于此数量，单个电芯电压波动对电池包性能的影响将显著增大。对于48V系统，15S或16S是标准最小值。",
+  },
+  {
+    question: "如何根据SxP配置计算总能量？",
+    answer: "总能量（Wh）= S × 电芯电压 × P × 电芯容量。示例：16S4P配置，3.2V 100Ah电芯 = 16 × 3.2 × 4 × 100 = 20,480 Wh（20.48 kWh）。这代表理论最大值——实际可用能量取决于放电深度限制和BMS截止阈值。",
+  },
+];
+
+const commonMistakes = [
+  "在同一电池包中混用不同容量或使用年限的电芯——最弱电芯限制整个支路的可用容量并加速所有电芯的退化。",
+  "超出BMS最大串联数——16S LFP BMS无法保护17S或18S电池包。请在购买电芯前确认BMS兼容性。",
+  "忽视并联支路间的环流——内阻不同的支路电流分配不均，导致局部过热和潜在热失控。",
+  "未为各并联支路安装保险丝——每个并联支路必须安装保险丝，以防止其他支路向短路点馈入故障电流。",
+  "对大型电池包使用串联优先拓扑——并联优先（P组串联）是行业标准，因为并联电芯可自动均衡，降低BMS复杂性。",
+  "将新支路预充至错误的荷电状态——在未匹配荷电状态的情况下将新并联支路连接到现有电池包，会产生大的均衡电流，可能损坏电芯。",
+  "误认为并联支路增加电压——并联连接增加容量（Ah），而非电压。只有串联连接才能增加电压。",
+  "忽视高电流电池包的汇流排规格——并联支路间汇流排规格不足会产生热点和电压降，降低电池包效率。",
+  "在同一电池包中混用不同制造商的电芯——不同制造商的电芯具有不同的内阻特性，导致电流分配不均。",
+  "未考虑BMS均衡电流限制——如果电芯失衡超过BMS均衡能力，充电可能中止或电芯可能过充。",
+];
+
+const relatedCalculators = [
+  { href: "/zh/tools/battery-sizing-calculator/", title: "电池容量计算工具", description: "确定每日能量容量存储规模。" },
+  { href: "/zh/tools/runtime-calculator/", title: "续航时间计算器", description: "估算静态瓦特负载下的备电运行时间。" },
+  { href: "/zh/tools/c-rate-calculator/", title: "C倍率计算器", description: "计算充电速率和负载电流。" },
+  { href: "/zh/tools/inverter-battery-calculator/", title: "逆变器电池计算器", description: "为交流逆变器负载匹配电池组规模。" },
+  { href: "/zh/tools/energy-conversion-calculator/", title: "能量单位换算", description: "在任意电压下进行Ah与Wh之间的转换。" },
+  { href: "/zh/tools/voltage-drop-calculator/", title: "压降计算器", description: "验证您串配置的电缆规格。" },
+];
+---
+
+<CalculatorLayout
+  title="电池并联串计算器 | 电池工具集"
+  description="确定电芯堆叠或电池模组的串联和并联配置，以实现目标电压和容量。免费工具。"
+  lang="zh"
+  faqItems={faqItems}
+  commonMistakes={commonMistakes}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+  relatedCalculators={relatedCalculators}
+>
+
+  <!-- Main Calculator Grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+
+    <!-- Input Form -->
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">目标规格</h3>
+      <div class="flex flex-col gap-6">
+
+        <!-- Target System Voltage -->
+        <InputField id="target-voltage" label="目标系统电压 (V)" value={48} min={1} step="any" helperText="常见目标值：12V、24V、48V、400V、800V" />
+
+        <!-- Target System Capacity -->
+        <InputField id="target-capacity" label="目标容量 (Ah)" value={200} min={1} step="any" />
+
+        <h3 class="text-title-sm text-primary uppercase border-t border-hairline pt-6 tracking-wider">电芯/模组基础单元</h3>
+
+        <!-- Cell Voltage -->
+        <InputField id="cell-voltage" label="单体电芯/模组电压 (V)" value={3.2} min={0.1} step="any" helperText="常见标称值：LFP电芯（3.2V）、NMC电芯（3.7V）、铅酸（12V）" />
+
+        <!-- Cell Capacity -->
+        <InputField id="cell-capacity" label="单体电芯/模组容量 (Ah)" value={100} min={0.1} step="any" helperText="单个基础单元电芯的容量（例如 100Ah、280Ah、3.2Ah）" />
+
+      </div>
+    </CalculatorCard>
+
+    <!-- Calculation Results -->
+    <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">计算配置方案</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <!-- Main Output -->
+          <ResultBox
+            label="配置结构"
+            value="15S 2P"
+            suffix="共需 30 个电芯或模组"
+            variant="primary"
+            id="result-structure"
+          />
+
+          <!-- Secondary Outputs -->
+          <ResultBox
+            label="实际系统电压"
+            value="48.0 V"
+            suffix="15个电芯串联"
+            id="result-actual-voltage"
+          />
+
+          <ResultBox
+            label="实际电池包容量"
+            value="200 Ah"
+            suffix="2条并联支路"
+            id="result-actual-capacity"
+          />
+
+          <!-- Total Energy Output -->
+          <ResultBox
+            label="实际总能量"
+            value="9,600 Wh"
+            suffix="9.60 kWh 电池储能容量"
+            variant="primary"
+            id="result-actual-energy"
+          />
+        </div>
+      </div>
+
+      <!-- Action Area -->
+      <div class="border-t border-hairline pt-6">
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">支路均衡安全提示</h4>
+        <p class="text-body-sm text-muted">
+          并联支路必须始终包含相同的串联电芯数量。支路间内阻或荷电状态失配会导致电流分配不均、局部过热，并有损坏电芯的风险。
+        </p>
+      </div>
+    </CalculatorCard>
+
+  </div>
+
+  <!-- Formulas and Worked Examples -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">公式与计算示例</h2>
+
+    <FormulaBox title="数学公式">
+      <p>
+        在配置电池包时，串联电芯提高电压，并联电芯或支路提升可用容量：
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        串联电芯数 (S) = ⌈目标电压 / 模块电压⌉
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        并联支路数 (P) = ⌈目标容量 (Ah) / 模块容量 (Ah)⌉
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        总模块数 (N) = 串联电芯数 (S) × 并联支路数 (P)
+      </div>
+      <p>
+        根据整数计算结果推算实际系统性能：
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        实际系统电压 = S × 模块电压
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        实际系统容量 = P × 模块容量
+      </div>
+    </FormulaBox>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample
+        number={1}
+        title="使用3.2V LFP电芯配置48V串联"
+        scenario="使用标准3.2V磷酸铁锂（LiFePO4）电芯串联设计标称48V电池支路。"
+        inputs={[
+          { label: "目标电压", value: "48 V" },
+          { label: "电芯电压", value: "3.2 V (LFP)" },
+        ]}
+        steps={[
+          { label: "计算串联数量", detail: "S = ⌈48 V / 3.2 V⌉ = 15 个电芯" },
+          { label: "计算实际电压", detail: "V_实际 = 15 × 3.2 V = 48.0 V" },
+        ]}
+        answer="15S配置 — 15个电芯串联，精确输出48.0V标称电压。"
+        interpretation="这是通信和太阳能储能中最常见的48V LFP配置。当逆变器需要裕量时，16S方案（51.2V）更为合适。"
+      />
+
+      <WorkedExample
+        number={2}
+        title="使用100Ah电芯配置400Ah并联"
+        scenario="通过将相同的100Ah LFP电芯并联来扩展容量至400Ah。"
+        inputs={[
+          { label: "目标容量", value: "400 Ah" },
+          { label: "电芯容量", value: "100 Ah" },
+        ]}
+        steps={[
+          { label: "计算并联数量", detail: "P = ⌈400 Ah / 100 Ah⌉ = 4 条支路" },
+          { label: "计算实际容量", detail: "Ah_实际 = 4 × 100 Ah = 400 Ah" },
+        ]}
+        answer="4P配置 — 4条并联支路，总容量400Ah。"
+        interpretation="每个并联组必须使用匹配的电芯（同一批次，容量偏差在2%以内）。为每个支路添加保险丝以防止环流故障。"
+      />
+
+      <WorkedExample
+        number={3}
+        title="组合16S4P配置48V 400Ah电池包"
+        scenario="使用3.2V 100Ah LFP电芯构建完整的48V 400Ah电池包，采用16S4P拓扑。"
+        inputs={[
+          { label: "目标电压", value: "48 V" },
+          { label: "目标容量", value: "400 Ah" },
+          { label: "电芯电压", value: "3.2 V (LFP)" },
+          { label: "电芯容量", value: "100 Ah" },
+        ]}
+        steps={[
+          { label: "计算串联数量", detail: "S = ⌈48 V / 3.2 V⌉ = 16 个电芯（向上取整至51.2V标称值）" },
+          { label: "计算并联数量", detail: "P = ⌈400 Ah / 100 Ah⌉ = 4 条支路" },
+          { label: "所需电芯总数", detail: "N = 16 × 4 = 64 个电芯" },
+          { label: "实际规格", detail: "V = 51.2 V, Ah = 400 Ah, E = 20,480 Wh (20.48 kWh)" },
+        ]}
+        answer="16S4P — 共64个电芯，输出51.2V、400Ah（20.48 kWh）。"
+        interpretation="此电池包略超48V目标（标称51.2V），在48V逆变器下性能更优。串联监控需使用16通道BMS。"
+      />
+    </div>
+  </section>
+
+  <EngineeringDiagram
+    title="串联 vs 并联电池接线"
+    description="串联提高电压，并联提高容量"
+    variant="circuit"
+    steps={[
+      { label: "单体电芯", icon: "battery" },
+      { label: "串联（电压↑）", icon: "battery" },
+      { label: "并联（容量↑）", icon: "battery" },
+      { label: "组合电池包", icon: "battery" },
+    ]}
+  />
+
+  <ComparisonTable
+    title="串联与并联对比"
+    headers={["接线方式", "效果", "电压", "容量", "风险"]}
+    rows={[
+      ["串联", "电压相加", "V_总 = n × V_电芯", "与单体电芯相同", "电芯失衡"],
+      ["并联", "容量相加", "与单体电芯相同", "Ah_总 = n × Ah_电芯", "电流不平衡"],
+      ["串并联组合", "两者均增加", "nS × V_电芯", "mP × Ah_电芯", "均衡复杂"],
+    ]}
+    caption="电池串配置的基本规则"
+  />
+
+  <FAQSection items={faqItems} />
+
+  <!-- Calculation Script -->
+  <script>
+    import { calculateParallelString } from '../../../utils/calculators';
+
+    const targetVoltageInput = document.getElementById('target-voltage') as HTMLInputElement;
+    const targetCapacityInput = document.getElementById('target-capacity') as HTMLInputElement;
+    const cellVoltageInput = document.getElementById('cell-voltage') as HTMLInputElement;
+    const cellCapacityInput = document.getElementById('cell-capacity') as HTMLInputElement;
+
+    // Outputs
+    const resultStructure = document.getElementById('result-structure');
+    const resultStructureValue = resultStructure?.querySelector('.text-display-md') as HTMLElement;
+    const resultStructureSuffix = resultStructure?.querySelector('.text-caption') as HTMLElement;
+
+    const resultActualVoltage = document.getElementById('result-actual-voltage');
+    const resultVoltageValue = resultActualVoltage?.querySelector('.text-title-lg') as HTMLElement;
+    const resultVoltageSuffix = resultActualVoltage?.querySelector('.text-caption') as HTMLElement;
+
+    const resultActualCapacity = document.getElementById('result-actual-capacity');
+    const resultCapacityValue = resultActualCapacity?.querySelector('.text-title-lg') as HTMLElement;
+    const resultCapacitySuffix = resultActualCapacity?.querySelector('.text-caption') as HTMLElement;
+
+    const resultActualEnergy = document.getElementById('result-actual-energy');
+    const resultEnergyValue = resultActualEnergy?.querySelector('.text-title-lg') as HTMLElement;
+    const resultEnergySuffix = resultActualEnergy?.querySelector('.text-caption') as HTMLElement;
+
+    function updateCalculations() {
+      const targetVoltage = parseFloat(targetVoltageInput.value) || 12;
+      const targetCapacity = parseFloat(targetCapacityInput.value) || 100;
+      const cellVoltage = parseFloat(cellVoltageInput.value) || 3.2;
+      const cellCapacity = parseFloat(cellCapacityInput.value) || 100;
+
+      const results = calculateParallelString(targetVoltage, targetCapacity, cellVoltage, cellCapacity);
+
+      // Render Outputs
+      if (resultStructureValue) {
+        resultStructureValue.textContent = `${results.seriesCells}S ${results.parallelStrings}P`;
+      }
+      if (resultStructureSuffix) {
+        resultStructureSuffix.textContent = `${results.totalCells} total cells or modules required`;
+      }
+      if (resultVoltageValue) {
+        resultVoltageValue.textContent = `${results.actualVoltageV.toFixed(1)} V`;
+      }
+      if (resultVoltageSuffix) {
+        resultVoltageSuffix.textContent = `${results.seriesCells} cells in series`;
+      }
+      if (resultCapacityValue) {
+        resultCapacityValue.textContent = `${results.actualCapacityAh.toFixed(1)} Ah`;
+      }
+      if (resultCapacitySuffix) {
+        resultCapacitySuffix.textContent = `${results.parallelStrings} parallel strings`;
+      }
+      if (resultEnergyValue) {
+        resultEnergyValue.textContent = `${results.actualEnergyWh.toLocaleString()} Wh`;
+      }
+      if (resultEnergySuffix) {
+        resultEnergySuffix.textContent = `${(results.actualEnergyWh / 1000).toFixed(2)} kWh battery storage capacity`;
+      }
+    }
+
+    [targetVoltageInput, targetCapacityInput, cellVoltageInput, cellCapacityInput].forEach(el => {
+      el.addEventListener('input', updateCalculations);
+    });
+
+    // Run on boot
+    updateCalculations();
+  </script>
+</CalculatorLayout>

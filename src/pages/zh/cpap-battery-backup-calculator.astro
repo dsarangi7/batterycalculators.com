@@ -1,0 +1,210 @@
+---
+import CalculatorLayout from '../../layouts/CalculatorLayout.astro';
+import FormulaBox from '../../components/FormulaBox.astro';
+import FAQSection from '../../components/FAQSection.astro';
+import PowerOutageForm from '../../components/PowerOutageForm.astro';
+import WorkedExample from '../../components/WorkedExample.astro';
+import ComparisonTable from '../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../components/EngineeringDiagram.astro';
+
+const whatIs = `CPAP电池备用计算器用于确定在停电期间为您的CPAP呼吸机整夜运行所需的电池容量和续航时间。CPAP是维持生命的重要医疗设备——睡眠中断电可能导致危险的呼吸暂停发作。本计算器根据您的CPAP实际运行功率（带或不带加湿器）来设计电池尺寸，考虑逆变器效率、放电深度限制和可配置的安全裕度。`;
+
+const whyItMatters = [
+  "睡眠中失去电力的CPAP用户面临直接健康风险——未经治疗的睡眠呼吸暂停会导致血氧饱和度下降和心脏负荷增加。",
+  "带加热加湿器的CPAP功耗30-60W，而不带加湿器仅10-30W——这2倍的差异显著改变电池需求。",
+  "大多数CPAP用户每晚需要6-10小时的续航。电池过小会导致凌晨断电。",
+  "露营、旅行和应急备灾都需要便携式CPAP供电——但并非所有电源站都能高效处理该负载。",
+  "低温使锂电池容量降低10-30%，可能导致CPAP用户在冬季停电中续航不足。"
+];
+
+const practicalApplications = [
+  { title: "整夜医疗备用", description: "确保CPAP在电网停电时整夜运行——睡眠呼吸暂停患者最关键的使用场景。" },
+  { title: "露营与旅行", description: "在露营、房车旅行或无可靠电源的地点为CPAP供电。" },
+  { title: "应急包备灾", description: "将CPAP备用电源纳入家庭应急包，与食品、水和通讯设备并列。" },
+  { title: "医院与避难所供电", description: "自然灾害期间，避难所可能缺乏医疗设备供电——便携式电池备用可确保连续性。" },
+];
+
+const expertNotes: { title: string; variant: 'engineering' | 'tip' | 'warning'; content: string }[] = [
+  { title: "加湿器影响巨大", variant: "engineering", content: "带加热加湿器的CPAP功耗30-60W，而不带加湿器仅10-30W。如果紧急情况下可以接受不使用加湿器睡眠，电池续航可以翻倍。" },
+  { title: "核实设备实际功率", variant: "warning", content: "CPAP功耗因型号和压力设置差异很大。请检查设备电源适配器标签或手册中的精确功率。本计算器提供估算值——请以您的具体设备为准。" },
+  { title: "12V直流直接连接", variant: "tip", content: "许多CPAP可以直接使用12V直流供电，完全绕过逆变器。这消除了逆变器损耗（10-15%）并延长电池续航。请检查您的CPAP是否有12V直流适配器。" }
+];
+
+const trustSection = {
+  text: "本计算器使用标准电气工程公式。请始终以设备制造商确认的CPAP实际功率需求为准。",
+  link: { label: "查看我们的方法论", href: "/zh/methodology/" }
+};
+
+const references = [
+  { title: "FDA — CPAP设备指南", url: "https://www.fda.gov/medical-devices/sleep-apnea/continuous-positive-airway-pressure-cpap-devices", source: "U.S. Food and Drug Administration" },
+  { title: "美国睡眠医学会", url: "https://aasm.org/resources/factsheets/sleepapnea.pdf", source: "AASM" },
+];
+
+const faqItems = [
+  { question: "CPAP需要多大的电池？", answer: "不带加湿器（约20W）运行8小时，需要约160-200Wh可用容量。带加湿器（约50W），建议400-500Wh。12V 50Ah LiFePO4电池（640Wh）可提供整夜续航并留有余量。" },
+  { question: "100Ah电池能为CPAP供电多长时间？", answer: "12V 100Ah LiFePO4电池（1,280Wh）在80% DoD下提供1,024Wh可用容量。不带加湿器（约20W）可运行约40+小时。带加湿器（约50W），约16-20小时。" },
+  { question: "便携式电源站能整夜运行CPAP吗？", answer: "可以，大多数300Wh以上的锂电便携式电源站可以运行CPAP整夜。500-1000Wh的设备可支持多夜。寻找直流输出以避免逆变器损耗。" },
+  { question: "CPAP加湿器会增加电池消耗吗？", answer: "会，而且影响显著。加热加湿器增加20-40W，实际使电池消耗翻倍或三倍。紧急情况下考虑降低湿度设置或关闭加热器以延长续航。" },
+];
+
+const commonMistakes = [
+  "忽略加热加湿器的功耗影响——它增加20-40W，实际使电池消耗翻倍或三倍。",
+  "在有12V直流直接连接可用时使用交流逆变器——逆变器损耗（10-15%）降低续航；大多数CPAP有12V直流适配器。",
+  "假设CPAP电源适配器标签功率是唯一消耗——实际功耗随压力设置和呼吸模式变化。",
+  "电池尺寸精确按一晚设计而不留安全裕度——低温使容量降低10-30%，且电池退化逐年减少可用容量。",
+  "使用直流输出效率低的便携式电源站——部分电源站在将电池直流转换为CPAP稳压直流输出时损失20-30%。",
+  "忘记更高压力设置增加功耗——15 cmH₂O的CPAP比8 cmH₂O的消耗更多。",
+  "未考虑旅行海拔和温度变化——寒冷的露营环境显著降低锂电池容量。",
+  "假设所有便携式电源站都能整夜处理CPAP负载——300Wh电源站在不带加湿器时可能仅持续6-8小时，带加湿器更短。"
+];
+
+const relatedArticles = [
+  { title: "LiFePO4 vs 铅酸电池", href: "/zh/learn/lifepo4-vs-lead-acid/" },
+  { title: "电池续航公式", href: "/zh/learn/battery-runtime-formula/" },
+  { title: "家庭电池备用规划", href: "/zh/learn/home-battery-backup-planning/" },
+];
+
+const relatedCalculators = [
+  { href: "/zh/home-power-outage-battery-backup-calculator/", title: "家庭停电电池备用计算器", description: "全屋备用电力计算器，适用于所有家用电器。" },
+  { href: "/zh/fridge-battery-backup-calculator/", title: "冰箱电池备用计算器", description: "专为停电期间冰箱备用设计的电池尺寸计算。" },
+  { href: "/zh/sump-pump-battery-backup-calculator/", title: "排水泵电池备用计算器", description: "确保排水泵在暴风停电期间持续运行。" },
+  { href: "/zh/portable-power-station-runtime-calculator/", title: "便携式电源站续航计算器", description: "查看便携式电源站可为您的负载供电多长时间。" },
+  { href: "/zh/solar-generator-sizing-calculator/", title: "太阳能发电机尺寸计算器", description: "设计含面板和电池的完整太阳能备用系统。" },
+  { href: "/zh/tools/runtime-calculator/", title: "电池续航计算器", description: "根据容量和负载估算放电时间。" },
+  { href: "/zh/tools/battery-sizing-calculator/", title: "电池尺寸计算器", description: "含温度降额的完整电池组尺寸设计。" },
+  { href: "/zh/tools/solar-battery-sizing-calculator/", title: "太阳能电池尺寸计算器", description: "设计与太阳能板阵列配套的电池尺寸。" },
+  { href: "/zh/tools/energy-conversion-calculator/", title: "能量转换计算器", description: "在任意电压下转换Ah、Wh和kWh。" },
+  { href: "/zh/tools/charging-time-calculator/", title: "充电时间计算器", description: "估算太阳能或电网充电时间。" },
+  { href: "/zh/tools/voltage-drop-calculator/", title: "电压降计算器", description: "设计线径以最小化电压降。" },
+  { href: "/zh/tools/dc-cable-loss-calculator/", title: "直流电缆损耗计算器", description: "计算直流连接中的线路损耗。" },
+];
+
+const presetAppliances = [
+  { name: "CPAP Machine", runningW: 40, surgeW: 80 }, { name: "CPAP (no humidifier)", runningW: 20, surgeW: 40 },
+  { name: "Wi-Fi Router", runningW: 12, surgeW: 12 }, { name: "LED Light", runningW: 10, surgeW: 10 },
+  { name: "Phone Charger", runningW: 15, surgeW: 15 }, { name: "Laptop", runningW: 60, surgeW: 90 },
+  { name: "Refrigerator", runningW: 150, surgeW: 600 }, { name: "Fan", runningW: 50, surgeW: 75 },
+];
+---
+
+<CalculatorLayout
+  lang="zh"
+  title="CPAP电池备用计算器 | Battery Calculators"
+  description="计算在停电期间为CPAP呼吸机整夜运行所需的电池尺寸和备用续航。确保睡眠呼吸暂停治疗不间断，合理设计应急电池备用。"
+  faqItems={faqItems}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+  relatedCalculators={relatedCalculators}
+  commonMistakes={commonMistakes}
+  relatedArticles={relatedArticles}
+>
+  <PowerOutageForm
+    presetAppliances={presetAppliances}
+    defaultBackupHours={10}
+    defaultVoltage="12"
+    defaultLoadsDescription="已预加载CPAP呼吸机。调整设置以匹配您的设备和需求。"
+    defaultLoads={[{ name: "CPAP Machine", quantity: 1 }]}
+  />
+
+  <section class="mb-16 border-t border-hairline pt-12">
+    <FormulaBox title="数学公式">
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Total Running W = Σ (Appliance Running W × Quantity)</div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Energy Required (Wh) = (Running W × Hours) / Inverter Efficiency × (1 + Safety Margin)</div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Battery Ah = Required Wh / (Battery Voltage × Depth of Discharge)</div>
+      <p class="text-xs text-muted mt-4">对于CPAP备用，考虑使用12V直流直接连接以消除逆变器损耗并延长续航。"</p>
+    </FormulaBox>
+
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">公式与计算示例</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample
+        number={1}
+        title="带加湿器的CPAP（整夜）"
+        scenario="在停电期间为带加热加湿器的CPAP呼吸机供电整夜8小时。"
+        inputs={[
+          { label: "CPAP + 加湿器", value: "40W" },
+          { label: "备用时长", value: "8小时" },
+          { label: "电池电压", value: "12V" },
+          { label: "逆变器效率", value: "90%" },
+        ]}
+        steps={[
+          { label: "步骤1：所需能量", formula: "40W × 8h = 320 Wh", result: "320 Wh" },
+          { label: "步骤2：考虑逆变器效率", formula: "320 / 0.90", result: "356 Wh" },
+          { label: "步骤3：加上20%安全裕度", formula: "356 × 1.20", result: "427 Wh" },
+          { label: "步骤4：电池容量（12V LFP, 80% DoD）", formula: "427 / (12 × 0.80)", result: "44.5 Ah → 12V 50Ah LFP" },
+        ]}
+        answer="12V 50Ah LiFePO4电池（640Wh）提供带加湿器的整夜CPAP供电并留有余量。"
+        interpretation="加热加湿器使功耗翻倍——如果可以接受降低湿度，电池续航将显著延长。"
+      />
+      <WorkedExample
+        number={2}
+        title="不带加湿器的CPAP（长途旅行）"
+        scenario="在露营期间连续3晚不带加湿器运行CPAP（每晚10小时）。"
+        inputs={[
+          { label: "CPAP（不带加湿器）", value: "20W" },
+          { label: "每晚时长", value: "10小时" },
+          { label: "夜间数", value: "3" },
+          { label: "总能量", value: "20W × 30h = 600 Wh" },
+        ]}
+        steps={[
+          { label: "步骤1：所需总能量", formula: "20W × 30h = 600 Wh", result: "600 Wh" },
+          { label: "步骤2：考虑逆变器效率", formula: "600 / 0.90", result: "667 Wh" },
+          { label: "步骤3：加上20%安全裕度", formula: "667 × 1.20", result: "800 Wh" },
+          { label: "步骤4：电池容量（12V LFP, 80% DoD）", formula: "800 / (12 × 0.80)", result: "83.3 Ah → 12V 100Ah LFP" },
+        ]}
+        answer="12V 100Ah LiFePO4电池（1,280Wh）可不带加湿器运行CPAP 3个完整露营夜晚。"
+        interpretation="关闭加湿器可大幅延长电池续航——非常适合多晚露营旅行。"
+      />
+      <WorkedExample
+        number={3}
+        title="旅行CPAP（12V直流直连）"
+        scenario="在公路旅行中使用12V直流直接供电（无逆变器）运行旅行CPAP 2晚。"
+        inputs={[
+          { label: "旅行CPAP（12V直流）", value: "25W" },
+          { label: "每晚时长", value: "8小时" },
+          { label: "夜间数", value: "2" },
+          { label: "绕过逆变器", value: "100%效率" },
+        ]}
+        steps={[
+          { label: "步骤1：所需总能量", formula: "25W × 16h = 400 Wh", result: "400 Wh" },
+          { label: "步骤2：无逆变器损耗（12V直流直连）", formula: "400 / 1.00", result: "400 Wh" },
+          { label: "步骤3：加上20%安全裕度", formula: "400 × 1.20", result: "480 Wh" },
+          { label: "步骤4：电池容量（12V LFP, 80% DoD）", formula: "480 / (12 × 0.80)", result: "50 Ah → 12V 50Ah LFP" },
+        ]}
+        answer="12V 50Ah LFP电池通过直流直连可运行旅行CPAP 2晚——比交流逆变器多15%续航。"
+        interpretation="12V直流直接连接消除逆变器损耗，是从电池为CPAP供电的最高效方式。"
+      />
+    </div>
+  </section>
+
+  <EngineeringDiagram
+    title="CPAP电池供电路径"
+    description="两条路径：交流逆变器（有损耗）和直流直接连接（无逆变器损耗，更高效）。"
+    steps={[
+      { label: "12V电池", icon: "battery" },
+      { label: "逆变器", icon: "inverter" },
+      { label: "交流适配器", icon: "cable" },
+      { label: "CPAP呼吸机", icon: "load" },
+    ]}
+    variant="circuit"
+  />
+
+  <ComparisonTable
+    title="按配置的CPAP功率需求"
+    headers={["配置", "功耗", "8小时能耗", "所需电池（12V LFP）", "100Ah续航"]}
+    rows={[
+      ["CPAP带加湿器（高）", "50W", "400 Wh", "12V 60Ah (768 Wh)", "15–16小时"],
+      ["CPAP带加湿器（典型）", "40W", "320 Wh", "12V 50Ah (640 Wh)", "16–20小时"],
+      ["CPAP不带加湿器", "20W", "160 Wh", "12V 25Ah (320 Wh)", "32–40小时"],
+      ["旅行CPAP（12V直流直连）", "25W", "200 Wh", "12V 30Ah (384 Wh)", "28–32小时"],
+      ["CPAP+手机充电", "55W", "440 Wh", "12V 60Ah (768 Wh)", "14–16小时"],
+      ["CPAP+Wi-Fi+灯", "72W", "576 Wh", "12V 75Ah (960 Wh)", "11–13小时"],
+    ]}
+    caption="续航基于12V 100Ah LiFePO4电池（1,280Wh）在80% DoD下。直流直连消除10-15%的逆变器损耗。"
+  />
+
+  <FAQSection items={faqItems} />
+</CalculatorLayout>

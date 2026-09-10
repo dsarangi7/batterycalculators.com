@@ -1,0 +1,417 @@
+---
+import CalculatorLayout from '../../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import InputField from '../../../components/InputField.astro';
+import ResultBox from '../../../components/ResultBox.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import WorkedExample from '../../../components/WorkedExample.astro';
+import ComparisonTable from '../../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../../components/EngineeringDiagram.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import RelatedTools from '../../../components/RelatedTools.astro';
+
+const whatIs = `电池选型是指确定电池组为满足既定用电负载、在指定时间内无外部充电的情况下，必须储存的总能量容量（以瓦时或安时计）。计算综合了<strong>日耗电量</strong>、<strong>备用天数</strong>（系统在无电网或无太阳能输入时必须运行多久）、<strong>放电深度限制</strong>（保护循环寿命）、<strong>系统综合效率</strong>（逆变器、线缆与BMS损耗），以及<strong>温度折减</strong>（低温会降低可用容量）。正确的电池选型是每个离网太阳能电站、户用储能系统、通信备用电源、船用电源系统和电动车续航扩展项目的基础。`;
+
+const whyItMatters = [
+  "电池组配大了浪费资金——配大30%可能意味着数千元的锂电池长期闲置。",
+  "配小了会导致意外断电，负载在备用期结束前就被迫关机。",
+  "忽视温度折减，寒冷地区系统的实际容量可能比预期少10–30%。",
+  "混淆标称容量与可用容量，纸面上够用的电池组在DoD限制下实际无法达标。",
+  "忽视综合效率，电池实际输出的能量要多于负载消耗，缺口会被隐藏。",
+];
+
+const practicalApplications = [
+  { title: "户用储能", description: "为太阳能自发自用、备用电源和分时电价优化配置家庭电池系统。" },
+  { title: "离网太阳能", description: "为完全脱离电网的住宅和小木屋确定电池组容量。" },
+  { title: "通信备用电源", description: "确保基站电池在长时间停电期间满足最低备电要求。" },
+  { title: "船用电源系统", description: "为长期巡航、酒店负载较大的船只配置生活电池组。" },
+  { title: "房车与移动生活", description: "为全职房车生活配合太阳能充电设施计算电池容量。" },
+  { title: "工业UPS", description: "为必须保证备用时长的关键工业流程配置电池组。" },
+];
+
+const expertNotes = [
+  { title: '寒冷气候设计', variant: 'warning', content: '锂电池在0°C以下充电会因析锂造成电芯永久损伤。如果设计温度低于冰点，选型时请配套电池加热系统，或预留足够的容量裕量。' },
+  { title: '备用天数规划', variant: 'engineering', content: '离网太阳能系统一般按2–3天备用设计。在连续阴雨较多的地区（如太平洋西北岸、北欧），可能需要4天。备用天数越多，电池组越大、成本越高。' },
+];
+
+const trustSection = {
+  text: "本计算器使用公开的电池工程公式。选型模型计入了按备用天数放大的能量需求、放电深度折减、综合效率损耗和与温度相关的容量折减。所有中间值都会展示，方便独立验算。我们的方法遵循IEEE 1188及厂商应用笔记。",
+  link: { label: "查看完整计算方法", href: "/zh/methodology/" },
+};
+
+const references = [
+  { title: "Battery University — 电池选型", url: "https://batteryuniversity.com/article/bu-403-positive-kinetics", source: "Battery University / Cadex Electronics" },
+  { title: "IEEE Std 1188-1996 — 固定式蓄电池维护", url: "https://standards.ieoe.org/ieee/1188/1076/", source: "IEEE Standards Association" },
+  { title: "NREL — 电池储能选型方法", url: "https://www.nrel.gov/storage-battery-sizing.html", source: "National Renewable Energy Laboratory" },
+  { title: "美国能源部 — 电池储能技术概述", url: "https://www.energy.gov/eere/storage/battery-storage-technology", source: "U.S. Department of Energy" },
+  { title: "Victron Energy — 电池组选型指南", url: "https://www.victronenergy.com/help-center", source: "Victron Energy" },
+];
+
+const faqItems = [
+  {
+    question: '“备用天数”是什么意思？',
+    answer: "备用天数是指电池组在没有任何充电输入的情况下能支撑系统负载的天数（如太阳能的连阴天、风机的无风期）。离网太阳能系统一般按2–3天备用设计，以防彻底断电。",
+  },
+  {
+    question: "铅酸与锂电池的温度特性有何不同？",
+    answer: "在-10°C以上低温环境，锂电池表现略好于铅酸。但锂电池有一个关键限制：0°C以下充电会因析锂造成电芯永久损伤，除非配有预热电路。",
+  },
+  {
+    question: "如何估算日耗电量？",
+    answer: "把每个负载的功率乘以每天运行小时数，再全部相加。例如：100W电视每天看3小时=300 Wh；50W冰箱每天累计运行10小时=500 Wh；日耗电量合计800 Wh。",
+  },
+  {
+    question: "为什么系统综合效率低于电芯效率？",
+    answer: "锂电芯本身效率高达98%，但系统还包括线缆电阻损耗、电池管理系统（BMS）待机功耗、熔断器触点损耗以及DC-AC逆变损耗。系统综合效率是从电池端到终端负载的净损耗。",
+  },
+  {
+    question: "5kW负载需要配多少电池？",
+    answer: "取决于备用天数与电压。以48V系统、每天运行8小时、备用2天、80% DoD为例：所需能量=（5,000W × 8h × 2）/（0.80 × 0.90）=111,111 Wh=111.1 kWh。按48V折算为2,314 Ah，约相当于8块大容量280Ah磷酸铁锂电池组成的48V系统。",
+  },
+  {
+    question: "电池标称容量与可用容量有什么区别？",
+    answer: "标称容量是满电时的总储能，可用容量是触及DoD限制前能安全取出的部分。100Ah磷酸铁锂按80% DoD可用80Ah；100Ah铅酸按50% DoD只可用50Ah。选型请按可用容量计算。",
+  },
+  {
+    question: "电池化学体系如何影响选型？",
+    answer: "磷酸铁锂可用80–90% DoD、循环5,000次以上；三元锂可用70–80% DoD、循环约2,000次；铅酸限制50% DoD、循环500–1,000次。磷酸铁锂达到同样可用能量所需的总容量更小，但每kWh前期成本更高。",
+  },
+  {
+    question: "电池组需要配大一点吗？",
+    answer: "适度配大（10–20%）可覆盖温度折减、老化与负载增长。过度配大（50%以上）浪费资金，还可能导致充电不足。一般在计算最小值上加15–20%裕量比较合适。",
+  },
+  {
+    question: "电池组电压选多少合适？",
+    answer: "电压越高，同功率下电流越小，线缆更细、损耗更低。12V适合小系统（1kW以下），24V适合中等系统（1–5kW），48V是户用与商用系统（5kW以上）的标准。现代逆变器多按48V设计。",
+  },
+  {
+    question: "如何考虑未来的负载增长？",
+    answer: "预留15–25%容量应对新增电器、用电增加或家庭成员变化。也可以按模块化扩容设计——选用支持后期并联扩容的电池系统，避免整组更换。",
+  },
+  {
+    question: "新旧电池可以混用吗？",
+    answer: "不可以。同一电池组内不要混用不同年限、不同化学体系或不同容量的电池。旧电池内阻大、容量低，会迫使新电池超负荷工作、加速衰减。更换时请整串或整组一起换。",
+  },
+  {
+    question: "电池组配小了会怎样？",
+    answer: "配小会导致深度放电加速衰减、带载电压跌落触发低压保护提前断电、连阴天备电不足。提前更换电池的费用往往超过当初配小省下的钱。",
+  },
+];
+
+const relatedTools = [
+  { href: "/zh/tools/runtime-calculator/", title: "续航时间计算器", description: "在特定瓦数负载下验证续航小时数。" },
+  { href: "/zh/tools/c-rate-calculator/", title: "C率计算器", description: "计算充放电电流倍率。" },
+  { href: "/zh/tools/solar-battery-sizing-calculator/", title: "太阳能蓄电池计算器", description: "按日耗电量配置太阳能蓄电池组。" },
+  { href: "/zh/tools/home-backup-battery-calculator/", title: "家庭备用电池计算器", description: "为关键负载配置家庭备用电源。" },
+  { href: "/zh/tools/battery-pack-calculator/", title: "电池组计算器", description: "设计串并联电芯配置方案。" },
+  { href: "/zh/tools/rv-battery-calculator/", title: "房车电池计算器", description: "规划离网出行房车用电。" },
+];
+
+const commonMistakes = [
+  "忘记温度折减——锂电池0°C以下充电会造成永久损伤，铅酸电池低温容量显著下降。请务必做温度修正。",
+  "混淆标称容量与可用容量——100Ah铅酸按50% DoD只可用50Ah，100Ah磷酸铁锂按80% DoD可用80Ah。请按可用容量选型。",
+  "忽视系统综合效率——电池充放电损耗5–15%的能量。负载需求必须除以系统效率，才是真实所需的电池容量。",
+  "用平均负载代替峰值负载——电池必须扛住峰值负载。深井泵可能启动5分钟就耗电1,000W，而平均功耗只有50W。",
+  "混用新旧或不同体系电池——同一电池组内不要混用新旧电池或不同化学体系。内阻不一致会导致负载不均、加速衰减。",
+  "忽视自放电损耗——多日备电期间，自放电（锂电池每月1–5%，铅酸更高）会减少可用能量。长备电计算请计入该因素。",
+  "只按当前负载选型——新增电器、家庭变化或用电增加很快就会超出配小的电池组。请预留15–20%增长裕量。",
+  "选错系统电压——5kW负载用12V系统需要400A以上电流，线缆极粗。2kW以上负载请用48V，把电流控制在合理范围。",
+];
+
+const relatedArticles = [
+  { href: "/learn/how-to-size-a-battery-bank/", title: "如何配置电池组" },
+  { href: "/learn/what-is-battery-sizing/", title: "什么是电池选型？" },
+  { href: "/learn/battery-sizing-formula/", title: "电池选型公式" },
+  { href: "/learn/battery-sizing-chart-guide/", title: "电池选型表指南" },
+];
+---
+
+<CalculatorLayout
+  title="电池容量计算器｜蓄电池Ah/kWh选型｜电池计算器"
+  description="电池容量计算器：由日耗电量、备用天数、放电深度与温度修正，一键算出所需蓄电池Ah与kWh，支持太阳能/房车/家庭备用选型，公式全公开。"
+  faqItems={faqItems}
+  commonMistakes={commonMistakes}
+  relatedCalculators={relatedTools}
+  relatedArticles={relatedArticles}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+  lang="zh"
+>
+
+  <!-- Main Calculator Grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+
+    <!-- Input Form -->
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">选型条件</h3>
+      <div class="flex flex-col gap-6">
+
+        <!-- Daily load (paired input + select) -->
+        <div class="flex flex-col gap-2 w-full">
+          <label for="daily-energy" class="text-label-uppercase text-xs text-primary">日耗电量</label>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            <input type="number" id="daily-energy" value="1200" class="text-input col-span-2" min="1" step="any" />
+            <select id="energy-unit" class="select-input">
+              <option value="wh">Wh</option>
+              <option value="kwh">kWh</option>
+            </select>
+          </div>
+        </div>
+
+        <InputField id="autonomy" label="备用天数" value={2} min={1} step={1} helperText="电池系统在不充电的情况下必须支撑负载的天数。" />
+        <InputField id="dod" label="最大放电深度（DoD %）" value={80} min={10} max={100} helperText="安全持续上限。建议：锂电池80%，铅酸50%。" />
+        <InputField id="voltage" label="标称系统电压（V）" value={25.6} min={1} step="any" helperText="电池组标称电压（如12.8V、25.6V、51.2V）" />
+        <InputField id="efficiency" label="系统综合效率（%）" value={90} min={50} max={100} helperText="逆变器损耗、线缆压降与电池充放接受效率。" />
+        <InputField id="temperature" label="设计最低温度（°C）" value={10} min={-40} max={50} helperText="低温会降低电化学储能能力。" />
+
+      </div>
+    </CalculatorCard>
+
+    <!-- Calculation Results -->
+    <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">预计输出</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <ResultBox
+            label="所需电池组能量"
+            value="3,546 Wh"
+            suffix="3.55 kWh storage recommended"
+            variant="primary"
+            id="result-energy"
+          />
+          <ResultBox
+            label="所需充电容量"
+            value="138.5 Ah"
+            suffix="At 25.6V nominal"
+            id="result-capacity-box"
+          />
+          <ResultBox
+            label="温度折减系数"
+            value="0.94"
+            suffix="6.00% capacity loss in cold"
+            id="result-temp-box"
+          />
+        </div>
+      </div>
+
+      <!-- Action Area -->
+      <div class="border-t border-hairline pt-6">
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">设计布局建议</h4>
+        <p class="text-body-sm text-muted" id="sizing-layout-suggestion">
+          要达到25.6V下138.5 Ah容量，可以采用8串电芯加多并的串并联配置。
+        </p>
+      </div>
+    </CalculatorCard>
+
+  </div>
+
+  <!-- Formulas and Worked Examples -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">公式与计算示例</h2>
+
+    <FormulaBox title="数学公式">
+      <p>
+        所需电池能量E_req的计算方法：日耗电量乘以备用天数，再除以各项损耗：
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        E_req (Wh) = （日耗电量 x 备用天数）/（DoD% x 效率% x 温度折减系数）
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        所需容量 (Ah) = E_req (Wh) / 标称电压 (V)
+      </div>
+      <p>
+        温度折减系数用于折算低温下的电池能力：
+      </p>
+      <ul class="list-disc pl-6 flex flex-col gap-1 text-xs">
+        <li>T ≥ 25°C：系数 = 1.00</li>
+        <li>0°C &lt;= T &lt; 25°C：系数 = 0.90 + 0.10 x (T/25)</li>
+        <li>-20°C &lt;= T &lt; 0°C：系数 = 0.70 + 0.20 x ((T+20)/20)</li>
+      </ul>
+      <p class="text-xs text-muted mt-4">
+        <strong>变量说明：</strong>日耗电量单位Wh，备用天数单位天，DoD为百分比，效率为百分比，温度单位°C。假设条件：每日负载恒定、标准放电曲线、参考温度25°C。
+      </p>
+    </FormulaBox>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample
+        number={1}
+        title="小木屋——每天1.5 kWh，25.6V"
+        scenario="离网小木屋日耗电1,500 Wh，备用2天，80% DoD，环境温度10°C，如何选型？"
+        inputs={[
+          { label: "日负载", value: "1,500 Wh" },
+          { label: "备用天数", value: "2天" },
+          { label: "放电深度上限", value: "80%" },
+          { label: "系统电压", value: "25.6 V" },
+          { label: "系统效率", value: "90%" },
+          { label: "环境温度", value: "10°C" },
+        ]}
+        steps={[
+          { label: "第1步：温度折减系数", formula: "0.90 + 0.10 × (10/25)", result: "0.94" },
+          { label: "第2步：所需能量", formula: "(1500 × 2) / (0.80 × 0.90 × 0.94)", result: "4,433 Wh（4.43 kWh）" },
+          { label: "第3步：所需容量", formula: "4433 / 25.6", result: "173.2 Ah" },
+        ]}
+        answer="4.43 kWh电池组，25.6V下173.2 Ah——约8块280Ah磷酸铁锂电芯组成8串"
+        interpretation="10°C环境使可用容量降低6%。单块280Ah 25.6V磷酸铁锂电池不够——25.6V下约需173Ah。"
+        variant="home"
+      />
+
+      <WorkedExample
+        number={2}
+        title="离网住宅——每天8 kWh，48V"
+        scenario="四口之家日耗电8 kWh，备用3天，环境温度20°C，设计电池系统。"
+        inputs={[
+          { label: "日负载", value: "8,000 Wh" },
+          { label: "备用天数", value: "3天" },
+          { label: "放电深度上限", value: "85%" },
+          { label: "系统电压", value: "48 V" },
+          { label: "系统效率", value: "92%" },
+          { label: "环境温度", value: "20°C" },
+        ]}
+        steps={[
+          { label: "第1步：温度折减系数", formula: "0.90 + 0.10 × (20/25)", result: "0.98" },
+          { label: "第2步：所需能量", formula: "(8000 × 3) / (0.85 × 0.92 × 0.98)", result: "31,358 Wh（31.36 kWh）" },
+          { label: "第3步：所需容量", formula: "31358 / 48", result: "653.3 Ah" },
+        ]}
+        answer="31.36 kWh电池组，48V下653.3 Ah——相当于8块280Ah磷酸铁锂电池组成16串2并"
+        interpretation="3天备用可较好应对连续阴雨。48V系统使户用线缆电流可控。"
+        variant="home"
+      />
+
+      <WorkedExample
+        number={3}
+        title="通信基站——寒冷气候"
+        scenario="48V通信备用电池，日负载5 kWh，备用4天，-10°C，如何选型？"
+        inputs={[
+          { label: "日负载", value: "5,000 Wh" },
+          { label: "备用天数", value: "4天" },
+          { label: "放电深度上限", value: "80%" },
+          { label: "系统电压", value: "48 V" },
+          { label: "系统效率", value: "90%" },
+          { label: "环境温度", value: "-10°C" },
+        ]}
+        steps={[
+          { label: "第1步：温度折减系数", formula: "0.70 + 0.20 × ((-10+20)/20)", result: "0.80" },
+          { label: "第2步：所需能量", formula: "(5000 × 4) / (0.80 × 0.90 × 0.80)", result: "34,722 Wh（34.72 kWh）" },
+          { label: "第3步：所需容量", formula: "34722 / 48", result: "723.4 Ah" },
+        ]}
+        answer="34.72 kWh电池组，48V下723.4 Ah——20%的低温折减显著增大了选型容量"
+        interpretation="寒冷地区基站比温带设计多配25–40%容量。加热系统可恢复满容量，但增加成本与寄生负载。"
+        variant="industrial"
+      />
+    </div>
+  </section>
+
+  <EngineeringDiagram
+    title="电池选型系统总览"
+    description="从日耗电量经选型计算到最终电池组配置的能量流"
+    variant="system"
+    steps={[
+      { label: "日负载", icon: "load" },
+      { label: "选型公式", icon: "chart" },
+      { label: "电池组", icon: "battery" },
+      { label: "逆变器输出", icon: "inverter" },
+    ]}
+  />
+
+  <ComparisonTable
+    title="不同化学体系对选型的影响"
+    headers={["参数", "磷酸铁锂（LFP）", "三元锂（NMC）", "铅酸（AGM）"]}
+    rows={[
+      ["推荐DoD", "80–90%", "70–80%", "50%"],
+      ["该DoD下循环寿命", "5,000次以上", "2,000次", "500–1,000次"],
+      ["每100Ah可用容量", "80–90 Ah", "70–80 Ah", "50 Ah"],
+      ["0°C温度折减", "约10%", "约15%", "约20%"],
+      ["充电温度下限", "0°C（关键限制）", "-10°C", "-20°C"],
+      ["综合效率", "95–98%", "92–95%", "80–85%"],
+      ["月自放电率", "1–3%", "1–3%", "3–5%"],
+    ]}
+    caption="化学体系选择如何影响电池组选型"
+  />
+
+  <ComparisonTable
+    title="系统电压选择指南"
+    headers={["系统电压", "最大建议负载", "2kW时电流", "线缆规格", "适用场景"]}
+    rows={[
+      ["12V", "1 kW", "167 A", "4/0 AWG (107 mm²)", "小型便携系统"],
+      ["24V", "3 kW", "83 A", "2/0 AWG (67 mm²)", "中型房车、小木屋"],
+      ["48V", "10+ kW", "42 A", "4 AWG (21 mm²)", "户用、通信、船用"],
+      ["96V", "20+ kW", "21 A", "8 AWG (8.4 mm²)", "商用/工业储能"],
+    ]}
+    caption="电压越高 = 电流越小 = 线缆越细、损耗越低"
+  />
+
+  <FAQSection items={faqItems} />
+  <RelatedTools tools={relatedTools} />
+
+  <!-- Calculation Script -->
+  <script>
+    import { calculateBatterySizing } from '../../../utils/calculators';
+
+    const dailyEnergyInput = document.getElementById('daily-energy') as HTMLInputElement;
+    const energyUnitSelect = document.getElementById('energy-unit') as HTMLSelectElement;
+    const autonomyInput = document.getElementById('autonomy') as HTMLInputElement;
+    const dodInput = document.getElementById('dod') as HTMLInputElement;
+    const voltageInput = document.getElementById('voltage') as HTMLInputElement;
+    const efficiencyInput = document.getElementById('efficiency') as HTMLInputElement;
+    const temperatureInput = document.getElementById('temperature') as HTMLInputElement;
+
+    // Outputs — adapted for ResultBox DOM structure
+    const resultEnergyContainer = document.getElementById('result-energy');
+    const resultEnergyValue = resultEnergyContainer?.querySelector('.text-display-md') as HTMLElement;
+    const resultKwh = resultEnergyContainer?.querySelector('.text-caption') as HTMLElement;
+
+    const resultCapacityContainer = document.getElementById('result-capacity-box');
+    const resultCapacity = resultCapacityContainer?.querySelector('.text-title-lg') as HTMLElement;
+    const resultVoltageRef = resultCapacityContainer?.querySelector('.text-caption') as HTMLElement;
+
+    const resultTempContainer = document.getElementById('result-temp-box');
+    const resultTempMultiplier = resultTempContainer?.querySelector('.text-title-lg') as HTMLElement;
+    const resultTempDesc = resultTempContainer?.querySelector('.text-caption') as HTMLElement;
+
+    const sizingLayoutSuggestion = document.getElementById('sizing-layout-suggestion');
+
+    function updateCalculations() {
+      const dailyVal = parseFloat(dailyEnergyInput.value) || 0;
+      const isKwh = energyUnitSelect.value === 'kwh';
+      const dailyEnergyWh = isKwh ? dailyVal * 1000 : dailyVal;
+      const autonomy = parseFloat(autonomyInput.value) || 1;
+      const dod = parseFloat(dodInput.value) || 80;
+      const voltage = parseFloat(voltageInput.value) || 25.6;
+      const efficiency = parseFloat(efficiencyInput.value) || 90;
+      const temperature = parseFloat(temperatureInput.value) || 25;
+
+      const results = calculateBatterySizing(dailyEnergyWh, autonomy, dod, voltage, efficiency, temperature);
+
+      // Render Outputs
+      if (resultEnergyValue) resultEnergyValue.textContent = `${Math.round(results.requiredEnergyWh).toLocaleString()} Wh`;
+      if (resultKwh) resultKwh.textContent = `${(results.requiredEnergyWh / 1000).toFixed(2)} kWh storage recommended`;
+      if (resultCapacity) resultCapacity.textContent = `${results.requiredCapacityAh.toFixed(1)} Ah`;
+      if (resultVoltageRef) resultVoltageRef.textContent = `At ${voltage.toFixed(1)}V nominal`;
+      if (resultTempMultiplier) resultTempMultiplier.textContent = results.temperatureMultiplier.toFixed(2);
+
+      const percentLoss = (1 - results.temperatureMultiplier) * 100;
+      if (resultTempDesc) resultTempDesc.textContent = `${percentLoss.toFixed(1)}% capacity loss in cold`;
+
+      // Suggest Series cell layout
+      // A typical lithium cell is 3.2V nominal.
+      const cellV = 3.2;
+      const seriesCells = Math.round(voltage / cellV);
+      if (sizingLayoutSuggestion) {
+        sizingLayoutSuggestion.textContent = `To achieve ${results.requiredCapacityAh.toFixed(1)} Ah capacity at ${voltage.toFixed(1)}V nominal, you could configure a pack with ${seriesCells} series cells (approx. ${cellV}V per cell) and parallel strings to match the targeted capacity.`;
+      }
+    }
+
+    [dailyEnergyInput, energyUnitSelect, autonomyInput, dodInput, voltageInput, efficiencyInput, temperatureInput].forEach(el => {
+      el.addEventListener('input', updateCalculations);
+    });
+
+    // Run on load
+    updateCalculations();
+  </script>
+
+</CalculatorLayout>

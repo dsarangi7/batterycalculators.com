@@ -1,0 +1,445 @@
+---
+import CalculatorLayout from '../../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import InputField from '../../../components/InputField.astro';
+import ResultBox from '../../../components/ResultBox.astro';
+import ComparisonTable from '../../../components/ComparisonTable.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import WorkedExample from '../../../components/WorkedExample.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import RelatedTools from '../../../components/RelatedTools.astro';
+
+const whatIs = `系统电压选择器根据负载功率、线缆距离和电池容量需求，确定最佳直流系统电压——<strong>12V</strong>、<strong>24V</strong>或<strong>48V</strong>。更高的电压在相同功率下降低电流，允许使用更细的线缆并减少电阻损耗，但需要更多串联电芯，并可能限制设备兼容性。最佳电压需要平衡<strong>电流需求</strong>、<strong>线缆成本</strong>、<strong>效率</strong>和<strong>设备可用性</strong>。`;
+
+const whyItMatters = [
+  "12V系统中5kW负载需要417A电流——需要4/0 AWG线缆，成本为$8–12/ft且难以布线。在48V下，相同负载仅需104A，使用4 AWG线缆，成本为$1–2/ft。",
+  "电压降与电流成正比——电压加倍使电流减半，相同线缆的电压降降低75%，直接提高系统效率。",
+  "设备可用性因电压而异——12V拥有最广泛的配件市场，48V逆变器效率最高，24V介于两者之间。",
+  "电池组复杂度随电压增加——48V LFP电池组需要16个串联电芯，而12V仅需4个，这影响BMS需求和故障模式。",
+  "安全法规因地区而异——超过60V直流电压在许多地区需要特殊安全措施，使48V成为住宅安装的实际最大值。",
+];
+
+const practicalApplications = [
+  { title: "小型便携系统", description: "12V用于露营、船用电子设备和500W以下的小型太阳能系统。" },
+  { title: "房车与露营车系统", description: "24V用于中等负载（1–3kW），平衡设备可用性和效率。" },
+  { title: "住宅太阳能+电池系统", description: "48V是3kW以上家用电池系统的标准，配合现代混合逆变器使用。" },
+  { title: "通信与工业应用", description: "48V是通信基站和工业备用电源的标准，满足高可靠性要求。" },
+  { title: "电动汽车与高尔夫球车", description: "48V–96V用于轻型电动汽车，更高电压用于高性能应用。" },
+  { title: "船用生活电池组", description: "24V或48V用于长途巡航期间有较大生活负载的船舶。" },
+];
+
+const expertNotes = [
+  { title: '48V是现代标准', variant: 'engineering', content: '对于2kW以上的系统，48V是推荐电压。现代混合逆变器（Victron、Sol-Ark、Growatt）针对48V优化，电池制造商专注于48V模块，降低的电流使大多数住宅安装可使用标准6 AWG布线。' },
+  { title: '12V传统系统', variant: 'info', content: '12V仍然适用于小型便携系统、房车配件和船用电子设备。汽车后市场生态系统建立在12V基础上，使其成为1kW以下移动和便携应用的默认选择。' },
+];
+
+const trustSection = {
+  text: "本计算器使用标准电气工程公式计算电流（P/V）、电压降（2 × L × I × ρ/A）和功率损耗（I²R）。线缆选型遵循NEC第9章表8铜导体标准。所有计算采用保守假设并显示中间值以便验证。",
+  link: { label: "查看我们的方法论", href: "/zh/methodology/" },
+};
+
+const references = [
+  { title: "NEC第9章——表8（导体特性）", url: "https://www.nfpa.org/codes-and-standards", source: "National Fire Protection Association" },
+  { title: "Victron Energy——12V vs 24V vs 48V系统", url: "https://www.victronenergy.com/help-center", source: "Victron Energy" },
+  { title: "Blue Sea Systems——线缆选型计算器", url: "https://www.bluesea.com/resources", source: "Blue Sea Systems" },
+  { title: "DOE——数据中心直流配电", url: "https://www.energy.gov/eere/amo/dc-power-distribution", source: "U.S. Department of Energy" },
+];
+
+const faqItems = [
+  {
+    question: "我的太阳能电池系统应该选择什么电压？",
+    answer: "对于2kW以上的系统，选择48V——它降低电流、线缆成本和损耗。对于500W–2kW，24V是良好的平衡点。对于500W以下，12V最简单且最经济。大多数现代混合逆变器设计用于48V。",
+  },
+  {
+    question: "电压如何影响线缆尺寸？",
+    answer: "更高的电压意味着相同功率下更低的电流。3kW负载在12V下需要250A（需要4/0 AWG线缆），在24V下需要125A（需要2/0 AWG），在48V下仅需62.5A（需要6 AWG）。更细的线缆更便宜、更轻且更容易布线。",
+  },
+  {
+    question: "我能混合使用12V和24V设备吗？",
+    answer: "不能——你不能将12V设备直接连接到24V电池组。需要使用DC-DC转换器降压。这会增加成本并导致5–10%的效率损失。最好统一电压标准并选择兼容设备。",
+  },
+  {
+    question: "逆变器的最低电压是多少？",
+    answer: "大多数纯正弦波逆变器的最低工作电压为10.5V（12V型号）、21V（24V型号）或42V（48V型号）。低于这些阈值时，逆变器将关机以保护电池免于过放电。",
+  },
+  {
+    question: "48V住宅使用安全吗？",
+    answer: "安全——48V直流低于NEC和IEC标准定义的60V直流安全阈值。除了正确的保险丝、断路器和布线规范外，不需要特殊安全措施。超过60V的电压需要额外的安全预防措施。",
+  },
+  {
+    question: "电压如何影响电池组配置？",
+    answer: "12V LFP电池组需要4个串联电芯（4S），24V需要8S，48V需要16S。更多串联电芯增加BMS复杂度但降低电流。并联串组增加容量而与电压无关——48V 2P电池组是两个48V串组并联。",
+  },
+  {
+    question: "我可以稍后从24V升级到48V吗？",
+    answer: "升级电压需要更换整个电池组、逆变器、充电控制器，可能还需要布线。如果预计负载超过2kW或计划扩展，从一开始就选择48V更具成本效益。",
+  },
+  {
+    question: "电动汽车使用什么电压？",
+    answer: "大多数现代电动汽车使用400V电池组。一些新设计使用800V以实现更快的充电和更高的效率。高尔夫球车和轻型电动汽车通常使用48V–96V。电压由电机需求和充电速度目标决定。",
+  },
+  {
+    question: "电压如何影响充电效率？",
+    answer: "更高电压的系统通常更高效，因为更低的电流减少了布线中的电阻损耗（I²R）。对于相同的功率传输，48V系统通常比12V系统低2–4%的传输损耗。",
+  },
+  {
+    question: "住宅直流系统的最大实际电压是多少？",
+    answer: "48V是住宅直流系统的实际最大值。它低于60V直流安全阈值，设备可用性广泛，标准布线可支持10+kW负载。更高电压需要商业级安全措施。",
+  },
+];
+
+const relatedTools = [
+  { href: "/zh/tools/voltage-drop-calculator/", title: "电压降计算器", description: "计算给定线缆长度和电流下的电压降。" },
+  { href: "/zh/tools/dc-cable-loss-calculator/", title: "直流线缆损耗计算器", description: "估算不同电压下直流布线的功率损耗。" },
+  { href: "/zh/tools/battery-sizing-calculator/", title: "电池容量计算器", description: "按所选系统电压确定电池组容量。" },
+  { href: "/zh/tools/battery-pack-calculator/", title: "电池组计算器", description: "为目标电压设计串联/并联电芯配置。" },
+  { href: "/zh/tools/inverter-battery-calculator/", title: "逆变器电池计算器", description: "匹配逆变器和电池规格。" },
+  { href: "/zh/tools/solar-battery-sizing-calculator/", title: "太阳能电池容量计算器", description: "带电压选择的太阳能电池组容量计算。" },
+];
+
+const commonMistakes = [
+  "为1kW以上负载选择12V——2kW负载在12V下需要167A，需要4/0 AWG线缆，其成本超过设备节省的费用。",
+  "忽略长距离线缆的电压降——10米线缆在12V/100A下损耗3.3%，而在48V/25A下使用相同线缆仅损耗0.8%。",
+  "在没有DC-DC转换的情况下混合不同电压设备——将12V负载连接到24V电池组会立即损坏设备。",
+  "仅根据逆变器价格选择电压——更便宜的12V逆变器可能因更粗的线缆和更高的长期损耗而总成本更高。",
+  "未规划扩展——24V系统需要扩展到5kW时将需要完全升级到48V。",
+  "在固定直流系统中使用汽车保险丝——汽车保险丝设计用于12V车载环境，而非连续工作的直流应用。",
+  "忽略充电控制器电压兼容性——PWM控制器需要电池电压匹配，而MPPT控制器接受更高的输入电压。",
+  "忽视安全法规——在大多数地区，超过60V的直流电压需要特殊的断路器、标识和安装规范。",
+];
+
+const relatedArticles = [
+  { href: "/zh/learn/12v-vs-24v-vs-48v-batteries/", title: "12V vs 24V vs 48V电池系统" },
+  { href: "/zh/learn/battery-voltage-systems/", title: "直流系统电压选择指南" },
+  { href: "/zh/learn/voltage-drop-explained/", title: "电池系统线缆选型" },
+];
+---
+
+<CalculatorLayout
+  title="系统电压选择器 | 电池计算器"
+  description="根据负载功率、线缆距离和效率要求选择最佳直流系统电压——12V、24V或48V。"
+  faqItems={faqItems}
+  commonMistakes={commonMistakes}
+  relatedCalculators={relatedTools}
+  relatedArticles={relatedArticles}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+  lang="zh"
+>
+
+  <!-- 主计算器网格 -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+
+    <!-- 输入表单 -->
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">系统参数</h3>
+      <div class="flex flex-col gap-6">
+        <InputField
+          id="total-load"
+          label="总系统负载"
+          value={3000}
+          min={10}
+          step={10}
+          unit="W"
+          helperText="所有负载的合计持续功率（瓦特）。"
+        />
+        <InputField
+          id="cable-distance"
+          label="线缆距离（单程）"
+          value={10}
+          min={0.5}
+          step={0.5}
+          unit="m"
+          helperText="从电池组到主负载配电盘或逆变器的距离。"
+        />
+        <InputField
+          id="battery-capacity"
+          label="目标电池容量"
+          value={5000}
+          min={100}
+          step={100}
+          unit="Wh"
+          helperText="总储能目标（瓦时）。"
+        />
+        <InputField
+          id="ambient-temp"
+          label="环境温度"
+          value={25}
+          min={-30}
+          max={60}
+          step={1}
+          unit="°C"
+          helperText="用于线缆电阻参考的平均工作温度。"
+        />
+      </div>
+    </CalculatorCard>
+
+    <!-- 电压对比结果 -->
+    <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">电压对比</h3>
+
+        <div class="grid grid-cols-1 gap-4 mb-6">
+          <!-- 12V -->
+          <div class="bg-surface-soft border border-hairline p-4">
+            <div class="flex justify-between items-center mb-2">
+              <span class="text-label-uppercase text-muted text-[10px]">12V 系统</span>
+              <span class="text-caption text-muted" id="v12-verdict">—</span>
+            </div>
+            <div class="grid grid-cols-3 gap-2">
+              <div>
+                <span class="text-caption text-muted block">电流</span>
+                <span class="text-title-lg text-primary" id="v12-current">—</span>
+              </div>
+              <div>
+                <span class="text-caption text-muted block">线缆损耗</span>
+                <span class="text-title-lg text-primary" id="v12-loss">—</span>
+              </div>
+              <div>
+                <span class="text-caption text-muted block">最小线缆</span>
+                <span class="text-title-lg text-primary" id="v12-cable">—</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 24V -->
+          <div class="bg-surface-soft border border-hairline p-4">
+            <div class="flex justify-between items-center mb-2">
+              <span class="text-label-uppercase text-muted text-[10px]">24V 系统</span>
+              <span class="text-caption text-muted" id="v24-verdict">—</span>
+            </div>
+            <div class="grid grid-cols-3 gap-2">
+              <div>
+                <span class="text-caption text-muted block">电流</span>
+                <span class="text-title-lg text-primary" id="v24-current">—</span>
+              </div>
+              <div>
+                <span class="text-caption text-muted block">线缆损耗</span>
+                <span class="text-title-lg text-primary" id="v24-loss">—</span>
+              </div>
+              <div>
+                <span class="text-caption text-muted block">最小线缆</span>
+                <span class="text-title-lg text-primary" id="v24-cable">—</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 48V -->
+          <div class="bg-surface-soft border border-m-blue-light p-4">
+            <div class="flex justify-between items-center mb-2">
+              <span class="text-label-uppercase text-m-blue-light text-[10px]">48V 系统</span>
+              <span class="text-caption text-m-blue-light font-bold" id="v48-verdict">—</span>
+            </div>
+            <div class="grid grid-cols-3 gap-2">
+              <div>
+                <span class="text-caption text-muted block">电流</span>
+                <span class="text-title-lg text-primary" id="v48-current">—</span>
+              </div>
+              <div>
+                <span class="text-caption text-muted block">线缆损耗</span>
+                <span class="text-title-lg text-primary" id="v48-loss">—</span>
+              </div>
+              <div>
+                <span class="text-caption text-muted block">最小线缆</span>
+                <span class="text-title-lg text-primary" id="v48-cable">—</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 推荐建议 -->
+        <div class="border-t border-hairline pt-4">
+          <h4 class="text-label-uppercase text-primary text-xs mb-2">推荐方案</h4>
+          <p class="text-body-sm text-muted" id="voltage-recommendation">
+            输入系统参数以查看电压推荐。
+          </p>
+        </div>
+      </div>
+    </CalculatorCard>
+
+  </div>
+
+  <!-- 各电压详细结果 -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-16">
+    <ResultBox label="12V串联电芯（LFP）" value="4 cells" suffix="4S配置" id="r12-cells" />
+    <ResultBox label="24V串联电芯（LFP）" value="8 cells" suffix="8S配置" id="r24-cells" />
+    <ResultBox label="48V串联电芯（LFP）" value="16 cells" suffix="16S配置" id="r48-cells" />
+  </div>
+
+  <!-- 公式部分 -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <FormulaBox title="电压选择公式">
+      <p>
+        各电压选项的电流计算：
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        I (安培) = P (瓦特) / V (伏特)
+      </div>
+      <p>
+        线缆电压降（往返）：
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        V_drop = 2 × L × I × ρ / A
+      </div>
+      <p>
+        线缆功率损耗：
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        P_loss (W) = I² × R_cable
+      </div>
+      <p class="text-xs text-muted mt-4">
+        <strong>变量说明：</strong>P = 总负载功率（W），V = 系统电压（V），L = 单程线缆长度（m），I = 电流（A），ρ = 铜电阻率（1.72×10⁻⁸ Ω·m），A = 线缆截面积（m²）。
+      </p>
+    </FormulaBox>
+
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">公式与计算示例</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample
+        number={1}
+        title="3kW系统——10米线缆距离"
+        scenario="比较12V、24V和48V在3,000W持续负载和10米单程线缆距离下的表现。"
+        inputs={[
+          { label: "总负载", value: "3,000 W" },
+          { label: "线缆距离", value: "10 m" },
+          { label: "电池容量", value: "5,000 Wh" },
+          { label: "环境温度", value: "25°C" },
+        ]}
+        steps={[
+          { label: "12V电流", formula: "3000 / 12", result: "250 A" },
+          { label: "24V电流", formula: "3000 / 24", result: "125 A" },
+          { label: "48V电流", formula: "3000 / 48", result: "62.5 A" },
+          { label: "12V线缆损耗（4/0 AWG）", formula: "250² × 0.00005 Ω", result: "31.2 W (1.04%)" },
+          { label: "48V线缆损耗（6 AWG）", formula: "62.5² × 0.0033 Ω", result: "12.9 W (0.43%)" },
+        ]}
+        answer="推荐48V——它仅需62.5A电流，而12V需要250A，使用6 AWG线缆替代4/0 AWG，节省约$200以上的铜材费用并减少60%的损耗。"
+        interpretation="在12V下，250A电流需要极粗的线缆，既昂贵又笨重且安装困难。48V将电流控制在标准住宅布线可承受的范围内。"
+        variant="home"
+      />
+    </div>
+  </section>
+
+  <!-- 对比表格 -->
+  <ComparisonTable
+    title="12V vs 24V vs 48V系统对比"
+    headers={["参数", "12V", "24V", "48V"]}
+    rows={[
+      ["最大实际负载", "1 kW", "3 kW", "10+ kW"],
+      ["3kW时电流", "250 A", "125 A", "62.5 A"],
+      ["3kW线缆（10m）", "4/0 AWG (107 mm²)", "2/0 AWG (67 mm²)", "6 AWG (13 mm²)"],
+      ["线缆成本（10m）", "$80–120", "$50–80", "$15–30"],
+      ["电压降（10m, 3kW）", "4.2% (4/0 AWG)", "2.1% (2/0 AWG)", "0.8% (6 AWG)"],
+      ["LFP电芯（串联）", "4S", "8S", "16S"],
+      ["逆变器效率", "85–90%", "90–93%", "93–96%"],
+      ["设备可用性", "最广泛", "良好", "优秀（现代）"],
+      ["安全阈值", "安全", "安全", "安全（<60V DC）"],
+      ["最佳用途", "便携、小型房车", "中型房车、小木屋", "住宅、通信"],
+    ]}
+    caption="线缆尺寸为75°C导体温度下持续工作的最小推荐值"
+  />
+
+  <FAQSection items={faqItems} />
+  <RelatedTools tools={relatedTools} />
+
+  <!-- Calculation Script -->
+  <script>
+    const totalLoadInput = document.getElementById('total-load') as HTMLInputElement;
+    const cableDistanceInput = document.getElementById('cable-distance') as HTMLInputElement;
+    const batteryCapacityInput = document.getElementById('battery-capacity') as HTMLInputElement;
+    const ambientTempInput = document.getElementById('ambient-temp') as HTMLInputElement;
+
+    const copperResistivity = 1.72e-8;
+
+    const cableAWG: { gauge: string; areaM2: number; areaMM2: number }[] = [
+      { gauge: '18 AWG', areaM2: 0.823e-6, areaMM2: 0.823 },
+      { gauge: '16 AWG', areaM2: 1.31e-6, areaMM2: 1.31 },
+      { gauge: '14 AWG', areaM2: 2.08e-6, areaMM2: 2.08 },
+      { gauge: '12 AWG', areaM2: 3.31e-6, areaMM2: 3.31 },
+      { gauge: '10 AWG', areaM2: 5.26e-6, areaMM2: 5.26 },
+      { gauge: '8 AWG', areaM2: 8.37e-6, areaMM2: 8.37 },
+      { gauge: '6 AWG', areaM2: 13.3e-6, areaMM2: 13.3 },
+      { gauge: '4 AWG', areaM2: 21.2e-6, areaMM2: 21.2 },
+      { gauge: '2 AWG', areaM2: 33.6e-6, areaMM2: 33.6 },
+      { gauge: '1/0 AWG', areaM2: 53.5e-6, areaMM2: 53.5 },
+      { gauge: '2/0 AWG', areaM2: 67.4e-6, areaMM2: 67.4 },
+      { gauge: '4/0 AWG', areaM2: 107e-6, areaMM2: 107 },
+    ];
+
+    function findMinCable(currentA: number): { gauge: string; areaM2: number } {
+      const maxCurrentDensity = 4e6;
+      const requiredArea = currentA / maxCurrentDensity;
+      for (const c of cableAWG) {
+        if (c.areaM2 >= requiredArea) return c;
+      }
+      return cableAWG[cableAWG.length - 1];
+    }
+
+    function updateCalculations() {
+      const loadW = parseFloat(totalLoadInput.value) || 3000;
+      const distanceM = parseFloat(cableDistanceInput.value) || 10;
+      const batteryWh = parseFloat(batteryCapacityInput.value) || 5000;
+
+      const voltages = [12, 24, 48];
+      const results: Record<number, { current: number; lossW: number; lossPercent: number; cable: string }> = {};
+
+      for (const v of voltages) {
+        const current = loadW / v;
+        const cable = findMinCable(current);
+        const resistance = 2 * distanceM * copperResistivity / cable.areaM2;
+        const lossW = current * current * resistance;
+        const lossPercent = (lossW / loadW) * 100;
+
+        results[v] = { current, lossW, lossPercent, cable: cable.gauge };
+
+        const prefix = v === 12 ? 'v12' : v === 24 ? 'v24' : 'v48';
+        document.getElementById(`${prefix}-current`)!.textContent = `${current.toFixed(1)} A`;
+        document.getElementById(`${prefix}-loss`)!.textContent = `${lossW.toFixed(1)} W`;
+        document.getElementById(`${prefix}-cable`)!.textContent = cable.gauge;
+      }
+
+      const verdicts: Record<number, string> = {};
+      if (results[12].current > 150) verdicts[12] = '✗ 过流风险';
+      else if (results[12].lossPercent > 3) verdicts[12] = '⚠ 损耗过高';
+      else verdicts[12] = '✓ 可接受';
+
+      if (results[24].current > 150) verdicts[24] = '✗ 过流风险';
+      else if (results[24].lossPercent > 3) verdicts[24] = '⚠ 损耗过高';
+      else verdicts[24] = '✓ 良好';
+
+      verdicts[48] = results[48].lossPercent < 2 ? '✓ 最佳' : '✓ 良好';
+
+      document.getElementById('v12-verdict')!.textContent = verdicts[12];
+      document.getElementById('v24-verdict')!.textContent = verdicts[24];
+      document.getElementById('v48-verdict')!.textContent = verdicts[48];
+
+      let recommended = 48;
+      if (loadW <= 500) recommended = 12;
+      else if (loadW <= 2000) recommended = 24;
+      else recommended = 48;
+
+      const recEl = document.getElementById('voltage-recommendation')!;
+      if (recommended === 48) {
+        recEl.textContent = `48V适用于您的${loadW.toLocaleString()}W系统。在${results[48].current.toFixed(1)}A电流下，使用${results[48].cable}线缆，${distanceM}米距离的损耗仅为${results[48].lossPercent.toFixed(2)}%——这是最高效、最具成本效益的选择。`;
+      } else if (recommended === 24) {
+        recEl.textContent = `24V适用于您的${loadW.toLocaleString()}W系统。在${results[24].current.toFixed(1)}A电流下，使用${results[24].cable}线缆，损耗为${results[24].lossPercent.toFixed(2)}%——在效率和简易性之间取得良好平衡。`;
+      } else {
+        recEl.textContent = `12V可满足您的${loadW.toLocaleString()}W系统需求。在${results[12].current.toFixed(1)}A电流下，使用${results[12].cable}线缆，损耗为${results[12].lossPercent.toFixed(2)}%——对于小负载简单且经济。`;
+      }
+
+      const lfpCellV = 3.2;
+      document.getElementById('r12-cells')!.querySelector('.text-title-lg')!.textContent = `${Math.round(12 / lfpCellV)} cells`;
+      document.getElementById('r24-cells')!.querySelector('.text-title-lg')!.textContent = `${Math.round(24 / lfpCellV)} cells`;
+      document.getElementById('r48-cells')!.querySelector('.text-title-lg')!.textContent = `${Math.round(48 / lfpCellV)} cells`;
+    }
+
+    [totalLoadInput, cableDistanceInput, batteryCapacityInput, ambientTempInput].forEach(el => {
+      el.addEventListener('input', updateCalculations);
+    });
+
+    updateCalculations();
+  </script>
+
+</CalculatorLayout>

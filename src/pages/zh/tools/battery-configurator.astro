@@ -1,0 +1,405 @@
+---
+import CalculatorLayout from '../../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import InputField from '../../../components/InputField.astro';
+import ResultBox from '../../../components/ResultBox.astro';
+import ComparisonTable from '../../../components/ComparisonTable.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import WorkedExample from '../../../components/WorkedExample.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import RelatedTools from '../../../components/RelatedTools.astro';
+
+const whatIs = `电池配置器计算最优的<strong>串并联电芯排列</strong>，以实现目标电池组电压与容量。根据目标规格和可用的单体参数，确定<strong>串联数</strong>（S）以满足电压要求，<strong>并联路数</strong>（P）以满足容量要求。本工具还生成文本形式的配置图，展示物理布局，并计算整组规格，包括能量、重量和总电芯数。`;
+
+const whyItMatters = [
+  "串联数错误会导致整组电压不对——48V系统恰好需要16节LFP电芯串联（16S × 3.2V = 51.2V），多一节或少一节都会造成电压不匹配。",
+  "并联路数均衡要求各路完全一致——每条并联路必须具有相同的电芯数、容量和内阻，以防止负载不均。",
+  "总电芯数决定BMS需求——16S2P配置需要32节电芯和16串规格的BMS。准确了解电芯数量有助于选择合适的BMS。",
+  "物理布局影响热管理——大电池组中心位置的电芯温度高于边缘电芯，合理的配置规划有助于设计有效的散热方案。",
+  "成本估算取决于准确的电芯数量——知道需要32节（而非\"大约30节\"）可以精确采购，避免短缺。",
+];
+
+const practicalApplications = [
+  { title: "DIY充电墙", description: "为户用储能配置LFP电芯，匹配目标电压和容量以适配逆变器。" },
+  { title: "电动车电池组", description: "为电动车动力电池设计串并联排列，满足特定电压和续航要求。" },
+  { title: "船舶生活电池组", description: "为24V或48V船舶电池组配置电芯，满足安时容量需求。" },
+  { title: "通信备电", description: "设计48V电池配置，满足特定备电时间和放电倍率要求。" },
+  { title: "高尔夫球车/低速车", description: "使用常见电芯规格配置48V–72V电池组，适用于高尔夫球车和低速电动车。" },
+  { title: "便携储能电源", description: "设计紧凑型电池组，优化电芯排列以实现便携储能。" },
+];
+
+const expertNotes = [
+  { title: '串路匹配至关重要', variant: 'warning', content: '使用多条并联路时，每路必须使用同一生产批次、容量和内阻匹配的电芯。不匹配的串路会导致负载不均——最强的串路负担过重加速衰减，最弱的串路未被充分利用。' },
+  { title: 'BMS兼容性', variant: 'engineering', content: 'BMS必须匹配串数。16串BMS无法管理15串或17串电池组。常见的LFP配置为4S（12V）、8S（24V）和16S（48V）。购买前务必确认BMS的电芯数兼容性。' },
+];
+
+const trustSection = {
+  text: "本配置器使用标准的串并联电气公式。串联电压具有加和性（V_total = n × V_cell），并联容量具有加和性（Ah_total = n × Ah_cell），总能量 = 电压 × 容量。所有计算过程透明并逐步展示。",
+  link: { label: "查看完整计算方法", href: "/zh/methodology/" },
+};
+
+const references = [
+  { title: "Battery University — 串联与并联配置", url: "https://batteryuniversity.com/article/bu-302-series-and-parallel-batteries", source: "Battery University / Cadex Electronics" },
+  { title: "NREL — 电池组设计指南", url: "https://www.nrel.gov/storage-battery-pack-design.html", source: "National Renewable Energy Laboratory" },
+  { title: "US DOE — 电池组架构", url: "https://www.energy.gov/eere/vehiclebatteries/battery-pack-architecture", source: "U.S. Department of Energy" },
+];
+
+const faqItems = [
+  {
+    question: "16S2P是什么意思？",
+    answer: "16S2P表示16节电芯串联（S）和2条并联路（P）。16节串联电芯决定电压（16 × 3.2V = 51.2V，LFP），2条并联路使容量翻倍（2 × 280Ah = 560Ah）。总电芯数：16 × 2 = 32节。",
+  },
+  {
+    question: "如何计算达到目标电压所需的串联电芯数？",
+    answer: "将目标电压除以电芯标称电压。对于LFP（3.2V）：48V ÷ 3.2V = 15，向上取整为16节（16S）。对于NMC（3.6V）：48V ÷ 3.6V = 13.3，向上取整为14节（14S）。始终向上取整以确保至少达到目标电压。",
+  },
+  {
+    question: "如何计算达到目标容量所需的并联路数？",
+    answer: "将目标安时数除以单节电芯容量。例如560Ah目标容量使用280Ah电芯：560 ÷ 280 = 2条并联路。每条并联路的串联电芯数必须相同。",
+  },
+  {
+    question: "可以在并联中混用不同容量的电芯吗？",
+    answer: "切勿在并联中混用不同容量的电芯。较弱的电芯会限制整条串路的可用容量，并承受更大应力导致提前失效。并联组中的所有电芯必须具有相同的容量和内阻。",
+  },
+  {
+    question: "总电芯数公式是什么？",
+    answer: "总电芯数 = 串联数 × 并联数。16S4P配置使用16 × 4 = 64节电芯。对于280Ah LFP电芯，产生51.2V × 1,120Ah = 57.3 kWh。",
+  },
+  {
+    question: "配置如何影响BMS选择？",
+    answer: "BMS必须完全匹配串数。16串BMS监控16节串联电芯。部分BMS通过监控一条串路并假设并联路已均衡来支持多条并联路。请根据具体配置确认兼容性。",
+  },
+  {
+    question: "串联和并联有什么区别？",
+    answer: "串联连接提升电压——电芯正极接负极连接，电压叠加。并联连接提升容量——电芯正极接正极、负极接负极连接，安时数叠加而电压不变。",
+  },
+  {
+    question: "电芯数量如何影响电池组重量？",
+    answer: "电池组重量 = 总电芯数 × 单节电芯重量。16S2P LFP电池组32节，每节2.8kg，总重89.6kg。NMC电芯较轻（每节1.8kg），相同配置总重57.6kg。务必在机械设计中考虑重量因素。",
+  },
+  {
+    question: "可以在同一电池组中使用不同规格的电芯吗？",
+    answer: "切勿在同一电池组中混用不同规格的电芯（如方形和圆柱）。不同规格的内阻、容量和热特性不同。即使同一规格但不同厂家的电芯也不应混用。",
+  },
+  {
+    question: "最小实用电芯数量是多少？",
+    answer: "最小数量由电压需求决定：12V LFP需4S，24V LFP需8S，48V LFP需16S。低于这些数量电压过低，逆变器无法正常工作。部分应用可接受3S（9.6V）用于低压直流负载。",
+  },
+];
+
+const relatedTools = [
+  { href: "/zh/tools/battery-pack-calculator/", title: "电池组计算器", description: "根据电芯规格计算电池组电压、容量和能量。" },
+  { href: "/zh/tools/parallel-string-calculator/", title: "并联路数计算器", description: "设计并联路配置以扩展容量。" },
+  { href: "/zh/tools/battery-sizing-calculator/", title: "电池容量计算器", description: "配置电芯前确定所需总容量。" },
+  { href: "/zh/tools/system-voltage-selector/", title: "系统电压选择器", description: "在12V、24V和48V系统之间选择。" },
+  { href: "/zh/tools/battery-chemistry-selector/", title: "电池化学体系选择器", description: "为应用选择合适的化学体系。" },
+  { href: "/zh/tools/charging-time-calculator/", title: "充电时间计算器", description: "计算配置好的电池组的充电时间。" },
+];
+
+const commonMistakes = [
+  "串联数取整错误——48V ÷ 3.2V = 15，虽然15 × 3.2V恰好等于48V，但LFP电芯电压范围为2.8–3.6V，16S能提供更安全的逆变器工作电压范围。",
+  "以为并联路会自动均衡——新串路在并联前必须单独充电至相同电压，否则会产生巨大的均衡电流。",
+  "忽视BMS串数上限——16串BMS无法管理17串电池组。购买前务必确认BMS与实际串数配置兼容。",
+  "在并联中混用不同批次的电芯——即使规格相同，不同批次的电芯也有轻微容量差异，混用新旧电芯会加速新电芯衰减。",
+  "机械设计未考虑电芯重量——64节LFP电芯总重超过180kg，结构支撑和安装必须按实际电池组重量设计。",
+  "并联中使用不同容量的电芯——100Ah电芯与280Ah电芯并联，大电芯浪费180Ah容量，小电芯承受过载应力。",
+  "忽略端子连接——并联路需要汇流排将所有正极端子和所有负极端子分别连接，不良连接会产生热点和故障点。",
+  "忽略热膨胀——电芯在充电时会轻微膨胀，机械设计必须容纳2–5%的体积膨胀而不会产生过大压缩力。",
+];
+
+const commonConfigs = [
+  { config: "4S1P", voltage: "12.8V", capacity: "280Ah", energy: "3.58 kWh", cells: 4, weight: "11.2 kg", use: "12V便携、小型房车" },
+  { config: "8S1P", voltage: "25.6V", capacity: "280Ah", energy: "7.17 kWh", cells: 8, weight: "22.4 kg", use: "24V房车、小型光伏" },
+  { config: "16S1P", voltage: "51.2V", capacity: "280Ah", energy: "14.34 kWh", cells: 16, weight: "44.8 kg", use: "48V户用、通信备电" },
+  { config: "16S2P", voltage: "51.2V", capacity: "560Ah", energy: "28.67 kWh", cells: 32, weight: "89.6 kg", use: "48V户用、大型光伏" },
+  { config: "16S4P", voltage: "51.2V", capacity: "1,120Ah", energy: "57.34 kWh", cells: 64, weight: "179.2 kg", use: "48V全屋备电、商用" },
+  { config: "7S1P (NMC)", voltage: "25.2V", capacity: "280Ah", energy: "7.06 kWh", cells: 7, weight: "12.6 kg", use: "24V房车 (NMC)" },
+  { config: "14S1P (NMC)", voltage: "50.4V", capacity: "280Ah", energy: "14.11 kWh", cells: 14, weight: "25.2 kg", use: "48V户用 (NMC)" },
+];
+
+const relatedArticles = [
+  { href: "/zh/learn/series-vs-parallel-batteries/", title: "电池串联与并联配置" },
+  { href: "/zh/learn/lifepo4-pack-design/", title: "DIY电池组设计指南" },
+  { href: "/zh/learn/how-to-build-a-battery-pack/", title: "BMS选型指南" },
+];
+---
+
+<CalculatorLayout
+  title="电池配置器 | 电池计算器"
+  description="设计串并联电芯配置以匹配目标电压和容量。计算电芯数量、电池组规格，并查看配置图。"
+  faqItems={faqItems}
+  commonMistakes={commonMistakes}
+  relatedCalculators={relatedTools}
+  relatedArticles={relatedArticles}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+  lang="zh"
+>
+
+  <!-- Main Calculator Grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+
+    <!-- Input Form -->
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">配置参数</h3>
+      <div class="flex flex-col gap-6">
+
+        <div class="flex flex-col gap-2 w-full">
+          <label class="text-label-uppercase text-xs text-primary">化学体系预设</label>
+          <div class="grid grid-cols-3 gap-2">
+            <button class="chem-btn selected" data-chem="lfp" data-cellv="3.2" data-cellah="280" data-cellkg="2.8">LFP (LiFePO4)</button>
+            <button class="chem-btn" data-chem="nmc" data-cellv="3.6" data-cellah="280" data-cellkg="1.8">NMC</button>
+            <button class="chem-btn" data-chem="nca" data-cellv="3.6" data-cellah="300" data-cellkg="1.6">NCA</button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <InputField id="target-voltage" label="目标电池组电压" value={48} min={1} step={1} unit="V" helperText="期望的标称电池组电压。" />
+          <InputField id="target-capacity" label="目标容量" value={560} min={1} step={1} unit="Ah" helperText="期望的总安时容量。" />
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <InputField id="cell-voltage" label="电芯标称电压" value={3.2} min={1} max={5} step={0.1} unit="V" helperText="每节电芯的标称电压。" />
+          <InputField id="cell-capacity" label="电芯容量" value={280} min={1} step={1} unit="Ah" helperText="每节电芯的安时容量。" />
+        </div>
+
+        <InputField id="cell-weight" label="电芯重量" value={2.8} min={0.1} step={0.1} unit="kg" helperText="每节电芯的重量（千克）。" />
+
+      </div>
+    </CalculatorCard>
+
+    <!-- Configuration Results -->
+    <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">配置结果</h3>
+
+        <div class="grid grid-cols-2 gap-4 mb-6">
+          <ResultBox label="串联数 (S)" value="16" id="result-series" variant="primary" />
+          <ResultBox label="并联路数 (P)" value="2" id="result-parallel" variant="primary" />
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 mb-6">
+          <ResultBox label="配置" value="16S2P" id="result-config" />
+          <ResultBox label="总电芯数" value="32" id="result-total-cells" />
+          <ResultBox label="电池组电压" value="51.2 V" id="result-pack-voltage" />
+          <ResultBox label="电池组容量" value="560 Ah" id="result-pack-capacity" />
+          <ResultBox label="总能量" value="28.67 kWh" id="result-pack-energy" />
+          <ResultBox label="电池组重量" value="89.6 kg" id="result-pack-weight" />
+        </div>
+      </div>
+
+      <!-- Configuration Diagram -->
+      <div class="border-t border-hairline pt-4">
+        <h4 class="text-label-uppercase text-primary text-xs mb-3">配置图</h4>
+        <pre class="bg-surface-soft border border-hairline p-4 text-caption text-body font-mono overflow-x-auto whitespace-pre" id="config-diagram">
+String 1: [C]─[C]─[C]─[C]─[C]─[C]─[C]─[C]─[C]─[C]─[C]─[C]─[C]─[C]─[C]─[C] → 51.2V
+String 2: [C]─[C]─[C]─[C]─[C]─[C]─[C]─[C]─[C]─[C]─[C]─[C]─[C]─[C]─[C]─[C] → 51.2V
+                                                                                      ‖
+                                                                               Bus Bars (+) (−)
+                                                                                      ‖
+                                                                               Total: 51.2V / 560Ah</pre>
+      </div>
+    </CalculatorCard>
+
+  </div>
+
+  <!-- Formula Section -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <FormulaBox title="配置公式">
+      <p>
+        达到目标电压所需的串联电芯数：
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        S = ⌈目标电压 / 电芯电压⌉
+      </div>
+      <p>
+        达到目标容量所需的并联路数：
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        P = ⌈目标容量 / 电芯容量⌉
+      </div>
+      <p>
+        电池组规格：
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        V_pack = S × V_cell
+        Ah_pack = P × Ah_cell
+        Wh_pack = V_pack × Ah_pack
+        Weight = S × P × W_cell
+      </div>
+      <p class="text-xs text-muted mt-4">
+        <strong>变量说明：</strong>S = 串联数，P = 并联路数，V_cell = 电芯标称电压，Ah_cell = 电芯容量，W_cell = 电芯重量。⌈ ⌉ = 向上取整函数。
+      </p>
+    </FormulaBox>
+
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">公式与计算示例</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample
+        number={1}
+        title="48V户用电池 — 16S2P LFP"
+        scenario="使用280Ah方形LFP电芯，设计560Ah容量的48V电池组。"
+        inputs={[
+          { label: "目标电压", value: "48 V" },
+          { label: "目标容量", value: "560 Ah" },
+          { label: "电芯电压", value: "3.2 V (LFP)" },
+          { label: "电芯容量", value: "280 Ah" },
+          { label: "电芯重量", value: "2.8 kg" },
+        ]}
+        steps={[
+          { label: "步骤1：串联电芯数", formula: "⌈48 / 3.2⌉", result: "16节 (16S)" },
+          { label: "步骤2：并联路数", formula: "⌈560 / 280⌉", result: "2路 (2P)" },
+          { label: "步骤3：电池组电压", formula: "16 × 3.2V", result: "51.2V 标称" },
+          { label: "步骤4：电池组容量", formula: "2 × 280Ah", result: "560Ah" },
+          { label: "步骤5：总能量", formula: "51.2V × 560Ah", result: "28,672 Wh (28.67 kWh)" },
+          { label: "步骤6：总重量", formula: "16 × 2 × 2.8kg", result: "89.6 kg" },
+        ]}
+        answer="16S2P配置：共32节电芯，51.2V标称，560Ah容量，28.67 kWh能量，总重89.6 kg。"
+        interpretation="这是标准的户用48V LFP配置。51.2V标称电压兼容大多数48V混合逆变器（Victron、Sol-Ark、Growatt）。两条并联路提供560Ah——足以满足典型家庭8–12小时的备电需求。"
+        variant="home"
+      />
+    </div>
+  </section>
+
+  <!-- Common Configurations Table -->
+  <ComparisonTable
+    title="常用LFP电芯配置（280Ah方形）"
+    headers={["配置", "电压", "容量", "能量", "电芯数", "重量", "典型用途"]}
+    rows={commonConfigs.map(c => [c.config, c.voltage, c.capacity, c.energy, String(c.cells), c.weight, c.use])}
+    caption="基于标准280Ah LFP方形电芯，标称3.2V，每节2.8kg"
+  />
+
+  <FAQSection items={faqItems} />
+  <RelatedTools tools={relatedTools} />
+
+  <style>
+    .chem-btn {
+      padding: 12px 8px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      border: 1px solid var(--color-hairline);
+      background: var(--color-surface-card);
+      color: var(--color-muted);
+      cursor: pointer;
+      transition: all 0.15s;
+      text-align: center;
+    }
+    .chem-btn:hover {
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+    }
+    .chem-btn.selected {
+      border-color: var(--color-m-blue-light);
+      color: var(--color-primary);
+      background: var(--color-surface-soft);
+    }
+  </style>
+
+  <!-- Calculation Script -->
+  <script>
+    const targetVoltageInput = document.getElementById('target-voltage') as HTMLInputElement;
+    const targetCapacityInput = document.getElementById('target-capacity') as HTMLInputElement;
+    const cellVoltageInput = document.getElementById('cell-voltage') as HTMLInputElement;
+    const cellCapacityInput = document.getElementById('cell-capacity') as HTMLInputElement;
+    const cellWeightInput = document.getElementById('cell-weight') as HTMLInputElement;
+    const chemBtns = document.querySelectorAll('.chem-btn');
+
+    let selectedCellV = 3.2;
+    let selectedCellAh = 280;
+    let selectedCellKg = 2.8;
+
+    chemBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        chemBtns.forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        selectedCellV = parseFloat((btn as HTMLElement).dataset.cellv!);
+        selectedCellAh = parseFloat((btn as HTMLElement).dataset.cellah!);
+        selectedCellKg = parseFloat((btn as HTMLElement).dataset.cellkg!);
+        cellVoltageInput.value = String(selectedCellV);
+        cellCapacityInput.value = String(selectedCellAh);
+        cellWeightInput.value = String(selectedCellKg);
+        updateCalculations();
+      });
+    });
+
+    function generateDiagram(s: number, p: number, vPack: number, ahPack: number): string {
+      const lines: string[] = [];
+      const maxDisplay = Math.min(s, 12);
+      const truncated = s > maxDisplay;
+
+      for (let i = 0; i < p; i++) {
+        let cells = '';
+        for (let j = 0; j < maxDisplay; j++) {
+          cells += '[C]';
+          if (j < maxDisplay - 1) cells += '─';
+        }
+        if (truncated) cells += `─...─[C]×${s}`;
+        lines.push(`String ${i + 1}: ${cells} → ${vPack.toFixed(1)}V`);
+      }
+
+      const dashLen = lines[0].length - 2;
+      lines.push(' '.repeat(dashLen - 20) + '‖');
+      lines.push(' '.repeat(dashLen - 24) + 'Bus Bars (+) (−)');
+      lines.push(' '.repeat(dashLen - 20) + '‖');
+      lines.push(' '.repeat(dashLen - 26) + `Total: ${vPack.toFixed(1)}V / ${ahPack.toFixed(0)}Ah`);
+
+      return lines.join('\n');
+    }
+
+    function updateCalculations() {
+      const targetV = parseFloat(targetVoltageInput.value) || 48;
+      const targetAh = parseFloat(targetCapacityInput.value) || 560;
+      const cellV = parseFloat(cellVoltageInput.value) || 3.2;
+      const cellAh = parseFloat(cellCapacityInput.value) || 280;
+      const cellKg = parseFloat(cellWeightInput.value) || 2.8;
+
+      const series = Math.ceil(targetV / cellV);
+      const parallel = Math.ceil(targetAh / cellAh);
+
+      const packV = series * cellV;
+      const packAh = parallel * cellAh;
+      const packWh = packV * packAh;
+      const totalCells = series * parallel;
+      const packWeight = totalCells * cellKg;
+
+      const resultSeries = document.getElementById('result-series')!;
+      const resultParallel = document.getElementById('result-parallel')!;
+      const resultConfig = document.getElementById('result-config')!;
+      const resultTotalCells = document.getElementById('result-total-cells')!;
+      const resultPackVoltage = document.getElementById('result-pack-voltage')!;
+      const resultPackCapacity = document.getElementById('result-pack-capacity')!;
+      const resultPackEnergy = document.getElementById('result-pack-energy')!;
+      const resultPackWeight = document.getElementById('result-pack-weight')!;
+
+      resultSeries.querySelector('.text-display-md')!.textContent = String(series);
+      resultParallel.querySelector('.text-display-md')!.textContent = String(parallel);
+      resultConfig.querySelector('.text-title-lg')!.textContent = `${series}S${parallel}P`;
+      resultTotalCells.querySelector('.text-title-lg')!.textContent = String(totalCells);
+      resultPackVoltage.querySelector('.text-title-lg')!.textContent = `${packV.toFixed(1)} V`;
+      resultPackCapacity.querySelector('.text-title-lg')!.textContent = `${packAh.toLocaleString()} Ah`;
+
+      if (packWh >= 1000) {
+        resultPackEnergy.querySelector('.text-title-lg')!.textContent = `${(packWh / 1000).toFixed(2)} kWh`;
+      } else {
+        resultPackEnergy.querySelector('.text-title-lg')!.textContent = `${packWh.toFixed(0)} Wh`;
+      }
+
+      resultPackWeight.querySelector('.text-title-lg')!.textContent = `${packWeight.toFixed(1)} kg`;
+
+      const diagram = document.getElementById('config-diagram')!;
+      diagram.textContent = generateDiagram(series, parallel, packV, packAh);
+    }
+
+    [targetVoltageInput, targetCapacityInput, cellVoltageInput, cellCapacityInput, cellWeightInput].forEach(el => {
+      el.addEventListener('input', updateCalculations);
+    });
+
+    updateCalculations();
+  </script>
+
+</CalculatorLayout>

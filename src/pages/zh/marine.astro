@@ -1,0 +1,555 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import CategoryToolGrid from '../../components/CategoryToolGrid.astro';
+import CalculatorCard from '../../components/CalculatorCard.astro';
+import FAQSection from '../../components/FAQSection.astro';
+import RelatedTools from '../../components/RelatedTools.astro';
+
+const WEB3FORMS_ACCESS_KEY = "6bfb4917-4ce5-42bc-911a-36e566d3769d";
+
+const tools = [
+  {
+    name: "船舶电池尺寸计算器",
+    href: "/zh/tools/marine-battery-sizing-calculator/",
+    description: "根据酒店负载、使用小时数、电池电压和放电深度配置船舶电池组尺寸，确保可靠的船舶电力系统。",
+    available: true,
+  },
+  {
+    name: "船舶储能计算器",
+    href: "/zh/tools/vessel-energy-storage-calculator/",
+    description: "确定船舶推进、酒店负载和混合动力管理系统的最佳储能容量。",
+    available: true,
+  },
+  {
+    name: "船舶CO₂减排计算器",
+    href: "/zh/tools/marine-co2-reduction-calculator/",
+    description: "估算混合动力或电池电动船舶配置的燃油节省和CO₂减排量。",
+    available: true,
+  },
+  {
+    name: "混合动力船舶投资回报计算器",
+    href: "/zh/tools/hybrid-vessel-roi-calculator/",
+    description: "计算混合动力和电动推进改装的投资回收期、燃油节省和投资回报率。",
+    available: true,
+  },
+  {
+    name: "岸电节省计算器",
+    href: "/zh/tools/shore-power-savings-calculator/",
+    description: "比较船舶靠泊或锚泊时岸电成本与船载柴油发电机运行成本。",
+    available: true,
+  },
+  {
+    name: "渡轮电池尺寸计算器",
+    href: "/zh/tools/ferry-battery-sizing-calculator/",
+    description: "根据航渡距离、时刻表和负载特性配置短途航线渡轮电气化的电池组尺寸。",
+    available: true,
+  },
+  {
+    name: "CII计算器",
+    href: "/zh/tools/cii-calculator/",
+    description: "估算您船舶的碳强度指标评级，并确定满足IMO目标的运营改进措施。",
+    available: true,
+  },
+  {
+    name: "EEXI计算器",
+    href: "/zh/tools/eexi-calculator/",
+    description: "评估现有船舶能效指数合规性，模拟满足EEXI要求的技术升级方案。",
+    available: false,
+  },
+];
+
+const toolCategories = [
+  {
+    title: "船舶储能",
+    description: "适用于所有船型的电池尺寸、储能规划和电力系统设计——从港口作业船到海上支援船和客渡轮。",
+    icon: "M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z",
+  },
+  {
+    title: "排放与CO₂减排",
+    description: "量化电气化、岸电和混合动力推进策略带来的燃油节省、CO₂减排以及NOx/SOx排放改善。",
+    icon: "M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z",
+  },
+  {
+    title: "混合动力船舶经济学",
+    description: "评估混合动力和电动推进改装的财务分析工具，包括投资回收期、燃油成本预测和生命周期投资回报率。",
+    icon: "M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z",
+  },
+  {
+    title: "IMO与法规工具",
+    description: "通过模拟合规路径和改进方案的计算器，帮助应对IMO CII评级、EEXI要求和脱碳法规。",
+    icon: "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z",
+  },
+];
+
+const resourceArticles = [
+  { title: "船东为何应投资更清洁的运营", href: "/learn/what-is-marine-electrification/" },
+  { title: "降低船舶燃油消耗：实用策略", href: "/learn/how-hybrid-vessels-reduce-emissions/" },
+  { title: "混合动力推进如何降低运营成本", href: "/learn/hybrid-propulsion-systems-explained/" },
+  { title: "渡轮和作业船的电池储能", href: "/learn/battery-electric-ferries-explained/" },
+  { title: "了解岸电的优势", href: "/learn/shore-power-vs-diesel-generators/" },
+  { title: "船舶运营商如何提高CII评级", href: "/learn/understanding-cii-ratings/" },
+  { title: "海事脱碳路线图", href: "/learn/maritime-decarbonization-roadmap/" },
+];
+
+const learnArticles = [
+  { title: "什么是船舶电气化？", href: "/learn/what-is-marine-electrification/" },
+  { title: "混合动力推进系统详解", href: "/learn/hybrid-propulsion-systems-explained/" },
+  { title: "电池电动渡轮详解", href: "/learn/battery-electric-ferries-explained/" },
+  { title: "岸电与柴油发电机对比", href: "/learn/shore-power-vs-diesel-generators/" },
+  { title: "了解CII评级", href: "/learn/understanding-cii-ratings/" },
+  { title: "船舶储能系统详解", href: "/learn/vessel-energy-storage-systems-explained/" },
+  { title: "混合动力船舶如何减少排放", href: "/learn/how-hybrid-vessels-reduce-emissions/" },
+  { title: "海事脱碳路线图", href: "/learn/maritime-decarbonization-roadmap/" },
+];
+
+const relatedTools = [
+  { href: "/zh/tools/marine-co2-reduction-calculator/", title: "船舶CO₂减排计算器", description: "量化混合动力化和岸电带来的排放减少。" },
+  { href: "/zh/tools/hybrid-vessel-roi-calculator/", title: "混合动力船舶投资回报计算器", description: "评估混合动力推进投资的财务回报。" },
+  { href: "/zh/tools/shore-power-savings-calculator/", title: "岸电节省计算器", description: "估算岸电连接带来的燃油节省。" },
+  { href: "/zh/tools/vessel-energy-storage-calculator/", title: "船舶储能计算器", description: "确定混合动力或电动船舶系统的电池容量。" },
+  { href: "/zh/tools/ferry-battery-sizing-calculator/", title: "渡轮电池尺寸计算器", description: "配置短途航线渡轮电气化的电池组尺寸。" },
+  { href: "/zh/tools/cii-calculator/", title: "CII计算器", description: "估算您船舶的碳强度指标评级。" },
+];
+
+const faqItems = [
+  {
+    question: "什么是船舶电气化？",
+    answer: "船舶电气化是将电池储能、电力推进电机和电力管理系统集成到船舶中以减少或替代化石燃料依赖的过程。从短途航线的全电池电动运行到用电力驱动补充主发动机的混合动力柴油电力系统，以提高效率并降低排放。",
+  },
+  {
+    question: "电池如何减少船舶排放？",
+    answer: "电池通过在港口和排放控制区实现零排放运行、支持电动机在柴油发动机低效运行的低负载工况下工作的混合模式、以及回收推进器和推进系统的再生能量来减少排放。设计良好的混合动力系统可减少15–30%的燃油消耗，并显著削减CO₂、NOx和SOx排放。",
+  },
+  {
+    question: "哪些船舶最适合混合动力推进？",
+    answer: "负载变化较大的船舶受益最大：频繁靠港的渡轮、具有动态定位工况周期的海上支援船、具有间歇性高功率需求的港口拖轮、具有大量酒店负载的邮轮以及具有较长怠速时间的渔船。这些船型获得最大燃油节省，因为电池可以处理峰值负载而发动机在最佳效率运行。",
+  },
+  {
+    question: "什么是岸电？",
+    answer: "岸电（也称为冷熨斗或替代海事电源）允许船舶在靠泊时连接到当地电网，关闭船载柴油发电机。这消除了港口的废气排放，降低了噪音，并且当电网电力比船用燃油更便宜时可以降低运营成本。岸电需要兼容的船舶基础设施和港口侧供电系统。",
+  },
+  {
+    question: "什么是CII？",
+    answer: "碳强度指标（CII）是IMO根据船舶运营碳强度（以每运输工作的CO₂排放量衡量）对船舶进行A到E评级的指标。连续三年评为D级或任何一年评为E级的船舶必须提交纠正行动计划。CII适用于5,000总吨及以上的船舶，是IMO减少国际航运温室气体排放战略的一部分。",
+  },
+  {
+    question: "什么是EEXI？",
+    answer: "现有船舶能效指数（EEXI）是一项强制性的IMO技术措施，要求现有船舶满足最低能效标准。它是一项基于船舶设计和安装功率的一次性认证。EEXI于2023年1月1日生效，适用于大多数货船、油轮和客船。合规通常需要发动机功率限制、螺旋桨改装或节能装置安装。",
+  },
+  {
+    question: "电池能完全替代船舶上的柴油发动机吗？",
+    answer: "电池电动运行适用于短途航线渡轮、港口作业船和具有可预测时刻表和充电基础设施的内河船舶。对于长途远洋船舶，电池目前还无法匹敌船用燃油的能量密度。将柴油发动机与电池储能结合的混合动力系统提供了最实用的近期路径，在保持运营范围和可靠性的同时实现显著的排放减少。",
+  },
+  {
+    question: "本节计算器是否适用于官方合规报告？",
+    answer: "不适用。本网站上的所有计算器都是教育性工程估算器，旨在用于初步规划、可行性分析和学习目的。它们不能替代船级社计算、船旗国提交或IMO合规文件。请始终咨询船级社、船舶检验师和持证船舶工程师以获取最终系统设计和官方合规。",
+  },
+  {
+    question: "船东如何减少船舶排放？",
+    answer: "船东可以通过多种途径减少排放：混合动力推进系统（节省15–30%燃油）、靠泊岸电（消除港口排放）、航速优化（减少10–20%燃油）、船体和螺旋桨维护（改善5–10%）、气象航线规划以及转向更清洁的燃料。技术和运营措施的组合带来最大影响。我们的船舶CO₂减排计算器帮助量化每种策略的潜力。",
+  },
+  {
+    question: "岸电对船舶有什么好处？",
+    answer: "岸电消除了靠泊时的发电机燃油消耗，根据靠港频率和靠泊时长，每艘船每年可节省5,000–50,000升以上燃油。它消除了港口的NOx、SOx和颗粒物排放，降低了噪音污染，并有资格获得10–30%的绿色港口费折扣。净成本效益取决于当地电价与船用燃油价格的比较——我们的岸电节省计算器为您的具体运营量化了这一点。",
+  },
+  {
+    question: "混合动力船舶能节省多少燃油？",
+    answer: "混合动力船舶通常节省年度燃油消耗的15–30%，具体取决于工况周期。频繁靠港且负载变化的渡轮实现最高节省（20–40%），而稳定巡航的船舶节省较少（5–15%）。节省来自低负载工况下的电池电动运行、使发动机保持在最佳效率区间的负载均衡以及再生能量回收。我们的混合动力船舶投资回报计算器模拟了这些节省的财务回报。",
+  },
+  {
+    question: "电池系统如何提高船舶效率？",
+    answer: "电池系统通过处理柴油发动机运行不良的低负载工况（低于额定功率的25%）来提高船舶效率，使发动机在其最佳效率区间运行。它们还实现削峰（减少安装发动机功率）、负载均衡以及在港口和排放控制区的零排放运行。渡轮和作业船的电池储能可将总能耗比传统纯柴油推进降低20–40%。",
+  },
+  {
+    question: "什么是船舶CO₂计算器？",
+    answer: "船舶CO₂计算器是一种工程工具，根据燃油消耗、燃料类型和运行小时数估算船舶运营的二氧化碳排放量。它帮助船东、运营商和船舶设计师量化基线排放，并模拟混合动力化、岸电和效率提升的减排方案。我们的船舶CO₂减排计算器使用第四次IMO温室气体研究报告的排放系数提供CO₂、NOx和SOx估算。",
+  },
+  {
+    question: "船舶电气化如何支持脱碳？",
+    answer: "船舶电气化通过用电池或岸电供电的电力推进替代化石燃料燃烧来直接减少CO₂排放。混合动力系统减少15–30%燃油消耗，而全电池电动运行在合适航线上完全消除直接排放。电气化还通过改善运营碳强度支持IMO碳强度指标（CII）目标，帮助船舶在2030年基准收紧时保持合规评级。",
+  },
+  {
+    question: "哪些因素影响船舶的碳足迹？",
+    answer: "船舶碳足迹受以下因素影响：燃料类型和消耗率（最大因素）、发动机效率和负载系数、航行距离和货物运量、航速曲线、港口时间和发电机使用、天气和海况、船体污损和螺旋桨状况以及酒店负载（暖通空调、照明、厨房）。我们的计算器帮助量化每个因素的影响，并为船舶脱碳模拟改进方案。",
+  },
+  {
+    question: "电池系统能帮助改善CII表现吗？",
+    answer: "可以。电池系统通过混合动力运行减少年度燃油消耗（从而减少CO₂排放）来改善CII。15%的燃油减少直接转化为约15%的CII改善。结合岸电（额外5%）和运营效率措施（10%），总CII改善可达28–30%。这可以使船舶从D或E评级转变为合规的C或B评级。我们的CII计算器模拟了这些改进方案。",
+  },
+];
+
+const breadcrumbItems = [
+  { label: "船舶电气化与脱碳" },
+];
+
+const advisoryBenefits = [
+  "船舶排放减少评估",
+  "混合动力推进可行性审查",
+  "电池储能尺寸指导",
+  "岸电机会评估",
+  "燃油消耗减少策略",
+  "CII改进机会",
+  "能效规划",
+];
+
+const decisionBlocks = [
+  {
+    title: "法规合规",
+    icon: "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z",
+    content: "IMO初步温室气体战略目标是到2050年左右实现净零排放，2030年碳强度降低40%、2040年降低70%的中期目标。碳强度指标（CII）对5,000总吨以上船舶进行年度评级——持续D或E评级需要提交纠正行动计划。欧盟碳排放交易体系现在覆盖航运排放，增加直接碳成本。主动脱碳可避免监管处罚，并使船舶在标准收紧时处于有利地位。",
+  },
+  {
+    title: "成本效益",
+    icon: "M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z",
+    content: "燃油占船舶运营成本的50–60%。混合动力推进可节省15–30%燃油，根据船舶大小和工况周期，每艘船每年可节省$50,000–$500,000+。岸电消除了靠泊时的发电机燃油消耗。减少发动机运行时间可降低20–40%的维护成本。短途航线的电池电动运行可将能源成本比柴油降低50–80%。这些节省在船舶15–25年的运营寿命中不断累积。",
+  },
+  {
+    title: "市场声誉",
+    icon: "M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z",
+    content: "租船方、货主和乘客越来越要求可验证的可持续发展资质。主要租船方（嘉吉、马士基、必和必拓）要求排放数据并青睐低碳船舶。邮轮乘客选择环境负责任的运营商。绿色航运认证（Green Marine、Clean Shipping）提供竞争优势。有据可查的脱碳策略在注重排放的市场中增强商业定位。",
+  },
+  {
+    title: "利益相关方期望",
+    icon: "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z",
+    content: "投资者筛选投资组合的气候风险，并青睐具有可信脱碳路线图的公司（TCFD、ESG报告）。港口为低排放船舶提供绿色费用折扣和优先靠泊。船旗国和船级社越来越奖励主动的环保措施。保险公司为具有文档化能源管理系统的船舶提供优惠费率。利益相关方在脱碳方面的协同创造复合商业效益。",
+  },
+  {
+    title: "未来准备",
+    icon: "M13 10V3L4 14h7v7l9-11h-7z",
+    content: "电池技术成本持续下降（预计到2030年降低50%），使电气化对更大船舶和更长航线越来越可行。混合动力系统为集成未来燃料电池、先进电池和风力辅助推进提供了灵活平台。数字能源管理系统优化实时燃油消耗。今天投资电气化基础设施的船舶避免了随着法规收紧和燃油成本上升而产生的搁浅资产风险。",
+  },
+];
+---
+
+<Layout
+  title="船舶电气化与脱碳工具 | Battery Calculators"
+  description="船舶电池、混合动力推进、岸电、排放减少和IMO CII/EEXI脱碳规划的工程计算器和指南。"
+  schema="collectionPage"
+  schemaName="船舶电气化与脱碳工具"
+  schemaDescription="船舶电池尺寸、混合动力推进经济学、船舶排放减少、岸电节省和IMO CII/EEXI合规规划的工程级计算器。"
+  canonical="https://batterycalculators.com/zh/marine"
+  breadcrumbs={[{ label: '船舶电气化与脱碳' }]}
+  faqItems={faqItems}
+  lang="zh"
+>
+  <Breadcrumb items={breadcrumbItems} />
+
+  <!-- Hero Section -->
+  <section class="mb-12 md:mb-16 border-b border-hairline pb-12">
+    <div class="max-w-4xl">
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">船舶电气化与脱碳</span>
+      <h1 class="text-display-md text-primary mb-6">船舶电气化与脱碳工具</h1>
+      <p class="text-body-md text-body max-w-2xl font-light mb-8">
+        船舶电池、混合动力推进、岸电、排放减少和IMO脱碳规划的工程计算器、指南和专家咨询服务。
+      </p>
+      <div class="flex flex-wrap gap-3">
+        <a href="#marine-calculators" class="btn-primary-outline px-6 py-3 text-sm">浏览船舶计算器</a>
+        <a href="#why-marine-electrification" class="btn-primary px-6 py-3 text-sm">了解船舶脱碳</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tool Category Section -->
+  <section class="mb-16">
+    <h2 class="text-title-lg text-primary mb-6">工具分类</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {toolCategories.map((cat) => (
+        <div class="bg-surface-card border border-hairline p-6">
+          <div class="flex items-start gap-4">
+            <div class="w-10 h-10 flex-shrink-0 flex items-center justify-center border border-hairline">
+              <svg class="w-5 h-5 text-m-blue-light" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d={cat.icon} />
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-title-md text-primary mb-2">{cat.title}</h3>
+              <p class="text-body-sm text-muted">{cat.description}</p>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- Featured Marine Tools Section -->
+  <section id="marine-calculators" class="mb-8 border-t border-hairline pt-12">
+    <h2 class="text-title-lg text-primary mb-6">船舶电气化计算器</h2>
+    <CategoryToolGrid tools={tools} />
+  </section>
+
+  <!-- Support CTA Below Calculators -->
+  <div class="bg-surface-card border border-hairline p-6 mb-16 flex flex-col sm:flex-row sm:items-center gap-4">
+    <div class="flex-1 min-w-0">
+      <h3 class="text-title-sm text-primary mb-2">需要帮助解读这些结果？</h3>
+      <p class="text-body-sm text-muted font-light">
+        如果您正在评估船舶电池尺寸、混合动力推进、岸电、CII改进或排放减少，可以使用以下表单申请工程支持。
+      </p>
+    </div>
+    <a href="#marine-advisory" class="btn-primary text-xs px-6 py-3 shrink-0 whitespace-nowrap">获取工程支持</a>
+  </div>
+
+  <!-- Why Marine Electrification Matters -->
+  <section id="why-marine-electrification" class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-display-sm text-primary mb-8">为什么船舶电气化重要</h2>
+    <div class="max-w-4xl text-body-md text-body font-light flex flex-col gap-6">
+      <p>
+        海运业约占全球温室气体排放的2.9%，来自IMO的监管压力正在加速向更清洁推进技术的转型。船舶电气化——通过电池储能、混合动力柴油电力系统和岸电连接——代表了在现有船队中实现有意义的减排的最实用路径。
+      </p>
+      <p>
+        燃油成本降低是电气化最强劲的经济驱动力之一。混合动力推进系统在低负载运行期间回收能量，减少发动机运行时间，并实现最佳发动机负荷——在工况周期变化的船型上实现15–30%的燃油节省。对于频繁进行短途航行的渡轮和港口作业船，全电池电动运行可在电动模式下完全消除燃油成本。
+      </p>
+      <p>
+        除了燃油节省，电气化直接减少CO₂、NOx和SOx排放。电池在港口和排放控制区实现零排放运行，帮助船舶满足越来越严格的区域和国际空气质量标准。岸电连接允许船舶在靠泊时关闭柴油发电机，消除局部废气排放并降低港口噪音污染。
+      </p>
+      <p>
+        运营效益延伸到低负载工况下的效率。柴油发动机在低负载时运行不良——通常低于额定功率的25%——此时每千瓦时燃油消耗急剧增加且燃烧不完全。混合动力系统使用电池处理这些低效的低负载期，使发动机在其最佳效率区间运行或完全关闭。
+      </p>
+      <p>
+        从混合动力和电动推进中受益最大的船型包括：短途航线渡轮、具有动态定位工况周期的海上支援船、具有间歇性高功率需求的港口拖轮、作业船、服务船以及具有大量酒店负载的邮轮。每种船型在电池尺寸、储能规划和运营工况分析方面都面临独特的挑战——而这正是这些计算器所解决的。
+      </p>
+      <p>
+        正确的电池尺寸和储能规划对成功的船舶电气化至关重要。过大的电池组增加资本成本和重量而没有相应的效益。过小的电池组限制电动航程并迫使发动机提前启动。我们的计算器为找到电池容量、船舶需求和经济回报之间的最佳平衡提供了工程基础。
+      </p>
+    </div>
+  </section>
+
+  <!-- Why Shipowners Are Investing in Cleaner Operations -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-display-sm text-primary mb-4">船东为何投资更清洁的运营</h2>
+    <p class="text-body-md text-muted max-w-3xl mb-8 font-light">
+      海事脱碳不再仅仅是环境要求——而是商业必需。投资更清洁运营的船东获得法规合规、成本节省、市场优势和长期资产韧性。
+    </p>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {decisionBlocks.map((block) => (
+        <div class="bg-surface-card border border-hairline p-6 flex flex-col">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 flex-shrink-0 flex items-center justify-center border border-hairline">
+              <svg class="w-5 h-5 text-m-blue-light" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d={block.icon} />
+              </svg>
+            </div>
+            <h3 class="text-title-sm text-primary">{block.title}</h3>
+          </div>
+          <p class="text-body-sm text-muted flex-1">{block.content}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- Marine Decarbonization Resource Center -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-title-lg text-primary mb-4">海事脱碳资源中心</h2>
+    <p class="text-body-sm text-muted max-w-3xl mb-8">
+      面向船东、运营商、船舶设计师、顾问和船舶工程师的教育指南，探索电气化和排放减少。
+    </p>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {resourceArticles.map((article) => (
+        <a href={article.href} class="bg-surface-card border border-hairline p-4 hover:border-primary transition-colors">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-label-uppercase text-muted text-[10px]">资源中心</span>
+          </div>
+          <h3 class="text-title-sm text-primary">{article.title}</h3>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <!-- Marine Learning Center -->
+  {learnArticles.length > 0 && (
+    <section class="mb-16 border-t border-hairline pt-12">
+      <h2 class="text-title-lg text-primary mb-6">船舶电气化学习中心</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {learnArticles.map((article) => (
+          <a href={article.href} class="bg-surface-card border border-hairline p-4 hover:border-primary transition-colors">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-label-uppercase text-muted text-[10px]">学习中心</span>
+            </div>
+            <h3 class="text-title-sm text-primary">{article.title}</h3>
+          </a>
+        ))}
+      </div>
+    </section>
+  )}
+
+  <!-- Related Tools (Internal Linking) -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-title-lg text-primary mb-6">船舶工程计算器</h2>
+    <p class="text-body-sm text-muted max-w-3xl mb-8">
+      浏览我们完整的船舶CO₂计算器、船舶排放计算器和海事脱碳工具——专为船东、运营商和船舶工程师设计。
+    </p>
+    <RelatedTools tools={relatedTools} />
+  </section>
+
+  <!-- Advisory Section + Get Support Form -->
+  <section id="marine-advisory" class="mb-16 border-t border-hairline pt-12 scroll-mt-24">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+
+      <!-- Advisory Content -->
+      <div>
+        <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">专家咨询</span>
+        <h2 class="text-title-lg text-primary mb-4">需要关于减少船舶排放和能耗的建议？</h2>
+        <p class="text-body-md text-muted font-light mb-6">
+          与电池和船舶电气化专家就船舶脱碳、混合动力推进、储能尺寸、岸电集成和运营效率改进进行交流。
+        </p>
+        <h3 class="text-label-uppercase text-primary text-xs mb-3">我们能提供的帮助</h3>
+        <ul class="flex flex-col gap-2 mb-6">
+          {advisoryBenefits.map((benefit) => (
+            <li class="flex items-start gap-2 text-body-sm text-muted">
+              <span class="text-m-blue-light shrink-0 mt-0.5">→</span>
+              <span>{benefit}</span>
+            </li>
+          ))}
+        </ul>
+        <div class="bg-surface-soft border border-hairline p-4 text-caption text-muted">
+          <span class="text-primary font-bold">教育性咨询服务。</span> 我们团队提供工程指导和初步可行性分析。最终船舶设计、船级认证和法规合规请咨询持证船舶工程师和船级社。
+        </div>
+      </div>
+
+      <!-- Get Support Form -->
+      <div>
+        <CalculatorCard>
+          <h3 class="text-title-md text-primary mb-6 uppercase tracking-wider">获取支持</h3>
+          <form id="marine-support-form" class="flex flex-col gap-4">
+            <input type="hidden" name="access_key" value={WEB3FORMS_ACCESS_KEY} />
+            <input type="hidden" name="subject" value="Marine Electrification Support Request" />
+            <input type="hidden" name="from_name" value="Battery Calculators - Marine Advisory" />
+            <input type="text" name="honeypot" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;opacity:0;height:0;width:0;overflow:hidden;" />
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="flex flex-col gap-1.5">
+                <label for="first-name" class="text-label-uppercase text-[10px] text-primary">名 *</label>
+                <input type="text" id="first-name" name="first_name" required class="text-input" placeholder="名" />
+              </div>
+              <div class="flex flex-col gap-1.5">
+                <label for="last-name" class="text-label-uppercase text-[10px] text-primary">姓 *</label>
+                <input type="text" id="last-name" name="last_name" required class="text-input" placeholder="姓" />
+              </div>
+            </div>
+
+            <div class="flex flex-col gap-1.5">
+              <label for="business-email" class="text-label-uppercase text-[10px] text-primary">商务邮箱 *</label>
+              <input type="email" id="business-email" name="email" required class="text-input" placeholder="name@company.com" />
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="flex flex-col gap-1.5">
+                <label for="company" class="text-label-uppercase text-[10px] text-primary">公司 *</label>
+                <input type="text" id="company" name="company" required class="text-input" placeholder="公司名称" />
+              </div>
+              <div class="flex flex-col gap-1.5">
+                <label for="country" class="text-label-uppercase text-[10px] text-primary">国家/地区 *</label>
+                <input type="text" id="country" name="country" required class="text-input" placeholder="国家" />
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="flex flex-col gap-1.5">
+                <label for="job-title" class="text-label-uppercase text-[10px] text-primary">职位 *</label>
+                <input type="text" id="job-title" name="job_title" required class="text-input" placeholder="职位" />
+              </div>
+              <div class="flex flex-col gap-1.5">
+                <label for="phone" class="text-label-uppercase text-[10px] text-primary">电话号码</label>
+                <input type="tel" id="phone" name="phone" class="text-input" placeholder="+1 (555) 000-0000" />
+              </div>
+            </div>
+
+            <div class="flex flex-col gap-1.5">
+              <label for="comments" class="text-label-uppercase text-[10px] text-primary">留言/项目详情 *</label>
+              <textarea id="comments" name="comments" required class="text-input h-28 resize-none" placeholder="描述您的船舶、航线和脱碳目标..."></textarea>
+            </div>
+
+            <div class="flex items-start gap-2">
+              <input type="checkbox" id="consent" name="consent" required class="mt-1 shrink-0" />
+              <label for="consent" class="text-caption text-muted leading-relaxed">
+                我同意就我的咨询被联系，并理解我的信息将根据网站<a href="/zh/privacy/" class="underline underline-offset-2 hover:text-primary transition-colors">隐私政策</a>进行处理。
+              </label>
+            </div>
+
+            <button type="submit" class="btn-primary w-full text-xs h-12 mt-2">联系Battery Calculators专家</button>
+          </form>
+
+          <div id="form-success" class="hidden mt-4 p-4 border border-green-600 bg-surface-soft text-body-sm text-green-500">
+            感谢您的咨询。船舶电气化专家将在1–2个工作日内与您联系。
+          </div>
+          <div id="form-error" class="hidden mt-4 p-4 border border-m-red bg-surface-soft text-body-sm text-m-red">
+            出了点问题。请重试或直接给我们发邮件。
+            <span class="block mt-2">如果表单不工作，请通过<a href="/zh/contact/" class="underline underline-offset-2 hover:text-primary transition-colors">联系页面</a>联系我们。</span>
+          </div>
+        </CalculatorCard>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <FAQSection items={faqItems} />
+  </section>
+
+  <!-- Engineering Disclaimer -->
+  <section class="bg-surface-soft border border-hairline p-6 text-caption text-muted mb-8">
+    <span class="text-primary font-bold text-[10px] tracking-wider uppercase border border-hairline px-1.5 py-0.5 mr-2 inline-block mb-3">
+      工程免责声明
+    </span>
+    所有计算器仅提供教育性工程估算。旨在用于初步规划、可行性分析和学习目的。这些工具不能替代船级社计算、船旗国提交、IMO合规文件或监管备案。船舶电气和推进系统必须遵守适用的船级社规则、船旗国法规和IMO公约。最终系统设计和官方合规请咨询持证船舶工程师和船舶设计师。
+  </section>
+
+  <!-- Form Submission Script -->
+  <script>
+    const form = document.getElementById('marine-support-form') as HTMLFormElement;
+    const successDiv = document.getElementById('form-success');
+    const errorDiv = document.getElementById('form-error');
+
+    form?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const honeypot = form.querySelector('input[name="honeypot"]') as HTMLInputElement;
+      if (honeypot?.value) {
+        console.log('[MarineForm] Honeypot triggered, aborting.');
+        return;
+      }
+
+      const submitBtn = form.querySelector('button[type="submit"]') as HTMLButtonElement;
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'SENDING...';
+      }
+
+      try {
+        const formData = new FormData(form);
+        console.log('[MarineForm] Submitting to Web3Forms...');
+        console.log('[MarineForm] Fields:', Object.fromEntries(formData.entries()));
+
+        const response = await fetch('https://api.web3forms.com/submit', {
+          method: 'POST',
+          body: formData,
+        });
+
+        const result = await response.json();
+        console.log('[MarineForm] Response:', result);
+
+        if (result.success) {
+          form.reset();
+          if (successDiv) successDiv.classList.remove('hidden');
+          if (errorDiv) errorDiv.classList.add('hidden');
+          setTimeout(() => { if (successDiv) successDiv.classList.add('hidden'); }, 10000);
+        } else {
+          console.error('[MarineForm] Submission failed:', result.message);
+          throw new Error(result.message || 'Submission failed');
+        }
+      } catch (err) {
+        console.error('[MarineForm] Error:', err);
+        if (errorDiv) errorDiv.classList.remove('hidden');
+        if (successDiv) successDiv.classList.add('hidden');
+        setTimeout(() => { if (errorDiv) errorDiv.classList.add('hidden'); }, 8000);
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Contact Battery Calculators Expert';
+        }
+      }
+    });
+  </script>
+
+</Layout>

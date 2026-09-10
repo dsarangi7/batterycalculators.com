@@ -1,0 +1,531 @@
+---
+import CalculatorLayout from '../../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import InputField from '../../../components/InputField.astro';
+import ResultBox from '../../../components/ResultBox.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import WorkedExample from '../../../components/WorkedExample.astro';
+import ComparisonTable from '../../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../../components/EngineeringDiagram.astro';
+
+const whatIs = `太阳能系统配置决定了太阳能+储能安装的完整组件尺寸：满足日常用电需求的<strong>太阳能阵列容量</strong>（以瓦特为单位）、用于夜间和阴天储能的<strong>蓄电池组容量</strong>（以Wh和Ah为单位），以及安全调节充电的<strong>充电控制器额定值</strong>（以安培为单位）。三个组件相互关联——阵列容量决定充电速率，电池容量决定自持天数，充电控制器必须能承受电池电压下阵列的最大电流。合理选型需考虑<strong>峰值日照时数</strong>（取决于所在位置的太阳能资源）、<strong>系统损耗</strong>（逆变器效率、线路损耗、温度折减）以及<strong>放电深度</strong>限制（取决于电池化学类型）。`;
+
+const whyItMatters = [
+  "太阳能阵列容量不足时，无法在冬季短日照期间为蓄电池组充电，导致SOC持续下降。",
+  "阵列容量过大则浪费资金，产生多余热量或以低电价并网输出。",
+  "蓄电池组相对于阵列容量不足会导致阴天频繁深放电，加速电池衰减。",
+  "充电控制器容量不足会削峰太阳能发电，在峰值日照时段浪费可用能量。",
+  "未考虑系统损耗（15–25%）会导致系统实际性能持续低于预期。",
+];
+
+const practicalApplications = [
+  { title: "离网家庭系统", description: "为脱离电网的家庭设计完整的太阳能+电池系统。" },
+  { title: "并网带备用电源", description: "为并网家庭配置太阳能+电池系统，以备停电时使用。" },
+  { title: "房车移动太阳能", description: "为房车、游艇和越野车辆配置便携式太阳能系统。" },
+  { title: "偏远小屋与通信", description: "为偏远小屋、通信塔和物联网设施设计自主供电系统。" },
+  { title: "工商业储能", description: "为工商业太阳能+电池系统进行需量电费削减和自发自用容量选型。" },
+];
+
+const expertNotes = [
+  { title: '系统损耗至关重要', variant: 'engineering', content: '实际太阳能系统仅能提供额定输出的75–85%，原因包括逆变器效率（92–96%）、线路损耗（2–5%）、温度折减（5–15%）和灰尘损耗（2–5%）。应始终按实际发电量而非铭牌功率进行阵列选型。' },
+  { title: '充电控制器选型', variant: 'warning', content: 'MPPT控制器必须能承受阵列的最大开路电压（Voc）和电池电压下的最大输出电流。低温会升高面板电压——务必在最低预期温度下检查Voc，而非仅在STC（25°C）条件下。' },
+];
+
+const trustSection = {
+  text: "本计算器采用标准行业方法对完整的太阳能+储能系统进行建模。模型考虑了能量平衡、太阳能资源、系统损耗、自持天数要求以及组件之间的相互关系。所有中间计算值均已显示以供验证。",
+  link: { label: "查看完整方法论", href: "/zh/methodology/" },
+};
+
+const references = [
+  { title: "NREL — 太阳能+储能选型指南", url: "https://www.nrel.gov/solar/solar-plus-storage-sizing.html", source: "美国国家可再生能源实验室" },
+  { title: "美国能源部 — 太阳能电池储能概述", url: "https://www.energy.gov/eere/solar/solar-plus-storage", source: "美国能源部" },
+  { title: "Victron Energy — 太阳能系统设计", url: "https://www.victronenergy.com/help-center", source: "Victron Energy" },
+  { title: "Morningstar — MPPT选型指南", url: "https://www.morningstarcorp.com/products/mppt-charge-controllers", source: "Morningstar Corporation" },
+];
+
+const faqItems = [
+  {
+    question: "如何估算每日用电量？",
+    answer: "将每个电器的功率乘以每日使用时间后求和。示例：5盏LED灯（10W × 6h）= 300Wh，冰箱（150W × 8h）= 1,200Wh，电视（100W × 4h）= 400Wh。总计：1,900Wh即1.9kWh。请查看电费账单获取实际日均用电量。",
+  },
+  {
+    question: "如何确定所在位置的峰值日照时数？",
+    answer: "峰值日照时数（PSH）代表1,000W/m²太阳辐照度的等效小时数。使用NREL的PVWatts工具或搜索「峰值日照时数 城市名」。典型值：亚利桑那6.5h，伦敦2.5h，孟买5h，悉尼5.5h。",
+  },
+  {
+    question: "我需要多大的太阳能阵列？",
+    answer: "阵列容量（W）= 每日用电量（Wh）/（PSH × 系统效率）。系统效率通常为0.75–0.85。以每日5kWh、4个峰值日照时数、80%效率为例：5,000 / (4 × 0.80) = 1,563W。",
+  },
+  {
+    question: "需要多少电池？",
+    answer: "电池容量（Wh）= 每日用电量 × 自持天数 / 放电深度。以每日5kWh、2天自持、80%放电深度为例：5,000 × 2 / 0.80 = 12,500Wh（12.5kWh）。在48V电压下，容量为260Ah。",
+  },
+  {
+    question: "需要多大容量的充电控制器？",
+    answer: "根据电池电压下阵列的最大输出电流选型。1,500W阵列在48V时产生约31A电流。预留25%余量：选择40A MPPT控制器。同时确认控制器能承受阵列的开路电压。",
+  },
+  {
+    question: "应该使用12V、24V还是48V系统电压？",
+    answer: "1kW以上系统推荐48V（降低电流和电缆需求）。500W–1kW系统使用24V。仅500W以下小系统使用12V。电压越高 = 电缆越细，损耗越小，成本越低。",
+  },
+  {
+    question: "太阳能系统最适合哪种电池化学类型？",
+    answer: "推荐LFP（磷酸铁锂）：5,000+次循环寿命，80–90%放电深度，热稳定性好，免维护。NMC能量密度更高但寿命较短。铅酸前期成本最低但需限制50%放电深度且需频繁更换。",
+  },
+  {
+    question: "如何应对阴雨天？",
+    answer: "增加自持天数以覆盖连续阴天。离网系统通常需要2–4天。冬季发电量可能比夏季低50–70%——按最不利月份选型。",
+  },
+  {
+    question: "后续能否扩容系统？",
+    answer: "大多数锂电池系统支持模块化扩展。从一开始就选择可扩展的平台以备扩容。所有电池串应匹配化学类型、生产日期和容量。",
+  },
+  {
+    question: "系统总成本估算多少？",
+    answer: "粗略估算：电池容量$1.50–$2.50/Wh，太阳能面板$0.70–$1.00/W，充电控制器和逆变器$0.30–$0.50/W。10kWh系统安装总价通常在$15,000–$25,000之间。",
+  },
+];
+
+const commonMistakes = [
+  "仅按晴天选型——离网系统必须考虑连续阴天。按最不利月份而非年均值确定自持天数。",
+  "忽略系统损耗——1,000W阵列每小时并不产生1,000Wh。逆变器效率、线路损耗和温度会使实际输出降低15–25%。",
+  "充电控制器与阵列不匹配——MPPT控制器容量不足会削峰发电，浪费正午时段的太阳能。",
+  "选择错误的系统电压——1kW以上负载的12V系统需要极粗电缆。住宅系统请使用48V。",
+  "忽略季节性变化——冬季发电量可能比夏季低50–70%。按夏季选型的系统可能在冬季失效。",
+  "混用新旧电池——切勿向已衰减的电池组添加新电池。内阻不匹配会导致负载不均。",
+  "阵列过大而电池容量不足——没有足够的电池储存，多余太阳能无处可用，导致发电被削峰。",
+  "忽略逆变器效率——电池必须提供比负载消耗更多的能量。92%效率的逆变器会浪费8%的能量。",
+];
+
+const relatedArticles = [
+  { href: "/zh/learn/how-to-size-solar-battery-bank/", title: "如何选型太阳能蓄电池组" },
+  { href: "/zh/learn/solar-storage-sizing-guide/", title: "太阳能系统选型指南" },
+  { href: "/zh/learn/charger-sizing-guide/", title: "MPPT与PWM控制器对比" },
+  { href: "/zh/learn/solar-battery-storage-explained/", title: "峰值日照时数详解" },
+];
+---
+
+<CalculatorLayout
+  title="太阳能系统配置器 | 电池计算器"
+  description="设计完整的太阳能+储能系统，包括阵列、蓄电池组和充电控制器的容量选型。"
+  lang="zh"
+  faqItems={faqItems}
+  commonMistakes={commonMistakes}
+  relatedArticles={relatedArticles}
+  relatedCalculators={[
+    { href: "/zh/tools/solar-battery-sizing-calculator/", title: "太阳能电池选型", description: "根据每日用电量选型蓄电池组。" },
+    { href: "/zh/tools/battery-sizing-calculator/", title: "电池选型工具", description: "根据用电量进行通用电池选型。" },
+    { href: "/zh/tools/charging-time-calculator/", title: "充电时间计算器", description: "估算CC-CV充电时长。" },
+    { href: "/zh/tools/energy-conversion-calculator/", title: "能量转换", description: "在容量Ah与能量Wh之间进行转换。" },
+    { href: "/zh/tools/runtime-calculator/", title: "续航时间计算器", description: "根据负载功率曲线计算续航时间。" },
+    { href: "/zh/tools/parallel-string-calculator/", title: "并联电池串工具", description: "配置串/并联电池组以匹配目标。" },
+  ]}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+>
+
+  <!-- 主计算器网格 -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+
+    <!-- 输入表单 -->
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">系统需求</h3>
+      <div class="flex flex-col gap-6">
+        <InputField id="daily-consumption" label="每日用电量 (kWh)" value={5} min={0.1} step="any" helperText="家庭每日总用电量。请查看电费账单。" />
+        <InputField id="peak-sun-hours" label="峰值日照时数 (小时)" value={4} min={0.5} step="any" helperText="您所在位置的平均等效满日照时数。搜索「峰值日照时数 城市名」。" />
+        <InputField id="autonomy" label="自持天数" value={2} min={1} max={7} step={1} helperText="电池在无太阳能输入时需为负载供电的天数。" />
+        <InputField id="voltage" label="系统电压 (V)" value={48} min={12} step={1} helperText="1kW以上系统推荐48V。500W–1kW系统使用24V。500W以下使用12V。" />
+        <InputField
+          id="chemistry"
+          label="电池化学类型"
+          type="select"
+          value="lfp"
+          helperText="太阳能系统推荐LFP：寿命最长且最安全。"
+          options={[
+            { label: "LFP（磷酸铁锂）— 90% 放电深度", value: "lfp" },
+            { label: "NMC — 80% 放电深度", value: "nmc" },
+            { label: "铅酸（AGM/Gel）— 50% 放电深度", value: "lead-acid" },
+          ]}
+        />
+        <InputField id="dod" label="放电深度 (%)" value={80} min={10} max={100} step={1} helperText="LFP：90%，NMC：80%，铅酸：50%。选择化学类型后自动调整。" />
+        <InputField id="system-efficiency" label="系统效率 (%)" value={82} min={60} max={95} step={1} helperText="考虑逆变器、线路和温度损耗。典型值80–85%。" />
+      </div>
+    </CalculatorCard>
+
+    <!-- 结果 -->
+    <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">系统设计</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <ResultBox
+            label="太阳能阵列容量"
+            value="1,524 W"
+            suffix="建议1.5 kW"
+            variant="primary"
+            id="result-array"
+          />
+          <ResultBox
+            label="蓄电池组容量"
+            value="12,500 Wh"
+            suffix="48V下12.5 kWh"
+            id="result-battery"
+          />
+          <ResultBox
+            label="充电控制器"
+            value="40 A"
+            suffix="MPPT，最大150V输入"
+            id="result-controller"
+          />
+          <ResultBox
+            label="电池容量"
+            value="260.4 Ah"
+            suffix="额定48V"
+            id="result-ah"
+          />
+        </div>
+      </div>
+
+      <!-- 操作区域 -->
+      <div class="border-t border-hairline pt-6">
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">组件清单</h4>
+        <div class="text-body-sm text-muted" id="component-list">
+          <p class="mb-1">太阳能面板：4 × 400W面板（总计1,600W）</p>
+          <p class="mb-1">蓄电池组：48V 260Ah LFP（例如：2 × 280Ah并联）</p>
+          <p class="mb-1">充电控制器：40A MPPT（例如：Victron 150/35或150/45）</p>
+          <p class="mb-1">逆变器：3,000W–5,000W纯正弦波，48V输入</p>
+        </div>
+      </div>
+    </CalculatorCard>
+
+  </div>
+
+  <!-- 不同应用场景的系统容量对比 -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-title-lg text-primary uppercase mb-6 tracking-wider">不同应用场景的系统容量</h2>
+    <p class="text-body-sm text-muted mb-8">基于您指定的位置和效率参数，常见太阳能+电池应用场景的参考选型。</p>
+
+    <div class="overflow-x-auto">
+      <table class="w-full border-collapse">
+        <thead>
+          <tr class="border-b border-hairline">
+            <th class="text-label-uppercase text-xs text-primary p-3 text-left">应用场景</th>
+            <th class="text-label-uppercase text-xs text-primary p-3 text-left">日用电量</th>
+            <th class="text-label-uppercase text-xs text-primary p-3 text-left">太阳能阵列</th>
+            <th class="text-label-uppercase text-xs text-primary p-3 text-left">蓄电池组</th>
+            <th class="text-label-uppercase text-xs text-primary p-3 text-left">控制器</th>
+            <th class="text-label-uppercase text-xs text-primary p-3 text-left">预估成本</th>
+          </tr>
+        </thead>
+        <tbody id="comparison-table-body">
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 公式与计算示例 -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">公式与计算示例</h2>
+    <FormulaBox title="数学公式">
+      <p>
+        太阳能阵列容量根据峰值日照时数和系统损耗确定，以满足每日用电需求：
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        阵列容量 (W) = 每日用电量 (Wh) / (PSH × 效率)
+      </div>
+      <p>
+        蓄电池组根据自持天数和放电深度限制确定容量：
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        电池容量 (Wh) = (每日用电量 × 自持天数) / 放电深度
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        电池容量 (Ah) = 电池容量 (Wh) / 系统电压
+      </div>
+      <p>
+        充电控制器必须能承受阵列的最大输出电流：
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        控制器电流 (A) = 阵列容量 (W) / 电池电压 × 1.25
+      </div>
+      <p class="text-xs text-muted mt-4">
+        <strong>变量说明：</strong>PSH = 峰值日照时数，效率 = 系统折减系数（通常0.75–0.85），放电深度 = 小数形式。控制器选型的1.25×系数为低温电压升高预留余量。
+      </p>
+    </FormulaBox>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample
+        number={1}
+        title="小型木屋 — 每日3 kWh，4个峰值日照时数"
+        scenario="一个离网木屋日用电3kWh，峰值日照时数为4小时。设计一套48V LFP系统，自持天数为2天。"
+        inputs={[
+          { label: "每日用电量", value: "3 kWh/天" },
+          { label: "峰值日照时数", value: "4小时" },
+          { label: "自持天数", value: "2天" },
+          { label: "系统电压", value: "48V" },
+          { label: "电池化学类型", value: "LFP（磷酸铁锂）" },
+          { label: "系统效率", value: "82%" },
+        ]}
+        steps={[
+          { label: "太阳能阵列", formula: "3,000 / (4 × 0.82)", result: "915W → 建议1,000W" },
+          { label: "电池容量", formula: "(3,000 × 2) / 0.90", result: "6,667 Wh (6.7 kWh)" },
+          { label: "电池安时", formula: "6,667 / 48", result: "138.9 Ah" },
+          { label: "充电控制器", formula: "1,000 / 48 × 1.25", result: "26A → 30A MPPT" },
+        ]}
+        answer="1kW太阳能阵列，6.7kWh（48V下139Ah）LFP蓄电池组，30A MPPT控制器。"
+        interpretation="一套紧凑且经济的系统。在4个峰值日照时数下，阵列每天可发电约3.3kWh——足以在一天内充满电池并满足日常用电需求。"
+        variant="solar"
+      />
+
+      <WorkedExample
+        number={2}
+        title="离网住宅 — 每日10 kWh，3.5个峰值日照时数"
+        scenario="一栋离网住宅日用电10kWh，冬季峰值日照时数为3.5小时。设计一套48V LFP系统，自持天数为3天以应对连续阴天。"
+        inputs={[
+          { label: "每日用电量", value: "10 kWh/天" },
+          { label: "峰值日照时数", value: "3.5小时" },
+          { label: "自持天数", value: "3天" },
+          { label: "系统电压", value: "48V" },
+          { label: "电池化学类型", value: "LFP（磷酸铁锂）" },
+          { label: "系统效率", value: "80%" },
+        ]}
+        steps={[
+          { label: "太阳能阵列", formula: "10,000 / (3.5 × 0.80)", result: "3,571W → 3,600W" },
+          { label: "电池容量", formula: "(10,000 × 3) / 0.90", result: "33,333 Wh (33.3 kWh)" },
+          { label: "电池安时", formula: "33,333 / 48", result: "694.4 Ah" },
+          { label: "充电控制器", formula: "3,600 / 48 × 1.25", result: "93.75A → 100A MPPT" },
+        ]}
+        answer="3.6kW太阳能阵列，33.3kWh（48V下694Ah）LFP蓄电池组，100A MPPT控制器。"
+        interpretation="一套大型离网系统。3天自持天数可应对连续阴天。大容量阵列确保即使在冬季短日照期间也能完全充满电池。"
+        variant="solar"
+      />
+
+      <WorkedExample
+        number={3}
+        title="房车移动系统 — 每日2 kWh，太阳能条件多变"
+        scenario="一辆房车日用电2kWh，太阳能条件多变。峰值日照时数在2小时（森林地区）到6小时（沙漠地区）之间。设计一套12V LFP系统，自持天数为2天。"
+        inputs={[
+          { label: "每日用电量", value: "2 kWh/天" },
+          { label: "峰值日照时数", value: "2–6小时（最不利：2小时）" },
+          { label: "自持天数", value: "2天" },
+          { label: "系统电压", value: "12V" },
+          { label: "电池化学类型", value: "LFP（磷酸铁锂）" },
+          { label: "系统效率", value: "78%" },
+        ]}
+        steps={[
+          { label: "太阳能阵列（最不利情况）", formula: "2,000 / (2 × 0.78)", result: "1,282W → 1,400W" },
+          { label: "电池容量", formula: "(2,000 × 2) / 0.90", result: "4,444 Wh (4.4 kWh)" },
+          { label: "电池安时", formula: "4,444 / 12.8", result: "347.2 Ah" },
+          { label: "充电控制器", formula: "1,400 / 12.8 × 1.25", result: "136.7A → 150A MPPT" },
+        ]}
+        answer="1.4kW太阳能阵列（便携式），4.4kWh（12V下347Ah）LFP蓄电池组，150A MPPT控制器。"
+        interpretation="移动系统必须按最不利太阳能条件规划。1.4kW便携式阵列确保在森林地区也能充电。在12V下大电流要求粗电缆——若负载允许可考虑24V。"
+        variant="solar"
+      />
+    </div>
+  </section>
+
+  <EngineeringDiagram
+    title="太阳能+储能系统"
+    description="从太阳能面板经控制器、电池到逆变器输出负载的完整能量流"
+    variant="system"
+    steps={[
+      { label: "太阳能面板", icon: "solar" },
+      { label: "MPPT控制器", icon: "charge" },
+      { label: "蓄电池组", icon: "battery" },
+      { label: "逆变器+负载", icon: "inverter" },
+    ]}
+  />
+
+  <ComparisonTable
+    title="按应用场景选型系统"
+    headers={["应用场景", "日用电量", "太阳能阵列", "蓄电池组", "控制器", "逆变器"]}
+    rows={[
+      ["手机充电", "0.05 kWh", "50W", "100Wh (12V)", "5A PWM", "100W"],
+      ["房车/露营车", "2 kWh", "400–800W", "200–400Ah (12V)", "20–40A MPPT", "1,000–2,000W"],
+      ["小型木屋", "3–5 kWh", "1–2kW", "100–200Ah (48V)", "30–60A MPPT", "3,000W"],
+      ["小型住宅", "5–10 kWh", "3–5kW", "200–400Ah (48V)", "60–100A MPPT", "5,000–8,000W"],
+      ["全屋供电", "15–30 kWh", "8–15kW", "400–800Ah (48V)", "100–200A MPPT", "10,000–15,000W"],
+      ["工商业", "50+ kWh", "20–100kW", "多组48V电池组", "多台MPPT", "50–200kW"],
+    ]}
+    caption="常见太阳能+电池应用场景参考选型"
+  />
+
+  <ComparisonTable
+    title="太阳能储能电池化学类型对比"
+    headers={["化学类型", "循环寿命", "放电深度限制", "能量密度", "成本/Wh", "最佳应用"]}
+    rows={[
+      ["LFP（磷酸铁锂）", "5,000+次", "90%", "中等", "$0.25–$0.40", "太阳能、固定储能"],
+      ["NMC", "2,000–3,000", "80%", "高", "$0.30–$0.50", "电动汽车、空间受限场景"],
+      ["铅酸（AGM）", "500–1,000", "50%", "低", "$0.10–$0.20", "预算有限、仅作备用"],
+      ["LTO", "10,000+次", "90%", "低", "$0.50–$1.00", "极端环境"],
+    ]}
+    caption="太阳能储能电池技术对比"
+  />
+
+  <FAQSection items={faqItems} />
+
+  <!-- 计算脚本 -->
+  <script>
+    const consumptionInput = document.getElementById('daily-consumption') as HTMLInputElement;
+    const pshInput = document.getElementById('peak-sun-hours') as HTMLInputElement;
+    const autonomyInput = document.getElementById('autonomy') as HTMLInputElement;
+    const voltageInput = document.getElementById('voltage') as HTMLInputElement;
+    const chemistrySelect = document.getElementById('chemistry') as HTMLSelectElement;
+    const dodInput = document.getElementById('dod') as HTMLInputElement;
+    const efficiencyInput = document.getElementById('system-efficiency') as HTMLInputElement;
+
+    // Result elements
+    const resultArrayBox = document.getElementById('result-array');
+    const resultArrayValue = resultArrayBox?.querySelector('.text-display-md') as HTMLElement;
+    const resultArrayNote = resultArrayBox?.querySelector('.text-caption') as HTMLElement;
+
+    const resultBatteryBox = document.getElementById('result-battery');
+    const resultBatteryValue = resultBatteryBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultBatteryNote = resultBatteryBox?.querySelector('.text-caption') as HTMLElement;
+
+    const resultControllerBox = document.getElementById('result-controller');
+    const resultControllerValue = resultControllerBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultControllerNote = resultControllerBox?.querySelector('.text-caption') as HTMLElement;
+
+    const resultAhBox = document.getElementById('result-ah');
+    const resultAhValue = resultAhBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultAhNote = resultAhBox?.querySelector('.text-caption') as HTMLElement;
+
+    const componentList = document.getElementById('component-list');
+    const comparisonTableBody = document.getElementById('comparison-table-body');
+
+    const CHEMISTRY_DOD: Record<string, number> = {
+      lfp: 90,
+      nmc: 80,
+      'lead-acid': 50,
+    };
+
+    function getChemistryName(chem: string): string {
+      return chem === 'lfp' ? 'LFP' : chem === 'nmc' ? 'NMC' : 'Lead-Acid';
+    }
+
+    function calculateSystem(
+      dailyKwh: number, psh: number, autonomy: number,
+      voltage: number, _chemistry: string, dod: number, efficiency: number
+    ) {
+      const dailyWh = dailyKwh * 1000;
+      const effDecimal = efficiency / 100;
+      const dodDecimal = dod / 100;
+
+      // Solar array
+      const arrayW = dailyWh / (psh * effDecimal);
+
+      // Battery
+      const batteryWh = (dailyWh * autonomy) / dodDecimal;
+      const batteryAh = batteryWh / voltage;
+
+      // Charge controller
+      const controllerA = (arrayW / voltage) * 1.25;
+
+      // Round to nice numbers
+      const arrayWRounded = Math.ceil(arrayW / 100) * 100;
+      const controllerARounded = Math.ceil(controllerA / 10) * 10;
+      const batteryAhRounded = Math.round(batteryAh * 10) / 10;
+      const batteryWhRounded = Math.round(batteryWh);
+
+      return { arrayW, arrayWRounded, batteryWh, batteryWhRounded, batteryAh, batteryAhRounded, controllerA, controllerARounded };
+    }
+
+    function updateCalculations() {
+      const dailyKwh = parseFloat(consumptionInput.value) || 5;
+      const psh = parseFloat(pshInput.value) || 4;
+      const autonomy = parseFloat(autonomyInput.value) || 2;
+      const voltage = parseFloat(voltageInput.value) || 48;
+      const chemistry = chemistrySelect.value;
+      const dod = parseFloat(dodInput.value) || 80;
+      const efficiency = parseFloat(efficiencyInput.value) || 82;
+
+      const r = calculateSystem(dailyKwh, psh, autonomy, voltage, chemistry, dod, efficiency);
+
+      // Render array
+      if (resultArrayValue) resultArrayValue.textContent = `${r.arrayWRounded.toLocaleString()} W`;
+      if (resultArrayNote) resultArrayNote.textContent = `${(r.arrayWRounded / 1000).toFixed(1)} kW recommended`;
+
+      // Render battery
+      if (resultBatteryValue) resultBatteryValue.textContent = `${r.batteryWhRounded.toLocaleString()} Wh`;
+      if (resultBatteryNote) resultBatteryNote.textContent = `${(r.batteryWhRounded / 1000).toFixed(1)} kWh at ${voltage}V`;
+
+      // Render controller
+      if (resultControllerValue) resultControllerValue.textContent = `${r.controllerARounded} A`;
+      if (resultControllerNote) resultControllerNote.textContent = `MPPT, 150V input max`;
+
+      // Render Ah
+      if (resultAhValue) resultAhValue.textContent = `${r.batteryAhRounded} Ah`;
+      if (resultAhNote) resultAhNote.textContent = `At ${voltage}V nominal`;
+
+      // Render component list
+      if (componentList) {
+        const panelCount = Math.ceil(r.arrayWRounded / 400);
+        const panelWattage = Math.round(r.arrayWRounded / panelCount);
+        const batteryModules = voltage >= 48
+          ? Math.max(2, Math.ceil(r.batteryAhRounded / 280))
+          : Math.max(1, Math.ceil(r.batteryAhRounded / 200));
+        const ahPerModule = Math.round(r.batteryAhRounded / batteryModules);
+        const inverterW = Math.max(2000, Math.ceil((dailyKwh * 1000 / 8) / 500) * 500);
+
+        componentList.innerHTML = `
+          <p class="mb-1">Solar Panels: ${panelCount} × ${panelWattage}W panels (${r.arrayWRounded.toLocaleString()}W total)</p>
+          <p class="mb-1">Battery Bank: ${voltage}V ${r.batteryAhRounded}Ah ${getChemistryName(chemistry)} (${batteryModules} × ${ahPerModule}Ah in ${batteryModules > 1 ? 'parallel' : 'series'})</p>
+          <p class="mb-1">Charge Controller: ${r.controllerARounded}A MPPT (e.g., Victron 150/${Math.min(r.controllerARounded, 45)} or ${r.controllerARounded}A unit)</p>
+          <p class="mb-1">Inverter: ${inverterW.toLocaleString()}W pure sine wave, ${voltage}V input</p>
+        `;
+      }
+
+      // Render comparison table
+      if (comparisonTableBody) {
+        const applications = [
+          { name: 'Phone Charging', dailyKwh: 0.05, psh: psh, autonomy: 1, voltage: 12, chem: 'lfp', dod: 90, eff: 75 },
+          { name: 'RV / Camper', dailyKwh: 2, psh: psh, autonomy: 2, voltage: 12, chem: 'lfp', dod: 90, eff: 78 },
+          { name: 'Tiny Cabin', dailyKwh: Math.min(dailyKwh, 5), psh: psh, autonomy: autonomy, voltage: 48, chem: 'lfp', dod: 90, eff: 82 },
+          { name: 'Your System', dailyKwh: dailyKwh, psh: psh, autonomy: autonomy, voltage: voltage, chem: chemistry, dod: dod, eff: efficiency },
+          { name: 'Full Home', dailyKwh: Math.max(dailyKwh, 20), psh: psh, autonomy: Math.max(autonomy, 2), voltage: 48, chem: 'lfp', dod: 90, eff: 85 },
+          { name: 'Commercial', dailyKwh: 50, psh: psh, autonomy: 1, voltage: 48, chem: 'lfp', dod: 90, eff: 85 },
+        ];
+
+        comparisonTableBody.innerHTML = '';
+        for (const app of applications) {
+          const s = calculateSystem(app.dailyKwh, app.psh, app.autonomy, app.voltage, app.chem, app.dod, app.eff);
+          const isCurrent = app.name === 'Your System';
+          const row = document.createElement('tr');
+          row.className = `border-b border-hairline ${isCurrent ? 'bg-surface-elevated' : ''}`;
+          row.innerHTML = `
+            <td class="p-3 text-body-sm text-primary ${isCurrent ? 'font-bold' : ''}">${isCurrent ? '→ ' : ''}${app.name}</td>
+            <td class="p-3 text-body-sm text-muted">${app.dailyKwh} kWh</td>
+            <td class="p-3 text-body-sm text-muted">${(s.arrayWRounded / 1000).toFixed(1)} kW</td>
+            <td class="p-3 text-body-sm text-muted">${(s.batteryWhRounded / 1000).toFixed(1)} kWh</td>
+            <td class="p-3 text-body-sm text-muted">${s.controllerARounded}A</td>
+            <td class="p-3 text-body-sm text-muted">${s.arrayWRounded > 5000 ? '$' + ((s.batteryWhRounded * 0.35 + s.arrayWRounded * 0.85 + s.controllerARounded * 50 + 3000) / 1000).toFixed(1) + 'k' : '$' + ((s.batteryWhRounded * 0.35 + s.arrayWRounded * 0.85 + s.controllerARounded * 50 + 1000) / 1000).toFixed(1) + 'k'}</td>
+          `;
+          comparisonTableBody.appendChild(row);
+        }
+      }
+    }
+
+    // Sync DoD with chemistry selection
+    chemistrySelect.addEventListener('change', () => {
+      const chem = chemistrySelect.value;
+      if (CHEMISTRY_DOD[chem]) {
+        dodInput.value = String(CHEMISTRY_DOD[chem]);
+      }
+      updateCalculations();
+    });
+
+    [consumptionInput, pshInput, autonomyInput, voltageInput, dodInput, efficiencyInput].forEach(el => {
+      el.addEventListener('input', updateCalculations);
+    });
+
+    updateCalculations();
+  </script>
+
+</CalculatorLayout>

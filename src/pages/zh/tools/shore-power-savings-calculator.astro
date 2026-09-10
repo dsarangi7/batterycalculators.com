@@ -1,0 +1,737 @@
+---
+import CalculatorLayout from '../../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import InputField from '../../../components/InputField.astro';
+import ResultBox from '../../../components/ResultBox.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import RelatedTools from '../../../components/RelatedTools.astro';
+import WorkedExample from '../../../components/WorkedExample.astro';
+import ComparisonTable from '../../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../../components/EngineeringDiagram.astro';
+
+const whatIs = `岸电节能计算器用于估算船舶在停泊期间接入岸电（冷铁化）替代船载柴油发电机组运行时，所能实现的减排量和运营成本节省。该工具采用行业标准排放因子，量化燃油避免量、成本差额、CO₂、NOx 和 SOx 减排量。本工具帮助船东、港口管理部门和环境管理人员评估岸电在船队年度港口运营中的经济和环境效益。`;
+
+const whyItMatters = [
+  "船舶发电机组在停泊期间每年消耗 5,000–50,000+ 升燃油——岸电完全消除此类燃烧排放。",
+  "港口排放是沿海空气污染的主要来源——发电机组产生的 NOx 和 SOx 直接影响港口社区和法规合规性。",
+  "欧盟 FuelEU Maritime 法规和 IMO CII 框架通过减排积分和港口费减免激励岸电应用。",
+  "当电网电价相对于船用燃油具有竞争力时，岸电成本通常比柴油发电机组运行成本低 30–60%。",
+  "量化岸电节能效益对于港口基础设施投资决策和船舶运营商船队规划至关重要。"
+];
+
+const practicalApplications = [
+  { title: "港口基础设施投资", description: "通过量化每次停靠的年度燃油节省和减排量，建立岸电安装的商业论证。" },
+  { title: "船队岸电规划", description: "根据靠港频次和停泊时长，评估船队中哪些船舶具有最大的岸电节能潜力。" },
+  { title: "绿色港口费优化", description: "量化岸电应用的经济效益，以获得 10–30% 的绿色港口费折扣。" },
+  { title: "排放合规策略", description: "模拟岸电对 CII 评级改善和 ECA（排放控制区）合规的贡献。" }
+];
+
+const expertNotes: { title: string; variant: 'warning' | 'engineering' | 'info'; content: string }[] = [
+  {
+    title: "发电机组负荷率",
+    variant: "engineering",
+    content: "本计算器假设发电机组在停泊期间以中等负荷（额定容量的 60–80%）运行，这是提供酒店负荷的典型工况。在较低负荷下，单位 kWh 燃油消耗增加，燃烧效率降低。默认发电机组燃油消耗率 200 L/小时代表中速辅机柴油发电机组，发电功率约 800–1,000 kW。"
+  },
+  {
+    title: "电网碳强度变异性",
+    variant: "info",
+    content: "岸电减排效果在很大程度上取决于当地电网的碳强度。使用水电电网的北欧港口（20–50 g CO₂/kWh）可实现近零排放。燃煤为主的电网（800–1000 g CO₂/kWh）可能比高效船载发电机组产生更多 CO₂。默认值 400 g CO₂/kWh 代表全球混合平均电网。"
+  },
+  {
+    title: "局限性",
+    variant: "warning",
+    content: "本工具仅提供教学性估算。未考虑港口特定的电费结构（需量电费、分时电价）、岸电接驳/断开时间、辅助系统寄生负荷或岸电基础设施建设的排放影响。如需官方排放报告，请使用经船级社认证的计算工具。"
+  }
+];
+
+const trustSection = {
+  text: "排放因子来源于第四次 IMO 温室气体研究（2020）及经同行评审的海事排放文献。所有公式和假设均在下方记录。",
+  link: { label: "查看方法论和公式推导", href: "/zh/methodology/" }
+};
+
+const references = [
+  { title: "第四次 IMO 温室气体研究 2020", url: "https://www.imo.org/en/OurWork/Environment/Pages/Fourth-IMO-Greenhouse-Gas-Study-2020.aspx", source: "国际海事组织" },
+  { title: "IEA — 各国电网排放因子", url: "https://www.iea.org/data-and-statistics/charts/grid-emission-factors-for-electricity-generation", source: "国际能源署" },
+  { title: "欧盟 FuelEU Maritime 法规", url: "https://transport.ec.europa.eu/transport-themes/maritime-transport/fuelEU-maritime_en", source: "欧盟委员会" },
+  { title: "DNV — 岸电技术评估", url: "https://www.dnv.com/maritime/", source: "DNV" }
+];
+
+const faqItems = [
+  {
+    question: "船舶发电机组在停泊期间消耗多少燃油？",
+    answer: "典型的辅机发电机组根据发动机容量和电力负荷，每小时消耗 150–400 升船用燃油。一艘每次停靠 8 小时、使用 200 L/小时发电机组的船舶，每次停靠消耗 1,600 升燃油。按年停靠 200 次计算，年总消耗达 320,000 升——这构成了岸电可消除的重大成本和排放源。"
+  },
+  {
+    question: "岸电在什么情况下具有经济效益？",
+    answer: "当电网电价每 kWh 成本低于发电机组运行的等效燃油成本时，岸电具有经济效益。以 MGO $0.75/L、能量密度 10 kWh/L、发电机组效率 40% 计算，柴油发电的等效电力成本约为 $0.19/kWh。低于此阈值时，岸电可节省成本；高于此阈值时，效益转向减排和法规合规。"
+  },
+  {
+    question: "岸电可实现多少 NOx 和 SOx 减排？",
+    answer: "岸电在停泊期间消除 100% 的船上燃烧相关 NOx 和 SOx 排放。NOx 减排量根据停泊时长和发电机组容量，年减排 500–5,000 kg/船。SOx 减排取决于燃油硫含量——0.1% 硫含量的 MGO 比 HFO 产生更少 SOx，但岸电无论燃油类型如何均可消除全部 SOx。这些减排直接改善港口社区空气质量。"
+  },
+  {
+    question: "电网碳强度如何影响岸电效益？",
+    answer: "电网碳强度决定岸电的净 CO₂ 效益。船舶从柴油发电机组（3.206 kg CO₂/升 MGO，40% 效率）切换到 400 g CO₂/kWh 的电网，可实现约 60% CO₂ 减排。若电网为 100 g CO₂/kWh（可再生能源），减排超过 90%。若电网超过 800 g CO₂/kWh（燃煤为主），岸电可能比发电机组产生更多 CO₂——但消除港口侧燃烧仍可改善当地空气质量。"
+  },
+  {
+    question: "岸电的典型电价是多少？",
+    answer: "岸电电价因地区而异：挪威 $0.08–0.12/kWh（水电），北欧 $0.10–0.18/kWh，美国西海岸 $0.15–0.22/kWh，亚洲 $0.08–0.25/kWh。部分港口为非高峰时段接入的船舶提供优惠电价。除电能费外，还可能收取需量电费和接驳费。"
+  },
+  {
+    question: "哪些船舶从岸电中受益最大？",
+    answer: "靠港频次高且停泊时间长的船舶受益最大：邮轮（停泊 8–12 小时，酒店负荷大）、集装箱船（停泊 6–24 小时）和客渡轮（每次停靠 30–60 分钟，但频次极高）。停泊时间短（< 1 小时）的船舶可能无法获得足够的岸电接驳时间来抵消接驳成本。"
+  },
+  {
+    question: "岸电基础设施成本如何？",
+    answer: "港口侧岸电基础设施每个泊位成本 $2–10 百万，取决于电力容量和当地电网接入要求。船舶侧改造成本每船 $200,000–$1 百万，包括开关柜、电缆和控制系统。本计算器未包含这些资本成本，仅关注年度运营节省。完整的投资分析应采用混合动力船舶投资回报率计算方法。"
+  },
+  {
+    question: "本计算器可用于法规合规吗？",
+    answer: "本工具提供教学性估算，用于规划和可行性分析。不可替代经认证的排放计算。如需 IMO CII 官方报告、EU MRV 合规或港口当局排放清单，请使用经船级社和船旗国批准的计算工具。"
+  }
+];
+
+const relatedArticles = [
+  { title: "岸电与柴油发电机对比", href: "/zh/learn/shore-power-vs-diesel-generators/" },
+  { title: "什么是船舶电气化？", href: "/zh/learn/what-is-marine-electrification/" },
+];
+
+const commonMistakes = [
+  "使用全球平均电网碳强度而非当地实际电网——北欧水电电网（20–50 g/kWh）与燃煤电网（800+ g/kWh）产生的 CO₂ 效益差异巨大。",
+  "忽略需量电费和接驳费——岸电成本不仅是电能费率；需量电费可能使等效 kWh 成本翻倍。",
+  "假设 100% 岸电可用率——港口基础设施故障、电压不匹配和接驳延迟使实际岸电利用率降至 70–85%。",
+  "未考虑岸电接驳和断开时间——每次接驳需 15–30 分钟，减少短时停靠的有效停泊小时数。",
+  "使用发电机组额定容量而非实际停泊负荷——发电机组在停泊时通常以 60–80% 负荷运行，而非满额定容量。",
+  "未包含岸电基础设施摊销成本进行燃油成本比较——$5M 岸电设施按 20 年摊销增加显著固定成本。",
+  "忽略绿色港口费折扣——许多港口为岸电用户提供 10–30% 的泊位费减免，改善经济效益超越纯能源节省。",
+  "使用年度燃油消耗而非港口特定燃油消耗——并非所有燃油在停泊期间消耗；仅停泊时间燃油消耗相关。"
+];
+
+const relatedCalculators = [
+  { href: "/zh/tools/marine-co2-reduction-calculator/", title: "船舶 CO₂ 减排计算器", description: "量化混合化和岸电应用带来的减排量。" },
+  { href: "/zh/tools/hybrid-vessel-roi-calculator/", title: "混合动力船舶投资回报率计算器", description: "评估混合动力推进投资的财务回报。" },
+  { href: "/zh/marine/", title: "船舶电气化中心", description: "探索所有船舶脱碳工具和资源。" },
+];
+---
+
+<CalculatorLayout
+  title="岸电节能计算器 | Battery Calculators"
+  description="估算船舶接入岸电替代停泊期间运行发电机组所实现的燃油节省、CO₂ 减排和运营成本效益。"
+  lang="zh"
+  faqItems={faqItems}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+  relatedCalculators={relatedCalculators}
+  commonMistakes={commonMistakes}
+  relatedArticles={relatedArticles}
+>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+
+    <!-- 输入表单 -->
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">港口运营</h3>
+      <div class="flex flex-col gap-6">
+
+        <InputField
+          id="port-calls"
+          label="年停靠次数"
+          value={200}
+          min={1}
+          max={1000}
+          step={10}
+          unit="次/年"
+          helperText="全年各目的地总停靠次数。"
+        />
+
+        <InputField
+          id="hours-at-berth"
+          label="每次停靠泊位时间"
+          value={8}
+          min={0.5}
+          max={72}
+          step={0.5}
+          unit="小时/次"
+          helperText="船舶每次停靠的平均停泊时间。"
+        />
+
+        <InputField
+          id="aux-load"
+          label="辅机负荷"
+          value={800}
+          min={10}
+          max={5000}
+          step={10}
+          unit="kW"
+          helperText="停泊期间由发电机组提供的电力负荷。"
+        />
+
+        <InputField
+          id="gen-fuel-rate"
+          label="发电机组燃油消耗率"
+          value={200}
+          min={10}
+          max={1000}
+          step={5}
+          unit="升/小时"
+          helperText="辅机发电机组在停泊负荷下的燃油消耗率。"
+        />
+
+        <InputField
+          id="fuel-cost"
+          label="燃油价格"
+          value={0.75}
+          min={0.01}
+          max={5}
+          step={0.05}
+          unit="美元/升"
+          helperText="船用燃油每升价格（MGO/MDO 典型值）。"
+        />
+
+        <InputField
+          id="elec-cost"
+          label="电网电价"
+          value={0.15}
+          min={0.01}
+          max={1}
+          step={0.01}
+          unit="美元/kWh"
+          helperText="岸电电力费率。"
+        />
+
+        <InputField
+          id="grid-carbon"
+          label="电网碳强度"
+          value={400}
+          min={0}
+          max={1200}
+          step={10}
+          unit="kg CO₂/MWh"
+          helperText="当地电网排放因子（默认 400 = 全球平均值）。"
+        />
+
+      </div>
+    </CalculatorCard>
+
+    <!-- 计算结果 -->
+    <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">岸电节能效益</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <ResultBox
+            label="年发电机组燃油避免量"
+            value="320,000 L"
+            suffix="升船用燃油节省"
+            variant="primary"
+            id="result-fuel-avoided"
+          />
+          <ResultBox
+            label="年燃油成本避免额"
+            value="$240,000"
+            suffix="发电机组燃油支出消除"
+            id="result-fuel-cost"
+          />
+          <ResultBox
+            label="年岸电成本"
+            value="$192,000"
+            suffix="电网电力成本"
+            id="result-shore-cost"
+          />
+          <ResultBox
+            label="年净节省额"
+            value="$48,000"
+            suffix="燃油节省减去电力成本"
+            id="result-net-savings"
+          />
+          <ResultBox
+            label="年 CO₂ 减排量"
+            value="409.6 t"
+            suffix="吨 CO₂ 消除"
+            id="result-co2"
+          />
+          <ResultBox
+            label="年 NOx 减排量"
+            value="18,880 kg"
+            suffix="kg NOx 消除"
+            id="result-nox"
+          />
+          <ResultBox
+            label="年 SOx 减排量"
+            value="640 kg"
+            suffix="kg SOx 消除"
+            id="result-sox"
+          />
+          <ResultBox
+            label="等效减少汽车数量"
+            value="89"
+            suffix="辆乘用车退出道路"
+            id="result-cars"
+          />
+        </div>
+      </div>
+
+      <div class="border-t border-hairline pt-6">
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">岸电评估</h4>
+        <p class="text-body-sm text-muted" id="summary-el">
+          每年接入岸电 1,600 小时可消除 320,000 升发电机组燃油，扣除电力成本后节省 $48,000。
+        </p>
+      </div>
+    </CalculatorCard>
+
+  </div>
+
+  <!-- 发电机组与岸电对比图表 -->
+  <section class="mb-16">
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-4 uppercase tracking-wider">发电机组模式与岸电对比</h3>
+      <p class="text-body-sm text-muted mb-6">船载发电机组运行与停泊期间使用岸电的年度成本和排放对比。</p>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- CO₂ 图表 -->
+        <div>
+          <span class="text-label-uppercase text-primary text-[10px] block mb-2">CO₂（吨/年）</span>
+          <div id="chart-co2" class="flex flex-col gap-2"></div>
+        </div>
+        <!-- 成本图表 -->
+        <div>
+          <span class="text-label-uppercase text-primary text-[10px] block mb-2">年度成本（美元）</span>
+          <div id="chart-cost" class="flex flex-col gap-2"></div>
+        </div>
+        <!-- NOx 图表 -->
+        <div>
+          <span class="text-label-uppercase text-primary text-[10px] block mb-2">NOx（kg/年）</span>
+          <div id="chart-nox" class="flex flex-col gap-2"></div>
+        </div>
+      </div>
+      <div class="flex items-center gap-4 mt-6 text-caption text-muted">
+        <span class="flex items-center gap-1.5"><span class="w-3 h-3 bg-m-blue-light inline-block"></span> 发电机组模式</span>
+        <span class="flex items-center gap-1.5"><span class="w-3 h-3 bg-green-600 inline-block"></span> 岸电</span>
+      </div>
+    </CalculatorCard>
+  </section>
+
+  <!-- 年度运营成本图表 -->
+  <section class="mb-16">
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-4 uppercase tracking-wider">年度运营成本构成</h3>
+      <p class="text-body-sm text-muted mb-6">当前停靠频次下发电机组燃油成本与岸电电力成本对比。</p>
+      <div id="cost-breakdown-chart" class="flex flex-col gap-3"></div>
+    </CalculatorCard>
+  </section>
+
+  <!-- 公式与计算示例 -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">公式与计算示例</h2>
+    <FormulaBox title="数学公式">
+      <p>
+        岸电节省通过比较发电机组燃油消耗与电网电力成本计算：
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        发电机组运行时间 = 停靠次数 × 停泊时间
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        燃油避免量 = 发电机组运行时间 × 燃油消耗率（升/小时）
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        燃油成本避免额 = 燃油避免量 × 燃油价格（美元/升）
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        岸电成本 = 发电机组运行时间 × 辅机负荷（kW）× 电价（美元/kWh）
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        净节省额 = 燃油成本避免额 − 岸电成本
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        CO₂ 减排量 = (燃油避免量 × 3.206) − (岸电 kWh × 电网碳强度) / 1000
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        等效减少汽车数 = CO₂ 减排量（吨）/ 4.6
+      </div>
+      <p class="mt-4">
+        MGO CO₂ 因子：3.206 kg/升（第四次 IMO 温室气体研究 2020）<br/>
+        NOx 因子：0.059 kg/升 | SOx 因子：0.002 kg/升<br/>
+        EPA 等效值：4.6 吨 CO₂/辆/年
+      </p>
+    </FormulaBox>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample
+        number={1}
+        title="小型游艇——岸电与柴油发电机对比"
+        scenario="一艘 20 米休闲游艇通常在 marina 每晚运行 2 kW 船载发电机组 10 小时，为照明、制冷和空调供电。岸电消除了发电机组噪音、燃油消耗和废气排放。"
+        inputs={[
+          { label: "酒店负荷", value: "2 kW" },
+          { label: "每日停泊时间", value: "10 小时" },
+          { label: "电网电价", value: "$0.30/kWh" },
+          { label: "柴油价格", value: "$2/L" },
+        ]}
+        steps={[
+          {
+            label: "每日发电机组运行时间",
+            formula: "10 小时/天",
+            result: "10 小时/天",
+          },
+          {
+            label: "2 kW 负荷下柴油消耗",
+            formula: "2 kW × 10 小时 ÷ 10 kWh/L ÷ 0.35 效率 ≈ 5.71 L/天",
+            result: "5.71 L/天",
+          },
+          {
+            label: "每日柴油成本",
+            formula: "5.71 L × $2/L",
+            result: "$11.43/天",
+          },
+          {
+            label: "每日岸电成本",
+            formula: "2 kW × 10 小时 × $0.30/kWh",
+            result: "$6.00/天",
+          },
+          {
+            label: "每日节省额",
+            formula: "$11.43 − $6.00",
+            result: "$5.43/天",
+          },
+          {
+            label: "年节省额（365 天）",
+            formula: "$5.43 × 365",
+            result: "$1,982/年",
+          },
+        ]}
+        answer="岸电在 2 kW 酒店负荷的小型游艇上每年节省约 $1,982，同时消除约 2,083 升柴油消耗。"
+        interpretation="即使是中等游艇酒店负荷也能从岸电中受益。绝对节省额虽小，但对运营预算有意义，且消除发电机组噪音改善了 marina 体验。"
+        variant="marine"
+      />
+
+      <WorkedExample
+        number={2}
+        title="商用船舶——港口岸电应用"
+        scenario="一艘酒店负荷 500 kW 的商用货船每次停靠 12 小时，年停靠 150 次。船舶持续运行辅机发电机组为船员住宿、货物泵和导航系统供电。"
+        inputs={[
+          { label: "酒店负荷", value: "500 kW" },
+          { label: "每次停泊时间", value: "12 小时" },
+          { label: "年停靠次数", value: "150" },
+          { label: "电网电价", value: "$0.15/kWh" },
+          { label: "MGO 燃油价格", value: "$0.75/L" },
+          { label: "发电机组燃油消耗率", value: "500 kW 下 130 L/小时" },
+        ]}
+        steps={[
+          {
+            label: "年停泊总时长",
+            formula: "150 次 × 12 小时",
+            result: "1,800 小时/年",
+          },
+          {
+            label: "年燃油避免量",
+            formula: "1,800 小时 × 130 L/小时",
+            result: "234,000 L/年",
+          },
+          {
+            label: "年燃油成本避免额",
+            formula: "234,000 L × $0.75/L",
+            result: "$175,500/年",
+          },
+          {
+            label: "年岸电成本",
+            formula: "1,800 小时 × 500 kW × $0.15/kWh",
+            result: "$135,000/年",
+          },
+          {
+            label: "年净节省额",
+            formula: "$175,500 − $135,000",
+            result: "$40,500/年",
+          },
+          {
+            label: "CO₂ 减排量",
+            formula: "(234,000 × 3.206 − 1,800 × 500 × 0.400) ÷ 1000",
+            result: "389.8 吨 CO₂/年",
+          },
+        ]}
+        answer="岸电年节省 $40,500，同时减排 390 吨 CO₂——相当于减少 85 辆乘用车上路。"
+        interpretation="酒店负荷高且停靠频次的商用船舶是岸电经济效益的最佳场景。CO₂ 减排还改善了船舶的 CII 评级。"
+        variant="marine"
+      />
+
+      <WorkedExample
+        number={3}
+        title="邮轮——岸电与 LNG 对比"
+        scenario="一艘酒店负荷 10 MW 的大型邮轮比较岸电与停泊期间继续运行 LNG 发电机组的方案。LNG 比柴油清洁但仍产生当地排放。该船年停靠 250 次，每次 10 小时。"
+        inputs={[
+          { label: "酒店负荷", value: "10 MW (10,000 kW)" },
+          { label: "每次停泊时间", value: "10 小时" },
+          { label: "年停靠次数", value: "250" },
+          { label: "电网电价", value: "$0.12/kWh" },
+          { label: "LNG 成本", value: "$0.60/kWh 等效" },
+          { label: "电网碳强度", value: "200 g CO₂/kWh（北欧电网）" },
+        ]}
+        steps={[
+          {
+            label: "年停泊总时长",
+            formula: "250 次 × 10 小时",
+            result: "2,500 小时/年",
+          },
+          {
+            label: "岸电总消耗",
+            formula: "2,500 小时 × 10,000 kW",
+            result: "25,000 MWh/年",
+          },
+          {
+            label: "LNG 发电机组成本",
+            formula: "25,000,000 kWh × $0.60/kWh",
+            result: "$15,000,000/年",
+          },
+          {
+            label: "岸电成本",
+            formula: "25,000,000 kWh × $0.12/kWh",
+            result: "$3,000,000/年",
+          },
+          {
+            label: "年净节省额",
+            formula: "$15,000,000 − $3,000,000",
+            result: "$12,000,000/年",
+          },
+          {
+            label: "CO₂ 减排量",
+            formula: "LNG 碳强度 ≈ 500 g/kWh → 25,000 t vs 岸电 = 200 g/kWh → 5,000 t",
+            result: "20,000 吨 CO₂/年",
+          },
+        ]}
+        answer="岸电年节省 $12 百万（对比 LNG 发电机组），同时消除 20,000 吨 CO₂——对邮轮公司碳足迹产生变革性影响。"
+        interpretation="邮轮因巨大的酒店负荷而获得最高的岸电绝对节省。低碳电网的北欧港口实现最大的 CO₂ 减排，使岸电成为邮轮行业脱碳的基石。"
+        variant="marine"
+      />
+    </div>
+  </section>
+
+  <!-- 假设条件 -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">假设条件与局限性</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <CalculatorCard>
+        <h4 class="text-primary font-bold text-sm mb-3">运营假设</h4>
+        <ul class="text-body-sm text-muted flex flex-col gap-2">
+          <li class="flex gap-2"><span class="text-m-blue-light shrink-0">→</span> 发电机组在停泊期间以 60–80% 额定负荷运行</li>
+          <li class="flex gap-2"><span class="text-m-blue-light shrink-0">→</span> MGO 排放因子：3.206 kg CO₂/升（第四次 IMO 温室气体研究）</li>
+          <li class="flex gap-2"><span class="text-m-blue-light shrink-0">→</span> NOx 因子：0.059 kg/升（中等发动机负荷）</li>
+          <li class="flex gap-2"><span class="text-m-blue-light shrink-0">→</span> SOx 因子：0.002 kg/升（0.1% 硫含量 MGO）</li>
+          <li class="flex gap-2"><span class="text-m-blue-light shrink-0">→</span> 电网碳强度默认值：400 g CO₂/kWh（全球平均值）</li>
+        </ul>
+      </CalculatorCard>
+      <CalculatorCard>
+        <h4 class="text-primary font-bold text-sm mb-3">本计算器未包含内容</h4>
+        <ul class="text-body-sm text-muted flex flex-col gap-2">
+          <li class="flex gap-2"><span class="text-m-red shrink-0">✗</span> 岸电基础设施资本成本</li>
+          <li class="flex gap-2"><span class="text-m-red shrink-0">✗</span> 船舶侧改造成本（开关柜、电缆、控制系统）</li>
+          <li class="flex gap-2"><span class="text-m-red shrink-0">✗</span> 需量电费或分时电价</li>
+          <li class="flex gap-2"><span class="text-m-red shrink-0">✗</span> 接驳/断开时间和人工成本</li>
+          <li class="flex gap-2"><span class="text-m-red shrink-0">✗</span> 使用岸电获得的绿色港口费折扣</li>
+        </ul>
+      </CalculatorCard>
+    </div>
+  </section>
+
+  <EngineeringDiagram
+    title="岸电连接系统"
+    description="船舶接入电网电力，在港期间关闭柴油发电机组"
+    variant="system"
+    steps={[
+      { label: "岸侧电网", icon: "charge" },
+      { label: "电力连接", icon: "cable" },
+      { label: "船舶配电", icon: "inverter" },
+      { label: "酒店负荷", icon: "load" },
+    ]}
+  />
+
+  <ComparisonTable
+    title="不同船舶规模的岸电经济效益"
+    headers={["船舶类型", "酒店负荷", "日停泊时间", "柴油成本", "岸电成本", "年节省额"]}
+    rows={[
+      ["小型游艇", "5 kW", "16 小时", "$4.50/L", "$0.25/kWh", "$2,000–5,000"],
+      ["邮轮", "10 MW", "10 小时", "$600/吨", "$0.12/kWh", "$1–3 百万"],
+      ["集装箱船", "1 MW", "24 小时", "$500/吨", "$0.10/kWh", "$200–500k"],
+      ["客渡轮", "200 kW", "8 小时", "$1.80/L", "$0.15/kWh", "$30,000–80,000"],
+    ]}
+    caption="岸电节省取决于当地电价与燃油成本的对比"
+  />
+
+  <FAQSection items={faqItems} />
+  <RelatedTools tools={relatedCalculators} />
+
+  <!-- 工程支持 -->
+  <div class="bg-surface-card border border-hairline p-6 mt-8 mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div class="max-w-xl">
+      <h3 class="text-title-sm text-primary mb-1">需要更深入的工程评估？</h3>
+      <p class="text-body-sm text-muted font-light">
+        本计算器提供初步估算。如需船舶特定分析、电池容量评估、减排规划或混合动力可行性支持，请联系 Battery Calculators 工程支持团队。
+      </p>
+    </div>
+    <a href="/zh/marine/#marine-advisory" class="btn-primary text-xs px-6 py-3 shrink-0 whitespace-nowrap">申请工程支持</a>
+  </div>
+
+  <!-- 计算脚本 -->
+  <script>
+    import { calculateShorePowerSavings } from '../../../utils/calculators';
+
+    const portCallsInput = document.getElementById('port-calls') as HTMLInputElement;
+    const hoursAtBerthInput = document.getElementById('hours-at-berth') as HTMLInputElement;
+    const auxLoadInput = document.getElementById('aux-load') as HTMLInputElement;
+    const genFuelRateInput = document.getElementById('gen-fuel-rate') as HTMLInputElement;
+    const fuelCostInput = document.getElementById('fuel-cost') as HTMLInputElement;
+    const elecCostInput = document.getElementById('elec-cost') as HTMLInputElement;
+    const gridCarbonInput = document.getElementById('grid-carbon') as HTMLInputElement;
+
+    function getResultElements(id: string) {
+      const box = document.getElementById(id);
+      return {
+        value: box?.querySelector('.text-display-md, .text-title-lg') as HTMLElement,
+        suffix: box?.querySelector('.text-caption') as HTMLElement,
+      };
+    }
+
+    const fuelAvoided = getResultElements('result-fuel-avoided');
+    const fuelCost = getResultElements('result-fuel-cost');
+    const shoreCost = getResultElements('result-shore-cost');
+    const netSavings = getResultElements('result-net-savings');
+    const co2Result = getResultElements('result-co2');
+    const noxResult = getResultElements('result-nox');
+    const soxResult = getResultElements('result-sox');
+    const carsResult = getResultElements('result-cars');
+    const summaryEl = document.getElementById('summary-el');
+
+    function fmt(n: number, decimals = 1): string {
+      return n.toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+    }
+
+    function updateBarChart(containerId: string, generatorVal: number, shoreVal: number, unit: string) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      const maxVal = Math.max(generatorVal, 0.001);
+      const genPct = (generatorVal / maxVal) * 100;
+      const shorePct = (shoreVal / maxVal) * 100;
+      const reduction = maxVal > 0 ? ((generatorVal - shoreVal) / generatorVal) * 100 : 0;
+
+      container.innerHTML = `
+        <div class="flex flex-col gap-1">
+          <div class="flex items-center gap-2">
+            <span class="text-caption text-muted w-16 text-right shrink-0">Generator</span>
+            <div class="flex-1 h-5 bg-surface-soft border border-hairline relative overflow-hidden">
+              <div class="h-full bg-m-blue-light transition-all duration-300" style="width: ${genPct}%"></div>
+            </div>
+            <span class="text-caption text-primary font-mono w-20 shrink-0">${fmt(generatorVal)}${unit}</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-caption text-muted w-16 text-right shrink-0">Shore</span>
+            <div class="flex-1 h-5 bg-surface-soft border border-hairline relative overflow-hidden">
+              <div class="h-full bg-green-600 transition-all duration-300" style="width: ${shorePct}%"></div>
+            </div>
+            <span class="text-caption text-primary font-mono w-20 shrink-0">${fmt(shoreVal)}${unit}</span>
+          </div>
+          <span class="text-caption text-green-500 font-mono text-[10px]">↓ ${fmt(reduction)}% reduction</span>
+        </div>
+      `;
+    }
+
+    function updateCalculations() {
+      const portCalls = parseFloat(portCallsInput.value) || 200;
+      const hoursAtBerth = parseFloat(hoursAtBerthInput.value) || 8;
+      const auxLoad = parseFloat(auxLoadInput.value) || 800;
+      const genFuelRate = parseFloat(genFuelRateInput.value) || 200;
+      const fuelCostPerLiter = parseFloat(fuelCostInput.value) || 0.75;
+      const elecCostPerKwh = parseFloat(elecCostInput.value) || 0.15;
+      const gridCarbon = parseFloat(gridCarbonInput.value) || 400;
+
+      const result = calculateShorePowerSavings({
+        portCallsPerYear: portCalls,
+        hoursAtBerthPerCall: hoursAtBerth,
+        auxiliaryLoadKw: auxLoad,
+        generatorFuelConsumptionLPerHour: genFuelRate,
+        fuelCostPerLiter: fuelCostPerLiter,
+        gridElectricityCostPerKwh: elecCostPerKwh,
+        gridCarbonIntensityKgPerKwh: gridCarbon / 1000,
+      });
+
+      if (fuelAvoided.value) fuelAvoided.value.textContent = `${Math.round(result.annualGeneratorFuelLiters).toLocaleString()} L`;
+      if (fuelAvoided.suffix) fuelAvoided.suffix.textContent = 'liters of marine fuel saved';
+
+      if (fuelCost.value) fuelCost.value.textContent = `$${Math.round(result.annualGeneratorFuelCost).toLocaleString()}`;
+      if (fuelCost.suffix) fuelCost.suffix.textContent = 'Generator fuel expenditure eliminated';
+
+      if (shoreCost.value) shoreCost.value.textContent = `$${Math.round(result.annualShorePowerCost).toLocaleString()}`;
+      if (shoreCost.suffix) shoreCost.suffix.textContent = 'Grid electricity cost';
+
+      if (netSavings.value) netSavings.value.textContent = `$${Math.round(result.annualNetSavings).toLocaleString()}`;
+      if (netSavings.suffix) netSavings.suffix.textContent = result.annualNetSavings >= 0 ? 'Fuel savings minus electricity cost' : 'Net cost — shore power exceeds generator cost';
+
+      if (co2Result.value) co2Result.value.textContent = `${fmt(result.annualCo2ReductionTonnes)} t`;
+      if (co2Result.suffix) co2Result.suffix.textContent = 'tonnes CO₂ eliminated';
+
+      if (noxResult.value) noxResult.value.textContent = `${Math.round(result.annualNoxReductionKg).toLocaleString()} kg`;
+      if (noxResult.suffix) noxResult.suffix.textContent = 'kg NOx eliminated';
+
+      if (soxResult.value) soxResult.value.textContent = `${Math.round(result.annualSoxReductionKg).toLocaleString()} kg`;
+      if (soxResult.suffix) soxResult.suffix.textContent = 'kg SOx eliminated';
+
+      if (carsResult.value) carsResult.value.textContent = `${Math.round(result.equivalentCarsRemoved)}`;
+      if (carsResult.suffix) carsResult.suffix.textContent = 'passenger vehicles off the road';
+
+      if (summaryEl) {
+        const hoursText = Math.round(result.annualGeneratorHours).toLocaleString();
+        const fuelText = Math.round(result.annualGeneratorFuelLiters).toLocaleString();
+        const savingsText = Math.abs(Math.round(result.annualNetSavings)).toLocaleString();
+        if (result.annualNetSavings >= 0) {
+          summaryEl.textContent = `Connecting to shore power for ${hoursText} hours annually eliminates ${fuelText} liters of generator fuel, saving $${savingsText} after electricity costs.`;
+        } else {
+          summaryEl.textContent = `Connecting to shore power for ${hoursText} hours eliminates ${fuelText} liters of generator fuel, but shore power costs exceed fuel savings by $${savingsText} at current electricity rates.`;
+        }
+      }
+
+      // Update comparison charts
+      updateBarChart('chart-co2', result.baselineCo2Tonnes, result.shorePowerCo2Tonnes, 't');
+      updateBarChart('chart-cost', result.annualGeneratorFuelCost, result.annualShorePowerCost, '');
+      updateBarChart('chart-nox', result.annualNoxReductionKg + (result.annualNoxReductionKg * 0.01), result.annualNoxReductionKg * 0.01, 'kg');
+
+      // Cost breakdown chart
+      const costContainer = document.getElementById('cost-breakdown-chart');
+      if (costContainer) {
+        const totalCost = Math.max(result.annualGeneratorFuelCost, result.annualShorePowerCost, 1);
+        const genPct = (result.annualGeneratorFuelCost / totalCost) * 100;
+        const shorePct = (result.annualShorePowerCost / totalCost) * 100;
+
+        costContainer.innerHTML = `
+          <div class="flex flex-col gap-2">
+            <div class="flex items-center gap-3">
+              <span class="text-caption text-muted w-24 text-right shrink-0">Generator</span>
+              <div class="flex-1 h-8 bg-surface-soft border border-hairline relative overflow-hidden">
+                <div class="h-full bg-m-blue-light transition-all duration-300 flex items-center pl-2" style="width: ${genPct}%">
+                  <span class="text-caption text-primary font-mono text-[10px] whitespace-nowrap">$${Math.round(result.annualGeneratorFuelCost).toLocaleString()}</span>
+                </div>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="text-caption text-muted w-24 text-right shrink-0">Shore Power</span>
+              <div class="flex-1 h-8 bg-surface-soft border border-hairline relative overflow-hidden">
+                <div class="h-full bg-green-600 transition-all duration-300 flex items-center pl-2" style="width: ${shorePct}%">
+                  <span class="text-caption text-primary font-mono text-[10px] whitespace-nowrap">$${Math.round(result.annualShorePowerCost).toLocaleString()}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="mt-2 text-caption text-muted">
+            <span class="text-primary font-bold">Net annual ${result.annualNetSavings >= 0 ? 'savings' : 'cost'}:</span> $${Math.abs(Math.round(result.annualNetSavings)).toLocaleString()}
+          </div>
+        `;
+      }
+    }
+
+    [portCallsInput, hoursAtBerthInput, auxLoadInput, genFuelRateInput, fuelCostInput, elecCostInput, gridCarbonInput].forEach(el => {
+      el.addEventListener('input', updateCalculations);
+    });
+
+    updateCalculations();
+  </script>
+
+</CalculatorLayout>

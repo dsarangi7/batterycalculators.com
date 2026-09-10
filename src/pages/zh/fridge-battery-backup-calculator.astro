@@ -1,0 +1,214 @@
+---
+import CalculatorLayout from '../../layouts/CalculatorLayout.astro';
+import FormulaBox from '../../components/FormulaBox.astro';
+import FAQSection from '../../components/FAQSection.astro';
+import PowerOutageForm from '../../components/PowerOutageForm.astro';
+import WorkedExample from '../../components/WorkedExample.astro';
+import ComparisonTable from '../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../components/EngineeringDiagram.astro';
+
+const whatIs = `冰箱电池备用计算器用于确定在停电期间保持冰箱运行所需的电池容量、逆变器尺寸和备用续航时间。冰箱是最重要的家用备用负载之一——满载冰箱如果食物变质，重新购置需要300-600美元。本计算器根据冰箱的实际运行功率和压缩机启动浪涌来设计电池尺寸，考虑逆变器效率、放电深度限制和可配置的安全裕度。`;
+
+const whyItMatters = [
+  "标准冰箱运行功率150W，但压缩机启动时浪涌至600W——逆变器尺寸不足会在最糟糕的时刻跳闸。",
+  "冰箱压缩机每15-30分钟循环开停，运行时间占30-50%。电池尺寸设计必须同时考虑浪涌和循环行为。",
+  "当冰箱温度升至40°F（4°C）以上时，食物开始变质——仅4小时断电后，易腐食品就不安全了。",
+  "飓风季、冬季暴风和山火停电常导致多天断电，保持食物冷藏是首要任务。",
+  "标称为冰箱就绪的便携式电源站可能没有足够的浪涌容量来启动压缩机——务必核实浪涌额定值。"
+];
+
+const practicalApplications = [
+  { title: "飓风与暴风备灾", description: "设计电池尺寸以在飓风和强雷暴常见的12-48小时停电中保持冰箱冷藏。" },
+  { title: "山火公共安全停电", description: "为高火险期间的计划电网停电做准备。加州公用事业公司经常断电数天。" },
+  { title: "冬季暴风备用", description: "冰暴和暴风雪可能导致数天断电。冰箱备用电池可防止昂贵的食物损失。" },
+  { title: "便携式电源站选型", description: "在购买前将便携式电源站与您的具体冰箱匹配。并非所有设备都能处理压缩机浪涌。" },
+];
+
+const expertNotes: { title: string; variant: 'engineering' | 'tip' | 'warning'; content: string }[] = [
+  { title: "冰箱工作周期", variant: "engineering", content: "冰箱在压缩机运行时消耗150W，但循环开停——通常运行30-50%的时间。本计算器使用连续运行功率进行保守设计。实际续航可能比计算值长40-60%。" },
+  { title: "压缩机启动浪涌", variant: "warning", content: "冰箱压缩机启动时消耗运行功率的3-4倍（1-3秒）。如果逆变器浪涌额定值过低，会在压缩机尝试启动时关机。务必核实逆变器浪涌容量。" },
+  { title: "冰箱备用推荐LiFePO4", variant: "tip", content: "LiFePO4电池提供80-100%可用容量，循环寿命是铅酸的10倍。对于应急冰箱备用，LFP是明确的推荐。50% DoD的铅酸需要双倍容量。" }
+];
+
+const trustSection = {
+  text: "本计算器使用标准电气工程公式进行电池系统尺寸设计。所有计算透明且可验证。",
+  link: { label: "查看我们的方法论", href: "/zh/methodology/" }
+};
+
+const references = [
+  { title: "FDA — 停电期间食品安全", url: "https://www.fda.gov/food/buy-store-serve-safe-food/food-safety-during-power-outages", source: "U.S. Food and Drug Administration" },
+  { title: "FEMA — 应急备用电力指南", url: "https://www.fema.gov/emergency-managers/risk-management/power/guidance", source: "Federal Emergency Management Agency" },
+];
+
+const faqItems = [
+  { question: "电池能为冰箱供电多长时间？", answer: "续航取决于电池容量和压缩机循环频率。标准150W冰箱在典型30%工作周期下平均消耗约45W。12V 100Ah LiFePO4电池（1,280Wh可用，80% DoD）平均可供电约28小时——但环境温度、开门频率和冰箱隔热质量可能将其实际缩短至12-16小时。能效之星冰箱比老型号节能30-40%。" },
+  { question: "冰箱需要多大的电池？", answer: "要可靠供电12小时，建议1,500-3,000Wh可用电池容量，具体取决于冰箱型号。24V 100Ah LiFePO4电池（2,560Wh）可为标准150W冰箱供电约16-20小时（含压缩机循环）。24V 200Ah电池组（5,120Wh）可提供24-36小时。增加20%裕度以应对低温环境和频繁开门。" },
+  { question: "便携式电源站能运行冰箱吗？", answer: "大多数中端便携式电源站（1,000-2,000Wh）可运行标准冰箱8-14小时，但需仔细检查两个规格：连续输出必须超过1,500W（以处理压缩机启动不跳闸），浪涌额定值必须达到3,000W以上。许多廉价电源站声称高容量但无法承受600W的压缩机启动尖峰。寻找纯正弦波输出——修正正弦波逆变器可能损坏冰箱压缩机。" },
+  { question: "冰箱需要多大的逆变器？", answer: "标准150W冰箱需要1,500-2,000W连续逆变器，至少3,000W浪涌容量。关键是压缩机启动浪涌仅持续1-3秒但可达600W——运行功率的4倍。如果计划运行额外负载（照明、手机充电），将其功率加到连续需求中。强烈建议压缩机电机使用纯正弦波逆变器。" },
+  { question: "冰箱尺寸影响电池需求吗？", answer: "是的，影响显著。紧凑型宿舍冰箱（60-100W）比全尺寸型号（150-250W）节能40-60%。顶置冷冻柜型号比对开门设计更高效。卧式冷冻柜因冷空气保持最佳而效率最高。检查冰箱上的黄色能效之星标签以获取实际年耗电量（kWh）——除以8,760得到平均瓦数，再乘以所需备用小时数。" },
+];
+
+const commonMistakes = [
+  "忽略压缩机启动浪涌——150W冰箱启动时消耗600W（运行功率的3-4倍），逆变器尺寸不足会跳闸。",
+  "使用铭牌功率而非实际循环消耗——冰箱压缩机运行30-50%的时间，平均消耗远低于额定功率。",
+  "忘记开门和环境温度增加续航消耗——每次开门冷空气流失，迫使压缩机运行更长时间。",
+  "假设便携式电源站的Wh额定值等于可用容量——逆变器效率损耗（10-15%）和DoD限制降低实际续航。",
+  "未核实逆变器或电源站的浪涌额定值——仅连续输出额定值不能保证设备能处理压缩机启动。",
+  "冰箱压缩机使用修正正弦波逆变器——修正正弦波可能损坏压缩机电机；始终使用纯正弦波。",
+  "为单次停电过度设计电池而无充电计划——单次冰箱停电用5kWh电池，若无太阳能或电网充电则是浪费。",
+  "忽略老冰箱比能效之星型号多用2-3倍电力——查看黄色标签获取实际年耗电量。"
+];
+
+const relatedArticles = [
+  { title: "电池能为12V冰箱供电多长时间", href: "/zh/learn/how-long-will-a-battery-run-a-12v-fridge/" },
+  { title: "LiFePO4 vs 铅酸电池", href: "/zh/learn/lifepo4-vs-lead-acid/" },
+  { title: "家庭电池备用规划", href: "/zh/learn/home-battery-backup-planning/" },
+  { title: "停电电池指南", href: "/zh/learn/power-outage-battery-guide/" },
+];
+
+const relatedCalculators = [
+  { href: "/zh/home-power-outage-battery-backup-calculator/", title: "家庭停电电池备用计算器", description: "全屋备用电力计算器，适用于所有家用电器。" },
+  { href: "/zh/cpap-battery-backup-calculator/", title: "CPAP电池备用计算器", description: "为CPAP整夜运行设计电池尺寸。" },
+  { href: "/zh/sump-pump-battery-backup-calculator/", title: "排水泵电池备用计算器", description: "确保排水泵在暴风停电期间持续运行。" },
+  { href: "/zh/portable-power-station-runtime-calculator/", title: "便携式电源站续航计算器", description: "查看便携式电源站可为您的负载供电多长时间。" },
+  { href: "/zh/solar-generator-sizing-calculator/", title: "太阳能发电机尺寸计算器", description: "设计含面板和电池的完整太阳能备用系统。" },
+  { href: "/zh/tools/runtime-calculator/", title: "电池续航计算器", description: "根据容量和负载估算放电时间。" },
+  { href: "/zh/tools/battery-sizing-calculator/", title: "电池尺寸计算器", description: "含温度降额的完整电池组尺寸设计。" },
+  { href: "/zh/tools/solar-battery-sizing-calculator/", title: "太阳能电池尺寸计算器", description: "设计与太阳能板阵列配套的电池尺寸。" },
+  { href: "/zh/tools/energy-conversion-calculator/", title: "能量转换计算器", description: "在任意电压下转换Ah、Wh和kWh。" },
+  { href: "/zh/tools/charging-time-calculator/", title: "充电时间计算器", description: "估算太阳能或电网充电时间。" },
+  { href: "/zh/tools/voltage-drop-calculator/", title: "电压降计算器", description: "设计线径以最小化电压降。" },
+  { href: "/zh/tools/dc-cable-loss-calculator/", title: "直流电缆损耗计算器", description: "计算直流连接中的线路损耗。" },
+];
+
+const presetAppliances = [
+  { name: "Refrigerator", runningW: 150, surgeW: 600 }, { name: "Freezer", runningW: 120, surgeW: 500 },
+  { name: "Wi-Fi Router", runningW: 12, surgeW: 12 }, { name: "LED Light", runningW: 10, surgeW: 10 },
+  { name: "Laptop", runningW: 60, surgeW: 90 }, { name: "TV", runningW: 100, surgeW: 150 },
+  { name: "CPAP Machine", runningW: 40, surgeW: 80 }, { name: "Fan", runningW: 50, surgeW: 75 },
+  { name: "Sump Pump", runningW: 800, surgeW: 2000 }, { name: "Microwave", runningW: 1000, surgeW: 1500 },
+];
+---
+
+<CalculatorLayout
+  lang="zh"
+  title="冰箱电池备用计算器 | Battery Calculators"
+  description="计算在停电期间保持冰箱运行所需的电池尺寸、逆变器容量和备用续航。合理设计应急备用电力，防止食物变质。"
+  faqItems={faqItems}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+  relatedCalculators={relatedCalculators}
+  commonMistakes={commonMistakes}
+  relatedArticles={relatedArticles}
+>
+  <PowerOutageForm
+    presetAppliances={presetAppliances}
+    defaultBackupHours={12}
+    defaultVoltage="24"
+    defaultLoadsDescription="已预加载冰箱。调整备用时长和设置以匹配您的需求。"
+    defaultLoads={[{ name: "Refrigerator", quantity: 1 }]}
+  />
+
+  <section class="mb-16 border-t border-hairline pt-12">
+    <FormulaBox title="数学公式">
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Total Running W = Σ (Appliance Running W × Quantity)</div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Surge W = Highest Single Appliance Surge + Other Running W</div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Energy Required (Wh) = (Running W × Hours) / Inverter Efficiency × (1 + Safety Margin)</div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Battery Ah = Required Wh / (Battery Voltage × Depth of Discharge)</div>
+    </FormulaBox>
+
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">公式与计算示例</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample
+        number={1}
+        title="小型冰箱（宿舍/办公室）"
+        scenario="在8小时工作日停电中保持紧凑型小冰箱冷藏。"
+        inputs={[
+          { label: "小冰箱", value: "60W运行 / 180W浪涌" },
+          { label: "备用时长", value: "8小时" },
+          { label: "工作周期", value: "~35%" },
+        ]}
+        steps={[
+          { label: "步骤1：平均消耗（35%工作周期）", formula: "60W × 0.35", result: "平均21W" },
+          { label: "步骤2：8小时所需能量", formula: "21W × 8h = 168 Wh", result: "168 Wh" },
+          { label: "步骤3：考虑逆变器效率（90%）", formula: "168 / 0.90", result: "187 Wh" },
+          { label: "步骤4：加上20%裕度", formula: "187 × 1.20", result: "224 Wh" },
+          { label: "步骤5：电池（12V LFP, 80% DoD）", formula: "224 / (12 × 0.80)", result: "23.3 Ah → 12V 25Ah LFP" },
+        ]}
+        answer="12V 25Ah LiFePO4电池（320Wh）可在8小时工作日中保持小冰箱运行。"
+        interpretation="小冰箱效率高——小型电池即可轻松应对。工作周期显著延长续航。"
+      />
+      <WorkedExample
+        number={2}
+        title="全尺寸冰箱（飓风备用）"
+        scenario="在24小时飓风停电中保持全尺寸冰箱冷藏。"
+        inputs={[
+          { label: "全尺寸冰箱", value: "150W运行 / 600W浪涌" },
+          { label: "备用时长", value: "24小时" },
+          { label: "工作周期", value: "~40%" },
+        ]}
+        steps={[
+          { label: "步骤1：平均消耗（40%工作周期）", formula: "150W × 0.40", result: "平均60W" },
+          { label: "步骤2：24小时所需能量", formula: "60W × 24h = 1,440 Wh", result: "1,440 Wh" },
+          { label: "步骤3：考虑逆变器效率（90%）", formula: "1,440 / 0.90", result: "1,600 Wh" },
+          { label: "步骤4：加上20%裕度", formula: "1,600 × 1.20", result: "1,920 Wh" },
+          { label: "步骤5：电池（24V LFP, 80% DoD）", formula: "1,920 / (24 × 0.80)", result: "100 Ah → 24V 100Ah LFP" },
+        ]}
+        answer="24V 100Ah LiFePO4电池（2,560Wh）可在24小时内保持全尺寸冰箱冷藏，含压缩机循环。"
+        interpretation="压缩机循环意味着冰箱不连续运行——平均消耗远低于额定功率。"
+      />
+      <WorkedExample
+        number={3}
+        title="卧式冷冻柜（长时间停电）"
+        scenario="在48小时冬季暴风停电中保持卧式冷冻柜冷冻。"
+        inputs={[
+          { label: "卧式冷冻柜", value: "120W运行 / 500W浪涌" },
+          { label: "备用时长", value: "48小时" },
+          { label: "工作周期", value: "~30%" },
+          { label: "冬季加成", value: "低温环境延长循环间隔" },
+        ]}
+        steps={[
+          { label: "步骤1：平均消耗（30%工作周期）", formula: "120W × 0.30", result: "平均36W" },
+          { label: "步骤2：48小时所需能量", formula: "36W × 48h = 1,728 Wh", result: "1,728 Wh" },
+          { label: "步骤3：考虑逆变器效率（90%）", formula: "1,728 / 0.90", result: "1,920 Wh" },
+          { label: "步骤4：加上20%裕度", formula: "1,920 × 1.20", result: "2,304 Wh" },
+          { label: "步骤5：电池（24V LFP, 80% DoD）", formula: "2,304 / (24 × 0.80)", result: "120 Ah → 24V 130Ah LFP" },
+        ]}
+        answer="24V 130Ah LiFePO4电池（3.1kWh）可在冬季暴风期间保持卧式冷冻柜冷冻48小时。"
+        interpretation="卧式冷冻柜是效率最高的冰箱类型——寒冷的冬季环境进一步减少压缩机运行时间。"
+      />
+    </div>
+  </section>
+
+  <EngineeringDiagram
+    title="冰箱备用电力流程"
+    description="电池直流电力通过逆变器转换为交流电，然后为冰箱压缩机电机供电。"
+    steps={[
+      { label: "电池组", icon: "battery" },
+      { label: "逆变器", icon: "inverter" },
+      { label: "浪涌保护", icon: "cable" },
+      { label: "冰箱压缩机", icon: "load" },
+    ]}
+    variant="system"
+  />
+
+  <ComparisonTable
+    title="冰箱电池备用对比"
+    headers={["冰箱类型", "运行功率", "浪涌功率", "平均消耗（40%工作周期）", "12小时能耗", "所需电池（24V LFP）"]}
+    rows={[
+      ["小型冰箱（宿舍）", "60 W", "180 W", "24 W", "288 Wh", "12V 25Ah (320 Wh)"],
+      ["紧凑型冰箱", "100 W", "350 W", "40 W", "480 Wh", "12V 50Ah (640 Wh)"],
+      ["标准顶置冷冻柜", "150 W", "600 W", "60 W", "720 Wh", "24V 50Ah (1,280 Wh)"],
+      ["对开门冰箱", "200 W", "800 W", "80 W", "960 Wh", "24V 65Ah (1,560 Wh)"],
+      ["法式对门（大容量）", "250 W", "1,000 W", "100 Wh", "1,200 Wh", "24V 80Ah (1,920 Wh)"],
+      ["卧式冷冻柜", "120 W", "500 W", "36 W", "432 Wh", "24V 30Ah (720 Wh)"],
+    ]}
+    caption="平均消耗按30-40%压缩机工作周期计算。实际续航因环境温度、开门频率和冰箱隔热而异。"
+  />
+
+  <FAQSection items={faqItems} />
+</CalculatorLayout>

@@ -1,0 +1,222 @@
+---
+import CalculatorLayout from '../../layouts/CalculatorLayout.astro';
+import FormulaBox from '../../components/FormulaBox.astro';
+import FAQSection from '../../components/FAQSection.astro';
+import PowerOutageForm from '../../components/PowerOutageForm.astro';
+import WorkedExample from '../../components/WorkedExample.astro';
+import ComparisonTable from '../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../components/EngineeringDiagram.astro';
+
+const whatIs = `太阳能发电机尺寸计算器用于确定完整的太阳能备用系统所需的电池容量、太阳能板功率、充电控制器尺寸和逆变器需求。与燃气发电机不同，太阳能发电机通过阳光充电——只要有阳光照射即可提供无限续航。本计算器对整个系统进行尺寸设计：用于夜间储能的电池组、用于白天充电的太阳能板，以及用于交流负载的逆变器。`;
+
+const whyItMatters = [
+  "太阳能发电机需要匹配三个组件：电池容量、太阳能板功率和逆变器尺寸。不匹配的组件会浪费资金或无法为负载供电。",
+  "电池容量决定夜间续航时间——即在无阳光时可运行负载的小时数。",
+  "太阳能板功率决定充电速度——即电池在白天的补电速度。",
+  "峰值日照时数因地点和季节差异巨大：夏季4-6小时，冬季2-3小时。系统尺寸设计必须考虑最差情况。",
+  "尺寸合适的太阳能发电机可在长时间停电期间提供无限期备用电力——与燃料受限的燃气发电机不同。"
+];
+
+const practicalApplications = [
+  { title: "离网小屋供电", description: "为离网小屋、微型住宅或无电网连接的离网生活设计完整的太阳能发电机系统。" },
+  { title: "紧急全屋备用", description: "设计一个每日通过阳光充电的太阳能备用系统，在多天电网停电期间提供无限期电力。" },
+  { title: "露营与越野旅行", description: "为长途露营旅行、房车生活或越野冒险设计便携式太阳能板和电池储能方案。" },
+  { title: "建筑工地与偏远站点", description: "使用太阳能充电电池系统为无电网接入的工地提供工具、照明和设备电力。" },
+];
+
+const expertNotes: { title: string; variant: 'engineering' | 'tip' | 'warning'; content: string }[] = [
+  { title: "太阳能充电量必须超过每日消耗", variant: "engineering", content: "要实现无限期离网运行，每日太阳能发电量必须超过每日消耗量。如果每日消耗2,000Wh，则需要2,000Wh以上的每日太阳能产量。以4小时峰值日照计算，需要500W以上的太阳能板（未计损耗）。" },
+  { title: "电池尺寸设计要点", variant: "tip", content: "电池尺寸应覆盖全部夜间负载并加上20%的安全裕度。太阳能板在白天充电。不要节省电池容量——它是应对阴天的缓冲。" },
+  { title: "MPPT与PWM充电控制器", variant: "warning", content: "MPPT控制器比PWM效率高15-30%，尤其是在使用高压太阳能板时。对于任何超过200W的系统，强烈建议使用MPPT。效率差异直接影响充电速度。" }
+];
+
+const trustSection = {
+  text: "本计算器使用标准太阳能工程公式。所有计算均假设使用MPPT充电控制器和标准太阳能板效率。实际性能因地点、天气和设备质量而异。",
+  link: { label: "查看我们的方法论", href: "/zh/methodology/" }
+};
+
+const references = [
+  { title: "NREL — 太阳能资源数据", url: "https://developer.nrel.gov/docs/solar/pvwatts/v8/", source: "National Renewable Energy Laboratory" },
+  { title: "DOE — 太阳能技术办公室", url: "https://www.energy.gov/eere/solar/solar-energy-technologies-office", source: "U.S. Department of Energy" },
+  { title: "Sandia国家实验室 — 光伏性能建模", url: "https://pvlib.readthedocs.io/", source: "Sandia National Laboratories" },
+];
+
+const faqItems = [
+  { question: "太阳能发电机需要多少块太阳能板？", answer: "对于每日运行1,500Wh的系统，在4小时峰值日照下需要约400-500W的太阳能板。在冬季（2-3小时峰值日照），需要700-800W才能维持相同的每日充电量。" },
+  { question: "太阳能发电机需要多大的电池？", answer: "电池尺寸应覆盖1-2天的自主运行时间。如果每日消耗2,000Wh，则4,000Wh（4kWh）的电池组可在无任何太阳能充电的情况下提供2天的备用电力。使用LiFePO4可获得80-100%的可用容量。" },
+  { question: "太阳能发电机能为整个房屋供电吗？", answer: "尺寸合适的太阳能发电机（5-15kWh电池、1-3kW太阳能）可无限期地为基本家用负载供电。要运行所有设备（空调、烤箱、烘干机），则需要20kWh以上的系统和5-10kW的太阳能板。" },
+  { question: "太阳能发电机充电需要多长时间？", answer: "充电时间取决于太阳能板功率和日照条件。400W太阳能板系统在5小时峰值日照下产生约2,000Wh。2,000Wh电池在约5小时峰值日照下即可从空充至满。大多数系统需要4-8小时。" },
+];
+
+const commonMistakes = [
+  "使用夏季峰值日照时数来设计全年运行的系统——冬季日照时数（2-3小时）比夏季（4-6小时）低50%，需要更大的太阳能板阵列。",
+  "电池过大而未匹配太阳能板功率——电池容量大但太阳能板不足，白天永远无法充满。",
+  "忽略充电控制器效率损耗——PWM控制器比MPPT多损失10-20%，直接减少每日太阳能发电量。",
+  "假设太阳能板持续以额定功率发电——实际输出取决于太阳角度、温度、遮挡和面板朝向。",
+  "未考虑电池放电深度（DoD）限制——4,000Wh电池在80% DoD下仅提供3,200Wh可用容量，而非全额定容量。",
+  "使用家用耗电量（10-30kWh/天）来设计便携式太阳能系统——这需要不切实际的大型太阳能板阵列（3-10kW）。",
+  "忽略逆变器待机功耗——许多逆变器持续消耗5-15W，每天增加120-360Wh的消耗。",
+  "忘记阴天会使太阳能发电量减少50-80%——系统设计必须考虑最差天气条件。"
+];
+
+const relatedArticles = [
+  { title: "太阳能电池备用指南", href: "/zh/learn/solar-battery-backup-guide/" },
+  { title: "如何设计太阳能电池组尺寸", href: "/zh/learn/how-to-size-solar-battery-bank/" },
+  { title: "最佳太阳能电池化学类型", href: "/zh/learn/best-battery-chemistry-for-solar/" },
+  { title: "太阳能需要多少块电池", href: "/zh/learn/how-many-batteries-for-solar/" },
+];
+
+const relatedCalculators = [
+  { href: "/zh/home-power-outage-battery-backup-calculator/", title: "家庭停电电池备用计算器", description: "全屋备用电力计算器，适用于所有家用电器。" },
+  { href: "/zh/fridge-battery-backup-calculator/", title: "冰箱电池备用计算器", description: "专为停电期间冰箱备用设计的电池尺寸计算。" },
+  { href: "/zh/cpap-battery-backup-calculator/", title: "CPAP电池备用计算器", description: "为CPAP整夜运行设计电池尺寸。" },
+  { href: "/zh/sump-pump-battery-backup-calculator/", title: "排水泵电池备用计算器", description: "确保排水泵在暴风停电期间持续运行。" },
+  { href: "/zh/portable-power-station-runtime-calculator/", title: "便携式电源站续航计算器", description: "查看便携式电源站可为您的负载供电多长时间。" },
+  { href: "/zh/tools/runtime-calculator/", title: "电池续航计算器", description: "根据容量和负载估算放电时间。" },
+  { href: "/zh/tools/battery-sizing-calculator/", title: "电池尺寸计算器", description: "含温度降额的完整电池组尺寸设计。" },
+  { href: "/zh/tools/solar-battery-sizing-calculator/", title: "太阳能电池尺寸计算器", description: "设计与太阳能板阵列配套的电池尺寸。" },
+  { href: "/zh/tools/energy-conversion-calculator/", title: "能量转换计算器", description: "在任意电压下转换Ah、Wh和kWh。" },
+  { href: "/zh/tools/charging-time-calculator/", title: "充电时间计算器", description: "估算太阳能或电网充电时间。" },
+  { href: "/zh/tools/voltage-drop-calculator/", title: "电压降计算器", description: "设计线径以最小化电压降。" },
+  { href: "/zh/tools/dc-cable-loss-calculator/", title: "直流电缆损耗计算器", description: "计算直流连接中的线路损耗。" },
+];
+
+const presetAppliances = [
+  { name: "Refrigerator", runningW: 150, surgeW: 600 }, { name: "Freezer", runningW: 120, surgeW: 500 },
+  { name: "Wi-Fi Router", runningW: 12, surgeW: 12 }, { name: "LED Light", runningW: 10, surgeW: 10 },
+  { name: "Laptop", runningW: 60, surgeW: 90 }, { name: "TV", runningW: 100, surgeW: 150 },
+  { name: "CPAP Machine", runningW: 40, surgeW: 80 }, { name: "Fan", runningW: 50, surgeW: 75 },
+  { name: "Sump Pump", runningW: 800, surgeW: 2000 }, { name: "Microwave", runningW: 1000, surgeW: 1500 },
+];
+---
+
+<CalculatorLayout
+  lang="zh"
+  title="太阳能发电机尺寸计算器 | Battery Calculators"
+  description="计算完整的太阳能发电机所需的电池容量、太阳能板功率和系统组件。为离网生活、应急备灾或露营设计太阳能备用系统。"
+  faqItems={faqItems}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+  relatedCalculators={relatedCalculators}
+  commonMistakes={commonMistakes}
+  relatedArticles={relatedArticles}
+>
+  <PowerOutageForm
+    presetAppliances={presetAppliances}
+    defaultBackupHours={12}
+    defaultVoltage="24"
+    defaultLoadsDescription="已预加载常见的太阳能发电机负载。添加您的设备并启用太阳能充电来设计完整系统。"
+    defaultLoads={[{ name: "Refrigerator", quantity: 1 }, { name: "Freezer", quantity: 1 }, { name: "Wi-Fi Router", quantity: 1 }]}
+  />
+
+  <section class="mb-16 border-t border-hairline pt-12">
+    <FormulaBox title="数学公式">
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Total Running W = Σ (Appliance Running W × Quantity)</div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Energy Required (Wh) = (Running W × Hours) / Inverter Efficiency × (1 + Safety Margin)</div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Battery Ah = Required Wh / (Battery Voltage × Depth of Discharge)</div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Daily Solar Production = Solar Panels (W) × Peak Sun Hours × Controller Efficiency</div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Panel Size (W) = Daily Consumption (Wh) / (Peak Sun Hours × Controller Efficiency)</div>
+      <p class="text-xs text-muted mt-4">要实现无限期离网运行，每日太阳能发电量必须超过每日消耗量。面板尺寸应按最差季节设计。</p>
+    </FormulaBox>
+
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">公式与计算示例</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample
+        number={1}
+        title="露营周末配置"
+        scenario="在3天露营旅行中，以4小时峰值日照为便携式冰箱、LED灯供电并为设备充电。"
+        inputs={[
+          { label: "便携式冰箱", value: "60W" },
+          { label: "LED灯 ×2", value: "总计20W" },
+          { label: "手机+相机充电", value: "平均30W" },
+          { label: "每日使用时间", value: "12小时" },
+        ]}
+        steps={[
+          { label: "步骤1：每日消耗量", formula: "110W × 12h = 1,320 Wh/天", result: "1,320 Wh/天" },
+          { label: "步骤2：电池（2天自主运行，24V LFP 80% DoD）", formula: "1,320 × 2 / (24 × 0.80)", result: "137.5 Ah → 24V 150Ah (3.6 kWh)" },
+          { label: "步骤3：太阳能板（4小时峰值日照，95%控制器效率）", formula: "1,320 / (4 × 0.95)", result: "347W → 400W太阳能板" },
+        ]}
+        answer="400W太阳能板 + 24V 150Ah LFP电池 + 1,000W逆变器，满足舒适的露营周末。"
+        interpretation="露营负载较轻——便携式400W太阳能板阵列每天可以富余地为电池充电。"
+      />
+      <WorkedExample
+        number={2}
+        title="紧急家庭备用（72小时）"
+        scenario="在冬季（3小时峰值日照）通过每日太阳能充电维持冰箱、冷冻柜、Wi-Fi和照明运行3天。"
+        inputs={[
+          { label: "冰箱+冷冻柜", value: "合计270W" },
+          { label: "Wi-Fi+路由器", value: "12W" },
+          { label: "LED灯 ×3", value: "30W" },
+          { label: "每日使用时间", value: "24小时" },
+        ]}
+        steps={[
+          { label: "步骤1：每日消耗量", formula: "312W × 24h = 7,488 Wh/天", result: "7,488 Wh/天" },
+          { label: "步骤2：电池（1天自主运行，48V LFP 80% DoD）", formula: "7,488 / (48 × 0.80)", result: "195 Ah → 48V 200Ah (9.6 kWh)" },
+          { label: "步骤3：太阳能板（3小时冬季日照，95%效率）", formula: "7,488 / (3 × 0.95)", result: "2,627W → 2,800W太阳能板" },
+        ]}
+        answer="2,800W太阳能板 + 48V 200Ah LFP电池 + 4,000W逆变器，应对多天冬季停电。"
+        interpretation="冬季太阳能需要大幅增加太阳能板阵列——夏季系统可以缩减约一半。"
+      />
+      <WorkedExample
+        number={3}
+        title="离网小屋（全时段）"
+        scenario="为小型离网小屋提供冰箱、照明、水泵和基本电器的全年供电。"
+        inputs={[
+          { label: "冰箱", value: "150W" },
+          { label: "水泵", value: "750W（间歇）" },
+          { label: "照明+电子设备", value: "100W" },
+          { label: "每日使用时间", value: "24小时" },
+        ]}
+        steps={[
+          { label: "步骤1：平均每日消耗量", formula: "~1,500Wh（冰箱循环）+ 500Wh（水泵）+ 2,400Wh（电子设备）", result: "平均4,400 Wh/天" },
+          { label: "步骤2：电池（3天自主运行，48V LFP 80% DoD）", formula: "4,400 × 3 / (48 × 0.80)", result: "344 Ah → 48V 400Ah (19.2 kWh)" },
+          { label: "步骤3：太阳能板（5小时峰值日照，95%效率）", formula: "4,400 / (5 × 0.95)", result: "926W → 1,000W太阳能板" },
+        ]}
+        answer="1,000W太阳能板 + 48V 400Ah LFP电池 + 3,000W逆变器，实现全时段离网小屋供电。"
+        interpretation="离网小屋需要充足的电池储能来应对阴天自主运行——3天以上可防止暴风雨期间电池耗尽。"
+      />
+    </div>
+  </section>
+
+  <EngineeringDiagram
+    title="太阳能发电机充电流程"
+    description="能量从太阳能板通过充电控制器流向电池组，再通过逆变器为交流负载供电。"
+    steps={[
+      { label: "太阳能板", icon: "solar" },
+      { label: "充电控制器", icon: "charge" },
+      { label: "电池组", icon: "battery" },
+      { label: "逆变器", icon: "inverter" },
+      { label: "交流负载", icon: "load" },
+    ]}
+    variant="flow"
+  />
+
+  <ComparisonTable
+    title="太阳能发电机面板+电池组合指南"
+    headers={["系统规模", "电池 (LFP)", "太阳能板", "每日发电量", "适用场景", "冬季够用？"]}
+    rows={[
+      ["小型便携", "24V 50Ah (1.2 kWh)", "200W", "800–1,000 Wh", "手机、照明、小冰箱", "仅夏季"],
+      ["标准露营", "24V 100Ah (2.4 kWh)", "400W", "1,600–2,000 Wh", "冰箱、照明、设备", "是（温和气候）"],
+      ["周末备用", "24V 200Ah (4.8 kWh)", "600W", "2,400–3,000 Wh", "冰箱+冷冻柜+Wi-Fi", "是"],
+      ["家庭应急", "48V 200Ah (9.6 kWh)", "1,200W", "4,800–6,000 Wh", "基本家用负载", "是"],
+      ["全屋备用", "48V 400Ah (19.2 kWh)", "2,400W", "9,600–12,000 Wh", "全屋备用电力", "是"],
+      ["离网小屋", "48V 600Ah (28.8 kWh)", "3,600W", "14,400–18,000 Wh", "全时段离网生活", "是"],
+    ]}
+    caption="冬季发电量按3小时峰值日照计算。夏季（5-6小时峰值日照）发电量约高60-100%。"
+  />
+
+  <FAQSection items={faqItems} />
+</CalculatorLayout>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const solarCheckbox = document.getElementById('solar-enabled') as HTMLInputElement | null;
+    if (solarCheckbox && !solarCheckbox.checked) {
+      solarCheckbox.click();
+    }
+  });
+</script>

@@ -1,0 +1,652 @@
+---
+import CalculatorLayout from '../../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import InputField from '../../../components/InputField.astro';
+import ResultBox from '../../../components/ResultBox.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import RelatedTools from '../../../components/RelatedTools.astro';
+import WorkedExample from '../../../components/WorkedExample.astro';
+import ComparisonTable from '../../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../../components/EngineeringDiagram.astro';
+
+const whatIs = `CII 计算器根据国际海事组织（IMO）温室气体排放框架，提供船舶碳强度指标（CII）评级的教育性估算。该工具可计算估算 CO₂ 排放量、运输工作量、达到的 CII 值以及指示性评级区间（A 至 E）。本工具适用于初步评估和改进方案建模——并非官方 IMO 合规计算器。实际 CII 评级取决于船舶特定参数、DCS 数据验证以及 IMO 认可的计算方法。`;
+
+const whyItMatters = [
+  "IMO CII 强制要求 5,000 总吨及以上船舶达到最低 C 级评级——连续三年获得 D 级或任何一年获得 E 级的船舶必须提交纠正行动计划。",
+  "CII 评级直接影响船舶商业价值——评级较低可能限制在环境要求更严格地区的贸易，并降低租船吸引力。",
+  "了解当前 CII 状况有助于主动规划改进措施，而非被动合规——提前行动始终更具成本效益。",
+  "混合动力化、岸电供电和运营效率提升均可带来 5-15% 的 CII 改善——量化这些路径对于投资决策至关重要。",
+  "CII 框架在 2030 年前逐年收紧——当前获得 C 级评级的船舶若不持续改进，到 2027 年可能降为 D 级。"
+];
+
+const practicalApplications = [
+  { title: "基线 CII 评估", description: "根据年度燃油消耗、航行距离和载重吨位估算当前 CII 评级，了解合规状况。" },
+  { title: "改进方案建模", description: "评估混合动力化、岸电供电、航速优化和运营效率提升对 CII 的影响。" },
+  { title: "船队 CII 基准对比", description: "比较船队内各船舶 CII 评级，优先对评级最低的船舶进行改进投资。" },
+  { title: "DCS 提交前准备", description: "通过理解燃油消耗、航行距离与 CII 评级之间的关系，为年度 DCS（数据收集系统）提交做好准备。" }
+];
+
+const expertNotes: { title: string; variant: 'warning' | 'engineering' | 'info'; content: string }[] = [
+  {
+    title: "非官方 IMO 计算器",
+    variant: "warning",
+    content: "本工具仅供教育估算使用。官方 CII 评级通过 IMO 自有方法（经修订的 MEPC.328(74)）计算，经 DCS 数据提交验证，并由船旗国批准。实际 CII 计算需要特定船舶参数（船型、载重吨、总吨位、货物装载能力、特定燃油类型 CO₂ 排放因子），且必须严格按照 IMO 规定的公式执行。"
+  },
+  {
+    title: "参考线与评级区间",
+    variant: "engineering",
+    content: "CII 评级通过将船舶达到的 CII 与其船型和尺寸对应的年度运营 CII 参考线进行比较来确定。评级区间定义为：A（显著优良）= 低于参考线 80%，B（轻微优良）= 80–90%，C（中等）= 90–100%，D（较差）= 100–110%，E（显著较差）= 高于 110%。本计算器使用简化参考线用于教育目的。"
+  },
+  {
+    title: "改进方案假设",
+    variant: "info",
+    content: "改进方案使用行业代表性平均值：混合动力化降低燃油消耗 15%，岸电供电消除 5% 的年度燃油消耗（停泊期间），运营效率提升（航速优化、船体清洁、气象航线）降低消耗 10%。实际改进潜力因船型、航线和运营工况而异。"
+  }
+];
+
+const trustSection = {
+  text: "CII 方法基于经修订的 IMO MEPC.328(74)。评级区间定义遵循 IMO DCS 数据分析。本工具提供教育性估算——请咨询您的船级社获取官方计算结果。",
+  link: { label: "查看我们的方法和公式推导", href: "/zh/methodology/" }
+};
+
+const references = [
+  { title: "IMO CII 指南（MEPC.328(74)）", url: "https://www.imo.org/en/OurWork/Environment/Pages/Carbon-Intensity-Indicator-(CII).aspx", source: "国际海事组织" },
+  { title: "IMO 第四次温室气体研究 2020", url: "https://www.imo.org/en/OurWork/Environment/Pages/Fourth-IMO-Greenhouse-Gas-Study-2020.aspx", source: "国际海事组织" },
+  { title: "DNV — CII 评估与评级", url: "https://www.dnv.com/maritime/", source: "DNV" },
+  { title: "IMO DCS 数据 — CII 参考线", url: "https://www.imo.org/en/OurWork/Environment/Pages/Initial-IMO-GHG-Strategy.aspx", source: "国际海事组织" }
+];
+
+const faqItems = [
+  {
+    question: "什么是碳强度指标（CII）？",
+    answer: "CII 是 IMO 的一项措施，根据船舶运营碳强度将船舶从 A 到 E 进行评级——以每吨英里货物运输工作排放的 CO₂ 克数来衡量。该指标适用于 5,000 总吨及以上从事国际航行的船舶。连续三年获得 D 级或任何一年获得 E 级评级的船舶，必须作为船舶能效管理计划（SEEMP）的一部分提交纠正行动计划。"
+  },
+  {
+    question: "CII 如何计算？",
+    answer: "达到的 CII = 年度 CO₂ 排放量（吨）/（载重吨 × 航行距离（海里））。计算结果与特定船型和尺寸对应的年度运营 CII 参考线进行比较。评级由达到的 CII 相对于参考线的位置确定：A 低于参考线 80%，B 为 80–90%，C 为 90–100%，D 为 100–110%，E 高于 110%。"
+  },
+  {
+    question: "各 CII 评级分别代表什么含义？",
+    answer: "A（显著优良）：大幅超出效率要求。B（轻微优良）：达到并超出要求。C（中等）：达到最低要求——这是 IMO 的目标运营区间。D（较差）：低于要求——若连续三年获得此评级需采取纠正措施。E（显著较差）：远低于要求——需立即提交纠正行动计划。"
+  },
+  {
+    question: "如何提高 CII 评级？",
+    answer: "主要改进路径包括：航速优化（改善 10–20%）、船体和螺旋桨清洁（5–10%）、气象航线和航程优化（3–8%）、混合动力化或电池电力系统（10–15%）、停泊岸电供电（3–8%）、风力辅助推进（5–15%）、LNG 或替代燃料（10–20%）。通常结合运营措施和技术措施可取得最佳效果。"
+  },
+  {
+    question: "此计算器能否替代官方 IMO 合规？",
+    answer: "不能。本工具提供教育性估算，用于初步评估和改进方案建模。官方 CII 评级通过 IMO 数据收集系统（DCS）确定，经船旗国验证，且必须严格遵循经修订的 MEPC.328(74) 规定的方法。请始终使用船级社批准的工具进行法规合规。"
+  },
+  {
+    question: "哪些船舶受 CII 影响？",
+    answer: "CII 适用于 5,000 总吨及以上从事国际航行的货船、邮轮和油轮。包括散货船、集装箱船、油轮、气体运输船、滚装货船和邮轮。不适用于海上支援船、渔船或未从事国际航行的船舶。未来 IMO 修订可能扩大适用范围。"
+  },
+  {
+    question: "混合动力化如何影响 CII？",
+    answer: "混合动力化通过低负荷期间的电池电力运行、负荷平衡和优化发动机负载，使年度燃油消耗降低 15–25%。由于 CII 与 CO₂ 排放量成正比（CO₂ 排放量源于燃油消耗），15% 的燃油减少可带来约 15% 的 CII 改善。这可使船舶从 D 级提升至 C 级或从 C 级提升至 B 级。"
+  },
+  {
+    question: "CII 多久重新评估一次？",
+    answer: "CII 作为 IMO DCS 数据收集的一部分每年进行评估。每年，船舶向船旗国提交燃油消耗、航行距离和货物数据。计算达到的 CII 并与参考线比较以确定年度评级。船舶的累计评级历史很重要——连续三年获得 D 级将触发纠正行动要求。"
+  }
+];
+
+const relatedArticles = [
+  { title: "了解 CII 评级与船舶碳强度", href: "/zh/learn/understanding-cii-ratings/" },
+  { title: "海事脱碳路线图", href: "/zh/learn/maritime-decarbonization-roadmap/" },
+];
+
+const commonMistakes = [
+  "使用简化参考线而非船型特定的 IMO 参考线——实际参考线因船舶类别和载重吨差异显著。",
+  "忽略 DCS 数据验证要求——CII 计算必须使用经验证的年度燃油消耗和航行距离数据（通过 IMO DCS 提交）。",
+  "将改进百分比叠加计算而非复利计算——15% 混合动力化 + 10% 岸电 + 10% 运营效率并不等于 35% 的总改善。",
+  "认为单一年度 CII 评级决定合规性——IMO 评估多年度 CII；连续三年 D 级触发纠正行动要求。",
+  "使用估算燃油消耗而非实际加油记录——IMO DCS 要求实际燃油采购和消耗记录，而非估算值。",
+  "忘记 CII 参考线在 2030 年前逐年收紧——当前获得 C 级评级的船舶若不进一步改进，可能降至 D 级。",
+  "未考虑航行距离变化——压载航行和重新定位影响年度距离和运输工作量计算。",
+  "将 CII 方法应用于 5,000 总吨以下的船舶——CII 仅适用于 5,000 总吨及以上从事国际航行的货船、邮轮和油轮。"
+];
+
+const relatedCalculators = [
+  { href: "/zh/tools/marine-co2-reduction-calculator/", title: "船舶 CO₂ 减排计算器", description: "量化混合动力化和岸电供电带来的排放减少。" },
+  { href: "/zh/tools/shore-power-savings-calculator/", title: "岸电节约计算器", description: "估算岸电连接带来的燃油节约和排放减少。" },
+  { href: "/zh/marine/", title: "船舶电气化中心", description: "探索所有船舶脱碳工具和资源。" },
+];
+
+const fuelOptions = [
+  { label: '船用汽油（MGO）', value: 'mgo' },
+  { label: '船用柴油（MDO）', value: 'mdo' },
+  { label: '重质燃油（HFO）', value: 'hfo' },
+  { label: 'LNG', value: 'lng' },
+];
+---
+
+<CalculatorLayout
+  title="CII 计算器 | Battery Calculators"
+  description="估算船舶碳强度指标（CII）评级并建模改进方案以符合 IMO 要求。教育工具——非官方 IMO 计算器。"
+  faqItems={faqItems}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+  relatedCalculators={relatedCalculators}
+  commonMistakes={commonMistakes}
+  relatedArticles={relatedArticles}
+  lang="zh"
+>
+
+  <!-- 醒目免责声明横幅 -->
+  <div class="bg-m-red/10 border border-m-red/30 p-4 mb-8 flex items-start gap-3">
+    <svg class="w-5 h-5 text-m-red shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z" />
+    </svg>
+    <div>
+      <h3 class="text-primary font-bold text-sm mb-1">教育工具——非官方 IMO 合规计算器</h3>
+      <p class="text-body-sm text-muted">本计算器提供规划和学习用途的初步估算。实际 CII 评级通过 IMO 数据收集系统（DCS）确定，且必须由船旗国和船级社使用 IMO 认可的方法进行验证。</p>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+
+    <!-- 输入表单 -->
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">船舶参数</h3>
+      <div class="flex flex-col gap-6">
+
+        <InputField
+          id="annual-fuel"
+          label="年度燃油消耗"
+          value={5000}
+          min={100}
+          max={100000}
+          step={100}
+          unit="吨/年"
+          helperText="每年消耗的燃油总量（公吨）。"
+        />
+
+        <InputField
+          id="fuel-type"
+          label="燃油类型"
+          type="select"
+          value="mgo"
+          options={fuelOptions}
+          helperText="船舶使用的主燃油。"
+        />
+
+        <InputField
+          id="distance-travelled"
+          label="航行距离"
+          value={50000}
+          min={1000}
+          max={500000}
+          step={1000}
+          unit="海里/年"
+          helperText="每年航行的总海里数。"
+        />
+
+        <InputField
+          id="dwt"
+          label="载重吨位（DWT）"
+          value={50000}
+          min={5000}
+          max={500000}
+          step={1000}
+          unit="DWT"
+          helperText="船舶载重吨位（公吨）（CII 适用要求 ≥5,000）。"
+        />
+
+      </div>
+    </CalculatorCard>
+
+    <!-- 结果 -->
+    <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">CII 评估</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <ResultBox
+            label="估算年度 CO₂ 排放量"
+            value="16,030 t"
+            suffix="吨 CO₂ / 年"
+            variant="primary"
+            id="result-co2-emissions"
+          />
+          <ResultBox
+            label="运输工作量"
+            value="2.5B tnm"
+            suffix="DWT × 海里"
+            id="result-transport-work"
+          />
+          <ResultBox
+            label="估算达到的 CII"
+            value="6.41"
+            suffix="g CO₂ / DWT-nm"
+            id="result-attained-cii"
+          />
+          <ResultBox
+            label="指示性评级区间"
+            value="C"
+            suffix="中等——达到最低要求"
+            id="result-rating-band"
+          />
+        </div>
+      </div>
+
+      <div class="border-t border-hairline pt-6">
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">CII 评估摘要</h4>
+        <p class="text-body-sm text-muted" id="summary-el">
+          基于 5,000 吨燃油和 50,000 海里航行距离，该船舶估算 CII 为 6.41 g CO₂/DWT-nm，处于 C 级评级区间。
+        </p>
+      </div>
+    </CalculatorCard>
+
+  </div>
+
+  <!-- 评级区间可视化 -->
+  <section class="mb-16">
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-4 uppercase tracking-wider">CII 评级区间</h3>
+      <p class="text-body-sm text-muted mb-6">船舶相对于 IMO 评级阈值的当前位置（教育参考）。</p>
+      <div id="rating-bands-chart" class="flex flex-col gap-3"></div>
+      <div class="flex items-center gap-4 mt-4 text-caption text-muted flex-wrap">
+        <span class="flex items-center gap-1.5"><span class="w-3 h-3 inline-block" style="background-color: #0fa336"></span> A — 显著优良</span>
+        <span class="flex items-center gap-1.5"><span class="w-3 h-3 inline-block" style="background-color: #16a34a"></span> B — 轻微优良</span>
+        <span class="flex items-center gap-1.5"><span class="w-3 h-3 inline-block" style="background-color: #f4b400"></span> C — 中等</span>
+        <span class="flex items-center gap-1.5"><span class="w-3 h-3 inline-block" style="background-color: #ea580c"></span> D — 较差</span>
+        <span class="flex items-center gap-1.5"><span class="w-3 h-3 inline-block" style="background-color: #e22718"></span> E — 显著较差</span>
+      </div>
+    </CalculatorCard>
+  </section>
+
+  <!-- 改进方案图表 -->
+  <section class="mb-16">
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-4 uppercase tracking-wider">当前 CII 与改进后 CII</h3>
+      <p class="text-body-sm text-muted mb-6">结合混合动力化、岸电供电和运营效率提升措施后的 CII 改善估算。</p>
+      <div id="improvement-chart" class="flex flex-col gap-4"></div>
+    </CalculatorCard>
+  </section>
+
+  <!-- 公式与实例 -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">公式与实例</h2>
+    <FormulaBox title="数学公式">
+      <p>
+        CII 为年度 CO₂ 排放量与运输工作量的比值：
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        CO₂ 排放量 = 燃油消耗量 × CO₂ 排放因子
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        运输工作量 = DWT × 航行距离（海里）
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        达到的 CII = CO₂（吨）× 1,000,000 / 运输工作量
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        CII 评级区间（相对于参考线 R）：
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2 text-[12px] leading-relaxed">
+        A：&lt; 0.80 × R<br/>
+        B：0.80 × R 至 &lt; 0.90 × R<br/>
+        C：0.90 × R 至 &lt; 1.00 × R<br/>
+        D：1.00 × R 至 &lt; 1.10 × R<br/>
+        E：≥ 1.10 × R
+      </div>
+      <p class="mt-4">
+        CO₂ 排放因子（吨 CO₂/吨燃油）：MGO 3.206，MDO 3.206，HFO 3.114，LNG 2.750<br/>
+        参考线 R = 5.0 g CO₂/DWT-nm（教育简化基准）<br/>
+        IMO DCS 数据显示典型参考线因船型和载重吨而异
+      </p>
+    </FormulaBox>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample
+        number={1}
+        title="散货船——年度 CII 评级"
+        scenario="一艘散货船全年在太平洋航线上运营，运输铁矿石和煤炭。我们需要根据燃油消耗、航行距离和载重吨位确定其年度 CII 评级。"
+        inputs={[
+          { label: "年度燃油消耗", value: "4,200 吨 MGO" },
+          { label: "航行距离", value: "55,000 海里" },
+          { label: "载重吨位", value: "82,000 DWT" },
+          { label: "CO₂ 排放因子（MGO）", value: "3.206 t CO₂/t 燃油" },
+        ]}
+        steps={[
+          "计算年度 CO₂ 排放量：4,200 × 3.206 = 13,465 吨 CO₂",
+          "计算运输工作量：82,000 × 55,000 = 4.51 × 10⁹ DWT-nm",
+          "计算达到的 CII：(13,465 × 1,000,000) / 4,510,000,000 = 2.99 g CO₂/DWT-nm",
+          "与参考线 R = 5.0 比较：比值 = 2.99 / 5.0 = 0.598",
+          "比值 < 0.80 → 评级：A（显著优良）",
+        ]}
+        answer="CII = 2.99 g CO₂/DWT-nm——评级：A（显著优良）"
+        interpretation="该散货船高效的运营——大吨位货物长距离运输——产生远低于参考线的低 CII。A 级评级使其位于同级别船舶前 20%，无需纠正行动且有资格获得绿色融资。"
+        variant="marine"
+      />
+
+      <WorkedExample
+        number={2}
+        title="集装箱船——评级区间差异"
+        scenario="两艘相同的集装箱船（12,000 TEU，85,000 DWT）以不同服务速度运营。A 船以 18 节巡航，而 E 船全年以 24 节运营。两船使用相同燃油类型但消耗率不同。"
+        inputs={[
+          { label: "A 船燃油消耗", value: "180 吨/天 × 280 天 = 50,400 吨 HFO" },
+          { label: "E 船燃油消耗", value: "260 吨/天 × 280 天 = 72,800 吨 HFO" },
+          { label: "年度航行距离（两船相同）", value: "65,000 海里" },
+          { label: "载重吨位", value: "85,000 DWT" },
+          { label: "CO₂ 排放因子（HFO）", value: "3.114 t CO₂/t 燃油" },
+        ]}
+        steps={[
+          "A 船 CO₂：50,400 × 3.114 = 156,946 t | E 船 CO₂：72,800 × 3.114 = 226,699 t",
+          "运输工作量（两船相同）：85,000 × 65,000 = 5.525 × 10⁹ DWT-nm",
+          "A 船 CII：156,946 × 10⁶ / 5.525 × 10⁹ = 2.84 g CO₂/DWT-nm",
+          "E 船 CII：226,699 × 10⁶ / 5.525 × 10⁹ = 4.10 g CO₂/DWT-nm",
+          "A 船比值 = 2.84 / 5.0 = 0.568 → 评级：A | E 船比值 = 4.10 / 5.0 = 0.820 → 评级：B",
+        ]}
+        answer="A 船：2.84 g CO₂/DWT-nm → 评级 A | E 船：4.10 g CO₂/DWT-nm → 评级 B"
+        interpretation="尽管船舶完全相同，33% 的航速差异导致整整一个评级区间的差距。A 船有资格获得绿色融资；B 船达到要求但缺乏竞争优势。仅将 E 船航速降低 2 节即可使其从 B 级提升至 A 级——这有力地证明了运营决策直接决定 CII 结果。"
+        variant="marine"
+      />
+
+      <WorkedExample
+        number={3}
+        title="油轮——降速航行影响"
+        scenario="一艘 MR 成品油轮目前以服务速度运营。运营团队建议在压载航段降低航速 20%，在满载航段降低 10%。我们对降速策略的 CII 改善进行建模。"
+        inputs={[
+          { label: "当前燃油消耗", value: "38 吨/天（平均）" },
+          { label: "运营天数", value: "320 天/年" },
+          { label: "年度航行距离", value: "48,000 海里" },
+          { label: "载重吨位", value: "45,000 DWT" },
+          { label: "航速降低", value: "航程工况平均约 15%" },
+          { label: "CO₂ 排放因子（MGO）", value: "3.206 t CO₂/t 燃油" },
+        ]}
+        steps={[
+          "当前燃油消耗：38 × 320 = 12,160 吨 → CO₂ = 12,160 × 3.206 = 38,985 t",
+          "当前运输工作量：45,000 × 48,000 = 2.16 × 10⁹ DWT-nm",
+          "当前 CII：38,985 × 10⁶ / 2.16 × 10⁹ = 18.05 g CO₂/DWT-nm",
+          "降低后燃油消耗（节约 15%）：12,160 × 0.85 = 10,336 吨 → CO₂ = 33,137 t",
+          "改善后 CO₂：10,336 × 3.206 = 33,137 t → 改善后 CII：15.34 g CO₂/DWT-nm",
+          "CII 降幅：(18.05 - 15.34) / 18.05 = 改善 15%",
+          "评级变化：E（18.05/5.0 = 3.61）→ D（15.34/5.0 = 3.07）",
+        ]}
+        answer="CII 从 18.05 降至 15.34 g CO₂/DWT-nm——评级从 E 提升至 D"
+        interpretation="仅降速航行即可实现 15% 的 CII 改善，使该油轮从 E 级提升至 D 级。虽然 D 级仍需提交纠正行动计划，但船舶避免了 E 级船舶要求的强制性即时改进。结合降速航行、船体清洁和气象航线规划，可将船舶推至 C 级，完全免除纠正行动义务。"
+        variant="marine"
+      />
+    </div>
+  </section>
+
+  <!-- 改进方案部分 -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">改进方案效果</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <CalculatorCard>
+        <h4 class="text-primary font-bold text-sm mb-3">混合动力化效果</h4>
+        <p class="text-body-sm text-muted mb-2">通过低负荷期间的电池电力运行和优化发动机负载，降低燃油消耗 15%。</p>
+        <p class="text-caption text-m-blue-light font-mono">CII 降幅：15%</p>
+      </CalculatorCard>
+      <CalculatorCard>
+        <h4 class="text-primary font-bold text-sm mb-3">岸电供电效果</h4>
+        <p class="text-body-sm text-muted mb-2">通过电网电力替代停泊期间的发电机运行，消除 5% 的年度燃油消耗。</p>
+        <p class="text-caption text-m-blue-light font-mono">CII 降幅：5%</p>
+      </CalculatorCard>
+      <CalculatorCard>
+        <h4 class="text-primary font-bold text-sm mb-3">运营效率提升</h4>
+        <p class="text-body-sm text-muted mb-2">航速优化、船体清洁、气象航线规划和航程优化可降低消耗 10%。</p>
+        <p class="text-caption text-m-blue-light font-mono">CII 降幅：10%</p>
+      </CalculatorCard>
+    </div>
+  </section>
+
+  <!-- 假设与限制 -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">假设与限制</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <CalculatorCard>
+        <h4 class="text-primary font-bold text-sm mb-3">计算假设</h4>
+        <ul class="text-body-sm text-muted flex flex-col gap-2">
+          <li class="flex gap-2"><span class="text-m-blue-light shrink-0">→</span> 简化参考线：5.0 g CO₂/DWT-nm（教育用途）</li>
+          <li class="flex gap-2"><span class="text-m-blue-light shrink-0">→</span> CO₂ 排放因子来自 IMO 第四次温室气体研究（2020）</li>
+          <li class="flex gap-2"><span class="text-m-blue-light shrink-0">→</span> 评级区间遵循 IMO DCS 数据分析比例</li>
+          <li class="flex gap-2"><span class="text-m-blue-light shrink-0">→</span> 改进百分比基于已发表的案例研究</li>
+        </ul>
+      </CalculatorCard>
+      <CalculatorCard>
+        <h4 class="text-primary font-bold text-sm mb-3">本计算器不包含的内容</h4>
+        <ul class="text-body-sm text-muted flex flex-col gap-2">
+          <li class="flex gap-2"><span class="text-m-red shrink-0">✗</span> 船型特定参考线（因船舶类别而异）</li>
+          <li class="flex gap-2"><span class="text-m-red shrink-0">✗</span> 货物装载能力调整</li>
+          <li class="flex gap-2"><span class="text-m-red shrink-0">✗</span> 天气和海况修正</li>
+          <li class="flex gap-2"><span class="text-m-red shrink-0">✗</span> DCS 数据验证和船旗国批准</li>
+          <li class="flex gap-2"><span class="text-m-red shrink-0">✗</span> 按 IMO 修正案进行的年度参考线调整</li>
+        </ul>
+      </CalculatorCard>
+    </div>
+  </section>
+
+  <EngineeringDiagram
+    title="CII 评级体系"
+    description="年度运营数据输入 CII 公式产生 A–E 评级"
+    variant="flow"
+    steps={[
+      { label: "燃油消耗", icon: "charge" },
+      { label: "航行距离", icon: "cable" },
+      { label: "CII 公式", icon: "chart" },
+      { label: "A–E 评级", icon: "chart" },
+    ]}
+  />
+
+  <ComparisonTable
+    title="CII 评级区间与含义"
+    headers={["评级", "CII 范围", "所需行动", "状态", "后果"]}
+    rows={[
+      ["A", "前 20%", "无需行动——模范", "绿色", "绿色融资资格"],
+      ["B", "次 20%", "无需行动——良好", "绿色", "无需纠正行动"],
+      ["C", "中间 40%", "无需行动——平均", "黄色", "监控并改进"],
+      ["D", "次 15%", "纠正行动计划", "橙色", "须在 12 个月内提交计划"],
+      ["E", "末 5%", "即时改进", "红色", "强制纠正行动"],
+    ]}
+    caption="CII 评级阈值基于 IMO 2023 年法规"
+  />
+
+  <FAQSection items={faqItems} />
+  <RelatedTools tools={relatedCalculators} />
+
+  <!-- 工程支持行动号召 -->
+  <div class="bg-surface-card border border-hairline p-6 mt-8 mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div class="max-w-xl">
+      <h3 class="text-title-sm text-primary mb-1">需要更深入的工程评审？</h3>
+      <p class="text-body-sm text-muted font-light">
+        本计算器用于初步估算。如需船舶特定分析、电池选型评审、减排规划或混合动力可行性支持，请联系 Battery Calculators 工程支持团队。
+      </p>
+    </div>
+    <a href="/zh/marine/#marine-advisory" class="btn-primary text-xs px-6 py-3 shrink-0 whitespace-nowrap">申请工程支持</a>
+  </div>
+
+  <!-- 计算脚本 -->
+  <script>
+    import { calculateCii } from '../../../utils/calculators';
+
+    const annualFuelInput = document.getElementById('annual-fuel') as HTMLInputElement;
+    const fuelTypeInput = document.getElementById('fuel-type') as HTMLSelectElement;
+    const distanceInput = document.getElementById('distance-travelled') as HTMLInputElement;
+    const dwtInput = document.getElementById('dwt') as HTMLInputElement;
+
+    function getResultElements(id: string) {
+      const box = document.getElementById(id);
+      return {
+        value: box?.querySelector('.text-display-md, .text-title-lg') as HTMLElement,
+        suffix: box?.querySelector('.text-caption') as HTMLElement,
+      };
+    }
+
+    const co2Emissions = getResultElements('result-co2-emissions');
+    const transportWork = getResultElements('result-transport-work');
+    const attainedCii = getResultElements('result-attained-cii');
+    const ratingBand = getResultElements('result-rating-band');
+    const summaryEl = document.getElementById('summary-el');
+
+    function fmt(n: number, decimals = 1): string {
+      return n.toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+    }
+
+    function updateRatingBandsChart(attainedCiiValue: number) {
+      const container = document.getElementById('rating-bands-chart');
+      if (!container) return;
+
+      // Reference line = 5.0 for educational purposes
+      const reference = 5.0;
+      const ratio = attainedCiiValue / reference;
+
+      // Scale: 0 to 8 g CO2/DWT-nm
+      const maxScale = 8;
+      const markerPos = Math.min((attainedCiiValue / maxScale) * 100, 100);
+
+      container.innerHTML = `
+        <div class="relative">
+          <div class="flex h-10 border border-hairline overflow-hidden">
+            <div class="flex-[0.8] flex items-center justify-center" style="background-color: #0fa336; opacity: 0.3">
+              <span class="text-[10px] font-bold text-primary">A</span>
+            </div>
+            <div class="flex-[0.1] flex items-center justify-center" style="background-color: #16a34a; opacity: 0.3">
+              <span class="text-[10px] font-bold text-primary">B</span>
+            </div>
+            <div class="flex-[0.1] flex items-center justify-center" style="background-color: #f4b400; opacity: 0.3">
+              <span class="text-[10px] font-bold text-primary">C</span>
+            </div>
+            <div class="flex-[0.1] flex items-center justify-center" style="background-color: #ea580c; opacity: 0.3">
+              <span class="text-[10px] font-bold text-primary">D</span>
+            </div>
+            <div class="flex-[0.9] flex items-center justify-center" style="background-color: #e22718; opacity: 0.3">
+              <span class="text-[10px] font-bold text-primary">E</span>
+            </div>
+          </div>
+          <div class="relative h-4 mt-1">
+            <div class="absolute top-0 w-0.5 h-4 bg-primary transition-all duration-300" style="left: ${markerPos}%"></div>
+            <div class="absolute -top-1 transition-all duration-300" style="left: ${markerPos}%; transform: translateX(-50%)">
+              <div class="w-0 h-0 border-l-4 border-r-4 border-t-6 border-l-transparent border-r-transparent border-t-primary"></div>
+            </div>
+          </div>
+          <div class="flex justify-between text-[10px] text-muted mt-1">
+            <span>0</span>
+            <span>1.0R</span>
+            <span>2.0R</span>
+            <span>3.0R</span>
+            <span>4.0R</span>
+          </div>
+          <div class="mt-2 text-caption text-muted">
+            <span class="text-primary font-bold">船舶 CII：</span> ${fmt(attainedCiiValue)} g CO₂/DWT-nm
+            <span class="text-m-blue-light ml-2">|</span>
+            <span class="ml-2"><span class="text-primary font-bold">比值：</span> ${fmt(ratio, 2)}× 参考线</span>
+          </div>
+        </div>
+      `;
+    }
+
+    function updateImprovementChart(attainedCiiValue: number) {
+      const container = document.getElementById('improvement-chart');
+      if (!container) return;
+
+      const hybridCii = attainedCiiValue * 0.85;
+      const shoreCii = hybridCii * 0.95;
+      const opsCii = shoreCii * 0.90;
+
+      const maxVal = Math.max(attainedCiiValue, 0.001);
+
+      container.innerHTML = `
+        <div class="flex flex-col gap-3">
+          <div class="flex items-center gap-3">
+            <span class="text-caption text-muted w-32 text-right shrink-0">当前</span>
+            <div class="flex-1 h-6 bg-surface-soft border border-hairline relative overflow-hidden">
+              <div class="h-full bg-m-red transition-all duration-300" style="width: ${(attainedCiiValue / maxVal) * 100}%"></div>
+            </div>
+            <span class="text-caption text-primary font-mono w-16 shrink-0">${fmt(attainedCiiValue)}</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="text-caption text-muted w-32 text-right shrink-0">+ 混合动力化</span>
+            <div class="flex-1 h-6 bg-surface-soft border border-hairline relative overflow-hidden">
+              <div class="h-full bg-m-blue-light transition-all duration-300" style="width: ${(hybridCii / maxVal) * 100}%"></div>
+            </div>
+            <span class="text-caption text-primary font-mono w-16 shrink-0">${fmt(hybridCii)}</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="text-caption text-muted w-32 text-right shrink-0">+ 岸电供电</span>
+            <div class="flex-1 h-6 bg-surface-soft border border-hairline relative overflow-hidden">
+              <div class="h-full bg-m-blue-dark transition-all duration-300" style="width: ${(shoreCii / maxVal) * 100}%"></div>
+            </div>
+            <span class="text-caption text-primary font-mono w-16 shrink-0">${fmt(shoreCii)}</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="text-caption text-muted w-32 text-right shrink-0">+ 运营效率提升</span>
+            <div class="flex-1 h-6 bg-surface-soft border border-hairline relative overflow-hidden">
+              <div class="h-full bg-green-600 transition-all duration-300" style="width: ${(opsCii / maxVal) * 100}%"></div>
+            </div>
+            <span class="text-caption text-primary font-mono w-16 shrink-0">${fmt(opsCii)}</span>
+          </div>
+        </div>
+        <div class="mt-3 text-caption text-muted flex gap-6">
+          <span><span class="text-m-red font-bold">当前：</span> ${fmt(attainedCiiValue)} g CO₂/DWT-nm</span>
+          <span><span class="text-green-500 font-bold">改善后：</span> ${fmt(opsCii)} g CO₂/DWT-nm</span>
+          <span><span class="text-primary font-bold">降幅：</span> ${fmt(((attainedCiiValue - opsCii) / attainedCiiValue) * 100, 0)}%</span>
+        </div>
+      `;
+    }
+
+    function updateCalculations() {
+      const annualFuel = parseFloat(annualFuelInput.value) || 5000;
+      const fuelType = fuelTypeInput.value as 'mgo' | 'mdo' | 'hfo' | 'lng';
+      const distance = parseFloat(distanceInput.value) || 50000;
+      const dwt = parseFloat(dwtInput.value) || 50000;
+
+      const result = calculateCii({
+        annualFuelConsumptionTonnes: annualFuel,
+        fuelType,
+        distanceTravelledNm: distance,
+        deadweightTonnage: dwt,
+      });
+
+      if (co2Emissions.value) co2Emissions.value.textContent = `${Math.round(result.annualCo2EmissionsTonnes).toLocaleString()} t`;
+      if (co2Emissions.suffix) co2Emissions.suffix.textContent = 'tonnes CO₂ per year';
+
+      if (transportWork.value) {
+        const tnmBillions = result.transportWorkTnm / 1000000000;
+        transportWork.value.textContent = `${fmt(tnmBillions, 1)}B tnm`;
+      }
+      if (transportWork.suffix) transportWork.suffix.textContent = 'DWT × nautical miles';
+
+      if (attainedCii.value) attainedCii.value.textContent = `${fmt(result.attainedCii)}`;
+      if (attainedCii.suffix) attainedCii.suffix.textContent = 'g CO₂ / DWT-nm';
+
+      if (ratingBand.value) {
+        ratingBand.value.textContent = result.ratingBand;
+        ratingBand.value.style.color = result.ratingColor;
+      }
+      if (ratingBand.suffix) {
+        const descriptions: Record<string, string> = {
+          'A': 'Major superior — exceeds efficiency requirements',
+          'B': 'Minor superior — meets and exceeds requirements',
+          'C': 'Moderate — meets minimum requirements',
+          'D': 'Inferior — corrective action may be required',
+          'E': 'Significantly inferior — corrective action required',
+        };
+        ratingBand.suffix.textContent = descriptions[result.ratingBand] || '';
+      }
+
+      if (summaryEl) {
+        summaryEl.textContent = `Based on ${annualFuel.toLocaleString()} tonnes of ${fuelType.toUpperCase()} and ${distance.toLocaleString()} nm distance, this vessel achieves an estimated CII of ${fmt(result.attainedCii)} g CO₂/DWT-nm, falling within the ${result.ratingBand} rating band. ${result.improvementNote}`;
+      }
+
+      // Update charts
+      updateRatingBandsChart(result.attainedCii);
+      updateImprovementChart(result.attainedCii);
+    }
+
+    [annualFuelInput, fuelTypeInput, distanceInput, dwtInput].forEach(el => {
+      el.addEventListener('input', updateCalculations);
+    });
+
+    updateCalculations();
+  </script>
+
+</CalculatorLayout>

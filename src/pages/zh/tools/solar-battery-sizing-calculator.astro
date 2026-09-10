@@ -1,0 +1,433 @@
+---
+import CalculatorLayout from '../../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import InputField from '../../../components/InputField.astro';
+import ResultBox from '../../../components/ResultBox.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import RelatedTools from '../../../components/RelatedTools.astro';
+import MiniSimulationChart from '../../../components/MiniSimulationChart.astro';
+import WorkedExample from '../../../components/WorkedExample.astro';
+import ComparisonTable from '../../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../../components/EngineeringDiagram.astro';
+
+const whatIs = `太阳能蓄电池选型用于确定蓄电池组在没有光伏发电的时段（夜间、阴天以及季节性弱光期）为家庭或设施供电所需的总储能容量。计算需要综合<strong>日耗电量</strong>、<strong>备用天数</strong>（用于跨越无日照时段）、<strong>电池化学体系</strong>（决定安全的放电深度）以及<strong>系统电压</strong>。与通用电池选型不同，太阳能选型必须考虑光伏发电周期、日照小时的季节变化，以及充电速率与放电速率之间的相互影响。`;
+
+const whyItMatters = [
+  "太阳能蓄电池选小了，在阴天期间会频繁深度放电，加速电池衰减并缩短系统寿命。",
+  "蓄电池组选大了，在日照充足、光伏发电超过用电的月份，大量锂电池容量闲置，浪费资金。",
+  "忽略季节变化，只按夏季选型的系统可能在冬季失效，此时光伏发电量会比夏季下降 50–70%。",
+  "选错化学体系会导致容量翻倍：铅酸电池按 50% 放电深度使用，要达到与磷酸铁锂按 80% 放电深度相同的可用能量，需要两倍的容量。",
+  "逆变器电压与电池电压不匹配，可能被迫更换昂贵设备，或限制未来的扩容能力。",
+];
+
+const practicalApplications = [
+  { title: "并网光伏 + 储能", description: "为并网家庭的光伏自发自用优化和分时电价套利配置储能容量。" },
+  { title: "离网光伏系统", description: "为完全脱离电网的住宅和小屋确定蓄电池组容量。" },
+  { title: "光伏 + 备用混合系统", description: "为希望在停电时备用、且可用光伏充电的并网家庭配置电池容量。" },
+  { title: "工商业光伏储能", description: "为希望提高光伏自用比例、降低需量电费的工商业设施配置储能系统。" },
+  { title: "社区光伏 + 储能", description: "为服务多户家庭的社区光伏项目配置共享储能系统。" },
+];
+
+const expertNotes = [
+  { title: '季节性规划', variant: 'warning', content: '只按夏季条件选型的太阳能蓄电池系统会在冬季失效。在高纬度地区（北纬 40° 以上），冬季光伏发电量可能比夏季低 50–70%。请按最差月份选型，而不是按年平均值。' },
+  { title: '化学体系选择', variant: 'engineering', content: '磷酸铁锂（LFP）是太阳能场景的推荐体系：循环寿命 5,000 次以上、可用放电深度 80–90%、热稳定性好。三元锂（NMC）能量密度更高，但循环寿命较短。铅酸电池初期最便宜，但只能按 50% 放电深度使用，且每 3–5 年需要更换。' },
+];
+
+const trustSection = {
+  text: "本计算器采用标准的太阳能工程选型方法。模型按备用天数折算能量，按放电深度限制进行降额，并考虑不同化学体系的约束条件。所有中间值都会展示，可独立验证。公式遵循 NREL、美国能源部以及主流逆变器厂商的行业做法。",
+  link: { label: "查看完整计算方法", href: "/zh/methodology/" },
+};
+
+const references = [
+  { title: "NREL：光伏 + 储能选型指南", url: "https://www.nrel.gov/solar/solar-plus-storage-sizing.html", source: "National Renewable Energy Laboratory" },
+  { title: "美国能源部：太阳能蓄电池储能概述", url: "https://www.energy.gov/eere/solar/solar-plus-storage", source: "U.S. Department of Energy" },
+  { title: "Battery University：太阳能储能电池", url: "https://batteryuniversity.com/article/bu-402-what-is-the-peukert-effect", source: "Battery University" },
+  { title: "美国太阳能行业协会：储能指南", url: "https://www.seia.org/solar-plus-storage", source: "SEIA" },
+  { title: "Victron Energy：太阳能蓄电池选型", url: "https://www.victronenergy.com/help-center", source: "Victron Energy" },
+];
+
+const faqItems = [
+  {
+    question: "如何估算每天的太阳能用电量？",
+    answer: "把每天使用的每个电器的功率与其使用小时数相乘后加总。例如：5 盏 LED 灯（每盏 10W × 6 小时）= 300 Wh，冰箱（150W × 8 小时）= 1,200 Wh，电视（100W × 4 小时）= 400 Wh。合计：1,900 Wh，即 1.9 kWh。",
+  },
+  {
+    question: "太阳能场景哪种电池化学体系最好？",
+    answer: "磷酸铁锂（LFP）是大多数太阳能安装的推荐选择：循环寿命长（5,000 次以上）、安全性好、可用放电深度高（90%）。三元锂（NMC）能量密度更高，但循环寿命较短。铅酸电池初期最便宜，但只能按 50% 放电深度使用，且需要频繁更换。",
+  },
+  {
+    question: "需要几天备用天数？",
+    answer: "带电池备用的并网系统一般需要 1–2 天。离网系统根据气候和太阳能资源需要 2–4 天。备用天数越多，电池容量越大、成本越高，但在阴天期间的韧性也越强。",
+  },
+  {
+    question: "什么是放电深度（DoD）？",
+    answer: "放电深度是指充电前可以安全使用的电池容量百分比。超过推荐放电深度会缩短电池寿命。磷酸铁锂允许 80–90% 放电深度，三元锂允许 70–80%，铅酸应保持在 50% 放电深度以内。",
+  },
+  {
+    question: "5kW 光伏系统需要配多少电池？",
+    answer: "一套每天发电 20 kWh 的 5kW 光伏系统，按 2 天备用、80% 放电深度计算：(20,000 × 2) / 0.80 = 50,000 Wh = 50 kWh 蓄电池组。按 48V 计算约为 1,042 Ah，相当于 4 块大容量 280Ah 磷酸铁锂电池组成 48V 系统。",
+  },
+  {
+    question: "太阳能蓄电池组应该选大一些吗？",
+    answer: "在计算最小值基础上留 15–20% 余量，可以应对温度降额、电池老化和季节变化。过度选大会浪费资金。如果预计负载会增长，建议按可模块化扩容的方向设计。",
+  },
+  {
+    question: "以后可以扩容太阳能蓄电池组吗？",
+    answer: "大多数现代锂电池系统支持通过增加并联串来模块化扩容。但所有电池串的化学体系、使用年限和容量应当一致。建议从一开始就选择可扩展的电池平台，为扩容留好规划。",
+  },
+  {
+    question: "冬季对太阳能蓄电池选型有什么影响？",
+    answer: "冬季光伏发电量可能比夏季低 50–70%。离网系统必须按一年中白天最短的时段选型。带备用的并网系统在冬季阴天期间可能需要更多备用天数。选型时请考虑季节变化。",
+  },
+  {
+    question: "直流耦合和交流耦合太阳能储能有什么区别？",
+    answer: "直流耦合系统把电池直接接到光伏充电控制器，效率更高（没有两次变换）。交流耦合系统通过逆变器接入电池，灵活性更好，但效率略低。两种方案都可行，新建系统一般直流耦合效率更高。",
+  },
+  {
+    question: "做电池选型时如何估算光伏发电量？",
+    answer: "用系统容量（kW）乘以当地峰值日照小时数，估算每天的光伏发电量。5kW 系统在 4 小时峰值日照地区，损耗前每天约发电 20 kWh。再乘以 0.75–0.85 的系统效率系数，计入逆变器、线缆和温度损耗。",
+  },
+  {
+    question: "太阳能蓄电池能在夜间给家里供电吗？",
+    answer: "可以。太阳能蓄电池把白天多余的发电存起来，在夜间使用。电池在傍晚和夜间放电，第二天再由光伏板充电。合理的选型可以保证夜间用电有足够的储能。",
+  },
+  {
+    question: "连续阴天时会发生什么？",
+    answer: "在连续多天阴天期间，蓄电池组必须用已存储的能量带负载。按 2 天备用选型的系统，可以在没有光伏输入的情况下维持 2 天。超过备用能力后，就必须削减负载或接入电网备用。",
+  },
+];
+
+const relatedTools = [
+  { href: "/zh/tools/runtime-calculator/", title: "电池续航时间计算器", description: "验证电池组在给定负载下可以供电多长时间。" },
+  { href: "/zh/tools/battery-sizing-calculator/", title: "电池容量计算器", description: "根据耗电量与备用天数计算通用电池容量。" },
+  { href: "/zh/tools/c-rate-calculator/", title: "C率计算器", description: "计算充放电倍率与可持续时间。" },
+  { href: "/zh/tools/home-backup-battery-calculator/", title: "家庭备用电池计算器", description: "为关键负载选配家庭备用电池。" },
+  { href: "/zh/tools/rv-battery-calculator/", title: "房车电池计算器", description: "汇总房车电器负载规划离网电池容量。" },
+  { href: "/zh/tools/battery-pack-calculator/", title: "电池组计算器", description: "设计串联并联电池组的电压与容量。" },
+];
+
+const commonMistakes = [
+  "用家庭平均用电代替实测数据：请查看电费账单上的实际日均 kWh 用电量，而不是逐个按电器功率估算。",
+  "只按晴天选型：离网光伏必须考虑连续阴天。很多地区需要 3–4 天备用才能可靠供电。",
+  "忽略放电深度限制：铅酸放电超过 50%、锂电池常用区间超过 80% 会明显缩短循环寿命。选型时让日常用电保持在安全的放电深度以内。",
+  "忘记逆变器和线缆损耗：电池实际要提供的能量比负载消耗更大，因为逆变器效率（88–96%）和线缆损耗会减少可用能量。",
+  "不考虑季节变化：冬季光伏发电比夏季低 50–70%。请按最差月份选型，而不是按年平均值。",
+  "选错系统电压：1kW 以上负载用 12V 系统需要非常粗的线缆。住宅光伏系统建议用 48V，以降低线缆损耗。",
+  "新旧电池混用：不要把新电池加到已经衰减的旧电池组里。内阻不一致会导致负载不均、加速衰减。",
+];
+
+const relatedArticles = [
+  { href: "/learn/how-to-size-solar-battery-bank/", title: "太阳能蓄电池组选型方法" },
+  { href: "/learn/how-many-batteries-for-solar/", title: "太阳能系统需要配多少块电池" },
+  { href: "/learn/how-much-battery-storage-do-i-need/", title: "我需要多少电池储能容量" },
+  { href: "/learn/solar-storage-sizing-guide/", title: "太阳能储能选型指南" },
+];
+---
+
+<CalculatorLayout
+  title="太阳能蓄电池计算器｜光伏储能容量选型｜电池计算器"
+  description="太阳能蓄电池计算器：输入日耗电量、光照小时、备用天数与电池电压，一键算出蓄电池Ah/kWh与光伏板配置，公式全公开。"
+  faqItems={faqItems}
+  commonMistakes={commonMistakes}
+  relatedCalculators={relatedTools}
+  relatedArticles={relatedArticles}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+  lang="zh"
+>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+
+    <!-- Input Form -->
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">太阳能系统输入</h3>
+      <div class="flex flex-col gap-6">
+
+        <InputField id="daily-consumption" label="日耗电量" value={5} min={0.1} step="any" unit="kWh/天" helperText="家庭每天的总用电量。请查看电费账单上的日均用电量。注：Wh/天 = kWh/天 × 1,000" />
+
+        <InputField id="autonomy" label="备用天数" value={2} min={1} max={7} step={1} helperText="在没有光伏输入的情况下，电池需要为家庭供电的天数。" />
+
+        <InputField id="voltage" label="电池系统电压" value={48} min={12} step={1} unit="V" helperText="常用：住宅系统为 12V、24V 或 48V。" />
+
+        <InputField
+          id="chemistry"
+          label="电池化学体系"
+          type="select"
+          value="lfp"
+          helperText="太阳能场景推荐磷酸铁锂：寿命最长且最安全。"
+          options={[
+            { label: "磷酸铁锂 (LiFePO4)", value: "lfp" },
+            { label: "三元锂 (镍钴锰)", value: "nmc" },
+            { label: "铅酸蓄电池 (AGM/胶体)", value: "lead-acid" },
+          ]}
+        />
+
+        <InputField id="dod" label="最大放电深度" value={80} min={10} max={100} step={1} unit="%" helperText="安全上限。磷酸铁锂：90%，三元锂：80%，铅酸：50%。" />
+
+      </div>
+    </CalculatorCard>
+
+    <!-- Results -->
+    <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">选型结果</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <ResultBox
+            label="所需电池能量"
+            value="12,500 Wh"
+            suffix="12.50 kWh 总容量"
+            variant="primary"
+            id="result-energy"
+          />
+          <ResultBox
+            label="推荐容量"
+            value="260.4 Ah"
+            suffix="按 48V 标称电压"
+            id="result-capacity"
+          />
+          <ResultBox
+            label="可用容量"
+            value="10,000 Wh"
+            suffix="10.00 kWh（计入放电深度后）"
+            id="result-usable"
+          />
+          <ResultBox
+            label="电池每日充电目标"
+            value="12,500 Wh/天"
+            suffix="12.50 kWh/天"
+            helperText="在所选备用天数下，每天平均需要补充、才能把电池组完全充满的能量。"
+            id="result-daily"
+          />
+        </div>
+
+        <MiniSimulationChart
+          title="备用天数与电池容量关系"
+          description="不同备用天数所需的电池容量"
+          xLabel="备用天数"
+          yLabel="电池容量 (kWh)"
+          chartId="chart-solar"
+        />
+      </div>
+
+      <div class="border-t border-hairline pt-6">
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">设计说明</h4>
+        <p class="text-body-sm text-muted" id="design-notes">
+          日负载 5 kWh、备用 2 天、48V 磷酸铁锂系统，大约需要 12.5 kWh 电池总容量，即 48V 下 260 Ah。
+        </p>
+      </div>
+    </CalculatorCard>
+
+  </div>
+
+  <!-- Formulas and Worked Examples -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">公式与计算示例</h2>
+
+    <FormulaBox title="数学公式">
+      <p>
+        所需电池能量容量的计算方法：日耗电量乘以备用天数，再除以放电深度：
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        所需能量 (Wh) =（日耗电量 × 备用天数）/ 放电深度%
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        容量 (Ah) = 所需能量 (Wh) / 系统电压 (V)
+      </div>
+      <p>
+        可用容量是实际可以取用的能量：
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        可用能量 = 日耗电量 × 备用天数
+      </div>
+      <p class="text-xs text-muted mt-4">
+        <strong>变量说明：</strong>日耗电量单位为 kWh 或 Wh，备用天数为天数，放电深度为百分比，电压单位为 V。假设条件：每天负载恒定、标准放电曲线、不含季节修正（离网场景请手动修正）。
+      </p>
+    </FormulaBox>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample
+        number={1}
+        title="小型木屋：3 kWh/天，4 小时峰值日照"
+        scenario="一间离网小木屋每天耗电 3 kWh，当地平均每天 4 小时峰值日照。按 48V 磷酸铁锂、2 天备用、80% 放电深度选型。"
+        inputs={[
+          { label: "日耗电量", value: "3 kWh/天" },
+          { label: "峰值日照小时", value: "4 小时" },
+          { label: "备用天数", value: "2 天" },
+          { label: "系统电压", value: "48V" },
+          { label: "化学体系", value: "磷酸铁锂 (LiFePO4)" },
+          { label: "最大放电深度", value: "80%" },
+        ]}
+        steps={[
+          { label: "可用能量", formula: "3,000 × 2", result: "6,000 Wh" },
+          { label: "总容量", formula: "6,000 / 0.80", result: "7,500 Wh (7.5 kWh)" },
+          { label: "安时数", formula: "7,500 / 48", result: "156.3 Ah" },
+          { label: "所需光伏阵列", formula: "3,000 / (4 × 0.80)", result: "938 W" },
+        ]}
+        answer="7,500 Wh（48V 下 156.3 Ah），推荐配 1,000W 光伏阵列"
+        interpretation="按 4 小时峰值日照，小木屋需要约 938W 光伏板才能在一天内把电池充满。1kW 阵列可以为阴天留出舒适余量。"
+        variant="solar"
+      />
+
+      <WorkedExample
+        number={2}
+        title="离网住宅：10 kWh/天，考虑阴天余量"
+        scenario="一户离网住宅每天用电 10 kWh，当地冬季平均 3.5 小时峰值日照。按 4 天备用、85% 放电深度、48V 磷酸铁锂选型，以应对连续 3 个阴天。"
+        inputs={[
+          { label: "日耗电量", value: "10 kWh/天" },
+          { label: "峰值日照小时（冬季）", value: "3.5 小时" },
+          { label: "备用天数（含阴天余量）", value: "4 天" },
+          { label: "系统电压", value: "48V" },
+          { label: "化学体系", value: "磷酸铁锂 (LiFePO4)" },
+          { label: "最大放电深度", value: "85%" },
+        ]}
+        steps={[
+          { label: "可用能量", formula: "10,000 × 4", result: "40,000 Wh" },
+          { label: "总容量", formula: "40,000 / 0.85", result: "47,059 Wh (47.1 kWh)" },
+          { label: "安时数", formula: "47,059 / 48", result: "980.4 Ah" },
+          { label: "所需光伏阵列", formula: "10,000 / (3.5 × 0.80)", result: "3,571 W" },
+        ]}
+        answer="47,059 Wh（48V 下 980.4 Ah），推荐配 3,600W 光伏阵列"
+        interpretation="冬季发电是瓶颈。峰值日照只有 3.5 小时，要在一天内充满 47 kWh 需要很大的阵列。建议减少负载，或接受分 2 天充满。"
+        variant="solar"
+      />
+
+      <WorkedExample
+        number={3}
+        title="房车可变光伏：2 kWh/天"
+        scenario="一辆房车每天耗电 2 kWh，行驶和驻车时的光伏输入不稳定。采用 12V 磷酸铁锂系统，2 天备用，80% 放电深度。峰值日照从林区驻车的 2 小时到开阔荒漠的 6 小时不等。"
+        inputs={[
+          { label: "日耗电量", value: "2 kWh/天" },
+          { label: "峰值日照小时（范围）", value: "2–6 小时" },
+          { label: "备用天数", value: "2 天" },
+          { label: "系统电压", value: "12V" },
+          { label: "化学体系", value: "磷酸铁锂 (LiFePO4)" },
+          { label: "最大放电深度", value: "80%" },
+        ]}
+        steps={[
+          { label: "可用能量", formula: "2,000 × 2", result: "4,000 Wh" },
+          { label: "总容量", formula: "4,000 / 0.80", result: "5,000 Wh (5.0 kWh)" },
+          { label: "安时数", formula: "5,000 / 12.8", result: "390.6 Ah" },
+          { label: "光伏（最差 2 小时）", formula: "2,000 / (2 × 0.80)", result: "1,250 W" },
+        ]}
+        answer="5,000 Wh（12V 下 390.6 Ah），需要 2 块 200Ah 磷酸铁锂电池并联"
+        interpretation="光伏输入不稳定，必须按最差情况规划。在只有 2 小时峰值日照的林区，需要 1,250W 便携或车顶光伏阵列才能把电池补满。"
+        variant="solar"
+      />
+    </div>
+  </section>
+
+  <EngineeringDiagram
+    title="太阳能蓄电池充电系统"
+    description="光伏板 → 充电控制器 → 蓄电池组 → 逆变器 → 负载"
+    variant="system"
+    steps={[
+      { label: "光伏板", icon: "solar" },
+      { label: "MPPT 控制器", icon: "charge" },
+      { label: "蓄电池组", icon: "battery" },
+      { label: "逆变器 + 负载", icon: "inverter" },
+    ]}
+  />
+
+  <ComparisonTable
+    title="按峰值日照小时选型"
+    headers={["地点", "峰值日照小时", "所需光伏 (3kWh/天)", "电池备用", "光伏阵列"]}
+    rows={[
+      ["美国亚利桑那", "6.5 h", "462 W", "2 天", "推荐 600W"],
+      ["英国伦敦", "2.5 h", "1,200 W", "4 天", "推荐 1,500W"],
+      ["印度孟买", "5.0 h", "600 W", "2 天", "推荐 800W"],
+      ["挪威奥斯陆", "2.0 h", "1,500 W", "5 天", "推荐 2,000W"],
+      ["澳大利亚悉尼", "5.5 h", "545 W", "2 天", "推荐 700W"],
+    ]}
+    caption="光伏阵列选型因地点差异很大，峰值日照小时是首要设计因素"
+  />
+
+  <FAQSection items={faqItems} />
+  <RelatedTools tools={relatedTools} />
+
+  <!-- Calculation Script -->
+  <script>
+    import { calculateSolarBatterySizing } from '../../../utils/calculators';
+    import { renderBarChart, clearChart } from '../../../utils/charting';
+
+    const consumptionInput = document.getElementById('daily-consumption') as HTMLInputElement;
+    const autonomyInput = document.getElementById('autonomy') as HTMLInputElement;
+    const voltageInput = document.getElementById('voltage') as HTMLInputElement;
+    const chemistrySelect = document.getElementById('chemistry') as HTMLSelectElement;
+    const dodInput = document.getElementById('dod') as HTMLInputElement;
+
+    const resultEnergyBox = document.getElementById('result-energy');
+    const resultEnergyValue = resultEnergyBox?.querySelector('.text-display-md') as HTMLElement;
+    const resultEnergyKwh = resultEnergyBox?.querySelector('.text-caption') as HTMLElement;
+
+    const resultCapacityBox = document.getElementById('result-capacity');
+    const resultCapacityValue = resultCapacityBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultCapacityRef = resultCapacityBox?.querySelector('.text-caption') as HTMLElement;
+
+    const resultUsableBox = document.getElementById('result-usable');
+    const resultUsableValue = resultUsableBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultUsableKwh = resultUsableBox?.querySelector('.text-caption') as HTMLElement;
+
+    const resultDailyBox = document.getElementById('result-daily');
+    const resultDailyValue = resultDailyBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultDailyKwh = resultDailyBox?.querySelector('.text-caption') as HTMLElement;
+
+    const designNotes = document.getElementById('design-notes');
+
+    const chartSvg = document.getElementById('chart-solar') as unknown as SVGElement;
+
+    function updateCalculations() {
+      const consumption = parseFloat(consumptionInput.value) || 5;
+      const autonomy = parseFloat(autonomyInput.value) || 2;
+      const voltage = parseFloat(voltageInput.value) || 48;
+      const chemistry = chemistrySelect.value as "lfp" | "nmc" | "lead-acid";
+      const dod = parseFloat(dodInput.value) || 80;
+
+      const results = calculateSolarBatterySizing(consumption, autonomy, voltage, chemistry, dod);
+
+      if (resultEnergyValue) resultEnergyValue.textContent = `${Math.round(results.requiredEnergyWh).toLocaleString()} Wh`;
+      if (resultEnergyKwh) resultEnergyKwh.textContent = `${(results.requiredEnergyWh / 1000).toFixed(2)} kWh 总容量`;
+
+      if (resultCapacityValue) resultCapacityValue.textContent = `${results.requiredCapacityAh.toFixed(1)} Ah`;
+      if (resultCapacityRef) resultCapacityRef.textContent = `按 ${voltage}V 标称电压`;
+
+      if (resultUsableValue) resultUsableValue.textContent = `${Math.round(results.usableCapacityWh).toLocaleString()} Wh`;
+      if (resultUsableKwh) resultUsableKwh.textContent = `${(results.usableCapacityWh / 1000).toFixed(2)} kWh（计入放电深度后）`;
+
+      if (resultDailyValue) resultDailyValue.textContent = `${Math.round(results.dailyProductionNeededWh).toLocaleString()} Wh/天`;
+      if (resultDailyKwh) resultDailyKwh.textContent = `${(results.dailyProductionNeededWh / 1000).toFixed(2)} kWh/天`;
+
+      if (designNotes) {
+        const chemistryName = chemistry === "lfp" ? "磷酸铁锂" : chemistry === "nmc" ? "三元锂" : "铅酸";
+        designNotes.textContent = `日负载 ${consumption} kWh、备用 ${autonomy} 天、${voltage}V ${chemistryName}系统，大约需要 ${(results.requiredEnergyWh / 1000).toFixed(1)} kWh 电池总容量，即 ${voltage}V 下 ${results.requiredCapacityAh.toFixed(0)} Ah。`;
+      }
+
+      if (chartSvg && consumption > 0) {
+        const pts: { x: number; y: number; label: string }[] = [];
+        for (let days = 1; days <= 5; days++) {
+          const r = calculateSolarBatterySizing(consumption, days, voltage, chemistry, dod);
+          pts.push({ x: days, y: r.requiredEnergyWh / 1000, label: String(days) });
+        }
+        renderBarChart(chartSvg, pts, {
+          width: 320, height: 160,
+          xLabel: '备用天数', yLabel: '电池容量 (kWh)',
+          yMin: 0,
+        });
+      } else if (chartSvg) {
+        clearChart(chartSvg);
+      }
+    }
+
+    [consumptionInput, autonomyInput, voltageInput, chemistrySelect, dodInput].forEach(el => {
+      el.addEventListener('input', updateCalculations);
+    });
+
+    updateCalculations();
+  </script>
+
+</CalculatorLayout>

@@ -1,0 +1,217 @@
+---
+import CalculatorLayout from '../../layouts/CalculatorLayout.astro';
+import FormulaBox from '../../components/FormulaBox.astro';
+import FAQSection from '../../components/FAQSection.astro';
+import PowerOutageForm from '../../components/PowerOutageForm.astro';
+import WorkedExample from '../../components/WorkedExample.astro';
+import ComparisonTable from '../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../components/EngineeringDiagram.astro';
+
+const whatIs = `排水泵电池备用计算器用于确定在停电期间保持排水泵运行所需的电池容量、逆变器尺寸和备用续航时间。排水泵是关键的防洪设备——暴风雨期间电网断电时，水位上升极快。本计算器根据排水泵的运行功率和电机启动浪涌来设计电池尺寸，考虑逆变器效率、放电深度限制和可配置的安全裕度。`;
+
+const whyItMatters = [
+  "排水泵运行功率800-1,200W，电机启动浪涌2,000-3,000W——是家用备用中功耗最高的电器之一。",
+  "暴风期间的停电恰恰是你最需要排水泵的时候——没有备用电力，地下室几小时内就会被淹。",
+  "1/3马力排水泵每分钟排水7-10加仑。地下室被淹平均造成5,000-15,000美元的损失。",
+  "电池备用排水泵系统是独立产品，但全屋电池提供更大的灵活性和更高的浪涌容量。",
+  "排水泵电机启动浪涌极高（运行功率的3-5倍）——大多数廉价逆变器无法承受该负载。"
+];
+
+const practicalApplications = [
+  { title: "暴风雨防洪", description: "在暴雨停电时保持排水泵运行——正是洪水风险最高的时候。" },
+  { title: "地下室保护", description: "确保主排水泵在电网停电时有电力供应，防止数千美元的水损。" },
+  { title: "全屋电池设计", description: "在全屋电池备用系统设计中考虑排水泵的高浪涌。" },
+  { title: "建筑与装修工地", description: "建筑项目的临时排水通常需要电池供电的水泵运行。" },
+];
+
+const expertNotes: { title: string; variant: 'engineering' | 'tip' | 'warning'; content: string }[] = [
+  { title: "排水泵浪涌才是真正的挑战", variant: "engineering", content: "1/3马力排水泵运行约800W，但电机启动时浪涌至2,000-3,000W（1-3秒）。逆变器必须承受此峰值。2,000W连续逆变器配4,000W浪涌是最低要求。" },
+  { title: "工作周期很低", variant: "tip", content: "排水泵根据水位循环开停——通常每次运行30秒至2分钟，间隔数分钟。实际功耗远低于连续运行的假设。" },
+  { title: "考虑电池备用排水泵", variant: "warning", content: "专用电池备用排水泵系统作为备用泵存在。它们使用12V船用电池独立运行。但容量有限——全屋电池提供更长续航和更大功率。" }
+];
+
+const trustSection = {
+  text: "本计算器使用标准电气工程公式进行电池系统尺寸设计。排水泵浪涌因型号差异很大——请以您的具体设备为准。",
+  link: { label: "查看我们的方法论", href: "/zh/methodology/" }
+};
+
+const references = [
+  { title: "FEMA — 洪水保险与防护", url: "https://www.fema.gov/flood-insurance", source: "Federal Emergency Management Agency" },
+  { title: "InterNACHI — 排水泵检查", url: "https://www.nachi.org/sump-pumps.htm", source: "International Association of Certified Home Inspectors" },
+];
+
+const faqItems = [
+  { question: "排水泵需要多大的电池？", answer: "1/3马力排水泵（约800W运行）需要24V 100Ah LiFePO4电池（2,560Wh）进行4-6小时的间歇排水。高电机浪涌（2,000-3,000W）需要高浪涌逆变器——至少2,000W连续配4,000W+峰值。" },
+  { question: "电池能为排水泵供电多长时间？", answer: "续航取决于泵的循环频率。持续降雨时，排水泵可能每5-10分钟运行30秒。24V 100Ah电池可支持此循环模式6-12小时。连续运行会在1-2小时内耗尽。" },
+  { question: "便携式电源站能运行排水泵吗？", answer: "只有高容量设备（2,000W+输出，2,000+Wh容量）才能处理排水泵的电机浪涌。大多数1,000W电源站无法承受2,000-3,000W的启动尖峰。务必检查浪涌额定值，而非仅看连续输出。" },
+  { question: "为什么排水泵需要这么大功率？", answer: "排水泵使用感应电机，启动时消耗运行功率的3-5倍（1-3秒）。1/3马力泵运行约800W，但启动时2,500W以上。此浪涌是电池备用设计的限制因素。" },
+];
+
+const commonMistakes = [
+  "忽略电机启动浪涌——1/3马力排水泵启动时消耗2,000-3,000W（运行功率的3-5倍），大多数逆变器无法承受此峰值。",
+  "按连续运行而非间歇循环设计电池——排水泵每5-10分钟运行30秒，实际消耗低得多。",
+  "使用低浪涌逆变器——排水泵电机至少需要4,000W浪涌容量；没有足够浪涌的2,000W连续逆变器会跳闸。",
+  "忘记暴风停电正是最需要排水泵备用的时候——尺寸不足会在风险最高时导致水淹。",
+  "仅依赖电池备用排水泵而无全屋电池支持——专用备用泵容量和续航有限。",
+  "未在暴风季前测试备用系统——洪水事件中发现电池没电或退化就毫无用处。",
+  "使用汽车电池作为排水泵备用——汽车电池不是为深度循环设计的，在所需放电速率下会迅速失效。",
+  "忽略电池与泵之间的线路电压降——12V系统在大电流下长距离线路会损失显著电压。"
+];
+
+const relatedArticles = [
+  { title: "电池备用排水泵能运行多长时间", href: "/zh/learn/how-long-will-a-battery-backup-sump-pump-run/" },
+  { title: "家庭电池备用规划", href: "/zh/learn/home-battery-backup-planning/" },
+  { title: "LiFePO4 vs 铅酸电池", href: "/zh/learn/lifepo4-vs-lead-acid/" },
+  { title: "停电电池指南", href: "/zh/learn/power-outage-battery-guide/" },
+];
+
+const relatedCalculators = [
+  { href: "/zh/home-power-outage-battery-backup-calculator/", title: "家庭停电电池备用计算器", description: "全屋备用电力计算器，适用于所有家用电器。" },
+  { href: "/zh/fridge-battery-backup-calculator/", title: "冰箱电池备用计算器", description: "专为停电期间冰箱备用设计的电池尺寸计算。" },
+  { href: "/zh/cpap-battery-backup-calculator/", title: "CPAP电池备用计算器", description: "为CPAP整夜运行设计电池尺寸。" },
+  { href: "/zh/portable-power-station-runtime-calculator/", title: "便携式电源站续航计算器", description: "查看便携式电源站可为您的负载供电多长时间。" },
+  { href: "/zh/solar-generator-sizing-calculator/", title: "太阳能发电机尺寸计算器", description: "设计含面板和电池的完整太阳能备用系统。" },
+  { href: "/zh/tools/runtime-calculator/", title: "电池续航计算器", description: "根据容量和负载估算放电时间。" },
+  { href: "/zh/tools/battery-sizing-calculator/", title: "电池尺寸计算器", description: "含温度降额的完整电池组尺寸设计。" },
+  { href: "/zh/tools/solar-battery-sizing-calculator/", title: "太阳能电池尺寸计算器", description: "设计与太阳能板阵列配套的电池尺寸。" },
+  { href: "/zh/tools/energy-conversion-calculator/", title: "能量转换计算器", description: "在任意电压下转换Ah、Wh和kWh。" },
+  { href: "/zh/tools/charging-time-calculator/", title: "充电时间计算器", description: "估算太阳能或电网充电时间。" },
+  { href: "/zh/tools/voltage-drop-calculator/", title: "电压降计算器", description: "设计线径以最小化电压降。" },
+  { href: "/zh/tools/dc-cable-loss-calculator/", title: "直流电缆损耗计算器", description: "计算直流连接中的线路损耗。" },
+];
+
+const presetAppliances = [
+  { name: "Sump Pump", runningW: 800, surgeW: 2000 }, { name: "Refrigerator", runningW: 150, surgeW: 600 },
+  { name: "Wi-Fi Router", runningW: 12, surgeW: 12 }, { name: "LED Light", runningW: 10, surgeW: 10 },
+  { name: "Laptop", runningW: 60, surgeW: 90 }, { name: "TV", runningW: 100, surgeW: 150 },
+  { name: "Fan", runningW: 50, surgeW: 75 }, { name: "Microwave", runningW: 1000, surgeW: 1500 },
+  { name: "Freezer", runningW: 120, surgeW: 500 }, { name: "CPAP Machine", runningW: 40, surgeW: 80 },
+];
+---
+
+<CalculatorLayout
+  lang="zh"
+  title="排水泵电池备用计算器 | Battery Calculators"
+  description="计算在停电期间保持排水泵运行所需的电池尺寸、逆变器容量和备用续航。合理设计应急备用电力，防止地下室水淹。"
+  faqItems={faqItems}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+  relatedCalculators={relatedCalculators}
+  commonMistakes={commonMistakes}
+  relatedArticles={relatedArticles}
+>
+  <PowerOutageForm
+    presetAppliances={presetAppliances}
+    defaultBackupHours={4}
+    defaultVoltage="24"
+    defaultLoadsDescription="已预加载排水泵。添加其他关键负载并调整备用时长。"
+    defaultLoads={[{ name: "Sump Pump", quantity: 1 }]}
+  />
+
+  <section class="mb-16 border-t border-hairline pt-12">
+    <FormulaBox title="数学公式">
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Total Running W = Σ (Appliance Running W × Quantity)</div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Surge W = Highest Single Appliance Surge + Other Running W</div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Energy Required (Wh) = (Running W × Hours) / Inverter Efficiency × (1 + Safety Margin)</div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">Battery Ah = Required Wh / (Battery Voltage × Depth of Discharge)</div>
+      <p class="text-xs text-muted mt-4">注意：排水泵间歇循环——实际续航可能比连续运行估算长2-4倍。"</p>
+    </FormulaBox>
+
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">公式与计算示例</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample
+        number={1}
+        title="1/3马力排水泵（暴风备用）"
+        scenario="在4小时强暴风停电中保持1/3马力排水泵频繁循环运行。"
+        inputs={[
+          { label: "1/3马力排水泵", value: "800W运行 / 2,000W浪涌" },
+          { label: "备用时长", value: "4小时" },
+          { label: "循环模式", value: "开30秒 / 停8分钟" },
+        ]}
+        steps={[
+          { label: "步骤1：有效工作周期", formula: "30s / (30s + 480s) ≈ 6.3%", result: "~6.3%工作周期" },
+          { label: "步骤2：平均消耗", formula: "800W × 0.063", result: "~50W平均" },
+          { label: "步骤3：4小时所需能量", formula: "50W × 4h = 200 Wh", result: "200 Wh" },
+          { label: "步骤4：考虑逆变器效率（90%）", formula: "200 / 0.90", result: "222 Wh" },
+          { label: "步骤5：加上20%裕度", formula: "222 × 1.20", result: "267 Wh" },
+          { label: "步骤6：电池（24V LFP, 80% DoD）", formula: "267 / (24 × 0.80)", result: "13.9 Ah → 12V 20Ah LFP" },
+        ]}
+        answer="12V 20Ah LFP电池可为1/3马力排水泵提供4+小时的间歇暴风循环。"
+        interpretation="排水泵在中等降雨时工作周期极低——电池续航远超连续运行估算。"
+      />
+      <WorkedExample
+        number={2}
+        title="1/2马力排水泵（暴雨）"
+        scenario="在暴雨导致频繁循环的6小时中为较大的1/2马力排水泵供电。"
+        inputs={[
+          { label: "1/2马力排水泵", value: "1,000W运行 / 2,500W浪涌" },
+          { label: "备用时长", value: "6小时" },
+          { label: "循环模式", value: "开45秒 / 停3分钟" },
+        ]}
+        steps={[
+          { label: "步骤1：有效工作周期", formula: "45s / (45s + 180s) = 20%", result: "20%工作周期" },
+          { label: "步骤2：平均消耗", formula: "1,000W × 0.20", result: "平均200W" },
+          { label: "步骤3：6小时所需能量", formula: "200W × 6h = 1,200 Wh", result: "1,200 Wh" },
+          { label: "步骤4：考虑逆变器效率（90%）", formula: "1,200 / 0.90", result: "1,333 Wh" },
+          { label: "步骤5：加上20%裕度", formula: "1,333 × 1.20", result: "1,600 Wh" },
+          { label: "步骤6：电池（24V LFP, 80% DoD）", formula: "1,600 / (24 × 0.80)", result: "83.3 Ah → 24V 100Ah LFP" },
+        ]}
+        answer="24V 100Ah LFP电池（2,560Wh）可在暴雨循环中为1/2马力排水泵供电6小时。"
+        interpretation="暴雨增加泵的循环频率——强暴风期间按20-30%工作周期规划。"
+      />
+      <WorkedExample
+        number={3}
+        title="排水泵+水位报警器（组合）"
+        scenario="在10小时过夜暴风停电中为排水泵和电池供电的水位报警传感器供电。"
+        inputs={[
+          { label: "排水泵（1/3马力）", value: "800W运行 / 2,000W浪涌" },
+          { label: "水位报警传感器", value: "5W连续" },
+          { label: "备用时长", value: "10小时" },
+          { label: "泵循环模式", value: "30秒 / 10分钟" },
+        ]}
+        steps={[
+          { label: "步骤1：泵平均消耗（5%工作周期）", formula: "800W × 0.05", result: "平均40W" },
+          { label: "步骤2：组合平均消耗", formula: "40W + 5W = 45W", result: "45W" },
+          { label: "步骤3：10小时所需能量", formula: "45W × 10h = 450 Wh", result: "450 Wh" },
+          { label: "步骤4：考虑逆变器效率（90%）", formula: "450 / 0.90", result: "500 Wh" },
+          { label: "步骤5：加上20%裕度", formula: "500 × 1.20", result: "600 Wh" },
+          { label: "步骤6：电池（24V LFP, 80% DoD）", formula: "600 / (24 × 0.80)", result: "31.3 Ah → 12V 35Ah LFP" },
+        ]}
+        answer="12V 35Ah LFP电池可在10小时过夜暴风保护中运行排水泵加水位报警器。"
+        interpretation="水位报警器功耗极小但提供关键预警——务必在备用计划中包含。"
+      />
+    </div>
+  </section>
+
+  <EngineeringDiagram
+    title="排水泵备用电力流程"
+    description="电池电力通过高浪涌逆变器以承受排水泵电机启动尖峰。"
+    steps={[
+      { label: "电池组", icon: "battery" },
+      { label: "高浪涌逆变器", icon: "inverter" },
+      { label: "浮球开关", icon: "chart" },
+      { label: "排水泵电机", icon: "load" },
+    ]}
+    variant="system"
+  />
+
+  <ComparisonTable
+    title="按尺寸的排水泵备用需求"
+    headers={["泵尺寸", "运行功率", "浪涌功率", "最低逆变器", "电池（4h备用）", "电池（8h备用）"]}
+    rows={[
+      ["1/4马力", "600 W", "1,500 W", "1,500W / 3,000W浪涌", "12V 30Ah (384 Wh)", "12V 60Ah (768 Wh)"],
+      ["1/3马力", "800 W", "2,000 W", "2,000W / 4,000W浪涌", "12V 40Ah (512 Wh)", "24V 50Ah (1,280 Wh)"],
+      ["1/2马力", "1,000 W", "2,500 W", "2,500W / 5,000W浪涌", "24V 60Ah (1,536 Wh)", "24V 100Ah (2,560 Wh)"],
+      ["3/4马力", "1,500 W", "3,500 W", "3,500W / 7,000W浪涌", "24V 100Ah (2,560 Wh)", "48V 100Ah (5,120 Wh)"],
+      ["1马力", "2,000 W", "5,000 W", "5,000W / 10,000W浪涌", "48V 100Ah (5,120 Wh)", "48V 200Ah (10,240 Wh)"],
+      ["+水位报警器", "+5 W", "—", "无需额外", "+6 Wh", "+12 Wh"],
+    ]}
+    caption="电池尺寸按间歇循环（5-20%工作周期）计算。连续运行需要所列容量的3-5倍。务必核实浪涌额定值与您的具体泵匹配。"
+  />
+
+  <FAQSection items={faqItems} />
+</CalculatorLayout>

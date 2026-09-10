@@ -1,0 +1,641 @@
+---
+import CalculatorLayout from '../../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import InputField from '../../../components/InputField.astro';
+import ResultBox from '../../../components/ResultBox.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import RelatedTools from '../../../components/RelatedTools.astro';
+import WorkedExample from '../../../components/WorkedExample.astro';
+import ComparisonTable from '../../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../../components/EngineeringDiagram.astro';
+
+const whatIs = `渡轮蓄电池选型计算器用于估算电动或混合动力渡轮运营所需的电池容量，基于航线距离、航行计划、推进功率、酒店负荷和充电基础设施。它提供安装容量、电池重量、体积以及充电功率建议，并根据渡轮的运营特征和所选电池化学体系进行定制。该工具帮助渡轮运营商、船舶建筑师和轮机工程师评估电池电动渡轮改装或新建项目的技术可行性和选型要求。`;
+
+const whyItMatters = [
+  "渡轮电动化是船舶电池领域增长最快的细分市场——截至 2026 年年中，全球已有超过 300 艘电池电动渡轮在运营或订购中。",
+  "电池选型不当会限制电动航程（迫使使用柴油备份）或增加不必要的重量和成本——精确选型对项目可行性至关重要。",
+  "充电策略从根本上影响电池尺寸：在两个码头进行机会充电可将所需容量比日终充电减少 50–70%。",
+  "电池化学体系选择（LFP 与 NMC）影响循环寿命、安全性、重量和总拥有成本——每日深度循环的渡轮强烈倾向于使用 LFP。",
+  "渡轮电动化可消除港口排放、获得绿色港口费减免优惠，并改善沿海和峡湾环境的空气质量。"
+];
+
+const practicalApplications = [
+  { title: "渡轮电动化可行性评估", description: "根据距离、航行计划和负荷曲线评估特定渡轮航线是否可由电池电动运营。" },
+  { title: "充电基础设施规划", description: "确定支持电池电动渡轮运营所需的岸侧充电功率和周转时间。" },
+  { title: "新造船电池规格", description: "为新造船渡轮项目指定电池系统容量、重量和体积，为船舶结构和稳性计算提供依据。" },
+  { title: "混合动力渡轮选型", description: "为柴油电动混合动力渡轮选型电池组件，以优化燃油节省同时保持航线可靠性。" }
+];
+
+const expertNotes: { title: string; variant: 'warning' | 'engineering' | 'info'; content: string }[] = [
+  {
+    title: "推进效率假设",
+    variant: "engineering",
+    content: "本计算器采用 85% 的传动系统效率系数，考虑了电机效率、逆变器损耗、齿轮箱损耗（如适用）以及螺旋桨-船体交互作用。实际传动系统效率因船型而异：全回转推进器 78–82%、常规螺旋桨 82–88%、喷水推进 85–90%。85% 的默认值代表优化良好的渡轮推进系统。"
+  },
+  {
+    title: "充电策略影响",
+    variant: "info",
+    content: "充电策略是渡轮电池选型中最具影响力的单一因素。日终充电要求电池容量足以覆盖所有每日航次。码头充电（30 分钟周转）按单次航次选型电池并进行快速补电。在两个码头进行机会充电允许使用更小的电池，通过短暂靠港期间的持续大功率充电进行补能。选择从根本上影响资本成本、重量和基础设施要求。"
+  },
+  {
+    title: "使用限制",
+    variant: "warning",
+    content: "本工具提供用于初步可行性分析的教育性估算。它未考虑船舶特定的水动力阻力、气象航线影响、潮汐水流、旅客负荷变化或电池热管理系统要求。实际电池系统设计必须符合 IEC 62619、DNV 电池符号以及船级社要求。"
+  }
+];
+
+const trustSection = {
+  text: "本计算器采用基于物理的选型方法，符合 DNV 电池符号指南以及已发表的北欧渡轮电动化案例研究。",
+  link: { label: "查看我们的方法论和公式推导", href: "/zh/methodology/" }
+};
+
+const references = [
+  { title: "DNV — 海事展望 2050：电池电动渡轮", url: "https://www.dnv.com/maritime/forecast/", source: "DNV" },
+  { title: "CE Delft — 电池电动渡轮：技术现状", url: "https://www.cedelft.eu/", source: "CE Delft" },
+  { title: "IEA — 全球电动汽车展望 2024：船舶电动化", url: "https://www.iea.org/reports/global-ev-outlook-2024", source: "国际能源署" },
+  { title: "劳氏船级社 — 零排放渡轮技术评估", url: "https://www.lr.org/", source: "劳氏船级社" }
+];
+
+const faqItems = [
+  {
+    question: "电池电动渡轮最大适合的航程距离是多少？",
+    answer: "目前的电池技术支持单次充电航程约 50–80 海里（90–150 公里）的电池电动渡轮航线，具体取决于船舶速度、功率需求和电池容量。在码头进行机会充电的情况下，全电动运营最常用于 10–30 公里的航线。更长航线需要混合柴油电动系统或氢燃料电池作为补充能源。"
+  },
+  {
+    question: "充电策略如何影响电池尺寸？",
+    answer: "充电策略是选型的主导因素。日终充电要求电池容量覆盖所有每日航次（例如 8 航次 × 500 kWh = 4,000 kWh）。码头充电（30 分钟周转）按单航次（500 kWh）选型并进行快速补电。在两个码头进行机会充电可将电池容量降至单航次能量的 70%（350 kWh），但需要非常高的充电功率。权衡在于电池资本成本与充电基础设施成本之间。"
+  },
+  {
+    question: "渡轮电池应该选 LFP 还是 NMC？",
+    answer: "强烈推荐使用 LFP（磷酸铁锂）用于渡轮。渡轮通常每日循环（每年 365 次），LFP 在 90% 放电深度下 5,000+ 次循环寿命可提供 13 年以上服务。NMC 在 80% 放电深度下 2,000 次循环可能需要中期电池更换。LFP 还具有更优的热稳定性——对客船安全至关重要——尽管能量密度较低，但每次循环成本更低。"
+  },
+  {
+    question: "30 分钟周转需要多大的充电功率？",
+    answer: "对于每航次需要 1,000 kWh、30 分钟码头充电的渡轮，所需充电功率约为 2,000–2,400 kW（考虑 85–90% 充电效率和 20% 裕量）。这需要高压直流充电基础设施（通常 1,000V 以上）和专用电网连接。许多港口正在安装 1–5 MW 充电系统以支持电池电动渡轮运营。"
+  },
+  {
+    question: "船舶速度如何影响电池需求？",
+    answer: "推进功率近似与速度的立方成正比（P ∝ V³）。速度翻倍需要约 8 倍的功率和能量。将渡轮速度从 20 km/h 降至 15 km/h 可将电池容量需求减少约 55%。许多成功的电池电动渡轮以降低的速度（15–20 km/h）运营，以优化电池选型并降低基础设施成本。"
+  },
+  {
+    question: "电池重量对渡轮稳性有什么影响？",
+    answer: "电池重量对渡轮稳性和载重量至关重要。一套 4,000 kWh LFP 电池系统重约 26,000 kg——虽然显著但在大多数渡轮设计中可控。低位安装（在汽车甲板下方）可通过降低重心来改善稳性。船舶建筑师必须在添加电池重量后按照 SOLAS 和船级社规则验证完整稳性和破损稳性。"
+  },
+  {
+    question: "现有渡轮可以改装为电池电动吗？",
+    answer: "可以，已有许多成功的改装案例，特别是在挪威（MF Ampere、MF Bastø Electric）。改装可行性取决于可用的重量容量、电池安装空间以及电气系统兼容性。通常，现有载重量的 10–20% 可分配给电池。柴油电动混合改装（部分电动化）在改装项目中比完全电池电动更为常见。"
+  },
+  {
+    question: "电池电动渡轮的典型运营成本是多少？",
+    answer: "电池电动渡轮通常比柴油渡轮实现 50–80% 的能源成本节约，具体取决于当地电价。一艘每航次消耗 1,000 kWh、电价 $0.12/kWh 的渡轮每次航次费用为 $120，而柴油渡轮为 $750（150 升 × $5/升）。维护成本也因活动部件减少以及取消发动机换油、排气系统维护和燃油系统维护而降低 30–50%。"
+  }
+];
+
+const relatedArticles = [
+  { title: "电池电动渡轮：设计考量、优势与挑战", href: "/zh/learn/battery-electric-ferries-explained/" },
+  { title: "船舶储能系统详解", href: "/zh/learn/vessel-energy-storage-systems-explained/" },
+];
+
+const commonMistakes = [
+  "忽略航线特定的水动力阻力——静水功率估算可能比潮汐水流或恶劣海况下的实际消耗低 20–40%。",
+  "使用日终充电选型而不评估机会充电——码头充电可将所需电池容量减少 50–70%。",
+  "在高循环渡轮航线上选择 NMC 而非 LFP——每日深度循环（每年 365 次）倾向于 LFP 的 5,000+ 次循环寿命而非 NMC 的 2,000 次。",
+  "低估酒店负荷波动性——旅客数量变化、暖通空调季节性负荷和厨房峰值可使酒店需求比平均值高出 30–50%。",
+  "未考虑电池重量对船舶稳性和载重量的影响——一套 4,000 kWh LFP 电池重约 26,000 kg，需要进行稳性验证。",
+  "忽略充电基础设施电网连接容量——一台 2 MW 岸侧充电器需要专用的中压电网基础设施，而大多数港口缺乏此条件。",
+  "按单次航程选型电池而不考虑船舶寿命期内的容量衰减——20% 的衰减裕量可确保寿命末期性能。",
+  "使用通用传动系统效率而非船舶特定值——全回转推进器（78–82%）的效率低于常规螺旋桨（82–88%）。",
+  "在热带渡轮运营中忽略电池热管理需求——环境温度高于 35°C 时需要主动冷却系统。"
+];
+
+const relatedCalculators = [
+  { href: "/zh/tools/vessel-energy-storage-calculator/", title: "船舶储能计算器", description: "确定船舶推进和酒店负荷的最优储能容量。" },
+  { href: "/zh/tools/marine-battery-sizing-calculator/", title: "船舶蓄电池选型计算器", description: "为休闲和小型商用船舶的酒店负荷选型电池组。" },
+  { href: "/zh/marine/", title: "船舶电动化中心", description: "探索所有船舶脱碳工具和资源。" },
+];
+
+const chargingOptions = [
+  { label: '仅日终充电', value: 'end_of_day' },
+  { label: '码头充电', value: 'terminal' },
+  { label: '机会充电', value: 'opportunity' },
+];
+
+const chemistryOptions = [
+  { label: 'LFP（磷酸铁锂）', value: 'lfp' },
+  { label: 'NMC（镍锰钴）', value: 'nmc' },
+];
+---
+
+<CalculatorLayout
+  title="渡轮蓄电池选型计算器 | 电池计算器"
+  description="根据航线距离、航行计划和负荷曲线估算电动或混合动力渡轮运营的电池容量、重量和充电需求。"
+  lang="zh"
+  faqItems={faqItems}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+  relatedCalculators={relatedCalculators}
+  commonMistakes={commonMistakes}
+  relatedArticles={relatedArticles}
+>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+
+    <!-- 输入表单 -->
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">航线与船舶参数</h3>
+      <div class="flex flex-col gap-6">
+
+        <InputField
+          id="route-distance"
+          label="航线距离"
+          value={15}
+          min={1}
+          max={200}
+          step={0.5}
+          unit="km"
+          helperText="单程过海距离。"
+        />
+
+        <InputField
+          id="trips-per-day"
+          label="每日航次"
+          value={8}
+          min={1}
+          max={50}
+          step={1}
+          unit="航次"
+          helperText="每日单程航次总数（双向）。"
+        />
+
+        <InputField
+          id="avg-speed"
+          label="平均速度"
+          value={18}
+          min={5}
+          max={40}
+          step={0.5}
+          unit="km/h"
+          helperText="过海时的服务速度（节 × 1.852 = km/h）。"
+        />
+
+        <InputField
+          id="prop-power"
+          label="推进功率"
+          value={500}
+          min={10}
+          max={5000}
+          step={10}
+          unit="kW"
+          helperText="服务速度下的持续推进功率。"
+        />
+
+        <InputField
+          id="hotel-load"
+          label="酒店负荷"
+          value={200}
+          min={0}
+          max={2000}
+          step={10}
+          unit="kW"
+          helperText="暖通空调、照明、厨房及旅客系统。"
+        />
+
+        <InputField
+          id="charging-opportunity"
+          label="充电机会"
+          type="select"
+          value="terminal"
+          options={chargingOptions}
+          helperText="电池可进行补电的场所和时间。"
+        />
+
+        <InputField
+          id="reserve-margin"
+          label="备用裕量"
+          value={20}
+          min={0}
+          max={50}
+          step={1}
+          unit="%"
+          helperText="用于负荷不确定性和容量衰减的额外容量。"
+        />
+
+        <InputField
+          id="battery-chemistry"
+          label="电池化学体系"
+          type="select"
+          value="lfp"
+          options={chemistryOptions}
+          helperText="推荐 LFP 用于高循环渡轮应用。"
+        />
+
+      </div>
+    </CalculatorCard>
+
+    <!-- 结果 -->
+    <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">电池选型结果</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <ResultBox
+            label="每航次能量"
+            value="850 kWh"
+            suffix="单次过海的推进 + 酒店负荷"
+            variant="primary"
+            id="result-energy-per-trip"
+          />
+          <ResultBox
+            label="每日能量需求"
+            value="6,800 kWh"
+            suffix="每日总电能需求"
+            id="result-daily-energy"
+          />
+          <ResultBox
+            label="所需可用容量"
+            value="850 kWh"
+            suffix="每个充电循环的可用能量"
+            id="result-usable-capacity"
+          />
+          <ResultBox
+            label="推荐安装容量"
+            value="1,172 kWh"
+            suffix="考虑放电深度和备用裕量"
+            id="result-installed-capacity"
+          />
+          <ResultBox
+            label="估算电池重量"
+            value="7,619 kg"
+            suffix="电池组总安装重量"
+            id="result-battery-weight"
+          />
+          <ResultBox
+            label="估算电池体积"
+            value="6.4 m³"
+            suffix="电池安装所需空间"
+            id="result-battery-volume"
+          />
+          <ResultBox
+            label="建议充电功率"
+            value="2,500 kW"
+            suffix="所需岸侧充电容量"
+            id="result-charging-power"
+          />
+          <ResultBox
+            label="充电窗口"
+            value="30 min"
+            suffix="可用于电池补电的时间"
+            id="result-charging-window"
+          />
+        </div>
+      </div>
+
+      <div class="border-t border-hairline pt-6">
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">充电策略评估</h4>
+        <p class="text-body-sm text-muted" id="charging-assessment">
+          以 2,500 kW 功率在码头充电 30 分钟，可支持单航次电池运营并在航次间完成完全补电。
+        </p>
+      </div>
+    </CalculatorCard>
+
+  </div>
+
+  <!-- 每日能耗分布图表 -->
+  <section class="mb-16">
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-4 uppercase tracking-wider">每日能耗分布</h3>
+      <p class="text-body-sm text-muted mb-6">基于当前航行计划的每航次和每日总能耗。</p>
+      <div id="energy-breakdown-chart" class="flex flex-col gap-3"></div>
+      <div class="flex items-center gap-4 mt-4 text-caption text-muted">
+        <span class="flex items-center gap-1.5"><span class="w-3 h-3 bg-m-blue-light inline-block"></span> 推进能耗</span>
+        <span class="flex items-center gap-1.5"><span class="w-3 h-3 bg-m-blue-dark inline-block"></span> 酒店负荷能耗</span>
+      </div>
+    </CalculatorCard>
+  </section>
+
+  <!-- 公式与算例 -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">公式与算例</h2>
+    <FormulaBox title="数学公式">
+      <p>
+        电池选型根据渡轮每航次能量需求和充电策略推导：
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        航行时间 = 距离 / 速度
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        推进能量 = 功率 × 航行时间 × 0.85
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        酒店能量 = 酒店负荷 × 航行时间
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        每航次能量 = 推进能量 + 酒店能量
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        可用容量 = 每航次能量 × (1 + 备用裕量%)
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        安装容量 = 可用容量 / 放电深度
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        电池重量 = 安装容量 × 能量密度
+      </div>
+      <p class="mt-4">
+        传动系统效率：85%（电机 + 逆变器 + 螺旋桨）<br/>
+        LFP：安装 6.5 kg/kWh，90% 放电深度，5,000+ 次循环<br/>
+        NMC：安装 5.0 kg/kWh，80% 放电深度，2,000 次循环
+      </p>
+    </FormulaBox>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample
+        number={1}
+        title="50 座通勤渡轮"
+        scenario="短途通勤过海，每日航次多，航次间在码头充电。"
+        inputs={[
+          { label: "航线距离", value: "8 km" },
+          { label: "过海时间", value: "30 分钟（0.5 小时）" },
+          { label: "推进功率", value: "2,000 kW" },
+          { label: "酒店负荷", value: "150 kW" },
+          { label: "每日航次", value: "24" },
+          { label: "充电方式", value: "码头充电（30 分钟周转）" },
+          { label: "化学体系", value: "LFP" },
+        ]}
+        steps={[
+          { label: "过海时间", formula: "8 km / 16 km/h = 0.5 h", result: "30 分钟" },
+          { label: "推进能量", formula: "2,000 × 0.5 × 0.85", result: "850.0 kWh" },
+          { label: "酒店能量", formula: "150 × 0.5", result: "75.0 kWh" },
+          { label: "每航次能量", formula: "850.0 + 75.0", result: "925.0 kWh" },
+          { label: "每日能量", formula: "925.0 × 24", result: "22,200 kWh" },
+          { label: "可用容量（20% 备用）", formula: "925.0 × 1.20", result: "1,110.0 kWh" },
+          { label: "安装容量（LFP 90% DoD）", formula: "1,110.0 / 0.90", result: "1,233.3 kWh" },
+          { label: "电池重量", formula: "1,233.3 × 6.5", result: "8,017 kg" },
+          { label: "充电功率（30 分钟）", formula: "1,110.0 / 0.5 × 1.2", result: "2,664 kW" },
+        ]}
+        answer="一艘 50 座通勤渡轮需要 1,233 kWh LFP 电池（8,017 kg），配合 2,664 kW 岸侧充电器实现 30 分钟码头周转。"
+        interpretation="高航次数量使能量需求快速叠加。码头充电使电池按单航次而非所有每日航次来选型，但需要非常高的充电功率。"
+        variant="marine"
+      />
+
+      <WorkedExample
+        number={2}
+        title="200 座汽车渡轮"
+        scenario="中等距离航线上较大的汽车渡轮，过海时间 1 小时，码头充电。"
+        inputs={[
+          { label: "航线距离", value: "18 km" },
+          { label: "过海时间", value: "1 小时" },
+          { label: "推进功率", value: "5,000 kW" },
+          { label: "酒店负荷", value: "400 kW" },
+          { label: "每日航次", value: "12" },
+          { label: "充电方式", value: "码头充电（30 分钟周转）" },
+          { label: "化学体系", value: "LFP" },
+        ]}
+        steps={[
+          { label: "过海时间", formula: "18 km / 18 km/h = 1.0 h", result: "60 分钟" },
+          { label: "推进能量", formula: "5,000 × 1.0 × 0.85", result: "4,250.0 kWh" },
+          { label: "酒店能量", formula: "400 × 1.0", result: "400.0 kWh" },
+          { label: "每航次能量", formula: "4,250.0 + 400.0", result: "4,650.0 kWh" },
+          { label: "每日能量", formula: "4,650.0 × 12", result: "55,800 kWh" },
+          { label: "可用容量（20% 备用）", formula: "4,650.0 × 1.20", result: "5,580.0 kWh" },
+          { label: "安装容量（LFP 90% DoD）", formula: "5,580.0 / 0.90", result: "6,200.0 kWh" },
+          { label: "电池重量", formula: "6,200.0 × 6.5", result: "40,300 kg" },
+          { label: "充电功率（30 分钟）", formula: "5,580.0 / 0.5 × 1.2", result: "13,392 kW" },
+        ]}
+        answer="一艘 200 座汽车渡轮需要 6,200 kWh LFP 电池（40,300 kg），配合约 13.4 MW 岸侧充电器实现 30 分钟周转。"
+        interpretation="汽车渡轮具有较大的推进负荷和酒店需求。在此规模下，在两个码头进行机会充电可降低电池尺寸。对于更长的过海航程，柴油电动混合方案也可能更为合理。"
+        variant="marine"
+      />
+
+      <WorkedExample
+        number={3}
+        title="短途电动渡轮"
+        scenario="非常短的城市过海航程，在码头快速充电——最小化电池尺寸同时最大化航次频率。"
+        inputs={[
+          { label: "航线距离", value: "2 km" },
+          { label: "过海时间", value: "15 分钟（0.25 小时）" },
+          { label: "推进功率", value: "500 kW" },
+          { label: "酒店负荷", value: "80 kW" },
+          { label: "每日航次", value: "40" },
+          { label: "充电方式", value: "机会充电（5 分钟快速充电）" },
+          { label: "化学体系", value: "LFP" },
+        ]}
+        steps={[
+          { label: "过海时间", formula: "2 km / 8 km/h = 0.25 h", result: "15 分钟" },
+          { label: "推进能量", formula: "500 × 0.25 × 0.85", result: "106.3 kWh" },
+          { label: "酒店能量", formula: "80 × 0.25", result: "20.0 kWh" },
+          { label: "每航次能量", formula: "106.3 + 20.0", result: "126.3 kWh" },
+          { label: "每日能量", formula: "126.3 × 40", result: "5,050 kWh" },
+          { label: "可用容量（30% 备用，快速循环）", formula: "126.3 × 1.30", result: "164.1 kWh" },
+          { label: "安装容量（LFP 90% DoD）", formula: "164.1 / 0.90", result: "182.4 kWh" },
+          { label: "电池重量", formula: "182.4 × 6.5", result: "1,185 kg" },
+          { label: "快速充电功率（5 分钟）", formula: "164.1 / 0.083 × 1.2", result: "2,367 kW" },
+        ]}
+        answer="一艘短途渡轮仅需 182 kWh LFP 电池（1,185 kg），配合 2.4 MW 快速充电器实现 5 分钟码头周转。"
+        interpretation="机会充电配合极短周转时间大幅减少电池尺寸和重量——非常适合城市水上出租车和穿梭渡轮服务。权衡在于每艘船更高的充电基础设施成本。"
+        variant="marine"
+      />
+    </div>
+  </section>
+
+  <!-- 假设条件 -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">假设条件与使用限制</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <CalculatorCard>
+        <h4 class="text-primary font-bold text-sm mb-3">电池化学体系对比</h4>
+        <ul class="text-body-sm text-muted flex flex-col gap-2">
+          <li class="flex gap-2"><span class="text-m-blue-light shrink-0">→</span> LFP：安装 6.5 kg/kWh，90% 放电深度，5,000+ 次循环，热安全性优越</li>
+          <li class="flex gap-2"><span class="text-m-blue-light shrink-0">→</span> NMC：安装 5.0 kg/kWh，80% 放电深度，2,000 次循环，能量密度高 20–30%</li>
+          <li class="flex gap-2"><span class="text-m-blue-light shrink-0">→</span> 推荐渡轮使用 LFP，因其每日深度循环和客船安全要求</li>
+          <li class="flex gap-2"><span class="text-m-blue-light shrink-0">→</span> NMC 可能适合对重量敏感的高速渡轮，但空间受限</li>
+        </ul>
+      </CalculatorCard>
+      <CalculatorCard>
+        <h4 class="text-primary font-bold text-sm mb-3">本计算器未包含的内容</h4>
+        <ul class="text-body-sm text-muted flex flex-col gap-2">
+          <li class="flex gap-2"><span class="text-m-red shrink-0">✗</span> 水动力阻力或气象/水流对能耗的影响</li>
+          <li class="flex gap-2"><span class="text-m-red shrink-0">✗</span> 旅客/车辆负荷变化和季节性航行计划调整</li>
+          <li class="flex gap-2"><span class="text-m-red shrink-0">✗</span> 电池热管理系统需求和冷却负荷</li>
+          <li class="flex gap-2"><span class="text-m-red shrink-0">✗</span> 岸侧电网连接容量和充电基础设施成本</li>
+          <li class="flex gap-2"><span class="text-m-red shrink-0">✗</span> 船舶寿命期内的电池容量衰减和更换计划</li>
+        </ul>
+      </CalculatorCard>
+    </div>
+  </section>
+
+  <EngineeringDiagram
+    title="电动渡轮电力系统"
+    description="电池组驱动电机，航次间在岸侧进行快速充电"
+    variant="system"
+    steps={[
+      { label: "岸侧充电", icon: "charge" },
+      { label: "电池组", icon: "battery" },
+      { label: "电力电子", icon: "inverter" },
+      { label: "电机", icon: "load" },
+    ]}
+  />
+
+  <ComparisonTable
+    title="电动渡轮配置对比"
+    headers={["渡轮类型", "电池容量", "过海时间", "充电时间", "每日航次"]}
+    rows={[
+      ["通勤渡轮（50 座）", "1–2 MWh", "15–30 分钟", "10–15 分钟", "20–40"],
+      ["汽车渡轮（200 座）", "5–10 MWh", "45–90 分钟", "20–30 分钟", "10–15"],
+      ["游览船", "200–500 kWh", "2–4 小时", "1–2 小时", "3–6"],
+      ["客滚船（500 座）", "15–30 MWh", "2–4 小时", "30–60 分钟", "6–10"],
+    ]}
+    caption="电池选型由航行距离、速度和可用充电窗口决定"
+  />
+
+  <FAQSection items={faqItems} />
+  <RelatedTools tools={relatedCalculators} />
+
+  <!-- 工程支持 CTA -->
+  <div class="bg-surface-card border border-hairline p-6 mt-8 mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div class="max-w-xl">
+      <h3 class="text-title-sm text-primary mb-1">需要更深入的工程评审？</h3>
+      <p class="text-body-sm text-muted font-light">
+        本计算器用于初步估算。如需船舶特定分析、电池选型评审、减排规划或混合动力可行性支持，请联系电池计算器工程支持团队。
+      </p>
+    </div>
+    <a href="/zh/marine/#marine-advisory" class="btn-primary text-xs px-6 py-3 shrink-0 whitespace-nowrap">申请工程支持</a>
+  </div>
+
+  <!-- 计算脚本 -->
+  <script>
+    import { calculateFerryBatterySizing } from '../../../utils/calculators';
+
+    const routeDistanceInput = document.getElementById('route-distance') as HTMLInputElement;
+    const tripsPerDayInput = document.getElementById('trips-per-day') as HTMLInputElement;
+    const avgSpeedInput = document.getElementById('avg-speed') as HTMLInputElement;
+    const propPowerInput = document.getElementById('prop-power') as HTMLInputElement;
+    const hotelLoadInput = document.getElementById('hotel-load') as HTMLInputElement;
+    const chargingOppInput = document.getElementById('charging-opportunity') as HTMLSelectElement;
+    const reserveMarginInput = document.getElementById('reserve-margin') as HTMLInputElement;
+    const batteryChemInput = document.getElementById('battery-chemistry') as HTMLSelectElement;
+
+    function getResultElements(id: string) {
+      const box = document.getElementById(id);
+      return {
+        value: box?.querySelector('.text-display-md, .text-title-lg') as HTMLElement,
+        suffix: box?.querySelector('.text-caption') as HTMLElement,
+      };
+    }
+
+    const energyPerTrip = getResultElements('result-energy-per-trip');
+    const dailyEnergy = getResultElements('result-daily-energy');
+    const usableCapacity = getResultElements('result-usable-capacity');
+    const installedCapacity = getResultElements('result-installed-capacity');
+    const batteryWeight = getResultElements('result-battery-weight');
+    const batteryVolume = getResultElements('result-battery-volume');
+    const chargingPower = getResultElements('result-charging-power');
+    const chargingWindow = getResultElements('result-charging-window');
+    const chargingAssessmentEl = document.getElementById('charging-assessment');
+
+    function fmt(n: number, decimals = 0): string {
+      return n.toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+    }
+
+    function updateCalculations() {
+      const routeDistance = parseFloat(routeDistanceInput.value) || 15;
+      const tripsPerDay = parseFloat(tripsPerDayInput.value) || 8;
+      const avgSpeed = parseFloat(avgSpeedInput.value) || 18;
+      const propPower = parseFloat(propPowerInput.value) || 500;
+      const hotelLoad = parseFloat(hotelLoadInput.value) || 200;
+      const chargingOpp = chargingOppInput.value as 'end_of_day' | 'terminal' | 'opportunity';
+      const reserveMargin = parseFloat(reserveMarginInput.value) || 20;
+      const batteryChem = batteryChemInput.value as 'lfp' | 'nmc';
+
+      const result = calculateFerryBatterySizing({
+        routeDistanceKm: routeDistance,
+        tripsPerDay,
+        averageSpeedKmh: avgSpeed,
+        propulsionPowerKw: propPower,
+        hotelLoadKw: hotelLoad,
+        chargingOpportunity: chargingOpp,
+        reserveMarginPercent: reserveMargin,
+        batteryChemistry: batteryChem,
+      });
+
+      if (energyPerTrip.value) energyPerTrip.value.textContent = `${fmt(result.energyPerTripKwh)} kWh`;
+      if (energyPerTrip.suffix) energyPerTrip.suffix.textContent = 'Propulsion + hotel for single crossing';
+
+      if (dailyEnergy.value) dailyEnergy.value.textContent = `${fmt(result.dailyEnergyDemandKwh)} kWh`;
+      if (dailyEnergy.suffix) dailyEnergy.suffix.textContent = 'Total daily electrical energy requirement';
+
+      if (usableCapacity.value) usableCapacity.value.textContent = `${fmt(result.usableCapacityKwh)} kWh`;
+      if (usableCapacity.suffix) usableCapacity.suffix.textContent = 'Usable energy per charge cycle';
+
+      if (installedCapacity.value) installedCapacity.value.textContent = `${fmt(result.installedCapacityKwh)} kWh`;
+      if (installedCapacity.suffix) installedCapacity.suffix.textContent = 'Accounting for DoD and reserve margin';
+
+      if (batteryWeight.value) batteryWeight.value.textContent = `${fmt(result.batteryWeightKg)} kg`;
+      if (batteryWeight.suffix) batteryWeight.suffix.textContent = 'Total installed battery pack weight';
+
+      if (batteryVolume.value) batteryVolume.value.textContent = `${fmt(result.batteryVolumeM3, 1)} m³`;
+      if (batteryVolume.suffix) batteryVolume.suffix.textContent = 'Space required for battery installation';
+
+      if (chargingPower.value) chargingPower.value.textContent = `${fmt(result.suggestedChargingPowerKw)} kW`;
+      if (chargingPower.suffix) chargingPower.suffix.textContent = 'Required shore-side charging capacity';
+
+      if (chargingWindow.value) chargingWindow.value.textContent = `${fmt(result.chargingWindowMinutes)} min`;
+      if (chargingWindow.suffix) chargingWindow.suffix.textContent = 'Time available for battery recharge';
+
+      if (chargingAssessmentEl) chargingAssessmentEl.textContent = result.chargingAssessment;
+
+      // Update energy breakdown chart
+      const chartContainer = document.getElementById('energy-breakdown-chart');
+      if (chartContainer) {
+        const routeDistance = parseFloat(routeDistanceInput.value) || 15;
+        const avgSpeed = parseFloat(avgSpeedInput.value) || 18;
+        const propPower = parseFloat(propPowerInput.value) || 500;
+        const hotelLoad = parseFloat(hotelLoadInput.value) || 200;
+        const tripTime = routeDistance / avgSpeed;
+        const propulsionEnergy = propPower * tripTime * 0.85;
+        const hotelEnergy = hotelLoad * tripTime;
+        const tripEnergy = propulsionEnergy + hotelEnergy;
+        const maxTripEnergy = Math.max(tripEnergy, 1);
+
+        chartContainer.innerHTML = `
+          <div class="flex flex-col gap-2">
+            <div class="flex items-center gap-2">
+              <span class="text-caption text-muted w-20 text-right shrink-0">Trip ${fmt(tripTime * 60, 0)} min</span>
+              <div class="flex-1 h-6 bg-surface-soft border border-hairline relative overflow-hidden flex">
+                <div class="h-full bg-m-blue-light transition-all duration-300" style="width: ${(propulsionEnergy / maxTripEnergy) * 100}%"></div>
+                <div class="h-full bg-m-blue-dark transition-all duration-300" style="width: ${(hotelEnergy / maxTripEnergy) * 100}%"></div>
+              </div>
+              <span class="text-caption text-primary font-mono w-20 shrink-0">${fmt(tripEnergy)} kWh</span>
+            </div>
+          </div>
+          <div class="grid grid-cols-3 gap-4 mt-4 text-caption text-muted">
+            <div>
+              <span class="text-[10px] text-label-uppercase block mb-1">Propulsion / Trip</span>
+              <span class="text-primary font-mono">${fmt(propulsionEnergy)} kWh</span>
+            </div>
+            <div>
+              <span class="text-[10px] text-label-uppercase block mb-1">Hotel / Trip</span>
+              <span class="text-primary font-mono">${fmt(hotelEnergy)} kWh</span>
+            </div>
+            <div>
+              <span class="text-[10px] text-label-uppercase block mb-1">Daily Total</span>
+              <span class="text-primary font-mono">${fmt(tripEnergy * (parseFloat(tripsPerDayInput.value) || 8))} kWh</span>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    [routeDistanceInput, tripsPerDayInput, avgSpeedInput, propPowerInput, hotelLoadInput, chargingOppInput, reserveMarginInput, batteryChemInput].forEach(el => {
+      el.addEventListener('input', updateCalculations);
+    });
+
+    updateCalculations();
+  </script>
+
+</CalculatorLayout>

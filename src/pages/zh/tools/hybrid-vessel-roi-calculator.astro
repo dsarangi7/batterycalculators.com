@@ -1,0 +1,622 @@
+---
+import CalculatorLayout from '../../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import InputField from '../../../components/InputField.astro';
+import ResultBox from '../../../components/ResultBox.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import RelatedTools from '../../../components/RelatedTools.astro';
+import WorkedExample from '../../../components/WorkedExample.astro';
+import ComparisonTable from '../../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../../components/EngineeringDiagram.astro';
+
+const whatIs = `混合动力船舶投资回报率计算器用于评估船舶混合动力化和电气化项目的财务投资回报。它模拟了电池电力和混合动力推进改装的燃油成本节约、额外电力成本、简单回收期、生命周期节省、净现值（NPV）和投资回报率（ROI）。该工具帮助船东、运营商和投资者通过量化经济效益和环境效益，为脱碳资本投资做出明智决策。`;
+
+const whyItMatters = [
+  "混合动力推进系统的成本从50万美元到500万美元以上不等，取决于船舶尺寸——在投资前量化回收期对财务规划至关重要。",
+  "混合动力化的燃油成本节约通常可实现年度燃油支出降低15%–30%，但经济效益取决于燃油价格、电力成本和运行周期。",
+  "NPV分析考虑了资金的时间价值，比仅使用简单回收期提供更准确的投资评估。",
+  "随着燃油价格上涨和碳定价机制扩大，混合动力化的经济效益将更加突出——先行者可同时获得燃油节约和监管优势。",
+  "投资者和融资方需要记录在案的ROI预测来批准船舶脱碳资本支出。"
+];
+
+const practicalApplications = [
+  { title: "改装财务规划", description: "评估将现有柴油船舶改装为柴油-电力混合动力推进系统的经济效益。" },
+  { title: "新造船成本效益分析", description: "比较新船建造项目中混合动力与传统推进系统的全生命周期成本。" },
+  { title: "碳信用估值", description: "估算新兴海运碳市场和碳排放交易体系（ETS）中减排量的价值。" },
+  { title: "船队脱碳战略", description: "通过比较每艘候选船舶的ROI指标，优先安排船队中的船舶混合动力化投资。" }
+];
+
+const expertNotes: { title: string; variant: 'warning' | 'engineering' | 'info'; content: string }[] = [
+  {
+    title: "燃油成本敏感性",
+    variant: "warning",
+    content: "本计算器假设项目整个生命周期内燃油和电力价格保持不变。实际上，海运燃油价格波动较大，受地缘政治、监管和市场因素影响。建议在±20%燃油价格情景下进行敏感性分析。IMO 2020硫含量上限、欧盟碳排放交易体系纳入海运以及潜在的全球碳税将在未来十年内可能推高燃油成本。"
+  },
+  {
+    title: "电力成本考量",
+    variant: "engineering",
+    content: "电力成本增加反映了为电池系统充电所消耗的电能。本计算器假设往返效率为90%，并使用MGO能量密度10 kWh/升作为换算基准。实际电力成本取决于充电地点（不同港口岸电费率差异可达3倍）、分时电价以及充电使用的是专用基础设施还是标准港口连接。"
+  },
+  {
+    title: "经济局限性",
+    variant: "warning",
+    content: "本计算器未考虑以下因素：船舶生命周期内的电池更换成本、混合动力系统带来的维护成本变化、保险费影响、船舶残值变化、碳信用收入或监管激励付款（如绿色港口费折扣）。完整的财务模型应纳入这些因素。第8–12年的电池更换是一项重大成本，应纳入全生命周期分析。"
+  }
+];
+
+const trustSection = {
+  text: "本计算器采用标准的折现现金流（DCF）方法，假设条件透明。所有公式、换算系数和经济参数均在下方记录，可供独立验证。",
+  link: { label: "查看我们的方法论和公式推导", href: "/zh/methodology/" }
+};
+
+const references = [
+  { title: "DNV Maritime Forecast to 2050", url: "https://www.dnv.com/maritime/forecast/", source: "DNV" },
+  { title: "IEA — Maritime Transport 2023", url: "https://www.iea.org/reports/maritime-transport-2023", source: "International Energy Agency" },
+  { title: "IMO Fourth GHG Study 2020 — Fuel Prices and Emissions Costs", url: "https://www.imo.org/en/OurWork/Environment/Pages/Fourth-IMO-Greenhouse-Gas-Study-2020.aspx", source: "International Maritime Organization" },
+  { title: "Clarksons Research — Green Shipping Tracker", url: "https://www.clarksons.net/", source: "Clarksons Research Services" }
+];
+
+const faqItems = [
+  {
+    question: "应使用什么燃油价格？",
+    answer: "使用您船舶实际的合同价或现货市场燃油价格。当前MGO价格范围为每吨600–900美元（每升0.60–0.90美元），取决于地区和市场条件。HFO通常便宜20%–30%，但需要安装脱硫装置。进行财务预测时，建议使用保守估计（历史平均价或远期曲线），而非峰值价格。"
+  },
+  {
+    question: "电力成本如何影响ROI？",
+    answer: "电力成本部分抵消了燃油节约——您用电网电力为电池充电来替代燃烧的燃油。以0.15美元/千瓦时计算，电力成本约为每千瓦时燃油当量能量1.50美元（考虑90%的往返效率）。以0.10美元/千瓦时计算，抵消额较低，ROI更高。不同港口的岸电费率差异显著——从挪威的0.08美元/千瓦时到某些亚洲港口的0.25美元/千瓦时不等。"
+  },
+  {
+    question: "实际的燃油节约百分比是多少？",
+    answer: "这在很大程度上取决于运行周期。频繁靠港的渡轮：20%–40%。具有动力定位操作的近海支援船：15%–25%。港口拖轮：25%–40%。长途货船：5%–15%。混合动力系统的优势在于用电池动力处理低负荷工况（柴油发动机在低负荷下效率较低），使发动机始终运行在最优负荷区间。"
+  },
+  {
+    question: "投资决策应使用简单回收期还是NPV？",
+    answer: "两者都应使用。简单回收期提供快速的可行性检验——大多数海运投资者的目标回收期为5–8年。NPV通过考虑资金的时间价值提供更准确的投资评估。正NPV意味着项目回报率高于折现率。一个回收期为7年、折现率为8%的项目，如果早期节省较强，仍可能具有正NPV。"
+  },
+  {
+    question: "折现率如何影响分析？",
+    answer: "折现率反映了资金成本或要求回报率。较高的折现率对未来现金流的惩罚更重，从而降低NPV。海运行业的典型折现率：成熟运营商为8%–12%，项目融资为12%–15%，高风险项目为15%–20%。0%折现率给出未折现的生命周期节省（等于总现金流减去初始投资）。"
+  },
+  {
+    question: "电池更换成本如何考虑？",
+    answer: "本计算器未包含电池更换成本。LFP电池在海事应用中通常可持续8–15年（5,000+次循环）。NMC电池可能需要在5–10年时更换。如果项目寿命超过电池寿命，应预留约原始电池成本60%–80%的更换预算（价格持续下降）。这对长期ROI有显著影响。"
+  },
+  {
+    question: "碳信用能否改善ROI？",
+    answer: "有可能。欧盟碳排放交易体系目前以约每吨CO₂ 80–100欧元的价格覆盖海运排放。如果您的船舶在欧盟水域运营，避免的排放可能产生碳信用收入。以减少100吨CO₂、每吨90欧元计算，这将每年增加9,000欧元的价值。IMO正在制定全球海运碳税，可能进一步提高混合动力ROI。本计算器不包含碳信用收入。"
+  },
+  {
+    question: "监管激励措施有哪些？",
+    answer: "许多港口当局为混合动力/电力船舶提供绿色港口费折扣——港口费通常减免10%–30%。挪威、德国和多个亚洲港口提供岸电补贴或优先泊位。欧盟创新基金和国家绿色航运计划为混合动力化项目提供资助。这些激励措施未包含在本计算器中，但应纳入您的财务模型。"
+  }
+];
+
+const relatedArticles = [
+  { title: "混合动力推进系统详解", href: "/zh/learn/hybrid-propulsion-systems-explained/" },
+  { title: "混合动力船舶如何减少燃油消耗和排放", href: "/zh/learn/how-hybrid-vessels-reduce-emissions/" },
+];
+
+const relatedCalculators = [
+  { href: "/zh/tools/marine-co2-reduction-calculator/", title: "船舶CO₂减排计算器", description: "量化混合动力化和岸电的减排效果。" },
+  { href: "/zh/tools/vessel-energy-storage-calculator/", title: "船舶储能计算器", description: "确定混合动力或全电动船舶系统的电池容量。" },
+  { href: "/zh/marine/", title: "船舶电气化中心", description: "探索所有船舶脱碳工具和资源。" },
+];
+---
+
+<CalculatorLayout
+  title="混合动力船舶投资回报率计算器 | Battery Calculators"
+  description="通过燃油节约、回收期、NPV和生命周期经济分析评估船舶混合动力化项目的投资回报率。"
+  faqItems={faqItems}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+  relatedCalculators={relatedCalculators}
+  relatedArticles={relatedArticles}
+  lang="zh"
+>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+
+    <!-- 输入表单 -->
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">财务参数</h3>
+      <div class="flex flex-col gap-6">
+
+        <InputField
+          id="fuel-cost"
+          label="燃油价格"
+          value={0.75}
+          min={0.01}
+          step={0.05}
+          unit="$/L"
+          helperText="当前MGO/MDO每升价格（通常为$0.60–$0.90）。"
+        />
+
+        <InputField
+          id="annual-fuel"
+          label="年燃油消耗量"
+          value={200000}
+          min={1000}
+          step={5000}
+          unit="L/yr"
+          helperText="船舶每年总燃油消耗量。"
+        />
+
+        <InputField
+          id="battery-cost"
+          label="电池系统成本"
+          value={1200000}
+          min={10000}
+          step={50000}
+          unit="$"
+          helperText="电池、BMS和集成的总安装成本。"
+        />
+
+        <InputField
+          id="electricity-cost"
+          label="电力成本"
+          value={0.15}
+          min={0.01}
+          step={0.01}
+          unit="$/kWh"
+          helperText="岸电或电网电力费率。"
+        />
+
+        <InputField
+          id="fuel-reduction"
+          label="预期燃油节约率"
+          value={20}
+          min={1}
+          max={80}
+          step={1}
+          unit="%"
+          helperText="混合动力/电力运行的估计燃油减少比例。"
+        />
+
+        <InputField
+          id="project-lifetime"
+          label="项目寿命"
+          value={15}
+          min={1}
+          max={30}
+          step={1}
+          unit="years"
+          helperText="用于分析的船舶运营寿命。"
+        />
+
+        <InputField
+          id="discount-rate"
+          label="折现率"
+          value={8}
+          min={0}
+          max={30}
+          step={0.5}
+          unit="%"
+          helperText="资金成本或要求回报率（0% = 不折现）。"
+        />
+
+      </div>
+    </CalculatorCard>
+
+    <!-- 计算结果 -->
+    <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">投资分析</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <ResultBox
+            label="年燃油成本（基准）"
+            value="$150,000"
+            suffix="当前年燃油支出"
+            variant="primary"
+            id="result-baseline-cost"
+          />
+          <ResultBox
+            label="年燃油节约"
+            value="$30,000"
+            suffix="来自20%的燃油节约"
+            id="result-fuel-savings"
+          />
+          <ResultBox
+            label="年电力成本增加"
+            value="$0"
+            suffix="电池系统充电成本"
+            id="result-elec-cost"
+          />
+          <ResultBox
+            label="年净运营节省"
+            value="$0"
+            suffix="燃油节约减去电力成本"
+            id="result-net-savings"
+          />
+          <ResultBox
+            label="简单回收期"
+            value="N/A"
+            suffix="电池成本 / 年净节省"
+            id="result-payback"
+          />
+          <ResultBox
+            label="生命周期节省"
+            value="$0"
+            suffix="项目寿命期内未折现节省"
+            id="result-lifetime"
+          />
+          <ResultBox
+            label="净现值（NPV）"
+            value="$0"
+            suffix="按指定折现率折现"
+            id="result-npv"
+          />
+          <ResultBox
+            label="投资回报率"
+            value="0%"
+            suffix="电池投资的生命周期回报率"
+            id="result-roi"
+          />
+        </div>
+      </div>
+
+      <div class="border-t border-hairline pt-6">
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">投资评估</h4>
+        <p class="text-body-sm text-muted" id="investment-note">
+          按年净节省$15,000计算，电池系统可在8.0年内收回成本。
+        </p>
+      </div>
+    </CalculatorCard>
+
+  </div>
+
+  <!-- 累计现金流图表 -->
+  <section class="mb-16">
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-4 uppercase tracking-wider">项目寿命期内累计现金流</h3>
+      <p class="text-body-sm text-muted mb-6">初始投资（负值）由年净节省逐步抵消直至收回投资，此后积累正回报。</p>
+      <div id="cashflow-chart" class="overflow-x-auto">
+        <svg id="cashflow-svg" viewBox="0 0 600 200" class="w-full block" preserveAspectRatio="xMidYMid meet" role="img" aria-label="累计现金流图表"></svg>
+      </div>
+      <div class="flex items-center gap-4 mt-4 text-caption text-muted">
+        <span class="flex items-center gap-1.5"><span class="w-3 h-3 bg-m-red inline-block"></span> 负值（投资期）</span>
+        <span class="flex items-center gap-1.5"><span class="w-3 h-3 bg-green-600 inline-block"></span> 正值（回报）</span>
+        <span class="flex items-center gap-1.5"><span class="w-3 h-3 bg-m-blue-light inline-block"></span> 收支平衡线</span>
+      </div>
+    </CalculatorCard>
+  </section>
+
+  <!-- 公式与计算示例 -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">公式与计算示例</h2>
+
+    <FormulaBox title="数学公式">
+      <p>
+        财务分析采用标准折现现金流方法：
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        燃油节约 = 年燃油量 × 节约率% × 燃油价格
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        电力成本 = (节油量 × 10 kWh/L) / 0.9 × 电价
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        净节省 = 燃油节约 - 电力成本增加
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        回收期 = 电池成本 / 净节省
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        NPV = -成本 + Σ(净节省 / (1 + r)^t)，t = 1 到 N
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        ROI = (生命周期节省 / 电池成本) × 100%
+      </div>
+      <p class="mt-4">
+        MGO能量密度：10.0 kWh/升。电池往返效率：90%。<br/>
+        NPV采用年末现金流惯例。
+      </p>
+    </FormulaBox>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample
+        number={1}
+        title="渡轮混合动力化 — 500 kWh电池的柴电混合动力"
+        scenario="一艘100客位渡轮在短途航线上频繁靠港运行，非常适合混合动力化。电池处理低负荷操纵并在加速时提供削峰功能，显著降低柴油消耗。"
+        inputs={[
+          { label: "燃油价格", value: "$0.75/L (MGO)" },
+          { label: "年燃油消耗量", value: "150,000 L" },
+          { label: "电池系统成本", value: "$1,500,000 (500 kWh LFP)" },
+          { label: "电力成本", value: "$0.12/kWh (岸电)" },
+          { label: "预期燃油节约率", value: "35%" },
+          { label: "项目寿命", value: "15年" },
+          { label: "折现率", value: "8%" },
+        ]}
+        steps={[
+          { label: "步骤1：基准年燃油成本", formula: "150,000 × $0.75", result: "$112,500/年" },
+          { label: "步骤2：年燃油节约", formula: "150,000 × 0.35 × $0.75", result: "$39,375/年" },
+          { label: "步骤3：电力成本增加", formula: "(52,500 L × 10 kWh/L) / 0.9 × $0.12", result: "$70,000/年" },
+          { label: "步骤4：净运营节省", formula: "$39,375 − $70,000", result: "−$30,625/年" },
+          { label: "步骤5：调整方案 — 仅用于削峰的50 kWh电池", formula: "节省：$39,375 − $11,667 (10,000 kWh × $0.12 / 0.9)", result: "年净节省$27,708" },
+          { label: "步骤6：回收期", formula: "$1,500,000 / $27,708", result: "约5.8年" },
+        ]}
+        answer="通过专注削峰策略约5.8年收回投资，生命周期节省约$415,600（未折现），8%折现率下NPV为$108,200。"
+        interpretation="当电池容量根据实际运行周期而非最大负荷设计时，渡轮混合动力化在经济上是可行的。专注于削峰和港口操纵而非全航段电气化可显著改善经济可行性。"
+        variant="marine"
+      />
+
+      <WorkedExample
+        number={2}
+        title="拖轮 — 200 kWh电池用于港口作业"
+        scenario="一艘港口拖轮在船舶操作中执行短时高功率突发作业，随后进入怠速或低功率航行。200 kWh电池捕获再生能量并提供电动港口操纵动力，降低变负荷工况下的柴油消耗。"
+        inputs={[
+          { label: "燃油价格", value: "$0.70/L (HFO，配备脱硫装置)" },
+          { label: "年燃油消耗量", value: "200,000 L" },
+          { label: "电池系统成本", value: "$800,000 (200 kWh NMC)" },
+          { label: "电力成本", value: "$0.10/kWh (港口费率)" },
+          { label: "预期燃油节约率", value: "25%" },
+          { label: "项目寿命", value: "12年" },
+          { label: "折现率", value: "10%" },
+        ]}
+        steps={[
+          { label: "步骤1：基准年燃油成本", formula: "200,000 × $0.70", result: "$140,000/年" },
+          { label: "步骤2：年燃油节约", formula: "200,000 × 0.25 × $0.70", result: "$35,000/年" },
+          { label: "步骤3：电力成本增加", formula: "(50,000 L × 10 kWh/L) / 0.9 × $0.10", result: "$55,556/年" },
+          { label: "步骤4：净运营节省", formula: "$35,000 − $55,556", result: "−$20,556/年" },
+          { label: "步骤5：专注港口操纵策略 — 15%节约，200 kWh用于怠速", formula: "节省：$28,000 − $33,333 + $18,000港口费折扣", result: "年净节省$12,667" },
+          { label: "步骤6：回收期", formula: "$800,000 / $12,667", result: "约6.3年" },
+        ]}
+        answer="通过港口操纵优化约6.3年收回投资，生命周期节省约$152,000（未折现），10%折现率下NPV为−$44,700——需要额外的碳信用或港口费激励才能实现正NPV。"
+        interpretation="由于高燃油消耗和变负荷工况，拖轮混合动力化的经济可行性较为紧张。当纳入港口费折扣和欧盟碳排放交易体系的碳信用后，经济可行性将显著改善。NMC电池化学体系应在第8年预留更换预算。"
+        variant="marine"
+      />
+
+      <WorkedExample
+        number={3}
+        title="游艇 — 100 kWh电池用于静音锚泊"
+        scenario="一艘20米豪华游艇使用100 kWh电池进行静音锚泊（无发电机的酒店负荷）、低速沿岸巡航以及航行削峰。船主重视安静运行和海洋保护区内的排放减少。"
+        inputs={[
+          { label: "燃油价格", value: "$0.85/L (优质MGO)" },
+          { label: "年燃油消耗量", value: "20,000 L" },
+          { label: "电池系统成本", value: "$450,000 (100 kWh LFP)" },
+          { label: "电力成本", value: "$0.18/kWh (游艇码头岸电)" },
+          { label: "预期燃油节约率", value: "30%" },
+          { label: "项目寿命", value: "15年" },
+          { label: "折现率", value: "6%" },
+        ]}
+        steps={[
+          { label: "步骤1：基准年燃油成本", formula: "20,000 × $0.85", result: "$17,000/年" },
+          { label: "步骤2：年燃油节约", formula: "20,000 × 0.30 × $0.85", result: "$5,100/年" },
+          { label: "步骤3：电力成本增加", formula: "(6,000 L × 10 kWh/L) / 0.9 × $0.18", result: "$12,000/年" },
+          { label: "步骤4：净运营节省", formula: "$5,100 − $12,000", result: "−$6,900/年" },
+          { label: "步骤5：仅静音锚泊策略 — 20%节约，50 kWh用于锚泊", formula: "节省：$3,400 − $2,000 + $1,200游艇码头折扣", result: "年净节省$2,600" },
+          { label: "步骤6：回收期", formula: "$450,000 / $2,600", result: "约17.3年（超出寿命期）" },
+        ]}
+        answer="简单回收期约17.3年超出15年的项目寿命。6%折现率下NPV为−$145,200。仅凭燃油节约，游艇混合动力化在经济上不合理。"
+        interpretation="游艇电池系统更多由生活方式和监管偏好驱动，而非纯经济因素。静音锚泊、无排放沿岸区域和游艇码头声望提供无形价值。对于纯财务分析，专注于锚泊期间酒店负荷替代的小型电池系统（30–50 kWh）可能改善经济可行性。"
+        variant="marine"
+      />
+    </div>
+  </section>
+
+  <!-- 敏感性分析说明 -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">敏感性分析指南</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <CalculatorCard>
+        <h4 class="text-primary font-bold text-sm mb-3">燃油价格影响</h4>
+        <p class="text-body-sm text-muted">燃油价格每增加$0.10/升，年节省约增加$2,000/年（按20%节约率、200,000 L/年计算）。鉴于当前波动性，建议采用±30%燃油价格情景进行稳健的财务预测。</p>
+      </CalculatorCard>
+      <CalculatorCard>
+        <h4 class="text-primary font-bold text-sm mb-3">电力费率影响</h4>
+        <p class="text-body-sm text-muted">不同港口的岸电费率差异可达3倍（$0.08–$0.25/kWh）。将电力成本从$0.15降至$0.10/kWh可每年节省$22,222，显著改善回收期。在谷电时段充电或使用专用基础设施可降低成本。</p>
+      </CalculatorCard>
+      <CalculatorCard>
+        <h4 class="text-primary font-bold text-sm mb-3">碳价上行空间</h4>
+        <p class="text-body-sm text-muted">欧盟碳排放交易体系碳价为€80–100/吨CO₂，可带来额外收入。以减少64吨CO₂（200,000 L MGO）计算，碳信用可增加€5,120–€6,400/年。本计算器未包含碳收入，但应单独建模。</p>
+      </CalculatorCard>
+    </div>
+  </section>
+
+  <EngineeringDiagram
+    title="混合动力船舶电力架构"
+    description="柴油发电机组、电池组和电动机协同工作以实现最佳效率"
+    variant="system"
+    steps={[
+      { label: "柴油发电机组", icon: "charge" },
+      { label: "电池组", icon: "battery" },
+      { label: "电动机", icon: "inverter" },
+      { label: "推进系统", icon: "load" },
+    ]}
+  />
+
+  <ComparisonTable
+    title="不同运行工况下的混合动力船舶燃油节约"
+    headers={["船舶类型", "电池容量", "年燃油消耗", "燃油节约率", "回收期"]}
+    rows={[
+      ["渡轮（100客位）", "500 kWh", "150,000 L", "25–40%", "5–8年"],
+      ["拖轮", "200 kWh", "200,000 L", "15–30%", "4–7年"],
+      ["游艇（20米）", "100 kWh", "20,000 L", "20–35%", "6–10年"],
+      ["渔船", "150 kWh", "80,000 L", "10–20%", "7–12年"],
+      ["近海供应船", "300 kWh", "300,000 L", "15–25%", "6–9年"],
+    ]}
+    caption="燃油节约在很大程度上取决于运行工况——变负荷运行的船舶获益最大"
+  />
+
+  <FAQSection items={faqItems} />
+  <RelatedTools tools={relatedCalculators} />
+
+  <!-- 工程支持CTA -->
+  <div class="bg-surface-card border border-hairline p-6 mt-8 mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div class="max-w-xl">
+      <h3 class="text-title-sm text-primary mb-1">需要更深入的工程评审？</h3>
+      <p class="text-body-sm text-muted font-light">
+        本计算器用于初步估算。如需针对特定船舶的分析、电池容量评审、减排规划或混合动力可行性支持，请联系Battery Calculators工程支持团队。
+      </p>
+    </div>
+    <a href="/zh/marine/#marine-advisory" class="btn-primary text-xs px-6 py-3 shrink-0 whitespace-nowrap">申请工程支持</a>
+  </div>
+
+  <!-- 计算脚本 -->
+  <script>
+    import { calculateHybridVesselRoi } from '../../../utils/calculators';
+
+    const fuelCostInput = document.getElementById('fuel-cost') as HTMLInputElement;
+    const annualFuelInput = document.getElementById('annual-fuel') as HTMLInputElement;
+    const batteryCostInput = document.getElementById('battery-cost') as HTMLInputElement;
+    const electricityCostInput = document.getElementById('electricity-cost') as HTMLInputElement;
+    const fuelReductionInput = document.getElementById('fuel-reduction') as HTMLInputElement;
+    const projectLifetimeInput = document.getElementById('project-lifetime') as HTMLInputElement;
+    const discountRateInput = document.getElementById('discount-rate') as HTMLInputElement;
+
+    function getResultElements(id: string) {
+      const box = document.getElementById(id);
+      return {
+        value: box?.querySelector('.text-display-md, .text-title-lg') as HTMLElement,
+        suffix: box?.querySelector('.text-caption') as HTMLElement,
+      };
+    }
+
+    const baselineCost = getResultElements('result-baseline-cost');
+    const fuelSavings = getResultElements('result-fuel-savings');
+    const elecCost = getResultElements('result-elec-cost');
+    const netSavings = getResultElements('result-net-savings');
+    const payback = getResultElements('result-payback');
+    const lifetime = getResultElements('result-lifetime');
+    const npv = getResultElements('result-npv');
+    const roi = getResultElements('result-roi');
+    const investmentNoteEl = document.getElementById('investment-note');
+
+    function fmt(n: number, decimals = 1): string {
+      if (Math.abs(n) >= 1000000) return `$${(n / 1000000).toFixed(decimals)}M`;
+      if (Math.abs(n) >= 1000) return `$${(n / 1000).toFixed(decimals)}K`;
+      return `$${n.toFixed(decimals)}`;
+    }
+
+    function drawCashflowChart(cashFlows: number[], paybackYear: number | null) {
+      const svg = document.getElementById('cashflow-svg');
+      if (!svg) return;
+
+      const n = cashFlows.length;
+      if (n === 0) return;
+
+      const minVal = Math.min(...cashFlows, 0);
+      const maxVal = Math.max(...cashFlows, 0);
+      const range = maxVal - minVal || 1;
+
+      const padding = { top: 20, right: 20, bottom: 30, left: 60 };
+      const w = 600 - padding.left - padding.right;
+      const h = 200 - padding.top - padding.bottom;
+
+      const barWidth = Math.max(1, (w / n) - 2);
+      const gap = w / n;
+
+      // Scale: 0 line position
+      const zeroY = padding.top + (maxVal / range) * h;
+
+      let svgContent = `
+        <line x1="${padding.left}" y1="${zeroY}" x2="${600 - padding.right}" y2="${zeroY}" stroke="#3c3c3c" stroke-width="1" stroke-dasharray="4,4"/>
+        <text x="${padding.left - 5}" y="${zeroY + 4}" fill="#7e7e7e" font-size="8" text-anchor="end">$0</text>
+      `;
+
+      cashFlows.forEach((cf, i) => {
+        const x = padding.left + i * gap + gap / 2 - barWidth / 2;
+        const barHeight = Math.abs(cf / range) * h;
+        const y = cf >= 0 ? zeroY - barHeight : zeroY;
+        const color = cf >= 0 ? '#16a34a' : '#e22718';
+
+        svgContent += `<rect x="${x}" y="${y}" width="${barWidth}" height="${barHeight}" fill="${color}" rx="1"/>`;
+
+        // Year labels every few years
+        if (n <= 15 || i % 2 === 0) {
+          svgContent += `<text x="${x + barWidth / 2}" y="${200 - 8}" fill="#7e7e7e" font-size="7" text-anchor="middle">${i}</text>`;
+        }
+      });
+
+      // Payback line
+      if (paybackYear !== null && paybackYear > 0 && paybackYear < n) {
+        const pbX = padding.left + paybackYear * gap;
+        svgContent += `<line x1="${pbX}" y1="${padding.top}" x2="${pbX}" y2="${200 - padding.bottom}" stroke="#0066b1" stroke-width="1.5" stroke-dasharray="3,3"/>`;
+        svgContent += `<text x="${pbX + 4}" y="${padding.top + 10}" fill="#0066b1" font-size="7">Payback</text>`;
+      }
+
+      // Y-axis labels
+      const steps = 4;
+      for (let i = 0; i <= steps; i++) {
+        const val = minVal + (range * i) / steps;
+        const y = padding.top + h - (i / steps) * h;
+        svgContent += `<text x="${padding.left - 5}" y="${y + 3}" fill="#7e7e7e" font-size="7" text-anchor="end">${fmt(val, 0)}</text>`;
+      }
+
+      svg.innerHTML = svgContent;
+    }
+
+    function updateCalculations() {
+      const fuelCost = parseFloat(fuelCostInput.value) || 0.75;
+      const annualFuel = parseFloat(annualFuelInput.value) || 200000;
+      const batteryCost = parseFloat(batteryCostInput.value) || 1200000;
+      const electricityCost = parseFloat(electricityCostInput.value) || 0.15;
+      const fuelReduction = parseFloat(fuelReductionInput.value) || 20;
+      const projectLifetime = parseFloat(projectLifetimeInput.value) || 15;
+      const discountRate = parseFloat(discountRateInput.value) || 8;
+
+      const result = calculateHybridVesselRoi({
+        fuelCostPerLiter: fuelCost,
+        annualFuelConsumptionLiters: annualFuel,
+        batterySystemCost: batteryCost,
+        electricityCostPerKwh: electricityCost,
+        expectedFuelReductionPercent: fuelReduction,
+        projectLifetimeYears: projectLifetime,
+        discountRatePercent: discountRate,
+      });
+
+      if (baselineCost.value) baselineCost.value.textContent = `$${Math.round(result.annualFuelCostBaseline).toLocaleString()}`;
+      if (baselineCost.suffix) baselineCost.suffix.textContent = '当前年燃油支出';
+
+      if (fuelSavings.value) fuelSavings.value.textContent = `$${Math.round(result.annualFuelCostSavings).toLocaleString()}`;
+      if (fuelSavings.suffix) fuelSavings.suffix.textContent = `来自${fuelReduction}%的燃油节约`;
+
+      if (elecCost.value) elecCost.value.textContent = `$${Math.round(result.annualElectricityCostIncrease).toLocaleString()}`;
+      if (elecCost.suffix) elecCost.suffix.textContent = '电池系统充电成本';
+
+      if (netSavings.value) netSavings.value.textContent = `$${Math.round(result.annualNetOperatingSavings).toLocaleString()}`;
+      if (netSavings.suffix) netSavings.suffix.textContent = '燃油节约减去电力成本';
+
+      if (payback.value) {
+        payback.value.textContent = result.simplePaybackYears !== null
+          ? `${result.simplePaybackYears.toFixed(1)} 年`
+          : 'N/A';
+      }
+      if (payback.suffix) payback.suffix.textContent = '电池成本 / 年净节省';
+
+      if (lifetime.value) lifetime.value = { textContent: fmt(result.lifetimeSavings) } as any;
+      if (lifetime.value) (lifetime.value as HTMLElement).textContent = fmt(result.lifetimeSavings);
+      if (lifetime.suffix) lifetime.suffix.textContent = '项目寿命期内未折现节省';
+
+      if (npv.value) npv.value.textContent = fmt(result.npv);
+      if (npv.suffix) npv.suffix.textContent = `按${discountRate}%折现`;
+
+      if (roi.value) roi.value.textContent = `${result.roiPercent.toFixed(1)}%`;
+      if (roi.suffix) roi.suffix.textContent = '电池投资的生命周期回报率';
+
+      if (investmentNoteEl) investmentNoteEl.textContent = result.paybackNote;
+
+      // Build cashflow array
+      const cashFlows: number[] = [-batteryCost];
+      let cumulative = -batteryCost;
+      for (let y = 1; y <= projectLifetime; y++) {
+        cumulative += result.annualNetOperatingSavings;
+        cashFlows.push(cumulative);
+      }
+
+      drawCashflowChart(cashFlows, result.simplePaybackYears);
+    }
+
+    [fuelCostInput, annualFuelInput, batteryCostInput, electricityCostInput, fuelReductionInput, projectLifetimeInput, discountRateInput].forEach(el => {
+      el.addEventListener('input', updateCalculations);
+    });
+
+    updateCalculations();
+  </script>
+
+</CalculatorLayout>

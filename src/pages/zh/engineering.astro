@@ -1,0 +1,182 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import CategoryToolGrid from '../../components/CategoryToolGrid.astro';
+import FAQSection from '../../components/FAQSection.astro';
+
+const tools = [
+  {
+    name: "电池护照生成器",
+    href: "/zh/battery-passport-generator/",
+    description: "创建结构化的电池生命周期和合规准备报告，包含身份、SOH 和碳足迹数据。",
+    available: true,
+  },
+  {
+    name: "C-Rate 计算器",
+    href: "/zh/tools/c-rate-calculator/",
+    description: "根据容量计算充放电电流、C-Rate 速率和充电时间。",
+    available: true,
+  },
+  {
+    name: "SOC 估算器",
+    href: "/zh/tools/soc-estimator/",
+    description: "从开路电压（OCV）曲线插值充电状态，或模拟库仑计数。",
+    available: true,
+  },
+  {
+    name: "衰减估算器",
+    href: "/zh/tools/battery-degradation-estimator/",
+    description: "估算 LFP、NMC、LTO 和铅酸化学的日历和循环寿命衰减（SOH）。",
+    available: true,
+  },
+  {
+    name: "直流压降计算器",
+    href: "/zh/tools/voltage-drop-calculator/",
+    description: "根据线规、走线距离和负载电流计算直流导体压降百分比。",
+    available: true,
+  },
+  {
+    name: "直流电缆损耗计算器",
+    href: "/zh/tools/dc-cable-loss-calculator/",
+    description: "确定直流输电线路中的电阻功率损耗（I²R）和热耗散。",
+    available: true,
+  },
+  {
+    name: "电池续航计算器",
+    href: "/zh/tools/runtime-calculator/",
+    description: "根据标称容量、负载功率、效率和 DoD 限制估算电池放电续航。",
+    available: true,
+  },
+];
+
+const learnArticles = [
+  { title: "什么是电池 C-Rate？", href: "/zh/learn/what-is-battery-c-rate/" },
+  { title: "理解充电状态（SOC）", href: "/zh/learn/understanding-state-of-charge/" },
+  { title: "电池衰减详解", href: "/zh/learn/battery-degradation-explained/" },
+  { title: "压降详解", href: "/zh/learn/voltage-drop-explained/" },
+  { title: "如何计算电池续航", href: "/zh/learn/how-to-calculate-battery-runtime/" },
+  { title: "如何选型电池组", href: "/zh/learn/how-to-size-a-battery-bank/" },
+  { title: "电池续航公式", href: "/zh/learn/battery-runtime-formula/" },
+  { title: "12V vs 24V vs 48V 续航", href: "/zh/learn/12v-vs-24v-vs-48v-runtime/" },
+  { title: "LiFePO4 电压表", href: "/zh/learn/lifepo4-voltage-chart/" },
+  { title: "电池 C-Rate 参考", href: "/zh/learn/battery-c-rate-reference/" },
+  { title: "电池温度校正图表", href: "/zh/learn/battery-temperature-correction-chart/" },
+];
+
+const faqItems = [
+  {
+    question: "什么是 C-Rate，为什么重要？",
+    answer: "C-Rate 表示相对于电池容量的充放电电流。100Ah 电池上 1C 速率意味着 100A 电流。更高的 C-Rate 产生更多热量，增加压降并减少可用容量。理解 C-Rate 对为应用选择合适电池和确保在制造商限制内安全运行至关重要。",
+  },
+  {
+    question: "温度如何影响电池性能？",
+    answer: "温度对电池性能有显著影响。低温增加内阻，减少可用容量和输出电压。在 0°C，锂电池可能损失 10% 容量。在 -20°C，损失可达 30%。高温加速日历老化并可能触发热管理系统。大多数计算假定 25°C 标准环境温度。",
+  },
+  {
+    question: "SOC 和 DoD 有什么区别？",
+    answer: "充电状态（SOC）表示电池中剩余容量的百分比（100% = 充满，0% = 空）。放电深度（DoD）表示已使用容量的百分比（0% = 充满，100% = 空）。它们互补：SOC + DoD = 100%。大多数电池规格参考 DoD 限制作为循环寿命。",
+  },
+  {
+    question: "如何计算直流布线中的压降？",
+    answer: "压降使用 V_drop = I × R × 2L 计算，其中 I 是电流，R 是单位长度电阻，2L 代表往返距离（正负导体）。使用我们的直流压降计算器确定布线是否满足馈线 3% 最大压降和分支电路 1% 的可接受标准。",
+  },
+  {
+    question: "为什么电池会随时间衰减？",
+    answer: "电池通过两种主要机制衰减：日历老化（即使不使用也发生的化学衰减）和循环老化（充放电循环引起的衰减）。日历老化由温度和充电状态驱动。循环老化由放电深度、C-Rate 和温度驱动。两种机制都增加内阻并随时间减少容量。",
+  },
+];
+
+const relatedCategories = [
+  { href: "/zh/solar/", title: "太阳能", description: "太阳能电池选型和离网规划" },
+  { href: "/zh/ev/", title: "电动汽车与电池组", description: "电池组设计和电芯配置" },
+  { href: "/zh/bess/", title: "BESS 与商用", description: "商业电池储能 ROI 分析" },
+];
+
+const breadcrumbItems = [
+  { label: "工程工具" },
+];
+---
+
+<Layout
+  title="工程电池计算器 | 电池计算器"
+  description="专业电池工程计算器，用于 C-Rate 分析、SOC 估算、SOH 衰减、压降和电缆损耗计算。"
+  schema="website"
+  schemaName="工程电池计算器"
+  schemaDescription="专业电气工程工具，用于电池系统设计、分析和诊断。"
+  breadcrumbs={[{ label: '工程工具' }]}
+  lang="zh"
+>
+  <Breadcrumb items={breadcrumbItems} />
+
+  <section class="mb-12 md:mb-16 border-b border-hairline pb-12">
+    <div class="max-w-4xl">
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">工程工具</span>
+      <h1 class="text-display-md text-primary mb-6">工程电池计算器</h1>
+      <p class="text-body-md text-body max-w-2xl font-light">
+        专业级电池工程计算器，用于系统设计、分析和诊断。基于标准电气工程原理的透明公式。
+      </p>
+    </div>
+  </section>
+
+  <section class="mb-16">
+    <div class="max-w-4xl text-body-md text-body font-light flex flex-col gap-6">
+      <p>
+        电池工程远不止简单的容量计算。专业电池系统设计需要理解电化学行为、热管理、电气配电损耗和长期衰减模式。本页的工程计算器涵盖支撑可靠电池系统设计的技术分析。
+      </p>
+      <p>
+        C-Rate 分析对每个电池应用都至关重要。C-Rate 决定电池相对于其容量充电或放电的速度。额定 1C 的电池理论上可以在一小时内充满或放空其全部容量。更高的 C-Rate 提供更多功率但产生更多热量，增加内部损耗并加速衰减。我们的 C-Rate 计算器帮助您为特定电池化学和应用确定最优充放电速率。
+      </p>
+      <p>
+        充电状态（SOC）估算对电池管理至关重要。准确的 SOC 数据可防止损坏电芯的深度放电事件，并确保您的应用有足够的 reserve。我们的 SOC 估算器同时支持开路电压（OCV）插值和库仑计数模拟，提供两种独立方法验证电池充电水平。
+      </p>
+      <p>
+        直流配电损耗在电池系统设计中常被忽视。电缆电阻导致压降和功率损耗，降低系统效率。对于传输 100A 电流、使用 2 AWG 电缆的 10 米走线系统，压降约为 48V 系统上的 0.46V（接近 1%），功率损耗为 46W 持续。一年下来，这代表 403 kWh 浪费能源。我们的压降和电缆损耗计算器帮助您选型导体以最小化这些损耗。
+      </p>
+      <p>
+        电池衰减分析可实现准确的使用寿命成本预测。了解容量如何随时间和循环衰减，使您能够以适当裕度选型电池系统、规划更换时间表并计算真实的平准化储能成本。我们的衰减估算器建模 LFP、NMC、LTO 和铅酸化学的日历和循环老化。
+      </p>
+    </div>
+  </section>
+
+  <section class="mb-16">
+    <h2 class="text-title-lg text-primary mb-6">所有工程计算器</h2>
+    <CategoryToolGrid tools={tools} />
+  </section>
+
+  {learnArticles.length > 0 && (
+    <section class="mb-16 border-t border-hairline pt-12">
+      <h2 class="text-title-lg text-primary mb-6">工程指南</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {learnArticles.map((article) => (
+          <a href={article.href} class="bg-surface-card border border-hairline p-4 hover:border-primary transition-colors">
+            <span class="text-label-uppercase text-muted text-[10px] block mb-2">学习中心</span>
+            <h3 class="text-title-sm text-primary">{article.title}</h3>
+          </a>
+        ))}
+      </div>
+    </section>
+  )}
+
+  <FAQSection items={faqItems} />
+
+  {relatedCategories.length > 0 && (
+    <section class="mb-16 border-t border-hairline pt-12">
+      <h2 class="text-title-lg text-primary mb-6">相关分类</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {relatedCategories.map((cat) => (
+          <a href={cat.href} class="bg-surface-card border border-hairline p-6 hover:border-primary transition-colors block">
+            <h3 class="text-title-md text-primary mb-2">{cat.title}</h3>
+            <p class="text-body-sm text-muted">{cat.description}</p>
+          </a>
+        ))}
+      </div>
+    </section>
+  )}
+
+  <section class="bg-surface-soft border border-hairline p-6 text-caption text-muted mb-8">
+    <span class="text-primary font-bold text-[10px] tracking-wider uppercase border border-hairline px-1.5 py-0.5 mr-2 inline-block mb-3">
+      工程免责声明
+    </span>
+    所有计算使用标准工程公式，仅供教育参考。结果必须由合格工程师验证用于生产电池系统。
+  </section>
+</Layout>

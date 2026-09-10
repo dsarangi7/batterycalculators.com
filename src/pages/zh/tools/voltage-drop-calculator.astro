@@ -1,0 +1,419 @@
+---
+import CalculatorLayout from '../../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import InputField from '../../../components/InputField.astro';
+import ResultBox from '../../../components/ResultBox.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import WorkedExample from '../../../components/WorkedExample.astro';
+import ComparisonTable from '../../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../../components/EngineeringDiagram.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import RelatedTools from '../../../components/RelatedTools.astro';
+
+const wireSizes = [
+  { label: "16 AWG (1.31 mm²)", value: 1.31 },
+  { label: "14 AWG (2.08 mm²)", value: 2.08 },
+  { label: "12 AWG (3.31 mm²)", value: 3.31 },
+  { label: "10 AWG (5.26 mm²)", value: 5.26 },
+  { label: "8 AWG (8.37 mm²)", value: 8.37 },
+  { label: "6 AWG (13.3 mm²)", value: 13.3 },
+  { label: "4 AWG (21.15 mm²)", value: 21.15 },
+  { label: "2 AWG (33.6 mm²)", value: 33.6 },
+  { label: "1/0 AWG (53.5 mm²)", value: 53.5 },
+  { label: "2/0 AWG (67.4 mm²)", value: 67.4 },
+  { label: "4/0 AWG (107 mm²)", value: 107.0 },
+  { label: "Custom Metric Size (mm²)", value: "-1" },
+];
+
+const materialOptions = [
+  { label: "铜（高导电率）", value: "copper" },
+  { label: "铝", value: "aluminum" },
+];
+
+const whatIs = `直流电压降是指电流沿导体从电池源到负载的传输过程中电位的降低。它由导线的固有电阻引起，电阻将电能转化为热量（I²R损耗）。电压降取决于四个因素：<strong>电流大小</strong>、<strong>线缆长度</strong>、<strong>导体截面积</strong>和<strong>导体材料电阻率</strong>（含温度修正）。过大的电压降会导致电子设备故障、照明亮度降低、电机效率下降和能量浪费。在12V系统中，即使0.5V的压降也意味着4%的损耗——足以引发问题。船用（ISO 13297）、汽车（SAE J1127）和太阳能（NEC 690）标准均要求按照电压降限制进行合理的线缆选型。`;
+
+const whyItMatters = [
+  "12V系统中5%的电压降意味着0.6V的损耗——足以导致逆变器关机和LED变暗。",
+  "电池与负载之间的长距离线缆会叠加电压降——30A电流下10米线缆若线径不足可损失1V甚至更多。",
+  "线径不足不仅导致性能下降，还会引起过热和火灾隐患。",
+  "电压降与电流成正比——相同线缆下，负载电流加倍，电压降也加倍。",
+  "更高的系统电压（48V对比12V）在相同功率下降低电流，从而大幅减少电压降。",
+];
+
+const practicalApplications = [
+  { title: "船用电气系统", description: "按照ISO 13297电压降限制为导航、照明和推进系统选配电池线缆。" },
+  { title: "太阳能光伏布线", description: "计算太阳能充电控制器到电池组之间直流线路的电压降。" },
+  { title: "汽车与房车", description: "为房车和汽车直流系统选配电池到逆变器的线缆。" },
+  { title: "通信设备安装", description: "验证48V直流配电到通信设备的线缆选型。" },
+  { title: "离网小木屋布线", description: "计算远程电池组与负载之间长距离线缆的线径。" },
+];
+
+const expertNotes = [
+  { title: '船用标准', variant: 'engineering', content: '船用标准指南（ISO 13297）允许关键部件（航行灯、舱底泵、电子设备）的最大电压降为3%，非关键负载（照明回路、家用设备）为10%。' },
+  { title: '温度敏感性', variant: 'warning', content: '铜的电阻率随温度升高0.393%/°C。在60°C的高温机舱中，线缆电阻增加约15.7%。请始终考虑线缆的实际工作温度，而非环境室温。' },
+];
+
+const commonMistakes = [
+  "完全忽略电压降——即使在12V系统中0.5V的压降也意味着4%的损耗，足以导致逆变器关机和LED变暗。",
+  "使用单程距离而非回路距离——电压降同时作用于正极和回流导体。计算时务必将单程距离乘以2。",
+  "只检查电压降不检查载流量——线缆可能在热安全（载流量）方面合格，但在长距离传输中仍会出现不可接受的电压降。务必同时检查两个指标。",
+  "忽略温度对电阻的影响——铜的电阻率随温度升高0.393%/°C。60°C时线缆电阻比20°C时高15.7%。",
+  "使用标称电压代替实际电池电压——电压降百分比取决于电源电压。12.8V下0.5V压降为3.9%，而12.0V下则为4.2%。",
+  "忽略连接电阻——腐蚀的端子、松动的螺栓和氧化的连接器会增加显著的电阻，这部分不包含在线缆本身的计算中。",
+  "使用铝线未相应加粗——铝需要铜的1.6倍截面积才能实现相同的电压降。忘记这一系数会导致线径不足。",
+  "不考虑峰值电流与平均电流——电压降与电流成正比。峰值负载（电机启动、浪涌电流）引起的瞬态电压跌落可能触发BMS故障。",
+  "忽略电压降对BMS读数的影响——电池端子处的电压降会导致BMS读取较低的电压，可能触发过早的低压断开保护。",
+  "假设电压降是恒定的——电压降随负载电流变化。在额定负载下满足3%压降的系统，在峰值负载下可能超标。",
+];
+
+const relatedArticles = [
+  { href: "/zh/learn/voltage-drop-explained/", title: "电压降详解" },
+  { href: "/zh/learn/battery-voltage-systems/", title: "电池电压系统" },
+  { href: "/zh/learn/marine-battery-voltage-selection/", title: "船用电池电压选型" },
+];
+
+const trustSection = {
+  text: "本计算器采用标准的基于电阻率的电压降模型，包含铜和铝导体的温度修正因子。所有公式均遵循IEEE和IEC导体选型标准。",
+  link: { label: "查看完整计算方法", href: "/zh/methodology/" },
+};
+
+const references = [
+  { title: "ISO 13297 — 船用电气装置", url: "https://www.iso.org/standard/68333.html", source: "International Organization for Standardization" },
+  { title: "NEC Article 690 — 太阳能光伏系统", url: "https://www.nfpa.org/codes-and-standards/nfpa-70-standard-for-electrical-safety-in-the-workplace", source: "NFPA / National Electrical Code" },
+  { title: "SAE J1127 — 电池线缆", url: "https://www.sae.org/standards/content/j1127_202004/", source: "SAE International" },
+  { title: "Copper Development Association — 导线电阻表", url: "https://www.copper.org/", source: "Copper Development Association" },
+];
+
+const faqItems = [
+  {
+    question: "为什么电压降在高温时会增加？",
+    answer: "在铜和铝等金属导体中，原子的热振动会干扰传导电子的路径，增加内部电阻。铜的电阻率大约每升高1°C增加0.393%。如果线缆敷设在高温机舱中（如60°C），其电阻将增加约15.7%。",
+  },
+  {
+    question: "为什么12V系统比48V系统更需要关注电压降？",
+    answer: "电压降与电流成正比，与电压无关。480W负载在12.8V时需要37.5A电流，而在51.2V时仅需9.37A。12.8V下0.5V压降占系统电压的3.9%；51.2V下由于电流更低，压降仅为0.125V，占比仅0.24%。提高系统电压是解决线缆损耗的最佳方案。",
+  },
+  {
+    question: "应该按电压降还是按安全电流限值（载流量）来选配线缆？",
+    answer: "两者都必须检查。载流量限值由消防安全规范规定，防止线缆绝缘层在负载下熔化。但热安全的线缆在长距离传输中仍可能出现不可接受的电压降。请始终选取两个标准中要求更大的线径。",
+  },
+  {
+    question: "铝和铜的电阻率分别是多少？",
+    answer: "铝的电阻率比铜高约64%（2.82×10⁻⁸ Ω·m对比1.72×10⁻⁸ Ω·m）。铝线缆需要约铜线缆1.6倍的截面积才能在相同电压降下承载相同的电流。",
+  },
+  {
+    question: "可接受的电压降百分比是多少？",
+    answer: "直流供电系统：关键负载（导航、安全设备）最大3%，一般负载5%，非关键照明最大10%。太阳能系统通常要求充电控制器到电池之间的直流线路电压降不超过2%。",
+  },
+  {
+    question: "线缆长度如何影响电压降？",
+    answer: "电压降与线缆长度成正比。线缆距离加倍，电压降也加倍。5米线缆若压降0.5V，则10米线缆在相同电流和线径下压降为1.0V。",
+  },
+  {
+    question: "能否用铝线代替铜线来节省成本？",
+    answer: "铝线更轻、单位载流量成本更低，但需要铜线1.6倍的截面积才能实现相同的电压降。铝线连接处还需使用抗氧化剂并按正确力矩紧固以防止松动。大多数电池和太阳能系统优选铜线。",
+  },
+  {
+    question: "电压降如何影响电池性能？",
+    answer: "电池端子处的电压降导致BMS读取的电压低于实际值，可能触发过早的低压断开保护。同时还会降低输送到负载的有效能量，减少表观续航时间。",
+  },
+  {
+    question: "30A电流5米距离需要多粗的AWG线缆？",
+    answer: "12V系统、30A、5米单程、最大3%压降：需要6 AWG（13.3 mm²）铜线。48V系统由于同等功率下电流更低，10 AWG（5.26 mm²）可能即可满足。",
+  },
+  {
+    question: "线缆绝缘类型会影响电压降吗？",
+    answer: "不会，绝缘层不影响电气电阻。但绝缘层的温度额定值决定了最高安全工作温度。使用90°C额定的线缆可以在不超过绝缘热极限的情况下承载更高的电流。",
+  },
+  {
+    question: "如何测量系统中的实际电压降？",
+    answer: "在负载状态下测量电池端子电压，然后在相同负载下测量负载端子电压。两者之差即为电压降。将压降百分比与系统电压对比，即可判断线缆选型是否合适。",
+  },
+];
+
+const relatedTools = [
+  { href: "/zh/tools/dc-cable-loss-calculator/", title: "直流线缆损耗", description: "直接计算电阻功率损耗。" },
+  { href: "/zh/tools/battery-sizing-calculator/", title: "电池容量计算器", description: "确定日耗电量选型需求。" },
+  { href: "/zh/tools/parallel-string-calculator/", title: "并联串计算器", description: "配置串并联组串布局。" },
+  { href: "/zh/tools/runtime-calculator/", title: "续航时间计算器", description: "根据负载瓦数计算续航时间。" },
+  { href: "/zh/tools/battery-pack-calculator/", title: "电池组计算器", description: "设计串并联电芯配置方案。" },
+  { href: "/zh/tools/energy-conversion-calculator/", title: "能量换算", description: "在容量Ah和能量Wh之间换算。" },
+];
+---
+
+<CalculatorLayout
+  title="直流电压降计算器｜电池线缆压降计算｜电池计算器"
+  description="直流电压降计算器：根据负载电流、线缆长度、导体材料和线径，计算电池线缆的电压降，支持船用/太阳能/汽车/通信系统线缆选型，公式全公开。"
+  faqItems={faqItems}
+  commonMistakes={commonMistakes}
+  relatedArticles={relatedArticles}
+  relatedCalculators={relatedTools}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+  lang="zh"
+>
+
+  <!-- Main Calculator Grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+
+    <!-- Input Form -->
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">线缆参数</h3>
+      <div class="flex flex-col gap-6">
+        <InputField id="voltage" label="系统直流电压（V）" value={12.8} min={1} step="any" helperText="常用值：12.8V、25.6V、51.2V" />
+        <InputField id="current" label="持续负载电流（安培）" value={30} min={0.1} step="any" />
+        <InputField id="length" label="单程敷设距离（米）" value={5} min={0.1} step="any" helperText="计算器会自动乘以2，计入正极和回流导体。" />
+        <InputField id="wire-dropdown" label="导体截面积" type="select" options={wireSizes} value="13.3" />
+        <InputField id="custom-area" label="自定义截面积（mm²）" value={10} min={0.01} step="any" wrapperId="custom-area-wrapper" />
+        <InputField id="material" label="导体材料" type="select" options={materialOptions} value="copper" />
+        <InputField id="temperature" label="导体工作温度（°C）" value={25} min={-40} max={200} helperText="电阻随温度升高（铜温度系数：0.393%/°C）" />
+      </div>
+    </CalculatorCard>
+
+    <!-- Calculation Results -->
+    <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">预计输出</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <ResultBox
+            label="电压降"
+            value="4.03%"
+            suffix="回路压降0.52 V"
+            variant="primary"
+            id="result-status-card"
+          />
+          <ResultBox
+            label="负载端子电压"
+            value="12.28 V"
+            suffix="可用端电压"
+            id="result-end-voltage-box"
+          />
+          <ResultBox
+            label="回路电阻"
+            value="0.0172 Ω"
+            suffix="已做温度修正"
+            id="result-resistance-box"
+          />
+        </div>
+      </div>
+
+      <!-- Action Area -->
+      <div class="border-t border-hairline pt-6">
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">直流线缆工程指南</h4>
+        <p class="text-body-sm text-muted">
+          船用标准指南（ISO 13297）允许关键部件（航行灯、舱底泵、电子设备）的最大<span class="text-primary font-bold">电压降为3%</span>，非关键负载（照明回路、家用设备）为<span class="text-primary font-bold">10%</span>。
+        </p>
+      </div>
+    </CalculatorCard>
+
+  </div>
+
+  <!-- Formulas and Worked Examples -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">公式与计算示例</h2>
+
+    <FormulaBox title="数学公式">
+      <p>
+        导体回路电阻基于距离、线径、材料电阻率和温度系数计算：
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        电阻率 ρ(T) = ρ(20°C) × [1 + α × (T - 20)]
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        回路电阻 (Ω) = ρ(T) × (2 × 距离 (m)) / 截面积 (m²)
+      </div>
+      <p>
+        电压降根据欧姆定律（V = I × R）推导：
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        电压降 (V) = 负载电流 (A) × 回路电阻 (Ω)
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        压降百分比 (%) = (电压降 (V) / 电源电压 (V)) × 100
+      </div>
+    </FormulaBox>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample
+        number={1}
+        title="12V船用航行电路"
+        scenario="在12.8V系统、25°C环境下，为30A航行灯电路选配铜线缆，单程距离5米。"
+        inputs={[
+          { label: "电源电压", value: "12.8 V" },
+          { label: "负载电流", value: "30 A" },
+          { label: "单程距离", value: "5 m（10 m回路）" },
+          { label: "导体", value: "铜，10 mm²（~8 AWG）" },
+          { label: "温度", value: "25°C" },
+        ]}
+        steps={[
+          { label: "第1步：回路电阻", formula: "R = ρ × (2 × L) / A = 1.72×10⁻⁸ × 10 / 10×10⁻⁶", result: "0.0172 Ω" },
+          { label: "第2步：电压降", formula: "V_drop = I × R = 30 × 0.0172", result: "0.516 V" },
+          { label: "第3步：压降百分比", formula: "% = (0.516 / 12.8) × 100", result: "4.03%" },
+          { label: "第4步：负载端子电压", formula: "V_end = 12.8 - 0.516", result: "12.28 V" },
+        ]}
+        answer="4.03%电压降——超过船用关键设备3%的阈值。建议升级到6 AWG（13.3 mm²）。"
+        interpretation="在4.03%压降下，该线缆对于关键航行设备仅勉强合格。对于非关键照明（10%限值）可以接受。升级到6 AWG可将压降降至约2.5%。"
+        variant="marine"
+      />
+
+      <WorkedExample
+        number={2}
+        title="48V太阳能电池线缆"
+        scenario="计算48V太阳能系统、20A充电控制器输出、15米线缆、35°C环境下的电压降。"
+        inputs={[
+          { label: "电源电压", value: "51.2 V" },
+          { label: "充电电流", value: "20 A" },
+          { label: "单程距离", value: "15 m（30 m回路）" },
+          { label: "导体", value: "铜，6 mm²（~10 AWG）" },
+          { label: "温度", value: "35°C" },
+        ]}
+        steps={[
+          { label: "第1步：温度修正电阻率", formula: "ρ(35°C) = 1.72×10⁻⁸ × [1 + 0.00393 × 15]", result: "1.82×10⁻⁸ Ω·m" },
+          { label: "第2步：回路电阻", formula: "R = 1.82×10⁻⁸ × 30 / 6×10⁻⁶", result: "0.091 Ω" },
+          { label: "第3步：电压降", formula: "V_drop = 20 × 0.091", result: "1.82 V" },
+          { label: "第4步：压降百分比", formula: "% = (1.82 / 51.2) × 100", result: "3.55%" },
+        ]}
+        answer="3.55%压降——超过太阳能直流2%的目标。升级到4 AWG（21.15 mm²）可实现约2.1%。"
+        interpretation="更高的系统电压（48V对比12V）保持了较低的电流，但长距离线缆仍会累积显著的压降。NEC建议太阳能充电控制器到电池之间的直流线路压降不超过2%。"
+        variant="solar"
+      />
+
+      <WorkedExample
+        number={3}
+        title="12V房车逆变器线缆"
+        scenario="一台2000W逆变器从12V电池抽取167A电流，计算1米敷设距离的线缆需求。"
+        inputs={[
+          { label: "逆变器功率", value: "2000 W" },
+          { label: "系统电压", value: "12.8 V" },
+          { label: "负载电流", value: "167 A（2000W / 12V）" },
+          { label: "单程距离", value: "1 m（2 m回路）" },
+          { label: "目标压降", value: "≤3%" },
+        ]}
+        steps={[
+          { label: "第1步：最大允许电阻", formula: "R_max = (V × 0.03) / I = (12.8 × 0.03) / 167", result: "0.0023 Ω" },
+          { label: "第2步：所需线缆截面积", formula: "A = ρ × 2L / R = 1.72×10⁻⁸ × 2 / 0.0023", result: "14.96 mm²" },
+          { label: "第3步：选择AWG", formula: "14.96 mm² → 6 AWG（13.3 mm²）或 4 AWG（21.15 mm²）", result: "推荐4 AWG" },
+        ]}
+        answer="4 AWG（21.15 mm²）铜线缆，167A下压降≤3%"
+        interpretation="大电流12V系统需要非常粗的线缆。这就是为什么2kW以上负载优选24V或48V系统——它们大幅降低电流和线缆需求。"
+        variant="rv"
+      />
+    </div>
+  </section>
+
+  <EngineeringDiagram
+    title="直流电压降系统"
+    description="从电池源经线缆到负载的完整回路，显示电压损失位置"
+    variant="circuit"
+    steps={[
+      { label: "电池源", icon: "battery" },
+      { label: "正极线缆", icon: "cable" },
+      { label: "连接负载", icon: "load" },
+      { label: "回流线缆", icon: "cable" },
+    ]}
+  />
+
+  <ComparisonTable
+    title="不同应用场景的允许电压降"
+    headers={["应用场景", "最大压降%", "标准", "关键阈值", "备注"]}
+    rows={[
+      ["船用导航", "3%", "ISO 13297", "1%（优选）", "安全关键设备"],
+      ["船用非关键", "10%", "ISO 13297", "5%", "照明、家用负载"],
+      ["太阳能直流线路", "2%", "NEC 690", "1%", "充电控制器到电池"],
+      ["汽车", "2%", "SAE J1127", "1%", "电池到启动机、点火"],
+      ["通信48V", "1%", "ITU-T", "0.5%", "直流配电"],
+      ["一般直流", "3%", "IEEE", "1%", "电池到负载系统"],
+    ]}
+    caption="直流系统最大允许电压降的行业标准"
+  />
+
+  <ComparisonTable
+    title="铜与铝——等效电压降下的线缆选型对比"
+    headers={["参数", "铜", "铝", "比率"]}
+    rows={[
+      ["电阻率（Ω·m）", "1.72×10⁻⁸", "2.82×10⁻⁸", "1.64倍"],
+      ["等效压降所需截面积", "1.0×", "1.6×", "铝需多60%"],
+      ["每米重量", "1.0×", "0.5×", "铝轻50%"],
+      ["单位载流量成本", "1.0×", "0.6×", "铝便宜40%"],
+      ["氧化风险", "低", "高", "铝需抗氧化剂"],
+      ["柔韧性", "高", "低", "铜更适合紧凑敷设"],
+    ]}
+    caption="直流电力导体的材料对比"
+  />
+
+  <FAQSection items={faqItems} />
+
+  <!-- Calculation Script -->
+  <script>
+    import { calculateVoltageDrop } from '../../../utils/calculators';
+
+    const voltageInput = document.getElementById('voltage') as HTMLInputElement;
+    const currentInput = document.getElementById('current') as HTMLInputElement;
+    const lengthInput = document.getElementById('length') as HTMLInputElement;
+    const wireDropdown = document.getElementById('wire-dropdown') as HTMLSelectElement;
+    const customAreaWrapper = document.getElementById('custom-area-wrapper');
+    const customAreaInput = document.getElementById('custom-area') as HTMLInputElement;
+    const materialSelect = document.getElementById('material') as HTMLSelectElement;
+    const temperatureInput = document.getElementById('temperature') as HTMLInputElement;
+
+    // Outputs
+    const resultStatusCard = document.getElementById('result-status-card');
+    const resultDropPercent = resultStatusCard?.querySelector('.text-display-md') as HTMLElement;
+    const resultDropVoltage = resultStatusCard?.querySelector('.text-caption') as HTMLElement;
+    const resultEndVoltage = document.getElementById('result-end-voltage-box')?.querySelector('.text-title-lg') as HTMLElement;
+    const resultResistance = document.getElementById('result-resistance-box')?.querySelector('.text-title-lg') as HTMLElement;
+
+    function toggleCustomArea() {
+      const isCustom = wireDropdown.value === "-1";
+      if (isCustom) {
+        customAreaWrapper?.classList.remove('hidden');
+      } else {
+        customAreaWrapper?.classList.add('hidden');
+      }
+      updateCalculations();
+    }
+
+    function updateCalculations() {
+      const voltage = parseFloat(voltageInput.value) || 12.8;
+      const current = parseFloat(currentInput.value) || 0;
+      const length = parseFloat(lengthInput.value) || 0;
+      const material = materialSelect.value as "copper" | "aluminum";
+      const temperature = parseFloat(temperatureInput.value) || 25;
+
+      const dropdownArea = parseFloat(wireDropdown.value);
+      const wireSize = dropdownArea === -1 ? (parseFloat(customAreaInput.value) || 0.1) : dropdownArea;
+
+      const results = calculateVoltageDrop(voltage, current, length, wireSize, material, temperature);
+
+      // Render percentage
+      if (resultDropPercent) resultDropPercent.textContent = `${results.voltageDropPercent.toFixed(2)}%`;
+      if (resultDropVoltage) resultDropVoltage.textContent = `${results.voltageDropV.toFixed(3)} V drop along loop`;
+      if (resultEndVoltage) resultEndVoltage.textContent = `${results.endVoltageV.toFixed(2)} V`;
+
+      // Resistance per wire = loop resistance / 2.
+      // But loop resistance is results.voltageDropV / current.
+      const loopR = current > 0 ? results.voltageDropV / current : 0;
+      if (resultResistance) resultResistance.textContent = `${loopR.toFixed(4)} Ω`;
+
+      // Update card color border based on safety threshold (3% target)
+      if (resultStatusCard) {
+        resultStatusCard.className = "bg-surface-soft p-6 border col-span-1 md:col-span-2 " +
+          (results.voltageDropPercent > 10 ? "border-red-600" :
+           results.voltageDropPercent > 3 ? "border-yellow-500" : "border-hairline");
+      }
+    }
+
+    wireDropdown.addEventListener('change', toggleCustomArea);
+    [voltageInput, currentInput, lengthInput, customAreaInput, materialSelect, temperatureInput].forEach(el => {
+      el.addEventListener('input', updateCalculations);
+    });
+
+    // Run on boot
+    toggleCustomArea();
+  </script>
+</CalculatorLayout>

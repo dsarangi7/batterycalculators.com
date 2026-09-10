@@ -1,0 +1,433 @@
+---
+import CalculatorLayout from '../../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import InputField from '../../../components/InputField.astro';
+import ResultBox from '../../../components/ResultBox.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import RelatedTools from '../../../components/RelatedTools.astro';
+import MiniSimulationChart from '../../../components/MiniSimulationChart.astro';
+import WorkedExample from '../../../components/WorkedExample.astro';
+import ComparisonTable from '../../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../../components/EngineeringDiagram.astro';
+
+const whatIs = `电池充电时间是指使用指定充电器电流，将电池从给定荷电状态（SOC）恢复到目标SOC所需的时长。锂离子电池充电分为两个不同阶段：<strong>恒流（CC）阶段</strong>，充电器以恒定电流持续供电直至电芯达到上限电压（通常约为80% SOC），随后进入<strong>恒压（CV）阶段</strong>，充电器保持电压恒定，电流随电芯接近100% SOC而指数衰减。CV阶段虽仅提供最后20%的容量，却可能占总充电时间的20–30%。理解充电时间对于安排电动汽车充电、规划太阳能电池回充窗口、管理离网电力预算以及优化车队车辆周转时间至关重要。`;
+
+const whyItMatters = [
+  "CV阶段比简单的容量/电流计算结果多增加20–40%的时间——导致充电时间被低估。",
+  "以超过推荐C率充电会加速锂枝晶析出和热应力，使电池寿命缩短20–40%。",
+  "铅酸电池需要较长的吸收和浮充阶段，充电时间可能为锂电的两倍。",
+  "高SOC下的BMS均衡可能在电芯电压不一致时减慢或中断充电，增加不可预测的额外时间。",
+  "太阳能充电系统必须考虑基于可用日照时间和光伏板输出的充电倍率变化。",
+];
+
+const practicalApplications = [
+  { title: "电动汽车充电调度", description: "估算Level 1、Level 2和直流快充的充电时间，以安排车辆可用性。" },
+  { title: "太阳能回充规划", description: "确定可用日照时间是否足够在傍晚负载之前将电池充满。" },
+  { title: "车队车辆管理", description: "为商用电动汽车车队安排充电窗口，以最小化停机时间。" },
+  { title: "离网电力预算", description: "规划发电机运行时间和太阳能充电窗口，以在负载周期内维持电池SOC。" },
+  { title: "船用电池回充", description: "估算船舶生活电池组的发电机或岸电充电时间。" },
+];
+
+const expertNotes = [
+  { title: 'CV阶段的影响', variant: 'engineering', content: '充电的最后20%（CV阶段）耗时不成比例地更长，因为充电器限制电流以防止过压。这是正常的CC-CV行为，而非充电器故障。规划80%充电量可获得最佳的时间-能量比。' },
+  { title: '铅酸与锂电对比', variant: 'info', content: '铅酸电池需要显著更长的吸收（CV）和浮充阶段。其较低的充电效率（80–85%）也意味着需要输入比存储更多的能量。在相同容量和电流下，铅酸充电时间预计为锂电的1.5–2倍。' },
+];
+
+const trustSection = {
+  text: "本计算器模拟了锂离子电池充电器通用的标准CC-CV充电曲线。CC阶段计算线性充电量，CV阶段使用基于指数电流衰减的经验过载模型。所有中间值均已显示以供验证。",
+  link: { label: "查看完整计算方法", href: "/zh/methodology/" },
+};
+
+const references = [
+  { title: "Battery University — 锂离子电池充电", url: "https://batteryuniversity.com/article/bu-409-charging-lithium-ion-batteries", source: "Battery University / Cadex Electronics" },
+  { title: "TI应用笔记 — 锂离子充电曲线", url: "https://www.ti.com/lit/an/slua480/slua480.pdf", source: "Texas Instruments" },
+  { title: "IEEE Std 1188 — 电池充电实践", url: "https://standards.ieee.org/ieee/1188/1076/", source: "IEEE Standards Association" },
+];
+
+const faqItems = [
+  {
+    question: "为什么充电的最后20%耗时这么长？",
+    answer: "这是由于CV（恒压）阶段。当电池电芯接近满充时，其端电压与充电器电压匹配。为防止电芯过充，充电器锁定电压并允许电流指数衰减，导致充电速率变慢。",
+  },
+  {
+    question: "铅酸电池也能计算充电时间吗？",
+    answer: "铅酸电池可以估算，但其吸收（CV）和浮充阶段比锂电长得多。其效率也较低（通常80–85%）。标准经验法则是铅酸的CV过载系数加倍。",
+  },
+  {
+    question: "磷酸铁锂电芯推荐的充电C率是多少？",
+    answer: "标准磷酸铁锂电芯优选0.2C至0.5C充电倍率以延长寿命。例如，100Ah电池最佳充电电流为20A至50A。许多大功率电芯支持更快充电（1C），但会升高电芯内部温度。",
+  },
+  {
+    question: "均衡损耗如何影响充电时间？",
+    answer: "当电芯电压出现偏差时，电池管理系统（BMS）通过分流电阻绕过高电压电芯的电流来进行均衡。如果电芯失配严重，充电将在高端减慢或中断以完成均衡，增加不可预测的额外时间。",
+  },
+  {
+    question: "100Ah电池充满需要多长时间？",
+    answer: "在0.2C（20A）下，100Ah电池从20%充到100%约需5小时。在0.5C（50A）下约需2小时。在1C（100A）下约需1小时，但CV阶段需额外20–30分钟才能达到100% SOC。",
+  },
+  {
+    question: "可以在不损坏电池的情况下加快充电吗？",
+    answer: "增大充电电流会加快CC阶段，但会产生更多热量并加速退化。多数厂商推荐0.2C–0.5C以获得最佳寿命。1C充电可偶尔用于快速补电，但不宜日常使用。",
+  },
+  {
+    question: "温度会影响充电时间吗？",
+    answer: "会。低温增加内阻，导致BMS降低充电电流以防止锂枝晶析出。在0°C时，许多BMS会将充电倍率降至0.1C或更低。最佳充电温度范围为10–35°C。",
+  },
+  {
+    question: "CC充电和CV充电有什么区别？",
+    answer: "CC（恒流）提供恒定电流直至电池达到电压限值（约80% SOC）。CV（恒压）保持电压恒定，电流随电池接近100% SOC而指数衰减。两个阶段都是安全满充所必需的。",
+  },
+  {
+    question: "应该充到80%还是100%？",
+    answer: "充到80%可避免缓慢的CV阶段并减少电芯的日历老化应力。日常使用建议充至80%以获得最佳电池寿命。仅在需要满容量应对即将出行或停电时才充至100%。",
+  },
+  {
+    question: "充电器效率如何影响充电时间？",
+    answer: "充电器效率（通常90–95%）意味着5–10%的输入能量以热量形式损失。一台95%效率的充电器必须提供105Wh才能存储100Wh，按比例延长充电时间。本计算器在其计算中已考虑充电器效率。",
+  },
+  {
+    question: "可以用铅酸充电器给锂电池充电吗？",
+    answer: "不推荐。铅酸充电器使用不同的电压设定值和多阶段曲线（恒流、吸收、浮充），可能导致锂电芯过充或欠充。请始终使用专为锂离子或磷酸铁锂化学体系设计的充电器。",
+  },
+];
+
+const commonMistakes = [
+  "忽略CV（恒压）阶段——充电的最后20%因指数电流衰减而耗时不成比例地更长。简单的Ah/电流计算会低估总充电时间20–40%。",
+  "日常使用超过推荐C率充电——虽然1C充电对许多锂电芯可行，但日常快充会比0.2C–0.5C充电加速退化20–40%。",
+  "用铅酸充电器给锂电池充电——铅酸充电器使用不同的电压设定值和多阶段曲线，可能导致锂电芯过充或欠充，造成损坏。",
+  "忽略充电器效率——一台90%效率的充电器会将10%的输入能量以热量形式浪费，按比例延长充电时间。务必在时间估算中考虑充电器效率。",
+  "未考虑BMS均衡过载——当电芯电压偏差时，BMS可能减慢或中断充电以均衡电芯，为充电周期增加不可预测的时间。",
+  "假设充电电流全程恒定——随着电池接近满充，充电电流会减小，尤其是在80% SOC以上。CC-CV曲线并非线性。",
+  "忽略温度降额——低温导致BMS降低充电电流以防止锂枝晶析出。在0°C时，充电倍率可能降至0.1C或更低。",
+  "日常使用充至100%——充至80%可避免缓慢的CV阶段并减少日历老化应力。仅在确实需要满容量时才充至100%。",
+  "混用充电器和电池化学体系——NMC充电器与LFP充电器具有不同的电压曲线。使用错误的化学体系曲线可能导致过充或欠充。",
+  "太阳能充电系统未考虑太阳能波动性——太阳能充电电流随辐照度变化。额定0.2C的太阳能充电控制器在阴天可能仅提供0.05C。",
+];
+
+const relatedTools = [
+  { href: "/zh/tools/c-rate-calculator/", title: "C率计算器", description: "充放电电流与C率倍率换算。" },
+  { href: "/zh/tools/soc-estimator/", title: "SOC估算器", description: "根据OCV曲线查表估算荷电状态。" },
+  { href: "/zh/tools/battery-sizing-calculator/", title: "电池容量计算器", description: "根据日耗电量确定所需电池容量。" },
+  { href: "/zh/tools/runtime-calculator/", title: "电池续航时间计算器", description: "根据负载瓦特曲线计算续航时间。" },
+  { href: "/zh/tools/battery-degradation-estimator/", title: "电池衰减估算器", description: "估算电池容量衰减与老化状态。" },
+  { href: "/zh/tools/solar-battery-sizing-calculator/", title: "太阳能蓄电池计算器", description: "根据日耗电与备电天数确定太阳能蓄电池容量。" },
+];
+
+const relatedArticles = [
+  { href: "/zh/learn/how-long-to-charge-a-battery/", title: "电池需要充多久" },
+  { href: "/zh/learn/how-long-to-charge-a-100ah-battery/", title: "100Ah电池需要充多久" },
+  { href: "/zh/learn/charger-sizing-guide/", title: "充电器选型指南" },
+  { href: "/zh/learn/lifepo4-charge-voltage-table/", title: "磷酸铁锂充电电压表" },
+];
+
+---
+
+<CalculatorLayout
+  title="电池充电时间计算器 | 电池计算器"
+  description="根据容量、充电器电流和目标SOC估算锂离子和磷酸铁锂电池的CC-CV充电时间。"
+  faqItems={faqItems}
+  commonMistakes={commonMistakes}
+  relatedArticles={relatedArticles}
+  relatedCalculators={relatedTools}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+  lang="zh"
+>
+
+  <!-- Main Calculator Grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+
+    <!-- Input Form -->
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">参数</h3>
+      <div class="flex flex-col gap-6">
+        <InputField id="capacity" label="电池容量 (Ah)" value={100} min={0.1} step="any" />
+        <InputField id="voltage" label="标称电压 (V)" value={12.8} min={1} step="any" />
+        <InputField id="charge-current" label="充电器输出电流 (安培)" value={20} min={0.1} step="any" helperText="常见充电电流：5A、10A、20A、50A" />
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <InputField id="start-soc" label="起始SOC (%)" value={20} min={0} max={100} />
+          <InputField id="target-soc" label="目标SOC (%)" value={100} min={0} max={100} />
+        </div>
+        <InputField id="efficiency" label="充电器效率 (%)" value={95} min={50} max={100} helperText="充电器电路中的热功转换损耗（通常90-95%）" />
+      </div>
+    </CalculatorCard>
+
+    <!-- Calculation Results -->
+    <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">预计输出</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <ResultBox
+            label="总充电时间"
+            value="5h 01m"
+            suffix="5.01 小时"
+            variant="primary"
+            id="result-time"
+          />
+          <ResultBox
+            label="充入能量"
+            value="1,024 Wh"
+            suffix="1.02 kWh"
+            id="result-energy-box"
+          />
+          <ResultBox
+            label="充电C率"
+            value="0.20 C"
+            suffix="慢速充电"
+            id="result-c-rate-box"
+          />
+        </div>
+
+        <MiniSimulationChart
+          title="SOC充电曲线"
+          description="CC-CV充电过程中的荷电状态变化"
+          xLabel="时间（小时）"
+          yLabel="SOC (%)"
+          chartId="chart-charging"
+        />
+      </div>
+
+      <!-- Action Area -->
+      <div class="border-t border-hairline pt-6">
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">关于CV恒压饱和阶段的说明</h4>
+        <p class="text-body-sm text-muted">
+          锂离子和磷酸铁锂电池充电分为两个阶段：恒流（CC）充电至约80% SOC，然后恒压（CV）充电至100%。在CV模式下，电池限制电流输入，需增加过载时间模型。
+        </p>
+      </div>
+    </CalculatorCard>
+
+  </div>
+
+  <!-- Formulas and Worked Examples -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">公式与计算示例</h2>
+
+    <FormulaBox title="数学公式">
+      <p>
+        充电时间T_total考虑了恒流充电效率和恒压饱和偏移量：
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        所需安时 (Ah) = 容量 (Ah) × (目标SOC% − 起始SOC%) / 100
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        CC阶段时间（小时）= 所需Ah / (充电器电流 (A) × (效率% / 100))
+      </div>
+      <p>
+        若目标SOC在80%或以上，需增加基于指数电流衰减的经验CV阶段过载：
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        CV阶段过载 = (目标SOC% − max(80, 起始SOC%)) × 0.04 小时/%
+      </div>
+    </FormulaBox>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample
+        number={1}
+        title="以0.5C (50A) 充电100Ah LFP——CC/CV阶段"
+        scenario="一块12.8V磷酸铁锂电池从20% SOC以50A充电器（0.5C）充至100% SOC，效率95%。"
+        inputs={[
+          { label: "容量", value: "100 Ah" },
+          { label: "电压", value: "12.8 V" },
+          { label: "充电器电流", value: "50 A (0.5C)" },
+          { label: "起始SOC → 目标SOC", value: "20% → 100%" },
+          { label: "效率", value: "95%" },
+        ]}
+        steps={[
+          { label: "步骤1：所需充电Ah", formula: "Ah = 100 × (100 − 20) / 100", result: "80 Ah" },
+          { label: "步骤2：CC阶段时间（0→80% SOC）", formula: "T_CC = 80 / (50 × 0.95)", result: "1.68 小时（≈ 1h 41m）" },
+          { label: "步骤3：CV阶段过载（80→100%）", formula: "T_CV = (100 − 80) × 0.04", result: "0.80 小时（≈ 48m）" },
+          { label: "步骤4：总充电时间", formula: "T_total = 1.68 + 0.80", result: "2.48 小时" },
+        ]}
+        answer="≈ 2小时29分钟"
+        interpretation="在0.5C下，CC阶段在不到2小时内提供大部分能量。CV阶段需额外约48分钟才能达到100% SOC。充至80%可节省近1小时。"
+        variant="default"
+      />
+
+      <WorkedExample
+        number={2}
+        title="以0.1C (20A) 充电200Ah铅酸——吸收时间"
+        scenario="一块12V铅酸电池从30% SOC以20A充电器（0.1C）充至100% SOC。铅酸需要较长的吸收和浮充阶段。"
+        inputs={[
+          { label: "容量", value: "200 Ah" },
+          { label: "电压", value: "12 V" },
+          { label: "充电器电流", value: "20 A (0.1C)" },
+          { label: "起始SOC → 目标SOC", value: "30% → 100%" },
+          { label: "充电效率", value: "85%" },
+        ]}
+        steps={[
+          { label: "步骤1：所需充电Ah", formula: "Ah = 200 × (100 − 30) / 100", result: "140 Ah" },
+          { label: "步骤2：主充电阶段时间", formula: "T_bulk = 140 / (20 × 0.85)", result: "8.24 小时" },
+          { label: "步骤3：吸收阶段（14.4V恒压）", formula: "T_abs ≈ 3–5小时（铅酸经验值）", result: "≈4 小时" },
+          { label: "步骤4：浮充阶段", formula: "T_float ≈ 1–3小时稳定电芯", result: "≈2 小时" },
+          { label: "步骤5：总充电时间", formula: "T_total = 8.24 + 4 + 2", result: "14.24 小时" },
+        ]}
+        answer="≈ 14小时15分钟"
+        interpretation="铅酸的吸收和浮充阶段几乎使总充电时间达到主充电阶段的两倍。这就是铅酸系统需要仔细规划充电时间的原因。"
+        variant="marine"
+      />
+
+      <WorkedExample
+        number={3}
+        title="以1C (100A) 快充100Ah NMC——时间与退化对比"
+        scenario="一块36V三元锂电池从10% SOC以1C (100A) 快充至90% SOC。对比快充时间与退化代价。"
+        inputs={[
+          { label: "容量", value: "100 Ah" },
+          { label: "电压", value: "36 V" },
+          { label: "充电器电流", value: "100 A (1C)" },
+          { label: "起始SOC → 目标SOC", value: "10% → 90%" },
+          { label: "效率", value: "93%" },
+        ]}
+        steps={[
+          { label: "步骤1：所需充电Ah", formula: "Ah = 100 × (90 − 10) / 100", result: "80 Ah" },
+          { label: "步骤2：CC阶段时间（10→80%）", formula: "T_CC = 70 / (100 × 0.93)", result: "0.75 小时（45分钟）" },
+          { label: "步骤3：CV阶段过载（80→90%）", formula: "T_CV = (90 − 80) × 0.04", result: "0.40 小时（24分钟）" },
+          { label: "步骤4：总充电时间", formula: "T_total = 0.75 + 0.40", result: "1.15 小时" },
+        ]}
+        answer="≈ 1小时9分钟"
+        interpretation="1C快充仅需略超1小时即可完成，但日常使用会比0.25C充电加速容量衰减20–40%。仅在偶尔紧急补电时使用1C倍率。"
+        variant="industrial"
+      />
+    </div>
+  </section>
+
+  <EngineeringDiagram
+    title="CC-CV充电流程"
+    description="锂离子电池充电中的恒流阶段后接恒压阶段"
+    variant="flow"
+    steps={[
+      { label: "充电电源", icon: "charge" },
+      { label: "恒流（CC）阶段", icon: "battery" },
+      { label: "恒压（CV）阶段", icon: "battery" },
+      { label: "满充完成", icon: "chart" },
+    ]}
+  />
+
+  <ComparisonTable
+    title="各化学体系及C率下的充电时间"
+    headers={["化学体系", "0.1C", "0.25C", "0.5C", "1C", "最大推荐值"]}
+    rows={[
+      ["LiFePO4（磷酸铁锂）", "≈11小时", "≈4.5小时", "≈2.5小时", "≈1.5小时", "1C"],
+      ["NMC（三元锂）", "≈11小时", "≈4.5小时", "≈2.5小时", "≈1.2小时", "0.7C"],
+      ["铅酸（吸收模式）", "≈14小时", "≈7小时", "≈4小时", "不推荐", "0.1C"],
+      ["铅酸（浮充模式）", "主充 + 3h", "主充 + 3h", "N/A", "N/A", "0.1C"],
+    ]}
+    caption="包含CC和CV阶段的近似充电时间"
+  />
+
+  <FAQSection items={faqItems} />
+
+  <!-- Calculation Script -->
+  <script>
+    import { calculateChargingTime } from '../../../utils/calculators';
+    import { renderLineChart, clearChart } from '../../../utils/charting';
+
+    const capacityInput = document.getElementById('capacity') as HTMLInputElement;
+    const voltageInput = document.getElementById('voltage') as HTMLInputElement;
+    const chargeCurrentInput = document.getElementById('charge-current') as HTMLInputElement;
+    const startSocInput = document.getElementById('start-soc') as HTMLInputElement;
+    const targetSocInput = document.getElementById('target-soc') as HTMLInputElement;
+    const efficiencyInput = document.getElementById('efficiency') as HTMLInputElement;
+
+    // Outputs - Primary result box
+    const resultTimeCard = document.getElementById('result-time');
+    const resultTime = resultTimeCard?.querySelector('.text-display-md') as HTMLElement;
+    const resultHoursDecimal = resultTimeCard?.querySelector('.text-caption') as HTMLElement;
+
+    // Outputs - Secondary result boxes
+    const resultEnergy = document.getElementById('result-energy-box')?.querySelector('.text-title-lg') as HTMLElement;
+    const resultKwh = document.getElementById('result-energy-box')?.querySelector('.text-caption') as HTMLElement;
+    const resultCRate = document.getElementById('result-c-rate-box')?.querySelector('.text-title-lg') as HTMLElement;
+    const resultCRateDesc = document.getElementById('result-c-rate-box')?.querySelector('.text-caption') as HTMLElement;
+
+    const chartSvg = document.getElementById('chart-charging') as unknown as SVGElement;
+
+    function updateCalculations() {
+      const cap = parseFloat(capacityInput.value) || 100;
+      const voltage = parseFloat(voltageInput.value) || 12.8;
+      const current = parseFloat(chargeCurrentInput.value) || 20;
+      const startSoc = parseFloat(startSocInput.value) || 0;
+      const targetSoc = parseFloat(targetSocInput.value) || 100;
+      const eff = parseFloat(efficiencyInput.value) || 95;
+
+      const results = calculateChargingTime(cap, voltage, startSoc, targetSoc, current, eff);
+
+      // Render Time
+      if (results.chargeTimeHours <= 0) {
+        if (resultTime) resultTime.textContent = '0h 00m';
+        if (resultHoursDecimal) resultHoursDecimal.textContent = '0.00 小时';
+      } else {
+        const totalMinutes = Math.round(results.chargeTimeHours * 60);
+        const hours = Math.floor(totalMinutes / 60);
+        const mins = totalMinutes % 60;
+
+        if (resultTime) resultTime.textContent = `${hours}h ${mins < 10 ? '0' : ''}${mins}m`;
+        if (resultHoursDecimal) resultHoursDecimal.textContent = `${results.chargeTimeHours.toFixed(2)} 小时`;
+      }
+
+      // Render Energy
+      if (resultEnergy) resultEnergy.textContent = `${Math.round(results.energyAddedWh).toLocaleString()} Wh`;
+      if (resultKwh) resultKwh.textContent = `${(results.energyAddedWh / 1000).toFixed(3)} kWh`;
+
+      // Render C-rate
+      const cRate = cap > 0 ? current / cap : 0;
+      if (resultCRate) resultCRate.textContent = `${cRate.toFixed(2)} C`;
+
+      let desc = '慢速充电';
+      if (cRate >= 1.0) {
+        desc = '超高倍率（有热应力风险）';
+      } else if (cRate >= 0.5) {
+        desc = '标准快充倍率';
+      } else if (cRate >= 0.1) {
+        desc = '最佳慢充倍率';
+      } else {
+        desc = '涓流/维护充电';
+      }
+      if (resultCRateDesc) resultCRateDesc.textContent = desc;
+
+      if (chartSvg && results.chargeTimeHours > 0 && cap > 0 && current > 0 && targetSoc > startSoc) {
+        const totalT = results.chargeTimeHours;
+        const ccEndSoc = Math.min(80, targetSoc);
+        const effectiveI = current * eff / 100;
+        const ccAh = cap * Math.max(0, ccEndSoc - startSoc) / 100;
+        const ccTime = effectiveI > 0 ? ccAh / effectiveI : 0;
+        const cvTime = Math.max(0, totalT - ccTime);
+
+        const pts: { x: number; y: number }[] = [];
+        for (let i = 0; i < 20; i++) {
+          const t = totalT * (i / 19);
+          let soc: number;
+          if (ccTime > 0 && t <= ccTime) {
+            soc = startSoc + (ccEndSoc - startSoc) * (t / ccTime);
+          } else if (cvTime > 0) {
+            const cvProg = (t - ccTime) / cvTime;
+            soc = ccEndSoc + (targetSoc - ccEndSoc) * (1 - Math.exp(-3 * cvProg));
+          } else {
+            soc = targetSoc;
+          }
+          pts.push({ x: t, y: Math.max(0, Math.min(100, soc)) });
+        }
+        renderLineChart(chartSvg, pts, {
+          width: 320, height: 160,
+          xLabel: 'Time (hours)', yLabel: 'SOC (%)',
+          xMin: 0, xMax: Math.ceil(totalT),
+          yMin: Math.max(0, startSoc - 5), yMax: Math.min(100, targetSoc + 5),
+        });
+      } else if (chartSvg) {
+        clearChart(chartSvg);
+      }
+    }
+
+    [capacityInput, voltageInput, chargeCurrentInput, startSocInput, targetSocInput, efficiencyInput].forEach(el => {
+      el.addEventListener('input', updateCalculations);
+    });
+
+    // Run on boot
+    updateCalculations();
+  </script>
+</CalculatorLayout>

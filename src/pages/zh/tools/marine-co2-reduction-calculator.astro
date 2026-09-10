@@ -1,0 +1,565 @@
+---
+import CalculatorLayout from '../../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import InputField from '../../../components/InputField.astro';
+import ResultBox from '../../../components/ResultBox.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import RelatedTools from '../../../components/RelatedTools.astro';
+import WorkedExample from '../../../components/WorkedExample.astro';
+import ComparisonTable from '../../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../../components/EngineeringDiagram.astro';
+
+const whatIs = `船舶CO₂减排计算器用于估算通过船舶混合动力化、电池电力推进和岸电系统所实现的减排潜力。该工具采用国际海事组织（IMO）第四次温室气体研究报告（2020）中的行业标准排放因子，量化燃油节省量以及CO₂、NOx和SOx的减排量。本工具帮助船东、运营商和船舶设计师在投资混合动力或电力推进系统之前，评估脱碳策略对环境的影响。`;
+
+const whyItMatters = [
+  "IMO设定目标：到2030年碳强度降低40%，到2050年左右实现温室气体净零排放——量化减排潜力是实现合规的第一步。",
+  "混合动力和电池电力船舶可减少15–30%的燃油消耗，直接降低运营成本和碳排放交易方案中的碳暴露风险。",
+  "港口当局日益要求排放报告并为岸电系统提供激励措施——了解基线排放和减排潜力可帮助获取这些收益。",
+  "NOx和SOx的减少可改善港口和沿海社区的空气质量，支持排放控制区（ECA）和地区法规的合规要求。",
+  "投资者和承租人要求提供可验证的排放数据——记录完善的减排策略可增强船舶的商业竞争力。"
+];
+
+const practicalApplications = [
+  { title: "混合动力推进规划", description: "在投资柴油电力混合动力改装之前，估算渡轮、海上支援船或工作船的减排效果。" },
+  { title: "岸电系统商业论证", description: "量化岸电系统（冷停机）带来的排放减少和燃油节省，为岸电基础设施投资提供依据。" },
+  { title: "CII评级改善", description: "模拟混合动力化或电气化对碳强度指标（CII）的改善效果，以达到IMO目标。" },
+  { title: "法规合规策略", description: "为船旗国提交和环境影响评估建立有据可查的排放基线。" }
+];
+
+const expertNotes: { title: string; variant: 'warning' | 'engineering' | 'info'; content: string }[] = [
+  {
+    title: "排放因子假设",
+    variant: "engineering",
+    content: "本计算器采用IMO第四次温室气体研究报告（2020）中的排放因子：MGO为3.206 kg CO₂/升，MDO为3.206 kg CO₂/升，HFO为3.114 kg CO₂/升，LNG为2.750 kg CO₂/升。NOx和SOx因子因燃油硫含量和发动机类型而异。实际排放量取决于发动机负荷、燃烧效率、废气处理和燃油质量。这些数值代表典型巡航负荷下运行良好的船用柴油发动机的排放水平。"
+  },
+  {
+    title: "混合动力化燃油节省",
+    variant: "info",
+    content: "混合动力化比例代表通过电池电力运行、负荷均衡和优化发动机负荷所消除的总燃油消耗比例。实际混合动力节省效果在很大程度上取决于船舶的运行工况——负荷变化较大的船舶（渡轮、拖船、平台供应船）比巡航负荷稳定的船舶获得更高的节省。典型节省范围为15–30%（针对设计良好的混合动力系统）。"
+  },
+  {
+    title: "使用限制",
+    variant: "warning",
+    content: "本工具仅提供教育性估算。它未考虑特定发动机的排放曲线、废气后处理（SCR、EGR）、燃油硫含量变化、甲烷逃逸（LNG）或航速优化和气象航线等运行因素。如需正式排放报告或IMO合规，请使用经船级社认证的排放计算工具。"
+  }
+];
+
+const trustSection = {
+  text: "排放因子来源于IMO第四次温室气体研究报告（2020）及同行评审的海事排放文献。所有公式和假设均在下方详细记录。",
+  link: { label: "查看我们的方法论和公式推导", href: "/zh/methodology/" }
+};
+
+const references = [
+  { title: "Fourth IMO GHG Study 2020", url: "https://www.imo.org/en/OurWork/Environment/Pages/Fourth-IMO-Greenhouse-Gas-Study-2020.aspx", source: "International Maritime Organization" },
+  { title: "IMO Initial GHG Strategy (Resolution MEPC.304(72))", url: "https://www.imo.org/en/OurWork/Environment/Pages/Strategy-on-reduction-of-GHG-emissions-from-ships.aspx", source: "International Maritime Organization" },
+  { title: "EPA Greenhouse Gas Equivalencies Calculator", url: "https://www.epa.gov/energy/greenhouse-gas-equivalencies-calculator", source: "U.S. Environmental Protection Agency" },
+  { title: "EMEP/EEA Air Pollutant Emission Inventory Guidebook 2019", url: "https://www.eea.europa.eu/publications/emep-eea-guidebook-2019", source: "European Environment Agency" }
+];
+
+const faqItems = [
+  {
+    question: "本计算器使用的排放因子准确度如何？",
+    answer: "排放因子来源于IMO第四次温室气体研究报告（2020），这是最全面且引用最广泛的海事排放数据集。MGO和MDO的CO₂因子相同（3.206 kg/升），因为它们的碳含量相近。HFO的CO₂因子略低，但由于硫和氮含量较高，其NOx和SOx显著更高。实际排放量因发动机类型、负荷和燃油质量而异。"
+  },
+  {
+    question: "\"混合动力化比例\"是什么意思？",
+    answer: "混合动力化比例代表通过电池电力推进、负荷均衡和优化发动机负荷所消除的年燃油消耗比例。一艘年消耗500,000升燃油的船舶采用20%混合动力化，意味着每年节省100,000升燃油。实际节省效果取决于运行工况——负荷变化较大的船舶（渡轮、拖船）比巡航负荷稳定的船舶获得更高的节省。"
+  },
+  {
+    question: "岸电系统如何减少排放？",
+    answer: "岸电系统（冷停机）允许船舶在靠港时关闭柴油发电机组，转而连接港口电网供电。这消除了港口停靠期间的所有船载燃烧排放。净减排效果取决于电网的碳强度——如果电网由可再生能源供电，减排效果显著；如果电网依赖燃煤发电，效益将降低。"
+  },
+  {
+    question: "典型的NOx和SOx减排水平是多少？",
+    answer: "混合动力化带来的NOx减排范围为15–30%，与节省的燃油量成正比。SOx减排取决于燃油硫含量——MGO和MDO的硫含量较低（排放控制区内为0.1%），而HFO硫含量较高（全球最高可达3.5%）。LNG完全消除SOx并减少约50%的NOx。废气后处理系统（SCR、脱硫器）可进一步降低这些污染物。"
+  },
+  {
+    question: "我可以使用本计算器进行IMO CII合规计算吗？",
+    answer: "本计算器提供用于规划和可行性分析的初步估算。它不能替代认证的CII计算工具。如需正式IMO CII评级提交，必须使用IMO官方CII计算器以及经船级社验证的数据。但本工具可帮助您模拟改善方案，并估算混合动力化对CII轨迹的影响。"
+  },
+  {
+    question: "如何将CO₂减排量转换为等效汽车数量或树木数量？",
+    answer: "本计算器采用基于EPA的等效换算：一辆乘用车每年排放约4.6吨CO₂，一棵树每年吸收约21 kg CO₂。这些是近似平均值——实际值因车辆类型、驾驶模式、树种和气候条件而异。等效换算有助于在利益相关者沟通和公开报告中以更直观的方式传达减排效果。"
+  },
+  {
+    question: "LNG对排放的影响是什么？",
+    answer: "LNG相比MGO可减少约10–15%的CO₂（按升计算），完全消除SOx，并减少约50%的NOx。但LNG会引入甲烷逃逸——燃烧过程中未燃烧释放的甲烷，其20年全球变暖潜力是CO₂的80倍。考虑甲烷逃逸后，LNG的净温室气体效益存在争议，很大程度上取决于发动机技术和甲烷逃逸率。"
+  },
+  {
+    question: "是否应考虑油井到油箱（WTT）排放？",
+    answer: "本计算器仅涉及油箱到尾流（TTW）排放——即船载燃烧的排放。油井到油箱（WTT）排放（燃料生产、炼制和运输过程中的排放）未包含在内。对于完整的生命周期评估，化石燃料的WTT排放约占TTW排放的15–25%。电池电力和岸电系统将排放转移至上游电网，因此WTT分析对于准确比较至关重要。"
+  }
+];
+
+const relatedArticles = [
+  { title: "混合动力船舶如何减少燃油消耗和排放", href: "/zh/learn/how-hybrid-vessels-reduce-emissions/" },
+  { title: "海事脱碳路线图", href: "/zh/learn/maritime-decarbonization-roadmap/" },
+];
+
+const commonMistakes = [
+  "使用错误的CO₂排放因子——MGO（3.206 kg/L）和HFO（3.114 kg/L）虽然都是船用燃油，但具有不同的排放因子。",
+  "忽略LNG发动机的甲烷逃逸——未燃烧甲烷的20年变暖潜力是CO₂的80倍，显著降低了LNG的净温室气体效益。",
+  "假设混合动力化节省适用于总燃油消耗而未考虑运行工况——巡航负荷稳定的船舶节省远低于负荷变化的船舶。",
+  "应用岸电减排效果时未验证当地电网碳强度——高碳排放电网可能比高效的船载发电机组产生更多CO₂。",
+  "比较燃油转换时仅使用TTW排放——电池电力和岸电系统将排放转移至上游电网。",
+  "忽略NOx和SOx因子因发动机类型和负荷的变化——75% MCR下的排放因子与50%或100%负荷下的差异显著。",
+  "忘记废气后处理（SCR、EGR）会改变实际排放特性——标准排放因子假设无后处理。",
+  "重复计算混合动力化和岸电系统的燃油节省——这两项应作为独立的减排路径分别计算。"
+];
+
+const relatedCalculators = [
+  { href: "/zh/tools/hybrid-vessel-roi-calculator/", title: "混合动力船舶投资回报率计算器", description: "评估混合动力推进投资的财务回报。" },
+  { href: "/zh/tools/vessel-energy-storage-calculator/", title: "船舶储能计算器", description: "确定混合动力或电力船舶系统的电池容量。" },
+  { href: "/zh/marine/", title: "海事电气化中心", description: "探索所有海事脱碳工具和资源。" },
+];
+
+const fuelOptions = [
+  { label: '船用燃油 (MGO)', value: 'mgo' },
+  { label: '船用柴油 (MDO)', value: 'mdo' },
+  { label: '重油 (HFO)', value: 'hfo' },
+  { label: 'LNG', value: 'lng' },
+];
+---
+
+<CalculatorLayout
+  title="船舶CO₂减排计算器 | Battery Calculators"
+  description="使用行业标准排放因子，估算船舶混合动力化、电气化和岸电系统带来的CO₂、NOx和SOx减排量。"
+  faqItems={faqItems}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+  relatedCalculators={relatedCalculators}
+  commonMistakes={commonMistakes}
+  relatedArticles={relatedArticles}
+  lang="zh"
+>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+
+    <!-- 输入表单 -->
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">船舶配置</h3>
+      <div class="flex flex-col gap-6">
+
+        <InputField
+          id="fuel-type"
+          label="燃油类型"
+          type="select"
+          value="mgo"
+          options={fuelOptions}
+          helperText="选择船舶使用的主要燃油。"
+        />
+
+        <InputField
+          id="annual-fuel"
+          label="年燃油消耗量"
+          value={200000}
+          min={100}
+          step={1000}
+          unit="L/年"
+          helperText="每年消耗的燃油总量（升）。"
+        />
+
+        <InputField
+          id="operating-hours"
+          label="年运行时长"
+          value={5000}
+          min={100}
+          max={8760}
+          step={100}
+          unit="小时/年"
+          helperText="年运行总时长（最大8,760小时）。"
+        />
+
+        <InputField
+          id="hybrid-percent"
+          label="混合动力化比例"
+          value={20}
+          min={0}
+          max={100}
+          step={1}
+          unit="%"
+          helperText="通过混合动力/电力运行消除的燃油比例（0–100%）。"
+        />
+
+        <InputField
+          id="shore-power-percent"
+          label="岸电使用比例"
+          value={10}
+          min={0}
+          max={100}
+          step={1}
+          unit="%"
+          helperText="靠港时连接岸电的时间比例（0–100%）。"
+        />
+
+      </div>
+    </CalculatorCard>
+
+    <!-- 结果 -->
+    <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">减排结果</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <ResultBox
+            label="年节省燃油"
+            value="50,000 L"
+            suffix="减少25.0%"
+            variant="primary"
+            id="result-fuel-saved"
+          />
+          <ResultBox
+            label="年CO₂减排量"
+            value="160.3 t"
+            suffix="吨CO₂消除"
+            id="result-co2"
+          />
+          <ResultBox
+            label="年NOx减排量"
+            value="0 kg"
+            suffix="kg NOx消除"
+            id="result-nox"
+          />
+          <ResultBox
+            label="年SOx减排量"
+            value="0 kg"
+            suffix="kg SOx消除"
+            id="result-sox"
+          />
+          <ResultBox
+            label="等效减少汽车"
+            value="0"
+            suffix="辆乘用车退出道路"
+            id="result-cars"
+          />
+          <ResultBox
+            label="等效种植树木"
+            value="0"
+            suffix="棵树吸收CO₂一年"
+            id="result-trees"
+          />
+        </div>
+      </div>
+
+      <div class="border-t border-hairline pt-6">
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">减排摘要</h4>
+        <p class="text-body-sm text-muted" id="reduction-summary">
+          以20%混合动力化比例配合10%岸电使用，年CO₂排放从641.2吨降至480.9吨。
+        </p>
+      </div>
+    </CalculatorCard>
+
+  </div>
+
+  <!-- 减排前后对比图 -->
+  <section class="mb-16">
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-4 uppercase tracking-wider">减排前后对比</h3>
+      <p class="text-body-sm text-muted mb-6">各污染物基线排放（左）与减排后排放（右）对比。</p>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- CO2 图表 -->
+        <div>
+          <span class="text-label-uppercase text-primary text-[10px] block mb-2">CO₂（吨/年）</span>
+          <div id="chart-co2" class="flex flex-col gap-2"></div>
+        </div>
+        <!-- NOx 图表 -->
+        <div>
+          <span class="text-label-uppercase text-primary text-[10px] block mb-2">NOx（kg/年）</span>
+          <div id="chart-nox" class="flex flex-col gap-2"></div>
+        </div>
+        <!-- SOx 图表 -->
+        <div>
+          <span class="text-label-uppercase text-primary text-[10px] block mb-2">SOx（kg/年）</span>
+          <div id="chart-sox" class="flex flex-col gap-2"></div>
+        </div>
+      </div>
+      <div class="flex items-center gap-4 mt-6 text-caption text-muted">
+        <span class="flex items-center gap-1.5"><span class="w-3 h-3 bg-m-blue-light inline-block"></span> 基线</span>
+        <span class="flex items-center gap-1.5"><span class="w-3 h-3 bg-green-600 inline-block"></span> 减排后</span>
+      </div>
+    </CalculatorCard>
+  </section>
+
+  <!-- 公式与计算示例 -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">公式与计算示例</h2>
+    <FormulaBox title="数学公式">
+      <p>
+        排放减少量使用行业标准燃油特定排放因子计算：
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        节省燃油 = 年燃油消耗量 × [(混合动力比例 × (1 - 岸电比例)) + 岸电比例]
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        CO₂减排量（吨）= 节省燃油 × CO₂因子 / 1000
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        NOx减排量（kg）= 节省燃油 × NOx因子
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        SOx减排量（kg）= 节省燃油 × SOx因子
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        等效汽车数 = CO₂减排量 / 4.6
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        等效树木数 = CO₂减排量（kg）/ 21
+      </div>
+      <p class="mt-4">
+        CO₂因子（kg/升）：MGO 3.206，MDO 3.206，HFO 3.114，LNG 2.750<br/>
+        等效换算：4.6 吨CO₂/辆/年（EPA），21 kg CO₂/棵/年（EPA）
+      </p>
+    </FormulaBox>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample
+        number={1}
+        title="渡轮30%燃油转换为电力"
+        scenario="一艘汽车渡轮每年运营280天，行驶固定航线，年消耗800,000升MGO。运营商计划将30%的推进动力转换为电池电力，使用6 MWh船载电池系统，通过靠港期间夜间岸电充电，利用可再生能源供电。"
+        inputs={[
+          { label: "燃油类型", value: "MGO（3.206 kg CO₂/L）" },
+          { label: "年燃油消耗量", value: "800,000 L/年" },
+          { label: "混合动力化比例", value: "30%" },
+          { label: "岸电使用比例", value: "15%" },
+        ]}
+        steps={[
+          { label: "步骤1：混合动力化节省的燃油", formula: "800,000 × 0.30 × (1 - 0.15) = 204,000 L", result: "通过电力推进节省204,000升" },
+          { label: "步骤2：岸电节省的燃油", formula: "800,000 × 0.15 = 120,000 L", result: "靠港停靠期间节省120,000升" },
+          { label: "步骤3：总节省燃油", formula: "204,000 + 120,000 = 324,000 L", result: "总计324,000 L（减少40.5%）" },
+          { label: "步骤4：CO₂减排", formula: "324,000 × 3.206 / 1000 = 1,038.7 t", result: "消除1,038.7吨CO₂" },
+          { label: "步骤5：等效影响", formula: "1,038.7 / 4.6 = 226辆 | 1,038,700 / 21 = 49,462棵", result: "相当于减少226辆汽车或种植49,462棵树一年" },
+        ]}
+        answer="将渡轮30%的推进动力转换为电力，每年可消除1,038.7吨CO₂——相当于减少226辆乘用车上路。"
+        interpretation="电池电力推进与夜间岸电充电的组合实现了40.5%的总减排效果。渡轮航线可预测且有固定的夜间靠港计划，非常适合利用可再生电网电力进行夜间充电。"
+        variant="marine"
+      />
+
+      <WorkedExample
+        number={2}
+        title="拖船接入岸电系统"
+        scenario="一艘港口拖船每年有40%的运行时间在靠港等待作业。运营商安装岸电系统（冷停机），在空闲期间消除发电机组运行时间，连接到60%可再生能源供电的电网。"
+        inputs={[
+          { label: "燃油类型", value: "MGO（3.206 kg CO₂/L）" },
+          { label: "年燃油消耗量", value: "350,000 L/年" },
+          { label: "混合动力化比例", value: "10%（负荷均衡）" },
+          { label: "岸电使用比例", value: "40%" },
+        ]}
+        steps={[
+          { label: "步骤1：混合动力化节省的燃油", formula: "350,000 × 0.10 × (1 - 0.40) = 21,000 L", result: "通过负荷均衡节省21,000升" },
+          { label: "步骤2：岸电节省的燃油", formula: "350,000 × 0.40 = 140,000 L", result: "港口空闲期间节省140,000升" },
+          { label: "步骤3：总节省燃油", formula: "21,000 + 140,000 = 161,000 L", result: "总计161,000 L（减少46.0%）" },
+          { label: "步骤4：CO₂减排", formula: "161,000 × 3.206 / 1000 = 516.2 t", result: "消除516.2吨CO₂" },
+          { label: "步骤5：电网修正后净减排", formula: "516.2 × 0.60（可再生能源占比）+ 516.2 × 0.40 × (1 - 0.4) = 432.0 t", result: "考虑电网结构后净减排432.0吨CO₂" },
+        ]}
+        answer="考虑电网碳强度后，岸电加负荷均衡每年净减少432.0吨CO₂。"
+        interpretation="拖船是岸电系统的理想对象，因为它们在作业间隙长时间靠港。40%的空闲时间岸电连接消除了最低效的发电机组运行——低负荷运行。电网碳强度对净效益有显著影响。"
+        variant="marine"
+      />
+
+      <WorkedExample
+        number={3}
+        title="游艇安装太阳能板——年CO₂抵消"
+        scenario="一艘25米机动游艇安装8 kW甲板太阳能板，在300个航行日内平均每天发电32 kWh。太阳能抵消了原本需由船载柴油发电机组供电的酒店负荷需求。"
+        inputs={[
+          { label: "燃油类型", value: "MGO（3.206 kg CO₂/L）" },
+          { label: "发电机组燃油消耗", value: "8 L/小时" },
+          { label: "太阳能输出", value: "32 kWh/天" },
+          { label: "发电机组负荷抵消", value: "等效4小时/天" },
+          { label: "运行天数", value: "300天/年" },
+        ]}
+        steps={[
+          { label: "步骤1：太阳能每日燃油抵消", formula: "32 kWh / (8 L/小时 × 5.0 kWh/L) = 0.8小时等效 → 8 × 0.8 = 6.4 L/天", result: "每日抵消6.4升柴油" },
+          { label: "步骤2：年燃油抵消", formula: "6.4 × 300 = 1,920 L/年", result: "年抵消1,920升柴油" },
+          { label: "步骤3：CO₂减排", formula: "1,920 × 3.206 / 1000 = 6.2 t", result: "年消除6.16吨CO₂" },
+          { label: "步骤4：等效影响", formula: "6.16 / 4.6 = 1.3辆 | 6,160 / 21 = 293棵", result: "相当于减少1.3辆汽车或种植293棵树一年" },
+        ]}
+        answer="25米游艇上的太阳能板每年可抵消6.2吨CO₂——相当于减少1.3辆乘用车上路。"
+        interpretation="游艇上的太阳能板提供了有意义但适度的CO₂抵消，相对于船舶总燃油消耗而言。其主要价值在于锚泊时提供静音、无排放的酒店负荷发电，改善宾客体验的同时减少发电机组运行时间和燃油成本。"
+        variant="marine"
+      />
+    </div>
+  </section>
+
+  <!-- 假设条件 -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">假设条件与使用限制</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <CalculatorCard>
+        <h4 class="text-primary font-bold text-sm mb-3">排放因子</h4>
+        <ul class="text-body-sm text-muted flex flex-col gap-2">
+          <li class="flex gap-2"><span class="text-m-blue-light shrink-0">→</span> CO₂因子来源于IMO第四次温室气体研究报告（2020）</li>
+          <li class="flex gap-2"><span class="text-m-blue-light shrink-0">→</span> NOx因子假设中等发动机负荷（75% MCR）</li>
+          <li class="flex gap-2"><span class="text-m-blue-light shrink-0">→</span> SOx因子假设HFO全球硫含量0.5%，MGO/MDO为0.1%</li>
+          <li class="flex gap-2"><span class="text-m-blue-light shrink-0">→</span> LNG无SOx（不含硫分）</li>
+        </ul>
+      </CalculatorCard>
+      <CalculatorCard>
+        <h4 class="text-primary font-bold text-sm mb-3">本计算器未包含的内容</h4>
+        <ul class="text-body-sm text-muted flex flex-col gap-2">
+          <li class="flex gap-2"><span class="text-m-red shrink-0">✗</span> 特定发动机的排放曲线或负荷相关因子</li>
+          <li class="flex gap-2"><span class="text-m-red shrink-0">✗</span> 废气后处理（SCR、EGR、脱硫器）</li>
+          <li class="flex gap-2"><span class="text-m-red shrink-0">✗</span> LNG发动机的甲烷逃逸</li>
+          <li class="flex gap-2"><span class="text-m-red shrink-0">✗</span> 油井到油箱（WTT）上游排放</li>
+          <li class="flex gap-2"><span class="text-m-red shrink-0">✗</span> 运行措施（航速优化、气象航线规划）</li>
+        </ul>
+      </CalculatorCard>
+    </div>
+  </section>
+
+  <section class="mb-16">
+    <EngineeringDiagram
+      title="海事脱碳路径"
+      description="从纯柴油到全面电气化的渐进式步骤"
+      variant="flow"
+      steps={[
+        { label: "纯柴油", icon: "charge" },
+        { label: "混合动力", icon: "battery" },
+        { label: "岸电", icon: "inverter" },
+        { label: "零排放", icon: "solar" },
+      ]}
+    />
+  </section>
+
+  <section class="mb-16">
+    <ComparisonTable
+      title="海事排放标准"
+      headers={["标准", "适用范围", "目标", "时间表", "处罚"]}
+      rows={[
+        ["IMO EEXI", "现有船舶", "相比2008年CO₂降低40%", "2023年1月", "航速限制"],
+        ["IMO CII", "5,000 GT以上船舶", "年效率评级A–E", "2023年1月", "纠正行动计划"],
+        ["EU ETS", "欧盟港口停靠", "碳价约€80/吨", "2024年", "财务成本"],
+        ["FuelEU Maritime", "欧盟船舶", "2025年温室气体降低2%", "2025年", "合规盈余"],
+      ]}
+      caption="推动海事电气化的国际和地区法规"
+    />
+  </section>
+
+  <FAQSection items={faqItems} />
+  <RelatedTools tools={relatedCalculators} />
+
+  <!-- 工程支持 -->
+  <div class="bg-surface-card border border-hairline p-6 mt-8 mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div class="max-w-xl">
+      <h3 class="text-title-sm text-primary mb-1">需要更深入的工程评估？</h3>
+      <p class="text-body-sm text-muted font-light">
+        本计算器提供初步估算。如需船舶专项分析、电池容量评估、减排规划或混合动力可行性支持，请联系Battery Calculators工程支持团队。
+      </p>
+    </div>
+    <a href="/zh/marine/#marine-advisory" class="btn-primary text-xs px-6 py-3 shrink-0 whitespace-nowrap">申请工程支持</a>
+  </div>
+
+  <!-- 计算脚本 -->
+  <script>
+    import { calculateMarineCo2Reduction } from '../../../utils/calculators';
+
+    const fuelTypeInput = document.getElementById('fuel-type') as HTMLSelectElement;
+    const annualFuelInput = document.getElementById('annual-fuel') as HTMLInputElement;
+    const operatingHoursInput = document.getElementById('operating-hours') as HTMLInputElement;
+    const hybridPercentInput = document.getElementById('hybrid-percent') as HTMLInputElement;
+    const shorePowerPercentInput = document.getElementById('shore-power-percent') as HTMLInputElement;
+
+    function getResultElements(id: string) {
+      const box = document.getElementById(id);
+      return {
+        value: box?.querySelector('.text-display-md, .text-title-lg') as HTMLElement,
+        suffix: box?.querySelector('.text-caption') as HTMLElement,
+      };
+    }
+
+    const fuelSaved = getResultElements('result-fuel-saved');
+    const co2Result = getResultElements('result-co2');
+    const noxResult = getResultElements('result-nox');
+    const soxResult = getResultElements('result-sox');
+    const carsResult = getResultElements('result-cars');
+    const treesResult = getResultElements('result-trees');
+    const summaryEl = document.getElementById('reduction-summary');
+
+    function fmt(n: number, decimals = 1): string {
+      return n.toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+    }
+
+    function updateChart(containerId: string, baseline: number, reduced: number) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      const maxVal = Math.max(baseline, 0.001);
+      const baselinePct = (baseline / maxVal) * 100;
+      const reducedPct = (reduced / maxVal) * 100;
+      const pctReduced = maxVal > 0 ? ((baseline - reduced) / baseline) * 100 : 0;
+
+      container.innerHTML = `
+        <div class="flex flex-col gap-1">
+          <div class="flex items-center gap-2">
+            <span class="text-caption text-muted w-16 text-right shrink-0">Before</span>
+            <div class="flex-1 h-5 bg-surface-soft border border-hairline relative overflow-hidden">
+              <div class="h-full bg-m-blue-light transition-all duration-300" style="width: ${baselinePct}%"></div>
+            </div>
+            <span class="text-caption text-primary font-mono w-20 shrink-0">${fmt(baseline)}</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-caption text-muted w-16 text-right shrink-0">After</span>
+            <div class="flex-1 h-5 bg-surface-soft border border-hairline relative overflow-hidden">
+              <div class="h-full bg-green-600 transition-all duration-300" style="width: ${reducedPct}%"></div>
+            </div>
+            <span class="text-caption text-primary font-mono w-20 shrink-0">${fmt(reduced)}</span>
+          </div>
+          <span class="text-caption text-green-500 font-mono text-[10px]">↓ ${fmt(pctReduced)}% reduction</span>
+        </div>
+      `;
+    }
+
+    function updateCalculations() {
+      const fuelType = fuelTypeInput.value as 'mgo' | 'mdo' | 'hfo' | 'lng';
+      const annualFuel = parseFloat(annualFuelInput.value) || 200000;
+      const operatingHours = parseFloat(operatingHoursInput.value) || 5000;
+      const hybridPercent = parseFloat(hybridPercentInput.value) || 0;
+      const shorePowerPercent = parseFloat(shorePowerPercentInput.value) || 0;
+
+      const result = calculateMarineCo2Reduction({
+        fuelType,
+        annualFuelLiters: annualFuel,
+        operatingHours,
+        hybridPercent,
+        shorePowerPercent,
+      });
+
+      if (fuelSaved.value) fuelSaved.value.textContent = `${Math.round(result.annualFuelSavedLiters).toLocaleString()} L`;
+      if (fuelSaved.suffix) fuelSaved.suffix.textContent = `${fmt(result.annualFuelSavedPercent)}% reduction`;
+
+      if (co2Result.value) co2Result.value.textContent = `${fmt(result.co2ReductionTonnes)} t`;
+      if (co2Result.suffix) co2Result.suffix.textContent = 'tonnes CO₂ eliminated';
+
+      if (noxResult.value) noxResult.value.textContent = `${fmt(result.noxReductionKg)} kg`;
+      if (noxResult.suffix) noxResult.suffix.textContent = 'kg NOx eliminated';
+
+      if (soxResult.value) soxResult.value.textContent = `${fmt(result.soxReductionKg)} kg`;
+      if (soxResult.suffix) soxResult.suffix.textContent = 'kg SOx eliminated';
+
+      if (carsResult.value) carsResult.value.textContent = `${fmt(result.equivalentCarsRemoved, 0)}`;
+      if (carsResult.suffix) carsResult.suffix.textContent = 'passenger vehicles off the road';
+
+      if (treesResult.value) treesResult.value.textContent = `${Math.round(result.equivalentTreesPlanted).toLocaleString()}`;
+      if (treesResult.suffix) treesResult.suffix.textContent = 'trees absorbing CO₂ for one year';
+
+      if (summaryEl) {
+        summaryEl.textContent = `Hybridizing at ${fmt(hybridPercent)}% with ${fmt(shorePowerPercent)}% shore power usage reduces annual CO₂ emissions from ${fmt(result.baselineCo2Tonnes)} tonnes to ${fmt(result.reducedCo2Tonnes)} tonnes.`;
+      }
+
+      // Update charts
+      updateChart('chart-co2', result.baselineCo2Tonnes, result.reducedCo2Tonnes);
+      updateChart('chart-nox', result.baselineNoxKg, result.reducedNoxKg);
+      updateChart('chart-sox', result.baselineSoxKg, result.reducedSoxKg);
+    }
+
+    [fuelTypeInput, annualFuelInput, operatingHoursInput, hybridPercentInput, shorePowerPercentInput].forEach(el => {
+      el.addEventListener('input', updateCalculations);
+    });
+
+    updateCalculations();
+  </script>
+
+</CalculatorLayout>

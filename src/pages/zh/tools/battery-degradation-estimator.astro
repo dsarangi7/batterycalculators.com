@@ -1,0 +1,379 @@
+---
+import CalculatorLayout from '../../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import InputField from '../../../components/InputField.astro';
+import ResultBox from '../../../components/ResultBox.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import RelatedTools from '../../../components/RelatedTools.astro';
+import WorkedExample from '../../../components/WorkedExample.astro';
+import ComparisonTable from '../../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../../components/EngineeringDiagram.astro';
+
+const chemistryOptions = [
+  { label: "磷酸铁锂（LiFePO4 / LFP）", value: "lfp" },
+  { label: "三元锂（NMC）", value: "nmc" },
+  { label: "钛酸锂（LTO — 高循环寿命）", value: "lto" },
+  { label: "深循环铅酸", value: "lead-acid" },
+];
+
+const whatIs = `电池衰减估算是预测电池最大容量（健康状态，SOH）因两种主要机制随时间下降的过程：<strong>循环老化</strong>（反复充放电导致的容量损失）和<strong>日历老化</strong>（即使在空闲状态下化学反应导致的容量损失）。衰减模型使用阿伦尼乌斯方程来考虑温度影响，使用幂律关系来描述放电深度的影响，以及特定化学体系的额定循环次数。了解衰减对于预测电池更换时间线、评估BESS项目经济性以及规划储能系统维护计划至关重要。`;
+
+const whyItMatters = [
+  "SOH降至80%意味着电池已损失20%的原始容量——一块100Ah的电池现在表现为80Ah，续航时间和储能能力均降低。",
+  "不同化学体系的衰减率差异巨大——LFP可能使用10年以上，而铅酸在类似条件下3–5年就需要更换。",
+  "温度是最大的可控因素——每高于25°C的10°C，衰减速度约翻倍（阿伦尼乌斯动力学）。",
+  "在财务模型中忽略衰减会使BESS投资回报率高估20–40%，导致不良投资决策。",
+  "当电池在高放电深度或高温下运行时，寿命终止（80% SOH）会比预期更早到来。",
+];
+
+const practicalApplications = [
+  { title: "BESS财务建模", description: "将实际衰减曲线纳入商业储能项目的净现值和投资回收期计算。" },
+  { title: "电动车电池生命周期", description: "预测电动车电池容量降至80%以下的时间，估算车辆续航衰减和更换时间。" },
+  { title: "太阳能储能规划", description: "根据预期衰减率规划离网太阳能系统的电池更换周期。" },
+  { title: "质保验证", description: "将实际衰减与厂商质保声明进行对比，验证SOH保证。" },
+  { title: "通信基站维护", description: "在容量降至备电要求以下之前，安排通信站点的主动电池更换。" },
+  { title: "电网级资产管理", description: "优化公用事业级电池资产的更换计划和残值估算。" },
+];
+
+const expertNotes = [
+  { title: '阿伦尼乌斯效应', variant: 'warning', content: '每高于25°C的10°C，老化速度翻倍。35°C下运行的电池老化速度是25°C下的2倍，45°C下则是4倍。温度管理是延长电池寿命最有效的方法。' },
+  { title: '放电深度影响', variant: 'engineering', content: '循环衰减与放电深度呈幂律关系。浅循环（20% DoD）可将循环寿命延长3–5倍（相比深循环80% DoD）。这就是许多BESS系统限制每日吞吐量的原因。' },
+  { title: '寿命终止定义', variant: 'info', content: '在太阳能、电动车和BESS应用中，当SOH降至80%以下时电池即达到寿命终止（EOL）。此时内阻显著增加，容量变得不可预测。' },
+];
+
+const trustSection = {
+  text: "本估算器使用阿伦尼乌斯方程进行温度相关的日历老化计算，使用DoD幂律模型进行循环老化计算——两者都是经同行评审文献验证的成熟电化学衰减模型。化学体系相关的额定循环次数基于厂商数据手册和公开研究。所有中间值均会展示，方便独立验算。",
+  link: { label: "查看完整计算方法", href: "/zh/methodology/" },
+};
+
+const references = [
+  { title: "Battery University — 如何延长锂离子电池寿命", url: "https://batteryuniversity.com/article/bu-705-how-to-prolong-lithium-based-batteries", source: "Battery University / Cadex Electronics" },
+  { title: "Journal of Power Sources — 锂离子电池老化模型", url: "https://www.sciencedirect.com/journal/journal-of-power-sources", source: "Elsevier / Journal of Power Sources" },
+  { title: "NREL — 电池衰减建模", url: "https://www.nrel.gov/analysis/battery-degradation.html", source: "National Renewable Energy Laboratory" },
+  { title: "IEEE — 锂离子电池日历与循环老化", url: "https://ieeexplore.ieee.org/", source: "IEEE Xplore" },
+  { title: "Sandia国家实验室 — 电池滥用测试", url: "https://www.sandia.gov/ess-ssl/battery-abuse-testing/", source: "Sandia National Laboratories" },
+];
+
+const faqItems = [
+  {
+    question: "SOC和SOH有什么区别？",
+    answer: "荷电状态（SOC）衡量电池相对于其*当前最大容量*的剩余电量（类似油量表）。健康状态（SOH）衡量电池*最大储能容量*相对于*出厂原始设计容量*的剩余比例。",
+  },
+  {
+    question: "为什么温度会加速日历老化？",
+    answer: "锂电池在活性锂、极板和液态电解质之间会发生寄生化学反应。即使电池处于空闲状态，这些反应也持续发生。由于化学反应速度遵循阿伦尼乌斯定律，较高的温度会加速这种寄生衰减。",
+  },
+  {
+    question: "充电状态如何影响日历老化？",
+    answer: "将锂离子电池（特别是NMC）存储在高电压（100% SOC）下会增加阳极和阴极晶体结构的物理应力，加速日历衰减。建议将锂电池存储在40%–60% SOC和凉爽环境中。",
+  },
+  {
+    question: "LFP电池真的能跑5,000个循环吗？",
+    answer: "是的，高质量方形LiFePO4电芯在80% DoD下通常可达到4,000至6,000个循环才达到寿命终止限值（80% SOH），前提是运行温度在20°C至30°C之间且以低C率充电。适当的电池温度管理是循环寿命的关键。",
+  },
+  {
+    question: "放电深度如何影响循环寿命？",
+    answer: "更深的放电会对电极材料造成更大的机械应力。在80% DoD下循环的电池可能达到2,000次，而相同电池在20% DoD下可能达到10,000次以上。该关系遵循幂律——浅循环可显著延长寿命。",
+  },
+  {
+    question: "什么是日历老化？",
+    answer: "日历老化是即使电池未使用也会发生的容量损失。电解质和电极之间的化学副反应导致锂库存逐渐减少。日历老化与温度相关，高温存储下发生更快。",
+  },
+  {
+    question: "如何减缓电池衰减？",
+    answer: "保持电池在适中温度（20–25°C），避免频繁深放电（使用60–80% DoD而非100%），不使用时存储在40–60% SOC，避免在0°C以下充电。这些做法可将电池寿命延长2–3倍。",
+  },
+  {
+    question: "SOH降至80%以下会怎样？",
+    answer: "低于80% SOH时，内阻显著增加，负载下电压跌落加剧。容量变得不可预测且可能更快下降。对于大多数应用（太阳能、电动车、BESS），80% SOH被视为寿命终止，应计划更换。",
+  },
+  {
+    question: "这个衰减估算有多准确？",
+    answer: "本工具基于公开的衰减模型提供一阶近似。实际衰减因厂商、电芯质量、充电倍率和具体运行条件而异。请将此用于规划目的，并用实际监控数据验证。",
+  },
+  {
+    question: "快充会影响衰减吗？",
+    answer: "会。高充电倍率（高于1C）增加析锂风险，特别是在低温下。这会加速容量损失。大多数厂商建议0.5C或更低以获得最佳循环寿命。与慢充相比，快充可使循环寿命降低20–40%。",
+  },
+  {
+    question: "如何监测实际SOH？",
+    answer: "SOH可通过比较当前满充容量与原始额定容量来估算。大多数BMS会自动跟踪此指标。手动方法包括完全充电、以已知倍率放电，并测量实际输出Ah与额定容量的差值。",
+  },
+];
+
+const relatedTools = [
+  { href: "/zh/tools/bess-roi-calculator/", title: "BESS投资回报计算器", description: "将此衰减曲线纳入长期财务净现值分析。" },
+  { href: "/zh/tools/battery-sizing-calculator/", title: "电池选型计算器", description: "根据持续负载计算电池组储能容量。" },
+  { href: "/zh/tools/soc-estimator/", title: "荷电状态估算器", description: "根据电芯电压估算电池荷电状态。" },
+  { href: "/zh/tools/runtime-calculator/", title: "续航时间计算器", description: "根据负载功率档计算续航时间。" },
+  { href: "/zh/tools/c-rate-calculator/", title: "C率计算器", description: "计算充放电电流倍率。" },
+  { href: "/zh/tools/solar-battery-sizing-calculator/", title: "太阳能蓄电池计算器", description: "根据日耗电量配置太阳能蓄电池组。" },
+];
+
+const commonMistakes = [
+  "假设SOH始终为100%——所有电池都会衰减。使用5年的电池通常有85–90%的SOH，具体取决于使用模式和温度。",
+  "在衰减模型中忽略温度——温度是最显著的可控因素。40°C下的电池老化速度是25°C下的4倍。",
+  "用标称容量做财务预测——务必逐年建模容量下降。每年2%的衰减率意味着第10年容量减少18%。",
+  "在100% SOC下存储电池——高SOC存储加速日历老化。将锂电池存储在40–60% SOC和凉爽环境中。",
+  "深循环但不调整预期——反复100% DoD循环可使循环寿命减半（相比80% DoD运行）。",
+  "忽略充电倍率影响——高于1C充电增加析锂风险并加速衰减，特别是在低温下。",
+];
+
+const relatedArticles = [
+  { href: "/zh/learn/battery-degradation-explained/", title: "电池衰减详解" },
+  { href: "/zh/learn/battery-depth-of-discharge-chart/", title: "如何延长电池寿命" },
+  { href: "/zh/learn/understanding-state-of-charge/", title: "电池SOH与SOC" },
+];
+---
+
+<CalculatorLayout
+  title="电池衰减与寿命估算器 | 电池计算器"
+  description="估算LFP、NMC、LTO或铅酸电池的容量衰减和剩余健康状态（SOH），基于循环次数、使用年限和温度。注意：本工具仅提供教育性近似。结果不是诊断测量或认证电池健康预测。实际衰减因充电倍率、存储条件和厂商特定电芯配方而异。"
+  faqItems={faqItems}
+  commonMistakes={commonMistakes}
+  relatedCalculators={relatedTools}
+  relatedArticles={relatedArticles}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+  lang="zh"
+>
+
+  <!-- Main Calculator Grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+
+    <!-- Input Form -->
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">运行参数</h3>
+      <div class="flex flex-col gap-6">
+        <InputField id="chemistry" label="电池化学体系" type="select" options={chemistryOptions} value="lfp" />
+        <InputField id="cycles" label="已完成循环次数" value={1500} min={0} step={1} helperText="一个完整循环表示从100%放电到0%再充满。" />
+        <InputField id="dod" label="平均放电深度（DoD %）" value={80} min={10} max={100} helperText="每次循环的典型放电深度。" />
+        <InputField id="temperature" label="平均电芯温度（°C）" value={30} min={5} max={60} helperText="阿伦尼乌斯因子：每高于25°C的10°C，老化速度翻倍。" />
+        <InputField id="age" label="使用年限（年）" value={3} min={0} step={0.5} />
+      </div>
+    </CalculatorCard>
+
+    <!-- Calculation Results -->
+    <CalculatorCard class="border-m-red flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">预估健康状态</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <ResultBox
+            label="健康状态（SOH）"
+            value="85.2%"
+            suffix="系统已衰减14.8%"
+            variant="primary"
+            id="soh-status-card"
+          />
+          <ResultBox
+            label="循环衰减损耗"
+            value="8.5%"
+            suffix="由电池循环造成"
+            id="result-cycle-loss-box"
+          />
+          <ResultBox
+            label="日历老化损耗"
+            value="6.4%"
+            suffix="由化学老化造成"
+            id="result-calendar-loss-box"
+          />
+        </div>
+      </div>
+
+      <!-- Action Area -->
+      <div class="border-t border-hairline pt-6">
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">寿命终止（EOL）阈值</h4>
+        <p class="text-body-sm text-muted">
+          在太阳能、电动车和BESS应用中，当电池SOH降至<span class="text-primary font-bold">80%</span>以下时即视为达到寿命终止。此时内阻增加，电芯容量变得不稳定。
+        </p>
+      </div>
+    </CalculatorCard>
+
+  </div>
+
+  <!-- Formulas and Worked Examples -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">公式与计算示例</h2>
+
+    <FormulaBox title="数学公式">
+      <p>
+        衰减模型将容量衰减计算为循环老化和日历老化之和（阿伦尼乌斯温度相关性）：
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        温度因子 = 2^((温度 - 25) / 10)（当T > 25°C时）
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        DoD因子 = (DoD / 标称DoD)^1.7
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        循环损耗 (%) = (循环次数 / 额定循环次数) × 20 × DoD因子 × 温度因子
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        日历损耗 (%) = 使用年限 × 基准速率 × 温度因子
+      </div>
+      <p>
+        标准额定假设（在25°C下）：
+      </p>
+      <ul class="list-disc pl-6 flex flex-col gap-1 text-xs">
+        <li><strong>LFP：</strong>5,000次循环至80% SOH。基准日历速率为每年1.5% SOH。</li>
+        <li><strong>NMC：</strong>2,000次循环至80% SOH。基准日历速率为每年2.0% SOH。</li>
+        <li><strong>LTO：</strong>15,000次循环至80% SOH。基准日历速率为每年0.8% SOH。</li>
+        <li><strong>铅酸：</strong>500次循环至80% SOH（50% DoD）。基准日历速率为每年3.0% SOH。</li>
+      </ul>
+    </FormulaBox>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample
+        number={1}
+        title="LFP在80% DoD、25°C下——预测2,000次循环后的容量"
+        scenario="太阳能BESS系统中的LFP电池组每天在恒温箱（维持25°C）中以80% DoD循环。2,000次循环后，我们预计剩余多少容量？"
+        inputs={[
+          "化学体系：LiFePO4（LFP）",
+          "额定循环次数至80% SOH：5,000",
+          "已完成循环：2,000",
+          "DoD：80%",
+          "温度：25°C",
+          "使用年限：3年",
+        ]}
+        steps={[
+          "温度因子 = 2^((25 − 25) / 10) = 2^0 = 1.0",
+          "DoD因子 = (80 / 80)^1.7 = 1.0",
+          "循环损耗 = (2000 / 5000) × 20 × 1.0 × 1.0 = 8.0%",
+          "日历损耗 = 3 × 1.5 × 1.0 = 4.5%",
+          "SOH = 100 − 8.0 − 4.5 = 87.5%",
+        ]}
+        answer="SOH = 87.5%"
+        interpretation="LFP电池保留了87.5%的原始容量——远高于80%的寿命终止阈值。25°C的凉爽运行环境加上适度的循环保持了充足裕量。按此速率，该电池组在达到寿命终止前还有约1,000+次循环。"
+      />
+
+      <WorkedExample
+        number={2}
+        title="NMC在70% DoD、35°C下——预测500次循环后的容量"
+        scenario="电动车中的NMC电池每天充满至100%，经常放电至30%（70% DoD），平均环境温度35°C。500次循环和使用2年后，估算SOH是多少？"
+        inputs={[
+          "化学体系：NMC",
+          "额定循环次数至80% SOH：2,000",
+          "已完成循环：500",
+          "DoD：70%",
+          "温度：35°C",
+          "使用年限：2年",
+        ]}
+        steps={[
+          "温度因子 = 2^((35 − 25) / 10) = 2^1 = 2.0",
+          "DoD因子 = (70 / 80)^1.7 = 0.798",
+          "循环损耗 = (500 / 2000) × 20 × 0.798 × 2.0 = 7.98%",
+          "日历损耗 = 2 × 2.0 × 2.0 = 8.0%",
+          "SOH = 100 − 7.98 − 8.0 = 84.0%",
+        ]}
+        answer="SOH = 84.0%"
+        interpretation="尽管仅500次循环，NMC电池组已损失16%容量。升高的温度（35°C）使日历老化速度翻倍，加上NMC较高的基准日历速率（2.0%/年 vs LFP的1.5%/年）加剧了损失。在该温度下持续运行将在3–4年内将电池推至寿命终止。"
+      />
+
+      <WorkedExample
+        number={3}
+        title="铅酸50% DoD vs. LFP——衰减曲线对比"
+        scenario="对比50% DoD下富液式铅酸电池与80% DoD下LFP电池的衰减轨迹，两者均在25°C下运行3年。这说明了化学体系选择对生命周期规划的重要性。"
+        inputs={[
+          "铅酸：额定500次循环（50% DoD），基准日历速率3.0%/年",
+          "LFP：额定5,000次循环（80% DoD），基准日历速率1.5%/年",
+          "均在25°C下，3年使用年限",
+        ]}
+        steps={[
+          "铅酸温度因子 = 1.0（在25°C下）",
+          "铅酸循环损耗 = (500 / 5000) × 20 × 1.0 × 1.0 = 2.0%",
+          "铅酸日历损耗 = 3 × 3.0 × 1.0 = 9.0%",
+          "铅酸SOH = 100 − 2.0 − 9.0 = 89.0%",
+          "LFP循环损耗 = (500 / 5000) × 20 × 1.0 × 1.0 = 2.0%",
+          "LFP日历损耗 = 3 × 1.5 × 1.0 = 4.5%",
+          "LFP SOH = 100 − 2.0 − 4.5 = 93.5%",
+        ]}
+        answer="铅酸SOH = 89.0% | LFP SOH = 93.5%"
+        interpretation="500次循环和3年后，两种化学体系仍高于寿命终止阈值。但铅酸的日历老化速率是LFP的2倍（3.0% vs 1.5%/年）。在10年时间跨度内，铅酸大约在第3–5年达到寿命终止，而LFP可远超10年。LFP的前期成本溢价被更低的更换频率和更高的往返效率所抵消。"
+      />
+    </div>
+  </section>
+
+  <EngineeringDiagram
+    title="电池衰减因素"
+    description="多种应力因素叠加加速容量随时间下降"
+    variant="flow"
+    steps={[
+      { label: "循环应力", icon: "battery" },
+      { label: "日历老化", icon: "chart" },
+      { label: "温度", icon: "chart" },
+      { label: "容量损失", icon: "chart" },
+    ]}
+  />
+
+  <ComparisonTable
+    title="各化学体系的衰减速率"
+    headers={["化学体系", "循环寿命（80% DoD）", "日历寿命", "温度敏感性", "寿命终止阈值"]}
+    rows={[
+      ["LiFePO4", "5,000次以上", "15–20年", "低", "初始容量80%"],
+      ["NMC", "1,500–2,500次", "10–15年", "中等", "初始容量80%"],
+      ["NCA", "1,000–2,000次", "8–12年", "高", "初始容量80%"],
+      ["铅酸（AGM）", "500–1,000次", "5–8年", "中等", "初始容量50%"],
+      ["铅酸（富液式）", "300–600次", "3–5年", "高", "初始容量50%"],
+    ]}
+    caption="标准运行条件下的预期寿命"
+  />
+
+  <FAQSection items={faqItems} />
+  <RelatedTools tools={relatedTools} />
+
+  <!-- Calculation Script -->
+  <script>
+    import { calculateDegradation } from '../../../utils/calculators';
+
+    const chemistrySelect = document.getElementById('chemistry') as HTMLSelectElement;
+    const cyclesInput = document.getElementById('cycles') as HTMLInputElement;
+    const dodInput = document.getElementById('dod') as HTMLInputElement;
+    const temperatureInput = document.getElementById('temperature') as HTMLInputElement;
+    const ageInput = document.getElementById('age') as HTMLInputElement;
+
+    // Outputs
+    const resultSohCard = document.getElementById('soh-status-card');
+    const resultSoh = resultSohCard?.querySelector('.text-display-md') as HTMLElement;
+    const resultStatusDesc = resultSohCard?.querySelector('.text-caption') as HTMLElement;
+    const resultCycleLoss = document.getElementById('result-cycle-loss-box')?.querySelector('.text-title-lg') as HTMLElement;
+    const resultCalendarLoss = document.getElementById('result-calendar-loss-box')?.querySelector('.text-title-lg') as HTMLElement;
+
+    function updateCalculations() {
+      const chemistry = chemistrySelect.value as "lfp" | "nmc" | "lto" | "lead-acid";
+      const cycles = parseFloat(cyclesInput.value) || 0;
+      const dod = parseFloat(dodInput.value) || 0;
+      const temperature = parseFloat(temperatureInput.value) || 25;
+      const age = parseFloat(ageInput.value) || 0;
+
+      const results = calculateDegradation(chemistry, cycles, dod, temperature, age);
+
+      // Render Outputs
+      if (resultSoh) resultSoh.textContent = `${results.remainingSohPercent.toFixed(1)}%`;
+
+      const fade = 100 - results.remainingSohPercent;
+      if (resultStatusDesc) resultStatusDesc.textContent = `System has degraded by ${fade.toFixed(1)}%`;
+
+      if (resultCycleLoss) resultCycleLoss.textContent = `${results.cycleLossPercent.toFixed(1)}%`;
+      if (resultCalendarLoss) resultCalendarLoss.textContent = `${results.calendarLossPercent.toFixed(1)}%`;
+
+      // Status card color highlights for EOL (SOH < 80%)
+      if (resultSohCard) {
+        resultSohCard.className = "bg-surface-soft p-6 border col-span-1 md:col-span-2 " +
+          (results.remainingSohPercent < 80 ? "border-red-600 animate-pulse" : "border-hairline");
+      }
+    }
+
+    [chemistrySelect, cyclesInput, dodInput, temperatureInput, ageInput].forEach(el => {
+      el.addEventListener('input', updateCalculations);
+    });
+
+    // Run on boot
+    updateCalculations();
+  </script>
+</CalculatorLayout>

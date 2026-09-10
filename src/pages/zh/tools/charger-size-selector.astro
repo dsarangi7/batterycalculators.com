@@ -1,0 +1,439 @@
+---
+import CalculatorLayout from '../../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import InputField from '../../../components/InputField.astro';
+import ResultBox from '../../../components/ResultBox.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import WorkedExample from '../../../components/WorkedExample.astro';
+import ComparisonTable from '../../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../../components/EngineeringDiagram.astro';
+
+const whatIs = `充电器规格选型决定了针对给定电池组的最优充电电流和功率额定值，需在<strong>充电时间</strong>、<strong>电池寿命</strong>和<strong>系统成本</strong>之间取得平衡。关键参数为<strong>C率</strong>——充电电流与电池容量的比值。0.2C倍率以20A为100Ah电池充电，而1C倍率则以100A充电。较高的C率可提供更快的充电速度，但会产生更多热量、加速电芯老化，并需要更大、更昂贵的充电器硬件。最优C率取决于电池化学体系（磷酸铁锂比三元锂可承受更高倍率）、应用紧迫性（电动汽车快充与夜间太阳能充电）以及热管理能力。`;
+
+const whyItMatters = [
+  "充电器功率不足可能导致充满电需要12小时以上，错过关键的充电窗口，如夜间太阳能充电或车队周转。",
+  "充电器功率过剩会浪费资金用于很少使用的容量，并可能超过电池推荐充电速率，缩短使用寿命。",
+  "磷酸铁锂电池可承受0.5C–1C充电；三元锂电池日常使用应保持在0.7C以下以防止加速老化。",
+  "充电器类型很重要——开关电源充电器效率为85–95%，而线性充电器会以热量形式浪费30–50%的能量。",
+  "MPPT太阳能充电控制器可根据光伏板输出动态调整电流，为变化的能源提供最优充电速率。",
+];
+
+const practicalApplications = [
+  { title: "太阳能电池充电", description: "为您的光伏阵列和电池组选择合适的MPPT充电控制器规格。" },
+  { title: "电动汽车/车队充电", description: "为有明确周转时间的商用车队选择充电器功率等级。" },
+  { title: "船用岸电充电", description: "根据可用靠港时间为船用生活电池组选择岸电充电器规格。" },
+  { title: "房车/离网系统", description: "为移动电池系统选择发电机和太阳能充电器。" },
+  { title: "UPS/备用电源系统", description: "确保备用电池可在要求的恢复窗口内完成充电。" },
+];
+
+const expertNotes = [
+  { title: 'C率与寿命的关系', variant: 'engineering', content: '以0.2C充电相比1C充电可为大多数锂电化学体系提供2–3倍的充电循环次数。如果需要每日充电，0.25C–0.5C是兼顾时间与寿命的最佳区间。仅在偶尔快速补电时使用1C倍率。' },
+  { title: '充电器效率的影响', variant: 'info', content: '一台效率为90%的充电器必须从电网汲取111W才能向电池输送100W。这种低效率延长了插座端的充电时间并增加发热。开关电源充电器效率为85–95%；线性充电器效率仅为50–70%。' },
+];
+
+const trustSection = {
+  text: "本计算器采用标准C率方法对充电器选型进行建模。模型根据期望充电时间和电池容量计算所需充电电流，然后推荐合适的充电器类型。所有中间计算值均已显示以便验证。",
+  link: { label: "查看完整计算方法", href: "/zh/methodology/" },
+};
+
+const references = [
+  { title: "Battery University — 锂离子电池充电", url: "https://batteryuniversity.com/article/bu-409-charging-lithium-ion-batteries", source: "Battery University / Cadex Electronics" },
+  { title: "TI — 电池充电器选型指南", url: "https://www.ti.com/lit/an/slyt185/slyt185.pdf", source: "Texas Instruments" },
+  { title: "Victron Energy — MPPT充电控制器选型", url: "https://www.victronenergy.com/help-center", source: "Victron Energy" },
+];
+
+const faqItems = [
+  {
+    question: "磷酸铁锂电池应该以什么C率充电？",
+    answer: "日常充电建议使用0.2C–0.5C以获得最佳寿命。100Ah LFP电池的推荐充电电流为20A–50A。偶尔使用1C充电（100A）是可以接受的，但会随时间推移使循环寿命降低20–40%。",
+  },
+  {
+    question: "线性充电器和开关电源充电器如何选择？",
+    answer: "开关电源（SMPS）充电器效率为85–95%，体积紧凑且重量轻。线性充电器结构更简单但效率仅为50–70%，且会产生大量热量。对于50W以上应用，始终选择开关电源充电器。",
+  },
+  {
+    question: "需要多大规格的MPPT充电控制器？",
+    answer: "MPPT控制器的规格应根据光伏阵列在电池电压下的最大输出电流确定。400W阵列在48V下产生约8.3A。增加25%余量以应对低温电压升高：选择10A或15A控制器。",
+  },
+  {
+    question: "可以用比推荐更大的充电器吗？",
+    answer: "可以，但充电器应具有可调电流限制功能。以20A（0.2C）运行50A充电器是可以的，并为未来电池扩容提供余量。切勿超过电池制造商规定的最大C率。",
+  },
+  {
+    question: "充电器类型如何影响充电时间？",
+    answer: "充电时间主要由充电电流（C率）决定，而非充电器类型。然而，充电器效率影响电网端能耗：效率为95%的充电器将95%的输入功率输送至电池，而效率为70%的充电器会以热量形式浪费30%的能量。",
+  },
+  {
+    question: "充电器是否应该选大一些？",
+    answer: "选择大15–25%的规格可为电池老化（内阻增加）和偶尔快速充电提供余量。然而，过大的充电器成本更高，且可能导致频繁快充从而缩短电池寿命。",
+  },
+  {
+    question: "如何用一台充电器为两块电池充电？",
+    answer: "将相同化学体系、电压和容量的电池并联连接至单台充电器。切勿混用新旧电池或不同化学体系的电池。每块电池的BMS管理各自的电芯均衡。",
+  },
+  {
+    question: "充电过慢会怎样？",
+    answer: "极慢充电（低于0.05C）是安全的，但可能在下一次放电周期前无法充分补充电量。对于太阳能系统，这意味着电池可能在傍晚负载开始前无法达到满充电状态。",
+  },
+  {
+    question: "温度是否影响充电器选型？",
+    answer: "是的。低温会降低电池的安全充电速率。在0°C以下，许多BMS会将充电电流限制在0.1C或更低以防止锂析出。在寒冷气候中，充电器不宜过度放大，但应考虑冬季充电速率降低的情况。",
+  },
+  {
+    question: "充电速率和充电时间有什么区别？",
+    answer: "充电速率（C率）是相对于电池容量输出的电流（例如，100Ah电池的0.5C = 50A）。充电时间是达到目标SOC所需的总时长，包括恒压饱和阶段。较高的C率意味着较短的充电时间。",
+  },
+];
+
+const commonMistakes = [
+  "未配备可调电流限制的充电器规格过大——在BMS未能限制电流的情况下，100A充电器用于50Ah电池会导致过充。",
+  "忽略CV阶段——充电的最后20%耗时不成比例地更长，因此仅基于容量/电流的充电时间估算会低估20–40%。",
+  "混用不同化学体系的充电器和电池——三元锂电池和磷酸铁锂电池具有不同的电压特性曲线。使用错误的化学体系充电器可能导致过充或欠充。",
+  "未考虑充电器效率——效率为90%的充电器必须从插座汲取更多功率，影响断路器选型和充电时间。",
+  "在大功率应用中使用线性充电器——线性充电器以热量形式浪费30–50%的能量，需要大型散热片并减少可用充电电流。",
+  "忽略温度降额——低温会降低安全充电速率。为夏季设计的充电器在冬季可能不足，因为BMS会限制电流。",
+  "按峰值而非平均充电量选型——如果电池很少需要满充，运行时间更长的小功率充电器更高效且更具成本效益。",
+  "未规划电池扩容——如果将来可能增加电池组，应按未来的电池组而非仅当前的规格选型充电器。",
+];
+
+const relatedArticles = [
+  { href: "/zh/learn/charger-sizing-guide/", title: "充电器选型指南" },
+  { href: "/reference/charge-controller-specs/", title: "MPPT与PWM控制器对比" },
+  { href: "/zh/learn/lifepo4-charge-voltage-table/", title: "磷酸铁锂充电电压表" },
+  { href: "/zh/learn/battery-charging-formula/", title: "电池充电最佳实践" },
+];
+---
+
+<CalculatorLayout
+  title="充电器规格选择器 | 电池计算器"
+  description="根据化学体系、期望充电时间和C率准则，为您的电池组选择合适的充电器规格。"
+  lang="zh"
+  faqItems={faqItems}
+  commonMistakes={commonMistakes}
+  relatedArticles={relatedArticles}
+  relatedCalculators={[
+    { href: "/zh/tools/charging-time-calculator/", title: "充电时间计算器", description: "估算CC-CV充电时长。" },
+    { href: "/zh/tools/c-rate-calculator/", title: "C率计算器", description: "在安培和C率值之间转换。" },
+    { href: "/zh/tools/battery-sizing-calculator/", title: "电池容量选型工具", description: "确定每日用电量的容量需求。" },
+    { href: "/zh/tools/solar-battery-sizing-calculator/", title: "太阳能电池选型", description: "根据每日用电量确定太阳能电池组容量。" },
+    { href: "/zh/tools/runtime-calculator/", title: "续航时间计算器", description: "根据负载功率曲线计算续航时间。" },
+    { href: "/zh/tools/energy-conversion-calculator/", title: "能量转换", description: "在容量Ah与能量Wh之间转换。" },
+  ]}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+>
+
+  <!-- Main Calculator Grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+
+    <!-- Input Form -->
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">充电器参数</h3>
+      <div class="flex flex-col gap-6">
+        <InputField id="capacity" label="电池容量 (Ah)" value={100} min={0.1} step="any" helperText="电池组的总容量，单位为安时。" />
+        <InputField id="voltage" label="系统电压 (V)" value={48} min={1} step="any" helperText="电池组的标称电压。常见值：12V、24V、48V。" />
+        <InputField
+          id="chemistry"
+          label="电池化学体系"
+          type="select"
+          value="lfp"
+          helperText="化学体系决定安全的最大C率。"
+          options={[
+            { label: "LFP (LiFePO4) — 每日最大1C", value: "lfp" },
+            { label: "NMC (三元锂) — 每日最大0.7C", value: "nmc" },
+            { label: "铅酸 (AGM/Gel) — 最大0.1C", value: "lead-acid" },
+          ]}
+        />
+        <InputField id="charge-time" label="期望充电时间 (小时)" value={4} min={0.5} step="any" helperText="从20%充至100% SOC的目标时间。" />
+        <InputField id="charge-efficiency" label="充电器效率 (%)" value={92} min={50} max={100} step={1} helperText="开关电源充电器：85–95%，线性充电器：50–70%。优质开关电源默认92%。" />
+      </div>
+    </CalculatorCard>
+
+    <!-- Calculation Results -->
+    <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">推荐充电器</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <ResultBox
+            label="所需充电电流"
+            value="20 A"
+            suffix="电池端电压"
+            variant="primary"
+            id="result-current"
+          />
+          <ResultBox
+            label="充电C率"
+            value="0.20 C"
+            suffix="最优慢充"
+            id="result-crate"
+          />
+          <ResultBox
+            label="充电器功率额定值"
+            value="960 W"
+            suffix="DC输出功率"
+            id="result-power"
+          />
+          <ResultBox
+            label="电网端功率"
+            value="1,043 W"
+            suffix="效率92%时"
+            id="result-wall"
+          />
+        </div>
+      </div>
+
+      <!-- Action Area -->
+      <div class="border-t border-hairline pt-6">
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">充电器选型指南</h4>
+        <p class="text-body-sm text-muted" id="charger-guide">
+          在0.2C下，这是适合夜间充电的慢充配置。推荐使用额定20A / 48V或更高规格的开关电源充电器。
+        </p>
+      </div>
+    </CalculatorCard>
+
+  </div>
+
+  <!-- Formulas and Worked Examples -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">公式与计算实例</h2>
+    <FormulaBox title="数学公式">
+      <p>
+        所需充电电流由期望充电时间、电池容量和充电器效率推导得出：
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        C率 = 期望充电时间 (小时) / 1.25
+      </div>
+      <p>
+        1.25系数考虑了恒压（CV）饱和阶段的开销（约占总时间的20%）。
+      </p>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        充电电流 (A) = 容量 (Ah) × C率
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        充电功率 (W) = 充电电流 (A) × 系统电压 (V)
+      </div>
+      <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+        电网端功率 (W) = 充电功率 (W) / 充电器效率
+      </div>
+    </FormulaBox>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample
+        number={1}
+        title="100Ah LFP — 4小时充电"
+        scenario="一块48V 100Ah磷酸铁锂电池需要在4小时内使用效率为92%的开关电源充电器从20%充至100%。"
+        inputs={[
+          { label: "容量", value: "100 Ah" },
+          { label: "电压", value: "48 V" },
+          { label: "化学体系", value: "LFP (LiFePO4)" },
+          { label: "期望时间", value: "4小时" },
+          { label: "充电器效率", value: "92%" },
+        ]}
+        steps={[
+          { label: "步骤1：目标C率", formula: "C率 = 4 / 1.25", result: "0.32C" },
+          { label: "步骤2：充电电流", formula: "I = 100 × 0.32", result: "32A" },
+          { label: "步骤3：DC充电功率", formula: "P_dc = 32 × 48", result: "1,536W" },
+          { label: "步骤4：电网端功率", formula: "P_wall = 1,536 / 0.92", result: "1,670W" },
+        ]}
+        answer="32A充电器，48V，DC输出额定功率1,536W。电网端电路须承受1,670W。"
+        interpretation="32A MPPT充电控制器或开关电源充电器是合适的。0.32C倍率完全在LFP安全日常充电范围内，并提供良好的电池使用寿命。"
+        variant="default"
+      />
+
+      <WorkedExample
+        number={2}
+        title="200Ah NMC — 2小时快充"
+        scenario="一块36V 200Ah三元锂电池需要2小时充满。NMC日常使用不应超过0.7C。"
+        inputs={[
+          { label: "容量", value: "200 Ah" },
+          { label: "电压", value: "36 V" },
+          { label: "化学体系", value: "NMC" },
+          { label: "期望时间", value: "2小时" },
+          { label: "充电器效率", value: "90%" },
+        ]}
+        steps={[
+          { label: "步骤1：目标C率", formula: "C率 = 2 / 1.25", result: "0.60C" },
+          { label: "步骤2：充电电流", formula: "I = 200 × 0.60", result: "120A" },
+          { label: "步骤3：DC充电功率", formula: "P_dc = 120 × 36", result: "4,320W" },
+          { label: "步骤4：电网端功率", formula: "P_wall = 4,320 / 0.90", result: "4,800W" },
+        ]}
+        answer="120A充电器，36V，DC输出额定功率4,320W。"
+        interpretation="0.60C接近NMC的每日充电上限。与0.25C相比，此充电速率会使循环寿命降低约20%。建议仅在偶尔快充时使用此速率，不宜作为日常使用。"
+        variant="default"
+      />
+
+      <WorkedExample
+        number={3}
+        title="太阳能MPPT控制器 — 400W阵列，48V LFP"
+        scenario="一个400W太阳能阵列为48V 200Ah LFP电池组充电。选择合适的MPPT充电控制器。"
+        inputs={[
+          { label: "太阳能阵列", value: "400W" },
+          { label: "电池电压", value: "48V" },
+          { label: "电池容量", value: "200 Ah" },
+          { label: "化学体系", value: "LFP (LiFePO4)" },
+          { label: "峰值日照小时", value: "5小时" },
+        ]}
+        steps={[
+          { label: "步骤1：阵列最大电流", formula: "I_max = 400 / (48 × 0.92)", result: "9.06A" },
+          { label: "步骤2：低温升额", formula: "I_cold = 9.06 × 1.25", result: "11.3A" },
+          { label: "步骤3：控制器额定值", formula: "选择 ≥ 15A MPPT控制器", result: "推荐15A" },
+          { label: "步骤4：每日充电量", formula: "400W × 5h × 0.92 = 1,840Wh", result: "1,840 Wh/天" },
+        ]}
+        answer="15A或20A MPPT充电控制器，额定48V电池系统。"
+        interpretation="MPPT控制器应始终比阵列最大电流大25–50%。低温会增加光伏板的电压和电流。15A控制器在此400W阵列下有充足余量。"
+        variant="solar"
+      />
+    </div>
+  </section>
+
+  <EngineeringDiagram
+    title="充电器选型系统"
+    description="从电源经充电器到电池，各阶段的关键选型参数"
+    variant="flow"
+    steps={[
+      { label: "电源", icon: "charge" },
+      { label: "充电器 (SMPS)", icon: "charge" },
+      { label: "电池组", icon: "battery" },
+      { label: "BMS保护", icon: "battery" },
+    ]}
+  />
+
+  <ComparisonTable
+    title="充电器类型对比"
+    headers={["类型", "效率", "体积", "成本", "适用场景", "缺点"]}
+    rows={[
+      ["线性", "50–70%", "大（散热片）", "低", "极低功率 (<20W)", "浪费30–50%为热量"],
+      ["SMPS", "85–95%", "紧凑", "中", "通用充电", "电路复杂"],
+      ["MPPT (太阳能)", "95–99%", "中", "高", "太阳能阵列至电池", "初始成本较高"],
+      ["PFM", "80–90%", "小", "低", "电池供电设备", "电流输出能力较低"],
+    ]}
+    caption="电池充电应用中的充电器技术对比"
+  />
+
+  <ComparisonTable
+    title="各化学体系C率指南"
+    headers={["化学体系", "最优日常C率", "最大偶尔C率", "充电时间 (最优)", "充电时间 (最大)", "寿命影响"]}
+    rows={[
+      ["LFP (LiFePO4)", "0.2C–0.5C", "1C", "2.5–5小时", "~1.5小时", "0.5C相比0.2C损失约10%"],
+      ["NMC", "0.2C–0.5C", "0.7C", "2.5–5小时", "~2小时", "0.7C相比0.2C损失约20%"],
+      ["铅酸", "0.05C–0.1C", "0.15C", "12–24小时", "~8小时", "超过0.1C会导致硫化"],
+    ]}
+    caption="常见电池化学体系的推荐充电速率"
+  />
+
+  <FAQSection items={faqItems} />
+
+  <!-- Calculation Script -->
+  <script>
+    const capacityInput = document.getElementById('capacity') as HTMLInputElement;
+    const voltageInput = document.getElementById('voltage') as HTMLInputElement;
+    const chemistrySelect = document.getElementById('chemistry') as HTMLSelectElement;
+    const chargeTimeInput = document.getElementById('charge-time') as HTMLInputElement;
+    const chargeEfficiencyInput = document.getElementById('charge-efficiency') as HTMLInputElement;
+
+    // Result elements
+    const resultCurrentBox = document.getElementById('result-current');
+    const resultCurrentValue = resultCurrentBox?.querySelector('.text-display-md') as HTMLElement;
+    const resultCurrentNote = resultCurrentBox?.querySelector('.text-caption') as HTMLElement;
+
+    const resultCrateBox = document.getElementById('result-crate');
+    const resultCrateValue = resultCrateBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultCrateDesc = resultCrateBox?.querySelector('.text-caption') as HTMLElement;
+
+    const resultPowerBox = document.getElementById('result-power');
+    const resultPowerValue = resultPowerBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultPowerNote = resultPowerBox?.querySelector('.text-caption') as HTMLElement;
+
+    const resultWallBox = document.getElementById('result-wall');
+    const resultWallValue = resultWallBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultWallNote = resultWallBox?.querySelector('.text-caption') as HTMLElement;
+
+    const chargerGuide = document.getElementById('charger-guide');
+
+    function getChemistryLimits(chemistry: string): { maxDaily: number; maxOccasional: number } {
+      switch (chemistry) {
+        case 'lfp': return { maxDaily: 1.0, maxOccasional: 1.5 };
+        case 'nmc': return { maxDaily: 0.7, maxOccasional: 1.0 };
+        case 'lead-acid': return { maxDaily: 0.1, maxOccasional: 0.15 };
+        default: return { maxDaily: 0.5, maxOccasional: 1.0 };
+      }
+    }
+
+    function updateCalculations() {
+      const capacity = parseFloat(capacityInput.value) || 100;
+      const voltage = parseFloat(voltageInput.value) || 48;
+      const chemistry = chemistrySelect.value;
+      const desiredTime = parseFloat(chargeTimeInput.value) || 4;
+      const efficiency = parseFloat(chargeEfficiencyInput.value) || 92;
+
+      // Calculate C-rate from desired time
+      // T_total ≈ T_CC + T_CV. T_CC = capacity / (I * eff). T_CV ≈ 0.25 * T_CC for 80-100%.
+      // Simplified: total time ≈ 1.25 * capacity / (I * eff)
+      // Solving for I: I = 1.25 * capacity / (T_total * eff/100)
+      const cRate = desiredTime > 0 ? 1.25 / (desiredTime * (efficiency / 100)) : 0;
+      const chargerCurrent = capacity * cRate;
+      const chargerPower = chargerCurrent * voltage;
+      const wallPower = chargerPower / (efficiency / 100);
+
+      // Render current
+      if (resultCurrentValue) resultCurrentValue.textContent = `${chargerCurrent.toFixed(1)} A`;
+      if (resultCurrentNote) resultCurrentNote.textContent = `At ${voltage}V nominal`;
+
+      // Render C-rate
+      if (resultCrateValue) resultCrateValue.textContent = `${cRate.toFixed(2)} C`;
+      let cRateDesc = '';
+      const limits = getChemistryLimits(chemistry);
+      if (cRate > limits.maxOccasional) {
+        cRateDesc = 'Exceeds recommended maximum — risk of cell damage';
+      } else if (cRate > limits.maxDaily) {
+        cRateDesc = 'Acceptable for occasional fast charge only';
+      } else if (cRate >= 0.2) {
+        cRateDesc = 'Optimal daily charge rate';
+      } else if (cRate >= 0.05) {
+        cRateDesc = 'Slow charge — good for battery longevity';
+      } else {
+        cRateDesc = 'Very slow — may not replenish daily consumption';
+      }
+      if (resultCrateDesc) resultCrateDesc.textContent = cRateDesc;
+
+      // Render power
+      if (resultPowerValue) resultPowerValue.textContent = `${Math.round(chargerPower).toLocaleString()} W`;
+      if (resultPowerNote) resultPowerNote.textContent = 'DC output power';
+
+      // Render wall draw
+      if (resultWallValue) resultWallValue.textContent = `${Math.round(wallPower).toLocaleString()} W`;
+      if (resultWallNote) resultWallNote.textContent = `At ${efficiency}% efficiency`;
+
+      // Render guide
+      if (chargerGuide) {
+        const chemistryName = chemistry === 'lfp' ? 'LFP' : chemistry === 'nmc' ? 'NMC' : 'Lead-Acid';
+        if (cRate > limits.maxOccasional) {
+          chargerGuide.textContent = `Warning: ${cRate.toFixed(2)}C exceeds the ${chemistryName} maximum of ${limits.maxOccasional}C. Reduce desired charge time or accept slower charging to protect battery lifespan.`;
+        } else if (cRate > limits.maxDaily) {
+          chargerGuide.textContent = `At ${cRate.toFixed(2)}C, this is a fast-charge configuration. Suitable for occasional use on ${chemistryName}, but daily use will accelerate degradation. Consider a slower charge for routine cycling.`;
+        } else {
+          chargerGuide.textContent = `At ${cRate.toFixed(2)}C, this is a ${cRate <= 0.3 ? 'slow' : 'standard'} charge configuration ideal for ${cRate <= 0.3 ? 'overnight' : 'daily'} charging. An SMPS charger rated at ${chargerCurrent.toFixed(0)}A / ${voltage}V or higher is recommended.`;
+        }
+      }
+
+      // Update border color based on safety
+      if (resultCurrentBox) {
+        resultCurrentBox.className = "bg-surface-soft p-6 border col-span-1 md:col-span-2 " +
+          (cRate > limits.maxOccasional ? "border-red-600" :
+           cRate > limits.maxDaily ? "border-yellow-500" : "border-hairline");
+      }
+    }
+
+    [capacityInput, voltageInput, chemistrySelect, chargeTimeInput, chargeEfficiencyInput].forEach(el => {
+      el.addEventListener('input', updateCalculations);
+    });
+
+    updateCalculations();
+  </script>
+</CalculatorLayout>

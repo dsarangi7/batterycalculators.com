@@ -1,0 +1,73 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import CalculatorFinder from '../../../components/CalculatorFinder.astro';
+
+const tools = [
+  { name: "电池续航时间计算器", path: "/zh/tools/runtime-calculator/", category: "电芯与电池组", input: "容量Ah/Wh、负载W", output: "放电续航小时" },
+  { name: "电池容量计算器", path: "/zh/tools/battery-sizing-calculator/", category: "电气", input: "日耗电、备用天数、DoD、温度", output: "目标容量" },
+  { name: "C率计算器", path: "/zh/tools/c-rate-calculator/", category: "电芯与电池组", input: "容量Ah、电流A", output: "C率、时长" },
+  { name: "太阳能蓄电池计算器", path: "/zh/tools/solar-battery-sizing-calculator/", category: "太阳能", input: "日负载、光照小时、备用天数", output: "电池+光伏配置" },
+  { name: "家庭备用电池计算器", path: "/zh/tools/home-backup-battery-calculator/", category: "家庭备用", input: "关键负载、备用时长、效率", output: "电池+逆变器选型" },
+  { name: "房车电池计算器", path: "/zh/tools/rv-battery-calculator/", category: "房车", input: "电器负载、使用小时、电压", output: "电池容量Ah/kWh" },
+  { name: "电池组计算器", path: "/zh/tools/battery-pack-calculator/", category: "电芯与电池组", input: "单体电压/Ah、串并数", output: "整组电压容量能量" },
+  { name: "英文完整目录", path: "/tools/", category: "全部", input: "30款工具", output: "打开英文版" },
+];
+---
+
+<Layout
+  title="电池计算器索引｜续航/容量/C率/太阳能/房车/储能选型工具"
+  description="浏览中文电池计算器：电池续航时间计算、蓄电池容量选型、太阳能蓄电池、房车电池、电池组串并联、C率与储能选型，公式全公开。"
+  lang="zh"
+>
+  <div class="mb-12">
+    <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">工程手册目录</span>
+    <h1 class="text-display-md text-primary mb-6">计算器索引</h1>
+    <p class="text-body-md text-body max-w-2xl font-light">
+      中文电池计算器一览，点击任意行打开工具。
+    </p>
+  </div>
+
+  <div class="mb-10">
+    <CalculatorFinder lang="zh" />
+  </div>
+
+  <CalculatorCard class="overflow-x-auto p-0 border border-hairline bg-surface-soft">
+    <table class="w-full text-left border-collapse min-w-[580px]">
+      <thead>
+        <tr class="border-b border-hairline bg-surface-card">
+          <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">工具名称</th>
+          <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">分类</th>
+          <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">主要输入</th>
+          <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">输出结果</th>
+          <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider text-right">操作</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-hairline">
+        {tools.map(tool => (
+          <tr class="hover:bg-surface-card transition-colors group">
+            <td class="p-4 font-bold text-primary">
+              <a href={tool.path} class="block hover:underline">{tool.name}</a>
+            </td>
+            <td class="p-4 text-body-sm">
+              <span class={`inline-block px-2 py-0.5 text-[10px] uppercase font-bold tracking-wider border rounded-none ${
+                tool.category === "电芯与电池组" ? "border-m-blue-light text-m-blue-light" :
+                (tool.category === "电气" || tool.category === "太阳能" || tool.category === "家庭备用" || tool.category === "房车") ? "border-m-blue-dark text-m-blue-dark" :
+                "border-m-red text-m-red"
+              }`}>
+                {tool.category}
+              </span>
+            </td>
+            <td class="p-4 text-body-sm font-light text-body">{tool.input}</td>
+            <td class="p-4 text-body-sm font-light text-body">{tool.output}</td>
+            <td class="p-4 text-right">
+              <a href={tool.path} class="text-label-uppercase text-xs text-primary group-hover:text-m-blue-dark transition-colors inline-flex items-center gap-1">
+                打开工具 <span class="group-hover:translate-x-1 transition-transform inline-block">→</span>
+              </a>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </CalculatorCard>
+</Layout>

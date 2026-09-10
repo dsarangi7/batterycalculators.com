@@ -1,0 +1,499 @@
+---
+import CalculatorLayout from '../../../layouts/CalculatorLayout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import InputField from '../../../components/InputField.astro';
+import ResultBox from '../../../components/ResultBox.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import RelatedTools from '../../../components/RelatedTools.astro';
+import MiniSimulationChart from '../../../components/MiniSimulationChart.astro';
+import WorkedExample from '../../../components/WorkedExample.astro';
+import ComparisonTable from '../../../components/ComparisonTable.astro';
+import EngineeringDiagram from '../../../components/EngineeringDiagram.astro';
+
+const whatIs = `电池续航时间是指电池在电压降至可用阈值以下之前，能够持续为给定电负载供电的时间。它取决于四个相互关联的因素：<strong>总储能</strong>（以瓦时计）、<strong>所连负载的持续功率</strong>、<strong>电池化学体系为保护循环寿命而设定的放电深度限制</strong>，以及<strong>逆变器、线缆和电池管理系统中的系统效率损耗</strong>。正确计算续航时间对于离网太阳能阵列选型、房车用电规划、船用酒店负载系统设计、UPS备用时长配置，以及电网停电期间的家庭备用电源配置都至关重要。续航估算不准确，可能导致关键时刻断电，也可能因购买多余容量而浪费资金。`;
+
+const whyItMatters = [
+  "意外停电时，如果续航时间被高估，医疗设备、通信设备、制冷等关键负载将失去备用电源保障。",
+  "电池组配大了浪费资金；配小了会导致电压过早跌落，在负载周期结束前被迫关机。",
+  "逆变器4–12%的效率损耗经常被忽略，实际续航比简单的“容量除以负载”计算结果更短。",
+  "极端温度可使可用容量降低10–30%，实验室常温下的续航估算不适用于寒冷或户外场景。",
+  "忽视放电深度限制会加速电池衰减——长期以100% DoD循环的电池，标称循环寿命可能缩短20–40%。",
+];
+
+const practicalApplications = [
+  { title: "房车露营", description: "在多日离网露营中，为照明、冰箱、风扇和电子设备规划用电。" },
+  { title: "离网太阳能", description: "测算在没有太阳能输入的阴雨天里，电池组能支撑家庭负载多久。" },
+  { title: "船用负载", description: "为船上的导航电子设备、照明、制冷和舱底泵配置电池组。" },
+  { title: "家庭备用电源", description: "估算电网停电期间，家庭储能系统能为关键负载供电多久。" },
+  { title: "UPS与关键负载", description: "验证不间断电源能否在停电期间持续支撑服务器或医疗负载。" },
+  { title: "通信基站", description: "验证基站备用电池是否满足停电期间的最低备电时长要求。" },
+];
+
+const expertNotes = [
+  { title: '船用系统', variant: 'engineering', content: '船用电池系统常用的放电深度限制与户用系统不同。船用生活负载电池组通常按50% DoD选型以保护循环寿命，而专用发动机启动电池则按更高的瞬时电流、更低的放电深度设计。' },
+  { title: '温度影响', variant: 'warning', content: '低温下电池续航明显缩短。0°C时锂电池容量约下降10%；-20°C时可用能量可下降30%以上。选型时请按最恶劣的工作温度考虑，而不是实验室条件。' },
+  { title: '化学体系差异', variant: 'info', content: '磷酸铁锂（LiFePO4）电池在放电过程中电压曲线比三元锂或铅酸电池更平坦，整个放电区间的可用容量更可预测，但放电末端电压跌落更陡——SOC低于20%时请密切监测电压。' },
+];
+
+const trustSection = {
+  text: "本计算器使用的所有公式均源自公开的电池工程原理。续航模型计入了可用容量（Ah × V × DoD）、效率折算后的负载（W / η）以及放电电流计算。没有任何黑盒算法——每个中间值都会展示，方便您独立验算。我们的方法遵循 Battery University、IEEE标准及厂商应用笔记中的通用做法。",
+  link: { label: "查看完整计算方法", href: "/zh/methodology/" },
+};
+
+const references = [
+  { title: "Battery University — 放电倍率与续航时间", url: "https://batteryuniversity.com/article/bu-502-discharging-at-high-current", source: "Battery University / Cadex Electronics" },
+  { title: "IEEE Std 1188-1996 — 固定式蓄电池维护推荐规程", url: "https://standards.ieee.org/ieee/1188/1076/", source: "IEEE Standards Association" },
+  { title: "铅酸电池的Peukert效应与续航时间", url: "https://batteryuniversity.com/article/bu-402-what-is-the-peukert-effect", source: "Battery University" },
+  { title: "Victron Energy — 电池续航计算", url: "https://www.victronenergy.com/help-center", source: "Victron Energy" },
+  { title: "美国能源部 — 电池储能技术概述", url: "https://www.energy.gov/eere/storage/battery-storage-technology", source: "U.S. DOE" },
+];
+
+const faqItems = [
+  {
+    question: "C率如何影响电池续航？",
+    answer: "大电流（高C率）放电会因内阻产生热量并增大压降（I²R损耗），实际输出能量低于标称值。锂电池的这一影响很小（一般小于5%），但铅酸电池受Peukert效应影响，1C放电时可用容量可下降30%以上。",
+  },
+  {
+    question: "锂电池安全的放电深度（DoD）是多少？",
+    answer: "磷酸铁锂（LiFePO4）电池常规放电至80%–90% DoD，不会明显损伤循环寿命。三元锂（NMC）电池一般限制在80%以内，以保护循环性能。长期放电至100% DoD会加速日历老化，甚至损伤电芯。",
+  },
+  {
+    question: "为什么要计入逆变器效率？",
+    answer: "DC-AC逆变器峰值效率一般在88%–96%之间。轻载或满载运行时效率都会下降。我们引入标准的效率系数来模拟这部分热损耗，避免高估续航时间。",
+  },
+  {
+    question: "环境温度如何影响放电？",
+    answer: "低温会增大电化学内阻，降低输出电压与总容量。0°C时常见锂电池容量下降约10%；-20°C时可用能量可下降30%以上。",
+  },
+  {
+    question: "100Ah电池能用多久？",
+    answer: "100Ah 12.8V磷酸铁锂电池按80% DoD计算，可用能量为1,024 Wh。带250W负载、逆变效率90%时，续航约3小时41分钟；带100W负载时约9小时13分钟。理想情况下续航与负载成反比。",
+  },
+  {
+    question: "200Ah电池能用多久？",
+    answer: "200Ah 12.8V磷酸铁锂电池按80% DoD计算，可用能量为2,048 Wh。带250W负载、逆变效率90%时，续航约7小时22分钟。容量翻倍，同一负载下的续航也翻倍。",
+  },
+  {
+    question: "如何计算电池续航时间？",
+    answer: "用可用能量（容量 × 电压 × DoD）除以效率折算后的负载（负载功率 / 系统效率）。公式为：续航（小时）=（Ah × V × DoD%）/（负载W / 效率%）。计算能量时请统一用瓦时，不要用安时。",
+  },
+  {
+    question: "影响电池续航最大的因素是什么？",
+    answer: "负载功率是主导因素——负载减半，续航翻倍。次要因素包括放电深度限制、逆变器效率、环境温度、电池老化程度（SOH），以及大倍率放电时增大的内阻。",
+  },
+  {
+    question: "温度会影响电池续航吗？",
+    answer: "会。0°C时锂电池容量损失约10%；-20°C时损失可达30%。铅酸电池对温度更敏感。寒冷环境应用应对续航计算做温度折减。",
+  },
+  {
+    question: "Ah和Wh有什么区别？",
+    answer: "安时（Ah）是特定电压下的电荷容量，瓦时（Wh）是总能量。100Ah 12V电池储能1,200 Wh，同为100Ah的48V电池储能4,800 Wh。比较不同电压的电池或按瓦数负载计算续航时，请统一换算成Wh。",
+  },
+  {
+    question: "这个计算器能用于铅酸电池吗？",
+    answer: "可以，但请将DoD设为富液铅酸50%、AGM/胶体80%。铅酸电池还有明显的Peukert效应——大倍率放电时可用容量显著下降。如需更准确的结果，请使用经Peukert修正的容量值。",
+  },
+  {
+    question: "电池老化如何影响续航？",
+    answer: "电池老化后健康度（SOH）下降。SOH为80%的电池只能输出标称容量的80%，100Ah电池实际相当于80Ah。老旧电池组的续航计算请计入SOH。",
+  },
+];
+
+const relatedTools = [
+  { href: "/zh/tools/c-rate-calculator/", title: "C率计算器", description: "计算任意电池配置的充放电电流倍率。" },
+  { href: "/zh/tools/battery-sizing-calculator/", title: "电池容量计算器", description: "按日耗电量与备用天数确定电池选型。" },
+  { href: "/zh/tools/energy-conversion-calculator/", title: "能量换算", description: "在任意电压下换算容量Ah与能量Wh。" },
+  { href: "/zh/tools/solar-battery-sizing-calculator/", title: "太阳能蓄电池计算器", description: "按日耗电量配置太阳能蓄电池组。" },
+  { href: "/zh/tools/home-backup-battery-calculator/", title: "家庭备用电池计算器", description: "为关键负载配置家庭备用电池系统。" },
+  { href: "/zh/tools/rv-battery-calculator/", title: "房车电池计算器", description: "规划离网露营的房车用电。" },
+  { href: "/zh/tools/battery-pack-calculator/", title: "电池组计算器", description: "设计串并联电芯配置方案。" },
+];
+
+const commonMistakes = [
+  "忽视逆变器效率——90%效率的逆变器意味着10%的电池能量以热量形式损耗。请务必计入系统效率。",
+  "按100%放电深度使用——锂电池放到0% SoC会加速衰减。磷酸铁锂请按80% DoD、三元锂按80% DoD使用，以保护循环寿命。",
+  "忘记温度影响——0°C时锂电池容量下降约10%，-20°C时可下降30%以上。请按最恶劣的工作温度选型。",
+  "混淆Ah与Wh——100Ah 12V电池储能1,280 Wh，而不是100 Wh。计算负载续航时请确认单位正确。",
+  "忽视电池老化——SOH为80%的电池只能输出标称容量的80%。旧电池的实际续航低于标称值。",
+  "假设线性放电——真实电池在带载时电压会跌落，大倍率下更明显。实际可用能量小于标称容量与电压的乘积。",
+  "用峰值负载估算续航——持续续航应按平均持续负载计算，而不是电机启动等瞬时峰值负载。",
+  "忽视自放电——多日备电期间，自放电（锂电池每月1–5%，铅酸更高）会减少可用能量。",
+  "未计入线缆损耗——电池到负载之间过长的线缆会产生压降，减少实际送达负载的能量。",
+  "过度留安全裕量——叠加过多的折减系数（如按50%效率计算）会导致电池组过大、成本过高。",
+];
+
+const relatedArticles = [
+  { href: "/learn/how-to-calculate-battery-runtime/", title: "如何计算电池续航时间" },
+  { href: "/learn/battery-runtime-formula/", title: "电池续航时间公式" },
+  { href: "/learn/how-long-will-a-battery-last/", title: "电池能用多久？" },
+  { href: "/learn/12v-vs-24v-vs-48v-runtime/", title: "12V/24V/48V续航对比" },
+  { href: "/learn/battery-temperature-correction-chart/", title: "电池温度修正表" },
+];
+---
+
+<CalculatorLayout
+  title="电池续航时间计算器｜锂电池/磷酸铁锂续航计算｜电池计算器"
+  description="电池续航时间计算器：输入容量Ah/Wh、电压、负载瓦数、放电深度DoD与系统效率，一键算出可用能量与续航小时分钟，公式全公开，支持锂电池与船用电池。"
+  faqItems={faqItems}
+  commonMistakes={commonMistakes}
+  relatedCalculators={relatedTools}
+  relatedArticles={relatedArticles}
+  whatIs={whatIs}
+  whyItMatters={whyItMatters}
+  practicalApplications={practicalApplications}
+  trustSection={trustSection}
+  references={references}
+  expertNotes={expertNotes}
+  lang="zh"
+>
+
+  <!-- Main Calculator Grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-16">
+
+    <!-- Input Form -->
+    <CalculatorCard>
+      <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">系统参数</h3>
+      <div class="flex flex-col gap-5 md:gap-6">
+
+        <!-- Capacity (number + unit select side by side) -->
+        <div class="flex flex-col gap-2">
+          <label for="capacity" class="text-label-uppercase text-xs text-primary">电池容量</label>
+          <div class="grid grid-cols-3 gap-2">
+            <input type="number" id="capacity" value="100" class="text-input col-span-2" min="1" step="any" />
+            <select id="capacity-unit" class="select-input">
+              <option value="ah">Ah</option>
+              <option value="wh">Wh</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Voltage -->
+        <InputField
+          id="voltage"
+          label="标称电压（V）"
+          value={12.8}
+          min={1}
+          step="any"
+          wrapperId="voltage-wrapper"
+          helperText="常见值：磷酸铁锂（12.8V / 25.6V）、三元锂（11.1V / 37V）、铅酸（12V）"
+        />
+
+        <!-- DoD -->
+        <InputField
+          id="dod"
+          label="最大放电深度（DoD %）"
+          value={80}
+          min={1}
+          max={100}
+          helperText="推荐上限：磷酸铁锂（80–90%）、三元锂（80%）、铅酸（50%）"
+        />
+
+        <!-- Inverter / System Efficiency -->
+        <InputField
+          id="efficiency"
+          label="系统效率（%）"
+          value={90}
+          min={1}
+          max={100}
+          helperText="计入逆变器转换、线缆电阻与自放电损耗。"
+        />
+
+        <!-- Power Load -->
+        <InputField
+          id="load"
+          label="持续负载（瓦）"
+          value={250}
+          min={1}
+          step="any"
+        />
+
+      </div>
+    </CalculatorCard>
+
+    <!-- Calculation Results -->
+    <CalculatorCard class="border-m-blue-light flex flex-col justify-between">
+      <div>
+        <h3 class="text-title-lg text-primary mb-6 uppercase tracking-wider">预计输出</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <!-- Main Output -->
+          <ResultBox
+            label="备用续航"
+            value="3h 41m"
+            suffix="3.68 hours"
+            variant="primary"
+            id="result-runtime"
+          />
+
+          <!-- Energy Metrics -->
+          <ResultBox
+            label="电池可用能量"
+            value="1,024 Wh"
+            suffix="1.02 kWh"
+            id="result-energy-box"
+            helperText="扣除放电深度限制后的可用能量。"
+          />
+
+          <ResultBox
+            label="系统输出能量"
+            value="921.6 Wh"
+            suffix="0.92 kWh"
+            id="result-delivered-box"
+            helperText="扣除逆变器与系统损耗后供给负载的能量。"
+          />
+
+          <ResultBox
+            label="放电电流"
+            value="19.53 A"
+            suffix="0.20 C"
+            id="result-current-box"
+          />
+        </div>
+
+        <MiniSimulationChart
+          title="能量衰减曲线"
+          description="电池剩余能量随放电时间的变化"
+          xLabel="时间（小时）"
+          yLabel="能量（%）"
+          chartId="chart-runtime"
+        />
+      </div>
+
+      <!-- Action Area -->
+      <div class="border-t border-hairline pt-6">
+        <h4 class="text-label-uppercase text-primary text-xs mb-2">技术警告 / 安全提示</h4>
+        <p class="text-body-sm text-muted">
+          该估算基于标准放电曲线。大电流持续放电会使电芯升温，并因Peukert效应降低总可用容量。
+        </p>
+      </div>
+    </CalculatorCard>
+
+  </div>
+
+  <!-- Formulas and Worked Examples -->
+  <section class="mb-16 border-t border-hairline pt-12">
+    <h2 class="text-display-sm text-primary uppercase tracking-wider mb-8">公式与计算示例</h2>
+
+    <FormulaBox title="数学公式">
+      <p>
+        续航时间T的计算方法：用可用电池容量除以经效率折算后的放电负载：
+      </p>
+      <div class="bg-surface-soft p-3 md:p-4 font-mono text-primary border border-hairline my-2 overflow-x-auto whitespace-nowrap md:whitespace-normal text-xs md:text-sm">
+        总能量 (Wh) = 容量 (Ah) x 电压 (V)
+      </div>
+      <div class="bg-surface-soft p-3 md:p-4 font-mono text-primary border border-hairline my-2 overflow-x-auto whitespace-nowrap md:whitespace-normal text-xs md:text-sm">
+        电池可用能量 (Wh) = 总能量 (Wh) x (DoD% / 100)
+      </div>
+      <div class="bg-surface-soft p-3 md:p-4 font-mono text-primary border border-hairline my-2 overflow-x-auto whitespace-nowrap md:whitespace-normal text-xs md:text-sm">
+        系统输出能量 (Wh) = 电池可用能量 (Wh) x (效率% / 100)
+      </div>
+      <div class="bg-surface-soft p-3 md:p-4 font-mono text-primary border border-hairline my-2 overflow-x-auto whitespace-nowrap md:whitespace-normal text-xs md:text-sm">
+        续航时间 (小时) = 系统输出能量 (Wh) / 负载 (W)
+      </div>
+      <p>
+        放电电流I与C率定义如下：
+      </p>
+      <div class="bg-surface-soft p-3 md:p-4 font-mono text-primary border border-hairline my-2 overflow-x-auto whitespace-nowrap md:whitespace-normal text-xs md:text-sm">
+        放电电流 (A) = 负载 (W) / 电压 (V)
+      </div>
+      <div class="bg-surface-soft p-3 md:p-4 font-mono text-primary border border-hairline my-2 overflow-x-auto whitespace-nowrap md:whitespace-normal text-xs md:text-sm">
+        C率 = 放电电流 (A) / 容量 (Ah)
+      </div>
+      <p class="text-xs text-muted mt-4">
+        <strong>变量说明：</strong>容量单位Ah，电压为标称电压V，放电深度为百分比（0–100），负载为持续功率瓦数，效率为百分比（0–100）。假设条件：负载恒定、放电全程电压为标称值、标准温度（25°C）。
+      </p>
+    </FormulaBox>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      <WorkedExample
+        number={1}
+        title="12V船用冰箱续航"
+        scenario="12V船用冰箱持续耗电45W，配100Ah磷酸铁锂生活电池组，能运行多久？"
+        inputs={[
+          { label: "容量", value: "100 Ah" },
+          { label: "电压", value: "12.8V" },
+          { label: "放电深度", value: "80%" },
+          { label: "系统效率", value: "90%" },
+          { label: "负载", value: "45W" },
+        ]}
+        steps={[
+          { label: "总能量", formula: "100 × 12.8", result: "1,280 Wh" },
+          { label: "电池可用能量", formula: "1,280 × 0.80", result: "1,024 Wh" },
+          { label: "系统输出能量", formula: "1,024 × 0.90", result: "921.6 Wh" },
+          { label: "续航时间", formula: "921.6 / 45", result: "20.48小时（约20小时29分钟）" },
+        ]}
+        answer="20.48小时（约20小时29分钟）"
+        interpretation="100Ah磷酸铁锂电池组以80% DoD可带动45W船用冰箱近一整天，适合夜间锚泊时不启动发动机、不接岸电使用。"
+        variant="marine"
+      />
+
+      <WorkedExample
+        number={2}
+        title="房车电视用电"
+        scenario="32英寸LED电视加投屏棒约耗电80W，由24V 200Ah磷酸铁锂电池组经效率92%的逆变器供电。"
+        inputs={[
+          { label: "容量", value: "200 Ah" },
+          { label: "电压", value: "25.6V" },
+          { label: "放电深度", value: "80%" },
+          { label: "系统效率", value: "92%" },
+          { label: "负载", value: "80W" },
+        ]}
+        steps={[
+          { label: "总能量", formula: "200 × 25.6", result: "5,120 Wh" },
+          { label: "电池可用能量", formula: "5,120 × 0.80", result: "4,096 Wh" },
+          { label: "系统输出能量", formula: "4,096 × 0.92", result: "3,768.32 Wh" },
+          { label: "续航时间", formula: "3,768.32 / 80", result: "47.1小时（约47小时6分钟）" },
+        ]}
+        answer="47.1小时（约47小时6分钟）"
+        interpretation="24V 200Ah电池组可带动80W房车电视近两整天，多日野营无太阳能补充时也有充足的娱乐用电。"
+        variant="rv"
+      />
+
+      <WorkedExample
+        number={3}
+        title="CPAP呼吸机续航"
+        scenario="医用CPAP呼吸机带加湿器耗电30W，使用12V 100Ah磷酸铁锂电池，按80% DoD、系统效率90%计算。"
+        inputs={[
+          { label: "容量", value: "100 Ah" },
+          { label: "电压", value: "12.8V" },
+          { label: "放电深度", value: "80%" },
+          { label: "系统效率", value: "90%" },
+          { label: "负载", value: "30W" },
+        ]}
+        steps={[
+          { label: "总能量", formula: "100 × 12.8", result: "1,280 Wh" },
+          { label: "电池可用能量", formula: "1,280 × 0.80", result: "1,024 Wh" },
+          { label: "系统输出能量", formula: "1,024 × 0.90", result: "921.6 Wh" },
+          { label: "续航时间", formula: "921.6 / 30", result: "30.72小时（约30小时43分钟）" },
+        ]}
+        answer="30.72小时（约30小时43分钟）"
+        interpretation="100Ah磷酸铁锂电池可为CPAP呼吸机供电30小时以上，露营或停电期间为医疗用户提供可靠的多晚备用电源。"
+        variant="default"
+      />
+    </div>
+  </section>
+
+  <EngineeringDiagram
+    title="电池续航系统流程图"
+    description="电池储能经负载消耗到续航输出的能量路径"
+    variant="flow"
+    steps={[
+      { label: "电池组", icon: "battery" },
+      { label: "负载消耗", icon: "load" },
+      { label: "续航输出", icon: "chart" },
+    ]}
+  />
+
+  <ComparisonTable
+    title="不同化学体系与负载下的续航对比"
+    headers={["化学体系", "100Ah带10W负载", "100Ah带50W负载", "100Ah带200W负载", "可用容量"]}
+    rows={[
+      ["磷酸铁锂（80% DoD）", "96小时", "19.2小时", "4.8小时", "80 Ah"],
+      ["三元锂（70% DoD）", "84小时", "16.8小时", "4.2小时", "70 Ah"],
+      ["铅酸（50% DoD）", "48小时", "9.6小时", "2.4小时", "50 Ah"],
+      ["铅酸1C放电", "不适用（Peukert效应）", "7.2小时", "1.8小时", "约36 Ah（有效）"],
+    ]}
+    caption="12V电池系统在不同放电倍率下的约计续航时间"
+  />
+
+  <FAQSection items={faqItems} />
+  <RelatedTools tools={relatedTools} />
+
+  <!-- Client-side Calculation Script -->
+  <script>
+    import { calculateRuntime } from '../../../utils/calculators';
+    import { renderLineChart, clearChart } from '../../../utils/charting';
+
+    const capacityInput = document.getElementById('capacity') as HTMLInputElement;
+    const capacityUnit = document.getElementById('capacity-unit') as HTMLSelectElement;
+    const voltageInput = document.getElementById('voltage') as HTMLInputElement;
+    const dodInput = document.getElementById('dod') as HTMLInputElement;
+    const efficiencyInput = document.getElementById('efficiency') as HTMLInputElement;
+    const loadInput = document.getElementById('load') as HTMLInputElement;
+
+    // Outputs — query inner elements from ResultBox wrappers
+    const resultRuntimeBox = document.getElementById('result-runtime');
+    const resultRuntime = resultRuntimeBox?.querySelector('.text-display-md') as HTMLElement;
+    const resultHoursDecimal = resultRuntimeBox?.querySelector('.text-caption') as HTMLElement;
+    const resultEnergyBox = document.getElementById('result-energy-box');
+    const resultEnergy = resultEnergyBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultKwh = resultEnergyBox?.querySelector('.text-caption') as HTMLElement;
+    const resultDeliveredBox = document.getElementById('result-delivered-box');
+    const resultDelivered = resultDeliveredBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultDeliveredKwh = resultDeliveredBox?.querySelector('.text-caption') as HTMLElement;
+    const resultCurrentBox = document.getElementById('result-current-box');
+    const resultCurrent = resultCurrentBox?.querySelector('.text-title-lg') as HTMLElement;
+    const resultCRate = resultCurrentBox?.querySelector('.text-caption') as HTMLElement;
+
+    const chartSvg = document.getElementById('chart-runtime') as unknown as SVGElement;
+
+    function updateCalculations() {
+      const cap = parseFloat(capacityInput.value) || 0;
+      const isWh = capacityUnit.value === 'wh';
+      const voltage = parseFloat(voltageInput.value) || 12.8;
+      const dod = parseFloat(dodInput.value) || 80;
+      const eff = parseFloat(efficiencyInput.value) || 90;
+      const load = parseFloat(loadInput.value) || 0;
+
+      // Handle visibility of voltage input (if in Wh, voltage is only needed for discharge current, but still important)
+      if (isWh) {
+        // We can keep it visible but document it's only for current
+      }
+
+      const results = calculateRuntime(cap, isWh, voltage, dod, eff, load);
+
+      // Render Runtime hours/minutes
+      if (results.runtimeHours <= 0) {
+        if (resultRuntime) resultRuntime.textContent = '0h 00m';
+        if (resultHoursDecimal) resultHoursDecimal.textContent = '0.00 hours';
+      } else {
+        const totalMinutes = Math.round(results.runtimeHours * 60);
+        const hours = Math.floor(totalMinutes / 60);
+        const mins = totalMinutes % 60;
+
+        if (resultRuntime) resultRuntime.textContent = `${hours}h ${mins < 10 ? '0' : ''}${mins}m`;
+        if (resultHoursDecimal) resultHoursDecimal.textContent = `${results.runtimeHours.toFixed(2)} hours`;
+      }
+
+      // Render Battery Usable Energy
+      if (resultEnergy) resultEnergy.textContent = `${Math.round(results.usableEnergyWh).toLocaleString()} Wh`;
+      if (resultKwh) resultKwh.textContent = `${(results.usableEnergyWh / 1000).toFixed(3)} kWh`;
+
+      // Render Delivered System Energy
+      if (resultDelivered) resultDelivered.textContent = `${Math.round(results.deliveredEnergyWh).toLocaleString()} Wh`;
+      if (resultDeliveredKwh) resultDeliveredKwh.textContent = `${(results.deliveredEnergyWh / 1000).toFixed(3)} kWh`;
+
+      // Render Current
+      if (resultCurrent) resultCurrent.textContent = `${results.dischargeCurrentA.toFixed(2)} A`;
+
+      // Calculate C-rate
+      const capacityAh = isWh ? cap / voltage : cap;
+      const cRate = capacityAh > 0 ? results.dischargeCurrentA / capacityAh : 0;
+      if (resultCRate) resultCRate.textContent = `${cRate.toFixed(2)} C`;
+
+      if (chartSvg && results.runtimeHours > 0 && load > 0) {
+        const pts: { x: number; y: number }[] = [];
+        for (let i = 0; i < 20; i++) {
+          pts.push({ x: results.runtimeHours * (i / 19), y: 100 * (1 - i / 19) });
+        }
+        renderLineChart(chartSvg, pts, {
+          width: 320, height: 160,
+          xLabel: '时间（小时）', yLabel: '能量（%）',
+          xMin: 0, xMax: Math.ceil(results.runtimeHours),
+          yMin: 0, yMax: 100,
+        });
+      } else if (chartSvg) {
+        clearChart(chartSvg);
+      }
+    }
+
+    [capacityInput, capacityUnit, voltageInput, dodInput, efficiencyInput, loadInput].forEach(el => {
+      el.addEventListener('input', updateCalculations);
+      el.addEventListener('change', updateCalculations);
+    });
+
+    // Run once on load
+    updateCalculations();
+  </script>
+</CalculatorLayout>
