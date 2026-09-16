@@ -1,0 +1,404 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "O que é dimensionamento de bateria?",
+    answer: "Dimensionamento de bateria é o processo de calcular a capacidade total de energia (em Wh ou Ah) que um banco de baterias deve armazenar para atender uma carga definida por uma duração especificada. Considera o consumo diário de energia, requisitos de autonomia, limites de profundidade de descarga, eficiência do sistema e fatores ambientais como temperatura.",
+  },
+  {
+    question: "Por que o dimensionamento de bateria importa?",
+    answer: "Um banco subdimensionado falha em alimentar cargas durante apagões ou períodos sem recarga, causando indisponibilidade ou danos a equipamentos. Um banco superdimensionado desperdiça capital, adiciona peso e espaço desnecessários e pode ciclar superficialmente demais para manter a saúde da bateria. O dimensionamento correto equilibra custo, desempenho e longevidade.",
+  },
+  {
+    question: "Qual é a diferença entre capacidade e dimensionamento de bateria?",
+    answer: "Capacidade de bateria é uma especificação fixa — a energia total que uma bateria pode armazenar totalmente carregada (ex.: 200 Ah a 48V). Dimensionamento é o processo de engenharia para determinar de qual capacidade você realmente precisa para sua aplicação específica. O dimensionamento recebe suas cargas, autonomia e restrições como entradas e entrega uma capacidade necessária como saída.",
+  },
+  {
+    question: "Quanto tempo leva o processo de dimensionamento?",
+    answer: "Com um inventário de cargas e parâmetros básicos do sistema (tensão, dias de autonomia, limite de DoD), um cálculo de dimensionamento pode ser concluído em minutos com planilha ou calculadora. A etapa mais demorada é reunir dados precisos de carga, especialmente para sistemas com muitos dispositivos intermitentes.",
+  },
+  {
+    question: "Qual fator de redução por temperatura devo usar?",
+    answer: "Fatores de redução por temperatura variam por química. A 0°C (32°F), baterias LFP entregam aproximadamente 90% da capacidade nominal (fator 0,90), enquanto chumbo-ácido entrega apenas 80% (fator 0,80). A -20°C (-4°F), caem para 70% e 50% respectivamente. Em temperatura ambiente (25°C), nenhuma redução é necessária — o fator é 1,00. Consulte sempre o datasheet do fabricante para curvas precisas, pois os valores variam por modelo e construção.",
+  },
+  {
+    question: "Qual química de bateria é melhor para dimensionamento?",
+    answer: "O LFP (LiFePO4) é geralmente a melhor escolha para armazenamento estacionário devido à sua capacidade de descarga profunda (80–90% de DoD), longa vida útil (3.000–5.000 ciclos) e excelente estabilidade térmica. O lítio NMC oferece maior densidade energética, mas menor vida útil. O chumbo-ácido tem o menor custo inicial, mas exige limitação a 50% de DoD e maior peso. A melhor química depende das suas restrições específicas — peso, espaço, orçamento e requisitos de vida útil.",
+  },
+];
+---
+
+<Layout
+  title="O Que É Dimensionamento de Bateria? | Calculadoras de Bateria"
+  description="Aprenda o que significa dimensionamento de bateria, por que importa para a confiabilidade do sistema e como funciona o processo. Uma visão completa para engenheiros e projetistas."
+  canonical="https://batterycalculators.com/pt/learn/what-is-battery-sizing/"
+  schema="faqPage"
+  schemaName="O Que É Dimensionamento de Bateria?"
+  schemaDescription="Visão de engenharia do dimensionamento de baterias: definição, importância e o processo padrão para calcular a capacidade necessária."
+  schemaUrl="https://batterycalculators.com/pt/learn/what-is-battery-sizing/"
+  faqItems={faqItems}
+  lang="pt"
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/pt/learn/" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Voltar aos Guias</a>
+      <Breadcrumb items={[
+        { label: "Centro de Aprendizagem", href: "/pt/learn/" },
+        { label: "O Que É Dimensionamento de Bateria?" }
+      ]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">PROJETO DE SISTEMAS</span>
+      <h1 class="text-display-md text-primary mb-6">O Que É Dimensionamento de Bateria?</h1>
+      <p class="text-body-md text-body font-light">
+        Dimensionamento de bateria é o processo de engenharia para determinar quanta capacidade de energia um banco de baterias deve armazenar para alimentar com confiabilidade um conjunto de cargas por um período definido. É a etapa mais importante no projeto de qualquer sistema baseado em bateria — errando, o sistema ou falha em atender a demanda ou desperdiça dinheiro com capacidade desnecessária.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Por Que o Dimensionamento Importa</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Todo sistema de baterias existe para cobrir uma lacuna entre fornecimento e demanda de energia. Uma instalação solar produz energia de dia, mas deve suprir cargas à noite. Um UPS deve manter servidores funcionando até a rede retornar. Uma cabana off-grid precisa de energia em períodos nublados sem sol. Em cada caso, o banco é dimensionado para cobrir essa lacuna.
+        </p>
+        <p class="text-body-md text-body font-light mb-4">
+          O subdimensionamento é o erro mais comum e mais prejudicial. Um banco pequeno demais atinge seu limite de profundidade de descarga antes de a fonte de recarga voltar, causando desligamento total do sistema. Para aplicações críticas — equipamentos médicos, telecomunicações, data centers — isso pode ter consequências graves. Para sistemas residenciais, significa perder energia exatamente nos momentos em que mais se precisa.
+        </p>
+        <p class="text-body-md text-body font-light">
+          O superdimensionamento tem seus próprios custos. Baterias estão entre os componentes mais caros de um sistema de energia. Cada ampère-hora não usado representa capital que poderia ter sido alocado em outro lugar. Bancos grandes demais também ciclam superficialmente demais, o que pode acelerar certos mecanismos de degradação em células de lítio e reduzir o retorno sobre o investimento ao longo da vida.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Visão Geral do Processo de Dimensionamento</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          O dimensionamento segue um processo sistemático e repetível. As etapas abaixo aplicam-se universalmente — seja dimensionando uma bateria solar residencial, um banco residencial marítimo, um UPS para servidores ou um site off-grid de telecom. As entradas mudam, mas o método não.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Etapa 1: Inventário de Cargas</h4>
+            <p class="text-body-sm text-muted">
+              Liste cada dispositivo elétrico que vai consumir da bateria. Registre a potência em watts e estime as horas diárias de uso. Multiplique potência por horas para obter watt-horas por dispositivo. Some todos para o consumo diário total. Para cargas intermitentes como bombas ou compressores, use o ciclo médio de trabalho em vez da potência contínua.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Etapa 2: Requisito de Autonomia</h4>
+            <p class="text-body-sm text-muted">
+              Defina por quantos dias o sistema deve operar sem nenhuma entrada de recarga. Para solar conectado à rede com net metering, a autonomia pode ser de 0–1 dias. Para solar off-grid, 2–3 dias é típico para cobrir dias nublados consecutivos. Para sistemas críticos de backup, 3–7 dias podem ser necessários.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Etapa 3: Limite de Profundidade de Descarga</h4>
+            <p class="text-body-sm text-muted">
+              Decida quão profundamente você vai descarregar o banco regularmente. Baterias LFP suportam com segurança 80–90% de DoD. Baterias de chumbo-ácido devem ser limitadas a 50% de DoD para vida útil razoável. O lítio NMC normalmente usa 80% de DoD. O limite de DoD determina diretamente quanta capacidade instalada é utilizável.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Etapa 4: Eficiência e Temperatura</h4>
+            <p class="text-body-sm text-muted">
+              Considere perdas de energia no inversor (85–95%), controlador de carga (95–98%), eficiência de ida e volta da bateria (85–98% conforme a química) e perdas na fiação. Aplique um fator de redução por temperatura se a bateria operar abaixo de 25°C — o frio reduz significativamente a capacidade disponível.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FormulaBox title="A Fórmula Central de Dimensionamento">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Capacidade Necessária (Wh) = Carga Diária (Wh) × Dias de Autonomia / DoD / Eficiência do Sistema / Fator Temp.
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Capacidade Necessária (Ah) = Capacidade Necessária (Wh) / Tensão do Sistema (V)
+        </div>
+        <p>
+          Esta fórmula é a base de todo dimensionamento de baterias. Toda ferramenta especializada — seja para solar, UPS, marítimo ou telecom — é uma variação desta equação com entradas específicas da aplicação.
+        </p>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Parâmetros-Chave Explicados</h2>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Parâmetro</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Faixa Típica</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Impacto</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">Carga Diária</td>
+                <td class="p-4 font-mono text-primary">500–10,000 Wh</td>
+                <td class="p-4 text-muted">Escala diretamente a capacidade necessária</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Dias de Autonomia</td>
+                <td class="p-4 font-mono text-primary">0.5–7 dias</td>
+                <td class="p-4 text-muted">Multiplicador linear — dobrar a autonomia dobra a capacidade</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Limite de DoD</td>
+                <td class="p-4 font-mono text-primary">50–90%</td>
+                <td class="p-4 text-muted">Menor DoD exige maior capacidade instalada</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Eficiência do Sistema</td>
+                <td class="p-4 font-mono text-primary">70–92%</td>
+                <td class="p-4 text-muted">Perdas de inversor, fiação e bateria combinadas</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Fator Temp.</td>
+                <td class="p-4 font-mono text-primary">0.70–1.00</td>
+                <td class="p-4 text-muted">Climas frios reduzem a capacidade em 10–30%</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Fatores de Redução por Temperatura</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Baterias são classificadas a 25°C. Temperaturas frias retardam as reações químicas dentro das células, reduzindo a energia extraível. O fator de temperatura é aplicado como divisor na fórmula de dimensionamento — um fator menor significa mais capacidade instalada para compensar a produção reduzida no frio.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Temperatura</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">LFP (LiFePO4)</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Chumbo-Ácido</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">NMC (Lítio)</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">30°C (86°F)</td>
+                <td class="p-4 font-mono text-primary">1.02</td>
+                <td class="p-4 font-mono text-primary">1.00</td>
+                <td class="p-4 font-mono text-primary">1.01</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">25°C (77°F)</td>
+                <td class="p-4 font-mono text-primary">1.00</td>
+                <td class="p-4 font-mono text-primary">1.00</td>
+                <td class="p-4 font-mono text-primary">1.00</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">10°C (50°F)</td>
+                <td class="p-4 font-mono text-primary">0.95</td>
+                <td class="p-4 font-mono text-primary">0.90</td>
+                <td class="p-4 font-mono text-primary">0.93</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">0°C (32°F)</td>
+                <td class="p-4 font-mono text-primary">0.90</td>
+                <td class="p-4 font-mono text-primary">0.80</td>
+                <td class="p-4 font-mono text-primary">0.85</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">-10°C (14°F)</td>
+                <td class="p-4 font-mono text-primary">0.80</td>
+                <td class="p-4 font-mono text-primary">0.65</td>
+                <td class="p-4 font-mono text-primary">0.75</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">-20°C (-4°F)</td>
+                <td class="p-4 font-mono text-primary">0.70</td>
+                <td class="p-4 font-mono text-primary">0.50</td>
+                <td class="p-4 font-mono text-primary">0.60</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-body-sm text-muted mt-2">Valores aproximados e variam por fabricante. Consulte sempre o datasheet específico da bateria para curvas precisas de redução.</p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Dimensionamento por Aplicação</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          O método de dimensionamento é universal, mas as restrições dominantes variam por aplicação. Entender quais parâmetros mais importam no seu cenário ajuda a priorizar a coleta de dados e as decisões de projeto.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Aplicação</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Restrição-Chave</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Autonomia Típica</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">Backup Solar Residencial</td>
+                <td class="p-4 text-muted">Cargas noturnas + reserva para dia nublado</td>
+                <td class="p-4 font-mono text-primary">1–3 dias</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">UPS / Infraestrutura de TI</td>
+                <td class="p-4 text-muted">Autonomia até partir o gerador ou desligar com segurança</td>
+                <td class="p-4 font-mono text-primary">5–30 min</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Solar Off-Grid</td>
+                <td class="p-4 text-muted">Períodos nublados prolongados</td>
+                <td class="p-4 font-mono text-primary">2–5 dias</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Telecom / Crítico</td>
+                <td class="p-4 text-muted">Confiabilidade em todas as condições</td>
+                <td class="p-4 font-mono text-primary">3–7 dias</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Marítimo / RV</td>
+                <td class="p-4 text-muted">Restrições de espaço e peso</td>
+                <td class="p-4 font-mono text-primary">1–2 dias</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <h3 class="text-title-md text-primary mt-8 mb-4">Guia de Seleção de Química</h3>
+        <p class="text-body-md text-body font-light mb-4">
+          A química da bateria determina a capacidade utilizável, a vida útil, o perfil de segurança e o custo por kWh. A química certa depende das suas restrições específicas — peso, espaço, orçamento e vida útil esperada.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Química</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">DoD</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Vida Útil em Ciclos</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Custo/kWh</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Ideal Para</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">LFP (LiFePO4)</td>
+                <td class="p-4 font-mono text-primary">80–90%</td>
+                <td class="p-4 text-muted">3,000–5,000</td>
+                <td class="p-4 text-muted">$250–400</td>
+                <td class="p-4 text-muted">Solar, backup residencial, off-grid</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">NMC (Lítio)</td>
+                <td class="p-4 font-mono text-primary">80–90%</td>
+                <td class="p-4 text-muted">2,000–3,000</td>
+                <td class="p-4 text-muted">$300–500</td>
+                <td class="p-4 text-muted">Aplicações móveis sensíveis ao peso</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Chumbo-Ácido (AGM)</td>
+                <td class="p-4 font-mono text-primary">50%</td>
+                <td class="p-4 text-muted">500–1,000</td>
+                <td class="p-4 text-muted">$150–250</td>
+                <td class="p-4 text-muted">Projetos econômicos, só backup</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Sódio-Íon</td>
+                <td class="p-4 font-mono text-primary">80–90%</td>
+                <td class="p-4 text-muted">2,000–4,000</td>
+                <td class="p-4 text-muted">$150–300</td>
+                <td class="p-4 text-muted">Armazenamento estacionário emergente</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-body-sm text-muted mt-2">Ao comparar custos, considere o custo de vida útil por kWh entregue, não apenas o preço inicial. Uma bateria LFP de $350/kWh entregando 4.000 ciclos a 85% de DoD custa $0,10 por kWh entregue. Uma bateria de chumbo-ácido de $200/kWh entregando 800 ciclos a 50% de DoD custa $0,50 por kWh entregue — cinco vezes mais caro ao longo da vida.</p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Exemplo Resolvido</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Cenário:</strong> Dimensionar uma bateria para uma pequena cabana off-grid.</p>
+            <p><strong>Dados:</strong></p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li>Carga diária: 2,400 Wh (2.4 kWh)</li>
+              <li>Autonomia: 2 dias</li>
+              <li>Limite de DoD: 80% (química LFP)</li>
+              <li>Eficiência do sistema: 85% (inversor + fiação)</li>
+              <li>Fator de temperatura: 0.95 (clima ameno)</li>
+              <li>Tensão do sistema: 48V</li>
+            </ul>
+            <p><strong>Etapa 1:</strong> Capacidade necessária em Wh:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              2,400 Wh × 2 / 0.80 / 0.85 / 0.95 = 7,431 Wh
+            </div>
+            <p><strong>Etapa 2:</strong> Converter para Ah:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              7,431 Wh / 48V = 154.8 Ah
+            </div>
+            <p><strong>Etapa 3:</strong> Arredonde para uma configuração prática. Um banco LFP 48V 200Ah (9.600 Wh) oferece os 7.431 Wh necessários com 23% de margem para perda de capacidade ao longo do tempo e crescimento de cargas.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <CalculatorCard class="border-m-blue-light">
+        <h4 class="text-label-uppercase text-primary text-xs mb-3">Próxima Etapa: Configure Seu Banco de Baterias</h4>
+        <p class="text-body-sm text-muted mb-4">
+          Depois de determinar a capacidade necessária em Ah, o próximo passo é configurar o arranjo em série e paralelo de células ou módulos para alcançar sua tensão alvo e capacidade total.
+        </p>
+        <a href="/pt/tools/parallel-string-calculator/" class="btn-primary-outline text-xs py-3 px-6 inline-block">Abrir Calculadora de Strings Paralelas</a>
+      </CalculatorCard>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Experimente</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use a Calculadora de Dimensionamento de Bateria para inserir suas cargas específicas e obter uma recomendação de banco em segundos.
+          </p>
+          <a href="/pt/tools/battery-sizing-calculator/" class="btn-primary text-xs py-3 px-6 inline-block">Abrir Calculadora de Dimensionamento</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Para Solar</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Dimensionando uma bateria integrada com solar? Use a Calculadora de Dimensionamento de Bateria Solar para considerar taxas de carga e produção solar.
+          </p>
+          <a href="/pt/tools/solar-battery-sizing-calculator/" class="btn-primary-outline text-xs py-3 px-6 inline-block">Abrir Calculadora de Bateria Solar</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Artigos Relacionados</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Fórmula de Dimensionamento de Bateria</h4>
+            <p class="text-body-sm text-muted mb-3">Referência completa de fórmulas com todos os parâmetros, definições de variáveis e exemplos resolvidos.</p>
+            <a href="/pt/learn/battery-sizing-formula/" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Ler Guia →</a>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Como Dimensionar um Banco de Baterias</h4>
+            <p class="text-body-sm text-muted mb-3">Tutorial prático passo a passo com fluxograma de decisão e erros comuns de dimensionamento.</p>
+            <a href="/pt/learn/how-to-size-a-battery-bank/" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Ler Guia →</a>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Guia de Tabela de Dimensionamento</h4>
+            <p class="text-body-sm text-muted mb-3">Tabela visual de referência mapeando perfis de carga para capacidades recomendadas.</p>
+            <a href="/pt/learn/battery-sizing-chart-guide/" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Ler Guia →</a>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Guia de Dimensionamento Residencial</h4>
+            <p class="text-body-sm text-muted mb-3">Como dimensionar um backup residencial para cargas domésticas essenciais.</p>
+            <a href="/pt/learn/home-battery-sizing-guide/" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Ler Guia →</a>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Guia de Dimensionamento Solar</h4>
+            <p class="text-body-sm text-muted mb-3">Guia completo de dimensionamento solar com arranjo e seleção de química.</p>
+            <a href="/pt/learn/solar-storage-sizing-guide/" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Ler Guia →</a>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Guia de Dimensionamento Marítimo</h4>
+            <p class="text-body-sm text-muted mb-3">Como dimensionar bancos residenciais e baterias de partida para aplicações marítimas.</p>
+            <a href="/pt/learn/marine-battery-sizing-guide/" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Ler Guia →</a>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

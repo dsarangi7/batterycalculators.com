@@ -1,0 +1,324 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import ReferenceChart from '../../../components/ReferenceChart.astro';
+import ReferenceTable from '../../../components/ReferenceTable.astro';
+
+const faqItems = [
+  {
+    question: "Qual é a tensão de repouso de uma bateria LiFePO4 totalmente carregada?",
+    answer: "Uma célula LiFePO4 cheia repousa em aproximadamente 3,35–3,40V. Para um pack nominal 12V (4 células em série), isso é cerca de 13,4–13,6V. Um pack 24V (8 células) repousa em 26,8–27,2V, e um pack 48V (16 células) em 53,6–54,4V.",
+  },
+  {
+    question: "Por que a tensão do LiFePO4 é plana no meio do SOC?",
+    answer: "O LiFePO4 tem um patamar de descarga extremamente plano entre ~20% e 90% de SOC. A tensão fica perto de 3,2V por célula em quase toda essa faixa, tornando a estimativa por tensão pouco confiável no meio. Por isso prefere-se contagem de coulombs ou BMS com balanceamento.",
+  },
+  {
+    question: "A temperatura afeta a tensão de repouso do LiFePO4?",
+    answer: "Sim. O frio reduz levemente a tensão de circuito aberto e aumenta a resistência interna, causando queda sob carga. À temperatura ambiente (25°C), os valores da tabela são mais precisos. A 0°C, espere ~0,05–0,1V a menos por célula sob carga.",
+  },
+  {
+    question: "Posso usar multímetro para ver o SOC do LiFePO4?",
+    answer: "Dá uma estimativa grosseira, mas só se a bateria repousou (sem carga nem descarga) por pelo menos 30 minutos a algumas horas. A carga superficial de recarga recente infla a leitura. Para SOC preciso, use BMS com contagem de coulombs.",
+  },
+];
+
+const tableOfContents = [
+  { id: "why-voltage-matters", label: "Por Que a Tensão Importa" },
+  { id: "voltage-chart", label: "Tabela de Tensão LiFePO4" },
+  { id: "reading-the-table", label: "Lendo a Tabela" },
+  { id: "accuracy-notes", label: "Notas de Precisão" },
+  { id: "practical-tips", label: "Dicas Práticas" },
+  { id: "common-mistakes", label: "Erros Comuns" },
+];
+
+const relatedCalculators = [
+  { title: "Estimador de SOC", href: "/pt/tools/soc-estimator/" },
+  { title: "Calculadora de Autonomia de Bateria", href: "/pt/tools/runtime-calculator/" },
+  { title: "Calculadora de Dimensionamento de Bateria", href: "/pt/tools/battery-sizing-calculator/" },
+];
+
+const references = [
+  { title: "Battery University — Características de Tensão do LiFePO4", url: "https://batteryuniversity.com/article/bu-402-types-of-lithium-ion" },
+  { title: "Wikipedia — Bateria de Fosfato de Ferro-Lítio", url: "https://en.wikipedia.org/wiki/Lithium_iron_phosphate_battery" },
+];
+---
+
+<Layout
+  title="Tabela de Tensão LiFePO4 — Tensão de Repouso por SOC | Calculadoras de Bateria"
+  description="Tabela aproximada de tensão de repouso para baterias LiFePO4 a 12V, 24V e 48V. Gráfico de referência com tensão em cada nível de SOC e ressalvas de precisão."
+  canonical="https://batterycalculators.com/pt/learn/lifepo4-voltage-chart/"
+  faqItems={faqItems}
+  lang="pt"
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/pt/learn/" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">&larr; Voltar aos Guias</a>
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">REFERÊNCIA</span>
+      <h1 class="text-display-md text-primary mb-6">Tabela de Tensão LiFePO4</h1>
+      <p class="text-body-md text-body font-light">
+        Valores aproximados de tensão de repouso para baterias LiFePO4 (LFP) nas tensões comuns de pack. Use esta tabela como referência rápida para estimar o estado de carga pela tensão de circuito aberto.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section id="why-voltage-matters">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Por Que a Tensão Importa</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          A tensão é o indicador mais acessível de estado de carga. Um multímetro nos terminais revela aproximadamente quão carregada está a bateria — se você conhece a química e a configuração. Para LiFePO4, a relação entre tensão de circuito aberto e SOC segue uma curva bem caracterizada, embora notavelmente plana no meio.
+        </p>
+        <p class="text-body-md text-body font-light">
+          Entender a tensão de repouso ajuda a conferir leituras do BMS, diagnosticar problemas de carga e estimar a capacidade restante sem equipamento especializado. Porém a estimativa por tensão tem limitações reais no LiFePO4, e muitos sistemas usam contagem de coulombs como método principal.
+        </p>
+      </section>
+
+      <section id="voltage-chart">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Tabela de Tensão LiFePO4</h2>
+        <ReferenceChart
+          type="line"
+          title="Tensão de Repouso vs SOC — LiFePO4"
+          description="Pack nominal 12V (4S) — note o patamar plano entre 30–70% de SOC"
+          xLabel="SOC %"
+          yLabel="Tensão (V)"
+          data={[
+            { x: 0, y: 12.0, label: '0%' },
+            { x: 10, y: 12.6, label: '10%' },
+            { x: 20, y: 12.9, label: '20%' },
+            { x: 30, y: 13.0, label: '30%' },
+            { x: 40, y: 13.1, label: '40%' },
+            { x: 50, y: 13.1, label: '50%' },
+            { x: 60, y: 13.2, label: '60%' },
+            { x: 70, y: 13.2, label: '70%' },
+            { x: 80, y: 13.3, label: '80%' },
+            { x: 90, y: 13.4, label: '90%' },
+            { x: 100, y: 13.6, label: '100%' },
+          ]}
+          yMin={11.5}
+          yMax={14.0}
+          caption="Tensões aproximadas de repouso a 25°C. Valores reais variam por fabricante."
+        />
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-body-sm min-w-[640px]">
+              <thead>
+                <tr class="border-b border-hairline bg-surface-card">
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">SOC %</th>
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Pack 12V (4S)</th>
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Pack 24V (8S)</th>
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Pack 48V (16S)</th>
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Observações</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-hairline">
+                <tr>
+                  <td class="p-4 font-mono text-primary">100%</td>
+                  <td class="p-4 text-muted">13.6V</td>
+                  <td class="p-4 text-muted">27.2V</td>
+                  <td class="p-4 text-muted">54.4V</td>
+                  <td class="p-4 text-muted">Totalmente carregada, em repouso</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">90%</td>
+                  <td class="p-4 text-muted">13.4V</td>
+                  <td class="p-4 text-muted">26.8V</td>
+                  <td class="p-4 text-muted">53.6V</td>
+                  <td class="p-4 text-muted">Perto do topo da curva</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">80%</td>
+                  <td class="p-4 text-muted">13.3V</td>
+                  <td class="p-4 text-muted">26.6V</td>
+                  <td class="p-4 text-muted">53.2V</td>
+                  <td class="p-4 text-muted">Entrando no patamar plano</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">70%</td>
+                  <td class="p-4 text-muted">13.2V</td>
+                  <td class="p-4 text-muted">26.4V</td>
+                  <td class="p-4 text-muted">52.8V</td>
+                  <td class="p-4 text-muted">Região plana começa</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">60%</td>
+                  <td class="p-4 text-muted">13.2V</td>
+                  <td class="p-4 text-muted">26.4V</td>
+                  <td class="p-4 text-muted">52.8V</td>
+                  <td class="p-4 text-muted">Tensão quase constante</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">50%</td>
+                  <td class="p-4 text-muted">13.1V</td>
+                  <td class="p-4 text-muted">26.2V</td>
+                  <td class="p-4 text-muted">52.4V</td>
+                  <td class="p-4 text-muted">Meio do patamar plano</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">40%</td>
+                  <td class="p-4 text-muted">13.1V</td>
+                  <td class="p-4 text-muted">26.2V</td>
+                  <td class="p-4 text-muted">52.4V</td>
+                  <td class="p-4 text-muted">Tensão indistinguível de 50–60%</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">30%</td>
+                  <td class="p-4 text-muted">13.0V</td>
+                  <td class="p-4 text-muted">26.0V</td>
+                  <td class="p-4 text-muted">52.0V</td>
+                  <td class="p-4 text-muted">Ainda na região plana</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">20%</td>
+                  <td class="p-4 text-muted">12.9V</td>
+                  <td class="p-4 text-muted">25.8V</td>
+                  <td class="p-4 text-muted">51.6V</td>
+                  <td class="p-4 text-muted">Começando a cair</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">10%</td>
+                  <td class="p-4 text-muted">12.6V</td>
+                  <td class="p-4 text-muted">25.2V</td>
+                  <td class="p-4 text-muted">50.4V</td>
+                  <td class="p-4 text-muted">Queda acentuada</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">0%</td>
+                  <td class="p-4 text-muted">12.0V</td>
+                  <td class="p-4 text-muted">24.0V</td>
+                  <td class="p-4 text-muted">48.0V</td>
+                  <td class="p-4 text-muted">Totalmente descarregada (corte)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <p class="text-caption text-muted mt-3">Valores aproximados. A tensão real varia por fabricante, idade, temperatura e histórico de carga.</p>
+      </section>
+
+      <section id="reading-the-table">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Lendo a Tabela</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          A tabela mostra tensão de circuito aberto (OCV) — medida após a bateria repousar sem carga por pelo menos 30 minutos. Um pack LiFePO4 12V usa 4 células em série (4S), um 24V usa 8 (8S) e um 48V usa 16 (16S).
+        </p>
+        <p class="text-body-md text-body font-light">
+          Note o patamar extremamente plano entre 30% e 70% de SOC. Nessa faixa, a tensão difere em só 0,1–0,2V no pack inteiro. Essa é a característica definidora do LiFePO4 e torna a estimativa por tensão pouco confiável no meio. A tensão só vira um bom indicador perto do topo (acima de 80%) e da base (abaixo de 20%).
+        </p>
+      </section>
+
+      <section id="accuracy-notes">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Notas de Precisão</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Variação entre Fabricantes</h4>
+            <p class="text-body-sm text-muted">
+              Fabricantes diferentes produzem células com curvas OCV levemente distintas. Uma célula Grau A pode repousar 0,02–0,05V diferente de outra. Confira sempre o datasheet do seu fabricante.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Efeitos da Temperatura</h4>
+            <p class="text-body-sm text-muted">
+              O frio reduz a tensão de circuito aberto. A 0°C, espere leituras 0,05–0,1V menores por célula que a 25°C. Compensação no BMS ou tabela corrigida melhora a precisão.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Exigência de Repouso</h4>
+            <p class="text-body-sm text-muted">
+              A carga superficial de recarga recente infla as leituras. Para OCV precisa, a bateria precisa repousar pelo menos 30 minutos após carga ou descarga. Alguns fabricantes recomendam 2–4 horas para máxima precisão.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Calibração do BMS</h4>
+            <p class="text-body-sm text-muted">
+              Muitos BMS combinam estimativa por tensão com contagem de coulombs. Se o SOC do BMS discordar da tensão, pode precisar de recalibração. Faça um ciclo completo de carga-descarga-carga para zerar.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <section id="practical-tips">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Dicas Práticas</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Use a tensão para confirmar se a bateria está numa faixa razoável. Por exemplo, se seu pack 12V LiFePO4 lê 12,8V após repouso, dá para estimar ~20–25% de SOC. Se lê 13,4V, está quase cheio.
+        </p>
+        <p class="text-body-md text-body font-light mb-4">
+          Para aplicações que exigem SOC preciso (como solar ou RV off-grid), combine monitoramento de tensão com BMS de contagem. Só a tensão é insuficiente para precisão no patamar plano.
+        </p>
+        <p class="text-body-md text-body font-light">
+          Ao comparar leituras, meça sempre com a bateria em repouso. A carga altera muito a tensão. Uma bateria LiFePO4 de 100Ah sob 50A mostra tensão menor que a mesma em repouso, no mesmo SOC.
+        </p>
+      </section>
+
+      <section id="common-mistakes">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Erros Comuns</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Medir sob Carga</h4>
+            <p class="text-body-sm text-muted">
+              A tensão sob carga é sempre menor que a de repouso pela resistência interna (V = OCV − I × R). Medir descarregando dá estimativa falsamente baixa. Desconecte a carga e aguarde antes de medir.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Ignorar a Temperatura</h4>
+            <p class="text-body-sm text-muted">
+              Bateria fria lê abaixo dos valores da tabela. Aplicar tabelas de temperatura ambiente a uma bateria em garagem fria subestima o SOC. Use valores corrigidos no frio.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Confiar Só na Tensão para o SOC</h4>
+            <p class="text-body-sm text-muted">
+              O patamar plano entre 30% e 70% significa diferenças menores que 0,1V. Um voltímetro barato não distingue 40% de 60% num pack 12V LiFePO4. Confie na contagem para o meio da faixa.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Confundir Tensões de Pack e Célula</h4>
+            <p class="text-body-sm text-muted">
+              Saiba sempre se lê tensão de célula (3,0–3,65V) ou de pack (12–54V). Confundir as duas gera estimativas totalmente erradas. Os valores da tabela são para packs nominais, não células individuais.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <CalculatorCard class="border-m-blue-light">
+        <h4 class="text-label-uppercase text-primary text-xs mb-3">Experimente</h4>
+        <p class="text-body-sm text-muted mb-4">
+          Use o Estimador de SOC para interpolar o estado de carga a partir de medições de tensão de circuito aberto no seu pack LiFePO4.
+        </p>
+        <a href="/pt/tools/soc-estimator/" class="btn-primary text-xs py-3 px-6 inline-block">Abrir Estimador de SOC</a>
+      </CalculatorCard>
+
+      <ReferenceTable
+        title="Tabela de Referência Tensão-SOC LiFePO4"
+        description="Baixe esta tabela para referência offline"
+        headers={["SOC %", "Pack 12V (4S)", "Pack 24V (8S)", "Pack 48V (16S)", "Observações"]}
+        rows={[
+          ["100%", "13.6V", "27.2V", "54.4V", "Totalmente carregada, em repouso"],
+          ["90%", "13.4V", "26.8V", "53.6V", "Perto do topo da curva"],
+          ["80%", "13.3V", "26.6V", "53.2V", "Entrando no patamar plano"],
+          ["70%", "13.2V", "26.4V", "52.8V", "Região plana começa"],
+          ["60%", "13.2V", "26.4V", "52.8V", "Tensão quase constante"],
+          ["50%", "13.1V", "26.2V", "52.4V", "Meio do patamar plano"],
+          ["40%", "13.1V", "26.2V", "52.4V", "Tensão indistinguível de 50–60%"],
+          ["30%", "13.0V", "26.0V", "52.0V", "Ainda na região plana"],
+          ["20%", "12.9V", "25.8V", "51.6V", "Começando a cair"],
+          ["10%", "12.6V", "25.2V", "50.4V", "Queda acentuada"],
+          ["0%", "12.0V", "24.0V", "48.0V", "Totalmente descarregada (corte)"],
+        ]}
+        source="Battery University / Datasheets de fabricantes"
+      />
+
+      <FAQSection items={faqItems} />
+
+      <section class="border-t border-hairline pt-12">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Referências</h2>
+        <ul class="flex flex-col gap-2 text-body-sm text-muted">
+          {references.map((ref) => (
+            <li class="flex gap-2">
+              <span class="text-m-blue-light shrink-0">—</span>
+              <a href={ref.url} class="hover:text-primary transition-colors underline underline-offset-2" target="_blank" rel="noopener noreferrer">{ref.title}</a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    </div>
+  </div>
+</Layout>

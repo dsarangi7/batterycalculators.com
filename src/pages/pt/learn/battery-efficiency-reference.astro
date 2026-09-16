@@ -1,0 +1,293 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import ReferenceTable from '../../../components/ReferenceTable.astro';
+
+const faqItems = [
+  {
+    question: "O que é eficiência de ciclo completo (round-trip)?",
+    answer: "Eficiência de ciclo completo é o percentual de energia que pode ser recuperado da bateria em relação à energia inserida na carga. Uma bateria com 90% de eficiência perde 10% da energia de entrada como calor no ciclo carga-descarga. LiFePO4 normalmente atinge 95–98% de eficiência.",
+  },
+  {
+    question: "Por que a eficiência do inversor importa?",
+    answer: "Inversores convertem a potência DC da bateria em CA para cargas domésticas. Essa conversão não é 100% eficiente — tipicamente 85–95%. Uma carga CA de 1.000W exige 1.050–1.175W da bateria. A eficiência do inversor deve ser incluída em todos os cálculos de autonomia e dimensionamento.",
+  },
+  {
+    question: "Como a temperatura afeta a eficiência da bateria?",
+    answer: "Temperaturas frias aumentam a resistência interna, o que reduz a eficiência de carga e descarga. A 0°C, uma bateria de lítio pode perder 5–10% de eficiência em relação a 25°C. Em altas temperaturas, a eficiência melhora um pouco, mas o envelhecimento calendário acelera.",
+  },
+  {
+    question: "Qual química tem a melhor eficiência?",
+    answer: "LiFePO4 tem a maior eficiência de ciclo completo, com 95–98%. NMC atinge 92–96%. AGM chumbo-ácido chega a 80–85%. Chumbo-ácido inundada fica tipicamente em 70–80%. Maior eficiência significa mais energia utilizável na mesma capacidade.",
+  },
+];
+
+const tableOfContents = [
+  { id: "chemistry-efficiency", label: "Eficiência por Química" },
+  { id: "inverter-efficiency", label: "Eficiência do Inversor" },
+  { id: "system-efficiency", label: "Eficiência do Sistema" },
+  { id: "common-mistakes", label: "Erros Comuns" },
+];
+
+const relatedCalculators = [
+  { title: "Calculadora de Autonomia", href: "/pt/tools/runtime-calculator/" },
+  { title: "Calculadora de Bateria com Inversor", href: "/pt/tools/inverter-battery-calculator/" },
+  { title: "Calculadora de Dimensionamento", href: "/pt/tools/battery-sizing-calculator/" },
+];
+
+const references = [
+  { title: "Battery University — Eficiência de Carga", url: "https://batteryuniversity.com/article/bu-407-charging-lithium-ion" },
+  { title: "NREL — Testes de Eficiência de Baterias", url: "https://www.nrel.gov/docs/fy24osti/87655.pdf" },
+];
+---
+
+<Layout
+  title="Referência de Eficiência de Bateria — Perdas de Ciclo, Inversor e Sistema | Calculadoras de Bateria"
+  description="Referência de eficiência: eficiência de ciclo completo por química, classificações de eficiência de inversores e cálculos de perdas totais do sistema para estimativa precisa de autonomia."
+  canonical="https://batterycalculators.com/pt/learn/battery-efficiency-reference/"
+  faqItems={faqItems}
+  lang="pt"
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/pt/learn/" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">&larr; Voltar aos Guias</a>
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">REFERÊNCIA</span>
+      <h1 class="text-display-md text-primary mb-6">Referência de Eficiência de Bateria</h1>
+      <p class="text-body-md text-body font-light">
+        Entenda as perdas de eficiência em cada etapa de um sistema de bateria. Da química da célula à saída do inversor, cada etapa de conversão perde energia.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section id="chemistry-efficiency">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Eficiência de Ciclo Completo por Química</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          A eficiência de ciclo completo mede quanta energia sai da bateria em relação ao que entrou na carga. A diferença é perdida como calor devido à resistência interna e ineficiências químicas.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-body-sm min-w-[480px]">
+              <thead>
+                <tr class="border-b border-hairline bg-surface-card">
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Química</th>
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Eficiência de Ciclo</th>
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Perda por Ciclo</th>
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Notas</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-hairline">
+                <tr>
+                  <td class="p-4 font-mono text-primary">LiFePO4</td>
+                  <td class="p-4 text-muted">95–98%</td>
+                  <td class="p-4 text-muted">2–5%</td>
+                  <td class="p-4 text-muted">Melhor disponível — perda mínima de calor</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">NMC (Lítio)</td>
+                  <td class="p-4 text-muted">92–96%</td>
+                  <td class="p-4 text-muted">4–8%</td>
+                  <td class="p-4 text-muted">Muito boa — resistência interna um pouco maior</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">AGM (Chumbo-Ácido Selada)</td>
+                  <td class="p-4 text-muted">80–85%</td>
+                  <td class="p-4 text-muted">15–20%</td>
+                  <td class="p-4 text-muted">Moderada — geração significativa de calor</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">Chumbo-Ácido Inundada</td>
+                  <td class="p-4 text-muted">70–80%</td>
+                  <td class="p-4 text-muted">20–30%</td>
+                  <td class="p-4 text-muted">Mais baixa — efeito Peukert agrava perdas</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <p class="text-caption text-muted mt-3">Eficiência medida a 25°C com taxa 0,5C. A eficiência real varia com temperatura, C-rate e idade da bateria.</p>
+      </section>
+
+      <section id="inverter-efficiency">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Classificações de Eficiência de Inversores</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Inversores convertem a potência DC da bateria em CA para cargas domésticas. A classificação de eficiência descreve quanta energia DC é convertida em energia CA útil. Inversores modernos de onda senoidal pura normalmente atingem 88–95% de eficiência em carga nominal.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-body-sm min-w-[480px]">
+              <thead>
+                <tr class="border-b border-hairline bg-surface-card">
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Tipo de Inversor</th>
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Faixa de Eficiência</th>
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Ideal Para</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-hairline">
+                <tr>
+                  <td class="p-4 font-mono text-primary">Onda Senoidal Pura</td>
+                  <td class="p-4 text-muted">90–95%</td>
+                  <td class="p-4 text-muted">Eletrônicos sensíveis, dispositivos médicos</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">Onda Senoidal Modificada</td>
+                  <td class="p-4 text-muted">85–90%</td>
+                  <td class="p-4 text-muted">Cargas básicas, ferramentas, iluminação</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">Inversor Híbrido</td>
+                  <td class="p-4 text-muted">92–97%</td>
+                  <td class="p-4 text-muted">Sistemas solares + bateria</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <p class="text-body-md text-body font-light mt-4">
+          A eficiência do inversor varia com a carga. Com 20% de carga, a eficiência pode cair para 80–85%. Com 50–80% de carga, atinge o pico de 90–95%. Em carga total, cai um pouco por perdas térmicas. Dimensione seu inversor para que as cargas típicas fiquem na faixa de 30–70% para melhor eficiência.
+        </p>
+      </section>
+
+      <section id="system-efficiency">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Eficiência Total do Sistema</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Um sistema completo de bateria tem perdas de eficiência em cada etapa: controlador de carga, bateria, inversor e fiação. A eficiência total é o produto de todas as eficiências individuais.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-body-sm min-w-[480px]">
+              <thead>
+                <tr class="border-b border-hairline bg-surface-card">
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Componente</th>
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Eficiência Típica</th>
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Notas</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-hairline">
+                <tr>
+                  <td class="p-4 font-mono text-primary">Controlador de Carga Solar (MPPT)</td>
+                  <td class="p-4 text-muted">95–98%</td>
+                  <td class="p-4 text-muted">MPPT um pouco melhor que PWM</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">Bateria (LiFePO4)</td>
+                  <td class="p-4 text-muted">95–98%</td>
+                  <td class="p-4 text-muted">Eficiência de ciclo completo</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">Inversor (Senoidal Pura)</td>
+                  <td class="p-4 text-muted">90–95%</td>
+                  <td class="p-4 text-muted">Varia com o nível de carga</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">Perdas de Fiação</td>
+                  <td class="p-4 text-muted">97–99%</td>
+                  <td class="p-4 text-muted">Depende de bitola e comprimento</td>
+                </tr>
+                <tr class="bg-surface-card">
+                  <td class="p-4 font-bold text-primary">Sistema Total (LFP + MPPT + Inversor)</td>
+                  <td class="p-4 font-mono font-bold text-primary">78–90%</td>
+                  <td class="p-4 text-muted">Produto de todas as eficiências</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <p class="text-body-md text-body font-light mt-4">
+          Para um sistema LiFePO4 típico com controlador MPPT e inversor senoidal puro, a eficiência total é de aproximadamente 80–88%. Isso significa que para cada 1.000Wh de energia solar captada, cerca de 800–880Wh chegam às suas cargas CA.
+        </p>
+      </section>
+
+      <section id="common-mistakes">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Erros Comuns</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Ignorar Perdas do Inversor</h4>
+            <p class="text-body-sm text-muted">
+              Uma carga CA de 1.000W exige 1.050–1.111W da bateria com 90–95% de eficiência do inversor. Ignorar essa sobrecarga de 5–15% faz a bateria drenar mais rápido que o calculado.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Assumir 100% de Eficiência da Bateria</h4>
+            <p class="text-body-sm text-muted">
+              Nenhuma bateria é 100% eficiente. Baterias de chumbo-ácido perdem 15–30% da energia de entrada como calor na carga e descarga. Mesmo LiFePO4 perde 2–5%. Inclua sempre a eficiência de ciclo nos cálculos.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Ignorar Perdas de Fiação</h4>
+            <p class="text-body-sm text-muted">
+              Percursos longos com fio subdimensionado causam queda de tensão e perda de potência significativas. Uma queda de 3% significa que 3% da sua energia é desperdiçada como calor nos cabos. Use bitolas adequadas.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Superdimensionar o Inversor</h4>
+            <p class="text-body-sm text-muted">
+              Um inversor superdimensionado operando com 10–20% de carga tem eficiência bem menor que um operando com 50–70%. Adeque o tamanho do inversor à sua faixa típica de carga para melhor eficiência.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <CalculatorCard class="border-m-blue-light">
+        <h4 class="text-label-uppercase text-primary text-xs mb-3">Experimente</h4>
+        <p class="text-body-sm text-muted mb-4">
+          Use a Calculadora de Autonomia com eficiência incluída para estimativas precisas de duração de descarga.
+        </p>
+        <a href="/pt/tools/runtime-calculator/" class="btn-primary text-xs py-3 px-6 inline-block">Abrir Calculadora de Autonomia</a>
+      </CalculatorCard>
+
+      <ReferenceTable
+        title="Eficiência de Ciclo Completo por Química"
+        description="Baixe esta tabela para referência offline"
+        headers={["Química", "Eficiência de Ciclo", "Perda por Ciclo", "Notas"]}
+        rows={[
+          ["LiFePO4", "95–98%", "2–5%", "Melhor disponível — perda mínima de calor"],
+          ["NMC (Lítio)", "92–96%", "4–8%", "Muito boa — resistência interna um pouco maior"],
+          ["AGM (Chumbo-Ácido Selada)", "80–85%", "15–20%", "Moderada — geração significativa de calor"],
+          ["Chumbo-Ácido Inundada", "70–80%", "20–30%", "Mais baixa — efeito Peukert agrava perdas"],
+        ]}
+        source="Battery University / NREL"
+      />
+
+      <ReferenceTable
+        title="Classificações de Eficiência de Inversores"
+        description="Baixe esta tabela para referência offline"
+        headers={["Tipo de Inversor", "Faixa de Eficiência", "Ideal Para"]}
+        rows={[
+          ["Onda Senoidal Pura", "90–95%", "Eletrônicos sensíveis, dispositivos médicos"],
+          ["Onda Senoidal Modificada", "85–90%", "Cargas básicas, ferramentas, iluminação"],
+          ["Inversor Híbrido", "92–97%", "Sistemas solares + bateria"],
+        ]}
+        source="Battery University / NREL"
+      />
+
+      <ReferenceTable
+        title="Detalhamento da Eficiência Total do Sistema"
+        description="Baixe esta tabela para referência offline"
+        headers={["Componente", "Eficiência Típica", "Notas"]}
+        rows={[
+          ["Controlador de Carga Solar (MPPT)", "95–98%", "MPPT um pouco melhor que PWM"],
+          ["Bateria (LiFePO4)", "95–98%", "Eficiência de ciclo completo"],
+          ["Inversor (Senoidal Pura)", "90–95%", "Varia com o nível de carga"],
+          ["Perdas de Fiação", "97–99%", "Depende de bitola e comprimento"],
+          ["Sistema Total (LFP + MPPT + Inversor)", "78–90%", "Produto de todas as eficiências"],
+        ]}
+        source="Battery University / NREL"
+      />
+
+      <FAQSection items={faqItems} />
+
+      <section class="border-t border-hairline pt-12">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Referências</h2>
+        <ul class="flex flex-col gap-2 text-body-sm text-muted">
+          {references.map((ref) => (
+            <li class="flex gap-2">
+              <span class="text-m-blue-light shrink-0">—</span>
+              <a href={ref.url} class="hover:text-primary transition-colors underline underline-offset-2" target="_blank" rel="noopener noreferrer">{ref.title}</a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    </div>
+  </div>
+</Layout>

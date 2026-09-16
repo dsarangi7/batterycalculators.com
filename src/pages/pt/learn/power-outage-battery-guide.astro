@@ -1,0 +1,310 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "Por quanto tempo uma bateria dura durante um apagão?",
+    answer: "A autonomia depende inteiramente da carga consumida. Uma bateria LFP de 10 kWh com 85% de DoD fornece 8,5 kWh utilizáveis. Uma carga crítica de 1.500W funciona por aproximadamente 5,7 horas. Reduzir a carga para 500W estende a autonomia para aproximadamente 17 horas. Quanto menos dispositivos você alimentar, mais a bateria dura.",
+  },
+  {
+    question: "Quais aparelhos devo priorizar durante um apagão?",
+    answer: "Priorize pelo impacto em saúde e segurança: equipamentos médicos (CPAP, concentrador de oxigênio) primeiro, depois refrigeração para evitar perda de alimentos, dispositivos de comunicação (celular, internet), iluminação para segurança e por fim cargas de conforto. Evite aparelhos de alto consumo como fornos elétricos, secadoras e HVAC, a menos que tenha um banco de baterias muito grande.",
+  },
+  {
+    question: "Preciso de chave de transferência para meu backup de bateria?",
+    answer: "Sim. Uma chave de transferência desconecta automaticamente sua casa da rede antes de conectar a energia da bateria. Isso evita realimentação perigosa nas linhas da concessionária, que pode ferir eletricistas e danificar equipamentos. Uma chave de transferência manual é uma opção mais barata, enquanto uma chave automática (ATS) oferece comutação contínua sem intervenção do usuário.",
+  },
+  {
+    question: "Posso ligar meu ar-condicionado na bateria durante um apagão?",
+    answer: "É tecnicamente possível, mas impraticável para a maioria dos sistemas residenciais de bateria. Uma unidade central de ar-condicionado típica consome 2.000–3.500W e funciona 8–12 horas por dia, totalizando 16–42 kWh diários. Isso por si só excede a capacidade da maioria dos sistemas residenciais. Se a climatização for essencial, considere uma unidade portátil de 12.000 BTU (1.200W) ou um mini-split com bateria dedicada menor.",
+  },
+];
+---
+
+<Layout
+  title="Guia de Bateria para Apagões | Calculadoras de Bateria"
+  description="Guia completo para preparar um sistema de backup de bateria para apagões: triagem de cargas críticas, estimativa de autonomia, método de dimensionamento e configuração do sistema para energia de backup confiável."
+  canonical="https://batterycalculators.com/pt/learn/power-outage-battery-guide/"
+  schema="faqPage"
+  schemaName="Guia de Bateria para Apagões"
+  schemaDescription="Guia completo para preparar um sistema de backup de bateria para apagões."
+  schemaUrl="https://batterycalculators.com/pt/learn/power-outage-battery-guide/"
+  faqItems={faqItems}
+  lang="pt"
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/pt/learn/" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Voltar aos Guias</a>
+      <Breadcrumb items={[
+        { label: "Centro de Aprendizagem", href: "/pt/learn/" },
+        { label: "Guia de Bateria para Apagões" },
+      ]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">BACKUP RESIDENCIAL</span>
+      <h1 class="text-display-md text-primary mb-6">Guia de Bateria para Apagões</h1>
+      <p class="text-body-md text-body font-light">
+        Um sistema de bateria para apagões mantém suas cargas elétricas essenciais funcionando quando a rede cai. Este guia cobre a abordagem de engenharia para dimensionar, configurar e operar um sistema de backup de bateria projetado especificamente para resiliência em apagões — da identificação de cargas críticas ao cálculo de autonomia e implantação do sistema.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Entendendo os Padrões de Apagão</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Antes de dimensionar um sistema de backup, estude o histórico de apagões da sua região. Entre em contato com sua concessionária ou consulte dados públicos de interrupções para entender a frequência, a duração típica e as causas. Apagões causados por tempestades em áreas rurais podem durar dias, enquanto falhas urbanas por defeito de equipamento geralmente se resolvem em horas.
+        </p>
+        <p class="text-body-md text-body font-light mb-6">
+          O Departamento de Energia dos EUA informa que o consumidor médio enfrenta aproximadamente 1,5 apagões por ano com duração média de cerca de 7 horas. No entanto, médias enganam — algumas regiões têm interrupções curtas frequentes, enquanto outras enfrentam apagões raros, mas prolongados. Seu sistema de backup deve ser dimensionado para o pior cenário da sua região, não para a média nacional.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Tipo de Apagão</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Duração Típica</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Backup Recomendado</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-primary font-bold">Piscada / momentâneo</td>
+                <td class="p-4 font-mono text-primary">Segundos – 5 minutos</td>
+                <td class="p-4 text-muted">UPS ou bateria pequena (1–3 kWh)</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-primary font-bold">Falha de equipamento</td>
+                <td class="p-4 font-mono text-primary">2 – 8 horas</td>
+                <td class="p-4 text-muted">Bateria média (5–10 kWh)</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-primary font-bold">Tempestade / evento climático</td>
+                <td class="p-4 font-mono text-primary">8 – 48 horas</td>
+                <td class="p-4 text-muted">Bateria grande (10–20 kWh) ou híbrido</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-primary font-bold">Falha prolongada da rede</td>
+                <td class="p-4 font-mono text-primary">2 – 7+ dias</td>
+                <td class="p-4 text-muted">Sistema híbrido de gerador + bateria</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Etapa 1: Criar uma Lista de Cargas Críticas</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Uma lista de cargas críticas é um inventário de todos os dispositivos que você precisa manter alimentados durante um apagão. Categorize as cargas por prioridade: críticas (segurança de vida e preservação de alimentos), importantes (conforto e comunicação) e adiáveis (conveniência). Essa triagem controla o tamanho e o custo da sua bateria — cada carga adicional aumenta a capacidade necessária.
+        </p>
+        <p class="text-body-md text-body font-light mb-6">
+          Percorra sua casa e anote fisicamente cada dispositivo que você gostaria de manter operando. Não esqueça itens de baixa potência que somam no conjunto: detectores de fumaça, luzes externas de segurança, bombas de porão e abridores de porta de garagem. Um detector de fumaça de 5W é desprezível sozinho, mas dez dispositivos de 5W pela casa totalizam 50W funcionando 24h — ou seja, 1,2 kWh por dia só para dispositivos de segurança.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Prioridade</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Dispositivos</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Potência Típica</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Energia Diária</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-primary font-bold">Crítica</td>
+                <td class="p-4 text-muted">Geladeira, dispositivos médicos, carga de celular, detectores de fumaça/CO</td>
+                <td class="p-4 font-mono text-primary">200 – 800W</td>
+                <td class="p-4 font-mono text-primary">3 – 6 kWh</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-primary font-bold">Importante</td>
+                <td class="p-4 text-muted">Iluminação LED, internet, bomba de porão, sistema de segurança</td>
+                <td class="p-4 font-mono text-primary">100 – 500W</td>
+                <td class="p-4 font-mono text-primary">1 – 4 kWh</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-primary font-bold">Adiável</td>
+                <td class="p-4 text-muted">TV, máquina de lavar, porta da garagem, ventiladores de teto</td>
+                <td class="p-4 font-mono text-primary">200 – 1,500W</td>
+                <td class="p-4 font-mono text-primary">1 – 5 kWh</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Etapa 2: Estimar as Necessidades de Autonomia</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Com a lista de cargas pronta, decida quantas horas de backup você precisa. Isso depende da frequência e duração dos apagões na sua região. Um ponto de partida razoável para a maioria das casas é 24 horas de cobertura de cargas críticas — isso cobre apagões noturnos e se estende bem pelo dia seguinte.
+        </p>
+        <p class="text-body-md text-body font-light mb-6">
+          Para áreas propensas a apagões de vários dias, você tem duas estratégias: superdimensionar a bateria para 48–72 horas apenas de cargas críticas, ou combinar uma bateria moderada com um gerador. A abordagem híbrida é mais econômica porque o gerador oferece autonomia ilimitada enquanto houver combustível, enquanto as baterias fornecem energia silenciosa e instantânea nas primeiras 12–24 horas.
+        </p>
+      </section>
+
+      <FormulaBox title="Fórmulas de Estimativa de Autonomia">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Autonomia (horas) = (Capacidade da Bateria (Wh) × DoD × Eficiência do Inversor) / Potência da Carga (W)
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Bateria Necessária (Wh) = Potência da Carga (W) × Horas Desejadas / (DoD × Eficiência do Inversor)
+        </div>
+        <p>
+          A profundidade de descarga (DoD) representa a fração utilizável da capacidade total da bateria. Baterias LFP são normalmente classificadas com 85% de DoD. A eficiência do inversor considera as perdas de conversão DC-CA, geralmente 90–95%. Juntos, esses fatores significam que você precisa de aproximadamente 1,2–1,3× sua necessidade bruta de energia em capacidade total de bateria.
+        </p>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Exemplo Resolvido: Backup Crítico de 24 Horas</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Cenário:</strong> Casa de família, backup de 24 horas para cargas críticas em sistema LFP 48V.</p>
+            <p><strong>Lista de cargas críticas:</strong></p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li>Geladeira: 200W × 10h de operação = 2,000 Wh</li>
+              <li>Luzes LED (4 cômodos): 60W × 6h = 360 Wh</li>
+              <li>Modem de internet: 20W × 24h = 480 Wh</li>
+              <li>Carga de celular: 30W × 4h = 120 Wh</li>
+              <li>Dispositivo médico (CPAP): 40W × 8h = 320 Wh</li>
+              <li>Detectores de fumaça/CO: 10W × 24h = 240 Wh</li>
+            </ul>
+            <p class="pt-2 border-t border-hairline"><strong>Carga crítica total:</strong> <span class="font-mono text-primary">3,520 Wh/dia (3.52 kWh)</span></p>
+            <p><strong>Dimensionamento da bateria:</strong></p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              3,520 / (0.85 × 0.92) = 4,513 Wh ≈ 4.5 kWh
+            </div>
+            <p><strong>A 48V:</strong></p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              4,513 Wh / 48V = 94 Ah
+            </div>
+            <p><strong>Recomendação:</strong> Uma única bateria LFP 48V 100Ah (5,12 kWh) oferece capacidade suficiente com 13% de margem para envelhecimento e redução por temperatura. Para mais resiliência, duas unidades 48V 50Ah em paralelo oferecem redundância — se uma unidade falhar, a outra ainda alimenta cargas críticas por cerca de 14 horas.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Etapa 3: Configuração do Sistema</h2>
+        <p class="text-body-md text-body font-light mb-6">
+          Um sistema de backup para apagões exige quatro componentes principais: o banco de baterias, um inversor, um controlador de carga (se carregado por solar) e uma chave de transferência. A bateria armazena energia, o inversor converte DC em CA, o controlador de carga gerencia o carregamento e a chave de transferência isola sua casa da rede durante um apagão. Cada componente deve ser dimensionado para as cargas e a tensão de bateria escolhidas.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Banco de Baterias</h4>
+            <p class="text-body-sm text-muted">
+              A química LFP (LiFePO4) é o padrão para backup em apagões. Oferece 85% de profundidade de descarga utilizável, vida útil de 3.000+ ciclos e estabilidade térmica sem resfriamento ativo. Dimensione com base na fórmula acima.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Inversor</h4>
+            <p class="text-body-sm text-muted">
+              Deve suportar o pico simultâneo de carga de todos os circuitos críticos. Para a maioria das casas, um inversor de onda senoidal pura de 3.000–5.000W cobre as cargas essenciais. Garanta que o inversor suporte a tensão da sua bateria (12V, 24V ou 48V).
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Chave de Transferência</h4>
+            <p class="text-body-sm text-muted">
+              Essencial para a segurança. Desconecta da rede antes de conectar a energia da bateria. Uma chave de transferência automática (ATS) oferece comutação contínua. Chaves manuais são mais baratas, mas exigem que você esteja em casa.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Controlador de Carga</h4>
+            <p class="text-body-sm text-muted">
+              Necessário se adicionar painéis solares para recarregar a bateria durante apagões prolongados. Controladores MPPT maximizam a captação solar. Não é necessário se carregar exclusivamente da rede elétrica.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Autonomia por Tamanho de Bateria</h2>
+        <p class="text-body-md text-body font-light mb-6">
+          A tabela a seguir mostra a autonomia estimada para diferentes capacidades de bateria em vários níveis de carga crítica. Todos os valores assumem química LFP (85% de DoD) com inversor de 92% de eficiência. Use como referência rápida ao decidir entre tamanhos de bateria.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Tamanho da Bateria</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Carga de 1,000W</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Carga de 2,000W</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Carga de 3,000W</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">5 kWh</td>
+                <td class="p-4 font-mono text-primary">3.9 hrs</td>
+                <td class="p-4 font-mono text-primary">1.9 hrs</td>
+                <td class="p-4 font-mono text-primary">1.3 hrs</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">10 kWh</td>
+                <td class="p-4 font-mono text-primary">7.8 hrs</td>
+                <td class="p-4 font-mono text-primary">3.9 hrs</td>
+                <td class="p-4 font-mono text-primary">2.6 hrs</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">15 kWh</td>
+                <td class="p-4 font-mono text-primary">11.7 hrs</td>
+                <td class="p-4 font-mono text-primary">5.9 hrs</td>
+                <td class="p-4 font-mono text-primary">3.9 hrs</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">20 kWh</td>
+                <td class="p-4 font-mono text-primary">15.6 hrs</td>
+                <td class="p-4 font-mono text-primary">7.8 hrs</td>
+                <td class="p-4 font-mono text-primary">5.2 hrs</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Experimente</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use a Calculadora de Backup Residencial para dimensionar um sistema completo de backup para apagões com base em suas cargas críticas e autonomia desejada.
+          </p>
+          <a href="/pt/tools/home-backup-battery-calculator/" class="btn-primary text-xs py-3 px-6 inline-block">Abrir Calculadora de Backup Residencial</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Ferramenta Relacionada</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Calcule a autonomia exata do seu sistema de baterias configurado em diferentes níveis de carga com a Calculadora de Autonomia.
+          </p>
+          <a href="/pt/tools/runtime-calculator/" class="btn-primary-outline text-xs py-3 px-6 inline-block">Abrir Calculadora de Autonomia</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Artigos Relacionados</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <a href="/pt/learn/home-battery-backup-planning/" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors mb-2 block">
+              Planejamento de Backup Residencial de Bateria
+            </a>
+            <p class="text-body-sm text-muted">
+              Um passo a passo para planejar um sistema completo de backup residencial de bateria, da identificação de cargas à configuração final.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <a href="/pt/learn/generator-vs-battery-backup/" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors mb-2 block">
+              Gerador vs Backup de Bateria
+            </a>
+            <p class="text-body-sm text-muted">
+              Compara os pontos fortes e fracos de geradores versus baterias para energia de backup, incluindo estratégias de sistemas híbridos.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

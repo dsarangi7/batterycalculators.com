@@ -1,0 +1,208 @@
+---
+import ArticleLayout from '../../../layouts/ArticleLayout.astro';
+import TroubleshootingBlock from '../../../components/TroubleshootingBlock.astro';
+
+const relatedCalculators = [
+  { title: 'Calculadora de Bateria com Inversor', href: '/pt/tools/inverter-battery-calculator/', type: 'calculator' as const },
+  { title: 'Calculadora de Autonomia', href: '/pt/tools/runtime-calculator/', type: 'calculator' as const },
+  { title: 'Calculadora de Queda de Tensão', href: '/pt/tools/voltage-drop-calculator/', type: 'calculator' as const },
+  { title: 'Calculadora de Perda em Cabos DC', href: '/pt/tools/dc-cable-loss-calculator/', type: 'calculator' as const },
+];
+
+const relatedGuides = [
+  { title: 'Guia de Autonomia de Bateria com Inversor', href: '/pt/learn/inverter-battery-runtime-guide/', type: 'guide' as const },
+  { title: 'Autonomia 12V vs 24V vs 48V', href: '/pt/learn/12v-vs-24v-vs-48v-runtime/', type: 'guide' as const },
+  { title: 'Queda de Tensão Explicada', href: '/pt/learn/voltage-drop-explained/', type: 'guide' as const },
+];
+
+const faqItems = [
+  {
+    question: 'Por que meu inversor desliga quando o ar-condicionado liga?',
+    answer: 'Aparelhos de ar-condicionado e motores drenam 3–5× sua corrente nominal durante a partida (corrente de rotor bloqueado). Esse surto pode exceder a potência de pico do inversor, acionando a proteção contra sobrecarga. Um aparelho de 1500W pode drenar 4500–7500W momentaneamente. Dimensione o inversor para suportar surtos de partida ou use um dispositivo soft-start no compressor para limitar a corrente de partida.',
+  },
+  {
+    question: 'Como sei se os cabos da minha bateria estão subdimensionados?',
+    answer: 'Meça a queda de tensão entre os terminais da bateria e os terminais do inversor sob carga total. Uma queda maior que 0,5V em um sistema de 12V (4%) indica cabos subdimensionados. Para uma carga de 2000W a 12V, a corrente é de ~167A, exigindo no mínimo cabos de cobre 2/0 AWG. Use a Calculadora de Queda de Tensão para determinar a bitola correta para seu comprimento de cabo e corrente.',
+  },
+  {
+    question: 'Uma falha de aterramento pode fazer meu inversor desligar?',
+    answer: 'Sim. Inversores têm proteção integrada contra falha de aterramento (GFP) que desconecta a saída se a fuga de corrente para o terra exceder o limite (normalmente 5–30mA para proteção pessoal). Causas comuns incluem conexões úmidas, isolamento danificado ou umidade dentro do gabinete. Teste desconectando as cargas CA uma de cada vez para identificar o circuito com defeito.',
+  },
+  {
+    question: 'O que significa corte por baixa tensão da bateria?',
+    answer: 'O inversor tem um limite mínimo de tensão de entrada (normalmente 10,5V para sistemas 12V, 21V para 24V, 42V para 48V). Quando a tensão cai abaixo desse limite sob carga, o inversor desliga para evitar dano por descarga profunda. Se o inversor desligar prematuramente, verifique o nível de carga, as conexões e a saúde da bateria.',
+  },
+  {
+    question: 'Por que meu inversor superaquece e desliga?',
+    answer: 'Inversores convertem CC em CA com 85–95% de eficiência, ou seja, 5–15% da potência é perdida como calor. Se a ventilação for inadequada, a temperatura ambiente for alta ou o inversor operar perto da capacidade máxima por longos períodos, a temperatura interna excede o corte térmico (normalmente 70–85°C). Garanta pelo menos 15cm de folga em todos os lados e opere em área bem ventilada.',
+  },
+  {
+    question: 'Como evito o desligamento do inversor durante uso prolongado?',
+    answer: 'Três estratégias principais: (1) dimensione o inversor para que sua carga típica seja 50–75% da capacidade nominal para eficiência ideal, (2) garanta ventilação adequada e mantenha a temperatura ambiente abaixo de 35°C, (3) use cabos de bateria bem dimensionados para minimizar a queda de tensão. Além disso, evite operar o inversor a 100% da capacidade por longos períodos — reduza 20% para operação contínua.',
+  },
+];
+---
+
+<ArticleLayout
+  title="Desligamento do Inversor — Guia de Solução de Problemas | Calculadoras de Bateria"
+  description="Descubra por que seu inversor continua desligando durante o uso. Solucione tensão baixa da bateria, sobrecarga, superaquecimento, problemas de fiação e falhas de aterramento com listas de verificação passo a passo."
+  canonical="https://batterycalculators.com/pt/troubleshooting/inverter-shutdown/"
+  category="SOLUÇÃO DE PROBLEMAS"
+  breadcrumbItems={[{ label: 'Desligamento do Inversor' }]}
+  relatedCalculators={relatedCalculators}
+  relatedGuides={relatedGuides}
+  faqItems={faqItems}
+  lang="pt"
+>
+  <p class="text-body-md text-body font-light mb-8">
+    Um inversor que desliga no meio da operação pode deixá-lo sem energia no pior momento possível. Desligamentos são a resposta de proteção do inversor a condições inseguras — entender qual condição está acionando o corte é o primeiro passo para uma correção permanente. Este guia aborda as cinco causas mais comuns de desligamento com procedimentos de diagnóstico.
+  </p>
+
+  <TroubleshootingBlock
+    lang="pt"
+    problem="Tensão Baixa da Bateria — Inversor Corta Abaixo do Limite de Tensão"
+    causes={[
+      'SOC da bateria genuinamente esgotado sob carga',
+      'Queda de tensão por alta resistência interna sob carga pesada',
+      'Banco de baterias subdimensionado não sustenta a corrente da carga',
+      'Conexões frouxas ou corroídas causando queda de tensão',
+      'Desconexão de baixa tensão do BMS ativando antes do corte do inversor',
+    ]}
+    explanation="Quando um inversor drena corrente da bateria, a tensão dos terminais cai proporcionalmente à carga e à resistência interna: V_carga = V_aberto - (I × R_interna). Uma bateria a 12,6V em repouso pode cair para 11,5V sob carga de 100A se a resistência interna for 0,011Ω. Se o corte de baixa tensão do inversor estiver em 10,5V, a bateria deve manter pelo menos 10,5V na corrente de carga esperada. Uma bateria com alta resistência interna (por envelhecimento, frio ou subdimensionamento) atingirá esse limite prematuramente, fazendo o inversor desligar mesmo que a bateria não esteja realmente vazia. Essa é a causa mais comum de desligamento em sistemas solares e de backup."
+    checklist={[
+      'Verifique o SOC com um monitor shunt ou voltímetro em repouso',
+      'Meça a tensão da bateria sob carga nos terminais de entrada do inversor',
+      'Se a tensão sob carga cair abaixo do corte do inversor, o problema é bateria ou cabos',
+      'Compare a tensão sob carga nos terminais da bateria vs. nos terminais do inversor',
+      'Se a diferença for >0,5V, a resistência dos cabos é alta demais',
+      'Verifique a resistência interna da bateria, se mensurável',
+      'Confirme se o limite de baixa tensão do BMS está abaixo do corte do inversor',
+    ]}
+    solutions={[
+      'Adicione baterias em paralelo para aumentar a capacidade total e reduzir a corrente por célula',
+      'Migre para baterias de menor resistência interna (lítio vs. chumbo-ácido)',
+      'Encurte o cabo bateria-inversor ou aumente a bitola',
+      'Limpe e aperte todas as conexões dos terminais',
+      'Configure o corte de baixa tensão do inversor 0,5V acima do corte do BMS',
+      'Reduza a carga ou use menos aparelhos simultaneamente',
+    ]}
+  />
+
+  <TroubleshootingBlock
+    lang="pt"
+    problem="Sobrecarga — Carga Conectada Excede a Capacidade Nominal do Inversor"
+    causes={[
+      'Carga contínua total excede a potência contínua nominal do inversor',
+      'Surto de partida de aparelhos com motor excede a potência de pico',
+      'Múltiplos aparelhos de alto consumo operando simultaneamente',
+      'Especificação de potência do aparelho imprecisa ou enganosa',
+      'Potência contínua nominal do inversor otimista (não é RMS real)',
+    ]}
+    explanation="Inversores têm potências nominais contínua e de pico. Um inversor de 2000W pode sustentar apenas 1600W continuamente (ciclo de 80%) e suportar 4000W de pico por <1 segundo. Quando a carga excede a potência contínua, a proteção térmica e de corrente ativa e desliga a saída. Aparelhos com motor (geladeiras, ar-condicionado, ferramentas) têm corrente de rotor bloqueado (LRA) de 3–7× a potência em regime durante a partida. Uma geladeira de 500W pode drenar 1500–3500W por 1–3 segundos na partida. Se o inversor não suportar esse surto, ele aciona a proteção de sobrecarga. Calcule a carga total somando todos os aparelhos que operam simultaneamente mais 20% de margem de segurança."
+    checklist={[
+      'Liste todos os aparelhos conectados com suas potências nominais',
+      'Some a potência contínua de todas as cargas simultâneas',
+      'Verifique a potência contínua nominal do inversor (não a de pico)',
+      'Identifique cargas com motor e alto surto de partida',
+      'Confirme o limite de sobrecarga e as configurações de alarme',
+      'Teste com cargas desconectadas, adicionando uma de cada vez para achar o culpado',
+    ]}
+    solutions={[
+      'Reduza a carga simultânea para abaixo da potência contínua nominal',
+      'Escalone a partida de aparelhos com motor (não ligue todos de uma vez)',
+      'Instale dispositivos soft-start em aparelhos de alto surto',
+      'Atualize para um inversor de maior potência se a carga não puder ser reduzida',
+      'Use a Calculadora de Bateria com Inversor para verificar o dimensionamento',
+    ]}
+  />
+
+  <TroubleshootingBlock
+    lang="pt"
+    problem="Superaquecimento — Proteção Térmica Desliga o Inversor"
+    causes={[
+      'Ventilação inadequada ao redor do gabinete do inversor',
+      'Temperatura ambiente excede a faixa de operação do inversor',
+      'Inversor operando na capacidade máxima ou perto dela por período prolongado',
+      'Poeira ou detritos bloqueando saídas de ar ou ventiladores',
+      'Inversor montado em espaço fechado sem fluxo de ar',
+    ]}
+    explanation="Inversores dissipam calor significativo na conversão CC-CA. Um inversor de 2000W a 90% de eficiência gera aproximadamente 200W de calor — equivalente a uma lâmpada ligada continuamente dentro do gabinete. Sem ventilação adequada, esse calor se acumula e eleva as temperaturas internas acima do limite de desligamento térmico (normalmente 70–85°C para MOSFETs, 100–120°C para transformadores). A proteção térmica é um recurso crítico de segurança que evita incêndio e dano aos componentes. Inversores são mais eficientes com 50–80% de carga; operar com 90–100% gera proporcionalmente mais calor e reduz a margem de gerenciamento térmico."
+    checklist={[
+      'Verifique a temperatura da superfície do inversor com termômetro infravermelho',
+      'Garanta pelo menos 15cm de folga em todos os lados para fluxo de ar',
+      'Inspecione os ventiladores (devem girar quando o inversor esquenta)',
+      'Limpe a poeira das aberturas de ventilação e pás do ventilador',
+      'Verifique a temperatura ambiente — deve estar abaixo de 40°C para a maioria dos inversores',
+      'Garanta que o inversor não esteja montado perto de outras fontes de calor',
+      'Monitore o tempo até o desligamento térmico para identificar o limite de carga',
+    ]}
+    solutions={[
+      'Mude o inversor para área bem ventilada com fluxo de ar ambiente',
+      'Instale ventiladores adicionais para forçar ar pelo gabinete',
+      'Reduza a carga para 70–80% da capacidade nominal em operação contínua',
+      'Limpe regularmente as aberturas de ventilação e filtros',
+      'Monte o inversor na vertical para melhorar a convecção natural',
+      'Use a Calculadora de Autonomia para estimar a duração segura de operação na sua carga',
+    ]}
+  />
+
+  <TroubleshootingBlock
+    lang="pt"
+    problem="Problemas de Fiação — Queda de Tensão e Conexões de Alta Resistência"
+    causes={[
+      'Cabos bateria-inversor longos ou finos demais para a corrente',
+      'Conexões frouxas ou corroídas nos terminais',
+      'Conectores de baixa qualidade com alta resistência de contato',
+      'Fusível ou disjuntor subdimensionado adicionando resistência ao circuito',
+      'Múltiplas emendas ou pontos de junção no circuito',
+    ]}
+    explanation="O circuito CC entre bateria e inversor carrega toda a corrente da carga em baixa tensão, tornando-o extremamente sensível à resistência. A 12V, uma carga de 2000W drena 167A — mesmo 0,01Ω de resistência do cabo causa 1,67V de queda (13,9% da tensão do sistema). Essa queda tem dois efeitos: (1) o inversor recebe menos tensão, acionando o corte de baixa tensão, e (2) a resistência dissipa potência como calor (I²R = 278W para 0,01Ω a 167A), o que pode derreter o isolamento e iniciar incêndios. A NEC recomenda no máximo 3% de queda de tensão para circuitos. Para um sistema de 12V, isso significa que a resistência total da bateria ao inversor deve ser menor que 0,002Ω."
+    checklist={[
+      'Meça a tensão nos terminais da bateria sob carga total',
+      'Meça a tensão nos terminais de entrada do inversor sob carga total',
+      'Calcule a queda: V_bateria - V_inversor = ΔV',
+      'Queda aceitável é <0,36V para 12V (3%) ou <0,72V para 24V',
+      'Verifique o aperto e a corrosão de todas as conexões',
+      'Inspecione as conexões do fusível/disjuntor e a resistência de contato',
+      'Confirme se a bitola suporta a corrente da sua aplicação',
+    ]}
+    solutions={[
+      'Aumente a bitola: use a Calculadora de Queda de Tensão para seu comprimento e corrente',
+      'Encurte o cabo entre bateria e inversor, se possível',
+      'Limpe todas as conexões com escova de arame e aplique graxa dielétrica',
+      'Substitua porta-fusíveis corroídos por modelos robustos aparafusados',
+      'Elimine emendas desnecessárias — use cabos contínuos quando possível',
+      'Use terminais de cobre crimpados com crimpador hidráulico para conexões confiáveis',
+    ]}
+  />
+
+  <TroubleshootingBlock
+    lang="pt"
+    problem="Falha de Aterramento — DR ou Proteção de Terra Desarmando"
+    causes={[
+      'Entrada de umidade em conexões ou plugues de aparelhos',
+      'Isolamento de cabo danificado expondo condutor vivo ao terra',
+      'Aparelho molhado ou local úmido causando corrente de fuga',
+      'Falha interna de aterramento por defeito de componente',
+      'Fiação de aterramento incorreta criando caminhos paralelos',
+    ]}
+    explanation="A proteção contra falha de aterramento monitora o equilíbrio entre os condutores fase e neutro. Se houver fuga de corrente para o terra (por isolamento danificado, conexões úmidas ou aparelhos defeituosos), o DR detecta o desequilíbrio e desconecta a saída. O limite é normalmente 5–30mA para proteção pessoal. Em sistemas solares/bateria, falhas de terra também podem ocorrer no lado CC — uma falha entre o positivo da bateria e o chassi aterrado cria um caminho perigoso de alta corrente. Indicadores de falha de terra do inversor podem piscar um código de erro específico. A falha deve ser identificada e corrigida antes que o inversor reinicie com segurança — reiniciar sem achar a falha cria riscos de choque e incêndio."
+    checklist={[
+      'Verifique a luz indicadora do DR ou o display de código de erro',
+      'Desconecte todas as cargas CA e rearme o DR — se segurar, uma carga está com defeito',
+      'Teste cada carga individualmente reconectando uma de cada vez',
+      'Inspecione a fiação CA por danos, umidade ou isolamento desgastado',
+      'Verifique o lado CC: meça a tensão entre o positivo da bateria e o terra',
+      'Confirme o aterramento correto do chassi do inversor e da tomada CA',
+      'Use um megômetro para testar a resistência de isolamento da fiação',
+    ]}
+    solutions={[
+      'Seque todas as conexões e gabinetes antes de rearmar o DR',
+      'Substitua cabos ou cordões danificados causando a falha',
+      'Garanta que todas as conexões externas estejam em caixas à prova de intempéries',
+      'Peça a um eletricista qualificado para verificar o aterramento conforme a norma local',
+      'Se o DR desarmar com todas as cargas desconectadas, entre em contato com o fabricante',
+      'Instale proteção DR em circuitos individuais para isolar falhas rapidamente',
+    ]}
+  />
+</ArticleLayout>

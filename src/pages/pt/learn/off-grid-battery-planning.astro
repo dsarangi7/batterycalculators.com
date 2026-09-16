@@ -1,0 +1,378 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "Qual tamanho de bateria preciso para viver off-grid?",
+    answer: "Para uma cabana off-grid típica que consome 5–10 kWh/dia, você precisa de 15–50 kWh de armazenamento utilizável em bateria LFP (assumindo 2–3 dias de autonomia). O tamanho exato depende do seu consumo, do clima e de ter ou não um gerador de backup. Use: Capacidade Necessária = Consumo Diário × Dias de Autonomia / (DoD × Eficiência).",
+  },
+  {
+    question: "Quantos painéis solares preciso para baterias off-grid?",
+    answer: "Seu arranjo solar deve gerar energia diária suficiente para alimentar suas cargas e recarregar a bateria. Para um sistema de 5 kWh/dia com 5 horas de sol pleno, você precisa de pelo menos um arranjo de 1.200W. Superdimensione em 30–50% para sistemas off-grid para considerar dias nublados e variação sazonal.",
+  },
+  {
+    question: "Posso usar gerador com baterias solares off-grid?",
+    answer: "Sim, e é recomendado. Um gerador de backup (propano ou diesel) fornece energia de recarga durante períodos prolongados de nublado, reduzindo o tamanho necessário da bateria. Muitos inversores off-grid incluem entrada para gerador que liga o gerador automaticamente quando o SOC da bateria cai abaixo de um limite.",
+  },
+  {
+    question: "Qual é o maior risco no dimensionamento de bateria off-grid?",
+    answer: "Subdimensionar o banco de baterias. Em um sistema off-grid não há reserva da rede — se a bateria esvaziar, você fica sem energia. O subdimensionamento leva à ciclagem profunda crônica, degradação acelerada e eventual falha do sistema durante períodos prolongados de nublado. Superdimensione 30–50% além dos cálculos mínimos.",
+  },
+];
+---
+
+<Layout
+  title="Planejamento de Bateria Off-Grid | Calculadoras de Bateria"
+  description="Guia completo para planejar um sistema de bateria off-grid: análise de cargas, dimensionamento de autonomia, carregamento solar e seleção de bateria. Inclui exemplo resolvido para uma cabana de 5 kWh/dia."
+  canonical="https://batterycalculators.com/pt/learn/off-grid-battery-planning/"
+  schema="faqPage"
+  schemaName="Planejamento de Bateria Off-Grid"
+  schemaDescription="Guia de engenharia para planejar e dimensionar sistemas de bateria para instalações solares off-grid."
+  schemaUrl="https://batterycalculators.com/pt/learn/off-grid-battery-planning/"
+  faqItems={faqItems}
+  lang="pt"
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/pt/learn/" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Voltar aos Guias</a>
+      <Breadcrumb items={[
+        { label: "Centro de Aprendizagem", href: "/pt/learn/" },
+        { label: "Planejamento de Bateria Off-Grid" }
+      ]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">SOLAR</span>
+      <h1 class="text-display-md text-primary mb-6">Planejamento de Bateria Off-Grid</h1>
+      <p class="text-body-md text-body font-light">
+        Sistemas de bateria off-grid são a espinha dorsal de instalações solares autossuficientes. Sem conexão com a rede como reserva, seu banco de baterias deve armazenar energia suficiente para alimentar todas as cargas durante a noite e sobreviver a períodos nublados de vários dias. Este guia cobre o processo completo de engenharia — da análise de cargas à seleção de bateria e dimensionamento da recarga solar.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Por Que o Dimensionamento Off-Grid É Diferente</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Sistemas de backup conectados à rede podem ser conservadores porque a rede oferece um reservatório ilimitado de energia durante a operação normal. Sistemas off-grid não têm essa rede de segurança. Cada watt-hora deve vir do arranjo solar e passar pela bateria antes de chegar às suas cargas. Isso cria três desafios distintos de projeto:
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Sem Reserva</h4>
+            <p class="text-body-sm text-muted">
+              Se a bateria esvaziar, você fica com zero energia. Não há concessionária para alternar. A bateria deve ser dimensionada para os piores cenários, não para médias.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Dependência da Recarga Solar</h4>
+            <p class="text-body-sm text-muted">
+              O arranjo solar deve recarregar totalmente a bateria a cada dia. Um arranjo subdimensionado leva a subcarga crônica, perda de capacidade e eventual falha do sistema.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Variação Sazonal</h4>
+            <p class="text-body-sm text-muted">
+              As horas de sol no inverno são 30–50% menores que no verão. Sistemas off-grid devem ser dimensionados para a pior estação, não para a melhor. Isso muitas vezes dobra a capacidade necessária de arranjo e bateria.
+            </p>
+          </CalculatorCard>
+        </div>
+        <p class="text-body-md text-body font-light">
+          Essas restrições tornam o planejamento de bateria off-grid um exercício de engenharia mais rigoroso que o dimensionamento de backup conectado à rede. A margem de erro é menor e as consequências do subdimensionamento são mais graves.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Etapa 1: Auditoria Completa de Cargas</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Comece com uma auditoria exaustiva de cargas. Todo dispositivo que consome energia da bateria deve ser catalogado. Para cada aparelho, registre a potência nominal em watts e o tempo diário estimado de operação em horas. Multiplique para obter watt-horas por dia.
+        </p>
+        <p class="text-body-md text-body font-light mb-4">
+          Considere este exemplo para uma cabana remota:
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden mb-4">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Aparelho</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Potência (W)</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Horas/Dia</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Wh/Dia</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">Geladeira (eficiente)</td>
+                <td class="p-4 font-mono text-primary">100</td>
+                <td class="p-4 font-mono text-primary">8</td>
+                <td class="p-4 font-mono text-primary">800</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Iluminação LED (6 luminárias)</td>
+                <td class="p-4 font-mono text-primary">48</td>
+                <td class="p-4 font-mono text-primary">5</td>
+                <td class="p-4 font-mono text-primary">240</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Bomba de Água</td>
+                <td class="p-4 font-mono text-primary">200</td>
+                <td class="p-4 font-mono text-primary">1</td>
+                <td class="p-4 font-mono text-primary">200</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Internet + Roteador</td>
+                <td class="p-4 font-mono text-primary">15</td>
+                <td class="p-4 font-mono text-primary">24</td>
+                <td class="p-4 font-mono text-primary">360</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Notebook</td>
+                <td class="p-4 font-mono text-primary">65</td>
+                <td class="p-4 font-mono text-primary">4</td>
+                <td class="p-4 font-mono text-primary">260</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Ventilador de Teto</td>
+                <td class="p-4 font-mono text-primary">75</td>
+                <td class="p-4 font-mono text-primary">8</td>
+                <td class="p-4 font-mono text-primary">600</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">TV Pequena</td>
+                <td class="p-4 font-mono text-primary">60</td>
+                <td class="p-4 font-mono text-primary">3</td>
+                <td class="p-4 font-mono text-primary">180</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Carga de Celular</td>
+                <td class="p-4 font-mono text-primary">10</td>
+                <td class="p-4 font-mono text-primary">3</td>
+                <td class="p-4 font-mono text-primary">30</td>
+              </tr>
+              <tr class="bg-surface-card">
+                <td class="p-4 font-bold text-primary" colspan="3">Consumo Diário Total</td>
+                <td class="p-4 font-mono font-bold text-primary">2,670 Wh</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-body-md text-body font-light">
+          Esta cabana consome aproximadamente 2.700 Wh (2,7 kWh) por dia. Note que isso é modesto — a maioria das cabanas off-grid fica na faixa de 3–8 kWh/dia. Eletrodomésticos eficientes e iluminação LED mantêm o consumo gerenciável.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Etapa 2: Escolher os Dias de Autonomia</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Os dias de autonomia determinam por quantos dias consecutivos a bateria deve alimentar as cargas sem nenhuma entrada solar. Para sistemas off-grid, este é o parâmetro de dimensionamento mais crítico.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Autonomia</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Quando Usar</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Compromisso</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">2 dias</td>
+                <td class="p-4 text-muted">Climas ensolarados, gerador de backup disponível</td>
+                <td class="p-4 text-muted">Menor custo, gerador cobre lacunas</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">3 dias</td>
+                <td class="p-4 text-muted">Off-grid padrão, clima moderado</td>
+                <td class="p-4 text-muted">Custo e resiliência equilibrados</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">5 dias</td>
+                <td class="p-4 text-muted">Regiões nubladas, sem gerador, cargas críticas</td>
+                <td class="p-4 text-muted">Maior custo, resiliência máxima</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-body-md text-body font-light mt-4">
+          Um gerador de backup reduz drasticamente a autonomia necessária. Com gerador, dois dias de armazenamento em bateria são suficientes para a maioria dos locais. Sem ele, três a cinco dias oferecem a margem necessária para sobreviver a eventos climáticos prolongados.
+        </p>
+      </section>
+
+      <FormulaBox title="Fórmulas de Dimensionamento de Bateria Off-Grid">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Capacidade Necessária (Wh) = Consumo Diário (Wh) × Dias de Autonomia / (DoD × Eficiência)
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Arranjo Solar Mínimo (W) = Consumo Diário (Wh) / Horas de Sol Pleno
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Arranjo Recomendado = Arranjo Mínimo × 1.3 a 1.5 (fator de superdimensionamento)
+        </div>
+        <p>
+          O fator de superdimensionamento para arranjos off-grid é de 30–50% (maior que em sistemas conectados à rede) porque não há rede para complementar em dias nublados. Isso garante que a bateria recarregue totalmente mesmo em condições abaixo do ideal.
+        </p>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Exemplo Resolvido: Cabana Off-Grid, 5 kWh/dia</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Dados:</strong></p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li>Consumo diário: 5,000 Wh (5 kWh)</li>
+              <li>Autonomia: 3 dias (sem gerador de backup)</li>
+              <li>Química da bateria: LFP com 85% de DoD</li>
+              <li>Eficiência do sistema: 92%</li>
+              <li>Tensão do sistema: 48V</li>
+              <li>Horas de sol pleno: 5 (média de verão)</li>
+            </ul>
+            <p><strong>Etapa 1:</strong> Calcular a capacidade necessária da bateria:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              5,000 Wh × 3 / (0.85 × 0.92) = 15,000 / 0.782 = 19,182 Wh
+            </div>
+            <p><strong>Etapa 2:</strong> Converter para Ah a 48V:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              19,182 Wh / 48V = 399.6 Ah → arredondar para 400 Ah
+            </div>
+            <p><strong>Etapa 3:</strong> Calcular o arranjo solar mínimo:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              5,000 Wh / 5 h = 1,000 W mínimo
+            </div>
+            <p><strong>Etapa 4:</strong> Aplicar fator de superdimensionamento (1.4):</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              1,000 W × 1.4 = 1,400 W de arranjo recomendado
+            </div>
+            <p class="text-muted mt-2">Esta cabana off-grid precisa de um <strong>banco de baterias LFP 48V 400Ah (19,2 kWh nominais)</strong> e um <strong>arranjo solar de 1.400W</strong>. A bateria oferece 3 dias de autonomia total, e o arranjo superdimensionado a recarrega em aproximadamente 4,3 horas de sol pleno — deixando margem para dias nublados.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Etapa 3: Dimensionar o Arranjo Solar para Recarga</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          O arranjo solar deve gerar energia suficiente a cada dia para alimentar as cargas diurnas e recarregar totalmente a bateria para o uso noturno. Para sistemas off-grid, o arranjo é dimensionado para as piores condições solares, não para as médias.
+        </p>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-4">
+          Produção Diária do Arranjo (Wh) = Potência do Arranjo (W) × Horas de Sol Pleno × Eficiência do Sistema
+        </div>
+        <p class="text-body-md text-body font-light mb-4">
+          O arranjo deve produzir pelo menos seu consumo diário mais as perdas. Para nossa cabana de 5 kWh/dia com 5 horas de sol pleno e 92% de eficiência de carga, o arranjo mínimo é 5,000 / (5 × 0.92) = 1,087W. Superdimensionar para 1,400–1,500W oferece a margem de dias nublados essencial para a confiabilidade off-grid.
+        </p>
+        <p class="text-body-md text-body font-light">
+          A produção de inverno é tipicamente 40–60% da produção de verão dependendo da latitude. Se seu sistema deve manter autonomia o ano todo, dimensione o arranjo para as horas de sol pleno de inverno. Na latitude de 40°N, as horas de sol pleno de inverno podem ser 2,5–3,0, exigindo um arranjo proporcionalmente maior.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Opções de Configuração de Bateria</h2>
+        <div class="bg-surface-soft border border-hairline overflow-hidden mb-4">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Configuração</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Módulos</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Capacidade Total</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Ideal Para</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">4S2P (48V)</td>
+                <td class="p-4 text-muted">8 × 12V 100Ah</td>
+                <td class="p-4 font-mono text-primary">9.6 kWh</td>
+                <td class="p-4 text-muted">Cabanas pequenas (2–3 kWh/dia)</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">4S4P (48V)</td>
+                <td class="p-4 text-muted">16 × 12V 100Ah</td>
+                <td class="p-4 font-mono text-primary">19.2 kWh</td>
+                <td class="p-4 text-muted">Cabanas médias (4–6 kWh/dia)</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">Rack 48V</td>
+                <td class="p-4 text-muted">4 × 48V 100Ah</td>
+                <td class="p-4 font-mono text-primary">20.5 kWh</td>
+                <td class="p-4 text-muted">Residências off-grid padrão</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">Sistema em rack de servidor</td>
+                <td class="p-4 text-muted">1 × rack 48V 400Ah</td>
+                <td class="p-4 font-mono text-primary">20.5 kWh</td>
+                <td class="p-4 text-muted">Soluções integradas, simplicidade</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Lista de Verificação do Projeto Off-Grid</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Controlador de Carga</h4>
+            <p class="text-body-sm text-muted">
+              Use controladores de carga MPPT dimensionados para a tensão e corrente do seu arranjo. Para um arranjo 48V de 1.400W, um controlador MPPT de 60A suporta até 3.000W a 48V. Garanta que a tensão máxima de entrada do controlador exceda a tensão de circuito aberto do arranjo na menor temperatura esperada.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Seleção do Inversor</h4>
+            <p class="text-body-sm text-muted">
+              Dimensione o inversor para sua carga contínua de pico mais 20% de margem. Uma carga contínua de 2.000W exige um inversor de 2.500W. Inversores de onda senoidal pura são essenciais para eletrônicos sensíveis. Inversores off-grid devem incluir carregamento de bateria a partir da entrada do gerador.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Gerenciamento da Bateria</h4>
+            <p class="text-body-sm text-muted">
+              Um sistema de gerenciamento de bateria (BMS) protege contra sobrecarga, sobredescarga, sobrecorrente e extremos de temperatura. Para baterias de lítio, o BMS é obrigatório. Escolha um com balanceamento de células e comunicação com o inversor via barramento CAN ou RS485.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Fiação e Fusíveis</h4>
+            <p class="text-body-sm text-muted">
+              Bancos de bateria off-grid conduzem altas correntes. Dimensione os cabos para a corrente máxima esperada com 25% de margem de segurança. Use fusíveis ou disjuntores adequadamente dimensionados entre strings de bateria e na entrada do inversor. Consulte o Artigo 480 da NEC para requisitos de instalação de baterias.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Experimente</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use a Calculadora de Dimensionamento de Bateria Solar para calcular os tamanhos exatos de bateria e arranjo para sua instalação off-grid.
+          </p>
+          <a href="/pt/tools/solar-battery-sizing-calculator/" class="btn-primary text-xs py-3 px-6 inline-block">Abrir Calculadora de Bateria Solar</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Próxima Etapa</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Verifique seu dimensionamento com a Calculadora de Autonomia para ver por quanto tempo sua bateria alimenta cargas específicas.
+          </p>
+          <a href="/pt/tools/runtime-calculator/" class="btn-primary text-xs py-3 px-6 inline-block">Abrir Calculadora de Autonomia</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Artigos Relacionados</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Como Dimensionar um Banco de Baterias Solar</h4>
+            <p class="text-body-sm text-muted mb-3">
+              O método de engenharia em quatro etapas para dimensionar bancos de baterias solares do zero.
+            </p>
+            <a href="/pt/learn/how-to-size-solar-battery-bank/" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Ler Guia →</a>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Guia de Dimensionamento de Armazenamento Solar</h4>
+            <p class="text-body-sm text-muted mb-3">
+              Guia completo para dimensionar armazenamento solar, da análise de consumo à seleção de bateria.
+            </p>
+            <a href="/pt/learn/solar-storage-sizing-guide/" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Ler Guia →</a>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

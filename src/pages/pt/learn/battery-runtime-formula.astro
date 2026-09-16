@@ -1,0 +1,207 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "Qual é a fórmula básica de autonomia da bateria?",
+    answer: "Autonomia (horas) = (Capacidade Ah × Tensão V × DoD%) ÷ (Carga W ÷ Eficiência%). Por exemplo: (100Ah × 12,8V × 0,80) ÷ (200W ÷ 0,90) = 4,6 horas.",
+  },
+  {
+    question: "Como converto Ah para Wh em cálculos de autonomia?",
+    answer: "Multiplique Ah pela tensão nominal: Wh = Ah × V. Uma bateria 12,8V de 100Ah armazena 1.280 Wh. Aplique o DoD para obter Wh utilizáveis: 1.280 × 0,80 = 1.024 Wh utilizáveis.",
+  },
+  {
+    question: "Qual valor de eficiência devo usar?",
+    answer: "Para cargas CA via inversor, use 85–92% dependendo da qualidade do inversor e do nível de carga. Para cargas DC, use 95–99% (somente perdas de fiação). Para sistemas solares, inclua a eficiência do controlador (95–98%).",
+  },
+  {
+    question: "Como considero a temperatura nas fórmulas de autonomia?",
+    answer: "Aplique um fator de redução por temperatura: 0,95 a 10°C, 0,90 a 0°C, 0,80 a -10°C, 0,70 a -20°C. Multiplique a energia utilizável por esse fator antes de dividir pela carga.",
+  },
+];
+---
+
+<Layout
+  title="Fórmula de Autonomia de Bateria | Calculadoras de Bateria"
+  description="Referência completa de fórmulas de autonomia: conversão Ah para Wh, correções de eficiência, redução por temperatura e cálculos de tensão para todos os tipos de bateria."
+  canonical="https://batterycalculators.com/pt/learn/battery-runtime-formula/"
+  schema="faqPage"
+  schemaName="Fórmula de Autonomia de Bateria"
+  schemaDescription="Folha de referência com todas as fórmulas de cálculo de autonomia."
+  schemaUrl="https://batterycalculators.com/pt/learn/battery-runtime-formula/"
+  faqItems={faqItems}
+  lang="pt"
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/pt/learn/" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Voltar aos Guias</a>
+      <Breadcrumb items={[
+        { label: "Centro de Aprendizagem", href: "/pt/learn/" },
+        { label: "Fórmula de Autonomia de Bateria" }
+      ]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">REFERÊNCIA</span>
+      <h1 class="text-display-md text-primary mb-6">Fórmula de Autonomia de Bateria</h1>
+      <p class="text-body-md text-body font-light">
+        Uma folha de referência rápida para calcular a autonomia em todos os cenários comuns. Salve esta página para acesso rápido às fórmulas exatas que você precisa.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Fórmulas Essenciais</h2>
+        <FormulaBox title="Autonomia Fundamental">
+          <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+            Energia Total (Wh) = Capacidade (Ah) × Tensão Nominal (V)
+          </div>
+          <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+            Energia Utilizável (Wh) = Energia Total × (DoD% / 100)
+          </div>
+          <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+            Carga Efetiva (W) = Carga Real (W) / (Eficiência do Sistema / 100)
+          </div>
+          <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+            Autonomia (horas) = Energia Utilizável (Wh) / Carga Efetiva (W)
+          </div>
+        </FormulaBox>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Conversão Ah para Wh</h2>
+        <FormulaBox title="Conversão de Capacidade">
+          <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+            Energia (Wh) = Capacidade (Ah) × Tensão (V)
+          </div>
+          <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+            Capacidade (Ah) = Energia (Wh) / Tensão (V)
+          </div>
+          <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+            Corrente (A) = Potência (W) / Tensão (V)
+          </div>
+          <p>Tensões comuns de packs: 12V (3S/4S), 24V (7S/8S), 36V (10S/11S), 48V (14S/16S).</p>
+        </FormulaBox>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Eficiência do Inversor</h2>
+        <FormulaBox title="Autonomia com Carga CA">
+          <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+            Carga Efetiva (W) = Carga CA (W) / Eficiência do Inversor
+          </div>
+          <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+            Autonomia (h) = Energia Utilizável (Wh) / Carga Efetiva (W)
+          </div>
+          <p>Eficiência típica: 85–92% com 50–80% de carga. Cai para 75–80% com 10% de carga.</p>
+        </FormulaBox>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Redução por Temperatura</h2>
+        <FormulaBox title="Correção para Clima Frio">
+          <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+            Energia Reduzida = Energia Utilizável × Fator de Temperatura
+          </div>
+          <div class="bg-surface-soft border border-hairline overflow-hidden my-4">
+            <table class="w-full text-left text-body-sm">
+              <thead>
+                <tr class="border-b border-hairline bg-surface-card">
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Temperatura</th>
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Fator LFP</th>
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Fator Chumbo-Ácido</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-hairline">
+                <tr><td class="p-4 text-muted">25°C</td><td class="p-4 font-mono text-primary">1,00</td><td class="p-4 font-mono text-primary">1,00</td></tr>
+                <tr><td class="p-4 text-muted">10°C</td><td class="p-4 font-mono text-primary">0,95</td><td class="p-4 text-muted">0,90</td></tr>
+                <tr><td class="p-4 text-muted">0°C</td><td class="p-4 font-mono text-primary">0,90</td><td class="p-4 text-muted">0,80</td></tr>
+                <tr><td class="p-4 text-muted">-10°C</td><td class="p-4 font-mono text-primary">0,80</td><td class="p-4 text-muted">0,65</td></tr>
+                <tr><td class="p-4 text-muted">-20°C</td><td class="p-4 font-mono text-primary">0,70</td><td class="p-4 text-muted">0,50</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </FormulaBox>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Efeito Peukert (Somente Chumbo-Ácido)</h2>
+        <FormulaBox title="Redução para Chumbo-Ácido">
+          <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+            Ah Efetivo = Ah Nominal × (C-rate / 0,05C)^(n-1)
+          </div>
+          <p>
+            Onde n é o expoente de Peukert (1,1–1,3 para AGM, 1,3–1,6 para inundada). A 0,05C (taxa de 20 horas), a bateria entrega sua capacidade nominal total. Em taxas maiores, a capacidade efetiva diminui.
+          </p>
+          <p class="mt-2">
+            Baterias de lítio têm expoente próximo de 1,0, ou seja, entregam quase toda a capacidade em qualquer taxa razoável de descarga.
+          </p>
+        </FormulaBox>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Tabela de Referência Rápida</h2>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Cenário</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Fórmula</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">Carga DC, sem inversor</td>
+                <td class="p-4 font-mono text-primary text-[11px]">Ah × V × DoD / Carga</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Carga CA via inversor</td>
+                <td class="p-4 font-mono text-primary text-[11px]">Ah × V × DoD / (Carga / η_inv)</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Com redução por temperatura</td>
+                <td class="p-4 font-mono text-primary text-[11px]">Ah × V × DoD × FatorTemp / Carga</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Sistema solar + bateria</td>
+                <td class="p-4 font-mono text-primary text-[11px]">Ah × V × DoD / (Carga / (η_inv × η_fiação))</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Experimente</h4>
+          <p class="text-body-sm text-muted mb-4">Use a Calculadora de Autonomia para aplicar essas fórmulas ao seu sistema.</p>
+          <a href="/pt/tools/runtime-calculator/" class="btn-primary text-xs py-3 px-6 inline-block">Abrir Calculadora de Autonomia</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Relacionado</h4>
+          <p class="text-body-sm text-muted mb-4">Use a Calculadora de Bateria com Inversor para dimensionar sistemas CA.</p>
+          <a href="/pt/tools/inverter-battery-calculator/" class="btn-primary-outline text-xs py-3 px-6 inline-block">Calculadora de Bateria com Inversor</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Artigos Relacionados</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Como Calcular a Autonomia da Bateria</h4>
+            <p class="text-body-sm text-muted mb-3">O método de engenharia passo a passo explicado em detalhes.</p>
+            <a href="/pt/learn/how-to-calculate-battery-runtime/" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Ler Guia →</a>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Autonomia 12V vs 24V vs 48V</h4>
+            <p class="text-body-sm text-muted mb-3">Como a tensão afeta eficiência e autonomia do sistema.</p>
+            <a href="/pt/learn/12v-vs-24v-vs-48v-runtime/" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Ler Guia →</a>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

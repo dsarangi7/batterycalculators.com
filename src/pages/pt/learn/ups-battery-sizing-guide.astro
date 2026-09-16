@@ -1,0 +1,350 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "Como dimensiono uma bateria de UPS para meu computador?",
+    answer: "Comece medindo o consumo do computador e do monitor com um wattímetro de tomada. Um desktop típico com monitor consome 150–350W. Para 15 minutos de autonomia, você precisa de cerca de 75–175 Wh de energia utilizável. Um UPS de 600–1000VA com baterias internas normalmente oferece isso. Use a Calculadora de Autonomia para verificar.",
+  },
+  {
+    question: "Qual autonomia equipamentos médicos precisam de um UPS?",
+    answer: "Equipamentos médicos normalmente exigem 15–30 minutos de backup para desligamento ordenado ou transferência para gerador. Dispositivos críticos como ventiladores podem exigir 60+ minutos ou backup contínuo com bancos redundantes. Dimensione sempre sistemas UPS médicos com pelo menos 25% de margem acima do requisito calculado.",
+  },
+  {
+    question: "Quantas baterias um UPS de servidor precisa?",
+    answer: "Um UPS rack padrão de 2U normalmente contém 2–4 baterias internas. Para autonomia estendida, módulos externos de bateria (EBMs) adicionam capacidade em paralelo. Um UPS de data center pode ter 16–32 baterias em um gabinete, oferecendo 15–60 minutos de autonomia em carga total dependendo da configuração.",
+  },
+  {
+    question: "Posso substituir baterias de chumbo-ácido do UPS por lítio?",
+    answer: "Alguns modelos mais novos de UPS suportam baterias de íon-lítio, mas a maioria dos UPS legados é projetada para curvas de tensão e perfis de carga de chumbo-ácido. Trocar chumbo-ácido por lítio exige um UPS compatível ou um sistema de gerenciamento que adapte o perfil de carga. Consulte as especificações do fabricante do seu UPS antes de tentar trocar a química.",
+  },
+];
+---
+
+<Layout
+  title="Guia de Dimensionamento de Bateria para UPS | Calculadoras de Bateria"
+  description="Como dimensionar baterias de UPS para computadores, servidores e equipamentos médicos. Cobre requisitos de autonomia por aplicação, fórmulas de capacidade e exemplos de dimensionamento."
+  canonical="https://batterycalculators.com/pt/learn/ups-battery-sizing-guide/"
+  schema="faqPage"
+  schemaName="Guia de Dimensionamento de Bateria para UPS"
+  schemaDescription="Guia de engenharia para dimensionar baterias de UPS para computadores, servidores, equipamentos médicos e infraestrutura crítica."
+  schemaUrl="https://batterycalculators.com/pt/learn/ups-battery-sizing-guide/"
+  faqItems={faqItems}
+  lang="pt"
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/pt/learn/" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Voltar aos Guias</a>
+      <Breadcrumb items={[
+        { label: "Centro de Aprendizagem", href: "/pt/learn/" },
+        { label: "Guia de Dimensionamento de Bateria para UPS" }
+      ]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">APLICAÇÕES</span>
+      <h1 class="text-display-md text-primary mb-6">Guia de Dimensionamento de Bateria para UPS</h1>
+      <p class="text-body-md text-body font-light">
+        Dimensionar uma bateria de UPS é fundamentalmente diferente de dimensionar uma bateria solar ou off-grid. Baterias de UPS são projetadas para backup de curta duração e alta confiabilidade — devem entregar potência total instantaneamente quando a tensão da rede cai, com zero tempo de transferência. Este guia cobre como calcular a capacidade necessária para computadores, servidores, equipamentos médicos e outras cargas críticas.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Como Funciona o Dimensionamento de UPS</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Um UPS contém um banco de baterias, um inversor e uma chave de transferência. Com energia da rede presente, o UPS passa a energia para a carga mantendo a bateria carregada. Quando a rede falha, o inversor consome da bateria e fornece CA à carga sem interrupção. A bateria deve oferecer energia suficiente para sustentar a carga até a rede retornar ou um gerador partir.
+        </p>
+        <p class="text-body-md text-body font-light mb-4">
+          O dimensionamento de UPS é definido por dois parâmetros: a potência da carga (em watts) e a autonomia necessária (em minutos). A relação é linear — dobrar a autonomia exige dobrar a capacidade, assumindo a mesma carga. A maioria dos UPS domésticos é otimizada para 10–30 minutos de autonomia em carga total, suficiente para desligamento seguro, mas não para apagões prolongados.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Aplicação</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Carga Típica</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Autonomia Necessária</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Prioridade de Dimensionamento</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">PC desktop doméstico</td>
+                <td class="p-4 font-mono text-primary">150–350W</td>
+                <td class="p-4 font-mono text-primary">10–20 min</td>
+                <td class="p-4 text-muted">Salvar trabalho, desligamento seguro</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Estação de trabalho</td>
+                <td class="p-4 font-mono text-primary">200–500W</td>
+                <td class="p-4 font-mono text-primary">15–30 min</td>
+                <td class="p-4 text-muted">Salvar trabalho, limpeza da rede</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Servidor de rede (1U–2U)</td>
+                <td class="p-4 font-mono text-primary">300–800W</td>
+                <td class="p-4 font-mono text-primary">15–45 min</td>
+                <td class="p-4 text-muted">Partida do gerador ou desligamento ordenado</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Rack de servidores (cheio)</td>
+                <td class="p-4 font-mono text-primary">2–10 kW</td>
+                <td class="p-4 font-mono text-primary">15–60 min</td>
+                <td class="p-4 text-muted">Partida do gerador, failover</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Monitor médico / ventilador</td>
+                <td class="p-4 font-mono text-primary">100–500W</td>
+                <td class="p-4 font-mono text-primary">30–60+ min</td>
+                <td class="p-4 text-muted">Segurança de vida, sem interrupção</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Imagem médica (RM/TC)</td>
+                <td class="p-4 font-mono text-primary">10–50 kW</td>
+                <td class="p-4 font-mono text-primary">15–30 min</td>
+                <td class="p-4 text-muted">Proteger equipamentos, desligamento ordenado</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <FormulaBox title="Fórmulas de Dimensionamento de UPS">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Energia da Bateria (Wh) = Carga (W) × Autonomia (min) / 60
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Energia Utilizável (Wh) = Energia da Bateria × DoD × η_bateria × η_inversor
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Bateria Necessária (Wh) = Carga (W) × Autonomia (min) / 60 / DoD / η_bateria / η_inversor
+        </div>
+        <p>
+          Para baterias SLA de chumbo-ácido: DoD = 0,50, η_bateria = 0,80, η_inversor = 0,88–0,92. Combinados, isso significa que apenas cerca de 35–36% da capacidade nominal é energia utilizável na carga.
+        </p>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Ah Necessários = Bateria Necessária (Wh) / Tensão da Bateria (V)
+        </div>
+        <p>
+          A maioria dos UPS domésticos usa baterias 12V. Para um sistema 12V: Ah = Wh / 12. Para um sistema 48V (UPS maiores): Ah = Wh / 48.
+        </p>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Exemplo Resolvido: UPS para Desktop</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Dados:</strong></p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li>PC desktop + monitor: 280W</li>
+              <li>Autonomia necessária: 20 minutos</li>
+              <li>Tensão da bateria: 12V (baterias SLA internas)</li>
+              <li>Limite de DoD: 50% (chumbo-ácido SLA)</li>
+              <li>Eficiência da bateria: 80%</li>
+              <li>Eficiência do inversor: 90%</li>
+            </ul>
+            <p><strong>Etapa 1:</strong> Energia total necessária na carga:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              280W × 20 min / 60 = 93.3 Wh
+            </div>
+            <p><strong>Etapa 2:</strong> Capacidade necessária considerando perdas:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              93.3 / 0.50 / 0.80 / 0.90 = 259.2 Wh
+            </div>
+            <p><strong>Etapa 3:</strong> Converter para Ah a 12V:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              259.2 / 12 = 21.6 Ah
+            </div>
+            <p><strong>Etapa 4:</strong> Selecione a configuração de bateria. Duas baterias SLA 12V 12Ah em série (para barramento interno de 24V) ou uma única bateria 12V 24Ah atenderiam ao requisito. Um UPS típico de 1000VA/600W sai de fábrica com 2× baterias 12V 9Ah (18 Ah no total), o que oferece cerca de 10 minutos a 280W — suficiente para muitos usuários, mas abaixo da meta de 20 minutos. Seria necessário um modelo de autonomia estendida com 2× baterias 12V 18Ah.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Autonomia por Tamanho de UPS e Carga</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          A tabela a seguir mostra a autonomia aproximada para tamanhos comuns de UPS em vários níveis de carga. Valores reais dependem de idade da bateria, temperatura e fabricante. Use como estimativas de planejamento.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Classificação do UPS</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Carga Total</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">50% de Carga</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">25% de Carga</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Baterias Internas</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">350VA / 200W</td>
+                <td class="p-4 text-muted">~5 min</td>
+                <td class="p-4 text-muted">~12 min</td>
+                <td class="p-4 text-muted">~28 min</td>
+                <td class="p-4 font-mono text-primary">1× 12V 7Ah</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">600VA / 360W</td>
+                <td class="p-4 text-muted">~7 min</td>
+                <td class="p-4 text-muted">~18 min</td>
+                <td class="p-4 text-muted">~42 min</td>
+                <td class="p-4 font-mono text-primary">2× 12V 7Ah</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">1000VA / 600W</td>
+                <td class="p-4 text-muted">~10 min</td>
+                <td class="p-4 text-muted">~25 min</td>
+                <td class="p-4 text-muted">~55 min</td>
+                <td class="p-4 font-mono text-primary">2× 12V 9Ah</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">1500VA / 900W</td>
+                <td class="p-4 text-muted">~12 min</td>
+                <td class="p-4 text-muted">~30 min</td>
+                <td class="p-4 text-muted">~70 min</td>
+                <td class="p-4 font-mono text-primary">2× 12V 12Ah</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">3000VA / 2400W</td>
+                <td class="p-4 text-muted">~15 min</td>
+                <td class="p-4 text-muted">~40 min</td>
+                <td class="p-4 text-muted">~90 min</td>
+                <td class="p-4 font-mono text-primary">4× 12V 17Ah</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">5000VA / 4000W</td>
+                <td class="p-4 text-muted">~12 min</td>
+                <td class="p-4 text-muted">~35 min</td>
+                <td class="p-4 text-muted">~85 min</td>
+                <td class="p-4 font-mono text-primary">4× 12V 26Ah</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-body-sm text-muted mt-2">A autonomia aumenta aproximadamente na proporção em que a carga diminui. Reduzir a carga pela metade aproximadamente dobra a autonomia.</p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Estendendo a Autonomia do UPS</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Quando as baterias internas não oferecem autonomia suficiente, há várias abordagens para estender a duração do backup. A escolha certa depende da autonomia necessária, do orçamento e do espaço disponível.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Módulos Externos de Bateria</h4>
+            <p class="text-body-sm text-muted">
+              EBMs conectam-se ao UPS em paralelo, adicionando capacidade sem substituir o UPS. Um único EBM pode dobrar ou triplicar a autonomia. Vários EBMs podem ser encadeados para autonomia estendida. É a abordagem mais comum para aplicações de servidores e data centers.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Baterias Internas Maiores</h4>
+            <p class="text-body-sm text-muted">
+              Alguns modelos de UPS aceitam baterias de maior Ah no mesmo compartimento. Migrar de células 9Ah para 12Ah ou 18Ah pode aumentar a autonomia em 30–100%. Verifique dimensões físicas e compatibilidade de terminais antes de substituir.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Desligamento de Cargas</h4>
+            <p class="text-body-sm text-muted">
+              Reduzir a carga durante um apagão estende a autonomia proporcionalmente. Desconecte dispositivos não essenciais (monitores, impressoras, periféricos) e mantenha só equipamentos críticos no UPS. Cortar a carga de 300W para 150W dobra a autonomia.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Integração com Gerador</h4>
+            <p class="text-body-sm text-muted">
+              Para apagões prolongados, um gerador oferece energia contínua enquanto o UPS cobre o intervalo da partida (normalmente 10–30 segundos). Dimensione o UPS para o tempo de partida do gerador, não para todo o apagão.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Considerações para Equipamentos Médicos</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Sistemas UPS médicos têm requisitos mais rígidos que UPS padrão de TI. A norma IEC 60601-1 especifica que equipamentos eletromédicos devem manter energia durante o atendimento ao paciente. Dispositivos críticos como ventiladores, bombas de infusão e monitores de paciente exigem autonomia medida em horas, não minutos.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Equipamento</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Consumo</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Autonomia Mínima</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Observações</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">Monitor de paciente</td>
+                <td class="p-4 font-mono text-primary">50–150W</td>
+                <td class="p-4 font-mono text-primary">60 min</td>
+                <td class="p-4 text-muted">Monitoramento contínuo durante transferência</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Ventilador</td>
+                <td class="p-4 font-mono text-primary">100–300W</td>
+                <td class="p-4 font-mono text-primary">60+ min</td>
+                <td class="p-4 text-muted">Crítico, zero interrupção</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Bomba de infusão</td>
+                <td class="p-4 font-mono text-primary">30–80W</td>
+                <td class="p-4 font-mono text-primary">60+ min</td>
+                <td class="p-4 text-muted">A entrega de medicação não pode parar</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Iluminação cirúrgica</td>
+                <td class="p-4 font-mono text-primary">200–500W</td>
+                <td class="p-4 font-mono text-primary">15–30 min</td>
+                <td class="p-4 text-muted">Transição para iluminação de backup</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">RM / Tomógrafo</td>
+                <td class="p-4 font-mono text-primary">10–50 kW</td>
+                <td class="p-4 font-mono text-primary">15–30 min</td>
+                <td class="p-4 text-muted">Proteger dados de imagem, desligamento ordenado</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Experimente</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use a Calculadora de Autonomia para estimar por quanto tempo seu UPS sustenta determinada carga.
+          </p>
+          <a href="/pt/tools/runtime-calculator/" class="btn-primary text-xs py-3 px-6 inline-block">Abrir Calculadora de Autonomia</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Dimensione uma Bateria</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Precisa de um banco maior além do UPS padrão? Use a Calculadora de Dimensionamento de Bateria.
+          </p>
+          <a href="/pt/tools/battery-sizing-calculator/" class="btn-primary-outline text-xs py-3 px-6 inline-block">Abrir Calculadora de Dimensionamento</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Artigos Relacionados</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Guia de Autonomia de Bateria para UPS</h4>
+            <p class="text-body-sm text-muted mb-3">Como estimar e estender a autonomia do UPS com fórmulas práticas.</p>
+            <a href="/pt/learn/ups-battery-runtime-guide/" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Ler Guia →</a>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Guia de Dimensionamento de Bateria Residencial</h4>
+            <p class="text-body-sm text-muted mb-3">Dimensionando um backup residencial para cargas domésticas essenciais em apagões.</p>
+            <a href="/pt/learn/home-battery-sizing-guide/" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Ler Guia →</a>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

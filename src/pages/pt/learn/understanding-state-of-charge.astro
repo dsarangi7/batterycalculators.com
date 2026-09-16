@@ -1,0 +1,226 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "Qual é a diferença entre SOC e SoH?",
+    answer: "SOC (Estado de Carga) indica quanta energia está disponível no momento na bateria, como um medidor de combustível. SoH (Estado de Saúde) mede a capacidade atual da bateria em relação à sua capacidade nominal original, indicando a degradação geral.",
+  },
+  {
+    question: "Devo manter minha bateria em 100% de SOC?",
+    answer: "Para a maioria das químicas de lítio, manter 100% de SOC acelera o envelhecimento de calendário. Armazenar com 40-60% de SOC é recomendado para armazenamento de longo prazo. Para uso diário, manter o SOC entre 20-80% estende significativamente a vida útil.",
+  },
+  {
+    question: "Por que o SOC da minha bateria salta após o repouso?",
+    answer: "Sob carga, a tensão cai devido à resistência interna. Quando a carga é removida, a tensão dos terminais se recupera à medida que o equilíbrio químico é restaurado. Estimadores de SOC baseados em tensão leem valores maiores após o repouso, causando o salto aparente de SOC.",
+  },
+  {
+    question: "Posso descarregar totalmente uma bateria de lítio?",
+    answer: "Descarregar totalmente uma bateria de lítio (0% de SOC) pode causar danos permanentes. A maioria dos sistemas de gerenciamento (BMS) impõe um corte por baixa tensão para evitar sobredescarga. Operar repetidamente abaixo de 10% de SOC acelera a degradação.",
+  },
+];
+---
+
+<Layout
+  title="Entendendo o Estado de Carga (SOC) | Calculadoras de Bateria"
+  description="Um guia claro sobre Estado de Carga de bateria: o que significa SOC, como se relaciona com DoD, como é medido e por que gerenciar o SOC é crítico para a longevidade."
+  canonical="https://batterycalculators.com/pt/learn/understanding-state-of-charge/"
+  faqItems={faqItems}
+  lang="pt"
+>
+  <div class="max-w-3xl mx-auto">
+    <Breadcrumb items={[
+      { label: "Centro de Aprendizagem", href: "/pt/learn/" },
+      { label: "Entendendo o Estado de Carga (SOC)" },
+    ]} />
+
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/pt/learn/" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Voltar aos Guias</a>
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">FUNDAMENTOS DE CÉLULAS</span>
+      <h1 class="text-display-md text-primary mb-6">Entendendo o Estado de Carga (SOC)</h1>
+      <p class="text-body-md text-body font-light">
+        O Estado de Carga é o parâmetro em tempo real mais importante no gerenciamento de baterias. Ele indica quanta energia resta em uma célula em relação à sua capacidade disponível, e acertá-lo é essencial para operação segura, previsão precisa de autonomia e longa vida útil.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">O Que É Estado de Carga?</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          O Estado de Carga (SOC) expressa a energia utilizável restante em uma bateria como percentual de sua capacidade total disponível. Uma célula a 100% de SOC está totalmente carregada; uma célula a 0% de SOC está totalmente esgotada. Na prática, baterias nunca operam em nenhum dos extremos porque isso causa degradação rápida e pode ser perigoso.
+        </p>
+        <p class="text-body-md text-body font-light mb-4">
+          A analogia mais simples é o medidor de combustível de um carro. Assim como o medidor mostra quanto combustível resta no tanque em relação à sua capacidade total, o SOC mostra quanta energia eletroquímica está armazenada em relação ao máximo da bateria. No entanto, ao contrário de um tanque cuja capacidade é fixa e mensurável, a capacidade disponível de uma bateria muda com temperatura, idade e taxa de descarga — tornando o SOC significativamente mais difícil de determinar.
+        </p>
+        <p class="text-body-md text-body font-light">
+          Para engenheiros que projetam sistemas de bateria, o SOC alimenta diretamente o agendamento de carga, a divisão de cargas, as decisões de gerenciamento térmico e as estimativas de autonomia para o usuário. Uma leitura imprecisa de SOC pode levar a sobrecarga, sobredescarga ou desligamentos prematuros — tudo reduzindo a vida útil e a confiança do usuário.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">SOC, DoD e Capacidade Restante</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          SOC e Profundidade de Descarga (DoD) são métricas complementares. O SOC mostra o que resta; o DoD mostra o que foi usado. Em qualquer momento, a soma de SOC e DoD é 100%. Se uma bateria está a 60% de SOC, foi descarregada até 40% de DoD.
+        </p>
+        <p class="text-body-md text-body font-light mb-4">
+          Entender essa relação importa porque diferentes indústrias enfatizam métricas diferentes. Fabricantes de eletrônicos e EVs falam em SOC — "seu celular está em 15%". Projetistas de sistemas de armazenamento e fornecedores de garantia normalmente especificam limites de DoD — "esta bateria tem garantia para 80% de DoD". Ambos se referem ao mesmo estado físico, apenas de extremidades opostas da escala.
+        </p>
+        <p class="text-body-md text-body font-light">
+          A capacidade restante é os ampères-horas ou watt-horas reais ainda disponíveis no SOC atual. Não é simplesmente uma função linear do SOC porque a própria capacidade utilizável encolhe com o envelhecimento, temperaturas extremas ou altas taxas de descarga. Uma bateria a 50% de SOC com capacidade degradada entrega muito menos energia que a mesma bateria a 50% de SOC quando nova.
+        </p>
+      </section>
+
+      <FormulaBox title="Fórmulas de SOC">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          SOC (%) = (Capacidade Restante / Capacidade Total) × 100
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          DoD (%) = 100 − SOC (%)
+        </div>
+        <p>
+          Por exemplo, uma bateria de 100 Ah com 65 Ah restantes: SOC = (65 / 100) × 100 = 65%. Seu DoD correspondente é 100 − 65 = 35%.
+        </p>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Referência de SOC por Química</h2>
+        <p class="text-body-md text-body font-light mb-6">
+          Diferentes químicas de bateria têm perfis de tensão distintos ao longo da faixa de SOC, e cada uma tem uma janela operacional recomendada que equilibra capacidade utilizável e vida útil. A tabela abaixo resume os parâmetros-chave para químicas comuns.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Química</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Janela Nominal de SOC</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Faixa Recomendada</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Tensão de Carga Total (por célula)</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">LFP (LiFePO4)</td>
+                <td class="p-4 text-muted">0–100%</td>
+                <td class="p-4 text-muted">10–90%</td>
+                <td class="p-4 font-mono text-primary">3.65 V</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">NMC (LiNiMnCoO2)</td>
+                <td class="p-4 text-muted">0–100%</td>
+                <td class="p-4 text-muted">10–90%</td>
+                <td class="p-4 font-mono text-primary">4.20 V</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">NCA (LiNiCoAlO2)</td>
+                <td class="p-4 text-muted">0–100%</td>
+                <td class="p-4 text-muted">15–85%</td>
+                <td class="p-4 font-mono text-primary">4.20 V</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">Chumbo-Ácido (VRLA)</td>
+                <td class="p-4 text-muted">0–100%</td>
+                <td class="p-4 text-muted">20–80%</td>
+                <td class="p-4 font-mono text-primary">2.40–2.45 V</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-body-sm text-muted mt-4">
+          O LFP tem uma curva de tensão excepcionalmente plana entre 20–80% de SOC, o que torna a estimativa de SOC por tensão particularmente desafiadora para essa química. NMC e NCA têm gradientes de tensão mais íngremes, tornando a estimativa por tensão mais precisa na prática.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Como o SOC É Medido</h2>
+        <p class="text-body-md text-body font-light mb-6">
+          Não existe sensor físico direto que leia o SOC como um voltímetro lê tensão. Em vez disso, o SOC deve ser estimado por um ou mais métodos indiretos, cada um com pontos fortes e fracos distintos. Sistemas modernos de gerenciamento normalmente combinam várias abordagens.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Estimativa por Tensão</h4>
+            <p class="text-body-sm text-muted">
+              Mede a tensão de circuito aberto (OCV) da célula e a mapeia para o SOC usando uma tabela derivada da curva OCV-SOC da química. Simples e barato, mas preciso apenas com a bateria em repouso. Sob carga, a queda por resistência interna distorce a leitura. O platô plano de tensão do LFP entre 20–80% torna este método especialmente pouco confiável para essa química.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Contagem de Coulomb</h4>
+            <p class="text-body-sm text-muted">
+              Integra o fluxo de corrente ao longo do tempo para acompanhar quanta carga entrou ou saiu da bateria. Oferece bom rastreamento dinâmico durante carga e descarga, mas acumula erro com o tempo (deriva) porque pequenos vieses de medição se somam. Exige recalibração periódica contra um ponto de referência conhecido, normalmente em carga total.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Métodos por Impedância</h4>
+            <p class="text-body-sm text-muted">
+              Mede a impedância interna da célula, que varia com SOC, temperatura e estado de saúde. Útil para detectar condições de SOC muito baixo ou muito alto, onde as mudanças de impedância são mais pronunciadas. Menos eficaz na faixa média de SOC, onde a impedância é relativamente plana. Frequentemente usado como verificação suplementar em vez de método primário.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Por Que Estimar SOC É Difícil</h4>
+            <p class="text-body-sm text-muted">
+              A temperatura altera capacidade e tensão, o envelhecimento muda a própria relação OCV-SOC, e a deriva de medição se acumula nos contadores de coulomb. Uma célula a 50% de SOC a 25°C pode ler 47% a 0°C devido à redução de capacidade. Após 1.000 ciclos, a referência de capacidade total pode ser 15% menor que a original, deslocando todo cálculo de SOC. Esses efeitos compostos explicam por que BMS avançados usam filtros de Kalman e fusão baseada em modelos.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">SOC e Saúde da Bateria</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Gerenciar o SOC não é só saber quanta energia resta — impacta diretamente quanto a bateria dura. Células de íon-lítio degradam mais rápido nos extremos da faixa de SOC. Operar consistentemente a 100% de SOC acelera a decomposição do eletrólito e a degradação do cátodo. Operar com SOC muito baixo arrisca dissolução de cobre do coletor de corrente do ânodo e aumenta a chance de eventos de sobredescarga.
+        </p>
+        <p class="text-body-md text-body font-light mb-4">
+          Pesquisas mostram consistentemente que manter baterias de lítio entre 20% e 80% de SOC estende dramaticamente a vida útil. Uma célula LFP ciclada entre 20–80% de SOC pode entregar 6.000+ ciclos, enquanto a mesma célula ciclada entre 0–100% pode alcançar apenas 2.000–3.000 ciclos. Por isso muitos fabricantes de EV limitam a janela utilizável e garantias de armazenamento especificam limites de DoD.
+        </p>
+        <p class="text-body-md text-body font-light mb-4">
+          O envelhecimento de calendário — degradação que ocorre independentemente da ciclagem — também depende fortemente do SOC. Armazenar uma bateria de lítio a 100% de SOC em temperatura elevada (ex.: 40°C) pode perder 20–30% da capacidade em um ano. Armazenar a 50% de SOC nas mesmas condições reduz muito essa perda. Para armazenamento de longo prazo, o consenso da indústria é 40–60% de SOC em ambiente fresco.
+        </p>
+        <p class="text-body-md text-body font-light">
+          Para projetistas de sistemas, isso significa que o BMS deve impor janelas de SOC, fornecer leituras precisas aos usuários e implementar estratégias de limitação de carga. Ferramentas como o <a href="/pt/tools/" class="text-m-blue-light hover:underline">conjunto de calculadoras da BatteryCalculators.com</a> ajudam a quantificar os compromissos entre capacidade utilizável e vida útil para sua aplicação específica.
+        </p>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Experimente</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Estime o SOC a partir de tensão e temperatura para sua química específica.
+          </p>
+          <a href="/pt/tools/soc-estimator/" class="btn-primary text-xs py-3 px-6 inline-block">Abrir Estimador de SOC</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Relacionado</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Calcule a corrente de carga e descarga para um dado C-rate e capacidade.
+          </p>
+          <a href="/pt/tools/c-rate-calculator/" class="btn-primary text-xs py-3 px-6 inline-block">Abrir Calculadora de C-Rate</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Artigos Relacionados</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">O Que É C-Rate de Bateria?</h4>
+            <p class="text-body-sm text-muted mb-4">
+              Entenda como o C-rate define a velocidade de carga e descarga em relação à capacidade.
+            </p>
+            <a href="/pt/learn/what-is-battery-c-rate/" class="text-m-blue-light text-body-sm hover:underline">Ler artigo →</a>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Degradação de Bateria Explicada</h4>
+            <p class="text-body-sm text-muted mb-4">
+              Aprenda por que baterias perdem capacidade com o tempo e como padrões de uso afetam a longevidade.
+            </p>
+            <a href="/pt/learn/battery-degradation-explained/" class="text-m-blue-light text-body-sm hover:underline">Ler artigo →</a>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

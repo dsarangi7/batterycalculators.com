@@ -1,0 +1,183 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "Qual é a diferença de autonomia entre íon-lítio e LiFePO4?",
+    answer: "Para a mesma capacidade e tensão, a autonomia é semelhante. A principal diferença está na vida útil e na tolerância ao DoD. O LFP suporta 80–90% de DoD por 3.000–5.000 ciclos, enquanto o NMC suporta 80% de DoD por 2.000–3.000 ciclos. O LFP também tem uma curva de tensão mais plana, oferecendo entrega de potência mais consistente.",
+  },
+  {
+    question: "Como o efeito Peukert afeta as baterias de lítio?",
+    answer: "Baterias de lítio têm efeito Peukert mínimo — mantêm quase toda a capacidade mesmo em altas taxas de descarga. Essa é uma grande vantagem sobre o chumbo-ácido, que perde 20–40% da capacidade utilizável em C-rates altos. A autonomia do lítio é mais previsível em diferentes níveis de carga.",
+  },
+  {
+    question: "Baterias de lítio entregam toda a capacidade nominal?",
+    answer: "Sim, em condições normais. Baterias de lítio mantêm 95–100% da capacidade nominal até 20% de SOC. Abaixo de 10% de SOC, a tensão cai rapidamente e o BMS desconecta para evitar danos. A capacidade utilizável é tipicamente 80–90% da classificação nominal em Ah.",
+  },
+  {
+    question: "Como a idade da bateria de lítio afeta a autonomia?",
+    answer: "Baterias de lítio degradam gradualmente — normalmente atingindo 80% de SOH após 2.000–5.000 ciclos, dependendo da química e das condições. A 80% de SOH, a autonomia é 20% menor que quando nova. O envelhecimento de calendário também contribui com cerca de 2–3% de perda de capacidade por ano.",
+  },
+];
+---
+
+<Layout
+  title="Guia de Autonomia de Bateria de Lítio | Calculadoras de Bateria"
+  description="Entenda as características de autonomia de baterias de lítio: curvas de descarga, utilização de capacidade, efeitos da vida útil e cálculos práticos de autonomia para todas as aplicações."
+  canonical="https://batterycalculators.com/pt/learn/lithium-battery-runtime-guide/"
+  schema="faqPage"
+  schemaName="Guia de Autonomia de Bateria de Lítio"
+  schemaDescription="Guia de engenharia sobre autonomia e comportamento de descarga de baterias de lítio."
+  schemaUrl="https://batterycalculators.com/pt/learn/lithium-battery-runtime-guide/"
+  faqItems={faqItems}
+  lang="pt"
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/pt/learn/" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Voltar aos Guias</a>
+      <Breadcrumb items={[
+        { label: "Centro de Aprendizagem", href: "/pt/learn/" },
+        { label: "Guia de Autonomia de Bateria de Lítio" }
+      ]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">QUÍMICA</span>
+      <h1 class="text-display-md text-primary mb-6">Guia de Autonomia de Bateria de Lítio</h1>
+      <p class="text-body-md text-body font-light">
+        Baterias de lítio — incluindo as químicas LFP, NMC e NCA — oferecem características de autonomia superiores às de chumbo-ácido. Suas curvas de descarga planas, efeito Peukert mínimo e tolerância a DoD profundo fazem delas a escolha preferida para aplicações que exigem entrega de potência previsível e sustentada.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Características da Curva de Descarga</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Ao contrário das baterias de chumbo-ácido, onde a tensão cai progressivamente ao longo da descarga, as baterias de lítio mantêm uma tensão relativamente plana até os últimos 10–15% da capacidade. Essa curva plana significa que a potência entregue à sua carga permanece consistente durante a maior parte do ciclo de descarga.
+        </p>
+        <p class="text-body-md text-body font-light">
+          Para LFP, a tensão da célula permanece entre 3,2V e 3,3V de 90% até 10% de SOC. Para NMC, a curva tem uma inclinação moderada de 4,2V a 3,5V. Ambas são significativamente mais planas que o chumbo-ácido, que cai de 2,1V para 1,75V por célula ao longo do ciclo de descarga.
+        </p>
+      </section>
+
+      <FormulaBox title="Fórmula de Autonomia do Lítio">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Energia Utilizável (Wh) = Capacidade (Ah) × Tensão Nominal (V) × DoD%
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Autonomia (h) = Energia Utilizável / (Carga (W) / Eficiência)
+        </div>
+        <p>
+          Nominal do LFP: 3,2V/célula. Nominal do NMC: 3,6V/célula. Multiplique pelo número de células em série para obter a tensão do pack.
+        </p>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Exemplo Resolvido</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Dados:</strong> bateria NMC 100Ah 12,8V, carga de 200W, eficiência de 90%, DoD de 80%</p>
+            <p><strong>Etapa 1:</strong> Energia utilizável:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              100 × 12.8 × 0.80 = 1,024 Wh
+            </div>
+            <p><strong>Etapa 2:</strong> Carga efetiva:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              200 / 0.90 = 222 W
+            </div>
+            <p><strong>Etapa 3:</strong> Autonomia:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              1,024 / 222 = 4.61 hours
+            </div>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Comparação de Subquímicas de Lítio</h2>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Recurso</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">LFP</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">NMC</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">NCA</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">Tensão Nominal</td>
+                <td class="p-4 font-mono text-primary">3.2V</td>
+                <td class="p-4 font-mono text-primary">3.6V</td>
+                <td class="p-4 font-mono text-primary">3.6V</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">DoD Utilizável</td>
+                <td class="p-4 font-mono text-primary">80–90%</td>
+                <td class="p-4 text-muted">80%</td>
+                <td class="p-4 text-muted">80%</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Vida Útil em Ciclos</td>
+                <td class="p-4 font-mono text-primary">3,000–5,000</td>
+                <td class="p-4 text-muted">2,000–3,000</td>
+                <td class="p-4 text-muted">1,000–2,000</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Densidade de Energia</td>
+                <td class="p-4 text-muted">Moderada</td>
+                <td class="p-4 font-mono text-primary">Alta</td>
+                <td class="p-4 font-mono text-primary">Altíssima</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Estabilidade Térmica</td>
+                <td class="p-4 font-mono text-primary">Excelente</td>
+                <td class="p-4 text-muted">Boa</td>
+                <td class="p-4 text-muted">Moderada</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Ideal Para</td>
+                <td class="p-4 text-muted">Estacionário, RV, Marítimo</td>
+                <td class="p-4 text-muted">EV, Portátil</td>
+                <td class="p-4 text-muted">Ferramentas elétricas, EV</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Experimente</h4>
+          <p class="text-body-sm text-muted mb-4">Use a Calculadora de Autonomia para sua configuração de bateria de lítio.</p>
+          <a href="/pt/tools/runtime-calculator/" class="btn-primary text-xs py-3 px-6 inline-block">Abrir Calculadora de Autonomia</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Relacionado</h4>
+          <p class="text-body-sm text-muted mb-4">Entenda os efeitos da degradação na autonomia ao longo da vida da bateria.</p>
+          <a href="/pt/tools/battery-degradation-estimator/" class="btn-primary-outline text-xs py-3 px-6 inline-block">Estimador de Degradação</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Artigos Relacionados</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Guia de Autonomia LiFePO4</h4>
+            <p class="text-body-sm text-muted mb-3">Mergulho profundo nas características de autonomia específicas do LFP.</p>
+            <a href="/pt/learn/lifepo4-battery-runtime-guide/" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Ler Guia →</a>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Fórmula de Autonomia de Bateria</h4>
+            <p class="text-body-sm text-muted mb-3">Referência de todas as fórmulas de cálculo de autonomia.</p>
+            <a href="/pt/learn/battery-runtime-formula/" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Ler Guia →</a>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

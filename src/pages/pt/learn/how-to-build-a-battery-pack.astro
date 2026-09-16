@@ -1,0 +1,254 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "Do que preciso para montar um pack de baterias?",
+    answer: "Você precisa de: células casadas (mesma química, capacidade, idade), um BMS (Sistema de Gerenciamento de Bateria) para sua contagem de série, barramentos ou cabos para conexões, gabinete, terminais e fusível ou disjuntor. Opcional: gestão térmica, display de monitoramento e controlador de carga.",
+  },
+  {
+    question: "Como seleciono as células para um pack?",
+    answer: "Selecione células do mesmo fabricante e lote, com capacidade e resistência interna casadas. Teste a capacidade de cada célula (ciclo completo de carga-descarga) e a resistência interna antes de montar. Rejeite células que desviem mais de 2–3% da média. Células prismáticas LFP são as mais comuns para packs DIY.",
+  },
+  {
+    question: "É seguro montar um pack de baterias em casa?",
+    answer: "Células LFP são relativamente seguras para montagem doméstica — não entram em fuga térmica. Porém, curtos-circuitos por contato de barramentos ou erros de fiação podem causar arcos de alta corrente, queimaduras e incêndio. Trabalhe sempre com uma célula por vez, use ferramentas isoladas e instale fusível no terminal positivo principal antes de conectar as células.",
+  },
+  {
+    question: "Como conecto as células entre si?",
+    answer: "Use barramentos de cobre ou latão dimensionados para sua corrente máxima. Aperte os parafusos dos terminais conforme o torque do fabricante (normalmente 4–6 Nm para prismáticas LFP). Aplique composto antioxidante nos terminais. Use torquímetro para conexões consistentes — conexões frouxas causam aquecimento e risco de incêndio.",
+  },
+];
+---
+
+<Layout
+  title="Como Montar um Pack de Baterias | Calculadoras de Bateria"
+  description="Guia passo a passo para montar um pack de baterias a partir de células: seleção de células, seleção do BMS, fiação, considerações de segurança e procedimentos de teste."
+  canonical="https://batterycalculators.com/pt/learn/how-to-build-a-battery-pack/"
+  schema="faqPage"
+  schemaName="Como Montar um Pack de Baterias"
+  schemaDescription="Guia passo a passo de engenharia para montar packs de baterias a partir de células individuais."
+  schemaUrl="https://batterycalculators.com/pt/learn/how-to-build-a-battery-pack/"
+  faqItems={faqItems}
+  lang="pt"
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/pt/learn/" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Voltar aos Guias</a>
+      <Breadcrumb items={[
+        { label: "Centro de Aprendizagem", href: "/pt/learn/" },
+        { label: "Como Montar um Pack de Baterias" }
+      ]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">ELÉTRICA</span>
+      <h1 class="text-display-md text-primary mb-6">Como Montar um Pack de Baterias</h1>
+      <p class="text-body-md text-body font-light">
+        Montar um pack a partir de células individuais dá controle sobre capacidade, tensão e configuração — mas exige seleção cuidadosa das células, integração correta do BMS e práticas rígidas de segurança. Este guia percorre o processo completo, da aquisição das células ao teste final, com ênfase em segurança e confiabilidade.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Etapa 1: Seleção das Células</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          A seleção das células é a etapa mais crítica. Células descasadas limitam todo o desempenho do pack à célula mais fraca. Todas as células devem ser do mesmo fabricante, do mesmo lote de produção e testadas para confirmar capacidade e resistência interna equivalentes.
+        </p>
+        <p class="text-body-md text-body font-light mb-4">
+          Para packs DIY, células prismáticas LFP (p. ex., EVE LF280, CATL 280Ah) são a escolha recomendada. São mecanicamente robustas, termicamente estáveis e disponíveis em formatos padronizados. Evite cilíndricas para packs grandes — exigem fitas de níquel soldadas a ponto e são mais difíceis de manter.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Parâmetro</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Faixa aceitável</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Observações</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">Casamento de capacidade</td>
+                <td class="p-4 font-mono text-primary">±2%</td>
+                <td class="p-4 text-muted">Teste cada célula com ciclo completo de carga-descarga</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Casamento de resistência interna</td>
+                <td class="p-4 font-mono text-primary">±5%</td>
+                <td class="p-4 text-muted">Meça com medidor de impedância CA ou testador dedicado</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Casamento de tensão inicial</td>
+                <td class="p-4 font-mono text-primary">±0,05V</td>
+                <td class="p-4 text-muted">As células devem repousar em tensão semelhante antes da montagem</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Data de fabricação</td>
+                <td class="p-4 font-mono text-primary">Mesmo lote</td>
+                <td class="p-4 text-muted">Células de lotes diferentes podem ter química diferente</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Etapa 2: Seleção do BMS</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          O Sistema de Gerenciamento de Bateria (BMS) é o cérebro de segurança do pack. Ele monitora tensões individuais, corrente do pack e temperatura, e desconecta o pack se qualquer parâmetro exceder limites seguros. Em packs série, o BMS também faz o balanceamento para manter todas as células com igual estado de carga.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Balanceamento Passivo</h4>
+            <p class="text-body-sm text-muted">
+              Drena o excedente das células mais altas via resistores. Simples, barato, mas lento. Adequado para packs até 5kWh com células bem casadas. Corrente de balanceamento normalmente 50–100mA.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Balanceamento Ativo</h4>
+            <p class="text-body-sm text-muted">
+              Transfere energia das células mais altas para as mais baixas via capacitores ou indutores. Mais rápido e eficiente. Recomendado para packs acima de 5kWh ou onde se espera envelhecimento. Corrente de balanceamento 1–5A.
+            </p>
+          </CalculatorCard>
+        </div>
+        <p class="text-body-md text-body font-light mt-4">
+          Critérios de seleção do BMS: contagem de série igual à do pack (p. ex., 16S para LFP 48V), corrente contínua acima da sua carga máxima e proteções (sobrecarga, sobredescarga, sobrecorrente, curto-circuito, temperatura).
+        </p>
+      </section>
+
+      <FormulaBox title="Fórmulas de Projeto do Pack">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Contagem série (Ns) = Tensão alvo / Tensão da célula
+          Contagem paralela (Np) = Capacidade alvo / Capacidade da célula
+          Total de células = Ns × Np
+        </div>
+        <p>
+          Exemplo: pack 48V 200Ah com células de 3,2V 100Ah → Ns = 16, Np = 2, Total = 32 células.
+        </p>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Corrente do barramento ≥ Corrente máx. de carga × 1,5 (fator de segurança)
+        </div>
+        <p>
+          Para carga de 5kW a 48V: I = 5000/51,2 = 97,7A. Barramentos para ≥147A (com fator 1,5×). Use cabo 1/0 AWG mínimo nos terminais principais.
+        </p>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Etapa 3: Montagem</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          A montagem exige ferramentas isoladas, bancada limpa e abordagem metódica. Trabalhe com uma célula por vez para evitar curtos acidentais. Instale o fusível principal no terminal positivo antes de conectar as células entre si.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Instalação dos Barramentos</h4>
+            <p class="text-body-sm text-muted">
+              Use barramentos de cobre ou latão dimensionados para sua corrente. Aplique composto antioxidante nos terminais. Aperte com o torque do fabricante (normalmente 4–6 Nm para prismáticas LFP). Use torquímetro para consistência.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Fiação</h4>
+            <p class="text-body-sm text-muted">
+              Passe os fios de sensoriamento do BMS até cada terminal. Use bitola adequada (14 AWG para sensoriamento, 4/0 AWG para terminais principais em packs de alta corrente). Identifique todos os fios. Afaste-os de arestas e fontes de calor.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Gabinete</h4>
+            <p class="text-body-sm text-muted">
+              Use gabinete não condutivo (fibra de vidro, plástico ou madeira). Garanta ventilação para dissipar calor. Monte o BMS em local protegido. Preveja entradas de cabo com alívio de tensão e passa-fios.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Dispositivos de Segurança</h4>
+            <p class="text-body-sm text-muted">
+              Instale fusível principal ou disjuntor para 1,5× a corrente contínua máxima. Adicione chave de desconexão manual. Inclua sensor de temperatura no barramento ou no corpo da célula. Considere detector de fumaça dentro do gabinete.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Etapa 4: Testes</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Antes de conectar cargas, execute uma sequência sistemática de testes para verificar conexões, função do BMS e balanceamento. Nunca pule os testes — um erro de fiação não detectado pode causar incêndio ou explosão sob carga.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Teste</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Método</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Critério de aprovação</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">Tensão das células</td>
+                <td class="p-4 text-muted">Multímetro em cada terminal</td>
+                <td class="p-4 font-mono text-primary">Todas dentro de ±0,05V</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Polaridade</td>
+                <td class="p-4 text-muted">Multímetro na saída do pack</td>
+                <td class="p-4 font-mono text-primary">Polaridade correta, tensão esperada</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Proteção do BMS</td>
+                <td class="p-4 text-muted">Simular sobretensão numa célula</td>
+                <td class="p-4 font-mono text-primary">BMS desconecta em 1 segundo</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Teste de curto</td>
+                <td class="p-4 text-muted">Curto breve controlado via fusível</td>
+                <td class="p-4 font-mono text-primary">BMS desconecta, fusível intacto</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Teste de carga</td>
+                <td class="p-4 text-muted">Aplicar 50% da carga por 30 minutos</td>
+                <td class="p-4 font-mono text-primary">Tensão estável, sem calor nas conexões</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Experimente</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use a Calculadora de Pack de Baterias para modelar sua configuração antes de comprar as células.
+          </p>
+          <a href="/pt/tools/battery-pack-calculator/" class="btn-primary text-xs py-3 px-6 inline-block">Abrir Calculadora de Pack</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Próxima Etapa</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Calcule a divisão de corrente entre strings paralelas e os requisitos de balanceamento do seu pack.
+          </p>
+          <a href="/pt/tools/parallel-string-calculator/" class="btn-primary text-xs py-3 px-6 inline-block">Abrir Calculadora de Strings Paralelas</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Artigos Relacionados</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <a href="/pt/learn/battery-pack-design-basics/" class="text-primary hover:underline font-bold block mb-2">Fundamentos de Projeto de Packs</a>
+            <p class="text-body-sm text-muted">
+              Introdução ao projeto de packs cobrindo conceitos fundamentais, tipos de célula e arquitetura de sistemas.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <a href="/pt/learn/lifepo4-pack-design/" class="text-primary hover:underline font-bold block mb-2">Projeto de Pack LFP</a>
+            <p class="text-body-sm text-muted">
+              Orientação específica para LFP: casamento de células, estratégias de balanceamento e gestão térmica.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

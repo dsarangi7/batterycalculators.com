@@ -1,4 +1,6 @@
 ---
+import { t, type Locale } from '../utils/i18n';
+
 export interface Props {
   title: string;
   description?: string;
@@ -7,6 +9,7 @@ export interface Props {
   downloadLabel?: string;
   unit?: string;
   source?: string;
+  lang?: Locale;
 }
 
 const {
@@ -14,10 +17,13 @@ const {
   description,
   headers,
   rows,
-  downloadLabel = 'Download as CSV',
+  downloadLabel,
   unit,
   source,
+  lang = 'en',
 } = Astro.props as Props;
+
+const resolvedDownloadLabel = downloadLabel ?? t('components.reference_table.download_csv', lang);
 
 function toCSV(): string {
   const headerRow = headers.join(',');
@@ -44,7 +50,7 @@ const filename = downloadFilename();
       download={filename}
       class="text-label-uppercase text-xs text-m-blue-light hover:underline inline-flex items-center gap-1 shrink-0"
     >
-      {downloadLabel} →
+      {resolvedDownloadLabel} →
     </a>
   </div>
 
@@ -72,6 +78,6 @@ const filename = downloadFilename();
   </div>
 
   {source && (
-    <p class="text-caption text-muted mt-3">Source: {source}</p>
+    <p class="text-caption text-muted mt-3">{t('components.reference_table.source', lang)}: {source}</p>
   )}
 </section>

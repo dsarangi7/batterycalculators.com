@@ -1,0 +1,315 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "Por quanto tempo uma bateria solar alimenta minha casa durante um apagão?",
+    answer: "Depende da capacidade da bateria e das suas cargas. Uma bateria utilizável de 13,5 kWh alimentando uma carga noturna de 500W funciona por cerca de 22 horas. Uma casa inteira consumindo 1,5 kW tem cerca de 9 horas de backup com a mesma bateria. Bancos maiores ou cargas reduzidas estendem a autonomia proporcionalmente.",
+  },
+  {
+    question: "Preciso de um inversor especial para backup de bateria?",
+    answer: "Sim. O backup exige um inversor híbrido ou um inversor com bateria e capacidade de chave de transferência automática (ATS). Inversores padrão conectados à rede desligam durante apagões por segurança. Um inversor híbrido desconecta da rede e alterna para a energia da bateria em milissegundos.",
+  },
+  {
+    question: "Meus painéis solares carregam a bateria durante um apagão?",
+    answer: "Apenas com um inversor híbrido projetado para operação de backup. Durante um apagão, um inversor híbrido pode continuar direcionando a energia solar para a bateria mantendo as cargas críticas da casa alimentadas. Sistemas padrão conectados à rede desligam totalmente quando a rede cai.",
+  },
+  {
+    question: "Como o backup difere do solar off-grid?",
+    answer: "Sistemas de backup são conectados à rede com armazenamento em bateria — usam a rede como energia primária e a bateria para apagões. Sistemas off-grid não têm nenhuma conexão com a rede e devem ser dimensionados para autonomia total. Sistemas de backup podem ser menores porque a rede cobre o fornecimento diário, enquanto sistemas off-grid precisam de armazenamento suficiente para períodos nublados de vários dias.",
+  },
+];
+---
+
+<Layout
+  title="Guia de Backup com Bateria Solar | Calculadoras de Bateria"
+  description="Guia completo para usar baterias solares como backup residencial durante apagões. Cobre sistemas híbridos vs off-grid, painéis de cargas críticas e dimensionamento de backup."
+  canonical="https://batterycalculators.com/pt/learn/solar-battery-backup-guide/"
+  schema="faqPage"
+  schemaName="Guia de Backup com Bateria Solar"
+  schemaDescription="Guia abrangente de sistemas de backup com bateria solar para proteção contra apagões."
+  schemaUrl="https://batterycalculators.com/pt/learn/solar-battery-backup-guide/"
+  faqItems={faqItems}
+  lang="pt"
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/pt/learn/" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Voltar aos Guias</a>
+      <Breadcrumb items={[
+        { label: "Centro de Aprendizagem", href: "/pt/learn/" },
+        { label: "Guia de Backup com Bateria Solar" }
+      ]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">SOLAR</span>
+      <h1 class="text-display-md text-primary mb-6">Guia de Backup com Bateria Solar</h1>
+      <p class="text-body-md text-body font-light">
+        Sistemas de backup com bateria solar armazenam o excedente de energia diurna para alimentar sua casa quando a rede falha. Ao contrário do solar simples conectado à rede, um sistema com backup mantém suas luzes acesas durante apagões — mas dimensioná-lo corretamente exige entender a diferença entre backup da casa inteira e de cargas críticas, arquiteturas híbridas versus off-grid e a matemática de autonomia que rege quanto tempo sua bateria dura.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Como Funciona o Backup com Bateria Solar</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Um sistema de backup com bateria solar opera em dois modos distintos. Durante a operação normal, o arranjo solar carrega a bateria enquanto a rede cobre qualquer déficit. Quando a rede falha, o sistema detecta o apagão, desconecta da concessionária (anti-ilhamento) e alterna para a energia da bateria — normalmente em 20 milissegundos. Sua casa continua funcionando com energia armazenada sem interrupção perceptível.
+        </p>
+        <p class="text-body-md text-body font-light mb-4">
+          Quando a rede retorna, o sistema reconecta e retoma a operação normal. Se a bateria se esgotou durante o apagão, o arranjo solar a recarrega para o próximo evento. Esse ciclo se repete indefinidamente, oferecendo proteção de backup automática e livre de manutenção.
+        </p>
+        <p class="text-body-md text-body font-light">
+          O componente crítico é o inversor híbrido — um dispositivo que gerencia o fluxo de energia entre o arranjo solar, a bateria, a rede e as cargas da casa. Inversores padrão conectados à rede não têm essa capacidade e desligam totalmente durante apagões, mesmo com baterias presentes.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Híbrido vs Off-Grid: Principais Diferenças</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          A escolha entre um sistema híbrido (conectado à rede com backup) e um sistema totalmente off-grid muda fundamentalmente o dimensionamento da bateria. Cada arquitetura tem requisitos e compromissos distintos.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden mb-4">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Recurso</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Híbrido (Rede + Backup)</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Off-Grid</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">Dependência da rede</td>
+                <td class="p-4 text-muted">Rede como primária, bateria para apagões</td>
+                <td class="p-4 text-muted">Sem conexão com a rede</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Direcionador do dimensionamento</td>
+                <td class="p-4 text-muted">Autonomia de cargas críticas em apagões</td>
+                <td class="p-4 text-muted">Consumo diário total × dias de autonomia</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Tamanho típico de bateria</td>
+                <td class="p-4 font-mono text-primary">10–30 kWh</td>
+                <td class="p-4 font-mono text-primary">30–100+ kWh</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Dimensionamento do arranjo solar</td>
+                <td class="p-4 text-muted">Pode ser menor (rede cobre o déficit)</td>
+                <td class="p-4 text-muted">Deve cobrir todo o consumo diário + perdas</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Conta mensal de luz</td>
+                <td class="p-4 text-muted">Reduzida, mas não eliminada</td>
+                <td class="p-4 text-muted">Zero (sem conexão com a rede)</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Complexidade</td>
+                <td class="p-4 text-muted">Moderada — inversor híbrido + chave de transferência</td>
+                <td class="p-4 text-muted">Alta — projeto completo para autonomia</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-body-md text-body font-light">
+          Para a maioria dos proprietários, um sistema híbrido com 10–20 kWh de armazenamento de backup oferece o melhor equilíbrio entre custo e resiliência. O off-grid total é reservado para propriedades remotas onde a conexão com a rede é indisponível ou proibitivamente cara.
+        </p>
+      </section>
+
+      <FormulaBox title="Fórmula de Autonomia de Backup">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Autonomia de Backup (horas) = Energia Utilizável da Bateria (Wh) / (Potência da Carga (W) / Eficiência)
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Energia Utilizável da Bateria = Capacidade Nominal (Wh) × DoD
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Potência da Carga Crítica = Soma de todas as cargas no painel de backup (W)
+        </div>
+        <p>
+          A eficiência considera as perdas do inversor durante a descarga da bateria. Use 0,90–0,92 para inversores híbridos modernos.
+        </p>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Estratégia do Painel de Cargas Críticas</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Nem todo circuito da sua casa precisa de backup. Um painel de cargas críticas (subpainel) separa circuitos essenciais dos não essenciais. Essa abordagem reduz o tamanho da bateria, estende a autonomia e diminui o custo do sistema.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Cargas Críticas (Priorize Estas)</h4>
+            <ul class="text-body-sm text-muted list-disc pl-4 flex flex-col gap-1">
+              <li>Geladeira / freezer</li>
+              <li>Iluminação LED (cômodos selecionados)</li>
+              <li>Roteador / modem de internet</li>
+              <li>Equipamentos médicos</li>
+              <li>Bomba de porão</li>
+              <li>Carga de celular / notebook</li>
+              <li>Sistema de segurança</li>
+            </ul>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Cargas Não Críticas (Pule Estas)</h4>
+            <ul class="text-body-sm text-muted list-disc pl-4 flex flex-col gap-1">
+              <li>Secadora elétrica de roupas</li>
+              <li>Forno / fogão elétrico</li>
+              <li>Ar-condicionado central</li>
+              <li>Hidromassagem / bomba da piscina</li>
+              <li>Abridor de porta da garagem</li>
+              <li>Carregador de EV (salvo se crítico)</li>
+              <li>Iluminação decorativa / de jardim</li>
+            </ul>
+          </CalculatorCard>
+        </div>
+        <p class="text-body-md text-body font-light">
+          Um painel típico de cargas críticas carrega 1,0–2,0 kW de carga contínua. Com uma bateria utilizável de 10 kWh, isso oferece 5–10 horas de backup — suficiente para cobrir a maioria dos apagões noturnos ou aguentar até o solar recarregar a bateria na manhã seguinte.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Exemplo Resolvido: Backup Durante um Apagão</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Dados:</strong></p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li>Bateria: LFP 48V 200Ah (10,240 Wh nominais)</li>
+              <li>Limite de DoD: 80%</li>
+              <li>Eficiência do inversor: 92%</li>
+              <li>Cargas críticas: geladeira (150W) + luzes (80W) + roteador (12W) + bomba de porão (400W intermitente) = 642W em média</li>
+              <li>Duração do apagão: noturno (14 horas)</li>
+            </ul>
+            <p><strong>Etapa 1:</strong> Calcular a energia utilizável da bateria:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              10,240 Wh × 0.80 = 8,192 Wh utilizáveis
+            </div>
+            <p><strong>Etapa 2:</strong> Calcular a carga efetiva incluindo perdas do inversor:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              642 W / 0.92 = 698 W
+            </div>
+            <p><strong>Etapa 3:</strong> Calcular a autonomia de backup:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              8,192 Wh / 698 W = 11.7 horas
+            </div>
+            <p class="text-muted mt-2">Esta bateria oferece aproximadamente <strong>11,7 horas de backup</strong> para as cargas críticas — suficiente para cobrir a maioria dos apagões noturnos. Se o apagão se estender pelo dia seguinte, os painéis solares podem recarregar a bateria com a rede ainda fora, estendendo a proteção indefinidamente.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Autonomia de Backup por Tamanho de Bateria</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          A tabela abaixo mostra a autonomia aproximada de backup para um painel de cargas críticas de 1.500W usando baterias LFP com 80% de DoD e 92% de eficiência do inversor.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Tamanho da Bateria (Nominal)</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Energia Utilizável</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Autonomia a 1,500W</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">5 kWh</td>
+                <td class="p-4 text-muted">4.0 kWh</td>
+                <td class="p-4 font-mono text-primary">2.7 hours</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">10 kWh</td>
+                <td class="p-4 text-muted">8.0 kWh</td>
+                <td class="p-4 font-mono text-primary">5.3 hours</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">13.5 kWh</td>
+                <td class="p-4 text-muted">10.8 kWh</td>
+                <td class="p-4 font-mono text-primary">7.2 hours</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">20 kWh</td>
+                <td class="p-4 text-muted">16.0 kWh</td>
+                <td class="p-4 font-mono text-primary">10.7 hours</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">30 kWh</td>
+                <td class="p-4 text-muted">24.0 kWh</td>
+                <td class="p-4 font-mono text-primary">16.0 hours</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Considerações de Projeto para Sistemas de Backup</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Chave de Transferência Automática</h4>
+            <p class="text-body-sm text-muted">
+              A ATS detecta a falha da rede e alterna para a energia da bateria. Inversores híbridos modernos integram essa função. Garanta que o tempo de transferência seja inferior a 20ms para não interromper eletrônicos sensíveis. Algumas cargas (computadores com UPS) toleram intervalos maiores; outras (máquinas CPAP, dispositivos médicos) não.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Recarga Solar Durante o Apagão</h4>
+            <p class="text-body-sm text-muted">
+              Uma vantagem-chave dos sistemas híbridos é a recarga solar durante apagões prolongados. Se houver sol, seus painéis podem repor a bateria com a rede fora, estendendo efetivamente a autonomia de backup indefinidamente. Isso exige um inversor híbrido que suporte carregamento solar em modo ilhado.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Química de Bateria para Backup</h4>
+            <p class="text-body-sm text-muted">
+              O LFP é a química preferida para sistemas de backup devido à sua longa vida útil, estabilidade térmica e capacidade de descarga profunda. Ao contrário do chumbo-ácido, o LFP pode ficar em carga parcial sem sulfatação, ideal para aplicações de backup onde a bateria pode ficar semanas a 80% de SOC entre eventos.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Monitoramento e Alertas</h4>
+            <p class="text-body-sm text-muted">
+              Escolha um sistema com monitoramento por aplicativo que envie notificações push durante apagões. Dados em tempo real de SOC, potência de carga e produção solar ajudam a gerenciar o consumo durante eventos prolongados. Alguns sistemas suportam desligamento automático de cargas para preservar a bateria para as cargas mais críticas.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Experimente</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use a Calculadora de Dimensionamento de Bateria Solar para determinar o tamanho certo de bateria de backup para suas cargas críticas.
+          </p>
+          <a href="/pt/tools/solar-battery-sizing-calculator/" class="btn-primary text-xs py-3 px-6 inline-block">Abrir Calculadora de Bateria Solar</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Próxima Etapa</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Estime por quanto tempo sua bateria de backup alimenta as cargas específicas da sua casa durante um apagão.
+          </p>
+          <a href="/pt/tools/home-backup-battery-calculator/" class="btn-primary-outline text-xs py-3 px-6 inline-block">Abrir Calculadora de Backup Residencial</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Artigos Relacionados</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Quanto Tempo Dura Minha Bateria Solar?</h4>
+            <p class="text-body-sm text-muted mb-3">
+              Estime a autonomia da bateria solar à noite e durante períodos nublados prolongados.
+            </p>
+            <a href="/pt/learn/how-long-will-my-solar-battery-last/" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Ler Guia →</a>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Guia de Bateria para Apagões</h4>
+            <p class="text-body-sm text-muted mb-3">
+              Guia geral de backup de bateria durante apagões para todos os tipos de bateria.
+            </p>
+            <a href="/pt/learn/power-outage-battery-guide/" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Ler Guia →</a>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

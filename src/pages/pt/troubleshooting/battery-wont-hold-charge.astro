@@ -1,0 +1,186 @@
+---
+import ArticleLayout from '../../../layouts/ArticleLayout.astro';
+import TroubleshootingBlock from '../../../components/TroubleshootingBlock.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+
+const description = "Descubra por que sua bateria não segura carga. Abrange desequilíbrio de células, curtos internos, alta autodescarga, dano por temperatura e envelhecimento de calendário com listas de verificação passo a passo.";
+
+const faqItems = [
+  {
+    question: "Como sei se minha bateria tem autodescarga excessiva?",
+    answer: "Carregue totalmente a bateria e meça a tensão após 24–48 horas de repouso em temperatura ambiente. Uma célula LiFePO4 saudável deve perder menos de 1% de SOC por mês. Se a tensão cair mais de 0,1V por célula em um dia, a autodescarga está anormalmente alta.",
+  },
+  {
+    question: "Um BMS pode corrigir o desequilíbrio de células com o tempo?",
+    answer: "Um BMS de balanceamento passivo pode equalizar lentamente as células durante a fase final de carga, mas desvia apenas pequenas correntes (normalmente 50–200mA). Unidades de BMS com balanceamento ativo podem mover energia entre células de forma mais agressiva. Nenhum deles consegue recuperar uma célula verdadeiramente defeituosa.",
+  },
+  {
+    question: "O inchaço da bateria é sinal de curto-circuito interno?",
+    answer: "Sim. O inchaço indica geração de gás dentro da célula, que pode resultar de microcurtos internos, sobrecarga ou decomposição do eletrólito. Uma bateria inchada deve ser aposentada imediatamente e descartada em uma instalação de reciclagem de baterias.",
+  },
+  {
+    question: "Como o envelhecimento de calendário afeta a retenção de carga?",
+    answer: "Todas as baterias degradam com o tempo mesmo sem uso. LiFePO4 perde cerca de 1–3% da capacidade por ano a 25°C. Chumbo-ácido degrada mais rápido, perdendo 5–15% por ano. Armazenar baterias com SOC alto e em alta temperatura acelera significativamente o envelhecimento de calendário.",
+  },
+  {
+    question: "A exposição à temperatura pode danificar permanentemente uma bateria?",
+    answer: "Sim. Temperaturas sustentadas acima de 45°C aceleram a decomposição do eletrólito e o crescimento da camada SEI, reduzindo permanentemente a capacidade. Congelar uma bateria de lítio carregada pode causar curtos internos, pois a deposição de lítio se forma durante o carregamento em baixa temperatura.",
+  },
+];
+
+const relatedCalculators = [
+  { title: "Calculadora de Autonomia de Bateria", href: "/pt/tools/runtime-calculator/", type: "calculator" as const },
+  { title: "Estimador de SOC", href: "/pt/tools/soc-estimator/", type: "calculator" as const },
+  { title: "Estimador de Degradação de Bateria", href: "/pt/tools/battery-degradation-estimator/", type: "calculator" as const },
+];
+
+const relatedGuides = [
+  { title: "Tabela de Tensão LiFePO4", href: "/pt/learn/lifepo4-voltage-chart/", type: "guide" as const },
+  { title: "Quanto Tempo Vai Durar Minha Bateria Solar", href: "/pt/learn/how-long-will-my-solar-battery-last/", type: "guide" as const },
+];
+---
+
+<ArticleLayout
+  title="Bateria Não Segura Carga — Guia de Solução de Problemas | Calculadoras de Bateria"
+  description={description}
+  canonical="https://batterycalculators.com/pt/troubleshooting/battery-wont-hold-charge/"
+  category="SOLUÇÃO DE PROBLEMAS"
+  breadcrumbItems={[{ label: "Bateria Não Segura Carga" }]}
+  relatedCalculators={relatedCalculators}
+  relatedGuides={relatedGuides}
+  faqItems={faqItems}
+  lang="pt"
+>
+  <p class="text-body-md text-body font-light mb-8">
+    Uma bateria que perde carga rapidamente — mesmo parada — normalmente sofre de uma de cinco causas raiz: desequilíbrio de células, curto interno, autodescarga excessiva, dano térmico ou simples envelhecimento de calendário. Este guia percorre cada possibilidade com listas de verificação de diagnóstico e soluções.
+  </p>
+
+  <TroubleshootingBlock
+    lang="pt"
+    problem="Desequilíbrio de Células"
+    causes={[
+      "Células individuais do pacote divergiram para diferentes níveis de SOC ao longo do tempo",
+      "BMS de balanceamento passivo não consegue equalizar grandes diferenças de SOC",
+      "Uma ou mais células têm autodescarga maior que as demais",
+      "Pacote montado com células incompatíveis ou de diferentes lotes de produção",
+    ]}
+    explanation="Em um pacote de baterias em série, a tensão total é a soma de todas as tensões das células. Se as células estão desequilibradas, o BMS deve interromper a carga ou descarga quando a célula mais fraca atinge um limite — mesmo que as outras ainda tenham energia utilizável. Uma célula a 3,5V ao lado de outra a 3,2V significa que o pacote efetivamente tem menos capacidade utilizável do que sua especificação sugere."
+    checklist={[
+      "Meça as tensões individuais das células com um multímetro após carga total",
+      "Compare as tensões — qualquer célula a mais de 0,05V da média indica desequilíbrio",
+      "Verifique se a função de balanceamento do BMS está ativa no estágio final do carregamento",
+      "Registre as tensões com 50% de SOC para confirmar que o desequilíbrio persiste em toda a faixa",
+      "Observe se o desequilíbrio piora após ciclos de descarga profunda",
+    ]}
+    solutions={[
+      "Faça um ciclo completo de carga com o balanceamento do BMS ativado — pode levar 24–48 horas no balanceamento passivo",
+      "Use um balanceador externo para equalizar as células antes de remontar o pacote",
+      "Substitua qualquer célula que não equilibre dentro de 0,03V das demais após um ciclo completo",
+      "Garanta que todas as células do pacote sejam do mesmo fabricante, lote e capacidade nominal",
+    ]}
+  />
+
+  <TroubleshootingBlock
+    lang="pt"
+    problem="Curto-Circuito Interno"
+    causes={[
+      "Crescimento de dendritos perfurando o separador entre eletrodos",
+      "Defeito de fabricação permitindo contaminação por partículas metálicas",
+      "Dano físico por queda, esmagamento ou perfuração",
+      "Sobrecarga causando deposição de lítio que eventualmente atravessa o separador",
+    ]}
+    explanation="Um microcurto interno cria um caminho de corrente parasita que drena lentamente a célula. A célula ainda pode aceitar carga total, mas perderá tensão visivelmente mais rápido que o esperado. Em casos graves, a célula esquenta em repouso e a tensão cai rapidamente. Curtos internos são uma preocupação de segurança e podem evoluir para fuga térmica."
+    checklist={[
+      "Carregue totalmente a bateria e meça a tensão a cada hora por 12 horas em repouso",
+      "Compare a taxa de descarga com a especificação de autodescarga do fabricante",
+      "Sinta se há aquecimento localizado na carcaça em repouso — um curto interno gera calor",
+      "Verifique se a tensão da célula cai abaixo de 2,5V dias após carga total",
+      "Inspecione a bateria por sinais de dano físico, amassados ou perfurações",
+    ]}
+    solutions={[
+      "Se o curto interno for confirmado, aposente a bateria imediatamente — não tente recarregar",
+      "Para autodescarga leve, tente uma carga total seguida de descarga profunda controlada para recalibrar",
+      "Substitua as células afetadas em vez de todo o pacote, se houver acesso individual",
+      "Documente a falha para reivindicações de garantia com o fabricante",
+    ]}
+  />
+
+  <TroubleshootingBlock
+    lang="pt"
+    problem="Alta Taxa de Autodescarga"
+    causes={[
+      "Decomposição do eletrólito produzindo gás interno e subprodutos resistivos",
+      "Contaminação na superfície do eletrodo criando caminhos de microcorrente",
+      "Degradação do separador permitindo cruzamento de íons entre eletrodos",
+      "Temperatura excessiva durante o armazenamento acelerando reações químicas secundárias",
+    ]}
+    explanation="Todas as baterias têm alguma autodescarga. Baterias de chumbo-ácido perdem 5–15% por mês; células LiFePO4 normalmente perdem menos de 3% por mês. Se uma bateria perde significativamente mais que sua taxa nominal de autodescarga, a degradação química interna está acelerando. Isso é geralmente irreversível e piora com o tempo."
+    checklist={[
+      "Carregue totalmente a bateria e registre a tensão exata e a data",
+      "Armazene em temperatura ambiente (20–25°C) por 30 dias sem conectar nenhuma carga",
+      "Meça a tensão novamente e calcule a perda de SOC usando a relação tensão-SOC",
+      "Compare a perda medida com a especificação de autodescarga do fabricante",
+      "Repita o teste para confirmar se a taxa é consistente — autodescarga crescente indica degradação progressiva",
+    ]}
+    solutions={[
+      "Se a autodescarga exceder a especificação em menos de 2×, monitore mensalmente — algumas células estabilizam",
+      "Armazene baterias com 50% de SOC em ambiente fresco para minimizar degradação futura",
+      "Substitua baterias com autodescarga acima de 5% por mês — isso indica dano interno",
+      "Para chumbo-ácido, faça uma carga de equalização para reduzir a autodescarga induzida por sulfatação",
+    ]}
+  />
+
+  <TroubleshootingBlock
+    lang="pt"
+    problem="Dano por Exposição à Temperatura"
+    causes={[
+      "Armazenamento ou operação acima de 45°C por períodos prolongados",
+      "Carga de bateria congelada abaixo de 0°C causando deposição de lítio",
+      "Ciclagem térmica repetida criando estresse mecânico nos eletrodos",
+      "Exposição solar direta em baterias de instalações externas",
+    ]}
+    explanation="Altas temperaturas aceleram todos os mecanismos de degradação em uma bateria. O eletrólito se decompõe mais rápido, a camada de interfase de eletrólito sólido (SEI) cresce mais espessa e material ativo é perdido dos eletrodos. Carregar abaixo de 0°C é particularmente perigoso porque os íons de lítio não conseguem se intercalar rápido o suficiente e se depositam como lítio metálico no ânodo — reduzindo permanentemente a capacidade e criando risco de curto interno."
+    checklist={[
+      "Verifique a temperatura máxima que a bateria já sofreu — a maioria tem registrador de dados ou histórico de temperatura",
+      "Inspecione qualquer descoloração, deformação ou inchaço da carcaça",
+      "Meça a capacidade com um teste de descarga controlada e compare com a capacidade nominal",
+      "Verifique se o desempenho degrada mais em condições frias ou quentes",
+      "Revise o ambiente de instalação por fontes de calor, má ventilação ou sol direto",
+    ]}
+    solutions={[
+      "Mova a bateria para um local mais fresco, bem ventilado e longe de fontes de calor",
+      "Instale resfriamento ou aquecimento ativo para manter a bateria na faixa ideal (15–30°C)",
+      "Substitua baterias que perderam mais de 20% da capacidade nominal por dano térmico",
+      "Nunca carregue uma bateria de lítio abaixo de 0°C — garanta que o BMS tenha bloqueio de carga em baixa temperatura",
+    ]}
+  />
+
+  <TroubleshootingBlock
+    lang="pt"
+    problem="Envelhecimento de Calendário"
+    causes={[
+      "Degradação química natural ao longo do tempo mesmo sem uso",
+      "Armazenamento com SOC alto (100%) acelerando a perda de capacidade",
+      "Armazenamento em ambientes quentes agravando os efeitos do envelhecimento",
+      "Bateria atingiu ou excedeu sua vida útil esperada",
+    ]}
+    explanation="O envelhecimento de calendário é a perda inevitável de capacidade que ocorre simplesmente com a passagem do tempo. Mesmo uma bateria parada na prateleira degrada porque o eletrólito reage lentamente com as superfícies dos eletrodos. Esse efeito é acelerado por SOC alto e alta temperatura. A química LiFePO4 tem excelente vida de calendário (10+ anos com 50% de SOC a 25°C), enquanto baterias de chumbo-ácido degradam significativamente em 3–5 anos."
+    checklist={[
+      "Determine a idade da bateria pela etiqueta de fabricação ou nota de compra",
+      "Faça um teste de capacidade com descarga controlada a 0,2C e compare com a capacidade nominal",
+      "Verifique as condições de armazenamento — SOC alto e alta temperatura encurtam drasticamente a vida de calendário",
+      "Compare a vida de calendário esperada da sua química: LiFePO4 (10–15 anos), chumbo-ácido (3–5 anos), NMC (5–8 anos)",
+      "Observe se a bateria ficou armazenada sem uso por longos períodos — o envelhecimento continua sem uso",
+    ]}
+    solutions={[
+      "Para baterias dentro de 80% da capacidade nominal, continue usando, mas planeje a substituição",
+      "Armazene futuras baterias com 40–60% de SOC no local mais fresco disponível para estender a vida de calendário",
+      "Substitua baterias que caíram abaixo de 70% da capacidade nominal — elas continuarão degradando rápido",
+      "Considere migrar de chumbo-ácido para LiFePO4 em aplicações que exigem longa vida de calendário",
+    ]}
+  />
+
+  <p class="text-caption text-muted border-t border-hairline pt-8 mt-12">
+    <strong>Aviso:</strong> Este guia é apenas para fins educacionais e de diagnóstico. A solução de problemas de baterias envolve riscos elétricos. Sempre siga os procedimentos de segurança do fabricante, use EPI adequado e consulte um técnico qualificado antes de tentar reparos. Nunca tente abrir ou desmontar uma célula selada.
+  </p>
+</ArticleLayout>

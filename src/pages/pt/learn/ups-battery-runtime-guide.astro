@@ -1,0 +1,176 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "Por quanto tempo uma bateria de UPS dura durante um apagão?",
+    answer: "Depende da carga. Um UPS de 1500VA/900W com duas baterias 12V 7Ah (168 Wh no total) com 50% de DoD oferece cerca de 84 Wh utilizáveis. Com carga de 300W, a autonomia é de aproximadamente 15 minutos. A 100W, estende-se para cerca de 45 minutos.",
+  },
+  {
+    question: "Posso estender a autonomia da bateria do UPS?",
+    answer: "Sim. Packs externos de bateria (EBMs) adicionam capacidade em paralelo. Você também pode substituir as baterias de chumbo-ácido originais por baterias de maior Ah se couberem no compartimento. Para autonomia estendida, considere um UPS rack com módulos externos de bateria.",
+  },
+  {
+    question: "Qual tamanho de UPS preciso para meu computador?",
+    answer: "Um computador desktop típico com monitor consome 200–400W. Um UPS de 1000VA/600W oferece 15–30 minutos de autonomia a 300W. Para autonomia maior, escolha um modelo de 1500VA/900W ou adicione um pack externo de baterias.",
+  },
+  {
+    question: "Por que baterias de UPS degradam tão rápido?",
+    answer: "Baterias de UPS são tipicamente de chumbo-ácido, que degrada mais rápido que lítio. Altas temperaturas ambiente (acima de 25°C) aceleram a degradação. A carga flutuante do BMS também contribui para o envelhecimento de calendário. A maioria das baterias de UPS precisa de reposição a cada 3–5 anos.",
+  },
+];
+---
+
+<Layout
+  title="Guia de Autonomia de Bateria para UPS | Calculadoras de Bateria"
+  description="Como estimar e estender a autonomia da bateria do UPS. Cobre cálculos de carga, dimensionamento de bateria, fórmulas de autonomia e exemplos práticos para UPS residenciais e de escritório."
+  canonical="https://batterycalculators.com/pt/learn/ups-battery-runtime-guide/"
+  schema="faqPage"
+  schemaName="Guia de Autonomia de Bateria para UPS"
+  schemaDescription="Guia de engenharia para estimar e estender a autonomia da bateria do UPS."
+  schemaUrl="https://batterycalculators.com/pt/learn/ups-battery-runtime-guide/"
+  faqItems={faqItems}
+  lang="pt"
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/pt/learn/" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Voltar aos Guias</a>
+      <Breadcrumb items={[
+        { label: "Centro de Aprendizagem", href: "/pt/learn/" },
+        { label: "Guia de Autonomia de Bateria para UPS" }
+      ]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">APLICAÇÕES</span>
+      <h1 class="text-display-md text-primary mb-6">Guia de Autonomia de Bateria para UPS</h1>
+      <p class="text-body-md text-body font-light">
+        Nobreaks protegem equipamentos críticos durante apagões, mas sua autonomia costuma ser mal compreendida. Um UPS doméstico típico oferece apenas 10–30 minutos de backup — suficiente para salvar o trabalho e desligar com segurança, não para alimentar equipamentos indefinidamente.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Como Funciona a Autonomia do UPS</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Um UPS contém baterias seladas de chumbo-ácido (SLA) ou de lítio que alimentam um inversor durante falhas da rede. A autonomia depende da capacidade da bateria (medida em Ah ou Wh) e da potência da carga (medida em VA ou watts). A classificação em VA representa a potência aparente; a classificação em watts representa a potência real.
+        </p>
+        <p class="text-body-md text-body font-light">
+          A maioria dos UPS domésticos é projetada para backup de curta duração — 10–30 minutos em carga total. Autonomia estendida exige packs externos de bateria ou UPS industriais com bancos maiores.
+        </p>
+      </section>
+
+      <FormulaBox title="Fórmulas de Autonomia do UPS">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Energia da Bateria (Wh) = Tensão (V) × Capacidade (Ah)
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Energia Utilizável (Wh) = Energia da Bateria × DoD × Eficiência
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Autonomia (min) = Energia Utilizável (Wh) / Carga (W) × 60
+        </div>
+        <p>
+          O DoD do chumbo-ácido é tipicamente 50%. A eficiência SLA é cerca de 80%. A eficiência do inversor é cerca de 85–90%. A eficiência combinada do sistema é aproximadamente 65–70%.
+        </p>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Exemplo Resolvido</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Dados:</strong> UPS com 2× baterias SLA 12V 7Ah, carga de 300W</p>
+            <p><strong>Etapa 1:</strong> Energia total da bateria:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              2 × (12V × 7Ah) = 168 Wh
+            </div>
+            <p><strong>Etapa 2:</strong> Energia utilizável (50% de DoD × 80% de eficiência da bateria × 90% do inversor):</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              168 × 0.50 × 0.80 × 0.90 = 60.5 Wh
+            </div>
+            <p><strong>Etapa 3:</strong> Autonomia:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              60.5 / 300 × 60 = 12.1 minutos
+            </div>
+            <p class="mt-2 text-muted">Com meia carga (150W), a autonomia dobra para aproximadamente 24 minutos.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Autonomia por Nível de Carga</h2>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Tamanho do UPS</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Carga Total</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Meia Carga</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Um Quarto de Carga</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">600VA / 360W</td>
+                <td class="p-4 text-muted">~6 min</td>
+                <td class="p-4 text-muted">~15 min</td>
+                <td class="p-4 text-muted">~35 min</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">1000VA / 600W</td>
+                <td class="p-4 text-muted">~10 min</td>
+                <td class="p-4 text-muted">~25 min</td>
+                <td class="p-4 text-muted">~55 min</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">1500VA / 900W</td>
+                <td class="p-4 text-muted">~12 min</td>
+                <td class="p-4 text-muted">~30 min</td>
+                <td class="p-4 text-muted">~70 min</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">3000VA / 2400W</td>
+                <td class="p-4 text-muted">~15 min</td>
+                <td class="p-4 text-muted">~40 min</td>
+                <td class="p-4 text-muted">~90 min</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-caption text-muted mt-2">Valores aproximados para UPS típicos com SLA a 50% de DoD.</p>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Experimente</h4>
+          <p class="text-body-sm text-muted mb-4">Use a Calculadora de Autonomia para estimar a duração do backup de bateria.</p>
+          <a href="/pt/tools/runtime-calculator/" class="btn-primary text-xs py-3 px-6 inline-block">Abrir Calculadora de Autonomia</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Relacionado</h4>
+          <p class="text-body-sm text-muted mb-4">Dimensione seu sistema residencial de backup para apagões prolongados.</p>
+          <a href="/pt/tools/home-backup-battery-calculator/" class="btn-primary-outline text-xs py-3 px-6 inline-block">Calculadora de Backup Residencial</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Artigos Relacionados</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Fórmula de Autonomia de Bateria</h4>
+            <p class="text-body-sm text-muted mb-3">Referência de todas as fórmulas de cálculo de autonomia.</p>
+            <a href="/pt/learn/battery-runtime-formula/" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Ler Guia →</a>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Autonomia 12V vs 24V vs 48V</h4>
+            <p class="text-body-sm text-muted mb-3">Como a tensão do sistema afeta autonomia e eficiência.</p>
+            <a href="/pt/learn/12v-vs-24v-vs-48v-runtime/" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Ler Guia →</a>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

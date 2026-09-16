@@ -1,0 +1,904 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+const faqItems = [
+  {
+    question: "O que é o passaporte de bateria da UE?",
+    answer: "O passaporte de bateria da UE é um registro digital com dados abrangentes do ciclo de vida — de fabricação e química a pegada de carbono, conteúdo reciclado e instruções de fim de vida. É acessado via QR code ou matriz de dados fixada permanentemente em cada bateria, permitindo rastreabilidade transparente em toda a cadeia.",
+  },
+  {
+    question: "Quais baterias exigem passaporte pela regulação da UE?",
+    answer: "A partir de 18 de fevereiro de 2027, todas as baterias industriais acima de 2 kWh, todas as baterias de EV e todas as estacionárias colocadas no mercado da UE devem ter passaporte. Baterias LMT (meios leves de transporte) acima de 2 kWh seguem a partir de 18 de fevereiro de 2028.",
+  },
+  {
+    question: "Quando o passaporte se torna obrigatório?",
+    answer: "O requisito do Regulamento (UE) 2023/1542 torna-se obrigatório em 18 de fevereiro de 2027 para industriais >2 kWh, EV e estacionárias. LMT >2 kWh seguem em 18 de fevereiro de 2028. O regulamento entrou em vigor em 17 de agosto de 2023.",
+  },
+  {
+    question: "Quais dados devem constar no passaporte?",
+    answer: "Deve incluir identificação do fabricante, modelo e número de série, data de fabricação, química, capacidade nominal, energia nominal, pegada de carbono por kWh, percentual reciclado, due diligence da cadeia, estado de saúde, vida útil esperada, classificações de segurança e instruções de fim de vida.",
+  },
+  {
+    question: "Como os dados do passaporte são acessados?",
+    answer: "Cada bateria deve ter QR code ou matriz de dados que vincula ao passaporte. O código deve ser permanente, legível por máquina e acessível sem software especializado. Diferentes papéis (consumidores, recicladores, reguladores) recebem níveis distintos de acesso.",
+  },
+  {
+    question: "Baterias de consumo exigem passaporte?",
+    answer: "Baterias portáteis de consumo não exigem passaporte pelo atual Regulamento de Baterias da UE. Porém, produtores devem se registrar na Base de Dados de Baterias da UE e fornecer informações básicas. O passaporte vale para industriais >2 kWh, EV, estacionárias e LMT >2 kWh.",
+  },
+  {
+    question: "O que acontece se a empresa não cumprir?",
+    answer: "Baterias não conformes não podem ser colocadas no mercado da UE. Empresas enfrentam retirada do mercado, multas definidas por cada Estado-membro, perda de acesso ao mercado europeu e dano reputacional. O regulamento capacita autoridades nacionais de fiscalização.",
+  },
+  {
+    question: "Como o passaporte afeta a reciclagem?",
+    answer: "O passaporte dá aos recicladores informações críticas sobre química, desmontagem e materiais perigosos. Isso permite reciclagem mais eficiente e segura, melhora taxas de recuperação e apoia a economia circular com aplicações de segunda vida.",
+  },
+  {
+    question: "Passaporte é o mesmo que rótulo?",
+    answer: "Não. O rótulo traz identificação básica (capacidade, química, fabricante). O passaporte é um registro digital completo com ciclo de vida, pegada de carbono, cadeia e histórico de desempenho. O rótulo é físico; o passaporte é digital, acessado via QR code.",
+  },
+  {
+    question: "O que é a Base de Dados de Baterias da UE?",
+    answer: "É o repositório digital central criado pelo Regulamento. Armazena dados de passaportes, registros de fabricantes, relatórios de due diligence e declarações de carbono. Permite que autoridades, produtores e usuários autorizados acessem e verifiquem informações no mercado europeu.",
+  },
+  {
+    question: "Como calculo a pegada de carbono para o passaporte?",
+    answer: "O cálculo deve seguir a metodologia PEF (Pegada Ambiental de Produto) conforme os atos delegados. É preciso contabilizar extração, fabricação, transporte e fim de vida. A Comissão Europeia publicará regras específicas por categoria (PEFCRs) para baterias.",
+  },
+  {
+    question: "Qual conteúdo reciclado deve constar no passaporte?",
+    answer: "Deve declarar o percentual reciclado de cobalto, lítio, níquel e chumbo. O Regulamento define mínimos: 16% cobalto, 6% lítio, 6% níquel e 85% chumbo até fevereiro de 2031, subindo para 26% cobalto, 12% lítio, 15% níquel e 85% chumbo até fevereiro de 2036.",
+  },
+  {
+    question: "Posso usar plataforma de terceiros para o passaporte?",
+    answer: "Sim. Existem várias plataformas e consórcios, incluindo Battery Pass, Catena-X e outras soluções interoperáveis. O regulamento exige acesso via Base de Dados da UE e que qualquer plataforma garanta interoperabilidade, segurança e conformidade arquitetural.",
+  },
+  {
+    question: "Baterias importadas exigem passaporte?",
+    answer: "Sim. Qualquer bateria colocada no mercado da UE — fabricada dentro ou fora — deve cumprir. Importadores e representantes autorizados são responsáveis por garantir passaportes válidos nas baterias que trazem ao mercado europeu.",
+  },
+  {
+    question: "Como o passaporte apoia a economia circular?",
+    answer: "Permite avaliação de segunda vida com dados de saúde, reciclagem eficiente com química e desmontagem, remanufatura com histórico de componentes e transparência que incentiva fornecimento responsável e fabricação sustentável em toda a cadeia.",
+  },
+];
+
+---
+
+<Layout
+  title="Requisitos do Passaporte de Bateria da UE 2026 | Calculadoras de Bateria"
+  description="Guia completo dos requisitos do passaporte de bateria da UE pelo Regulamento (UE) 2023/1542. Saiba quais dados são exigidos, prazos e como se preparar para 2027."
+  canonical="https://batterycalculators.com/pt/learn/eu-battery-passport-requirements-2026/"
+  faqItems={faqItems}
+  lang="pt"
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/pt/learn/" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">&larr; Voltar aos Guias</a>
+      <Breadcrumb items={[{ label: "Centro de Aprendizagem", href: "/pt/learn/" }, { label: "Requisitos do Passaporte de Bateria da UE 2026" }]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">CONFORMIDADE REGULATÓRIA</span>
+      <h1 class="text-display-md text-primary mb-6">Requisitos do Passaporte de Bateria da UE 2026</h1>
+      <p class="text-body-md text-body font-light">
+        O Regulamento de Baterias da União Europeia introduz o maior requisito de rastreabilidade da história da fabricação. Até fevereiro de 2027, toda bateria industrial acima de 2 kWh, toda bateria de veículo elétrico e toda estacionária colocada no mercado da UE deve ter um passaporte digital — um registro completo de ciclo de vida acessado via QR code. Este artigo explica o conteúdo, quem deve cumprir e como se preparar.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+
+      <!-- INTRODUCTION -->
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Por Que a Rastreabilidade Importa Agora</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          O mercado global deve superar 4.500 GWh de produção anual até 2030. Com esse crescimento surge a necessidade urgente de transparência — da mineração ao fim de vida. O Regulamento (UE) 2023/1542 responde com o primeiro passaporte digital obrigatório do mundo para baterias.
+        </p>
+        <p class="text-body-md text-body font-light mb-4">
+          A rastreabilidade não é mais iniciativa voluntária de sustentabilidade. É requisito regulatório que determina se seus produtos podem acessar legalmente o mercado europeu. Empresas que tratam o passaporte como checklist perdem a vantagem estratégica: quem constrói infraestrutura de dados agora liderará em economia circular, verificação de carbono e resiliência da cadeia.
+        </p>
+        <p class="text-body-md text-body font-light">
+          Este guia traz o detalhe de engenharia, conformidade e operação para entender e implementar o passaporte. Se você fabrica células, monta packs ou integra armazenamento, as informações abaixo mapeiam diretamente as ações exigidas antes de fevereiro de 2027.
+        </p>
+      </section>
+
+      <!-- WHAT IS A BATTERY PASSPORT -->
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">O Que É um Passaporte de Bateria?</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Um passaporte de bateria é um registro digital que armazena e comunica dados abrangentes ao longo de todo o ciclo de vida. Funciona como a identidade digital da bateria — um conjunto estruturado que acompanha o produto físico da fabricação ao uso, segunda vida e reciclagem.
+        </p>
+        <p class="text-body-md text-body font-light mb-4">
+          Diferente de um rótulo tradicional, que traz informação estática na venda, o passaporte é um documento vivo. É atualizado ao longo da cadeia, reflete dados reais de desempenho e entrega informações distintas a cada parte conforme papel e autorização.
+        </p>
+
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Atributo</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Descrição</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">Definição</td>
+                <td class="p-4 text-muted">Registro digital com dados de ciclo de vida de uma bateria individual ou lote, acessado por identificador único</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Método de Acesso</td>
+                <td class="p-4 text-muted">QR code ou matriz de dados fixada permanentemente, vinculando ao passaporte digital</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Propósito</td>
+                <td class="p-4 text-muted">Permitir rastreabilidade, transparência, economia circular e conformidade</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Escopo de Dados</td>
+                <td class="p-4 text-muted">Fabricação, química, desempenho, pegada de carbono, reciclados, cadeia, fim de vida</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Frequência de Atualização</td>
+                <td class="p-4 text-muted">Contínua — dados atualizados ao longo do ciclo de vida</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Acesso por Usuário</td>
+                <td class="p-4 text-muted">Por papel — consumidores, recicladores, reguladores e remanufatureiros recebem níveis distintos</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Base Legal</td>
+                <td class="p-4 text-muted">Regulamento (UE) 2023/1542, Artigos 77–80 e atos delegados</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- WHICH BATTERIES REQUIRE A PASSPORT -->
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Quais Baterias Exigem Passaporte?</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          O Regulamento distingue cinco categorias. O passaporte vale para quatro, com limites e datas específicos. Saber a categoria do seu produto é o primeiro passo.
+        </p>
+
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Tipo</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Exige Passaporte?</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Limite</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Data Efetiva</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Exemplos</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">Baterias de EV</td>
+                <td class="p-4 font-mono text-m-teal">Sim</td>
+                <td class="p-4 text-muted">Todas (sem limite)</td>
+                <td class="p-4 font-mono text-primary">18 fev 2027</td>
+                <td class="p-4 text-muted">Tração automotiva, ônibus elétricos, módulos de EV</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Baterias Industriais</td>
+                <td class="p-4 font-mono text-m-teal">Sim</td>
+                <td class="p-4 text-muted">Capacidade &gt; 2 kWh</td>
+                <td class="p-4 font-mono text-primary">18 fev 2027</td>
+                <td class="p-4 text-muted">Empilhadeiras, backup telecom, UPS, armazenamento industrial</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Armazenamento Estacionário</td>
+                <td class="p-4 font-mono text-m-teal">Sim</td>
+                <td class="p-4 text-muted">Capacidade &gt; 2 kWh</td>
+                <td class="p-4 font-mono text-primary">18 fev 2027</td>
+                <td class="p-4 text-muted">Residencial, C&I, BESS de rede</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Baterias LMT</td>
+                <td class="p-4 font-mono text-m-teal">Sim</td>
+                <td class="p-4 text-muted">Capacidade &gt; 2 kWh</td>
+                <td class="p-4 font-mono text-primary">18 fev 2028</td>
+                <td class="p-4 text-muted">E-bikes, patinetes, leves elétricos, golf carts</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Baterias Portáteis</td>
+                <td class="p-4 font-mono text-m-red">Não</td>
+                <td class="p-4 text-muted">N/A</td>
+                <td class="p-4 text-muted">N/A</td>
+                <td class="p-4 text-muted">Pilhas AA/AAA, celular, laptop, ferramentas</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p class="text-body-sm text-muted mt-4">
+          Nota: portáteis são isentas do passaporte, mas devem cumprir outras disposições, incluindo registro na Base de Dados e marcas de reciclagem. O limite de 2 kWh vale para a capacidade total do sistema, não de células individuais.
+        </p>
+      </section>
+
+      <!-- EU BATTERY REGULATION OVERVIEW -->
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Visão Geral do Regulamento</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          O Regulamento (UE) 2023/1542 foi adotado em 13 de junho de 2023, entrou em vigor em 17 de agosto de 2023 e substitui a Diretiva 2006/66/EC. É a legislação mais abrangente já criada, cobrindo todo o ciclo da mineração à reciclagem.
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Requisitos de Sustentabilidade</h4>
+            <p class="text-body-sm text-muted">
+              Declarações obrigatórias de carbono, limites de reciclados e due diligence de matérias-primas. Garantem padrões ambientais mínimos no ciclo todo.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Objetivos de Economia Circular</h4>
+            <p class="text-body-sm text-muted">
+              O regulamento define metas de coleta, reciclagem e recuperação. Passaportes viabilizam esses objetivos dando aos recicladores o necessário para separação e recuperação eficientes.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Requisitos de Rastreabilidade</h4>
+            <p class="text-body-sm text-muted">
+              O passaporte é o mecanismo principal de rastreabilidade. Cria cadeia auditável da origem à fabricação, distribuição, uso e fim de vida.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Relato de Pegada de Carbono</h4>
+            <p class="text-body-sm text-muted">
+              Atos delegados especificam a metodologia PEF para o cálculo. O passaporte deve incluir o valor por kWh de capacidade nominal.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <!-- COMPLIANCE TIMELINE -->
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Cronograma de Conformidade</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          O Regulamento segue implantação faseada. Cada fase traz novas obrigações, e o passaporte está entre as últimas — mas a preparação começa agora.
+        </p>
+
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Data</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Requisito</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Quem É Afetado</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Ação Necessária</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">17 ago 2023</td>
+                <td class="p-4 text-muted">Regulamento entra em vigor</td>
+                <td class="p-4 text-muted">Todas as partes</td>
+                <td class="p-4 text-muted">Iniciar planejamento; revisar sistemas de dados</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">18 fev 2024</td>
+                <td class="p-4 text-muted">Obrigação de registro do produtor</td>
+                <td class="p-4 text-muted">Todos que colocam baterias na UE</td>
+                <td class="p-4 text-muted">Registrar no cadastro nacional de cada Estado-membro onde vende</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">18 fev 2025</td>
+                <td class="p-4 text-muted">Declaração de carbono para EV e industriais</td>
+                <td class="p-4 text-muted">Fabricantes de EV e industriais</td>
+                <td class="p-4 text-muted">Concluir cálculos PEF; preparar declarações pela metodologia delegada</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">18 ago 2025</td>
+                <td class="p-4 text-muted">Obrigações de due diligence</td>
+                <td class="p-4 text-muted">Todos os operadores da cadeia</td>
+                <td class="p-4 text-muted">Implementar políticas para cobalto, lítio, níquel e grafite pelas diretrizes OCDE</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">18 fev 2026</td>
+                <td class="p-4 text-muted">Declarações de conteúdo reciclado</td>
+                <td class="p-4 text-muted">Fabricantes</td>
+                <td class="p-4 text-muted">Criar rastreio de reciclados; preparar declarações de cobalto, lítio, níquel e chumbo</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">18 fev 2027</td>
+                <td class="p-4 font-mono text-m-teal">Passaporte obrigatório</td>
+                <td class="p-4 text-muted">Fabricantes de EV, industriais &gt;2 kWh, estacionárias &gt;2 kWh</td>
+                <td class="p-4 text-muted">Implementação completa com QR code, arquitetura e integração à Base de Dados</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">18 fev 2028</td>
+                <td class="p-4 font-mono text-m-teal">Passaporte LMT obrigatório</td>
+                <td class="p-4 text-muted">Fabricantes de LMT &gt;2 kWh</td>
+                <td class="p-4 text-muted">Estender o sistema à categoria LMT</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">18 fev 2031</td>
+                <td class="p-4 text-muted">Limites reciclados Fase 1</td>
+                <td class="p-4 text-muted">Todos os fabricantes</td>
+                <td class="p-4 text-muted">Atingir 16% cobalto, 6% lítio, 6% níquel, 85% chumbo</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">18 fev 2036</td>
+                <td class="p-4 text-muted">Limites reciclados Fase 2</td>
+                <td class="p-4 text-muted">Todos os fabricantes</td>
+                <td class="p-4 text-muted">Atingir 26% cobalto, 12% lítio, 15% níquel, 85% chumbo</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- DATA REQUIREMENTS -->
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Quais Dados Devem Constar no Passaporte?</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          O regulamento especifica categorias obrigatórias que todo passaporte deve cobrir. Os dados se organizam em grupos funcionais, cada um com um propósito no ciclo de vida. Abaixo, a arquitetura completa exigida.
+        </p>
+
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Categoria</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Dados Exigidos</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Exemplos</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Importância</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted font-bold">Dados do Fabricante</td>
+                <td class="p-4 text-muted">Nome, país, registro, contato</td>
+                <td class="p-4 text-muted">Razão social, ID de registro UE, endereço, representante autorizado</td>
+                <td class="p-4 text-muted">Estabelece responsabilidade legal e rastreio ao produtor</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted font-bold">Identificação</td>
+                <td class="p-4 text-muted">Modelo, série, data, lote</td>
+                <td class="p-4 text-muted">Modelo, série única, data, referência de lote</td>
+                <td class="p-4 text-muted">Permite rastrear cada bateria na cadeia</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted font-bold">Química &amp; Composição</td>
+                <td class="p-4 text-muted">Química, eletrodos, eletrólito</td>
+                <td class="p-4 text-muted">LFP, NMC, NCA, LMO; ânodo de grafite; sal de lítio</td>
+                <td class="p-4 text-muted">Crítica para reciclagem, segurança e segunda vida</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted font-bold">Especificações</td>
+                <td class="p-4 text-muted">Capacidade (Ah), energia (kWh), tensão, C-rate, faixa térmica</td>
+                <td class="p-4 text-muted">200 Ah, 76,8 kWh, 384V nominal, 0,5C, -20°C a +55°C</td>
+                <td class="p-4 text-muted">Define capacidades técnicas para cada aplicação</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted font-bold">Pegada de Carbono</td>
+                <td class="p-4 text-muted">Carbono por kWh, referência PEF, fronteira</td>
+                <td class="p-4 text-muted">45,2 kg CO₂e/kWh (berço ao portão), PEFCR de baterias</td>
+                <td class="p-4 text-muted">Divulgação obrigatória; permite comparar e comprar</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted font-bold">Conteúdo Reciclado</td>
+                <td class="p-4 text-muted">Percentual de cobalto, lítio, níquel e chumbo</td>
+                <td class="p-4 text-muted">18% cobalto, 8% lítio, 7% níquel reciclados</td>
+                <td class="p-4 text-muted">Verifica limites mínimos obrigatórios</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted font-bold">Cadeia de Suprimentos</td>
+                <td class="p-4 text-muted">Relatório de due diligence, origem, auditoria</td>
+                <td class="p-4 text-muted">Cobalto da RDC (auditado), lítio da Austrália, níquel da Indonésia</td>
+                <td class="p-4 text-muted">Demonstra fornecimento responsável pela OCDE</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted font-bold">Desempenho &amp; Saúde</td>
+                <td class="p-4 text-muted">SoH, ciclos, perda, impedância</td>
+                <td class="p-4 text-muted">92% SoH, 450 ciclos, 3,2% de perda, 18 mΩ</td>
+                <td class="p-4 text-muted">Viabiliza segunda vida e valor residual</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted font-bold">Segurança</td>
+                <td class="p-4 text-muted">UN38.3, FDS, alertas, transporte</td>
+                <td class="p-4 text-muted">UN3481 (pack íon-lítio), Classe 9, ref. FDS</td>
+                <td class="p-4 text-muted">Garante manuseio, transporte e estoque seguros</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted font-bold">Fim de Vida</td>
+                <td class="p-4 text-muted">Desmontagem, composição, pontos de coleta</td>
+                <td class="p-4 text-muted">Sequência de desmontagem, tipo de cátodo, ponto WEEE mais próximo</td>
+                <td class="p-4 text-muted">Facilita reciclagem e recuperação no fim de vida</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- QR CODES -->
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">QR Codes do Passaporte Explicados</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          O QR code (ou matriz equivalente) é o elo físico entre a bateria e o passaporte digital. O regulamento especifica requisitos precisos para garantir acessibilidade universal e permanência na vida útil.
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Propósito</h4>
+            <p class="text-body-sm text-muted">
+              O QR dá acesso instantâneo ao passaporte. Qualquer parte — do consumidor ao reciclador — escaneia para obter os dados relevantes. O código deve ser único por bateria ou lote.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Acesso a Dados</h4>
+            <p class="text-body-sm text-muted">
+              Cada papel recebe um nível. Consumidores veem segurança, especificações e carbono. Recicladores veem química e desmontagem. Reguladores veem trilhas completas. A plataforma deve impor esses controles.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Permanência</h4>
+            <p class="text-body-sm text-muted">
+              O código deve ser permanente e legível por toda a vida esperada. Isso exige materiais duráveis — gravação a laser, placas metálicas ou etiquetas de alta durabilidade para temperatura, UV e químicos.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Segurança</h4>
+            <p class="text-body-sm text-muted">
+              O código deve apontar para endpoint seguro. Embora o código não seja criptografado, a plataforma deve garantir integridade, impedir alterações não autorizadas e auditar atualizações. Mecanismos antifraude são recomendados.
+            </p>
+          </CalculatorCard>
+        </div>
+
+        <h3 class="text-title-md text-primary mt-8 mb-3">Exemplo de Fluxo do QR Code</h3>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2 text-body-sm">
+          Etapa 1: Fabricante gera o QR → vincula ao passaporte na Base de Dados da UE
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2 text-body-sm">
+          Etapa 2: QR fixado permanentemente ao pack na montagem
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2 text-body-sm">
+          Etapa 3: Distribuidor escaneia → verifica dados e atualiza distribuição
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2 text-body-sm">
+          Etapa 4: Usuário final escaneia → vê especificações, segurança e carbono
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2 text-body-sm">
+          Etapa 5: No fim de vida, reciclador escaneia → acessa química e desmontagem
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2 text-body-sm">
+          Etapa 6: Reciclador atualiza o passaporte → registra a recuperação
+        </div>
+      </section>
+
+      <!-- DATA ARCHITECTURE -->
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Arquitetura de Dados do Passaporte</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Implementar o passaporte exige arquitetura robusta que coleta, valida, armazena e distribui informações no ciclo todo. Deve suportar atualizações em tempo real, controle por papel e interoperabilidade com a Base de Dados da UE.
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Coleta de Dados</h4>
+            <p class="text-body-sm text-muted">
+              Dados vêm de várias fontes: MES, BMS, plataformas de supply chain e auditorias. A arquitetura deve ingerir dados estruturados de cada fonte e mapear ao esquema do regulamento.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Validação</h4>
+            <p class="text-body-sm text-muted">
+              Antes de entrar, os dados devem ser validados. Campos ausentes, fora de faixa e formatos inconsistentes devem ser sinalizados. Regras versionadas acompanham mudanças dos atos delegados.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Armazenamento</h4>
+            <p class="text-body-sm text-muted">
+              Os dados devem estar disponíveis pela vida esperada (10-20 anos). Isso exige redundância, backup e política clara de retenção. Nuvem com SLA contratual é a escolha pragmática.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Controle de Acesso</h4>
+            <p class="text-body-sm text-muted">
+              A arquitetura deve implementar RBAC. Cada parte recebe um nível. APIs devem ser autenticadas, limitadas e auditadas. A plataforma deve suportar portabilidade exigida.
+            </p>
+          </CalculatorCard>
+        </div>
+
+        <h3 class="text-title-md text-primary mt-8 mb-3">Fluxo de Implementação</h3>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2 text-body-sm">
+          1. Mapear campos internos ao esquema → identificar lacunas
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2 text-body-sm">
+          2. Criar interfaces com MES, BMS e supply chain
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2 text-body-sm">
+          3. Implementar validação com regras do regulamento
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2 text-body-sm">
+          4. Configurar RBAC e autenticação de API
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2 text-body-sm">
+          5. Integrar geração de QR e marcação permanente
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2 text-body-sm">
+          6. Conectar à Base de Dados da UE para registro
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2 text-body-sm">
+          7. Testar de ponta a ponta com lote piloto
+        </div>
+      </section>
+
+      <!-- CHECKLIST -->
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Checklist de Conformidade</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Use este checklist para acompanhar o progresso até fevereiro de 2027. Cada item mapeia um requisito. Conclua todos antes do prazo.
+        </p>
+
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Requisito</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Status</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Equipe Responsável</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Prioridade</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">Registrar na Base de Dados da UE</td>
+                <td class="p-4 text-muted">Não Iniciado</td>
+                <td class="p-4 text-muted">Jurídico / Compliance</td>
+                <td class="p-4 font-mono text-m-red">Alta</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Mapear campos internos ao esquema</td>
+                <td class="p-4 text-muted">Não Iniciado</td>
+                <td class="p-4 text-muted">Engenharia / Dados</td>
+                <td class="p-4 font-mono text-m-red">Alta</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Identificar e preencher lacunas</td>
+                <td class="p-4 text-muted">Não Iniciado</td>
+                <td class="p-4 text-muted">Engenharia / Qualidade</td>
+                <td class="p-4 font-mono text-m-red">Alta</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Estabelecer cálculo de carbono (PEF)</td>
+                <td class="p-4 text-muted">Não Iniciado</td>
+                <td class="p-4 text-muted">Sustentabilidade / ACV</td>
+                <td class="p-4 font-mono text-m-red">Alta</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Implementar rastreio de reciclados</td>
+                <td class="p-4 text-muted">Não Iniciado</td>
+                <td class="p-4 text-muted">Compras / Supply Chain</td>
+                <td class="p-4 font-mono text-m-red">Alta</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Concluir due diligence da cadeia</td>
+                <td class="p-4 text-muted">Não Iniciado</td>
+                <td class="p-4 text-muted">Compras / Compliance</td>
+                <td class="p-4 font-mono text-m-red">Alta</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Selecionar ou construir plataforma</td>
+                <td class="p-4 text-muted">Não Iniciado</td>
+                <td class="p-4 text-muted">TI / Engenharia</td>
+                <td class="p-4 font-mono text-m-red">Alta</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Implementar geração de QR</td>
+                <td class="p-4 text-muted">Não Iniciado</td>
+                <td class="p-4 text-muted">Manufatura / TI</td>
+                <td class="p-4 font-mono text-primary">Média</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Estabelecer marcação permanente</td>
+                <td class="p-4 text-muted">Não Iniciado</td>
+                <td class="p-4 text-muted">Manufatura</td>
+                <td class="p-4 font-mono text-primary">Média</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Configurar controle por papel</td>
+                <td class="p-4 text-muted">Não Iniciado</td>
+                <td class="p-4 text-muted">TI / Segurança</td>
+                <td class="p-4 font-mono text-primary">Média</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Conectar telemetria do BMS para SoH</td>
+                <td class="p-4 text-muted">Não Iniciado</td>
+                <td class="p-4 text-muted">Engenharia / Software</td>
+                <td class="p-4 font-mono text-primary">Média</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Testar de ponta a ponta com piloto</td>
+                <td class="p-4 text-muted">Não Iniciado</td>
+                <td class="p-4 text-muted">Qualidade / Engenharia</td>
+                <td class="p-4 font-mono text-primary">Média</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Treinar equipes nos requisitos</td>
+                <td class="p-4 text-muted">Não Iniciado</td>
+                <td class="p-4 text-muted">RH / Compliance</td>
+                <td class="p-4 font-mono text-primary">Média</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Preparar dados de fim de vida</td>
+                <td class="p-4 text-muted">Não Iniciado</td>
+                <td class="p-4 text-muted">Engenharia / Sustentabilidade</td>
+                <td class="p-4 font-mono text-primary">Média</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Documentar retenção e atualização</td>
+                <td class="p-4 text-muted">Não Iniciado</td>
+                <td class="p-4 text-muted">Qualidade / Compliance</td>
+                <td class="p-4 font-mono text-primary">Média</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Realizar auditoria interna</td>
+                <td class="p-4 text-muted">Não Iniciado</td>
+                <td class="p-4 text-muted">Qualidade / Compliance</td>
+                <td class="p-4 font-mono text-m-teal">Baixa</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- COMMON MISTAKES -->
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Erros Comuns de Conformidade</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Organizações frequentemente subestimam a complexidade. Abaixo, os erros mais comuns, consequências e prevenção.
+        </p>
+
+        <div class="flex flex-col gap-4">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">1. Tratar o Passaporte como Rotulagem</h4>
+            <p class="text-body-sm text-muted">
+              <strong class="text-body-strong">Consequência:</strong> Dados incompletos, auditorias reprovadas, não conformidade. O passaporte é um registro digital dinâmico, não um rótulo estático.
+            </p>
+            <p class="text-body-sm text-muted mt-2">
+              <strong class="text-body-strong">Prevenção:</strong> Construa arquitetura com atualizações contínuas de MES, BMS e cadeia. Trate como gestão de dados, não documentação.
+            </p>
+          </CalculatorCard>
+
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">2. Começar Tarde Demais</h4>
+            <p class="text-body-sm text-muted">
+              <strong class="text-body-strong">Consequência:</strong> Implantação apressada, campos ausentes, falhas de integração. Começar 6-12 meses antes é insuficiente para a infraestrutura exigida.
+            </p>
+            <p class="text-body-sm text-muted mt-2">
+              <strong class="text-body-strong">Prevenção:</strong> Inicie mapeamento e análise de lacunas imediatamente. O regulamento vigora desde agosto de 2023 — o planejamento deveria ter começado no início de 2024.
+            </p>
+          </CalculatorCard>
+
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">3. Ignorar a Complexidade do Carbono</h4>
+            <p class="text-body-sm text-muted">
+              <strong class="text-body-strong">Consequência:</strong> Valores imprecisos, alegações de greenwashing e desqualificação em compras. O PEF exige dados de ciclo de vida que muitos ainda não coletam.
+            </p>
+            <p class="text-body-sm text-muted mt-2">
+              <strong class="text-body-strong">Prevenção:</strong> Contrate consultoria de ACV cedo. Colete extração, transporte e energia fabril. Use as PEFCRs da UE como base.
+            </p>
+          </CalculatorCard>
+
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">4. Achar que QR Code É Simples</h4>
+            <p class="text-body-sm text-muted">
+              <strong class="text-body-strong">Consequência:</strong> Códigos que degradam no ambiente, ficam ilegíveis ou apontam errado. Um QR ilegível torna todo o passaporte inacessível.
+            </p>
+            <p class="text-body-sm text-muted mt-2">
+              <strong class="text-body-strong">Prevenção:</strong> Especifique durabilidade pelo ambiente operacional. Teste em condições reais (ciclos térmicos, UV, químicos). Use laser ou placas metálicas em industrial e EV.
+            </p>
+          </CalculatorCard>
+
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">5. Negligenciar Interoperabilidade</h4>
+            <p class="text-body-sm text-muted">
+              <strong class="text-body-strong">Consequência:</strong> Dados que não trocam com a Base de Dados da UE ou parceiros. Formatos proprietários criam silos que violam a interoperabilidade exigida.
+            </p>
+            <p class="text-body-sm text-muted mt-2">
+              <strong class="text-body-strong">Prevenção:</strong> Adote o esquema dos atos delegados. Use APIs e formatos padronizados. Avalie plataformas como Catena-X ou Battery Pass.
+            </p>
+          </CalculatorCard>
+
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">6. Due Diligence Incompleta</h4>
+            <p class="text-body-sm text-muted">
+              <strong class="text-body-strong">Consequência:</strong> Passaportes sem origem, expondo a penalidades e risco reputacional. Due diligence é componente obrigatório.
+            </p>
+            <p class="p-4 text-body-sm text-muted mt-2">
+              <strong class="text-body-strong">Prevenção:</strong> Implemente processos OCDE para cobalto, lítio, níquel e grafite. Exija rastreabilidade dos fornecedores. Mantenha registros auditáveis.
+            </p>
+          </CalculatorCard>
+
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">7. Não Planejar Atualizações na Vida Útil</h4>
+            <p class="text-body-sm text-muted">
+              <strong class="text-body-strong">Consequência:</strong> Dados obsoletos sem SoH, ciclos ou histórico atual. O passaporte deve permanecer preciso por 10-20 anos.
+            </p>
+            <p class="text-body-sm text-muted mt-2">
+              <strong class="text-body-strong">Prevenção:</strong> Integre telemetria do BMS à plataforma. Crie fluxos automatizados. Defina retenção cobrindo a vida esperada mais prazos regulatórios.
+            </p>
+          </CalculatorCard>
+
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">8. Esquecer o Controle por Papel</h4>
+            <p class="text-body-sm text-muted">
+              <strong class="text-body-strong">Consequência:</strong> Expor dados comerciais sensíveis (preços, fornecedores, química proprietária) ou não entregar o exigido a autorizados.
+            </p>
+            <p class="text-body-sm text-muted mt-2">
+              <strong class="text-body-strong">Prevenção:</strong> Defina níveis por papel antes de implementar. Consumidores veem segurança e especificações. Recicladores veem química e desmontagem. Reguladores veem trilhas. Implemente autenticação e logs.
+            </p>
+          </CalculatorCard>
+
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">9. Ignorar Dados de Fim de Vida</h4>
+            <p class="text-body-sm text-muted">
+              <strong class="text-body-strong">Consequência:</strong> Recicladores sem instruções ou química, reduzindo recuperação e aumentando riscos no processamento.
+            </p>
+            <p class="text-body-sm text-muted mt-2">
+              <strong class="text-body-strong">Prevenção:</strong> Inclua fim de vida desde a produção. Documente desmontagem, composição e perigos. Atualize se remanufaturar ou reaproveitar.
+            </p>
+          </CalculatorCard>
+
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">10. Escolher Plataforma sem Interoperabilidade</h4>
+            <p class="text-body-sm text-muted">
+              <strong class="text-body-strong">Consequência:</strong> Investimento em plataforma que não fala com a Base de Dados da UE nem com parceiros. Lock-in cria risco de longo prazo.
+            </p>
+            <p class="text-body-sm text-muted mt-2">
+              <strong class="text-body-strong">Prevenção:</strong> Antes de escolher, verifique integração com a Base de Dados. Confirme padrões abertos. Avalie histórico com outros fabricantes. Prefira consórcios de interoperabilidade.
+            </p>
+          </CalculatorCard>
+
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">11. Confundir Declaração com Verificação</h4>
+            <p class="text-body-sm text-muted">
+              <strong class="text-body-strong">Consequência:</strong> Enviar valores autodeclarados de carbono ou reciclados sem evidências para verificação. Declarações sem trilha são insuficientes.
+            </p>
+            <p class="text-body-sm text-muted mt-2">
+              <strong class="text-body-strong">Prevenção:</strong> Mantenha documentação de cada dado. Cálculos de carbono devem referenciar PEF e fontes. Reciclados devem rastrear até usina e lote.
+            </p>
+          </CalculatorCard>
+
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">12. Esquecer Baterias Importadas</h4>
+            <p class="text-body-sm text-muted">
+              <strong class="text-body-strong">Consequência:</strong> Importadores colocando baterias não conformes na UE. A regra vale para todas, independente da origem.
+            </p>
+            <p class="text-body-sm text-muted mt-2">
+              <strong class="text-body-strong">Prevenção:</strong> Importadores devem exigir dados conformes dos fabricantes (sobretudo fora da UE) antes de colocar no mercado. Autorize representante na UE se fabricar fora.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <!-- HOW TO PREPARE -->
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Como se Preparar para a Conformidade</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          A conformidade exige ação coordenada de engenharia, compras, TI, sustentabilidade e jurídico. O roteiro abaixo estrutura a preparação.
+        </p>
+
+        <div class="flex flex-col gap-3">
+          <div class="bg-surface-soft p-4 border-l-2 border-m-blue-light">
+            <h4 class="text-primary font-bold mb-1">Etapa 1: Avaliação Regulatória</h4>
+            <p class="text-body-sm text-muted">Identifique quais produtos exigem passaporte. Classifique por tipo e capacidade. Determine o prazo (fevereiro de 2027 ou 2028). Mapeie os dados exigidos ao seu cenário atual.</p>
+          </div>
+          <div class="bg-surface-soft p-4 border-l-2 border-m-blue-light">
+            <h4 class="text-primary font-bold mb-1">Etapa 2: Análise de Lacunas</h4>
+            <p class="text-body-sm text-muted">Compare os campos obrigatórios com sua coleta atual. Identifique faltantes, sobretudo carbono, reciclados e due diligence. Quantifique o esforço para cada lacuna.</p>
+          </div>
+          <div class="bg-surface-soft p-4 border-l-2 border-m-blue-light">
+            <h4 class="text-primary font-bold mb-1">Etapa 3: Seleção de Plataforma</h4>
+            <p class="text-body-sm text-muted">Avalie plataformas por interoperabilidade com a Base de Dados, suporte ao esquema, integração com MES e BMS e RBAC. Considere estabelecidas (Catena-X, Battery Pass) ou própria se único.</p>
+          </div>
+          <div class="bg-surface-soft p-4 border-l-2 border-m-blue-light">
+            <h4 class="text-primary font-bold mb-1">Etapa 4: Infraestrutura de Dados</h4>
+            <p class="text-body-sm text-muted">Implemente coleta para cada fonte. Crie validação alinhada ao esquema. Estabeleça armazenamento com retenção adequada. Configure RBAC e autenticação.</p>
+          </div>
+          <div class="bg-surface-soft p-4 border-l-2 border-m-blue-light">
+            <h4 class="text-primary font-bold mb-1">Etapa 5: Cálculo de Carbono</h4>
+            <p class="text-body-sm text-muted">Contrate ACV ou equipe interna para cálculos PEF por modelo. Colete extração, transporte, energia fabril e fim de vida. Documente fronteiras e premissas.</p>
+          </div>
+          <div class="bg-surface-soft p-4 border-l-2 border-m-blue-light">
+            <h4 class="text-primary font-bold mb-1">Etapa 6: Integração da Cadeia</h4>
+            <p class="text-body-sm text-muted">Exija rastreabilidade de matérias-primas (cobalto, lítio, níquel, grafite). Implemente OCDE. Crie auditorias de fornecedores e documentação para o passaporte.</p>
+          </div>
+          <div class="bg-surface-soft p-4 border-l-2 border-m-blue-light">
+            <h4 class="text-primary font-bold mb-1">Etapa 7: QR Code</h4>
+            <p class="text-body-sm text-muted">Escolha tecnologia adequada ao ambiente. Estabeleça a marcação na linha. Teste durabilidade real. Verifique se o escaneamento abre o registro correto.</p>
+          </div>
+          <div class="bg-surface-soft p-4 border-l-2 border-m-blue-light">
+            <h4 class="text-primary font-bold mb-1">Etapa 8: Piloto e Validação</h4>
+            <p class="text-body-sm text-muted">Rode um ciclo completo com lote piloto. Verifique completude, QR, integração e acessos. Corrija antes da escala total.</p>
+          </div>
+          <div class="bg-surface-soft p-4 border-l-2 border-m-blue-light">
+            <h4 class="text-primary font-bold mb-1">Etapa 9: Implantação Total</h4>
+            <p class="text-body-sm text-muted">Expanda a todas as linhas afetadas. Treine produção, qualidade e compliance em entrada e manutenção. Crie monitoramento e garantia de qualidade contínuos.</p>
+          </div>
+          <div class="bg-surface-soft p-4 border-l-2 border-m-blue-light">
+            <h4 class="text-primary font-bold mb-1">Etapa 10: Melhoria Contínua</h4>
+            <p class="text-body-sm text-muted">Acompanhe atos delegados que refinam requisitos. Melhore qualidade e automação. Use os dados para otimizar a cadeia e ir além do mínimo.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- BATTERY PASSPORT GENERATOR CTA -->
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Use Nosso Gerador de Passaporte</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Nosso <a href="/pt/battery-passport-generator/" class="text-m-blue-light hover:underline">Gerador de Passaporte de Bateria</a> ajuda a criar um passaporte completo com pontuação de conformidade e identificação de campos faltantes. Insira as especificações e o gerador produz um documento estruturado alinhado ao Regulamento.
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard class="border-m-blue-light">
+            <h4 class="text-label-uppercase text-primary text-xs mb-3">O Que Faz</h4>
+            <p class="text-body-sm text-muted mb-4">
+              O gerador avalia seus dados contra os campos obrigatórios, calcula a nota de prontidão, identifica faltantes e produz um documento imprimível com espaço para QR code.
+            </p>
+            <a href="/pt/battery-passport-generator/" class="btn-primary text-xs py-3 px-6 inline-block">Abrir Gerador de Passaporte</a>
+          </CalculatorCard>
+          <CalculatorCard class="border-m-blue-light">
+            <h4 class="text-label-uppercase text-primary text-xs mb-3">Prontidão Antecipada</h4>
+            <p class="text-body-sm text-muted mb-4">
+              Use agora para avaliar sua prontidão. Identifique lacunas antes que virem riscos. A ferramenta dá um ponto de partida estruturado para seu projeto.
+            </p>
+            <a href="/pt/battery-passport-generator/" class="btn-primary-outline text-xs py-3 px-6 inline-block">Iniciar Avaliação</a>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <!-- RELATED ARTICLES -->
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Artigos Relacionados</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">
+              <a href="/pt/learn/battery-pack-design-basics/" class="hover:text-m-blue-light transition-colors">Fundamentos de Projeto de Packs</a>
+            </h4>
+            <p class="text-body-sm text-muted">
+              Entender a arquitetura do pack é essencial para passaportes. O projeto define coleta, posição do QR e documentação de desmontagem.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">
+              <a href="/pt/learn/lifepo4-pack-design/" class="hover:text-m-blue-light transition-colors">Projeto de Pack LiFePO4</a>
+            </h4>
+            <p class="text-body-sm text-muted">
+              Packs LFP exigem dados específicos por sua química. Entender o LFP ajuda a preencher química e composição com precisão.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">
+              <a href="/pt/learn/battery-energy-density-chart/" class="hover:text-m-blue-light transition-colors">Gráfico de Densidade de Energia</a>
+            </h4>
+            <p class="text-body-sm text-muted">
+              Dados de densidade são especificação central do passaporte. O gráfico contextualiza o desempenho entre químicas.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">
+              <a href="/pt/learn/battery-degradation-explained/" class="hover:text-m-blue-light transition-colors">Degradação de Baterias Explicada</a>
+            </h4>
+            <p class="text-body-sm text-muted">
+              Dados de saúde e perda no passaporte exigem entender degradação. Este guia explica a ciência por trás das métricas.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <!-- FAQ SECTION -->
+      <FAQSection items={faqItems} />
+
+      <!-- DISCLAIMER -->
+      <section class="border-t border-hairline pt-8">
+        <p class="text-caption text-muted">
+          <strong class="text-body-strong">Aviso de Engenharia:</strong> Este artigo traz informações gerais sobre o passaporte pelo Regulamento (UE) 2023/1542. Não constitui aconselhamento jurídico. Requisitos e obrigações podem variar conforme atos delegados ainda em finalização. Consulte advogados e especialistas regulatórios para seu caso. Dados refletem o regulamento na data de publicação e podem mudar.
+        </p>
+      </section>
+
+    </div>
+  </div>
+</Layout>

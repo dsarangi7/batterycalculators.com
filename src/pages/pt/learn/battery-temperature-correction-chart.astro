@@ -1,0 +1,445 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+import CalculatorCard from "../../../components/CalculatorCard.astro";
+import FAQSection from "../../../components/FAQSection.astro";
+import ReferenceChart from "../../../components/ReferenceChart.astro";
+import ReferenceTable from "../../../components/ReferenceTable.astro";
+
+const faqItems = [
+  {
+    question: "Como o frio afeta a capacidade da bateria?",
+    answer:
+      "Temperaturas frias aumentam a resistência interna e desaceleram as reações químicas. A 0°C, uma bateria de lítio pode entregar apenas 80–90% da capacidade nominal. A −20°C, pode cair para 50–70%. Chumbo-ácido é ainda mais afetado, perdendo até 50% a −20°C.",
+  },
+  {
+    question: "Posso carregar uma bateria em temperaturas congelantes?",
+    answer:
+      "Carregar lítio abaixo de 0°C risca deposição de lítio no ânodo, o que danifica permanentemente a célula e pode criar riscos. A maioria dos BMS bloqueia a carga abaixo de 0°C. Chumbo-ácido aceita carga no frio, mas muito lentamente, e há risco de congelamento do eletrólito se profundamente descarregada.",
+  },
+  {
+    question: "Como o calor afeta as baterias?",
+    answer:
+      "Altas temperaturas (acima de 40°C) aceleram o envelhecimento calendário e a degradação química. Uma bateria armazenada a 40°C pode envelhecer 2–3x mais rápido que a 25°C. O calor também aumenta a autodescarga. No curto prazo, o calor eleva um pouco a capacidade disponível, mas acelera a degradação de longo prazo.",
+  },
+  {
+    question: "O que é redução por temperatura (derating)?",
+    answer:
+      "É a prática de reduzir a capacidade esperada conforme a temperatura operacional. Uma bateria de 100Ah a 25°C pode ser reduzida para 85Ah a 10°C ou 70Ah a 0°C. Aplique sempre a redução ao dimensionar para ambientes com extremos de temperatura.",
+  },
+];
+
+const tableOfContents = [
+  { id: "temperature-table", label: "Tabela de Efeitos da Temperatura" },
+  { id: "charging-cautions", label: "Cuidados de Carga" },
+  { id: "degradation-risk", label: "Risco de Degradação" },
+  { id: "practical-guidelines", label: "Diretrizes Práticas" },
+  { id: "common-mistakes", label: "Erros Comuns" },
+];
+
+const relatedCalculators = [
+  {
+    title: "Estimador de Degradação",
+    href: "/pt/tools/battery-degradation-estimator/",
+  },
+  { title: "Calculadora de Autonomia", href: "/pt/tools/runtime-calculator/" },
+  {
+    title: "Calculadora de Tempo de Carga",
+    href: "/pt/tools/charging-time-calculator/",
+  },
+];
+
+const references = [
+  {
+    title: "Battery University — Efeitos da Temperatura em Baterias",
+    url: "https://batteryuniversity.com/article/bu-706-how-to-temperature-condition-batteries",
+  },
+  {
+    title: "NREL — Efeitos da Temperatura no Desempenho",
+    url: "https://www.nrel.gov/docs/fy20osti/76169.pdf",
+  },
+];
+---
+
+<Layout
+  title="Gráfico de Correção por Temperatura — Capacidade vs Temperatura | Calculadoras de Bateria"
+  description="Como a temperatura afeta capacidade, segurança de carga e risco de degradação. Tabela de referência com fatores de correção para lítio e chumbo-ácido."
+  canonical="https://batterycalculators.com/pt/learn/battery-temperature-correction-chart/"
+  faqItems={faqItems}
+  lang="pt"
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a
+        href="/pt/learn/"
+        class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block"
+        >&larr; Voltar aos Guias</a
+      >
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4"
+        >REFERÊNCIA</span
+      >
+      <h1 class="text-display-md text-primary mb-6">
+        Gráfico de Correção por Temperatura
+      </h1>
+      <p class="text-body-md text-body font-light">
+        Como a temperatura afeta a capacidade disponível, a segurança de carga e a
+        degradação de longo prazo. Referência essencial para baterias em ambientes
+        extremos.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section id="temperature-table">
+        <ReferenceChart
+          type="bar"
+          title="Capacidade Aproximada vs Temperatura"
+          description="Apenas valores aproximados. Efeitos variam por química, idade, corrente e fabricante."
+          xLabel="Faixa de Temperatura"
+          yLabel="Capacidade (%)"
+          data={[
+            { x: 1, y: 60, label: "Abaixo de 0°C" },
+            { x: 2, y: 75, label: "0–10°C" },
+            { x: 3, y: 95, label: "10–25°C" },
+            { x: 4, y: 100, label: "25–40°C" },
+            { x: 5, y: 90, label: "Acima de 40°C" },
+          ]}
+          yMin={0}
+          yMax={110}
+          caption="Apenas valores aproximados. Efeitos variam por química, idade, corrente e fabricante."
+        />
+
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          Efeitos da Temperatura na Capacidade
+        </h2>
+        <p class="text-body-md text-body font-light mb-4">
+          A capacidade é classificada a 25°C. Desvios dessa
+          temperatura afetam capacidade disponível, resistência interna e
+          taxas de reação. O frio reduz a capacidade e
+          aumenta a resistência. O calor aumenta um pouco a capacidade,
+          mas acelera o envelhecimento.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-body-sm min-w-[700px]">
+              <thead>
+                <tr class="border-b border-hairline bg-surface-card">
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >Temperatura</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >Capacidade Lítio</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >Capacidade Chumbo-Ácido</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >Cuidado de Carga</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >Risco de Degradação</th
+                  >
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-hairline">
+                <tr>
+                  <td class="p-4 font-mono text-primary">Abaixo de 0°C</td>
+                  <td class="p-4 text-muted">70–85%</td>
+                  <td class="p-4 text-muted">50–80%</td>
+                  <td class="p-4 text-muted">Não carregue lítio abaixo de 0°C</td
+                  >
+                  <td class="p-4 text-muted"
+                    >Risco de deposição se carregar no frio</td
+                  >
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">0–10°C</td>
+                  <td class="p-4 text-muted">85–95%</td>
+                  <td class="p-4 text-muted">80–90%</td>
+                  <td class="p-4 text-muted"
+                    >Reduza a taxa, aqueça a bateria antes</td
+                  >
+                  <td class="p-4 text-muted">Baixo se carregar corretamente</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">10–25°C</td>
+                  <td class="p-4 text-muted">95–100%</td>
+                  <td class="p-4 text-muted">90–100%</td>
+                  <td class="p-4 text-muted">Carga padrão é segura</td>
+                  <td class="p-4 text-muted">Mínimo — faixa ideal</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">25–40°C</td>
+                  <td class="p-4 text-muted">100–103%</td>
+                  <td class="p-4 text-muted">100–105%</td>
+                  <td class="p-4 text-muted"
+                    >Monitore sobrecarga, reduza absorção</td
+                  >
+                  <td class="p-4 text-muted"
+                    >Moderado — envelhecimento acelerado</td
+                  >
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">Acima de 40°C</td>
+                  <td class="p-4 text-muted">100–105% (curto prazo)</td>
+                  <td class="p-4 text-muted">105% (curto prazo)</td>
+                  <td class="p-4 text-muted"
+                    >Reduza a taxa, resfriamento ativo necessário</td
+                  >
+                  <td class="p-4 text-muted">Alto — degradação 2–3x mais rápida</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <p class="text-caption text-muted mt-3">
+          Valores aproximados em percentual da capacidade nominal a 25°C. Variam por química e fabricante.
+        </p>
+      </section>
+
+      <section id="charging-cautions">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          Cuidados de Carga por Temperatura
+        </h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Carregar na temperatura errada é uma das formas mais rápidas de
+          danificar a bateria. O lítio é particularmente sensível — carregar
+          abaixo de 0°C faz o lítio metálico se depositar no ânodo, o que é
+          irreversível e cria riscos de curto interno.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Limites de Carga do Lítio</h4>
+            <p class="text-body-sm text-muted">
+              Abaixo de 0°C: não carregue (BMS deve bloquear)<br />
+              0–10°C: reduza para 0,1–0,2C<br />
+              10–45°C: carga padrão OK<br />
+              Acima de 45°C: reduza a taxa, resfriamento ativo
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">
+              Limites de Carga do Chumbo-Ácido
+            </h4>
+            <p class="text-body-sm text-muted">
+              Abaixo de −15°C: não carregue (eletrólito pode congelar)<br />
+              −15–0°C: reduza muito a taxa<br />
+              0–25°C: carga padrão OK<br />
+              Acima de 45°C: reduza a tensão de absorção
+            </p>
+          </CalculatorCard>
+        </div>
+        <p class="text-body-md text-body font-light mt-4">
+          A maioria dos BMS modernos inclui bloqueio de carga por temperatura. Se
+          seu BMS não tem esse recurso, adicione sensor de temperatura e
+          controlador que desabilite a carga abaixo de 0°C para lítio.
+        </p>
+      </section>
+
+      <section id="degradation-risk">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          Risco de Degradação por Temperatura
+        </h2>
+        <p class="text-body-md text-body font-light mb-4">
+          A degradação segue a equação de Arrhenius — as taxas de reação
+          aproximadamente dobram a cada 10°C de aumento. Uma
+          bateria armazenada a 35°C envelhece cerca de duas vezes mais rápido que a
+          25°C. Isso afeta tanto o envelhecimento calendário quanto o de
+          ciclagem.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-body-sm min-w-[480px]">
+              <thead>
+                <tr class="border-b border-hairline bg-surface-card">
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >Temperatura de Armazenamento</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >Taxa Relativa de Envelhecimento</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >Efeito na Vida Útil</th
+                  >
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-hairline">
+                <tr>
+                  <td class="p-4 font-mono text-primary">15°C</td>
+                  <td class="p-4 text-muted">0,5x</td>
+                  <td class="p-4 text-muted"
+                    >Dura ~2x mais que a 25°C</td
+                  >
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">25°C</td>
+                  <td class="p-4 text-muted">1,0x (base)</td>
+                  <td class="p-4 text-muted">Vida útil nominal padrão</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">35°C</td>
+                  <td class="p-4 text-muted">2,0x</td>
+                  <td class="p-4 text-muted">Envelhece ~2x mais rápido</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">45°C</td>
+                  <td class="p-4 text-muted">4,0x</td>
+                  <td class="p-4 text-muted">Envelhece ~4x mais rápido</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <p class="text-caption text-muted mt-3">
+          Taxa relativa à base de 25°C. Taxas reais variam por química
+          e estado de carga no armazenamento.
+        </p>
+      </section>
+
+      <section id="practical-guidelines">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          Diretrizes Práticas
+        </h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Ao dimensionar para temperaturas extremas, aplique
+          a redução à capacidade nominal. Uma bateria de 100Ah em local
+          que chega a 0°C deve ser dimensionada como ~120–130Ah
+          para cobrir a redução de 15–25%.
+        </p>
+        <p class="text-body-md text-body font-light mb-4">
+          Para gabinetes em climas quentes, forneça ventilação ou resfriamento
+          ativo para manter abaixo de 40°C. Para climas frios, considere
+          caixas isoladas ou instalação interna para manter acima de
+          0°C.
+        </p>
+        <p class="text-body-md text-body font-light">
+          Verifique sempre a faixa operacional do fabricante. A maioria do
+          lítio especifica 0–45°C para carga e −20–60°C para
+          descarga. Chumbo-ácido tem faixas mais amplas, mas capacidade reduzida
+          nos extremos.
+        </p>
+      </section>
+
+      <section id="common-mistakes">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          Erros Comuns
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">
+              Carregar Lítio Abaixo de Zero
+            </h4>
+            <p class="text-body-sm text-muted">
+              Carregar lítio abaixo de 0°C causa deposição, que
+              reduz permanentemente a capacidade e cria riscos. Sempre
+              aqueça acima de 0°C antes de carregar, ou use BMS que
+              bloqueie carga no frio.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">
+              Ignorar Dimensionamento no Calor
+            </h4>
+            <p class="text-body-sm text-muted">
+              Uma bateria em gabinete quente (50°C+) degradará 4x mais rápido que
+              a 25°C. Se operará em altas temperaturas,
+              superdimensione e forneça resfriamento.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">
+              Usar Classificação Ambiente no Frio
+            </h4>
+            <p class="text-body-sm text-muted">
+              Uma bateria de 100Ah a 25°C pode entregar só 75Ah a 0°C. Se você
+              dimensiona pela classificação a 25°C mas opera no frio,
+              terá 25% menos capacidade. Aplique a redução.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">
+              Não Monitorar a Temperatura
+            </h4>
+            <p class="text-body-sm text-muted">
+              Sem monitoramento, você não detecta quando a bateria
+              está fora da faixa segura. Adicione sensores ao
+              BMS ou controlador para proteção automática.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <CalculatorCard class="border-m-blue-light">
+        <h4 class="text-label-uppercase text-primary text-xs mb-3">Experimente</h4>
+        <p class="text-body-sm text-muted mb-4">
+          Use o Estimador de Degradação para ver como temperatura e DoD
+          afetam a vida em ciclos, ou a Calculadora de Tempo de Carga para
+          tempos ajustados por temperatura.
+        </p>
+        <a
+          href="/pt/tools/battery-degradation-estimator/"
+          class="btn-primary text-xs py-3 px-6 inline-block"
+          >Abrir Estimador de Degradação</a
+        >
+      </CalculatorCard>
+
+      <ReferenceTable
+        title="Efeitos da Temperatura na Capacidade"
+        description="Baixe esta tabela para referência offline"
+        headers={["Temperatura", "Capacidade Lítio", "Capacidade Chumbo-Ácido", "Cuidado de Carga", "Risco de Degradação"]}
+        rows={[
+          ["Abaixo de 0°C", "70–85%", "50–80%", "Não carregue lítio abaixo de 0°C", "Risco de deposição se carregar no frio"],
+          ["0–10°C", "85–95%", "80–90%", "Reduza a taxa, aqueça a bateria antes", "Baixo se carregar corretamente"],
+          ["10–25°C", "95–100%", "90–100%", "Carga padrão é segura", "Mínimo — faixa ideal"],
+          ["25–40°C", "100–103%", "100–105%", "Monitore sobrecarga, reduza absorção", "Moderado — envelhecimento acelerado"],
+          ["Acima de 40°C", "100–105% (curto prazo)", "105% (curto prazo)", "Reduza a taxa, resfriamento ativo necessário", "Alto — degradação 2–3x mais rápida"],
+        ]}
+        source="Battery University / NREL"
+      />
+
+      <ReferenceTable
+        title="Taxa de Degradação por Temperatura de Armazenamento"
+        description="Baixe esta tabela para referência offline"
+        headers={["Temperatura de Armazenamento", "Taxa Relativa", "Efeito na Vida Útil"]}
+        rows={[
+          ["15°C", "0,5x", "Dura ~2x mais que a 25°C"],
+          ["25°C", "1,0x (base)", "Vida útil nominal padrão"],
+          ["35°C", "2,0x", "Envelhece ~2x mais rápido"],
+          ["45°C", "4,0x", "Envelhece ~4x mais rápido"],
+        ]}
+        source="Battery University / NREL"
+      />
+
+      <FAQSection items={faqItems} />
+
+      <section class="border-t border-hairline pt-12">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          Referências
+        </h2>
+        <ul class="flex flex-col gap-2 text-body-sm text-muted">
+          {
+            references.map((ref) => (
+              <li class="flex gap-2">
+                <span class="text-m-blue-light shrink-0">—</span>
+                <a
+                  href={ref.url}
+                  class="hover:text-primary transition-colors underline underline-offset-2"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {ref.title}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+    </div>
+  </div>
+</Layout>

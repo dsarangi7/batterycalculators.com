@@ -1,0 +1,287 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "Quanto tempo uma bateria de 10kWh alimenta minha casa?",
+    answer: "Uma LFP de 10 kWh a 85% DoD com inversor de 92% fornece ~7,8 kWh utilizáveis. Com carga crítica de 1.500W, roda ~5,2 horas. Com 500W, dura ~15,6 horas. A autonomia escala linearmente — reduzir a carga pela metade dobra a duração.",
+  },
+  {
+    question: "O tamanho da bateria determina diretamente a autonomia?",
+    answer: "O tamanho define o limite, mas a autonomia é a razão entre energia utilizável e carga. Uma bateria de 20 kWh com 2 kW dura ~7,8 horas. A mesma com 500W dura ~31 horas. Reduzir a carga costuma ser mais barato que adicionar capacidade.",
+  },
+  {
+    question: "Como temperatura e idade afetam a autonomia?",
+    answer: "O frio reduz a capacidade — LFP perde 10–20% abaixo de 0°C. A capacidade também degrada: LFP retém ~80% após 3.000 ciclos (~8–10 anos de ciclagem diária). Uma bateria de 10 anos entrega ~80% da autonomia original.",
+  },
+  {
+    question: "Posso estender a autonomia sem mais baterias?",
+    answer: "Sim. Desligue não essenciais, use aparelhos eficientes e dimensione bem o inversor (inversores são mais eficientes a 40–80% que em cargas mínimas). Gerenciar cargas e agendar altos consumos no dia (se há solar) também estende a duração efetiva.",
+  },
+];
+---
+
+<Layout
+  title="Guia de Autonomia para Backup Residencial | Calculadoras de Bateria"
+  description="Guia detalhado de autonomia residencial: quanto duram baterias de 5kWh, 10kWh, 15kWh e 20kWh em cada carga, com tabelas, fórmulas e otimização."
+  canonical="https://batterycalculators.com/pt/learn/home-backup-runtime-guide/"
+  schema="faqPage"
+  schemaName="Guia de Autonomia para Backup Residencial"
+  schemaDescription="Guia detalhado de autonomia residencial em cada nível de carga."
+  schemaUrl="https://batterycalculators.com/pt/learn/home-backup-runtime-guide/"
+  faqItems={faqItems}
+  lang="pt"
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/pt/learn/" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Voltar aos Guias</a>
+      <Breadcrumb items={[
+        { label: "Centro de Aprendizagem", href: "/pt/learn/" },
+        { label: "Guia de Autonomia Residencial" },
+      ]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">BACKUP RESIDENCIAL</span>
+      <h1 class="text-display-md text-primary mb-6">Guia de Autonomia para Backup Residencial</h1>
+      <p class="text-body-md text-body font-light">
+        Autonomia é a métrica mais prática do backup — responde à pergunta de todos: quanto tempo isso mantém minhas luzes acesas? Este guia traz tabelas por tamanho, explica a física por trás dos números e mostra como gerenciar cargas para estender muito a duração sem hardware extra.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Como a Autonomia É Calculada</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          A autonomia é a razão entre energia utilizável e potência da carga. Energia utilizável = capacidade × profundidade de descarga (DoD) × eficiência do inversor. Potência = soma de todos os dispositivos simultâneos. Dividir uma pela outra dá horas.
+        </p>
+        <p class="text-body-md text-body font-light mb-6">
+          O cálculo assume carga constante. Na prática, cargas flutuam — a geladeira cicla, luzes ligam e desligam, dispositivos entram e saem ao longo do dia. Para estimar melhor, calcule pela carga média do período, não pelo pico momentâneo.
+        </p>
+        <FormulaBox title="Fórmula de Autonomia">
+          <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+            Autonomia (horas) = (Capacidade (Wh) × DoD × Eficiência do Inversor) / Carga (W)
+          </div>
+          <p>
+            Para uma LFP de 10 kWh (10.000 Wh) a 85% DoD com inversor de 92%, a energia utilizável é 10.000 × 0,85 × 0,92 = 7.820 Wh. Com 1.000W, são 7,82 horas. Com 2.000W, cai para 3,91 horas.
+          </p>
+        </FormulaBox>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Autonomia por Tamanho e Carga</h2>
+        <p class="text-body-md text-body font-light mb-6">
+          A tabela mostra a autonomia estimada para quatro tamanhos comuns em cinco cargas. Todos assumem LFP (85% DoD) com inversor de 92%. Use como referência rápida ao escolher.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Bateria</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">500W</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">1.000W</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">2.000W</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">3.000W</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">5.000W</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">5 kWh</td>
+                <td class="p-4 font-mono text-primary">7,8 h</td>
+                <td class="p-4 font-mono text-primary">3,9 h</td>
+                <td class="p-4 font-mono text-primary">2,0 h</td>
+                <td class="p-4 font-mono text-primary">1,3 h</td>
+                <td class="p-4 font-mono text-primary">0,8 h</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">10 kWh</td>
+                <td class="p-4 font-mono text-primary">15,6 h</td>
+                <td class="p-4 font-mono text-primary">7,8 h</td>
+                <td class="p-4 font-mono text-primary">3,9 h</td>
+                <td class="p-4 font-mono text-primary">2,6 h</td>
+                <td class="p-4 font-mono text-primary">1,6 h</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">15 kWh</td>
+                <td class="p-4 font-mono text-primary">23,5 h</td>
+                <td class="p-4 font-mono text-primary">11,7 h</td>
+                <td class="p-4 font-mono text-primary">5,9 h</td>
+                <td class="p-4 font-mono text-primary">3,9 h</td>
+                <td class="p-4 font-mono text-primary">2,3 h</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">20 kWh</td>
+                <td class="p-4 font-mono text-primary">31,3 h</td>
+                <td class="p-4 font-mono text-primary">15,6 h</td>
+                <td class="p-4 font-mono text-primary">7,8 h</td>
+                <td class="p-4 font-mono text-primary">5,2 h</td>
+                <td class="p-4 font-mono text-primary">3,1 h</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-body-sm text-muted mt-4">
+          Valores para carga estática. Na prática, será um pouco maior para cargas que ciclam (geladeiras) e um pouco menor para motores com alta corrente de partida.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Perfis Típicos de Carga Residencial</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Conhecer seu perfil real é essencial. O consumo não é constante — pica de manhã e à noite com vários aparelhos e cai de madrugada. A tabela mostra níveis típicos só com cargas críticas por período.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Período</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Carga Ativa</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Duração</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Energia (Wh)</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-primary font-bold">Manhã (6h – 9h)</td>
+                <td class="p-4 font-mono text-primary">1.500 – 2.500W</td>
+                <td class="p-4 font-mono text-primary">3 horas</td>
+                <td class="p-4 font-mono text-primary">4.500 – 7.500</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-primary font-bold">Dia (9h – 17h)</td>
+                <td class="p-4 font-mono text-primary">500 – 1.000W</td>
+                <td class="p-4 font-mono text-primary">8 horas</td>
+                <td class="p-4 font-mono text-primary">4.000 – 8.000</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-primary font-bold">Noite (17h – 22h)</td>
+                <td class="p-4 font-mono text-primary">2.000 – 3.500W</td>
+                <td class="p-4 font-mono text-primary">5 horas</td>
+                <td class="p-4 font-mono text-primary">10.000 – 17.500</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-primary font-bold">Madrugada (22h – 6h)</td>
+                <td class="p-4 font-mono text-primary">200 – 500W</td>
+                <td class="p-4 font-mono text-primary">8 horas</td>
+                <td class="p-4 font-mono text-primary">1.600 – 4.000</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-body-sm text-muted mt-4">
+          O consumo médio diário é a média ponderada da coluna de energia. Um perfil só crítico típico totaliza 20.000–37.000 Wh (20–37 kWh), embora a relação pico/média importe para o inversor mesmo que a média defina a bateria.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Exemplo Prático: Estimativa</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Cenário:</strong> Bateria LFP de 15 kWh, residência típica com cargas críticas.</p>
+            <p><strong>Dados:</strong></p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li>Bateria: 15.000 Wh</li>
+              <li>DoD: 85%</li>
+              <li>Eficiência do inversor: 92%</li>
+              <li>Carga crítica média: 1.200W</li>
+            </ul>
+            <p><strong>Etapa 1:</strong> Energia utilizável:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              15.000 × 0,85 × 0,92 = 11.730 Wh
+            </div>
+            <p><strong>Etapa 2:</strong> Autonomia na carga média:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              11.730 Wh / 1.200W = 9,8 horas
+            </div>
+            <p><strong>Etapa 3:</strong> Aplicar o perfil para mais precisão:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              Manhã (3h @ 2.000W): 6.000 Wh<br/>
+              Dia (8h @ 800W): 6.400 Wh<br/>
+              Noite (5h @ 2.500W): 12.500 Wh<br/>
+              Madrugada (8h @ 300W): 2.400 Wh<br/>
+              Total: 27.300 Wh → excede 11.730 Wh
+            </div>
+            <p class="pt-2 border-t border-hairline"><strong>Conclusão:</strong> Uma bateria de 15 kWh não sustenta 24 horas desse perfil crítico. Cobre ~10 horas de dia e noite. Para 24 horas, eleve para ~27 kWh ou reduza cargas noturnas.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Fatores que Reduzem a Autonomia</h2>
+        <p class="text-body-md text-body font-light mb-6">
+          Vários fatores reais reduzem a autonomia abaixo do teórico. Entendê-los evita superestimar e ajuda a projetar com resiliência.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Redução por Temperatura</h4>
+            <p class="text-body-sm text-muted">
+              LFP perde 10–20% utilizável abaixo de 0°C. Se a bateria fica em garagem sem aquecimento ou gabinete externo no inverno, espere menos autonomia. Mantenha acima de 10°C para o ideal.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Idade da Bateria</h4>
+            <p class="text-body-sm text-muted">
+              LFP degrada ~20% em 3.000 ciclos. Uma bateria de 5 anos em uso diário retém ~85–90%. Com 10 anos, pode reter 75–80%. Considere o envelhecimento se planeja longa vida útil.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Eficiência em Carga Leve</h4>
+            <p class="text-body-sm text-muted">
+              Inversores são menos eficientes em cargas mínimas (abaixo de 10%). Um inversor de 5 kW com 200W pode operar a só 80% em vez dos 92% nominais. Isso pesa em madrugadas longas de baixa carga.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Correntes de Partida</h4>
+            <p class="text-body-sm text-muted">
+              Motores de geladeiras, bombas e compressores puxam 3–6× a potência por 1–3 segundos na partida. Esses picos consomem extra e devem caber no surto do inversor, embora impactem pouco a autonomia total.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Experimente</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use a Calculadora de Backup para estimar com seu perfil e configuração.
+          </p>
+          <a href="/pt/tools/home-backup-battery-calculator/" class="btn-primary text-xs py-3 px-6 inline-block">Abrir Calculadora de Backup</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Ferramenta Relacionada</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Calcule a autonomia exata de qualquer configuração em uma carga específica.
+          </p>
+          <a href="/pt/tools/runtime-calculator/" class="btn-primary-outline text-xs py-3 px-6 inline-block">Abrir Calculadora de Autonomia</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Artigos Relacionados</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <a href="/pt/learn/how-many-kwh-do-i-need-for-my-house/" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors mb-2 block">
+              De Quantos kWh Preciso para Minha Casa?
+            </a>
+            <p class="text-body-sm text-muted">
+              Como calcular o consumo diário em kWh — o ponto de partida para bateria e autonomia.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <a href="/pt/learn/whole-house-battery-backup/" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors mb-2 block">
+              Backup da Casa Toda
+            </a>
+            <p class="text-body-sm text-muted">
+              Como dimensionar backup total, incluindo capacidades maiores para autonomia integral.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

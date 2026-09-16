@@ -1,0 +1,279 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "Quanto tempo leva para carregar uma bateria de 100Ah?",
+    answer: "Depende da corrente do carregador. A 0,2C (20A), uma bateria LFP de 100Ah carrega em aproximadamente 5 horas. A 0,5C (50A), carrega em cerca de 2 horas. A fase final CV (tensão constante) adiciona 30–60 minutos enquanto a bateria completa a carga.",
+  },
+  {
+    question: "Por que a carga desacelera perto do final?",
+    answer: "Baterias de lítio usam perfil CC-CV (corrente constante, tensão constante). Durante a fase CC, a corrente é constante e a carga é rápida. Durante a fase CV, o carregador mantém a tensão constante enquanto a corrente diminui, levando progressivamente mais tempo para adicionar cada ponto percentual de carga.",
+  },
+  {
+    question: "Posso carregar uma bateria acima de 1C?",
+    answer: "Algumas químicas de lítio suportam carga de 1C a 2C, mas taxas mais altas geram mais calor e aceleram a degradação. A química LFP normalmente é carregada de 0,2C a 0,5C para vida útil ideal. Siga sempre a taxa de carga recomendada pelo fabricante.",
+  },
+  {
+    question: "A temperatura afeta o tempo de carga?",
+    answer: "Sim. Baterias frias aceitam menos corrente porque o BMS limita a taxa de carga para evitar deposição de lítio. Abaixo de 0°C, a maioria das baterias de lítio não deve ser carregada. Carregar no frio estende a fase CV, aumentando o tempo total de carga.",
+  },
+];
+---
+
+<Layout
+  title="Quanto Tempo Leva para Carregar uma Bateria | Calculadoras de Bateria"
+  description="Aprenda a estimar o tempo de carga da bateria usando C-rate, corrente do carregador e perfis CC-CV. Inclui exemplos resolvidos, fórmulas e tabelas práticas de referência."
+  canonical="https://batterycalculators.com/pt/learn/how-long-to-charge-a-battery/"
+  schema="faqPage"
+  schemaName="Quanto Tempo Leva para Carregar uma Bateria"
+  schemaDescription="Guia para estimar o tempo de carga da bateria a partir de C-rate, corrente do carregador e perfis CC-CV."
+  schemaUrl="https://batterycalculators.com/pt/learn/how-long-to-charge-a-battery/"
+  faqItems={faqItems}
+  lang="pt"
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/pt/learn/" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Voltar aos Guias</a>
+      <Breadcrumb items={[
+        { label: "Centro de Aprendizagem", href: "/pt/learn/" },
+        { label: "Quanto Tempo Leva para Carregar uma Bateria" }
+      ]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">CARGA</span>
+      <h1 class="text-display-md text-primary mb-6">Quanto Tempo Leva para Carregar uma Bateria</h1>
+      <p class="text-body-md text-body font-light">
+        O tempo de carga depende da corrente de saída do carregador, da capacidade da bateria e do perfil de carga utilizado. Uma bateria não carrega em taxa constante durante todo o ciclo — os últimos 10–20% levam significativamente mais tempo que os primeiros 80%.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">O Perfil de Carga em Duas Fases</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          A maioria das baterias de íon-lítio e LFP usa perfil de carga CC-CV (Corrente Constante, Tensão Constante). Entender essas duas fases é essencial para estimar tempos de carga precisos.
+        </p>
+        <p class="text-body-md text-body font-light mb-4">
+          Durante a <strong class="text-primary">fase CC</strong>, o carregador fornece corrente constante (por exemplo, 50A em uma bateria de 100Ah). A tensão da bateria sobe de forma constante nessa fase. Esta é a porção de carga rápida, normalmente adicionando 80% da capacidade.
+        </p>
+        <p class="text-body-md text-body font-light">
+          Durante a <strong class="text-primary">fase CV</strong>, o carregador mantém a tensão constante no máximo da bateria (p. ex., 3,65V por célula para LFP) enquanto a corrente diminui exponencialmente. Essa fase adiciona os 10–20% finais, mas leva desproporcionalmente mais tempo porque a corrente está diminuindo.
+        </p>
+      </section>
+
+      <FormulaBox title="Fórmulas de Tempo de Carga">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Tempo fase CC (h) = Capacidade (Ah) × (SOC alvo% − SOC inicial%) / Corrente de carga (A)
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Tempo total ≈ Tempo fase CC × 1,25 a 1,35
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          C-Rate = Corrente de carga (A) / Capacidade (Ah)
+        </div>
+        <p>
+          O multiplicador de 1,25–1,35 considera a fase CV, onde a corrente diminui. O multiplicador exato depende de quão descarregada estava a bateria e das características de redução CV da química.
+        </p>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Tempo de Carga por C-Rate</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          O C-rate padroniza a velocidade de carga independentemente do tamanho da bateria. Uma bateria de 100Ah a 0,5C carrega a 50A; uma bateria de 200Ah a 0,5C carrega a 100A. Ambas levam aproximadamente o mesmo tempo porque a taxa é proporcional à capacidade.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">C-Rate</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Corrente em 100Ah</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Tempo aprox.</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Observações</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">0.1C</td>
+                <td class="p-4 text-muted">10 A</td>
+                <td class="p-4 text-muted">~12 horas</td>
+                <td class="p-4 text-muted">Carga lenta, vida útil máxima</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">0.2C</td>
+                <td class="p-4 text-muted">20 A</td>
+                <td class="p-4 text-muted">~6 horas</td>
+                <td class="p-4 text-muted">Carga lenta, longevidade LFP</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">0.5C</td>
+                <td class="p-4 text-muted">50 A</td>
+                <td class="p-4 text-muted">~2,5 horas</td>
+                <td class="p-4 text-muted">Carga rápida padrão</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">1C</td>
+                <td class="p-4 text-muted">100 A</td>
+                <td class="p-4 text-muted">~1,25 horas</td>
+                <td class="p-4 text-muted">Agressiva, mais calor</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">2C</td>
+                <td class="p-4 text-muted">200 A</td>
+                <td class="p-4 text-muted">~40 minutos</td>
+                <td class="p-4 text-muted">Muito rápida, menor vida útil</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Exemplo Resolvido</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Dados:</strong></p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li>Bateria: 200 Ah a 48V (rack de servidor LFP)</li>
+              <li>Carregador: 48V 50A (taxa de 0,25C)</li>
+              <li>SOC inicial: 20%</li>
+              <li>SOC alvo: 100%</li>
+            </ul>
+            <p><strong>Etapa 1:</strong> Calcular a carga necessária (Ah):</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              200 Ah × (1,00 − 0,20) = 160 Ah a adicionar
+            </div>
+            <p><strong>Etapa 2:</strong> Tempo da fase CC:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              160 Ah / 50 A = 3,2 horas
+            </div>
+            <p><strong>Etapa 3:</strong> Estimar o tempo total incluindo a redução CV:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              3,2 horas × 1,30 ≈ 4,16 horas ≈ 4 horas e 10 minutos
+            </div>
+            <p class="text-muted mt-2">Com um carregador maior de 1C (100A), a mesma carga de 80% a 100% levaria aproximadamente 1 hora e 18 minutos. A contrapartida é o aumento do aquecimento das células e a potencial degradação da capacidade no longo prazo.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Tempo de Carga por Tamanho de Bateria</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          A tabela abaixo mostra tempos típicos de carga de 20% a 100% SOC para tamanhos comuns de bateria usando um carregador de 0,2C.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Tamanho da bateria</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Carregador 0,2C</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Carregador 0,5C</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Carregador 1C</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">50 Ah 12.8V</td>
+                <td class="p-4 text-muted">~5,2 h</td>
+                <td class="p-4 text-muted">~2,1 h</td>
+                <td class="p-4 text-muted">~1,0 h</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">100 Ah 12.8V</td>
+                <td class="p-4 text-muted">~5,2 h</td>
+                <td class="p-4 text-muted">~2,1 h</td>
+                <td class="p-4 text-muted">~1,0 h</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">200 Ah 48V</td>
+                <td class="p-4 text-muted">~5,2 h</td>
+                <td class="p-4 text-muted">~2,1 h</td>
+                <td class="p-4 text-muted">~1,0 h</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">300 Ah 48V</td>
+                <td class="p-4 text-muted">~5,2 h</td>
+                <td class="p-4 text-muted">~2,1 h</td>
+                <td class="p-4 text-muted">~1,0 h</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-body-md text-body font-light mt-4">
+          Os tempos são semelhantes entre tamanhos de bateria porque o C-rate é proporcional. Uma bateria maior recebe proporcionalmente mais corrente de um carregador maior, mantendo o tempo de carga constante.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Fatores que Afetam o Tempo de Carga</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">SOC inicial</h4>
+            <p class="text-body-sm text-muted">
+              Carregar de 0% leva mais tempo que de 20% porque a fase CC cobre uma porção maior da capacidade. A fase de redução CV permanece aproximadamente constante independentemente do SOC inicial.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Temperatura</h4>
+            <p class="text-body-sm text-muted">
+              Baterias frias aceitam menos corrente. Abaixo de 0°C, unidades de BMS de lítio normalmente bloqueiam a carga por completo. Entre 0–10°C, as taxas de carga podem ser reduzidas para 0,1C, estendendo significativamente o tempo de carga.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Limite de potência do carregador</h4>
+            <p class="text-body-sm text-muted">
+              A corrente máxima de saída do carregador é o gargalo. Uma bateria de 100Ah com carregador de 25A (0,25C) carrega muito mais devagar que com um carregador de 100A (1C), independentemente da capacidade da bateria.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Idade da bateria</h4>
+            <p class="text-body-sm text-muted">
+              Baterias envelhecidas têm maior resistência interna, o que faz a fase CV iniciar mais cedo e a redução ser mais lenta. Isso estende o tempo total de carga em 10–20% para baterias com 80% de SOH.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Experimente</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use a Calculadora de Tempo de Carga para estimar a duração da carga para sua bateria e configuração de carregador específicas.
+          </p>
+          <a href="/pt/tools/charging-time-calculator/" class="btn-primary text-xs py-3 px-6 inline-block">Abrir Calculadora de Tempo de Carga</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Relacionado</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Entenda como o C-rate governa os limites de corrente de carga e descarga.
+          </p>
+          <a href="/pt/learn/what-is-battery-c-rate/" class="btn-primary-outline text-xs py-3 px-6 inline-block">Ler Guia de C-Rate</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Artigos Relacionados</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">O Que É C-Rate de Bateria?</h4>
+            <p class="text-body-sm text-muted mb-3">
+              Entenda a relação entre corrente e capacidade e como ela governa a velocidade de carga.
+            </p>
+            <a href="/pt/learn/what-is-battery-c-rate/" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Ler Guia →</a>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Quanto Tempo Durará uma Bateria?</h4>
+            <p class="text-body-sm text-muted mb-3">
+              O guia complementar: estimando a autonomia de descarga a partir de capacidade e carga.
+            </p>
+            <a href="/pt/learn/how-long-will-a-battery-last/" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Ler Guia →</a>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

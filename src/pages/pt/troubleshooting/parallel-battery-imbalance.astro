@@ -1,0 +1,187 @@
+---
+import ArticleLayout from '../../../layouts/ArticleLayout.astro';
+import TroubleshootingBlock from '../../../components/TroubleshootingBlock.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+
+const description = "Descubra por que baterias em paralelo não dividem a carga igualmente. Abrange SOC diferente, idade, resistência interna, assimetria de fiação e resistência de conexão com listas de verificação passo a passo.";
+
+const faqItems = [
+  {
+    question: "Como verifico se baterias em paralelo estão dividindo a carga igualmente?",
+    answer: "Use um alicate amperímetro nos cabos positivo e negativo de cada bateria com o sistema sob carga. Compare as leituras — cada bateria deve carregar aproximadamente a mesma corrente. Uma diferença maior que 10% indica um desequilíbrio que deve ser investigado.",
+  },
+  {
+    question: "Posso ligar em paralelo baterias de capacidades diferentes?",
+    answer: "Pode, mas elas não dividirão a carga proporcionalmente. A bateria com menor resistência interna (geralmente a de maior capacidade) carregará mais corrente. Idealmente, baterias em paralelo devem ter mesma química, capacidade, idade e fabricante para melhores resultados.",
+  },
+  {
+    question: "Como corrijo o desequilíbrio de baterias em paralelo?",
+    answer: "Primeiro, carregue totalmente todas as baterias individualmente antes de ligá-las em paralelo. Depois garanta que todas as conexões estejam limpas, firmes e idênticas em comprimento e bitola. Se o desequilíbrio persistir, verifique diferenças de resistência interna com um medidor de impedância CA. Substitua qualquer bateria com resistência significativamente maior.",
+  },
+  {
+    question: "Devo fusível individual para cada bateria em um banco paralelo?",
+    answer: "Sim. Cada bateria em um banco paralelo deve ter seu próprio fusível dimensionado para a corrente contínua máxima da bateria. Isso protege contra a falha de uma bateria fazendo todas as outras descarregarem no defeito. Fusíveis também facilitam isolar baterias individuais para manutenção.",
+  },
+  {
+    question: "Com que frequência devo verificar o equilíbrio das baterias em paralelo?",
+    answer: "Verifique a divisão de corrente mensalmente nos primeiros seis meses de operação. Após o sistema estabilizar, verificações trimestrais bastam. Monitore as tensões diariamente usando o BMS ou um monitor de bateria. Qualquer mudança súbita no equilíbrio indica um problema em desenvolvimento.",
+  },
+];
+
+const relatedCalculators = [
+  { title: "Calculadora de String Paralela", href: "/pt/tools/parallel-string-calculator/", type: "calculator" as const },
+  { title: "Calculadora de Dimensionamento de Bateria", href: "/pt/tools/battery-sizing-calculator/", type: "calculator" as const },
+  { title: "Calculadora de Queda de Tensão", href: "/pt/tools/voltage-drop-calculator/", type: "calculator" as const },
+];
+
+const relatedGuides = [
+  { title: "Como Dimensionar um Banco de Baterias", href: "/pt/learn/how-to-size-a-battery-bank/", type: "guide" as const },
+  { title: "Projeto de Pacote LiFePO4", href: "/pt/learn/lifepo4-pack-design/", type: "guide" as const },
+];
+---
+
+<ArticleLayout
+  title="Desequilíbrio de Baterias em Paralelo — Guia de Solução de Problemas | Calculadoras de Bateria"
+  description={description}
+  canonical="https://batterycalculators.com/pt/troubleshooting/parallel-battery-imbalance/"
+  category="SOLUÇÃO DE PROBLEMAS"
+  breadcrumbItems={[{ label: "Desequilíbrio de Baterias em Paralelo" }]}
+  relatedCalculators={relatedCalculators}
+  relatedGuides={relatedGuides}
+  faqItems={faqItems}
+  lang="pt"
+>
+  <p class="text-body-md text-body font-light mb-8">
+    Quando baterias conectadas em paralelo não dividem a carga igualmente, uma bateria trabalha mais que as demais — levando a degradação mais rápida, falha prematura e capacidade total reduzida do sistema. Este guia aborda as cinco causas comuns e como restaurar a operação equilibrada do seu banco em paralelo.
+  </p>
+
+  <TroubleshootingBlock
+    lang="pt"
+    problem="Estado de Carga (SOC) Diferente"
+    causes={[
+      "Baterias não foram totalmente carregadas à mesma tensão antes de ligar em paralelo",
+      "Diferentes taxas de autodescarga causaram divergência de SOC ao longo do tempo",
+      "Uma bateria foi carregada separadamente enquanto as outras não",
+      "Balanceamento do BMS em baterias individuais resultou em tensões finais diferentes",
+    ]}
+    explanation="Quando baterias com SOC diferentes são conectadas em paralelo, a corrente flui da bateria de maior tensão para a de menor até as tensões se equalizarem. Essa corrente de balanceamento pode ser muito alta — potencialmente centenas de ampères em baterias de lítio — e pode danificar conexões e fusíveis. Mesmo após a equalização, se as baterias têm capacidades diferentes, o SOC em tensão igual será diferente."
+    checklist={[
+      "Meça a tensão de circuito aberto de cada bateria antes de ligar em paralelo — devem estar dentro de 0,1V",
+      "Verifique se uma bateria está mais quente que as outras — calor indica corrente entrando ou saindo dela",
+      "Meça a corrente de cada cabo com alicate amperímetro com o sistema em repouso (sem carga, sem carga de entrada)",
+      "Registre as tensões por vários dias para ver se o equilíbrio é estável ou diverge",
+      "Confirme se todas as unidades de BMS estão com os mesmos parâmetros de carga",
+    ]}
+    solutions={[
+      "Carregue todas as baterias individualmente até 100% de SOC antes de conectá-las em paralelo",
+      "Use um projeto de barramento comum com cabos de igual comprimento para minimizar diferenças de tensão",
+      "Instale um isolador de baterias para evitar carga cruzada quando estiverem em tensões diferentes",
+      "Para lítio, use balanceamento ativo entre strings paralelas para manter o equilíbrio",
+    ]}
+  />
+
+  <TroubleshootingBlock
+    lang="pt"
+    problem="Idade ou Condição Diferente das Baterias"
+    causes={[
+      "Banco misturando baterias novas e velhas — as mais velhas têm maior resistência interna",
+      "Uma bateria passou por mais ciclos que as demais",
+      "Baterias de lotes diferentes com leves variações de fabricação",
+      "Uma bateria foi armazenada ou usada em condições mais severas",
+    ]}
+    explanation="Com o envelhecimento, a resistência interna aumenta e a capacidade diminui. Em um banco paralelo, a bateria com menor resistência interna (a mais nova ou menos usada) naturalmente carrega mais corrente. Isso cria um ciclo de realimentação: a bateria mais saudável trabalha mais e envelhece mais rápido, enquanto a mais fraca carrega menos corrente e degrada mais devagar. O efeito líquido é capacidade total reduzida em relação a um banco pareado."
+    checklist={[
+      "Registre a data de fabricação e a contagem de ciclos de cada bateria do banco",
+      "Meça a resistência interna de cada bateria com um medidor de impedância CA",
+      "Faça testes de capacidade em cada bateria individualmente descarregando a 0,2C",
+      "Compare o consumo de corrente de cada bateria sob condições idênticas de carga",
+      "Verifique se alguma bateria mostra sinais de inchaço, corrosão ou dano físico",
+    ]}
+    solutions={[
+      "Substitua qualquer bateria que degradou significativamente (abaixo de 80% da capacidade original)",
+      "Não misture baterias novas e velhas no mesmo banco — substitua em conjuntos pareados",
+      "Se a mistura for inevitável, use conversor CC-CC para equalizar a divisão de corrente",
+      "Documente a idade e condição de cada bateria para planejamento futuro de manutenção",
+    ]}
+  />
+
+  <TroubleshootingBlock
+    lang="pt"
+    problem="Resistência Interna Diferente"
+    causes={[
+      "Variação de fabricação entre células ou baterias",
+      "Uma bateria com terminais corroídos ou conexões internas frouxas",
+      "Comprimentos ou bitolas diferentes conectando cada bateria ao barramento",
+      "Uma bateria submetida a temperaturas maiores, aumentando sua resistência",
+    ]}
+    explanation="A resistência interna determina como a corrente é dividida em um banco paralelo. Baterias com menor resistência naturalmente carregam mais corrente. Mesmo baterias idênticas podem ter 5–10% de variação de resistência de fábrica. Com o tempo, corrosão, conexões frouxas e envelhecimento térmico aumentam a resistência de forma desigual. Uma diferença de 20% na resistência entre baterias em paralelo pode causar 20% de diferença na divisão de corrente."
+    checklist={[
+      "Meça a resistência interna CA de cada bateria a 1kHz com um medidor de impedância",
+      "Compare os valores — qualquer bateria 15% acima da média é problemática",
+      "Verifique o aperto e a corrosão de todas as conexões — reaperte todos os terminais",
+      "Meça a resistência dos cabos de cada bateria ao barramento comum — devem ser idênticas",
+      "Inspecione as conexões internas do barramento por sinais de superaquecimento ou descoloração",
+    ]}
+    solutions={[
+      "Substitua qualquer bateria com resistência interna muito maior que as demais",
+      "Garanta que todos os cabos paralelos tenham mesmo comprimento, bitola e material",
+      "Limpe e reaperte todas as conexões — aplique composto anticorrosivo",
+      "Use um projeto de barramento que dê igual resistência de caminho de cada bateria à carga",
+    ]}
+  />
+
+  <TroubleshootingBlock
+    lang="pt"
+    problem="Assimetria da Fiação"
+    causes={[
+      "Comprimentos diferentes dos cabos de cada bateria ao barramento",
+      "Bitolas diferentes usadas para diferentes baterias do banco",
+      "Layout assimétrico do barramento criando resistências desiguais",
+      "Uma bateria conectada por fusível ou chave de maior resistência que as demais",
+    ]}
+    explanation="Em um banco em paralelo, a resistência da fiação de cada bateria ao barramento comum determina a divisão de corrente. Mesmo pequenas diferenças de comprimento, bitola ou qualidade de conexão criam caminhos desiguais. A bateria conectada pelo caminho mais curto e de menor resistência carrega mais corrente. Essa é uma falha comum de projeto em bancos DIY."
+    checklist={[
+      "Meça a resistência do terminal positivo de cada bateria ao barramento com um miliohmímetro",
+      "Meça a resistência do terminal negativo de cada bateria ao barramento",
+      "Confirme se todos os cabos têm mesmo comprimento, bitola e tipo (mesma marca e construção)",
+      "Verifique se todos os fusíveis e chaves nos caminhos têm a mesma especificação de resistência",
+      "Desenhe um diagrama do layout físico para identificar diferenças de comprimento",
+    ]}
+    solutions={[
+      "Refaça a fiação do banco com cabos idênticos de mesmo comprimento para cada bateria",
+      "Use topologia em estrela onde cada bateria tem seu próprio cabo até um barramento central",
+      "Substitua qualquer fusível ou chave com resistência muito maior que os demais do banco",
+      "Considere um barramento que dê caminhos geometricamente iguais de cada bateria",
+    ]}
+  />
+
+  <TroubleshootingBlock
+    lang="pt"
+    problem="Resistência de Conexão"
+    causes={[
+      "Conexões frouxas ou corroídas em uma ou mais baterias",
+      "Metais mistos no ponto de conexão criando corrosão galvânica",
+      "Barramentos ou cabos subdimensionados que não suportam a corrente compartilhada",
+      "Parafusos de terminal com torques diferentes no banco",
+    ]}
+    explanation="A resistência de conexão nos terminais e barramentos costuma ser a maior variável em um banco paralelo. Conexões corroídas ou frouxas adicionam miliohms de resistência que afetam diretamente a divisão de corrente. Uma única conexão frouxa pode fazer a bateria afetada carregar 30–50% menos corrente que as vizinhas. Torque dos terminais, limpeza das superfícies e tratamento antioxidante importam."
+    checklist={[
+      "Verifique o aperto de cada conexão com torquímetro",
+      "Inspecione todos os terminais por corrosão, oxidação ou descoloração",
+      "Limpe todas as superfícies com escova de arame e aplique composto antioxidante",
+      "Meça a queda de tensão em cada conexão sob carga — deve ser menor que 50mV",
+      "Confirme se todos os barramentos são adequados à corrente total do banco",
+    ]}
+    solutions={[
+      "Reaperte todas as conexões no torque especificado pelo fabricante",
+      "Limpe todos os terminais e barramentos — remova corrosão com escova de arame e limpa-contatos",
+      "Aplique composto antioxidante (Noalox ou equivalente) em todas as conexões de alumínio",
+      "Substitua barramentos ou cabos subdimensionados que não suportam a corrente total",
+      "Use arruelas de pressão ou trava-roscas para evitar afrouxamento com o tempo",
+    ]}
+  />
+
+  <p class="text-caption text-muted border-t border-hairline pt-8 mt-12">
+    <strong>Aviso:</strong> Este guia é apenas para fins educacionais e de diagnóstico. Trabalhar com bancos de baterias em paralelo envolve altas correntes e riscos elétricos. Sempre desconecte todas as fontes de energia antes de mexer nas conexões. Siga os procedimentos de segurança do fabricante e consulte um técnico qualificado para grandes instalações.
+  </p>
+</ArticleLayout>

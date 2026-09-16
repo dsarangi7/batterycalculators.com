@@ -1,0 +1,130 @@
+---
+import ArticleLayout from '../../../layouts/ArticleLayout.astro';
+import ReferenceTable from '../../../components/ReferenceTable.astro';
+import ComparisonTable from '../../../components/ComparisonTable.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+
+const relatedCalculators = [
+  { title: 'Calculadora de Dimensionamento de Bateria', href: '/pt/tools/battery-sizing-calculator/', type: 'calculator' as const },
+  { title: 'Calculadora de Queda de Tensão', href: '/pt/tools/voltage-drop-calculator/', type: 'calculator' as const },
+  { title: 'Calculadora de Perdas em Cabos CC', href: '/pt/tools/dc-cable-loss-calculator/', type: 'calculator' as const },
+  { title: 'Calculadora de Pacote de Baterias', href: '/pt/tools/battery-pack-calculator/', type: 'calculator' as const },
+];
+
+const relatedGuides = [
+  { title: 'Guia de Sistemas de Tensão de Bateria', href: '/pt/learn/battery-voltage-systems/', type: 'guide' as const },
+  { title: 'Autonomia 12V vs 24V vs 48V', href: '/pt/learn/12v-vs-24v-vs-48v-runtime/', type: 'guide' as const },
+  { title: 'Baterias em Série vs Paralelo', href: '/pt/learn/series-vs-parallel-batteries/', type: 'guide' as const },
+];
+
+const faqItems = [
+  {
+    question: 'Qual é a tensão de bateria mais comum para uso marítimo?',
+    answer: '12V é a tensão mais comum para barcos de recreio e pequenas embarcações. Oferece compatibilidade universal com acessórios marítimos, sondas de pesca e equipamentos de navegação. Iates de cruzeiro maiores e embarcações comerciais costumam usar sistemas 24V ou 48V para reduzir a corrente e a bitola dos cabos.',
+  },
+  {
+    question: 'Quando devo escolher 48V em vez de 12V?',
+    answer: 'Escolha 48V quando sua carga exceder aproximadamente 2kW, os trechos de cabo excederem 5 metros ou você precisar minimizar perdas de energia. Uma carga de 5kW a 48V consome 104A contra 417A a 12V — exigindo cabos muito mais finos e com queda de tensão bem menor. 48V é o padrão para armazenamento residencial e sistemas solares acima de 3kW.',
+  },
+  {
+    question: 'Qual bitola de cabo preciso para um sistema 12V de 200A?',
+    answer: 'Para um sistema 12V conduzindo 200A em ida e volta de 3 metros, você precisa de cabo de cobre 2/0 AWG (67mm²) para manter a queda de tensão abaixo de 3%. A 48V, a mesma potência exige apenas 42A, que pode ser atendida por cabo 6 AWG (13mm²). Dimensione sempre os cabos pela corrente real, não pela potência nominal.',
+  },
+  {
+    question: 'Posso misturar baterias de tensões diferentes em paralelo?',
+    answer: 'Nunca conecte baterias de tensões diferentes em paralelo. Isso cria correntes circulantes entre as baterias que podem danificar ambos os bancos e representar risco à segurança. Você pode colocar em paralelo baterias da mesma tensão, mas de capacidades (Ah) diferentes, embora combinar química e idade seja recomendado para ciclagem equilibrada.',
+  },
+  {
+    question: 'Qual tensão os controladores de carga solar fornecem?',
+    answer: 'Controladores de carga MPPT podem fornecer qualquer tensão, da tensão da bateria até sua tensão máxima de entrada (tipicamente 100V–250V CC). O controlador converte a tensão mais alta dos painéis para a tensão do banco de baterias. Controladores PWM exigem que a tensão dos painéis seja igual à da bateria, o que os torna menos flexíveis.',
+  },
+  {
+    question: 'Como a tensão afeta a classificação de capacidade da bateria?',
+    answer: 'A capacidade da bateria é classificada em Ampères-hora (Ah), que independe da tensão. Porém, a capacidade de energia (Wh) aumenta com a tensão. Uma bateria de 100Ah e 12V armazena 1,200Wh, enquanto uma de 100Ah e 48V armazena 4,800Wh. Ao comparar baterias, compare sempre Ah e tensão para calcular a energia total.',
+  },
+];
+---
+
+<ArticleLayout
+  title="Referência de Tensão de Bateria | Calculadoras de Bateria"
+  description="Referência completa para todas as tensões comuns de bateria: sistemas de 2V, 6V, 12V, 24V, 36V, 48V e 96V com configurações típicas, aplicações, requisitos de cabos e guia de seleção de tensão."
+  canonical="https://batterycalculators.com/pt/reference/battery-voltage-reference/"
+  lang="pt"
+  category="REFERÊNCIA"
+  categoryHref="/pt/reference/"
+  breadcrumbItems={[{ label: 'Referência de Tensão de Bateria' }]}
+  relatedCalculators={relatedCalculators}
+  relatedGuides={relatedGuides}
+  faqItems={faqItems}
+>
+  <p class="text-body-md text-body font-light mb-8">
+    A tensão do sistema de baterias determina a corrente consumida, o dimensionamento dos cabos, a seleção de componentes e a eficiência geral. Esta referência abrange todos os níveis padrão de tensão, de células únicas de 2V a sistemas de alta tensão de 96V, incluindo configurações típicas, capacidades de carga, requisitos de cabos e aplicações comuns.
+  </p>
+
+  <ReferenceTable
+    lang="pt"
+    title="Tensões Nominais de Sistemas de Bateria"
+    description="Tensão nominal, configurações típicas de células e aplicações comuns para cada nível padrão de tensão de bateria."
+    headers={['Tensão do Sistema', 'Tensão Nominal (LFP)', 'Tensão Nominal (NMC)', 'Configuração de Células (LFP)', 'Aplicações Típicas', 'Carga Máx. Prática']}
+    rows={[
+      ['2V', '2.0V', '—', '1S', 'Backup estacionário UPS, telecom', '500W'],
+      ['6V', '6.4V', '—', '2S', 'Carrinhos de golfe, lavadoras de pisos, carros antigos', '1kW'],
+      ['12V', '12.8V', '10.8V', '4S', 'Automotivo, marítimo, RV, energia portátil', '2kW'],
+      ['24V', '25.6V', '25.2V', '8S', 'Marítimo de maior porte, veículos comerciais, caminhões', '5kW'],
+      ['36V', '38.4V', '36.0V', '12S', 'Bicicletas elétricas, motores de popa, carrinhos de golfe', '3kW'],
+      ['48V', '51.2V', '48.0V', '16S', 'Energia residencial, solar, VEs, telecom, BESS', '20kW'],
+      ['96V', '102.4V', '96.0V', '32S', 'VEs de grande porte, industrial, propulsão marítima', '50kW'],
+    ]}
+    source="IEEE 1189, IEC 61960, Battery University"
+  />
+
+  <ReferenceTable
+    lang="pt"
+    title="Limites de Carga e Descarga por Tensão do Sistema"
+    description="Janelas seguras de tensão de operação para químicas LFP e NMC em cada nível padrão de tensão."
+    headers={['Sistema', 'Tensão de Flutuação LFP', 'Tensão de Corte LFP', 'Tensão de Flutuação NMC', 'Tensão de Corte NMC']}
+    rows={[
+      ['2V', '2.10V', '1.60V', '—', '—'],
+      ['6V', '6.30V', '4.80V', '—', '—'],
+      ['12V', '14.4V', '10.0V', '12.6V', '7.5V'],
+      ['24V', '28.8V', '20.0V', '25.2V', '15.0V'],
+      ['36V', '43.2V', '30.0V', '37.8V', '22.5V'],
+      ['48V', '57.6V', '40.0V', '50.4V', '30.0V'],
+      ['96V', '115.2V', '80.0V', '100.8V', '60.0V'],
+    ]}
+    source="Folhas de dados de fabricantes de baterias, diretrizes de configuração de BMS"
+  />
+
+  <ComparisonTable
+    title="Guia de Seleção de Tensão por Tamanho da Carga"
+    headers={['Potência da Carga', 'Tensão Recomendada', 'Corrente Típica', 'Bitola do Cabo (AWG)', 'Observações']}
+    rows={[
+      ['< 200W', '12V', '< 17A', '10 AWG', 'Fiação simples, perdas mínimas'],
+      ['200W – 1kW', '12V ou 24V', '8–83A', '8–4/0 AWG', '24V preferível para trechos acima de 3m'],
+      ['1kW – 3kW', '24V ou 48V', '21–125A', '6–2/0 AWG', '48V preferível para eficiência'],
+      ['3kW – 10kW', '48V', '63–208A', '4–3/0 AWG', 'Padrão para armazenamento residencial'],
+      ['10kW – 50kW', '48V ou 96V', '104–521A', '2/0–4/0 AWG', '96V para cargas industriais'],
+      ['> 50kW', '96V+', '521A+', 'Barramentos', 'Industrial, propulsão marítima'],
+    ]}
+    highlightCol={1}
+    caption="Bitolas aproximadas para condutores de cobre com queda de tensão de 3% em ida e volta de 5 metros."
+  />
+
+  <ReferenceTable
+    lang="pt"
+    title="Dimensionamento de Cabos por Tensão e Corrente"
+    description="Bitola mínima de cabo de cobre para níveis comuns de corrente em cada tensão, assumindo queda máxima de 3% em ida e volta de 5m."
+    headers={['Corrente (A)', 'Cabo 12V (AWG)', 'Cabo 24V (AWG)', 'Cabo 48V (AWG)', 'Cabo 96V (AWG)']}
+    rows={[
+      ['10A', '10', '14', '16', '18'],
+      ['20A', '6', '10', '12', '14'],
+      ['50A', '2', '6', '8', '10'],
+      ['100A', '2/0', '2', '4', '6'],
+      ['150A', '4/0', '2/0', '2', '4'],
+      ['200A', '250 kcmil', '4/0', '2/0', '2'],
+      ['300A', '350 kcmil', '350 kcmil', '4/0', '2/0'],
+      ['500A', 'Barramentos', '500 kcmil', '350 kcmil', '4/0'],
+    ]}
+    source="NEC Capítulo 9 Tabela 8, cálculo de queda de tensão a 3% máx., condutores de cobre a 75°C"
+  />
+</ArticleLayout>

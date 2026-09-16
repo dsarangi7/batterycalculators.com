@@ -2,6 +2,7 @@
 import Layout from './Layout.astro';
 import Breadcrumb from '../components/Breadcrumb.astro';
 import FAQSection from '../components/FAQSection.astro';
+import { getLocalePrefix, type Locale } from '../utils/i18n';
 
 export interface FAQItem {
   question: string;
@@ -27,6 +28,7 @@ export interface Props {
   relatedGuides?: RelatedLink[];
   tableOfContents?: Array<{ id: string; label: string }>;
   references?: Array<{ title: string; url?: string }>;
+  lang?: Locale;
 }
 
 const {
@@ -42,7 +44,16 @@ const {
   relatedGuides = [],
   tableOfContents = [],
   references = [],
+  lang = 'en',
 } = Astro.props as Props;
+
+const prefix = getLocalePrefix(lang);
+const backHref = `${prefix}/learn/`;
+const backLabel = lang === 'pt' ? 'Voltar aos Guias' : lang === 'zh' ? '返回指南' : 'Back to Guides';
+const tocLabel = lang === 'pt' ? 'Nesta Página' : lang === 'zh' ? '本页目录' : 'On This Page';
+const relatedCalcLabel = lang === 'pt' ? 'Calculadoras Relacionadas' : lang === 'zh' ? '相关计算器' : 'Related Calculators';
+const relatedGuidesLabel = lang === 'pt' ? 'Guias Relacionados' : lang === 'zh' ? '相关指南' : 'Related Guides';
+const referencesLabel = lang === 'pt' ? 'Referências' : lang === 'zh' ? '参考资料' : 'References';
 
 const allBreadcrumbItems = categoryHref
   ? [{ label: category, href: categoryHref }, ...breadcrumbItems]
@@ -60,10 +71,11 @@ const allBreadcrumbItems = categoryHref
   schemaDescription={description}
   breadcrumbs={allBreadcrumbItems}
   faqItems={faqItems}
+  lang={lang}
 >
   <article class="max-w-3xl mx-auto">
     <div class="mb-12 border-b border-hairline pb-8">
-      <a href="/learn/" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">&larr; Back to Guides</a>
+      <a href={backHref} class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block whitespace-nowrap">&larr; {backLabel}</a>
       <Breadcrumb items={allBreadcrumbItems} />
       <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">{category.toUpperCase()}</span>
       <h1 class="text-display-md text-primary mb-6">{title.split('|')[0].trim()}</h1>
@@ -84,7 +96,7 @@ const allBreadcrumbItems = categoryHref
         <div class="lg:sticky lg:top-24 flex flex-col gap-8">
           {tableOfContents.length > 0 && (
             <nav class="bg-surface-card border border-hairline p-4">
-              <h3 class="text-label-uppercase text-primary text-xs mb-3">On This Page</h3>
+              <h3 class="text-label-uppercase text-primary text-xs mb-3">{tocLabel}</h3>
               <ul class="flex flex-col gap-2">
                 {tableOfContents.map((item) => (
                   <li>
@@ -99,7 +111,7 @@ const allBreadcrumbItems = categoryHref
 
           {relatedCalculators.length > 0 && (
             <div class="bg-surface-card border border-hairline p-4">
-              <h3 class="text-label-uppercase text-primary text-xs mb-3">Related Calculators</h3>
+              <h3 class="text-label-uppercase text-primary text-xs mb-3">{relatedCalcLabel}</h3>
               <ul class="flex flex-col gap-2">
                 {relatedCalculators.map((calc) => (
                   <li>
@@ -114,7 +126,7 @@ const allBreadcrumbItems = categoryHref
 
           {relatedGuides.length > 0 && (
             <div class="bg-surface-card border border-hairline p-4">
-              <h3 class="text-label-uppercase text-primary text-xs mb-3">Related Guides</h3>
+              <h3 class="text-label-uppercase text-primary text-xs mb-3">{relatedGuidesLabel}</h3>
               <ul class="flex flex-col gap-2">
                 {relatedGuides.map((guide) => (
                   <li>
@@ -132,7 +144,7 @@ const allBreadcrumbItems = categoryHref
 
     {references.length > 0 && (
       <section class="mt-16 border-t border-hairline pt-12">
-        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">References</h2>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">{referencesLabel}</h2>
         <ul class="flex flex-col gap-2 text-body-sm text-muted">
           {references.map((ref) => (
             <li class="flex gap-2">

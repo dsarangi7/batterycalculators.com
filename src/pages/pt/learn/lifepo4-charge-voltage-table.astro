@@ -1,0 +1,266 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import ReferenceTable from '../../../components/ReferenceTable.astro';
+
+const faqItems = [
+  {
+    question: "Qual é a tensão típica de carga de células LiFePO4?",
+    answer: "Uma célula LiFePO4 tem tensão nominal de 3,2V e tensão máxima de carga de 3,65V. Para um pack 12V (4 células em série), a faixa de carga é 14,4–14,6V. Para 24V, é 28,8–29,2V. Para 48V, é 57,6–58,4V.",
+  },
+  {
+    question: "Qual é a tensão de flutuação do LiFePO4?",
+    answer: "LiFePO4 não exige flutuação tradicional como o chumbo-ácido. Ao atingir a tensão máxima (3,65V por célula), o BMS normalmente desconecta o carregador. Alguns sistemas usam tensão reduzida de 3,38–3,42V por célula para manutenção, mas não é prática padrão.",
+  },
+  {
+    question: "Como a tensão de carga afeta a vida útil?",
+    answer: "Carregar mais alto (p. ex., 3,65V vs 3,55V por célula) dá um pouco mais de capacidade, mas acelera o envelhecimento. Carregar mais baixo (p. ex., 3,50V) reduz a capacidade em 5–10%, mas pode estender muito a vida útil. Muitos BMS permitem configurar o limite de tensão.",
+  },
+  {
+    question: "Posso carregar LiFePO4 com carregador de chumbo-ácido?",
+    answer: "Não de forma confiável. Carregadores de chumbo-ácido usam outro perfil (bulk, absorção, flutuação) incompatível com LiFePO4. A flutuação do chumbo-ácido (13,5–13,8V) é baixa demais para carga total, e a absorção pode ser alta demais. Use carregador específico para LiFePO4.",
+  },
+];
+
+const tableOfContents = [
+  { id: "cell-voltage", label: "Referência de Tensão da Célula" },
+  { id: "pack-voltage", label: "Tabela de Tensão do Pack" },
+  { id: "charge-profile", label: "Perfil de Carga" },
+  { id: "common-mistakes", label: "Erros Comuns" },
+];
+
+const relatedCalculators = [
+  { title: "Estimador de SOC", href: "/pt/tools/soc-estimator/" },
+  { title: "Calculadora de Pack de Baterias", href: "/pt/tools/battery-pack-calculator/" },
+  { title: "Calculadora de Tempo de Carga", href: "/pt/tools/charging-time-calculator/" },
+];
+
+const references = [
+  { title: "Battery University — Carregando LiFePO4", url: "https://batteryuniversity.com/article/bu-409-charging-lithium-iron-phosphate" },
+  { title: "Wikipedia — Características de Tensão do LiFePO4", url: "https://en.wikipedia.org/wiki/Lithium_iron_phosphate_battery" },
+];
+---
+
+<Layout
+  title="Tabela de Tensão de Carga LiFePO4 — Células e Packs | Calculadoras de Bateria"
+  description="Referência completa de tensão de carga para baterias LiFePO4. Tensões de célula e pack para sistemas 12V, 24V e 48V com orientação de perfil de carga."
+  canonical="https://batterycalculators.com/pt/learn/lifepo4-charge-voltage-table/"
+  faqItems={faqItems}
+  lang="pt"
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/pt/learn/" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">&larr; Voltar aos Guias</a>
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">REFERÊNCIA</span>
+      <h1 class="text-display-md text-primary mb-6">Tabela de Tensão de Carga LiFePO4</h1>
+      <p class="text-body-md text-body font-light">
+        Referência completa de tensão para carregar baterias LiFePO4 no nível de célula e de pack. Use esta tabela para configurar controladores de carga, BMS e reguladores solares.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section id="cell-voltage">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Referência de Tensão da Célula</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Cada célula LiFePO4 tem tensão nominal de 3,2V. A faixa de carga vai de 2,5V (mínimo) a 3,65V (máximo). A tabela abaixo mostra a tensão em cada estágio do ciclo de carga.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-body-sm min-w-[480px]">
+              <thead>
+                <tr class="border-b border-hairline bg-surface-card">
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Estágio</th>
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Tensão da célula</th>
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">SOC aprox.</th>
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Observações</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-hairline">
+                <tr>
+                  <td class="p-4 font-mono text-primary">Mínimo (vazia)</td>
+                  <td class="p-4 text-muted">2.50V</td>
+                  <td class="p-4 text-muted">0%</td>
+                  <td class="p-4 text-muted">Corte do BMS — não descarregue abaixo</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">Nominal</td>
+                  <td class="p-4 text-muted">3.20V</td>
+                  <td class="p-4 text-muted">~50%</td>
+                  <td class="p-4 text-muted">Região plana do patamar</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">Cheia (repouso)</td>
+                  <td class="p-4 text-muted">3.40V</td>
+                  <td class="p-4 text-muted">100%</td>
+                  <td class="p-4 text-muted">Tensão típica de repouso após carga total</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">Limite de carga (CC)</td>
+                  <td class="p-4 text-muted">3.65V</td>
+                  <td class="p-4 text-muted">100%</td>
+                  <td class="p-4 text-muted">Tensão máxima — não exceda</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section id="pack-voltage">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Tabela de Tensão do Pack</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          A tensão do pack é a tensão da célula multiplicada pelo número de células em série (contagem S). A tabela abaixo mostra tensões de carga para configurações comuns.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-body-sm min-w-[640px]">
+              <thead>
+                <tr class="border-b border-hairline bg-surface-card">
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Configuração do pack</th>
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Tensão nominal</th>
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Tensão mín.</th>
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Tensão máx. de carga</th>
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Flutuação típica</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-hairline">
+                <tr>
+                  <td class="p-4 font-mono text-primary">4S (12V)</td>
+                  <td class="p-4 text-muted">12.8V</td>
+                  <td class="p-4 text-muted">10.0V</td>
+                  <td class="p-4 text-muted">14.6V</td>
+                  <td class="p-4 text-muted">13.6V</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">8S (24V)</td>
+                  <td class="p-4 text-muted">25.6V</td>
+                  <td class="p-4 text-muted">20.0V</td>
+                  <td class="p-4 text-muted">29.2V</td>
+                  <td class="p-4 text-muted">27.2V</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">16S (48V)</td>
+                  <td class="p-4 text-muted">51.2V</td>
+                  <td class="p-4 text-muted">40.0V</td>
+                  <td class="p-4 text-muted">58.4V</td>
+                  <td class="p-4 text-muted">54.4V</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">7S (24V alt)</td>
+                  <td class="p-4 text-muted">22.4V</td>
+                  <td class="p-4 text-muted">17.5V</td>
+                  <td class="p-4 text-muted">25.55V</td>
+                  <td class="p-4 text-muted">23.8V</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <p class="text-caption text-muted mt-3">Valores por string. Strings em paralelo compartilham a mesma tensão. Use sempre BMS para balanceamento.</p>
+      </section>
+
+      <section id="charge-profile">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Perfil de Carga LiFePO4</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          O LiFePO4 usa perfil CC-CV (Corrente Constante, Tensão Constante). Na fase CC, o carregador fornece corrente constante enquanto a tensão sobe. Ao atingir 3,65V por célula, muda para CV e mantém a tensão enquanto a corrente diminui.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Fase CC (Bulk)</h4>
+            <p class="text-body-sm text-muted">
+              O carregador entrega corrente constante (p. ex., 0,5C). A tensão sobe de ~3,0V a 3,65V por célula. Essa fase leva a bateria de ~0% a ~90% de SOC. A duração depende da taxa e da capacidade.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Fase CV (Absorção)</h4>
+            <p class="text-body-sm text-muted">
+              O carregador segura 3,65V por célula. A corrente diminui conforme a bateria enche. Quando cai a ~0,05C, considera-se cheia. Essa fase leva 30–60 minutos em taxas típicas.
+            </p>
+          </CalculatorCard>
+        </div>
+        <p class="text-body-md text-body font-light mt-4">
+          Diferente do chumbo-ácido, o LiFePO4 não precisa de flutuação. Cheio, o BMS normalmente desconecta o carregador. Alguns sistemas usam tensão reduzida de manutenção (3,38–3,42V por célula) para compensar a autodescarga no armazenamento.
+        </p>
+      </section>
+
+      <section id="common-mistakes">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Erros Comuns</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Usar Tensões de Chumbo-Ácido</h4>
+            <p class="text-body-sm text-muted">
+              Carregadores de chumbo-ácido usam 14,4V de absorção e 13,5V de flutuação em 12V. LiFePO4 precisa de 14,4–14,6V máximos e dispensa flutuação. Ajustes de chumbo-ácido subcarregam o LiFePO4.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Exceder 3,65V por Célula</h4>
+            <p class="text-body-sm text-muted">
+              Carga acima de 3,65V por célula causa deposição de lítio no ânodo, danificando permanentemente a célula e criando riscos. Ajuste sempre o limite do BMS para 3,65V ou menos.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Dispensar o BMS</h4>
+            <p class="text-body-sm text-muted">
+              Sem BMS, células individuais podem sobrecarregar ou sobredescarregar. O desequilíbrio cresce com o tempo, causando perda prematura e riscos. Use sempre BMS.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Carregar em Taxa Alta Demais</h4>
+            <p class="text-body-sm text-muted">
+              Exceder o C-rate recomendado causa aquecimento excessivo e pode provocar deposição de lítio. Respeite os limites do datasheet para carga segura e duradoura.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <CalculatorCard class="border-m-blue-light">
+        <h4 class="text-label-uppercase text-primary text-xs mb-3">Experimente</h4>
+        <p class="text-body-sm text-muted mb-4">
+          Use a Calculadora de Tempo de Carga para estimar o tempo com base na corrente do carregador e na capacidade.
+        </p>
+        <a href="/pt/tools/charging-time-calculator/" class="btn-primary text-xs py-3 px-6 inline-block">Abrir Calculadora de Tempo de Carga</a>
+      </CalculatorCard>
+
+      <ReferenceTable
+        title="Referência de Tensão da Célula LiFePO4"
+        description="Baixe esta tabela para referência offline"
+        headers={["Estágio", "Tensão da célula", "SOC aprox.", "Observações"]}
+        rows={[
+          ["Mínimo (vazia)", "2.50V", "0%", "Corte do BMS — não descarregue abaixo"],
+          ["Nominal", "3.20V", "~50%", "Região plana do patamar"],
+          ["Cheia (repouso)", "3.40V", "100%", "Tensão típica de repouso após carga total"],
+          ["Limite de carga (CC)", "3.65V", "100%", "Tensão máxima — não exceda"],
+        ]}
+        source="Battery University / Datasheets de fabricantes"
+      />
+
+      <ReferenceTable
+        title="Tabela de Referência de Tensão de Packs LiFePO4"
+        description="Baixe esta tabela para referência offline"
+        headers={["Configuração do pack", "Tensão nominal", "Tensão mín.", "Tensão máx. de carga", "Flutuação típica"]}
+        rows={[
+          ["4S (12V)", "12.8V", "10.0V", "14.6V", "13.6V"],
+          ["8S (24V)", "25.6V", "20.0V", "29.2V", "27.2V"],
+          ["16S (48V)", "51.2V", "40.0V", "58.4V", "54.4V"],
+          ["7S (24V alt)", "22.4V", "17.5V", "25.55V", "23.8V"],
+        ]}
+        source="Battery University / Datasheets de fabricantes"
+      />
+
+      <FAQSection items={faqItems} />
+
+      <section class="border-t border-hairline pt-12">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Referências</h2>
+        <ul class="flex flex-col gap-2 text-body-sm text-muted">
+          {references.map((ref) => (
+            <li class="flex gap-2">
+              <span class="text-m-blue-light shrink-0">—</span>
+              <a href={ref.url} class="hover:text-primary transition-colors underline underline-offset-2" target="_blank" rel="noopener noreferrer">{ref.title}</a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    </div>
+  </div>
+</Layout>

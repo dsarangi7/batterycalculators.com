@@ -1,0 +1,580 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+import CalculatorCard from "../../../components/CalculatorCard.astro";
+import FAQSection from "../../../components/FAQSection.astro";
+import ReferenceChart from "../../../components/ReferenceChart.astro";
+import ReferenceTable from "../../../components/ReferenceTable.astro";
+
+const faqItems = [
+  {
+    question:
+      "Qual é a tensão de repouso de uma bateria de chumbo-ácido 12V totalmente carregada?",
+    answer:
+      "Uma bateria ventilada de chumbo-ácido totalmente carregada repousa em aproximadamente 12,6–12,8V. Baterias AGM e gel normalmente repousam um pouco acima, em 12,8–13,0V. Após a carga, a carga superficial pode elevar a leitura para 13,0–13,4V, então aguarde pelo menos 30 minutos antes de medir a tensão de repouso.",
+  },
+  {
+    question: "Como a temperatura afeta as leituras de tensão do chumbo-ácido?",
+    answer:
+      "A temperatura afeta o equilíbrio químico das células. O frio aumenta a resistência interna e reduz as leituras. A 0°C, uma bateria cheia pode ler 0,2–0,3V abaixo do valor a 25°C. Em calor alto (acima de 40°C), as leituras podem ficar levemente elevadas. Compense sempre a temperatura ao estimar o SOC pela tensão.",
+  },
+  {
+    question: "O que é carga superficial?",
+    answer:
+      "Carga superficial é uma elevação temporária da tensão após a carga. É causada pela concentração desigual de ácido perto das placas. Dissipasse em 30–60 minutos de repouso. Medir logo após carregar dá uma leitura falsamente alta de SOC. Deixe a bateria repousar antes de medir.",
+  },
+  {
+    question:
+      "Baterias ventiladas, AGM e gel têm curvas de tensão diferentes?",
+    answer:
+      "Sim. AGM e gel têm tensões de repouso levemente maiores que ventiladas no mesmo SOC. AGM normalmente repousa 0,1–0,2V acima da ventilada. Gel é similar à AGM. As diferenças são pequenas, mas relevantes ao estimar o SOC pela tensão. Use a curva correta para seu tipo.",
+  },
+];
+
+const tableOfContents = [
+  { id: "flooded-lead-acid", label: "Chumbo-Ácido Ventilada" },
+  { id: "agm-gel", label: "AGM e Gel" },
+  { id: "surface-charge", label: "Carga Superficial" },
+  { id: "temperature-effects", label: "Efeitos da Temperatura" },
+  { id: "common-mistakes", label: "Erros Comuns" },
+];
+
+const relatedCalculators = [
+  {
+    title: "Calculadora de Dimensionamento de Bateria",
+    href: "/pt/tools/battery-sizing-calculator/",
+  },
+  { title: "Calculadora de Autonomia de Bateria", href: "/pt/tools/runtime-calculator/" },
+];
+
+const references = [
+  {
+    title: "Battery University — Tensão de Chumbo-Ácido",
+    url: "https://batteryuniversity.com/article/bu-403-lead-acid",
+  },
+  {
+    title: "Concorde Battery — Especificações AGM",
+    url: "https://www.concordebattery.com/products/sealed-lead-acid/",
+  },
+];
+---
+
+<Layout
+  title="Tabela de Tensão de Bateria Chumbo-Ácido — Referência de SOC | Calculadoras de Bateria"
+  description="Tabelas de referência de tensão para baterias de chumbo-ácido ventiladas, AGM e gel a 12V, 24V e 48V. Tensão aproximada de repouso por estado de carga."
+  canonical="https://batterycalculators.com/pt/learn/lead-acid-voltage-chart/"
+  faqItems={faqItems}
+  lang="pt"
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a
+        href="/pt/learn/"
+        class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block"
+        >&larr; Voltar aos Guias</a
+      >
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4"
+        >REFERÊNCIA</span
+      >
+      <h1 class="text-display-md text-primary mb-6">
+        Tabela de Tensão de Bateria Chumbo-Ácido
+      </h1>
+      <p class="text-body-md text-body font-light">
+        Valores aproximados de tensão de repouso para baterias de chumbo-ácido
+        ventiladas, AGM e gel nas tensões comuns de banco. Use esta tabela para estimar o
+        estado de carga a partir de leituras de tensão.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section id="flooded-lead-acid">
+        <ReferenceChart
+          type="line"
+          title="Tensão de Repouso vs SOC — Chumbo-Ácido Ventilada"
+          description="Relação aproximada para um pack de 12V; a tensão do chumbo-ácido é geralmente mais linear que a do LiFePO4."
+          xLabel="SOC %"
+          yLabel="Tensão (V)"
+          data={[
+            { x: 0, y: 11.5, label: "0%" },
+            { x: 10, y: 11.64, label: "10%" },
+            { x: 20, y: 11.76, label: "20%" },
+            { x: 30, y: 11.88, label: "30%" },
+            { x: 40, y: 12.0, label: "40%" },
+            { x: 50, y: 12.12, label: "50%" },
+            { x: 60, y: 12.24, label: "60%" },
+            { x: 70, y: 12.34, label: "70%" },
+            { x: 80, y: 12.46, label: "80%" },
+            { x: 90, y: 12.58, label: "90%" },
+            { x: 100, y: 12.7, label: "100%" },
+          ]}
+          yMin={11.0}
+          yMax={13.2}
+          caption="Valores de chumbo-ácido ventilada a 25°C. A tensão real varia por fabricante, idade, temperatura e condições de medição."
+        />
+
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          Tabela de Tensão — Chumbo-Ácido Ventilada
+        </h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Baterias ventiladas de chumbo-ácido têm uma relação bem caracterizada
+          entre tensão de repouso e SOC. Diferente do LiFePO4, a tensão cai de
+          forma relativamente linear na faixa de SOC, tornando a tensão um indicador
+          prático — desde que a bateria tenha repousado e a temperatura seja
+          considerada.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-body-sm min-w-[640px]">
+              <thead>
+                <tr class="border-b border-hairline bg-surface-card">
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >SOC %</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >Pack 12V</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >Pack 24V</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >Pack 48V</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >Observações</th
+                  >
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-hairline">
+                <tr>
+                  <td class="p-4 font-mono text-primary">100%</td>
+                  <td class="p-4 text-muted">12.70V</td>
+                  <td class="p-4 text-muted">25.40V</td>
+                  <td class="p-4 text-muted">50.80V</td>
+                  <td class="p-4 text-muted">Totalmente carregada, em repouso</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">90%</td>
+                  <td class="p-4 text-muted">12.58V</td>
+                  <td class="p-4 text-muted">25.16V</td>
+                  <td class="p-4 text-muted">50.32V</td>
+                  <td class="p-4 text-muted">Possível carga superficial leve</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">80%</td>
+                  <td class="p-4 text-muted">12.46V</td>
+                  <td class="p-4 text-muted">24.92V</td>
+                  <td class="p-4 text-muted">49.84V</td>
+                  <td class="p-4 text-muted">Boa faixa de operação</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">70%</td>
+                  <td class="p-4 text-muted">12.34V</td>
+                  <td class="p-4 text-muted">24.68V</td>
+                  <td class="p-4 text-muted">49.36V</td>
+                  <td class="p-4 text-muted">Aceitável para uso diário</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">60%</td>
+                  <td class="p-4 text-muted">12.24V</td>
+                  <td class="p-4 text-muted">24.48V</td>
+                  <td class="p-4 text-muted">48.96V</td>
+                  <td class="p-4 text-muted">Recarregue em breve</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">50%</td>
+                  <td class="p-4 text-muted">12.12V</td>
+                  <td class="p-4 text-muted">24.24V</td>
+                  <td class="p-4 text-muted">48.48V</td>
+                  <td class="p-4 text-muted">Recarga recomendada</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">40%</td>
+                  <td class="p-4 text-muted">12.00V</td>
+                  <td class="p-4 text-muted">24.00V</td>
+                  <td class="p-4 text-muted">48.00V</td>
+                  <td class="p-4 text-muted">Risco de sulfatação</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">30%</td>
+                  <td class="p-4 text-muted">11.88V</td>
+                  <td class="p-4 text-muted">23.76V</td>
+                  <td class="p-4 text-muted">47.52V</td>
+                  <td class="p-4 text-muted">Zona de descarga profunda</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">20%</td>
+                  <td class="p-4 text-muted">11.76V</td>
+                  <td class="p-4 text-muted">23.52V</td>
+                  <td class="p-4 text-muted">47.04V</td>
+                  <td class="p-4 text-muted">Bateria em risco</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">10%</td>
+                  <td class="p-4 text-muted">11.64V</td>
+                  <td class="p-4 text-muted">23.28V</td>
+                  <td class="p-4 text-muted">46.56V</td>
+                  <td class="p-4 text-muted">Descarga severa</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">0%</td>
+                  <td class="p-4 text-muted">11.50V</td>
+                  <td class="p-4 text-muted">23.00V</td>
+                  <td class="p-4 text-muted">46.00V</td>
+                  <td class="p-4 text-muted">Totalmente descarregada</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <p class="text-caption text-muted mt-3">
+          Valores de chumbo-ácido ventilada a 25°C. A tensão real varia por
+          fabricante, idade e temperatura.
+        </p>
+      </section>
+
+      <section id="agm-gel">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          Tabela de Tensão AGM e Gel
+        </h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Baterias AGM (manta de vidro absorvente) e gel têm características de
+          tensão levemente diferentes das ventiladas. AGM normalmente tem menor
+          resistência interna e tensões de repouso um pouco maiores no mesmo SOC.
+          Gel é similar à AGM, mas com aceitação de carga levemente menor.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-body-sm min-w-[640px]">
+              <thead>
+                <tr class="border-b border-hairline bg-surface-card">
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >SOC %</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >AGM 12V</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >Gel 12V</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >AGM 24V</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >Observações</th
+                  >
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-hairline">
+                <tr>
+                  <td class="p-4 font-mono text-primary">100%</td>
+                  <td class="p-4 text-muted">12.90V</td>
+                  <td class="p-4 text-muted">12.85V</td>
+                  <td class="p-4 text-muted">25.80V</td>
+                  <td class="p-4 text-muted">Totalmente carregada, em repouso</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">90%</td>
+                  <td class="p-4 text-muted">12.75V</td>
+                  <td class="p-4 text-muted">12.70V</td>
+                  <td class="p-4 text-muted">25.50V</td>
+                  <td class="p-4 text-muted">Quase cheia</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">80%</td>
+                  <td class="p-4 text-muted">12.60V</td>
+                  <td class="p-4 text-muted">12.55V</td>
+                  <td class="p-4 text-muted">25.20V</td>
+                  <td class="p-4 text-muted">Boa faixa de operação</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">70%</td>
+                  <td class="p-4 text-muted">12.48V</td>
+                  <td class="p-4 text-muted">12.43V</td>
+                  <td class="p-4 text-muted">24.96V</td>
+                  <td class="p-4 text-muted">Aceitável</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">60%</td>
+                  <td class="p-4 text-muted">12.36V</td>
+                  <td class="p-4 text-muted">12.31V</td>
+                  <td class="p-4 text-muted">24.72V</td>
+                  <td class="p-4 text-muted">Recarregue em breve</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">50%</td>
+                  <td class="p-4 text-muted">12.24V</td>
+                  <td class="p-4 text-muted">12.19V</td>
+                  <td class="p-4 text-muted">24.48V</td>
+                  <td class="p-4 text-muted">Recarga recomendada</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">40%</td>
+                  <td class="p-4 text-muted">12.12V</td>
+                  <td class="p-4 text-muted">12.07V</td>
+                  <td class="p-4 text-muted">24.24V</td>
+                  <td class="p-4 text-muted">Risco de dano</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">30%</td>
+                  <td class="p-4 text-muted">12.00V</td>
+                  <td class="p-4 text-muted">11.95V</td>
+                  <td class="p-4 text-muted">24.00V</td>
+                  <td class="p-4 text-muted">Zona de descarga profunda</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">20%</td>
+                  <td class="p-4 text-muted">11.88V</td>
+                  <td class="p-4 text-muted">11.83V</td>
+                  <td class="p-4 text-muted">23.76V</td>
+                  <td class="p-4 text-muted">Bateria em risco</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">10%</td>
+                  <td class="p-4 text-muted">11.76V</td>
+                  <td class="p-4 text-muted">11.71V</td>
+                  <td class="p-4 text-muted">23.52V</td>
+                  <td class="p-4 text-muted">Descarga severa</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">0%</td>
+                  <td class="p-4 text-muted">11.60V</td>
+                  <td class="p-4 text-muted">11.55V</td>
+                  <td class="p-4 text-muted">23.20V</td>
+                  <td class="p-4 text-muted">Totalmente descarregada</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <p class="text-caption text-muted mt-3">
+          Valores AGM e gel a 25°C. AGM repousa um pouco acima da ventilada.
+          Gel repousa um pouco abaixo da AGM.
+        </p>
+      </section>
+
+      <section id="surface-charge">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          Carga Superficial
+        </h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Carga superficial é um fenômeno específico de baterias de chumbo-ácido. Após
+          a carga, a concentração de ácido perto das placas fica temporariamente
+          maior que no eletrólito geral. Isso eleva a tensão dos terminais em
+          0,1–0,3V acima da tensão real de repouso.
+        </p>
+        <p class="text-body-md text-body font-light mb-4">
+          A carga superficial dissipa-se em 30–60 minutos conforme o ácido se difunde
+          uniformemente pelo eletrólito. Se você medir logo após carregar, obterá
+          uma leitura falsamente alta de SOC. Para estimar o SOC pela tensão com
+          precisão, deixe a bateria repousar pelo menos 30 minutos após desconectar
+          o carregador.
+        </p>
+        <p class="text-body-md text-body font-light">
+          Alguns carregadores incluem função de remoção de carga superficial — uma breve
+          descarga de alta corrente que desfaz o gradiente de concentração. Isso é comum
+          em carregadores marítimos e de RV. Se o seu tem esse recurso, use-o antes de
+          confiar na tensão para estimar o SOC.
+        </p>
+      </section>
+
+      <section id="temperature-effects">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          Efeitos da Temperatura
+        </h2>
+        <p class="text-body-md text-body font-light mb-4">
+          A tensão do chumbo-ácido é afetada pela temperatura. No frio, a reação
+          química desacelera e a resistência interna aumenta, causando leituras
+          menores. No calor, a reação acelera e as leituras podem ficar levemente
+          elevadas.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-body-sm min-w-[480px]">
+              <thead>
+                <tr class="border-b border-hairline bg-surface-card">
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >Temperatura</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >Ajuste de tensão</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >Efeito na capacidade</th
+                  >
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-hairline">
+                <tr>
+                  <td class="p-4 font-mono text-primary">−20°C (−4°F)</td>
+                  <td class="p-4 text-muted">−0,4V por pack 12V</td>
+                  <td class="p-4 text-muted">~50% de capacidade disponível</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">0°C (32°F)</td>
+                  <td class="p-4 text-muted">−0,2V por pack 12V</td>
+                  <td class="p-4 text-muted">~75% de capacidade disponível</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">10°C (50°F)</td>
+                  <td class="p-4 text-muted">−0,1V por pack 12V</td>
+                  <td class="p-4 text-muted">~85% de capacidade disponível</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">25°C (77°F)</td>
+                  <td class="p-4 text-muted">Sem ajuste</td>
+                  <td class="p-4 text-muted">100% da capacidade</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">40°C (104°F)</td>
+                  <td class="p-4 text-muted">+0,1V por pack 12V</td>
+                  <td class="p-4 text-muted">Levemente elevada, envelhece mais rápido</td
+                  >
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <p class="text-caption text-muted mt-3">
+          A compensação por temperatura é crítica para estimar o SOC com precisão em
+          condições extremas.
+        </p>
+      </section>
+
+      <section id="common-mistakes">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          Erros Comuns
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">
+              Medir Logo Após Carregar
+            </h4>
+            <p class="text-body-sm text-muted">
+              A carga superficial infla a tensão em 0,1–0,3V. Uma bateria que
+              parece 100% pode estar na verdade em 70–80% após a dissipação.
+              Aguarde sempre 30+ minutos após carregar antes de medir.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">
+              Usar a Curva da Química Errada
+            </h4>
+            <p class="text-body-sm text-muted">
+              Ventiladas, AGM e gel têm perfis diferentes. Aplicar valores de
+              ventilada numa AGM (ou vice-versa) gera estimativas incorretas.
+              Identifique primeiro seu tipo de bateria.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Ignorar a Temperatura</h4>
+            <p class="text-body-sm text-muted">
+              Uma bateria num cofre frio ou depósito sem aquecimento lê abaixo
+              dos valores da tabela. Uma bateria 12V a 0°C pode ler 12,4V cheia,
+              o que pareceria 50% de SOC na tabela. Compense sempre a temperatura.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">
+              Descarregar Abaixo de 50% com Frequência
+            </h4>
+            <p class="text-body-sm text-muted">
+              Chumbo-ácido perde muita capacidade ao descarregar regularmente
+              abaixo de 50% de SOC. Ventiladas podem perder 50% da vida útil com
+              50% de DoD. Use a tabela para recarregar antes desse limite.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <CalculatorCard class="border-m-blue-light">
+        <h4 class="text-label-uppercase text-primary text-xs mb-3">Experimente</h4>
+        <p class="text-body-sm text-muted mb-4">
+          Use a Calculadora de Dimensionamento para dimensionar um banco de
+          chumbo-ácido com limites corretos de DoD e redução por temperatura.
+        </p>
+        <a
+          href="/pt/tools/battery-sizing-calculator/"
+          class="btn-primary text-xs py-3 px-6 inline-block"
+          >Abrir Calculadora de Dimensionamento</a
+        >
+      </CalculatorCard>
+
+      <ReferenceTable
+        title="Tabela de Referência Tensão-SOC — Chumbo-Ácido Ventilada"
+        description="Baixe esta tabela para referência offline"
+        headers={["SOC %", "Pack 12V", "Pack 24V", "Pack 48V", "Observações"]}
+        rows={[
+          ["100%", "12.70V", "25.40V", "50.80V", "Totalmente carregada, em repouso"],
+          ["90%", "12.58V", "25.16V", "50.32V", "Possível carga superficial leve"],
+          ["80%", "12.46V", "24.92V", "49.84V", "Boa faixa de operação"],
+          ["70%", "12.34V", "24.68V", "49.36V", "Aceitável para uso diário"],
+          ["60%", "12.24V", "24.48V", "48.96V", "Recarregue em breve"],
+          ["50%", "12.12V", "24.24V", "48.48V", "Recarga recomendada"],
+          ["40%", "12.00V", "24.00V", "48.00V", "Risco de sulfatação"],
+          ["30%", "11.88V", "23.76V", "47.52V", "Zona de descarga profunda"],
+          ["20%", "11.76V", "23.52V", "47.04V", "Bateria em risco"],
+          ["10%", "11.64V", "23.28V", "46.56V", "Descarga severa"],
+          ["0%", "11.50V", "23.00V", "46.00V", "Totalmente descarregada"],
+        ]}
+        source="Battery University / Concorde Battery"
+      />
+
+      <ReferenceTable
+        title="Tabela de Referência Tensão-SOC — AGM e Gel"
+        description="Baixe esta tabela para referência offline"
+        headers={["SOC %", "AGM 12V", "Gel 12V", "AGM 24V", "Observações"]}
+        rows={[
+          ["100%", "12.90V", "12.85V", "25.80V", "Totalmente carregada, em repouso"],
+          ["90%", "12.75V", "12.70V", "25.50V", "Quase cheia"],
+          ["80%", "12.60V", "12.55V", "25.20V", "Boa faixa de operação"],
+          ["70%", "12.48V", "12.43V", "24.96V", "Aceitável"],
+          ["60%", "12.36V", "12.31V", "24.72V", "Recarregue em breve"],
+          ["50%", "12.24V", "12.19V", "24.48V", "Recarga recomendada"],
+          ["40%", "12.12V", "12.07V", "24.24V", "Risco de dano"],
+          ["30%", "12.00V", "11.95V", "24.00V", "Zona de descarga profunda"],
+          ["20%", "11.88V", "11.83V", "23.76V", "Bateria em risco"],
+          ["10%", "11.76V", "11.71V", "23.52V", "Descarga severa"],
+          ["0%", "11.60V", "11.55V", "23.20V", "Totalmente descarregada"],
+        ]}
+        source="Battery University / Concorde Battery"
+      />
+
+      <FAQSection items={faqItems} />
+
+      <section class="border-t border-hairline pt-12">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          Referências
+        </h2>
+        <ul class="flex flex-col gap-2 text-body-sm text-muted">
+          {
+            references.map((ref) => (
+              <li class="flex gap-2">
+                <span class="text-m-blue-light shrink-0">—</span>
+                <a
+                  href={ref.url}
+                  class="hover:text-primary transition-colors underline underline-offset-2"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {ref.title}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+    </div>
+  </div>
+</Layout>

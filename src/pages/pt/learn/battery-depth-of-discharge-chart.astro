@@ -1,0 +1,440 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+import CalculatorCard from "../../../components/CalculatorCard.astro";
+import FAQSection from "../../../components/FAQSection.astro";
+import ReferenceChart from "../../../components/ReferenceChart.astro";
+import ReferenceTable from "../../../components/ReferenceTable.astro";
+
+const faqItems = [
+  {
+    question: "O que é profundidade de descarga (DoD)?",
+    answer:
+      "Profundidade de descarga é o percentual da capacidade total da bateria que foi usado. Uma bateria de 100Ah descarregada até 50Ah está em 50% DoD. É o inverso do estado de carga: DoD = 100% − SOC. Fabricantes especificam limites máximos de DoD para proteger a vida em ciclos.",
+  },
+  {
+    question: "Como o DoD afeta a vida útil da bateria?",
+    answer:
+      "Descargas mais profundas aceleram a degradação. Uma bateria LiFePO4 classificada para 5.000 ciclos a 80% DoD pode durar 3.000 ciclos a 100% DoD. Baterias de chumbo-ácido são ainda mais sensíveis — descarregar regularmente abaixo de 50% DoD pode cortar a vida em ciclos pela metade ou mais.",
+  },
+  {
+    question: "Posso descarregar uma bateria LiFePO4 até 100% DoD?",
+    answer:
+      "Tecnicamente sim, LiFePO4 suporta 100% DoD sem dano imediato. No entanto, descarregar regularmente até 100% DoD reduz a vida em ciclos em comparação com limitar a 80% DoD. A maioria dos projetistas recomenda limite de 80% DoD para longevidade ideal.",
+  },
+  {
+    question: "O que é capacidade utilizável?",
+    answer:
+      "Capacidade utilizável é a energia que você pode realmente extrair de uma bateria dado seu limite de DoD. Uma bateria de 100Ah com limite de 80% DoD fornece 80Ah de capacidade utilizável. Dimensione sempre os bancos pela capacidade utilizável, não pela nominal.",
+  },
+];
+
+const tableOfContents = [
+  { id: "dod-by-chemistry", label: "DoD por Química" },
+  { id: "usable-capacity", label: "Capacidade Utilizável" },
+  { id: "dod-and-cycle-life", label: "DoD e Vida em Ciclos" },
+  { id: "practical-guidelines", label: "Diretrizes Práticas" },
+  { id: "common-mistakes", label: "Erros Comuns" },
+];
+
+const relatedCalculators = [
+  {
+    title: "Calculadora de Dimensionamento de Bateria",
+    href: "/pt/tools/battery-sizing-calculator/",
+  },
+  {
+    title: "Estimador de Degradação de Bateria",
+    href: "/pt/tools/battery-degradation-estimator/",
+  },
+  { title: "Calculadora de Autonomia de Bateria", href: "/pt/tools/runtime-calculator/" },
+];
+
+const references = [
+  {
+    title: "Battery University — Profundidade de Descarga",
+    url: "https://batteryuniversity.com/article/bu-501-discharge-characteristics",
+  },
+  {
+    title: "NREL — Vida em Ciclos vs Análise de DoD",
+    url: "https://www.nrel.gov/docs/fy24osti/87655.pdf",
+  },
+];
+---
+
+<Layout
+  title="Gráfico de Profundidade de Descarga — DoD por Química | Calculadoras de Bateria"
+  description="Tabela de referência de profundidade de descarga para baterias LiFePO4, NMC, chumbo-ácido, AGM e gel. Capacidade utilizável de 100Ah e implicações na vida em ciclos."
+  canonical="https://batterycalculators.com/pt/learn/battery-depth-of-discharge-chart/"
+  faqItems={faqItems}
+  lang="pt"
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a
+        href="/pt/learn/"
+        class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block"
+        >&larr; Voltar aos Guias</a
+      >
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4"
+        >REFERÊNCIA</span
+      >
+      <h1 class="text-display-md text-primary mb-6">
+        Gráfico de Profundidade de Descarga
+      </h1>
+      <p class="text-body-md text-body font-light">
+        Até onde você pode descarregar com segurança cada química de bateria, como o DoD
+        afeta a capacidade utilizável e diretrizes práticas para maximizar a vida em ciclos.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section id="dod-by-chemistry">
+        <ReferenceChart
+          type="bar"
+          title="Capacidade Utilizável Recomendada por Química"
+          description="Capacidade utilizável aproximada de uma bateria de 100Ah. Verifique sempre as especificações do fabricante."
+          xLabel="Química"
+          yLabel="Capacidade Utilizável (Ah)"
+          data={[
+            { x: 1, y: 80, label: "LiFePO4 (80Ah)" },
+            { x: 2, y: 80, label: "NMC (80Ah)" },
+            { x: 3, y: 50, label: "AGM (50Ah)" },
+            { x: 4, y: 50, label: "Gel (50Ah)" },
+            { x: 5, y: 50, label: "Chumbo-Ácido Inundada (50Ah)" },
+          ]}
+          yMin={0}
+          yMax={100}
+          caption="Apenas valores aproximados. Verifique sempre as especificações do fabricante."
+        />
+
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          DoD por Química
+        </h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Diferentes químicas têm limites seguros distintos de descarga.
+          Exceder esses limites causa degradação acelerada, perda de capacidade
+          e, em casos extremos, dano permanente. A tabela abaixo mostra os limites
+          típicos recomendados de DoD para químicas comuns.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-body-sm min-w-[640px]">
+              <thead>
+                <tr class="border-b border-hairline bg-surface-card">
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >Química</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >DoD Máx. Típico</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >Utilizável de 100Ah</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >Notas</th
+                  >
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-hairline">
+                <tr>
+                  <td class="p-4 font-mono text-primary">LiFePO4 (LFP)</td>
+                  <td class="p-4 text-muted">80–100%</td>
+                  <td class="p-4 text-muted">80–100 Ah</td>
+                  <td class="p-4 text-muted"
+                    >Suporta 100% DoD; 80% recomendado para vida ideal em ciclos</td
+                  >
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">NMC (Lítio)</td>
+                  <td class="p-4 text-muted">80–90%</td>
+                  <td class="p-4 text-muted">80–90 Ah</td>
+                  <td class="p-4 text-muted"
+                    >Um pouco mais sensível que LFP a descargas profundas</td
+                  >
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">Chumbo-Ácido (Inundada)</td
+                  >
+                  <td class="p-4 text-muted">50%</td>
+                  <td class="p-4 text-muted">50 Ah</td>
+                  <td class="p-4 text-muted"
+                    >Descargas profundas causam sulfatação e perda rápida de capacidade</td
+                  >
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">AGM (Selada)</td>
+                  <td class="p-4 text-muted">50–60%</td>
+                  <td class="p-4 text-muted">50–60 Ah</td>
+                  <td class="p-4 text-muted"
+                    >Um pouco melhor que inundada; ainda limitada pela química</td
+                  >
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">Gel (Selada)</td>
+                  <td class="p-4 text-muted">50%</td>
+                  <td class="p-4 text-muted">50 Ah</td>
+                  <td class="p-4 text-muted"
+                    >Similar à inundada; descarga profunda danifica o eletrólito em gel</td
+                  >
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <p class="text-caption text-muted mt-3">
+          Valores são recomendações típicas. Verifique sempre as especificações do fabricante
+          para seu modelo específico de bateria.
+        </p>
+      </section>
+
+      <section id="usable-capacity">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          Capacidade Utilizável
+        </h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Capacidade utilizável é a energia que você pode realmente extrair de uma
+          bateria. Uma bateria de 100Ah a 50% DoD fornece apenas 50Ah de energia
+          utilizável. Por isso o dimensionamento deve considerar os limites de DoD —
+          um banco nominal de 200Ah em chumbo-ácido fornece apenas 100Ah utilizáveis
+          a 50% DoD.
+        </p>
+        <p class="text-body-md text-body font-light mb-4">
+          Baterias de lítio (LiFePO4 e NMC) oferecem significativamente mais capacidade
+          utilizável na mesma classificação nominal. Uma bateria LiFePO4 de 100Ah a 80%
+          DoD fornece 80Ah — 60% mais energia utilizável que uma bateria de chumbo-ácido de
+          mesma classificação. Essa é uma das principais razões pelas quais baterias de lítio
+          têm menor custo efetivo por Wh utilizável ao longo da vida.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-body-sm min-w-[480px]">
+              <thead>
+                <tr class="border-b border-hairline bg-surface-card">
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >Capacidade Nominal</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >LiFePO4 (80% DoD)</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >Chumbo-Ácido (50% DoD)</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >Diferença</th
+                  >
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-hairline">
+                <tr>
+                  <td class="p-4 font-mono text-primary">50 Ah</td>
+                  <td class="p-4 text-muted">40 Ah</td>
+                  <td class="p-4 text-muted">25 Ah</td>
+                  <td class="p-4 text-muted">+60%</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">100 Ah</td>
+                  <td class="p-4 text-muted">80 Ah</td>
+                  <td class="p-4 text-muted">50 Ah</td>
+                  <td class="p-4 text-muted">+60%</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">200 Ah</td>
+                  <td class="p-4 text-muted">160 Ah</td>
+                  <td class="p-4 text-muted">100 Ah</td>
+                  <td class="p-4 text-muted">+60%</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">300 Ah</td>
+                  <td class="p-4 text-muted">240 Ah</td>
+                  <td class="p-4 text-muted">150 Ah</td>
+                  <td class="p-4 text-muted">+60%</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section id="dod-and-cycle-life">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          DoD e Vida em Ciclos
+        </h2>
+        <p class="text-body-md text-body font-light mb-4">
+          A relação entre DoD e vida em ciclos é não linear. Descargas
+          mais profundas causam dano desproporcionalmente maior. Uma bateria que dura
+          5.000 ciclos a 20% DoD pode durar apenas 1.500 ciclos a 80% DoD e
+          500 ciclos a 100% DoD. Esse trade-off é um fator-chave no projeto de
+          sistemas de bateria.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Vida em Ciclos LiFePO4</h4>
+            <p class="text-body-sm text-muted">
+              A 80% DoD: ~3.000–5.000 ciclos<br />
+              A 50% DoD: ~5.000–7.000 ciclos<br />
+              A 20% DoD: ~7.000–10.000+ ciclos<br />
+              Vida calendário: 10–15 anos típicos
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Vida em Ciclos Chumbo-Ácido</h4>
+            <p class="text-body-sm text-muted">
+              A 50% DoD: ~300–500 ciclos<br />
+              A 30% DoD: ~600–1.000 ciclos<br />
+              A 20% DoD: ~1.000–1.500 ciclos<br />
+              Vida calendário: 3–5 anos típicos
+            </p>
+          </CalculatorCard>
+        </div>
+        <p class="text-body-md text-body font-light mt-4">
+          O DoD ideal depende da sua aplicação. Para armazenamento solar com ciclagem diária,
+          um DoD mais raso (50–80% para LiFePO4) estende a vida útil.
+          Para backup de emergência que raramente cicla, um DoD mais profundo pode ser
+          aceitável, pois a contagem de ciclos é baixa.
+        </p>
+      </section>
+
+      <section id="practical-guidelines">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          Diretrizes Práticas
+        </h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Ao dimensionar um banco de baterias, calcule sempre com base na capacidade utilizável
+          (capacidade nominal × limite de DoD), não apenas na nominal. Um sistema
+          que precisa de 100Ah utilizáveis exige um banco de 200Ah em chumbo-ácido ou
+          125Ah em LiFePO4.
+        </p>
+        <p class="text-body-md text-body font-light mb-4">
+          Inclua uma margem de segurança de 10–20% além da capacidade utilizável limitada por DoD
+          para cobrir degradação ao longo da vida,
+          efeitos de temperatura e erros de estimativa de carga.
+        </p>
+        <p class="text-body-md text-body font-light">
+          Para sistemas com BMS, ajuste o corte por baixa tensão conforme o
+          limite de DoD recomendado pelo fabricante. O BMS desconectará a carga
+          antes que a bateria atinja uma profundidade insegura de descarga.
+        </p>
+      </section>
+
+      <section id="common-mistakes">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          Erros Comuns
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">
+              Dimensionar pela Capacidade Nominal
+            </h4>
+            <p class="text-body-sm text-muted">
+              Usar a capacidade nominal sem considerar os limites de DoD leva a
+              bancos subdimensionados. Um banco de 200Ah em chumbo-ácido a 50% DoD só
+              fornece 100Ah utilizáveis. Dimensione pela utilizável, não pela nominal.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">
+              Aplicar Regras de Lítio ao Chumbo-Ácido
+            </h4>
+            <p class="text-body-sm text-muted">
+              Baterias de chumbo-ácido não toleram o mesmo DoD que o lítio. Um DoD de 50%
+              aceitável para LiFePO4 causará sulfatação rápida e
+              perda de capacidade no chumbo-ácido. Use o limite correto para sua
+              química.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">
+              Ignorar a Degradação com o Tempo
+            </h4>
+            <p class="text-body-sm text-muted">
+              Baterias perdem capacidade com a idade. Uma bateria de 100Ah a 80% DoD
+              fornece 80Ah quando nova, mas apenas 60–70Ah após vários anos. Planeje
+              para a capacidade de fim de vida, não apenas do Dia 1.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Sem Margem de Segurança</h4>
+            <p class="text-body-sm text-muted">
+              Projetar no limite da capacidade utilizável não deixa reserva
+              para erros de estimativa, efeitos de temperatura ou
+              degradação. Adicione 10–20% de margem a todos os cálculos.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <CalculatorCard class="border-m-blue-light">
+        <h4 class="text-label-uppercase text-primary text-xs mb-3">Experimente</h4>
+        <p class="text-body-sm text-muted mb-4">
+          Use a Calculadora de Dimensionamento para dimensionar um banco com limites
+          adequados de DoD, ou o Estimador de Degradação para ver como o DoD afeta a vida em ciclos
+          ao longo do tempo.
+        </p>
+        <a
+          href="/pt/tools/battery-sizing-calculator/"
+          class="btn-primary text-xs py-3 px-6 inline-block"
+          >Abrir Calculadora de Dimensionamento</a
+        >
+      </CalculatorCard>
+
+      <ReferenceTable
+        title="Profundidade de Descarga por Química"
+        description="Baixe esta tabela para referência offline"
+        headers={["Química", "DoD Máx. Típico", "Utilizável de 100Ah", "Notas"]}
+        rows={[
+          ["LiFePO4 (LFP)", "80–100%", "80–100 Ah", "Suporta 100% DoD; 80% recomendado para vida ideal em ciclos"],
+          ["NMC (Lítio)", "80–90%", "80–90 Ah", "Um pouco mais sensível que LFP a descargas profundas"],
+          ["Chumbo-Ácido (Inundada)", "50%", "50 Ah", "Descargas profundas causam sulfatação e perda rápida de capacidade"],
+          ["AGM (Selada)", "50–60%", "50–60 Ah", "Um pouco melhor que inundada; ainda limitada pela química"],
+          ["Gel (Selada)", "50%", "50 Ah", "Similar à inundada; descarga profunda danifica o eletrólito em gel"],
+        ]}
+        source="Battery University / NREL"
+      />
+
+      <ReferenceTable
+        title="Comparação de Capacidade Utilizável (LiFePO4 vs Chumbo-Ácido)"
+        description="Baixe esta tabela para referência offline"
+        headers={["Capacidade Nominal", "LiFePO4 (80% DoD)", "Chumbo-Ácido (50% DoD)", "Diferença"]}
+        rows={[
+          ["50 Ah", "40 Ah", "25 Ah", "+60%"],
+          ["100 Ah", "80 Ah", "50 Ah", "+60%"],
+          ["200 Ah", "160 Ah", "100 Ah", "+60%"],
+          ["300 Ah", "240 Ah", "150 Ah", "+60%"],
+        ]}
+        source="Battery University / NREL"
+      />
+
+      <FAQSection items={faqItems} />
+
+      <section class="border-t border-hairline pt-12">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          Referências
+        </h2>
+        <ul class="flex flex-col gap-2 text-body-sm text-muted">
+          {
+            references.map((ref) => (
+              <li class="flex gap-2">
+                <span class="text-m-blue-light shrink-0">—</span>
+                <a
+                  href={ref.url}
+                  class="hover:text-primary transition-colors underline underline-offset-2"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {ref.title}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+    </div>
+  </div>
+</Layout>

@@ -1,0 +1,173 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+
+const faqItems = [
+  {
+    question: "O que são dias de autonomia?",
+    answer: "Autonomia é o número de dias que o banco alimenta as cargas sem nenhuma entrada externa de carga. Para solar off-grid, 2-3 dias é típico para cobrir dias nublados seguidos. Sistemas críticos podem exigir 5-7 dias.",
+  },
+  {
+    question: "Por que preciso reduzir por temperatura?",
+    answer: "As taxas de reação química caem em baixas temperaturas, reduzindo a capacidade disponível. Uma bateria de 100 Ah a 25°C pode entregar só 85 Ah a 0°C. Ignorar isso subdimensiona o banco em instalações de clima frio.",
+  },
+  {
+    question: "Como a profundidade de descarga afeta o dimensionamento?",
+    answer: "Um limite menor de DoD exige bateria maior para a mesma energia utilizável. Se você limita a descarga a 50% de DoD para prolongar a vida útil, precisa do dobro da capacidade em relação a um sistema que descarrega até 100%.",
+  },
+  {
+    question: "Devo superdimensionar o banco de baterias?",
+    answer: "Um leve superdimensionamento (10-20%) é recomendado para cobrir perda de capacidade com o tempo, variação de temperatura e crescimento das cargas. Um banco exato na instalação fica subdimensionado em 2-3 anos conforme a capacidade degrada.",
+  },
+];
+---
+
+<Layout
+  title="Como Dimensionar um Banco de Baterias | Calculadoras de Bateria"
+  description="Aprenda a calcular a capacidade necessária do banco a partir de consumo diário, dias de autonomia, tensão, redução por temperatura e limites de profundidade de descarga."
+  canonical="https://batterycalculators.com/pt/learn/how-to-size-a-battery-bank/"
+  faqItems={faqItems}
+  lang="pt"
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/pt/learn/" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Voltar aos Guias</a>
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">PROJETO DE SISTEMAS</span>
+      <h1 class="text-display-md text-primary mb-6">Como Dimensionar um Banco de Baterias</h1>
+      <p class="text-body-md text-body font-light">
+        Dimensionar um banco significa determinar a capacidade total necessária para atender suas necessidades de energia por um período sem recarga. Este guia cobre o método padrão de engenharia.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">O Método de Dimensionamento</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          O processo começa com seu consumo diário total em watt-hora. Daí, considere por quantos dias o sistema precisa funcionar sem carga (autonomia), quão fundo aceita descarregar (DoD), quanta energia se perde no sistema (eficiência) e quão frio é o ambiente (redução por temperatura).
+        </p>
+        <p class="text-body-md text-body font-light">
+          O resultado é a capacidade necessária em watt-hora, convertida depois para ampères-hora na tensão do seu sistema.
+        </p>
+      </section>
+
+      <FormulaBox title="Fórmula de Dimensionamento">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Capacidade necessária (Wh) = Carga diária (Wh) × Dias de autonomia / (DoD% / 100) / (Eficiência% / 100) / Fator de temperatura
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Capacidade necessária (Ah) = Capacidade necessária (Wh) / Tensão do sistema (V)
+        </div>
+        <p>
+          O fator de temperatura é normalmente 0,85-0,90 para climas frios (0°C) e 1,0 para temperatura ambiente.
+        </p>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Exemplo Resolvido</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Dados:</strong></p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li>Consumo diário: 1.200 Wh (1,2 kWh)</li>
+              <li>Autonomia necessária: 3 dias</li>
+              <li>Limite de DoD: 80%</li>
+              <li>Eficiência do sistema: 90%</li>
+              <li>Fator de temperatura: 0,90 (clima frio, média 0°C)</li>
+              <li>Tensão do sistema: 48V</li>
+            </ul>
+            <p><strong>Etapa 1:</strong> Calcular a capacidade necessária em Wh:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              1.200 Wh × 3 / 0,80 / 0,90 / 0,90 = 5.556 Wh
+            </div>
+            <p><strong>Etapa 2:</strong> Converter para Ah na tensão do sistema:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              5.556 Wh / 48V = 115,7 Ah
+            </div>
+            <p><strong>Etapa 3:</strong> Arredonde para a capacidade prática mais próxima. Um banco de 120 Ah ou 200 Ah a 48V seria adequado, com 200 Ah dando margem para crescimento futuro e perda de capacidade.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Fatores de Redução por Temperatura</h2>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Temperatura</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Fator lítio</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Fator chumbo-ácido</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                  <td class="p-4 text-muted">25°C (77°F)</td>
+                <td class="p-4 font-mono text-primary">1,00</td>
+                <td class="p-4 font-mono text-primary">1,00</td>
+              </tr>
+              <tr>
+                  <td class="p-4 text-muted">10°C (50°F)</td>
+                <td class="p-4 font-mono text-primary">0,95</td>
+                <td class="p-4 font-mono text-primary">0,90</td>
+              </tr>
+              <tr>
+                  <td class="p-4 text-muted">0°C (32°F)</td>
+                <td class="p-4 font-mono text-primary">0,90</td>
+                <td class="p-4 font-mono text-primary">0,80</td>
+              </tr>
+              <tr>
+                  <td class="p-4 text-muted">-10°C (14°F)</td>
+                <td class="p-4 font-mono text-primary">0,80</td>
+                <td class="p-4 font-mono text-primary">0,65</td>
+              </tr>
+              <tr>
+                  <td class="p-4 text-muted">-20°C (-4°F)</td>
+                <td class="p-4 font-mono text-primary">0,70</td>
+                <td class="p-4 font-mono text-primary">0,50</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Considerações-Chave de Projeto</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Seleção da Química</h4>
+            <p class="text-body-sm text-muted">
+              LFP (LiFePO4) oferece a maior vida útil (4.000-6.000 ciclos) e melhor estabilidade térmica. NMC tem maior densidade energética, mas menor vida útil. Chumbo-ácido tem menor custo por kWh, mas é mais pesado e dura menos.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Configuração Série/Paralelo</h4>
+            <p class="text-body-sm text-muted">
+              Com o total em Ah, determine quantas células ou módulos em série (para tensão) e em paralelo (para capacidade). Use a Calculadora de Strings Paralelas para esta etapa.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Experimente</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use a Calculadora de Dimensionamento para determinar a capacidade necessária do pack para seu sistema.
+          </p>
+          <a href="/pt/tools/battery-sizing-calculator/" class="btn-primary text-xs py-3 px-6 inline-block">Abrir Calculadora de Dimensionamento</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Próxima Etapa</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Após dimensionar, configure o arranjo série-paralelo com a Calculadora de Strings Paralelas.
+          </p>
+          <a href="/pt/tools/parallel-string-calculator/" class="btn-primary-outline text-xs py-3 px-6 inline-block">Abrir Calculadora de Strings</a>
+        </CalculatorCard>
+      </div>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

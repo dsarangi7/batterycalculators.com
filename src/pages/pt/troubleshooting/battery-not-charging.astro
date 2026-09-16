@@ -1,0 +1,206 @@
+---
+import ArticleLayout from '../../../layouts/ArticleLayout.astro';
+import TroubleshootingBlock from '../../../components/TroubleshootingBlock.astro';
+
+const relatedCalculators = [
+  { title: 'Calculadora de Tempo de Carga', href: '/pt/tools/charging-time-calculator/', type: 'calculator' as const },
+  { title: 'Calculadora de Taxa C', href: '/pt/tools/c-rate-calculator/', type: 'calculator' as const },
+  { title: 'Estimador de SOC', href: '/pt/tools/soc-estimator/', type: 'calculator' as const },
+  { title: 'Calculadora de Dimensionamento de Bateria', href: '/pt/tools/battery-sizing-calculator/', type: 'calculator' as const },
+];
+
+const relatedGuides = [
+  { title: 'Guia de Dimensionamento de Carregador', href: '/pt/learn/charger-sizing-guide/', type: 'guide' as const },
+  { title: 'Tabela de Tensão de Carga LiFePO4', href: '/pt/learn/lifepo4-charge-voltage-table/', type: 'guide' as const },
+  { title: 'Fórmula de Carga de Bateria', href: '/pt/learn/battery-charging-formula/', type: 'guide' as const },
+];
+
+const faqItems = [
+  {
+    question: 'Por que minha bateria para de carregar em 80%?',
+    answer: 'A maioria das baterias de lítio interrompe a carga rápida em 80% de SOC para proteger a saúde das células. O BMS reduz a corrente durante a fase CV (tensão constante). Se sua bateria para permanentemente em 80%, o BMS pode estar travado devido a um desequilíbrio de células ou evento de sobretensão — tente um ciclo completo de reinicialização ou entre em contato com o fabricante.',
+  },
+  {
+    question: 'Como sei se meu carregador é compatível com minha bateria?',
+    answer: 'Combine a tensão do carregador com a tensão nominal da bateria (ex.: carregador de 12,8V para uma bateria LFP de 12,8V). A configuração de química do carregador deve corresponder: carregadores LFP carregam até 14,4–14,6V, enquanto carregadores NMC carregam até 16,8V. Usar o perfil de química errado pode causar subcarga ou sobrecarga perigosa.',
+  },
+  {
+    question: 'O frio pode impedir minha bateria de carregar?',
+    answer: 'Sim. Baterias LiFePO4 têm proteção contra carga em baixa temperatura que desabilita o carregamento abaixo de 0°C. Baterias de chumbo-ácido também podem ser danificadas ao carregar abaixo de zero. Sempre carregue baterias em ambiente com temperatura controlada ou use um carregador com compensação de temperatura integrada.',
+  },
+  {
+    question: 'O que significa bloqueio do BMS?',
+    answer: 'Um bloqueio do BMS ocorre quando o sistema de gerenciamento da bateria desconecta o MOSFET de carga para proteger as células contra sobretensão, sobrecorrente ou temperaturas extremas. A bateria parece descarregada para o carregador. Um procedimento adequado de reinicialização — geralmente envolvendo uma breve descarga com carga seguida de reconexão do carregador — resolve a maioria dos bloqueios.',
+  },
+  {
+    question: 'Como saber se minha bateria tem desequilíbrio de células?',
+    answer: 'Use um multímetro para medir as tensões individuais das células, se acessíveis. Uma diferença maior que 0,05V entre células indica desequilíbrio. Algumas unidades de BMS informam as tensões das células via Bluetooth. Células desequilibradas fazem o BMS interromper o carregamento cedo porque a célula mais alta atinge o limite de sobretensão antes de o pacote estar cheio.',
+  },
+  {
+    question: 'Carga lenta é normal em baterias de lítio?',
+    answer: 'Baterias de lítio carregam rápido com SOC baixo (0–80%) durante a fase CC, depois desaceleram drasticamente durante a fase CV de 80–100%. Uma bateria LFP de 100Ah a 0,5C carrega até 80% em cerca de 1,5 hora, mas leva mais 1–2 horas para chegar a 100%. Essa redução é normal e protege a longevidade das células.',
+  },
+];
+---
+
+<ArticleLayout
+  title="Bateria Não Carrega — Guia de Solução de Problemas | Calculadoras de Bateria"
+  description="Descubra por que sua bateria não carrega, carrega devagar ou para em 80%. Solução passo a passo para bloqueio do BMS, incompatibilidade de carregador, limites de temperatura, problemas de conexão e desequilíbrio de células."
+  canonical="https://batterycalculators.com/pt/troubleshooting/battery-not-charging/"
+  category="SOLUÇÃO DE PROBLEMAS"
+  breadcrumbItems={[{ label: 'Bateria Não Carrega' }]}
+  relatedCalculators={relatedCalculators}
+  relatedGuides={relatedGuides}
+  faqItems={faqItems}
+  lang="pt"
+>
+  <p class="text-body-md text-body font-light mb-8">
+    Uma bateria que se recusa a carregar — ou carrega dolorosamente devagar — pode ter dezenas de causas raiz na bateria, no carregador, na fiação e no ambiente. Este guia percorre os cinco modos de falha mais comuns com listas de verificação de diagnóstico para que você possa isolar e resolver o problema de forma sistemática.
+  </p>
+
+  <TroubleshootingBlock
+    lang="pt"
+    problem="Bloqueio do BMS — Bateria Recusa Totalmente a Carga"
+    causes={[
+      'Evento de sobretensão acionou a desconexão de carga do BMS',
+      'Proteção contra sobrecorrente ativada por falha ou curto',
+      'Limite de sobretensão de célula excedido devido a desequilíbrio',
+      'Falha de firmware do BMS após interrupção de energia',
+      'Bloqueio por subtensão após descarga profunda',
+    ]}
+    explanation="O Sistema de Gerenciamento da Bateria é o guardião entre o carregador e as células. Quando qualquer limite de proteção é ultrapassado — sobretensão, subtensão, sobrecorrente ou sobretemperatura — o BMS abre o MOSFET de carga, desconectando fisicamente o circuito de carga. A bateria parecerá completamente descarregada para o carregador. Muitas unidades de BMS exigem uma sequência específica de reinicialização: aplicar uma breve carga (5–10A por 5–10 segundos) para destravar o bloqueio de subtensão, ou desconectar o carregador e reconectar para limpar um bloqueio de sobretensão. Alguns projetos de BMS reiniciam automaticamente quando a tensão volta à faixa segura, enquanto outros exigem um ciclo completo de energia."
+    checklist={[
+      'Meça a tensão dos terminais da bateria com um multímetro',
+      'Se a tensão estiver próxima de 0V, o BMS está em bloqueio por subtensão',
+      'Se a tensão estiver normal mas o carregador não mostrar corrente, o BMS está em bloqueio por sobretensão',
+      'Desconecte todas as cargas e o carregador por 60 segundos',
+      'Aplique uma pequena carga (lâmpada ou resistor) por 10 segundos para reiniciar',
+      'Reconecte o carregador e verifique se há corrente de carga',
+      'Verifique o aplicativo Bluetooth do BMS por códigos de falha, se disponível',
+      'Se o bloqueio persistir, o BMS pode precisar de substituição ou reinicialização de fábrica',
+    ]}
+    solutions={[
+      'Faça um ciclo completo de energia: desconecte carregador e cargas por 5 minutos',
+      'Aplique uma pequena carga resistiva por 10 segundos para destravar o bloqueio de subtensão',
+      'Verifique o aplicativo ou indicador do BMS por códigos de falha específicos',
+      'Entre em contato com o fabricante para o procedimento de reinicialização específico do seu modelo',
+      'Se o BMS estiver defeituoso, substitua a unidade (mesma contagem de células e química)',
+    ]}
+  />
+
+  <TroubleshootingBlock
+    lang="pt"
+    problem="Incompatibilidade do Carregador — Tensão ou Química Errada"
+    causes={[
+      'Tensão do carregador não corresponde à tensão nominal da bateria',
+      'Perfil de química incompatível (carregador LFP em bateria NMC ou vice-versa)',
+      'Corrente nominal do carregador muito baixa para superar o limite mínimo de carga do BMS',
+      'Polaridade de saída do carregador invertida',
+      'Carregador projetado para chumbo-ácido usado em bateria de lítio',
+    ]}
+    explanation="Carregadores são projetados para tensões e químicas específicas de bateria. Um carregador de chumbo-ácido de 12V entrega 13,8–14,4V em modo bulk, o que é insuficiente para carregar totalmente uma bateria LiFePO4 de 12,8V que exige 14,4–14,6V. Por outro lado, carregar uma bateria LFP com um carregador NMC (16,8V) acionará a proteção contra sobretensão. Alguns carregadores têm modos de química selecionáveis — verifique se o perfil correto está ativo. Além disso, se a corrente máxima do carregador estiver abaixo do limite mínimo de carga do BMS (normalmente 0,05C), o BMS pode rejeitar totalmente a carga."
+    checklist={[
+      'Verifique a tensão de saída do carregador com um multímetro sob carga',
+      'Confirme se a configuração de química do carregador corresponde ao tipo de bateria (LFP, NMC, chumbo-ácido)',
+      'Verifique a corrente nominal do carregador em relação à capacidade da bateria (deve ser ≥0,1C)',
+      'Inspecione o conector do carregador quanto à polaridade correta',
+      'Teste com um carregador sabidamente compatível para isolar falha de bateria vs. carregador',
+      'Verifique os indicadores LED do carregador por códigos de erro',
+    ]}
+    solutions={[
+      'Use um carregador adequado à tensão e química da sua bateria',
+      'Selecione o perfil de química correto em carregadores multimodo',
+      'Atualize para um carregador com corrente adequada (recomendado ≥0,1C)',
+      'Substitua o conector danificado ou corrija a polaridade da fiação',
+      'Para baterias de chumbo-ácido, use um carregador com modo compatível com lítio',
+    ]}
+  />
+
+  <TroubleshootingBlock
+    lang="pt"
+    problem="Limites de Temperatura — Carga Desabilitada em Condições Extremas"
+    causes={[
+      'Temperatura ambiente abaixo de 0°C aciona a proteção de baixa temperatura',
+      'Temperatura central da bateria acima de 45°C aciona o corte por alta temperatura',
+      'Carregador com desligamento interno por sobretemperatura',
+      'Luz solar direta ou proximidade de fonte de calor superaquecendo a bateria',
+      'Mudança rápida de temperatura causando condensação dentro da bateria',
+    ]}
+    explanation="Baterias de lítio têm faixas rígidas de temperatura para carga segura. Células LiFePO4 não devem ser carregadas abaixo de 0°C porque os íons de lítio não conseguem se intercalar no ânodo de grafite em baixas temperaturas, causando deposição de lítio que danifica permanentemente a célula e cria risco à segurança. Acima de 45°C, a decomposição do eletrólito acelera e o BMS desconecta o carregamento para evitar fuga térmica. Baterias de chumbo-ácido também sofrem ao carregar abaixo de zero — o eletrólito pode congelar se a bateria estiver profundamente descarregada. A maioria dos carregadores e BMS de qualidade tem sensores de temperatura integrados, mas sondas externas podem ser necessárias para monitoramento preciso no nível da célula."
+    checklist={[
+      'Meça a temperatura ambiente perto da instalação da bateria',
+      'Verifique a temperatura da superfície da bateria com um termômetro infravermelho',
+      'Confirme as leituras do sensor de temperatura do BMS via aplicativo Bluetooth, se disponível',
+      'Garanta que a bateria não esteja sob luz solar direta ou perto de fonte de calor',
+      'Deixe a bateria aclimatar à temperatura ambiente antes de carregar se estiver congelada',
+      'Verifique a ventilação e a temperatura interna do carregador',
+    ]}
+    solutions={[
+      'Mova a bateria para um ambiente com temperatura controlada (ideal de 10–30°C)',
+      'Deixe a bateria fria aquecer acima de 5°C antes de conectar o carregador',
+      'Forneça sombra ou isolamento para baterias expostas à luz solar direta',
+      'Garanta ventilação adequada ao redor da bateria e do carregador (pelo menos 10cm de folga)',
+      'Use um carregador com compensação de temperatura integrada',
+      'Instale a bateria em um gabinete ventilado com resfriamento passivo ou ativo',
+    ]}
+  />
+
+  <TroubleshootingBlock
+    lang="pt"
+    problem="Problemas de Conexão — Mau Contato Entre Carregador e Bateria"
+    causes={[
+      'Conectores de terminal corroídos ou oxidados',
+      'Presilhas de cabo ou terminais olhal frouxos',
+      'Cabo de carga danificado ou desfiado',
+      'Bitola de cabo incorreta causando queda excessiva de tensão',
+      'Fusível inline ou disjuntor frouxo ou corroído',
+    ]}
+    explanation="Conexões de alta resistência causam queda de tensão entre o carregador e os terminais da bateria. Um carregador entregando 14,4V pode fornecer apenas 13,2V nos terminais da bateria se houver resistência significativa na fiação, conectores ou fusível. Essa queda de tensão pode impedir a bateria de atingir sua tensão de carga total. Por exemplo, 0,5V de queda em uma conexão significa que o carregador acha que está entregando 14,4V enquanto a bateria recebe apenas 13,9V — insuficiente para carga total na química LFP. A corrosão nos terminais cria uma fina camada de óxido que aumenta drasticamente a resistência, especialmente em ambientes marinhos ou úmidos."
+    checklist={[
+      'Meça a tensão de saída do carregador nos terminais do carregador',
+      'Meça a tensão nos terminais da bateria durante o carregamento',
+      'Calcule a diferença de tensão (deve ser <0,2V para cabos curtos)',
+      'Inspecione todos os conectores por acúmulo de corrosão verde/branca',
+      'Verifique se as presilhas estão firmes e os terminais olhal seguros',
+      'Confirme que o fusível inline ou disjuntor não está corroído ou frouxo',
+      'Inspecione o isolamento do cabo por danos ou derretimento',
+    ]}
+    solutions={[
+      'Limpe terminais corroídos com solução de bicarbonato e escova de arame',
+      'Aplique graxa dielétrica ou protetor de terminais após a limpeza',
+      'Aperte todas as presilhas e terminais olhal no torque especificado',
+      'Substitua cabos danificados por bitola adequada (mínimo 10AWG para a maioria dos sistemas 12V)',
+      'Substitua porta-fusíveis ou disjuntores corroídos',
+      'Use arruelas estrela sob terminais olhal para conexão estanque a gases',
+    ]}
+  />
+
+  <TroubleshootingBlock
+    lang="pt"
+    problem="Desequilíbrio de Células — Pacote Para de Carregar Antes de Encher"
+    causes={[
+      'Células individuais divergiram em capacidade devido ao envelhecimento',
+      'Um grupo de células tem maior taxa de autodescarga',
+      'Circuito de balanceamento do BMS não funciona ou é inadequado',
+      'Variação de fabricação na capacidade das células',
+      'Curto parcial em uma célula causando descarga acelerada',
+    ]}
+    explanation="Em um pacote de baterias em série, todas as células compartilham a mesma corrente de carga. Se um grupo de células tem menor capacidade ou maior autodescarga, ele atinge o corte de sobretensão antes do resto do pacote. O BMS deve então interromper o carregamento para proteger essa célula, mesmo que as outras não estejam cheias. Isso se manifesta como a bateria carregando apenas até 70–90% de SOC. Um BMS eficiente com balanceamento ativo pode compensar pequenos desequilíbrios (até 0,05V), mas o balanceamento passivo apenas dissipa o excesso de energia como calor e não consegue adicionar carga às células mais fracas. Desequilíbrio severo (>0,1V) geralmente indica uma célula em falha que precisa ser substituída."
+    checklist={[
+      'Verifique as tensões individuais das células via aplicativo Bluetooth do BMS ou multímetro',
+      'Identifique o grupo de células mais fraco (maior tensão no fim da carga)',
+      'Compare a dispersão das tensões (deve ser <0,05V com carga total)',
+      'Monitore se o desequilíbrio cresce ao longo de vários ciclos de carga',
+      'Verifique o status e a corrente de balanceamento do BMS',
+      'Faça um ciclo completo de carga-descarga-carga para recondicionar',
+    ]}
+    solutions={[
+      'Faça um ciclo completo de carga para permitir que o balanceamento do BMS atue',
+      'Se o BMS tiver modo de balanceamento forçado, ative-o por período prolongado',
+      'Para desequilíbrio severo (>0,1V), faça manualmente o top-balance das células individuais',
+      'Substitua o grupo de células mais fraco se a capacidade degradou significativamente',
+      'Atualize para um BMS com balanceamento ativo para pacotes grandes',
+      'Entre em contato com o fabricante se houver desequilíbrio dentro do período de garantia',
+    ]}
+  />
+</ArticleLayout>

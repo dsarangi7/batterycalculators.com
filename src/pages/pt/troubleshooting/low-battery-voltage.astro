@@ -1,0 +1,186 @@
+---
+import ArticleLayout from '../../../layouts/ArticleLayout.astro';
+import TroubleshootingBlock from '../../../components/TroubleshootingBlock.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+
+const description = "Descubra por que a tensão da sua bateria está mais baixa que o esperado. Abrange estado real de descarga, queda sob carga, erro de medição, efeitos de temperatura e envelhecimento com listas de verificação passo a passo.";
+
+const faqItems = [
+  {
+    question: "Quanto tempo a bateria deve descansar antes de uma leitura precisa de tensão?",
+    answer: "Para baterias LiFePO4, descanse por pelo menos 30 minutos após desconectar a carga. Para chumbo-ácido, descanse por 1–2 horas. Chumbo-ácido de ciclo profundo pode precisar de 4–6 horas para as reações químicas estabilizarem. A carga superficial do carregamento recente infla as leituras, então um descanso maior dá um OCV mais preciso.",
+  },
+  {
+    question: "Por que a tensão cai quando conecto uma carga?",
+    answer: "Isso é a queda de tensão causada pela resistência interna. A fórmula é V_carga = OCV - (I × R_interna). Uma célula LiFePO4 de 100Ah com 2 miliohms de resistência interna sob carga de 50A cairá 0,1V. Chumbo-ácido tem resistência interna muito maior, causando quedas maiores sob a mesma carga.",
+  },
+  {
+    question: "Uma conexão ruim pode causar leituras baixas de tensão?",
+    answer: "Sim. Terminais corroídos, conexões frouxas ou cabos subdimensionados adicionam resistência externa. Essa resistência causa queda adicional que o multímetro lê como tensão baixa da bateria. Limpe todas as conexões e meça diretamente nos terminais para eliminar a fiação como variável.",
+  },
+  {
+    question: "O frio faz a bateria ler tensão baixa?",
+    answer: "Temperaturas frias reduzem levemente a tensão de circuito aberto (cerca de 0,05–0,1V por célula a 0°C vs. 25°C) e aumentam significativamente a resistência interna. O efeito combinado faz uma bateria fria ler bem mais baixo sob carga que a mesma bateria em temperatura ambiente, mesmo com o mesmo SOC.",
+  },
+  {
+    question: "Quando devo substituir uma bateria que lê tensão baixa?",
+    answer: "Se a bateria lê tensão baixa após carga total e período adequado de descanso, a capacidade provavelmente degradou muito. Teste com descarga controlada a 0,2C. Se a capacidade estiver abaixo de 70% da original, recomenda-se a substituição. Abaixo de 50% indica o fim da vida útil.",
+  },
+];
+
+const relatedCalculators = [
+  { title: "Estimador de SOC", href: "/pt/tools/soc-estimator/", type: "calculator" as const },
+  { title: "Calculadora de Autonomia de Bateria", href: "/pt/tools/runtime-calculator/", type: "calculator" as const },
+  { title: "Calculadora de Queda de Tensão", href: "/pt/tools/voltage-drop-calculator/", type: "calculator" as const },
+];
+
+const relatedGuides = [
+  { title: "Tabela de Tensão LiFePO4", href: "/pt/learn/lifepo4-voltage-chart/", type: "guide" as const },
+  { title: "Sistemas de Tensão de Bateria", href: "/pt/learn/battery-voltage-systems/", type: "guide" as const },
+];
+---
+
+<ArticleLayout
+  title="Tensão Baixa da Bateria — Guia de Solução de Problemas | Calculadoras de Bateria"
+  description={description}
+  canonical="https://batterycalculators.com/pt/troubleshooting/low-battery-voltage/"
+  category="SOLUÇÃO DE PROBLEMAS"
+  breadcrumbItems={[{ label: "Tensão Baixa da Bateria" }]}
+  relatedCalculators={relatedCalculators}
+  relatedGuides={relatedGuides}
+  faqItems={faqItems}
+  lang="pt"
+>
+  <p class="text-body-md text-body font-light mb-8">
+    Quando a tensão da sua bateria está mais baixa que o esperado, a causa pode ser tão simples quanto uma carga recente ou tão grave quanto perda permanente de capacidade. Este guia percorre os cinco motivos mais comuns para leituras inesperadamente baixas e como isolar cada um.
+  </p>
+
+  <TroubleshootingBlock
+    lang="pt"
+    problem="Estado Real de Descarga"
+    causes={[
+      "Bateria genuinamente com SOC menor que o esperado por cargas maiores que o estimado",
+      "Cargas fantasmas ou drenos parasitas esgotando a bateria continuamente",
+      "Carregador não carregando totalmente por interrupção prematura",
+      "Ciclo de carga interrompido antes da conclusão",
+    ]}
+    explanation="A explicação mais simples costuma ser a correta: a bateria realmente tem menos carga do que você pensa. Culpados comuns incluem cargas esquecidas ligadas à noite, drenos parasitas de inversores ou controladores, e carregadores que terminam cedo por configurações incorretas. A tensão é um indicador direto do SOC para a maioria das químicas em repouso."
+    checklist={[
+      "Desconecte todas as cargas e o carregador, depois descanse a bateria por pelo menos 30 minutos antes de medir",
+      "Compare a tensão em repouso com a tabela tensão-SOC específica da química",
+      "Verifique cargas fantasmas — inversores, monitores e LEDs consomem corrente continuamente",
+      "Confirme se o carregador completou um ciclo total e atingiu a tensão de absorção correta",
+      "Use um monitor com contagem de coulombs para rastrear a energia real que entra e sai por vários dias",
+    ]}
+    solutions={[
+      "Carregue totalmente a bateria com o perfil correto da química e verifique a tensão após o descanso",
+      "Adicione uma chave desconectadora para eliminar cargas fantasmas durante armazenamento ou inatividade",
+      "Ajuste as configurações de término — LiFePO4 deve carregar até 3,65V por célula, chumbo-ácido até 2,4–2,45V por célula",
+      "Instale um monitor com contagem de coulombs para rastreamento preciso do SOC",
+    ]}
+  />
+
+  <TroubleshootingBlock
+    lang="pt"
+    problem="Queda de Tensão Sob Carga"
+    causes={[
+      "Resistência interna causa queda de tensão proporcional à corrente",
+      "Bateria subdimensionada para a carga — taxa C excede a capacidade nominal de descarga",
+      "Conexões de alta resistência entre bateria e carga amplificam a queda",
+      "Temperatura baixa da bateria aumenta a resistência interna",
+    ]}
+    explanation="Todas as baterias exibem queda de tensão sob carga devido à resistência interna. A relação é linear: V_queda = I × R_interna. Uma célula LiFePO4 de 100Ah com 2 miliohms sob carga de 100A cai 0,2V. A mesma célula sob 10A cai apenas 0,02V. Se você mede a tensão com uma carga conectada, sempre lerá menos que a tensão de circuito aberto."
+    checklist={[
+      "Meça a tensão nos terminais sem carga (tensão de circuito aberto)",
+      "Meça a tensão sob a carga real e compare — calcule a queda",
+      "Use a queda para estimar a resistência interna: R = V_queda / I_carga",
+      "Compare a resistência medida com a especificação do fabricante",
+      "Verifique todas as conexões entre bateria e carga por corrosão, aperto e bitola adequada",
+    ]}
+    solutions={[
+      "Meça sempre o OCV com a carga desconectada para leitura precisa de SOC",
+      "Se a queda for excessiva, a bateria pode estar subdimensionada — use uma calculadora de dimensionamento para verificar",
+      "Limpe e aperte todos os terminais e conexões — substitua cabos corroídos",
+      "Se a resistência interna for muito maior que a especificação, a bateria pode estar envelhecida ou danificada",
+    ]}
+  />
+
+  <TroubleshootingBlock
+    lang="pt"
+    problem="Erro de Medição"
+    causes={[
+      "Pontas do multímetro com alta resistência por desgaste ou corrosão",
+      "Medição no ponto errado do circuito em vez de direto nos terminais",
+      "Multímetro barato com precisão insuficiente para as pequenas diferenças do LiFePO4",
+      "Carga superficial do carregamento recente inflando a leitura",
+    ]}
+    explanation="O erro de medição é uma causa frequentemente ignorada de tensão aparentemente baixa. Mau contato das pontas, medição após fusíveis ou chaves, e uso de medidor descalibrado produzem leituras imprecisas. Para LiFePO4, a diferença entre 80% e 20% de SOC é de apenas cerca de 0,4V em um pacote de 12V — um erro de 0,1V se traduz em 20% de erro na estimativa de SOC."
+    checklist={[
+      "Encoste as pontas do multímetro para verificar leitura zero — qualquer desvio indica problema de calibração",
+      "Meça diretamente nos terminais, ignorando fusíveis, chaves e barramentos",
+      "Use um multímetro com pelo menos 0,1% de precisão e resolução de 0,001V para diagnósticos LiFePO4",
+      "Garanta pontas limpas e com bom contato metal-metal",
+      "Aguarde 30 minutos após desconectar cargas para dissipar a carga superficial",
+    ]}
+    solutions={[
+      "Limpe as pontas do multímetro e os terminais com álcool isopropílico",
+      "Meça a tensão nos próprios polos da bateria, não na carga ou no fusível",
+      "Invista em um multímetro de maior precisão se trabalha com LiFePO4 regularmente",
+      "Descanse sempre a bateria por pelo menos 30 minutos antes de medir o OCV",
+    ]}
+  />
+
+  <TroubleshootingBlock
+    lang="pt"
+    problem="Efeito da Temperatura na Tensão"
+    causes={[
+      "Temperaturas frias reduzem a tensão de circuito aberto e aumentam a resistência interna",
+      "Bateria armazenada ou operando abaixo da faixa recomendada",
+      "Sensor de temperatura do BMS lendo errado, mostrando falsa tensão baixa",
+      "Gradientes térmicos no pacote causam tensões diferentes entre células",
+    ]}
+    explanation="A temperatura tem efeito significativo na tensão da bateria. A 0°C, a tensão de circuito aberto de uma célula LiFePO4 cai cerca de 0,05–0,1V em relação a 25°C. Combinada com o aumento da resistência interna no frio, uma bateria pode ler 0,3–0,5V a menos sob carga a 0°C que em temperatura ambiente. Isso é comportamento normal, não defeito."
+    checklist={[
+      "Registre a temperatura ambiente onde a bateria está",
+      "Compare a leitura com a tabela de tensão corrigida por temperatura da sua química",
+      "Mova a bateria para ambiente em temperatura ambiente e meça de novo após equilíbrio térmico",
+      "Verifique se a leitura de temperatura do BMS confere com um termômetro independente",
+      "Observe se a tensão melhora conforme a bateria aquece na descarga — isso confirma sensibilidade à temperatura",
+    ]}
+    solutions={[
+      "Considere a temperatura ao interpretar leituras — use tabelas de SOC corrigidas",
+      "Instale aquecimento para aplicações em clima frio para manter as células acima de 0°C",
+      "Mude baterias de espaços sem isolamento para áreas com temperatura controlada quando possível",
+      "Para problemas de BMS, recalibre ou reposicione o sensor no centro do pacote",
+    ]}
+  />
+
+  <TroubleshootingBlock
+    lang="pt"
+    problem="Envelhecimento e Perda de Capacidade"
+    causes={[
+      "Degradação da vida em ciclos reduziu a capacidade real abaixo da nominal",
+      "Envelhecimento de calendário degradou permanentemente o material dos eletrodos",
+      "Sulfatação (chumbo-ácido) ou crescimento da camada SEI (lítio) aumentou a resistência interna",
+      "Uma ou mais células em série degradaram mais rápido que as demais",
+    ]}
+    explanation="Com o envelhecimento, capacidade e características de tensão mudam. A resistência interna aumenta, causando maior queda sob carga. A janela utilizável de SOC estreita e a curva de tensão se desloca. Uma bateria que antes mantinha 13,2V com 50% de SOC pode agora ler 12,8V no mesmo SOC porque a capacidade encolheu e a resistência interna cresceu."
+    checklist={[
+      "Faça um teste completo de capacidade descarregando a 0,2C e medindo os ampères-hora entregues",
+      "Compare a capacidade medida com a nominal e a contagem de ciclos esperada",
+      "Verifique a idade da bateria contra a vida de calendário esperada da química",
+      "Meça a resistência interna com medidor de impedância CA ou calculando a partir da queda de tensão",
+      "Compare o desempenho atual com registros históricos, se houver — declínio progressivo confirma envelhecimento",
+    ]}
+    solutions={[
+      "Se a capacidade estiver acima de 80% da nominal, a bateria está dentro do envelhecimento normal",
+      "Se estiver em 60–80%, a bateria está em fim de vida para aplicações exigentes, mas pode servir em usos leves",
+      "Se estiver abaixo de 60%, aposente e substitua — continuar usando pode ser inseguro",
+      "Para chumbo-ácido, tente uma carga de equalização para recuperar capacidade perdida por sulfatação",
+    ]}
+  />
+
+  <p class="text-caption text-muted border-t border-hairline pt-8 mt-12">
+    <strong>Aviso:</strong> Este guia é apenas para fins educacionais e de diagnóstico. A solução de problemas de baterias envolve riscos elétricos. Sempre siga os procedimentos de segurança do fabricante, use EPI adequado e consulte um técnico qualificado antes de tentar reparos. Nunca tente abrir ou desmontar uma célula selada.
+  </p>
+</ArticleLayout>

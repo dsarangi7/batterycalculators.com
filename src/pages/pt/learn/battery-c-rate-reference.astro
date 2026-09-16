@@ -1,0 +1,447 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+import CalculatorCard from "../../../components/CalculatorCard.astro";
+import FAQSection from "../../../components/FAQSection.astro";
+import ReferenceChart from "../../../components/ReferenceChart.astro";
+import ReferenceTable from "../../../components/ReferenceTable.astro";
+
+const faqItems = [
+  {
+    question: "O que significa 0,2C para uma bateria de 100Ah?",
+    answer:
+      "0,2C significa que a corrente de carga ou descarga é 20% da capacidade da bateria. Para uma bateria de 100Ah, 0,2C = 20A. Nessa taxa, a bateria teoricamente carrega ou descarrega em 5 horas (1 / 0,2 = 5). Essa é considerada uma taxa lenta e suave, que maximiza a vida útil da bateria.",
+  },
+  {
+    question:
+      "Qual é a diferença entre C-rate de carga e de descarga?",
+    answer:
+      "C-rate de carga é a corrente usada para carregar a bateria, enquanto C-rate de descarga é a corrente drenada durante o uso. Muitas baterias suportam C-rates de descarga maiores que os de carga. Por exemplo, uma bateria LiFePO4 pode suportar descarga a 1C, mas apenas 0,5C de carga. Verifique sempre as especificações do fabricante para ambos.",
+  },
+  {
+    question: "Qual C-rate é melhor para a longevidade da bateria?",
+    answer:
+      "C-rates mais baixos produzem menos calor e estresse, estendendo a vida útil em ciclos. Para LiFePO4, 0,2–0,5C é ideal para ciclagem diária. Para chumbo-ácido, manter a descarga abaixo de 0,2C (taxa de 5 horas) minimiza a sulfatação. C-rates mais altos (1C+) são aceitáveis para carga rápida ocasional ou descarga de alta potência, mas reduzem a vida útil geral.",
+  },
+  {
+    question: "Como calculo a corrente a partir do C-rate?",
+    answer:
+      "Multiplique o C-rate pela capacidade da bateria em Ah. Fórmula: Corrente (A) = C-Rate × Capacidade (Ah). Por exemplo, 0,5C em uma bateria de 200Ah = 0,5 × 200 = 100A. Inverta a fórmula para achar o C-rate a partir da corrente: C-Rate = Corrente (A) / Capacidade (Ah).",
+  },
+];
+
+const tableOfContents = [
+  { id: "c-rate-explained", label: "C-Rate Explicado" },
+  { id: "current-reference-table", label: "Tabela de Referência de Corrente" },
+  { id: "charging-vs-discharging", label: "Carga vs Descarga" },
+  { id: "chemistry-considerations", label: "Considerações por Química" },
+  { id: "common-mistakes", label: "Erros Comuns" },
+];
+
+const relatedCalculators = [
+  { title: "Calculadora de C-Rate", href: "/pt/tools/c-rate-calculator/" },
+  {
+    title: "Calculadora de Tempo de Carga",
+    href: "/pt/tools/charging-time-calculator/",
+  },
+  {
+    title: "Estimador de Degradação de Bateria",
+    href: "/pt/tools/battery-degradation-estimator/",
+  },
+];
+
+const references = [
+  {
+    title: "Battery University — C-Rate Explicado",
+    url: "https://batteryuniversity.com/article/bu-406-stress-and-strain",
+  },
+  {
+    title: "IEC 60086 — Norma de Baterias Primárias",
+    url: "https://webstore.iec.ch/en/publication/26863",
+  },
+];
+---
+
+<Layout
+  title="Referência de C-Rate de Bateria — Tabela de Corrente de Carga e Descarga | Calculadoras de Bateria"
+  description="Tabela de referência de C-rate com correntes de carga e descarga para baterias de 50Ah, 100Ah, 200Ah e 300Ah. Valores práticos de corrente para taxas 0,2C, 0,5C, 1C e 2C."
+  canonical="https://batterycalculators.com/pt/learn/battery-c-rate-reference/"
+  faqItems={faqItems}
+  lang="pt"
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a
+        href="/pt/learn/"
+        class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block"
+        >&larr; Voltar aos Guias</a
+      >
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4"
+        >REFERÊNCIA</span
+      >
+      <h1 class="text-display-md text-primary mb-6">
+        Referência de C-Rate de Bateria
+      </h1>
+      <p class="text-body-md text-body font-light">
+        Tabela de referência rápida para converter entre C-rate e corrente real.
+        Saiba exatamente quantos ampères sua bateria pode carregar ou descarregar em cada
+        taxa.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section id="c-rate-explained">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          C-Rate Explicado
+        </h2>
+        <p class="text-body-md text-body font-light mb-4">
+          C-rate é a forma padrão de expressar a corrente de carga ou descarga
+          em relação à capacidade da bateria. Ele normaliza a corrente entre
+          diferentes tamanhos de bateria. Uma taxa 1C em uma bateria de 100Ah é 100A; em uma
+          bateria de 50Ah, 1C é 50A. Ambas as baterias estão sendo carregadas ou
+          descarregadas no mesmo nível relativo de estresse.
+        </p>
+        <p class="text-body-md text-body font-light mb-4">
+          C-rates comuns variam de 0,05C (carga de manutenção) a 3C (descarga de alta potência
+          ). O "C" em C-rate significa capacidade. O número antes do C
+          indica o multiplicador. 0,5C significa metade da capacidade em ampères. 2C
+          significa o dobro da capacidade em ampères.
+        </p>
+        <p class="text-body-md text-body font-light">
+          O tempo para carregar ou descarregar é inversamente proporcional ao C-rate. A
+          0,2C, leva 5 horas. A 0,5C, leva 2 horas. A 1C, leva 1
+          hora. A 2C, leva 30 minutos. Essa relação vale independentemente
+          do tamanho da bateria.
+        </p>
+      </section>
+
+      <section id="current-reference-table">
+        <ReferenceChart
+          type="bar"
+          title="Demanda de Corrente por C-Rate para uma Bateria de 100Ah"
+          description="A corrente do C-rate equivale à capacidade da bateria multiplicada pelo C-rate."
+          xLabel="C-Rate"
+          yLabel="Corrente (A)"
+          data={[
+            { x: 1, y: 20, label: "0.2C" },
+            { x: 2, y: 50, label: "0.5C" },
+            { x: 3, y: 100, label: "1C" },
+            { x: 4, y: 200, label: "2C" },
+          ]}
+          yMin={0}
+          yMax={220}
+          caption="A corrente do C-rate equivale à capacidade da bateria multiplicada pelo C-rate."
+        />
+
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          Tabela de Referência de Corrente
+        </h2>
+        <p class="text-body-md text-body font-light mb-4">
+          A tabela abaixo mostra a corrente real em ampères para capacidades comuns de bateria
+          em cada C-rate. Use-a para determinar rapidamente qual corrente
+          sua bateria deve carregar ou descarregar.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-body-sm min-w-[640px]">
+              <thead>
+                <tr class="border-b border-hairline bg-surface-card">
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >C-Rate</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >50 Ah</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >100 Ah</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >200 Ah</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >300 Ah</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >Tempo Aprox.</th
+                  >
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-hairline">
+                <tr>
+                  <td class="p-4 font-mono text-primary">0.1C</td>
+                  <td class="p-4 text-muted">5 A</td>
+                  <td class="p-4 text-muted">10 A</td>
+                  <td class="p-4 text-muted">20 A</td>
+                  <td class="p-4 text-muted">30 A</td>
+                  <td class="p-4 text-muted">~10 horas</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">0.2C</td>
+                  <td class="p-4 text-muted">10 A</td>
+                  <td class="p-4 text-muted">20 A</td>
+                  <td class="p-4 text-muted">40 A</td>
+                  <td class="p-4 text-muted">60 A</td>
+                  <td class="p-4 text-muted">~5 horas</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">0.5C</td>
+                  <td class="p-4 text-muted">25 A</td>
+                  <td class="p-4 text-muted">50 A</td>
+                  <td class="p-4 text-muted">100 A</td>
+                  <td class="p-4 text-muted">150 A</td>
+                  <td class="p-4 text-muted">~2 horas</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">1C</td>
+                  <td class="p-4 text-muted">50 A</td>
+                  <td class="p-4 text-muted">100 A</td>
+                  <td class="p-4 text-muted">200 A</td>
+                  <td class="p-4 text-muted">300 A</td>
+                  <td class="p-4 text-muted">~1 hora</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">2C</td>
+                  <td class="p-4 text-muted">100 A</td>
+                  <td class="p-4 text-muted">200 A</td>
+                  <td class="p-4 text-muted">400 A</td>
+                  <td class="p-4 text-muted">600 A</td>
+                  <td class="p-4 text-muted">~30 minutos</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <p class="text-caption text-muted mt-3">
+          Tempos aproximados assumem corrente constante (somente fase CC). O tempo real
+          de carga inclui a fase CV e é maior.
+        </p>
+      </section>
+
+      <section id="charging-vs-discharging">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          C-Rates de Carga vs Descarga
+        </h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Baterias frequentemente têm C-rates máximos diferentes para carga e
+          descarga. Uma bateria que pode descarregar a 2C pode carregar com segurança
+          apenas a 0,5C. Essa assimetria existe porque a carga causa estresses
+          químicos diferentes da descarga — particularmente o risco de deposição de lítio
+          durante carga em alta taxa.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">C-Rates Típicos de Carga</h4>
+            <p class="text-body-sm text-muted">
+              LiFePO4: 0,5–1C (rápida), 0,2C (suave)<br />
+              NMC: 0,5–1C (rápida), 0,3C (suave)<br />
+              Chumbo-ácido: 0,1–0,3C (limitado pela química)<br />
+              AGM: 0,2–0,4C (melhor que inundada)
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">
+              C-Rates Típicos de Descarga
+            </h4>
+            <p class="text-body-sm text-muted">
+              LiFePO4: 1–3C (contínua), 5–10C (pico)<br />
+              NMC: 1–2C (contínua), 3–5C (pico)<br />
+              Chumbo-ácido: 0,1–0,3C (efeito Peukert acima disso)<br />
+              AGM: 0,2–0,5C (melhor em alta taxa que inundada)
+            </p>
+          </CalculatorCard>
+        </div>
+        <p class="text-body-md text-body font-light mt-4">
+          Verifique sempre a folha de dados do fabricante para os limites específicos de C-rate
+          da sua bateria. Exceder o C-rate recomendado anula
+          garantias, reduz a vida útil em ciclos e pode criar riscos de segurança.
+        </p>
+      </section>
+
+      <section id="chemistry-considerations">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          Considerações por Química
+        </h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Diferentes químicas de bateria respondem de forma diferente a C-rates altos.
+          LiFePO4 tolera bem C-rates altos com degradação mínima. Chumbo-ácido
+          sofre o efeito Peukert — a capacidade efetiva cai significativamente em
+          altas taxas de descarga. NMC fica entre as duas.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-body-sm min-w-[640px]">
+              <thead>
+                <tr class="border-b border-hairline bg-surface-card">
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >Química</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >Carga Recomendada</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >Descarga Recomendada</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >Tolerância a C-Rate Alto</th
+                  >
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-hairline">
+                <tr>
+                  <td class="p-4 font-mono text-primary">LiFePO4</td>
+                  <td class="p-4 text-muted">0,2–0,5C</td>
+                  <td class="p-4 text-muted">0,5–1C</td>
+                  <td class="p-4 text-muted">Excelente</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">NMC</td>
+                  <td class="p-4 text-muted">0,3–0,5C</td>
+                  <td class="p-4 text-muted">0,5–1C</td>
+                  <td class="p-4 text-muted">Boa</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">Chumbo-Ácido</td>
+                  <td class="p-4 text-muted">0,1–0,3C</td>
+                  <td class="p-4 text-muted">0,1–0,2C</td>
+                  <td class="p-4 text-muted">Ruim (efeito Peukert)</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">AGM</td>
+                  <td class="p-4 text-muted">0,2–0,4C</td>
+                  <td class="p-4 text-muted">0,2–0,3C</td>
+                  <td class="p-4 text-muted">Moderada</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section id="common-mistakes">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          Erros Comuns
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">
+              Confundir C-Rate com Corrente Absoluta
+            </h4>
+            <p class="text-body-sm text-muted">
+              1C significa correntes diferentes para baterias diferentes. 1C em uma bateria de 50Ah
+              é 50A; em uma de 200Ah, é 200A. Calcule sempre
+              a corrente real a partir do C-rate e da capacidade antes de dimensionar
+              fios, fusíveis ou componentes do BMS.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">
+              Exceder os Limites do Fabricante
+            </h4>
+            <p class="text-body-sm text-muted">
+              Só porque uma bateria pode fisicamente entregar 2C não significa que
+              deveria. Exceder o C-rate recomendado acelera a degradação,
+              anula garantias e pode criar riscos de segurança. Respeite os
+              limites da folha de dados.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">
+              Ignorar o Efeito Peukert no Chumbo-Ácido
+            </h4>
+            <p class="text-body-sm text-muted">
+              Baterias de chumbo-ácido entregam menos energia total em alta taxa de descarga.
+              Uma bateria de chumbo-ácido de 100Ah a 1C pode entregar apenas 60–70Ah.
+              LiFePO4 não sofre esse efeito — entrega próximo da capacidade nominal
+              independentemente do C-rate dentro dos limites.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">
+              Usar o Mesmo C-Rate para Carga e Descarga
+            </h4>
+            <p class="text-body-sm text-muted">
+              Os limites de C-rate de carga e descarga são diferentes. Uma bateria classificada
+              para descarga a 1C pode suportar apenas 0,5C de carga. Usar a classificação de descarga
+              para carga causa estresse por sobrecarga e potencial
+              dano.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <CalculatorCard class="border-m-blue-light">
+        <h4 class="text-label-uppercase text-primary text-xs mb-3">Experimente</h4>
+        <p class="text-body-sm text-muted mb-4">
+          Use a Calculadora de C-Rate para converter entre corrente, capacidade e
+          C-rate para sua configuração específica de bateria.
+        </p>
+        <a
+          href="/pt/tools/c-rate-calculator/"
+          class="btn-primary text-xs py-3 px-6 inline-block"
+          >Abrir Calculadora de C-Rate</a
+        >
+      </CalculatorCard>
+
+      <ReferenceTable
+        title="Tabela de Referência de Corrente por C-Rate"
+        description="Baixe esta tabela para referência offline"
+        headers={["C-Rate", "50 Ah", "100 Ah", "200 Ah", "300 Ah", "Tempo Aprox."]}
+        rows={[
+          ["0.1C", "5 A", "10 A", "20 A", "30 A", "~10 horas"],
+          ["0.2C", "10 A", "20 A", "40 A", "60 A", "~5 horas"],
+          ["0.5C", "25 A", "50 A", "100 A", "150 A", "~2 horas"],
+          ["1C", "50 A", "100 A", "200 A", "300 A", "~1 hora"],
+          ["2C", "100 A", "200 A", "400 A", "600 A", "~30 minutos"],
+        ]}
+        source="Battery University / IEC 60086"
+      />
+
+      <ReferenceTable
+        title="Limites de C-Rate por Química"
+        description="Baixe esta tabela para referência offline"
+        headers={["Química", "Carga Recomendada", "Descarga Recomendada", "Tolerância a C-Rate Alto"]}
+        rows={[
+          ["LiFePO4", "0,2–0,5C", "0,5–1C", "Excelente"],
+          ["NMC", "0,3–0,5C", "0,5–1C", "Boa"],
+          ["Chumbo-Ácido", "0,1–0,3C", "0,1–0,2C", "Ruim (efeito Peukert)"],
+          ["AGM", "0,2–0,4C", "0,2–0,3C", "Moderada"],
+        ]}
+        source="Battery University / IEC 60086"
+      />
+
+      <FAQSection items={faqItems} />
+
+      <section class="border-t border-hairline pt-12">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          Referências
+        </h2>
+        <ul class="flex flex-col gap-2 text-body-sm text-muted">
+          {
+            references.map((ref) => (
+              <li class="flex gap-2">
+                <span class="text-m-blue-light shrink-0">—</span>
+                <a
+                  href={ref.url}
+                  class="hover:text-primary transition-colors underline underline-offset-2"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {ref.title}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+    </div>
+  </div>
+</Layout>

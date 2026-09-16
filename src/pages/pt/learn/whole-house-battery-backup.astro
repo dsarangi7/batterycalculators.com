@@ -1,0 +1,295 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "Qual tamanho de bateria preciso para backup da casa inteira?",
+    answer: "Uma casa típica consumindo 20–30 kWh por dia exige 25–40 kWh de capacidade utilizável para 24 horas de backup total. Com 85% de DoD e 92% de eficiência do inversor, uma carga diária de 30 kWh exige aproximadamente 39 kWh de capacidade total. Casas maiores com HVAC podem precisar de 50+ kWh.",
+  },
+  {
+    question: "O backup da casa inteira vale o custo?",
+    answer: "O backup total é significativamente mais caro que o backup só de cargas críticas — normalmente 3–5× a capacidade de bateria. No entanto, oferece tranquilidade total e operação contínua sem mudanças de rotina durante um apagão. O valor depende da frequência de apagões, dos custos locais de energia e de combinar o sistema com solar para compensar a conta.",
+  },
+  {
+    question: "Posso alimentar minha casa inteira só com baterias?",
+    answer: "Sim, mas o banco deve ser grande o suficiente para suportar o pico de demanda e o consumo sustentado. Uma casa com HVAC, aquecimento de água, cozinha e iluminação simultâneos pode consumir 5–10 kW de pico e 25–40+ kWh por dia. Isso exige um banco substancial, um inversor de alta capacidade (10–15 kW) e integração adequada do quadro elétrico.",
+  },
+  {
+    question: "Como o backup total difere do backup de cargas críticas?",
+    answer: "O backup de cargas críticas alimenta um subconjunto de circuitos (geladeira, luzes, dispositivos médicos) com uma bateria menor e mais barata (5–15 kWh). O backup total alimenta todos os circuitos, incluindo HVAC e aparelhos, exigindo 3–5× mais capacidade. Sistemas totais usam um painel de cargas críticas ou quadro inteligente para gerenciar a casa inteira.",
+  },
+];
+---
+
+<Layout
+  title="Backup da Casa Inteira com Bateria | Calculadoras de Bateria"
+  description="Guia para dimensionar um sistema que alimenta uma casa inteira: cálculo de carga total, dimensionamento de inversor, integração do quadro elétrico e exemplos resolvidos para casas de 20 kWh/dia."
+  canonical="https://batterycalculators.com/pt/learn/whole-house-battery-backup/"
+  schema="faqPage"
+  schemaName="Backup da Casa Inteira com Bateria"
+  schemaDescription="Guia para dimensionar um sistema de bateria que alimenta uma casa inteira."
+  schemaUrl="https://batterycalculators.com/pt/learn/whole-house-battery-backup/"
+  faqItems={faqItems}
+  lang="pt"
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/pt/learn/" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Voltar aos Guias</a>
+      <Breadcrumb items={[
+        { label: "Centro de Aprendizagem", href: "/pt/learn/" },
+        { label: "Backup da Casa Inteira com Bateria" },
+      ]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">BACKUP RESIDENCIAL</span>
+      <h1 class="text-display-md text-primary mb-6">Backup da Casa Inteira com Bateria</h1>
+      <p class="text-body-md text-body font-light">
+        Backup da casa inteira significa alimentar todos os circuitos da sua casa — incluindo HVAC, aparelhos, iluminação e eletrônicos — inteiramente com energia armazenada durante um apagão. Este guia cobre os requisitos de engenharia para dimensionar um sistema grande o suficiente para sustentar o consumo total, além das considerações de inversor e quadro que diferem de sistemas menores de cargas críticas.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Backup Total vs Backup de Cargas Críticas</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          A diferença fundamental entre backup total e de cargas críticas é o escopo. Sistemas de cargas críticas alimentam 5–15 kWh de dispositivos essenciais. Sistemas totais alimentam 25–60+ kWh de tudo. Essa diferença de escopo se propaga por cada componente: bateria maior, inversor de maior capacidade, integração mais complexa do quadro e custo significativamente maior.
+        </p>
+        <p class="text-body-md text-body font-light mb-6">
+          A decisão entre as duas abordagens é principalmente econômica. O backup total exige 3–5× mais capacidade de bateria, que é o custo dominante do sistema. No entanto, elimina a necessidade de priorizar cargas ou mudar o comportamento durante um apagão. Tudo funciona como se a rede estivesse online, que é o resultado ideal para quem prioriza resiliência contínua.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Fator</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Cargas Críticas</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Casa Inteira</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-primary font-bold">Capacidade da bateria</td>
+                <td class="p-4 font-mono text-primary">5 – 15 kWh</td>
+                <td class="p-4 font-mono text-primary">25 – 60+ kWh</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-primary font-bold">Tamanho do inversor</td>
+                <td class="p-4 font-mono text-primary">3 – 5 kW</td>
+                <td class="p-4 font-mono text-primary">10 – 15+ kW</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-primary font-bold">Obra no quadro</td>
+                <td class="p-4 text-muted">Subpainel ou painel de cargas críticas</td>
+                <td class="p-4 text-muted">Integração total ou quadro inteligente</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-primary font-bold">Custo típico</td>
+                <td class="p-4 font-mono text-primary">$5,000 – $15,000</td>
+                <td class="p-4 font-mono text-primary">$15,000 – $40,000+</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-primary font-bold">Mudança de comportamento</td>
+                <td class="p-4 text-muted">Precisa gerenciar cargas no apagão</td>
+                <td class="p-4 text-muted">Sem mudanças — tudo funciona normalmente</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Etapa 1: Calcular o Consumo Total da Casa</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          O backup total exige conhecer seu consumo diário total de energia, não só cargas críticas. O método mais preciso é pegar o mês de maior uso na conta de luz e dividir pelo número de dias. Isso dá o consumo diário de pico que seu sistema deve sustentar.
+        </p>
+        <p class="text-body-md text-body font-light mb-6">
+          Para casas com painéis solares, seu consumo líquido da rede pode subestimar o uso real. Durante um apagão sem entrada solar, você precisa cobrir todo o consumo bruto. Consulte o app de monitoramento do inversor solar para dados totais de produção e consumo e ter o quadro verdadeiro.
+        </p>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Exemplo resolvido:</strong> Determinar o consumo doméstico a partir de dados da conta.</p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li>Maior conta de verão: 900 kWh</li>
+              <li>Período de faturamento: 31 dias</li>
+            </ul>
+            <p><strong>Cálculo:</strong></p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              900 kWh / 31 dias = 29.0 kWh/dia
+            </div>
+            <p>Esta casa consome aproximadamente 29 kWh por dia no pico. Para backup total, dimensione a bateria para sustentar esse nível pelo número desejado de horas.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Exemplo Resolvido: Casa de 20 kWh/Dia</h2>
+        <p class="text-body-md text-body font-light mb-6">
+          O exemplo resolvido a seguir dimensiona um sistema completo de backup total para uma casa consumindo 20 kWh por dia com cenário de apagão noturno.
+        </p>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Dados:</strong></p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li>Consumo diário: 20 kWh/dia</li>
+              <li>Duração alvo de backup: 24 horas</li>
+              <li>Química da bateria: LFP (85% de DoD)</li>
+              <li>Eficiência do inversor: 92%</li>
+              <li>Tensão do sistema: 48V</li>
+              <li>Pico simultâneo de carga: 8 kW</li>
+            </ul>
+            <p><strong>Etapa 1:</strong> Calcular a energia total necessária para 24 horas:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              20 kWh × 24h / 24h = 20 kWh
+            </div>
+            <p><strong>Etapa 2:</strong> Considerar DoD e eficiência do inversor:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              20 kWh / (0.85 × 0.92) = 25.53 kWh de capacidade total
+            </div>
+            <p><strong>Etapa 3:</strong> Converter para ampères-horas a 48V:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              25,530 Wh / 48V = 532 Ah
+            </div>
+            <p><strong>Etapa 4:</strong> Dimensionamento do inversor para a carga de pico:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              Pico de 8 kW ÷ 0.92 = 8,700W → Use inversor de 10 kW
+            </div>
+            <p><strong>Etapa 5:</strong> Configuração prática de bateria:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              Opção A: 1 × bateria rack LFP 48V 280Ah (13.4 kWh) + 1 × 48V 280Ah (13.4 kWh) = 26.8 kWh<br/>
+              Opção B: 5 × baterias LFP 48V 100Ah em paralelo = 25.6 kWh<br/>
+              Recomendado: Opção A — duas unidades modulares oferecem redundância e fiação mais simples
+            </div>
+            <p class="pt-2 border-t border-hairline"><strong>Sistema total:</strong> banco de 26,8 kWh + inversor híbrido de 10 kW + chave de transferência automática + monitoramento.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <FormulaBox title="Fórmulas de Dimensionamento Total">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Bateria Total (kWh) = Consumo Diário (kWh) / (DoD × Eficiência do Inversor)
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Tamanho do Inversor (W) = Pico Simultâneo de Carga (W) / Eficiência do Inversor
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Ah da Bateria = Bateria Total (Wh) / Tensão do Sistema
+        </div>
+        <p>
+          Para backup total, o inversor deve suportar a carga de pico — não só a carga média. Se HVAC, forno e aquecedor ligarem juntos, o inversor deve fornecer esse surto. Um inversor de 10 kW com banco 48V consome aproximadamente 208A no pico, exigindo cabeamento DC e fusíveis adequadamente dimensionados.
+        </p>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Integração do Quadro Elétrico</h2>
+        <p class="text-body-md text-body font-light mb-6">
+          O backup total exige integrar o sistema de baterias ao quadro principal. Há duas abordagens: um subpainel de cargas críticas (que limita os circuitos com backup) e a integração total (que alimenta tudo). Para backup verdadeiramente total, você precisa da abordagem total, muitas vezes com um quadro inteligente que pode desligar cargas não essenciais em apagões prolongados.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Integração Padrão</h4>
+            <p class="text-body-sm text-muted mb-3">
+              A bateria conecta-se ao quadro principal através de uma chave de transferência automática. Todos os circuitos têm backup. Simples e direto, mas a bateria deve ser dimensionada para toda a carga da casa. Ideal para casas com consumo total moderado.
+            </p>
+            <div class="font-mono text-m-blue-light text-xs">Todos os circuitos com backup · Fiação simples</div>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Integração com Quadro Inteligente</h4>
+            <p class="text-body-sm text-muted mb-3">
+              Um quadro inteligente (como Span ou Lumin) permite controle individual de circuitos por app. Durante um apagão, circuitos não essenciais são desligados automaticamente para estender a autonomia. Permite uma bateria menor mantendo cobertura das cargas críticas.
+            </p>
+            <div class="font-mono text-m-blue-light text-xs">Controle por circuito · Desligamento de cargas · Bateria menor possível</div>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Escala por Tamanho da Casa</h2>
+        <p class="text-body-md text-body font-light mb-6">
+          A tabela a seguir oferece faixas aproximadas de dimensionamento total por tamanho de casa. Assumem aparelhos elétricos padrão, HVAC central e 2–4 moradores. Requisitos reais variam significativamente por clima, isolamento e comportamento dos moradores.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Tamanho da Casa</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">kWh Diários</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Bateria (24h)</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Inversor</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-primary font-bold">Pequena (até 140 m²)</td>
+                <td class="p-4 font-mono text-primary">12 – 20 kWh</td>
+                <td class="p-4 font-mono text-primary">15 – 26 kWh</td>
+                <td class="p-4 font-mono text-primary">5 – 8 kW</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-primary font-bold">Média (140 – 230 m²)</td>
+                <td class="p-4 font-mono text-primary">20 – 35 kWh</td>
+                <td class="p-4 font-mono text-primary">26 – 45 kWh</td>
+                <td class="p-4 font-mono text-primary">8 – 12 kW</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-primary font-bold">Grande (230 – 325 m²)</td>
+                <td class="p-4 font-mono text-primary">35 – 50 kWh</td>
+                <td class="p-4 font-mono text-primary">45 – 65 kWh</td>
+                <td class="p-4 font-mono text-primary">12 – 15 kW</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-primary font-bold">Muito Grande (325+ m²)</td>
+                <td class="p-4 font-mono text-primary">50 – 70+ kWh</td>
+                <td class="p-4 font-mono text-primary">65 – 90+ kWh</td>
+                <td class="p-4 font-mono text-primary">15 – 20+ kW</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Experimente</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use a Calculadora de Backup Residencial para dimensionar um sistema total com base no consumo real da sua casa e na duração desejada.
+          </p>
+          <a href="/pt/tools/home-backup-battery-calculator/" class="btn-primary text-xs py-3 px-6 inline-block">Abrir Calculadora de Backup Residencial</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Ferramenta Relacionada</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use a Calculadora de Dimensionamento de Bateria para determinar a configuração exata do banco para sua tensão, química e capacidade.
+          </p>
+          <a href="/pt/tools/battery-sizing-calculator/" class="btn-primary text-xs py-3 px-6 inline-block">Abrir Calculadora de Dimensionamento</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Artigos Relacionados</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <a href="/pt/learn/how-many-kwh-do-i-need-for-my-house/" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors mb-2 block">
+              De Quantos kWh Preciso para Minha Casa?
+            </a>
+            <p class="text-body-sm text-muted">
+              Explica como calcular o consumo diário em kWh da sua casa, a entrada fundamental para qualquer projeto de backup.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <a href="/pt/learn/home-battery-backup-planning/" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors mb-2 block">
+              Planejamento de Backup Residencial
+            </a>
+            <p class="text-body-sm text-muted">
+              Um passo a passo para planejar um sistema residencial de backup, cobrindo identificação de cargas, planejamento de duração e configuração.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

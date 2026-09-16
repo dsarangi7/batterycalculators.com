@@ -1,0 +1,519 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+import CalculatorCard from "../../../components/CalculatorCard.astro";
+import FAQSection from "../../../components/FAQSection.astro";
+import ReferenceChart from "../../../components/ReferenceChart.astro";
+import ReferenceTable from "../../../components/ReferenceTable.astro";
+
+const faqItems = [
+  {
+    question: "Qual é a diferença entre Wh e Ah?",
+    answer:
+      "Ampères-hora (Ah) medem a capacidade de carga — quanta corrente a bateria entrega ao longo do tempo. Watt-horas (Wh) medem a capacidade de energia — quanto trabalho total a bateria realiza. Wh = Ah × Tensão. Uma bateria 12V de 100Ah armazena 1.280Wh. Uma de 48V e 100Ah armazena 5.120Wh. Wh é a métrica mais relevante para comparar armazenamento.",
+  },
+  {
+    question: "Qual é a diferença entre capacidade nominal e utilizável?",
+    answer:
+      "Capacidade nominal é a classificação do fabricante em condições ideais. Capacidade utilizável é a energia realmente extraível, considerando limites de profundidade de descarga, perdas de eficiência e redução por temperatura. Uma LiFePO4 de 100Ah a 80% DoD fornece 80Ah utilizáveis. Uma chumbo-ácido de 100Ah a 50% DoD fornece só 50Ah.",
+  },
+  {
+    question: "Como os dias de autonomia afetam o dimensionamento?",
+    answer:
+      "Dias de autonomia determinam quantos dias a bateria deve alimentar a carga sem recarga. Mais dias exigem bateria proporcionalmente maior. Um sistema que precisa de 1.000Wh/dia com 3 dias de autonomia exige 3.000Wh utilizáveis (antes de DoD e eficiência). Off-grid típico precisa de 2–5 dias; backup conectado à rede precisa de 1–2 dias.",
+  },
+  {
+    question: "Por que a eficiência do inversor importa no dimensionamento?",
+    answer:
+      "Inversores convertem potência DC em CA para cargas domésticas. Essa conversão não é 100% eficiente — tipicamente 85–95%. Uma carga CA de 1.000W exige 1.050–1.175W da bateria. A eficiência deve entrar no dimensionamento, ou a bateria drenará mais rápido que o esperado.",
+  },
+];
+
+const tableOfContents = [
+  { id: "wh-vs-ah", label: "Wh vs Ah" },
+  { id: "nominal-vs-usable", label: "Nominal vs Utilizável" },
+  { id: "sizing-table", label: "Tabela por Aplicação" },
+  { id: "sizing-factors", label: "Fatores-Chave" },
+  { id: "common-mistakes", label: "Erros Comuns" },
+];
+
+const relatedCalculators = [
+  {
+    title: "Calculadora de Dimensionamento",
+    href: "/pt/tools/battery-sizing-calculator/",
+  },
+  {
+    title: "Calculadora Solar de Dimensionamento",
+    href: "/pt/tools/solar-battery-sizing-calculator/",
+  },
+  {
+    title: "Calculadora de Backup Residencial",
+    href: "/pt/tools/home-backup-battery-calculator/",
+  },
+  {
+    title: "Calculadora Marítima de Dimensionamento",
+    href: "/pt/tools/marine-battery-sizing-calculator/",
+  },
+];
+
+const references = [
+  {
+    title: "Battery University — Dimensionando Baterias",
+    url: "https://batteryuniversity.com/article/bu-403-lead-acid",
+  },
+  {
+    title: "NREL — Guia de Dimensionamento de Armazenamento",
+    url: "https://www.nrel.gov/docs/fy24osti/87655.pdf",
+  },
+];
+---
+
+<Layout
+  title="Referência de Dimensionamento — Como Dimensionar um Banco | Calculadoras de Bateria"
+  description="Referência de dimensionamento com tabelas práticas para RV, solar, marítimo, backup residencial e comercial. Wh vs Ah, capacidade utilizável e fatores-chave."
+  canonical="https://batterycalculators.com/pt/learn/battery-sizing-reference/"
+  faqItems={faqItems}
+  lang="pt"
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a
+        href="/pt/learn/"
+        class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block"
+        >&larr; Voltar aos Guias</a
+      >
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4"
+        >REFERÊNCIA</span
+      >
+      <h1 class="text-display-md text-primary mb-6">
+        Referência de Dimensionamento de Bateria
+      </h1>
+      <p class="text-body-md text-body font-light">
+        Como dimensionar um banco para qualquer aplicação. Entenda Wh vs Ah,
+        capacidade nominal vs utilizável e os fatores-chave que determinam o tamanho
+        da sua bateria.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section id="wh-vs-ah">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          Wh vs Ah
+        </h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Ampères-hora (Ah) descrevem quanta carga a bateria entrega em sua
+          tensão nominal. Watt-horas (Wh) descrevem quanta energia total ela
+          armazena. A relação é direta: Wh = Ah × Tensão. Uma
+          bateria de 100Ah em 12V armazena 1.280Wh. A mesma capacidade em 48V
+          armazena 5.120Wh.
+        </p>
+        <p class="text-body-md text-body font-light mb-4">
+          Wh é a métrica mais útil para comparar baterias em diferentes
+          tensões. Uma bateria 12V de 100Ah e uma 24V de 50Ah armazenam a
+          mesma energia (1.280Wh), mas os Ah são bem diferentes. Ao
+          dimensionar, trabalhe sempre em Wh para evitar confusão entre
+          tensões.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-body-sm min-w-[480px]">
+              <thead>
+                <tr class="border-b border-hairline bg-surface-card">
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >Capacidade</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >12V</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >24V</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >48V</th
+                  >
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-hairline">
+                <tr>
+                  <td class="p-4 font-mono text-primary">50 Ah</td>
+                  <td class="p-4 text-muted">640 Wh</td>
+                  <td class="p-4 text-muted">1.280 Wh</td>
+                  <td class="p-4 text-muted">2.560 Wh</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">100 Ah</td>
+                  <td class="p-4 text-muted">1.280 Wh</td>
+                  <td class="p-4 text-muted">2.560 Wh</td>
+                  <td class="p-4 text-muted">5.120 Wh</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">200 Ah</td>
+                  <td class="p-4 text-muted">2.560 Wh</td>
+                  <td class="p-4 text-muted">5.120 Wh</td>
+                  <td class="p-4 text-muted">10.240 Wh</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">300 Ah</td>
+                  <td class="p-4 text-muted">3.840 Wh</td>
+                  <td class="p-4 text-muted">7.680 Wh</td>
+                  <td class="p-4 text-muted">15.360 Wh</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <p class="text-caption text-muted mt-3">
+          Wh = Ah × tensão nominal. Tensão nominal LiFePO4 é 3,2V por célula;
+          chumbo-ácido é 2,0V por célula.
+        </p>
+      </section>
+
+      <section id="nominal-vs-usable">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          Capacidade Nominal vs Utilizável
+        </h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Capacidade nominal é o que o fabricante imprime no rótulo. Capacidade
+          utilizável é o que você realmente extrai, considerando limites de
+          profundidade de descarga, eficiência do inversor e redução por temperatura. A
+          diferença pode ser de 20–50% dependendo de química
+          e condições.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-body-sm min-w-[480px]">
+              <thead>
+                <tr class="border-b border-hairline bg-surface-card">
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >Fator</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >Valor Típico</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >Efeito na Capacidade Utilizável</th
+                  >
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-hairline">
+                <tr>
+                  <td class="p-4 font-mono text-primary">Limite de DoD</td>
+                  <td class="p-4 text-muted">50–80%</td>
+                  <td class="p-4 text-muted">Reduz a utilizável em 20–50%</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">Eficiência do Inversor</td
+                  >
+                  <td class="p-4 text-muted">85–95%</td>
+                  <td class="p-4 text-muted"
+                    >Carga CA exige 5–15% mais energia DC</td
+                  >
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary"
+                    >Redução por Temperatura</td
+                  >
+                  <td class="p-4 text-muted">0–30%</td>
+                  <td class="p-4 text-muted"
+                    >Reduz a capacidade em ambientes frios</td
+                  >
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">Envelhecimento</td>
+                  <td class="p-4 text-muted">10–20%</td>
+                  <td class="p-4 text-muted"
+                    >Capacidade cai ao longo da vida</td
+                  >
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <p class="text-body-md text-body font-light mt-4">
+          Uma LiFePO4 de 100Ah a 25°C com 80% DoD e inversor de 90%
+          fornece cerca de 72Ah utilizáveis CA (100 × 0,80 × 0,90
+          = 72Ah). Planeje pela capacidade de fim de vida, não só do Dia 1.
+        </p>
+      </section>
+
+      <section id="sizing-table">
+        <ReferenceChart
+          type="bar"
+          title="Faixa Típica de Energia por Aplicação"
+          description="Apenas faixas típicas de planejamento. O dimensionamento real depende de carga, autonomia, DoD, eficiência e margem."
+          xLabel="Aplicação"
+          yLabel="Energia (kWh)"
+          data={[
+            { x: 1, y: 0.1, label: "Peq. ELET" },
+            { x: 2, y: 2, label: "RV" },
+            { x: 3, y: 10, label: "Solar" },
+            { x: 4, y: 15, label: "Marítimo" },
+            { x: 5, y: 20, label: "Residencial" },
+            { x: 6, y: 100, label: "BESS" },
+          ]}
+          yMin={0}
+          yMax={110}
+          caption="Apenas faixas típicas. O dimensionamento real depende de carga, autonomia, DoD, eficiência e margem."
+        />
+
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          Tabela por Aplicação
+        </h2>
+        <p class="text-body-md text-body font-light mb-4">
+          A tabela abaixo mostra configurações típicas para aplicações
+          comuns. São pontos de partida — os requisitos reais dependem
+          de cargas específicas, autonomia e condições ambientais.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-body-sm min-w-[700px]">
+              <thead>
+                <tr class="border-b border-hairline bg-surface-card">
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >Aplicação</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >Tensão Típica</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >Faixa Típica de Energia</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >Notas</th
+                  >
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-hairline">
+                <tr>
+                  <td class="p-4 font-mono text-primary">Pequenos Eletrônicos</td>
+                  <td class="p-4 text-muted">12V</td>
+                  <td class="p-4 text-muted">50–200 Wh</td>
+                  <td class="p-4 text-muted">Celulares, roteadores, LEDs</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">RV / Camper</td>
+                  <td class="p-4 text-muted">12V</td>
+                  <td class="p-4 text-muted">1–5 kWh</td>
+                  <td class="p-4 text-muted"
+                    >Fim de semana a moradia integral off-grid</td
+                  >
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">Backup Solar</td>
+                  <td class="p-4 text-muted">48V</td>
+                  <td class="p-4 text-muted">5–30 kWh</td>
+                  <td class="p-4 text-muted"
+                    >1–3 dias de autonomia residencial</td
+                  >
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">Carga Residencial Marítima</td>
+                  <td class="p-4 text-muted">12V / 24V</td>
+                  <td class="p-4 text-muted">2–10 kWh</td>
+                  <td class="p-4 text-muted"
+                    >Navegação, iluminação, refrigeração, eletrônicos</td
+                  >
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">Backup Residencial</td>
+                  <td class="p-4 text-muted">48V</td>
+                  <td class="p-4 text-muted">10–40 kWh</td>
+                  <td class="p-4 text-muted">Cargas essenciais por 1–3 dias</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">BESS Comercial</td>
+                  <td class="p-4 text-muted">48V–800V</td>
+                  <td class="p-4 text-muted">100–10.000+ kWh</td>
+                  <td class="p-4 text-muted"
+                    >Corte de pico, resposta à demanda, backup</td
+                  >
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section id="sizing-factors">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          Fatores-Chave de Dimensionamento
+        </h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Dimensionar não é só energia total. Vários fatores
+          devem ser considerados juntos:
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">
+              Consumo Diário de Energia
+            </h4>
+            <p class="text-body-sm text-muted">
+              Total de Wh por dia de todas as cargas. É a base
+              do dimensionamento. Meça ou estime cada carga que rodará na
+              bateria, multiplicada pelo tempo diário.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Dias de Autonomia</h4>
+            <p class="text-body-sm text-muted">
+              Dias que a bateria deve sustentar sem recarga.
+              Backup conectado: 1–2 dias. Solar off-grid: 2–5 dias. Locais
+              remotos: 3–7 dias. Mais autonomia = bateria maior.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Profundidade de Descarga</h4>
+            <p class="text-body-sm text-muted">
+              Limites de DoD reduzem a capacidade utilizável. LiFePO4: 80% DoD. Chumbo-ácido:
+              50% DoD. Dimensione para que a capacidade utilizável limitada por DoD
+              atenda sua necessidade.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Margem de Segurança</h4>
+            <p class="text-body-sm text-muted">
+              Adicione 10–20% para erros de estimativa, degradação
+              ao longo do tempo, temperatura e demanda inesperada. Bancos
+              subdimensionados falham quando você mais precisa.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <section id="common-mistakes">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          Erros Comuns
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">
+              Dimensionar pela Nominal
+            </h4>
+            <p class="text-body-sm text-muted">
+              Uma chumbo-ácido de 200Ah a 50% DoD fornece só 100Ah utilizáveis.
+              Se você precisa de 100Ah utilizáveis, precisa de 200Ah em chumbo-ácido,
+              não 100Ah. Dimensione sempre pela utilizável.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">
+              Esquecer a Eficiência do Inversor
+            </h4>
+            <p class="text-body-sm text-muted">
+              Uma carga CA de 1.000W exige 1.050–1.175W da bateria por
+              perdas do inversor. Ignorar essa sobrecarga de 5–15% faz a bateria
+              drenar mais rápido.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">
+              Não Considerar Temperatura
+            </h4>
+            <p class="text-body-sm text-muted">
+              Uma bateria no frio entrega menos capacidade. Se ficará em local sem aquecimento,
+              aplique redução por temperatura
+              ou superdimensione para compensar.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Ignorar Crescimento de Carga</h4>
+            <p class="text-body-sm text-muted">
+              Se planeja adicionar cargas (novos aparelhos, carga de EV, expansão),
+              dimensione para a capacidade futura, não só a atual.
+              Trocar bancos subdimensionados é caro.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <CalculatorCard class="border-m-blue-light">
+        <h4 class="text-label-uppercase text-primary text-xs mb-3">Experimente</h4>
+        <p class="text-body-sm text-muted mb-4">
+          Use a Calculadora de Dimensionamento para dimensionar um banco com suas
+          cargas, autonomia e química específicas.
+        </p>
+        <a
+          href="/pt/tools/battery-sizing-calculator/"
+          class="btn-primary text-xs py-3 px-6 inline-block"
+          >Abrir Calculadora de Dimensionamento</a
+        >
+      </CalculatorCard>
+
+      <ReferenceTable
+        title="Referência de Conversão Wh vs Ah"
+        description="Baixe esta tabela para referência offline"
+        headers={["Capacidade", "12V", "24V", "48V"]}
+        rows={[
+          ["50 Ah", "640 Wh", "1.280 Wh", "2.560 Wh"],
+          ["100 Ah", "1.280 Wh", "2.560 Wh", "5.120 Wh"],
+          ["200 Ah", "2.560 Wh", "5.120 Wh", "10.240 Wh"],
+          ["300 Ah", "3.840 Wh", "7.680 Wh", "15.360 Wh"],
+        ]}
+        source="Battery University / NREL"
+      />
+
+      <ReferenceTable
+        title="Fatores de Capacidade Nominal vs Utilizável"
+        description="Baixe esta tabela para referência offline"
+        headers={["Fator", "Valor Típico", "Efeito na Capacidade Utilizável"]}
+        rows={[
+          ["Limite de DoD", "50–80%", "Reduz a utilizável em 20–50%"],
+          ["Eficiência do Inversor", "85–95%", "Carga CA exige 5–15% mais energia DC"],
+          ["Redução por Temperatura", "0–30%", "Reduz a capacidade no frio"],
+          ["Envelhecimento", "10–20%", "Capacidade cai ao longo da vida"],
+        ]}
+        source="Battery University / NREL"
+      />
+
+      <ReferenceTable
+        title="Tabela de Referência por Aplicação"
+        description="Baixe esta tabela para referência offline"
+        headers={["Aplicação", "Tensão Típica", "Faixa Típica de Energia", "Notas"]}
+        rows={[
+          ["Pequenos Eletrônicos", "12V", "50–200 Wh", "Celulares, roteadores, LEDs"],
+          ["RV / Camper", "12V", "1–5 kWh", "Fim de semana a moradia integral off-grid"],
+          ["Backup Solar", "48V", "5–30 kWh", "1–3 dias de autonomia residencial"],
+          ["Carga Residencial Marítima", "12V / 24V", "2–10 kWh", "Navegação, iluminação, refrigeração, eletrônicos"],
+          ["Backup Residencial", "48V", "10–40 kWh", "Cargas essenciais por 1–3 dias"],
+          ["BESS Comercial", "48V–800V", "100–10.000+ kWh", "Corte de pico, resposta à demanda, backup"],
+        ]}
+        source="Battery University / NREL"
+      />
+
+      <FAQSection items={faqItems} />
+
+      <section class="border-t border-hairline pt-12">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          Referências
+        </h2>
+        <ul class="flex flex-col gap-2 text-body-sm text-muted">
+          {
+            references.map((ref) => (
+              <li class="flex gap-2">
+                <span class="text-m-blue-light shrink-0">—</span>
+                <a
+                  href={ref.url}
+                  class="hover:text-primary transition-colors underline underline-offset-2"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {ref.title}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+    </div>
+  </div>
+</Layout>

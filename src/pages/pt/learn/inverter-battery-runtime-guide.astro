@@ -1,0 +1,172 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "Como calculo a autonomia da bateria no inversor?",
+    answer: "Divida a energia utilizável (Ah × V × DoD) pela carga efetiva (potência ÷ eficiência do inversor). Uma LFP 200Ah 12,8V com 80% de DoD e carga de 1000W num inversor de 90% funciona por aproximadamente 1,8 horas.",
+  },
+  {
+    question: "Qual tamanho de inversor preciso para minha bateria?",
+    answer: "Iguale a potência contínua nominal do inversor à sua carga máxima esperada. Para uma bateria 12V 200Ah, um inversor de 2000W é típico. A taxa máxima de descarga da bateria (C-rate) também precisa suportar o pico de corrente do inversor.",
+  },
+  {
+    question: "A eficiência do inversor varia com a carga?",
+    answer: "Sim. Inversores são mais eficientes a 50–80% da capacidade nominal. Em cargas muito leves (5–10%), a eficiência cai para 70–80%. Em plena carga, fica normalmente em 85–92%. Ou seja, cargas leves consomem proporcionalmente mais energia da bateria.",
+  },
+  {
+    question: "Posso operar ar-condicionado na bateria via inversor?",
+    answer: "Sim, mas o pico de partida (3–5× a potência nominal) exige bateria e inversor dimensionados para a corrente de pico. Um ar de 1500W precisa de pelo menos um inversor de 3000W e um banco capaz de entregar 300–400A momentaneamente.",
+  },
+];
+---
+
+<Layout
+  title="Guia de Autonomia de Bateria no Inversor | Calculadoras de Bateria"
+  description="Como calcular a autonomia da bateria via inversor. Abrange curvas de eficiência, dimensionamento e cálculos práticos para cargas CA."
+  canonical="https://batterycalculators.com/pt/learn/inverter-battery-runtime-guide/"
+  schema="faqPage"
+  schemaName="Guia de Autonomia de Bateria no Inversor"
+  schemaDescription="Guia de engenharia para calcular a autonomia da bateria via inversores."
+  schemaUrl="https://batterycalculators.com/pt/learn/inverter-battery-runtime-guide/"
+  faqItems={faqItems}
+  lang="pt"
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/pt/learn/" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Voltar aos Guias</a>
+      <Breadcrumb items={[
+        { label: "Centro de Aprendizagem", href: "/pt/learn/" },
+        { label: "Guia de Autonomia de Bateria no Inversor" }
+      ]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">ELÉTRICA</span>
+      <h1 class="text-display-md text-primary mb-6">Guia de Autonomia de Bateria no Inversor</h1>
+      <p class="text-body-md text-body font-light">
+        A maioria das cargas em RV, marítimo e backup residencial passa por um inversor. Ele converte a energia CC da bateria em CA para aparelhos padrão, mas consome 8–15% da energia no processo. Entender essa perda de conversão é essencial para cálculos precisos de autonomia.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Como a Eficiência Afeta a Autonomia</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Um inversor de 90% significa que 10% da energia da bateria é perdida como calor na conversão CC-CA. Isso reduz diretamente a autonomia em 10%. Para uma carga de 1000W, a bateria na verdade fornece 1.111W — os 111W extras são o consumo do inversor.
+        </p>
+        <p class="text-body-md text-body font-light">
+          A eficiência varia com o nível de carga. A maioria é otimizada para 50–80% da capacidade nominal. Operar um inversor de 3000W a 100W pode render só 75–80% de eficiência, enquanto a 2000W rende 90–92%. Dimensione o inversor para sua faixa típica de carga para melhores resultados.
+        </p>
+      </section>
+
+      <FormulaBox title="Fórmula de Autonomia no Inversor">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Carga efetiva (W) = Carga CA (W) / Eficiência do inversor
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Autonomia (h) = Bateria Wh × DoD / Carga efetiva
+        </div>
+        <p>
+          Para cargas CC (sem inversor), remova a etapa de eficiência. Cargas CC consomem direto da bateria com só perdas de fiação (1–5%).
+        </p>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Exemplo Resolvido</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Dados:</strong> LFP 200Ah 12,8V, inversor 2000W (90% efic.), carga CA de 500W</p>
+            <p><strong>Etapa 1:</strong> Energia utilizável:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              200 × 12,8 × 0,80 = 2.048 Wh
+            </div>
+            <p><strong>Etapa 2:</strong> Carga efetiva:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              500 / 0,90 = 555,6 W
+            </div>
+            <p><strong>Etapa 3:</strong> Autonomia:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              2.048 / 555,6 = 3,69 horas ≈ 3 horas e 41 minutos
+            </div>
+            <p class="mt-2 text-muted">Sem o inversor (carga CC), a autonomia seria 4,1 horas — o inversor reduz em 10%.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Eficiência por Nível de Carga</h2>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">% de carga</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Eficiência típica</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Carga efetiva a 500W</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">10%</td>
+                <td class="p-4 text-muted">75–80%</td>
+                <td class="p-4 text-muted">625–667 W</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">25%</td>
+                <td class="p-4 text-muted">82–85%</td>
+                <td class="p-4 text-muted">588–610 W</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">50%</td>
+                <td class="p-4 font-mono text-primary">88–91%</td>
+                <td class="p-4 text-muted">549–568 W</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">75%</td>
+                <td class="p-4 font-mono text-primary">90–92%</td>
+                <td class="p-4 text-muted">543–556 W</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">100%</td>
+                <td class="p-4 text-muted">88–90%</td>
+                <td class="p-4 text-muted">556–568 W</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Experimente</h4>
+          <p class="text-body-sm text-muted mb-4">Use a Calculadora de Autonomia já considerando a eficiência do inversor.</p>
+          <a href="/pt/tools/runtime-calculator/" class="btn-primary text-xs py-3 px-6 inline-block">Abrir Calculadora de Autonomia</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Relacionado</h4>
+          <p class="text-body-sm text-muted mb-4">Dimensione o banco ideal para sua carga no inversor.</p>
+          <a href="/pt/tools/inverter-battery-calculator/" class="btn-primary-outline text-xs py-3 px-6 inline-block">Calculadora de Bateria para Inversor</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Artigos Relacionados</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Autonomia 12V vs 24V vs 48V</h4>
+            <p class="text-body-sm text-muted mb-3">Como a tensão do sistema afeta o desempenho do inversor e a autonomia.</p>
+            <a href="/pt/learn/12v-vs-24v-vs-48v-runtime/" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Ler Guia →</a>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Fórmula de Autonomia de Bateria</h4>
+            <p class="text-body-sm text-muted mb-3">Referência com todas as fórmulas, incluindo perdas do inversor.</p>
+            <a href="/pt/learn/battery-runtime-formula/" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Ler Guia →</a>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

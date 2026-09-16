@@ -1,0 +1,322 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "Quantos kWh uma casa média consome por dia?",
+    answer: "Uma casa média consome aproximadamente 29–30 kWh por dia, cerca de 900 kWh por mês. Porém isso varia muito por tamanho, clima e ocupação. Um apartamento pequeno pode usar 5–10 kWh/dia, enquanto uma casa grande em clima quente pode passar de 50 kWh/dia.",
+  },
+  {
+    question: "Como calculo meu consumo real em kWh?",
+    answer: "Verifique sua conta de luz: divida o consumo mensal em kWh por 30 para a média diária. Para um valor mais preciso, liste cada aparelho principal e multiplique sua potência pelo tempo diário estimado. Some todos para o consumo diário em watt-hora e divida por 1.000 para converter em kWh.",
+  },
+  {
+    question: "O tamanho da casa se correlaciona diretamente com o consumo?",
+    answer: "Há correlação, mas não linear. Casas maiores têm mais área para aquecer e resfriar, mais iluminação e normalmente mais aparelhos. Porém qualidade do isolamento, eficiência das janelas, idade do ar-condicionado e hábitos dos moradores são igualmente importantes. Uma casa bem isolada de 230 m² pode consumir menos que uma mal isolada de 140 m².",
+  },
+  {
+    question: "Qual a diferença entre kWh e Ah no dimensionamento?",
+    answer: "Quilowatts-hora (kWh) medem a energia total — quanto trabalho a bateria realiza. Ampères-hora (Ah) medem a carga elétrica numa dada tensão. Para converter, multiplique Ah pela tensão: uma bateria 48V 100Ah armazena 4.800 Wh ou 4,8 kWh. Ambas descrevem a mesma energia sob óticas diferentes. kWh é mais intuitivo para consumo doméstico, enquanto Ah é útil para configurar o sistema.",
+  },
+];
+---
+
+<Layout
+  title="De Quantos kWh Minha Casa Precisa? | Calculadoras de Bateria"
+  description="Aprenda a calcular o consumo diário em kWh da sua casa para dimensionar o backup de bateria. Inclui tabelas de consumo médio por tamanho, fórmulas passo a passo e exemplos resolvidos."
+  canonical="https://batterycalculators.com/pt/learn/how-many-kwh-do-i-need-for-my-house/"
+  schema="faqPage"
+  schemaName="De Quantos kWh Minha Casa Precisa?"
+  schemaDescription="Aprenda a calcular o consumo diário em kWh da sua casa para dimensionar o backup de bateria."
+  schemaUrl="https://batterycalculators.com/pt/learn/how-many-kwh-do-i-need-for-my-house/"
+  faqItems={faqItems}
+  lang="pt"
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/pt/learn/" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Voltar aos Guias</a>
+      <Breadcrumb items={[
+        { label: "Centro de Aprendizagem", href: "/pt/learn/" },
+        { label: "De Quantos kWh Minha Casa Precisa?" },
+      ]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">BACKUP RESIDENCIAL</span>
+      <h1 class="text-display-md text-primary mb-6">De Quantos kWh Minha Casa Precisa?</h1>
+      <p class="text-body-md text-body font-light">
+        Antes de dimensionar um sistema de backup residencial, você precisa saber quanta energia sua casa realmente consome. Este guia mostra o processo de engenharia para calcular as necessidades em kWh — da análise da conta de luz à auditoria por aparelho — para dimensionar com confiança.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Por Que o Consumo em kWh Importa</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          A capacidade da bateria é medida em quilowatts-hora (kWh). Se sua casa consome 25 kWh por dia e você quer um dia inteiro de backup, precisa de pelo menos 25 kWh de armazenamento utilizável — antes de considerar perdas do inversor e limites de profundidade de descarga. Subestimar o consumo gera um sistema que esgota antes do fim do apagão. Superestimar significa pagar por capacidade nunca usada.
+        </p>
+        <p class="text-body-md text-body font-light mb-6">
+          O cálculo é direto com dados precisos. O desafio é coletá-los. A conta de luz dá o total mensal, mas o dimensionamento exige detalhamento diário — ou até horário — de quais cargas funcionam e quando. Este guia cobre as duas abordagens: a estimativa rápida pela conta e a auditoria precisa por inventário de aparelhos.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Etapa 1: Estimativa Rápida pela Conta de Luz</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          A forma mais rápida é ler sua conta de luz mais recente. Procure o total de kWh consumidos no período. Divida pelo número de dias do ciclo para obter a média diária. A maioria das contas cobre 28–32 dias, então ajuste conforme o caso.
+        </p>
+        <p class="text-body-md text-body font-light mb-6">
+          Esse método dá uma média confiável, mas suaviza picos sazonais. Meses de verão com ar-condicionado ou de inverno com aquecimento elétrico mostram consumo bem maior que primavera ou outono. Para dimensionar baterias, projete para seu pior mês, não para a média anual.
+        </p>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Exemplo resolvido:</strong> Estimativa pela conta.</p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li>Consumo mensal na conta de junho: 930 kWh</li>
+              <li>Período de faturamento: 30 dias</li>
+            </ul>
+            <p><strong>Cálculo:</strong></p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              930 kWh / 30 dias = 31 kWh/dia
+            </div>
+            <p>Esta casa tem média de 31 kWh/dia. Para dimensionar, verifique o mês mais quente ou mais frio — esse pico define sua necessidade de pior caso.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Consumo Médio por Tamanho da Casa</h2>
+        <p class="text-body-md text-body font-light mb-6">
+          A tabela abaixo mostra faixas típicas de consumo diário segmentadas por área. Os valores assumem aquecimento e resfriamento elétricos, aparelhos padrão e 2–4 moradores. Casas com aquecedor elétrico de água, bomba de piscina ou carga de VE consomem bem mais.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Tamanho da casa</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">kWh diários méd.</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">kWh mensais</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Cargas típicas</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-primary font-bold">Pequena (até ~90 m²)</td>
+                <td class="p-4 font-mono text-primary">5 – 12 kWh</td>
+                <td class="p-4 font-mono text-primary">150 – 360</td>
+                <td class="p-4 text-muted">Apartamento de 1 quarto, poucos aparelhos, sem climatização central</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-primary font-bold">Média (~90 – 185 m²)</td>
+                <td class="p-4 font-mono text-primary">12 – 25 kWh</td>
+                <td class="p-4 font-mono text-primary">360 – 750</td>
+                <td class="p-4 text-muted">Casa de 2-3 quartos, aparelhos padrão, ar-condicionado central</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-primary font-bold">Grande (~185 – 280 m²)</td>
+                <td class="p-4 font-mono text-primary">25 – 40 kWh</td>
+                <td class="p-4 font-mono text-primary">750 – 1.200</td>
+                <td class="p-4 text-muted">Casa de 3-4 quartos, linha completa de aparelhos, climatização, iluminação</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-primary font-bold">Muito grande (280 m²+)</td>
+                <td class="p-4 font-mono text-primary">40 – 60+ kWh</td>
+                <td class="p-4 font-mono text-primary">1.200 – 1.800+</td>
+                <td class="p-4 text-muted">Casa de 5+ quartos, várias zonas de climatização, piscina, VE</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-body-sm text-muted mt-4">
+          Estas faixas são médias. Seu consumo real depende de zona climática, isolamento, número de moradores, eficiência dos aparelhos e estilo de vida. Use como verificação após seu próprio cálculo.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Etapa 2: Auditoria por Aparelho</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Para dimensionamento preciso, percorra sua casa e catalogue cada dispositivo elétrico. Anote sua potência (na placa ou no manual) e estime as horas diárias de uso. Multiplique potência por horas para obter watt-hora por dia. Some tudo para o total.
+        </p>
+        <p class="text-body-md text-body font-light mb-6">
+          Atenção especial a aparelhos que ligam e desligam sozinhos. O compressor da geladeira funciona cerca de 8–12 horas por dia mesmo ligado 24 horas. Um ar-condicionado pode rodar 8–16 horas no verão e zero na primavera. Estime o funcionamento pelo uso típico, não apenas pelas horas conectado.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Aparelho</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Potência (W)</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Uso diário (h)</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Energia (Wh/dia)</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">Geladeira</td>
+                <td class="p-4 font-mono text-primary">150 – 400</td>
+                <td class="p-4 font-mono text-primary">8 – 12</td>
+                <td class="p-4 font-mono text-primary">1.200 – 4.800</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Iluminação LED (casa toda)</td>
+                <td class="p-4 font-mono text-primary">200 – 500</td>
+                <td class="p-4 font-mono text-primary">5 – 8</td>
+                <td class="p-4 font-mono text-primary">1.000 – 4.000</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Internet / modem</td>
+                <td class="p-4 font-mono text-primary">15 – 30</td>
+                <td class="p-4 font-mono text-primary">24</td>
+                <td class="p-4 font-mono text-primary">360 – 720</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">TV / entretenimento</td>
+                <td class="p-4 font-mono text-primary">80 – 200</td>
+                <td class="p-4 font-mono text-primary">3 – 6</td>
+                <td class="p-4 font-mono text-primary">240 – 1.200</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Máquina de lavar</td>
+                <td class="p-4 font-mono text-primary">300 – 500</td>
+                <td class="p-4 font-mono text-primary">1</td>
+                <td class="p-4 font-mono text-primary">300 – 500</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Ar-condicionado central (2 ton)</td>
+                <td class="p-4 font-mono text-primary">2.000 – 3.500</td>
+                <td class="p-4 font-mono text-primary">6 – 12</td>
+                <td class="p-4 font-mono text-primary">12.000 – 42.000</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Forno elétrico</td>
+                <td class="p-4 font-mono text-primary">2.000 – 5.000</td>
+                <td class="p-4 font-mono text-primary">0,5 – 1</td>
+                <td class="p-4 font-mono text-primary">1.000 – 5.000</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <FormulaBox title="Fórmulas de kWh Residencial">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          kWh diários = Σ (Potência do aparelho × Horas diárias) / 1.000
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Bateria necessária (kWh) = kWh diários / (DoD × Eficiência do inversor)
+        </div>
+        <p>
+          Divida o consumo bruto pela profundidade de descarga e pela eficiência do inversor para obter a capacidade total necessária. Para LFP com 85% de DoD e inversor de 92%, o multiplicador é aproximadamente 1,28× o consumo bruto.
+        </p>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Exemplo Resolvido: Cálculo Completo</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Cenário:</strong> Casa média, ~200 m², 3 moradores, clima misto.</p>
+            <p><strong>Resumo do inventário:</strong></p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li>Geladeira: 200W × 10h = 2.000 Wh</li>
+              <li>Lâmpadas LED: 300W × 6h = 1.800 Wh</li>
+              <li>Internet: 20W × 24h = 480 Wh</li>
+              <li>TV: 120W × 4h = 480 Wh</li>
+              <li>Cafeteira: 900W × 0,5h = 450 Wh</li>
+              <li>Carga de celular/notebook: 60W × 4h = 240 Wh</li>
+              <li>Diversos: 200W × 3h = 600 Wh</li>
+            </ul>
+            <p class="pt-2 border-t border-hairline"><strong>Consumo diário total:</strong> <span class="font-mono text-primary">6.050 Wh (6,05 kWh/dia)</span></p>
+            <p class="text-xs text-muted">Nota: esta é uma lista só de cargas críticas. Climatização e aquecimento elétrico excluídos — veja o guia de Backup da Casa Inteira para cenários completos.</p>
+            <p class="pt-2 border-t border-hairline"><strong>Dimensionamento para 24h de backup crítico:</strong></p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              6.050 / (0,85 × 0,92) = 7.756 Wh ≈ 7,8 kWh
+            </div>
+            <p>Uma única bateria LFP de 8 kWh ou duas de 4 kWh cobririam as cargas críticas por 24 horas. Para um sistema 48V, isso equivale a aproximadamente 161 Ah a 48V.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Cargas Críticas vs. Consumo da Casa Inteira</h2>
+        <p class="text-body-md text-body font-light mb-6">
+          Um erro comum é dimensionar o backup para todo o consumo doméstico. Num apagão, você não precisa alimentar tudo — precisa do essencial. Cargas críticas (refrigeração, dispositivos médicos, iluminação, comunicação) representam normalmente 20–40% do consumo total. Excluindo climatização, aquecimento elétrico, água quente e lavanderia, o tamanho e o custo da bateria caem drasticamente.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Categoria de carga</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">% do total</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">kWh/dia típicos</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Bateria p/ 24h</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-primary font-bold">Somente críticas</td>
+                <td class="p-4 font-mono text-primary">20 – 40%</td>
+                <td class="p-4 font-mono text-primary">5 – 12 kWh</td>
+                <td class="p-4 font-mono text-primary">6 – 15 kWh</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-primary font-bold">Críticas + importantes</td>
+                <td class="p-4 font-mono text-primary">40 – 60%</td>
+                <td class="p-4 font-mono text-primary">10 – 25 kWh</td>
+                <td class="p-4 font-mono text-primary">13 – 32 kWh</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-primary font-bold">Casa inteira (todas)</td>
+                <td class="p-4 font-mono text-primary">100%</td>
+                <td class="p-4 font-mono text-primary">25 – 50+ kWh</td>
+                <td class="p-4 font-mono text-primary">32 – 64+ kWh</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Experimente</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use a Calculadora de Backup Residencial para dimensionar um sistema com base no seu inventário real de cargas críticas e na duração desejada.
+          </p>
+          <a href="/pt/tools/home-backup-battery-calculator/" class="btn-primary text-xs py-3 px-6 inline-block">Abrir Calculadora de Backup Residencial</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Ferramenta Relacionada</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Após dimensionar, use a Calculadora de Dimensionamento para definir a configuração exata do banco por tensão e química.
+          </p>
+          <a href="/pt/tools/battery-sizing-calculator/" class="btn-primary text-xs py-3 px-6 inline-block">Abrir Calculadora de Dimensionamento</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Artigos Relacionados</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <a href="/pt/learn/home-battery-sizing-guide/" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors mb-2 block">
+              Guia de Dimensionamento Residencial
+            </a>
+            <p class="text-body-sm text-muted">
+              Mostra o processo completo de dimensionamento residencial, da identificação das cargas às recomendações finais.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <a href="/pt/learn/power-outage-battery-guide/" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors mb-2 block">
+              Guia de Bateria para Apagões
+            </a>
+            <p class="text-body-sm text-muted">
+              Explica como preparar um backup especificamente para apagões, incluindo triagem de cargas críticas e planejamento de autonomia.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

@@ -1,0 +1,181 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+
+const faqItems = [
+  {
+    question: "O que é queda de tensão aceitável?",
+    answer: "Para a maioria dos sistemas DC, mantenha a queda de tensão abaixo de 3% da fonte até a carga. Para eletrônicos críticos, busque abaixo de 1%. Em sistemas 12V, uma queda de 0,5V já é 4,2%, o que costuma ser inaceitável. Tensões de sistema mais altas (48V, 400V) são inerentemente mais tolerantes.",
+  },
+  {
+    question: "Como a bitola do cabo afeta a queda de tensão?",
+    answer: "A queda de tensão é inversamente proporcional à área da seção transversal do condutor. Um cabo 10 AWG tem aproximadamente o dobro da resistência de um cabo 8 AWG, ou seja, o dobro da queda de tensão. Bitola maior (número menor) = menor queda.",
+  },
+  {
+    question: "Por que a temperatura importa para a queda de tensão?",
+    answer: "Condutores metálicos aumentam a resistência com a elevação da temperatura. A resistência do cobre aumenta aproximadamente 0,393% por grau Celsius. Um cabo passando por um cofre de motor quente (60°C) tem cerca de 15,7% mais resistência que a 20°C.",
+  },
+  {
+    question: "Devo usar cobre ou alumínio?",
+    answer: "O cobre tem menor resistividade e é mais fácil de trabalhar, mas custa mais e é mais pesado. O alumínio é mais leve e barato, mas exige aproximadamente 1,6 vezes a área de seção transversal para desempenho equivalente. O alumínio é comum em longos percursos de concessionárias.",
+  },
+];
+---
+
+<Layout
+  title="Queda de Tensão Explicada | Calculadoras de Bateria"
+  description="Entenda por que ocorre a queda de tensão DC, como calculá-la usando comprimento de cabo, bitola, corrente e temperatura, e como selecionar a bitola correta."
+  canonical="https://batterycalculators.com/pt/learn/voltage-drop-explained/"
+  faqItems={faqItems}
+  lang="pt"
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/pt/learn/" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Voltar aos Guias</a>
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">ELÉTRICA</span>
+      <h1 class="text-display-md text-primary mb-6">Queda de Tensão Explicada</h1>
+      <p class="text-body-md text-body font-light">
+        Queda de tensão é a perda de potencial elétrico ao longo de um condutor causada por sua resistência interna. Em sistemas de bateria DC, isso reduz diretamente a tensão e a potência disponíveis na carga.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Por Que Ocorre Queda de Tensão</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Todo condutor tem alguma resistência interna. Quando a corrente flui por um cabo, uma parte da energia elétrica é convertida em calor por essa resistência. O resultado é uma queda mensurável de tensão entre as duas extremidades do cabo.
+        </p>
+        <p class="text-body-md text-body font-light">
+          Em sistemas DC de baixa tensão (12V, 24V, 48V), mesmo pequenas quedas representam um percentual significativo da tensão do sistema. Uma queda de 0,5V em um sistema 12V é uma perda de 4,2%, enquanto a mesma queda de 0,5V em um sistema 48V é de apenas 1,0%. Por isso tensões mais altas são preferidas para aplicações de alta potência.
+        </p>
+      </section>
+
+      <FormulaBox title="Fórmula de Queda de Tensão">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          V_queda = (2 × L × I × R) / A
+        </div>
+        <p>
+          Onde L é o comprimento de ida do cabo, I é a corrente, R é a resistividade do material condutor e A é a área da seção transversal. O fator 2 considera o percurso de ida e volta (condutores positivo e negativo).
+        </p>
+        <p>
+          Para cobre a 20°C, resistividade R = 1,72 × 10⁻⁸ Ω·m. Para alumínio, R = 2,82 × 10⁻⁸ Ω·m.
+        </p>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Queda de Tensão (%) = (V_queda / V_sistema) × 100
+        </div>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Exemplo Resolvido</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Dados:</strong></p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li>Tensão do sistema: 12.8V (LFP 4S)</li>
+              <li>Corrente da carga: 20 A</li>
+              <li>Comprimento do cabo (ida): 3 metros</li>
+              <li>Cabo: cobre 10 AWG (seção de 5,26 mm²)</li>
+            </ul>
+            <p><strong>Etapa 1:</strong> Calcular a queda de tensão:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              V_queda = (2 × 3 × 20 × 1.72 × 10⁻⁸) / (5.26 × 10⁻⁶) = 0.039 V
+            </div>
+            <p><strong>Etapa 2:</strong> Expressar em percentual:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              (0.039 / 12.8) × 100 = 0.31%
+            </div>
+            <p>Isso está bem dentro da meta de 3%. No entanto, aumentar o cabo para 5 metros dobraria a queda para 0,62%, e um percurso de 15 metros chegaria a 1,84%.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Referência Cobre vs Alumínio</h2>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Propriedade</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Cobre</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Alumínio</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">Resistividade (Ω·m)</td>
+                <td class="p-4 font-mono text-primary">1.72 × 10⁻⁸</td>
+                <td class="p-4 font-mono text-primary">2.82 × 10⁻⁸</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Resistência Relativa</td>
+                <td class="p-4 font-mono text-primary">1.00×</td>
+                <td class="p-4 font-mono text-primary">1.64×</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Peso</td>
+                <td class="p-4 text-muted">Mais pesado</td>
+                <td class="p-4 text-muted">Mais leve</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Custo</td>
+                <td class="p-4 text-muted">Maior</td>
+                <td class="p-4 text-muted">Menor</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Diretrizes de Projeto</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Aumente a Tensão do Sistema</h4>
+            <p class="text-body-sm text-muted">
+              A forma mais eficaz de reduzir a queda de tensão é aumentar a tensão do sistema. Um sistema 48V consome 4× menos corrente que um sistema 12V para a mesma potência, reduzindo perdas nos cabos em 16× (I²R).
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Encurte os Percursos de Cabo</h4>
+            <p class="text-body-sm text-muted">
+              Coloque as baterias o mais próximo possível do inversor/carga. Cada metro de cabo adiciona resistência. Se percursos longos forem inevitáveis, aumente a bitola para compensar.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Verifique Ambos os Critérios</h4>
+            <p class="text-body-sm text-muted">
+              Os cabos devem satisfazer tanto os limites de queda de tensão quanto os limites de ampacidade (capacidade de condução de corrente). Um cabo que atende aos requisitos de queda pode ainda estar subdimensionado para a segurança térmica.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Compensação de Temperatura</h4>
+            <p class="text-body-sm text-muted">
+              Cabos em ambientes quentes (cofres de motor, solar no telhado) têm maior resistência. Projete para a temperatura ambiente do pior caso, não para a temperatura ambiente normal.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Experimente</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use a Calculadora de Queda de Tensão DC para verificar seu dimensionamento de cabos.
+          </p>
+          <a href="/pt/tools/voltage-drop-calculator/" class="btn-primary text-xs py-3 px-6 inline-block">Abrir Calculadora de Queda de Tensão</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Relacionado</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Calcule a perda real de potência (I²R) com a Calculadora de Perdas em Cabos DC.
+          </p>
+          <a href="/pt/tools/dc-cable-loss-calculator/" class="btn-primary-outline text-xs py-3 px-6 inline-block">Abrir Calculadora de Perdas em Cabos</a>
+        </CalculatorCard>
+      </div>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

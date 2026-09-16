@@ -1,0 +1,279 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "Quantas células preciso para uma bateria 48V?",
+    answer: "Para células LFP (3,2V nominal), você precisa de 16 células em série para um pack nominal de 51,2V. Para células NMC (3,6V-3,7V nominal), precisa de 14 células em série para aproximadamente 50,4V-51,8V. A contagem exata depende da faixa de tensão alvo e das tensões de corte do BMS.",
+  },
+  {
+    question: "O que é balanceamento de células e por que importa?",
+    answer: "O balanceamento garante que todas as células em uma string série carreguem e descarreguem igualmente. Sem balanceamento, células mais fracas atingem os limites de tensão primeiro, reduzindo a capacidade utilizável e podendo causar danos. O balanceamento passivo dissipa o excesso como calor; o ativo transfere energia entre células.",
+  },
+  {
+    question: "Posso misturar células de fabricantes diferentes?",
+    answer: "Misturar células de fabricantes diferentes é fortemente desaconselhado. Células distintas podem ter resistência interna, capacidade e envelhecimento diferentes. Isso cria desequilíbrios que reduzem desempenho e vida útil. Use sempre células combinadas do mesmo lote de produção.",
+  },
+  {
+    question: "Qual bitola de fio preciso para conexões do pack?",
+    answer: "A bitola depende da corrente máxima e do comprimento do cabo. Para um pack que entrega 100A, use no mínimo cabo 2 AWG (33,6 mm²) de cobre. Para percursos curtos abaixo de 1 metro, 4 AWG (21,2 mm²) pode bastar. Calcule sempre a queda de tensão para seu comprimento e corrente específicos.",
+  },
+];
+---
+
+<Layout
+  title="Fundamentos de Projeto de Packs de Bateria | Calculadoras de Bateria"
+  description="Aprenda os fundamentos do projeto de packs: conexões série e paralelo, cálculos de tensão e capacidade, configurações de células e diretrizes práticas para montar packs."
+  canonical="https://batterycalculators.com/pt/learn/battery-pack-design-basics/"
+  faqItems={faqItems}
+  lang="pt"
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/pt/learn/" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Voltar aos Guias</a>
+      <Breadcrumb items={[{ label: "Centro de Aprendizagem", href: "/pt/learn/" }, { label: "Fundamentos de Projeto de Packs" }]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">EV & PACKS DE BATERIA</span>
+      <h1 class="text-display-md text-primary mb-6">Fundamentos de Projeto de Packs de Bateria</h1>
+      <p class="text-body-md text-body font-light">
+        Montar um pack a partir de células individuais é a base de trens de força de EVs, armazenamento residencial e sistemas portáteis. O arranjo das células em série e paralelo determina tensão, capacidade e corrente do pack — os três parâmetros que definem seu desempenho.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Conexão Série: Aumentando a Tensão</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          A conexão série liga células ponta a ponta, conectando o terminal positivo de uma ao negativo da seguinte. Em uma string série, as tensões se somam enquanto a capacidade permanece a de uma única célula. É o método principal para atingir as tensões maiores exigidas por motores, inversores e sistemas conectados à rede.
+        </p>
+        <p class="text-body-md text-body font-light">
+          Considere quatro células LFP de 3,2V e 100 Ah ligadas em série. O pack resultante entrega 12,8V (4 × 3,2V) a 100 Ah. A energia armazenada é 12,8V × 100 Ah = 1.280 Wh. Não importa quantas células você empilhe em série, a capacidade nunca excede a de uma célula — só a tensão aumenta.
+        </p>
+      </section>
+
+      <FormulaBox title="Fórmulas de Conexão Série">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          V_pack = N_série × V_célula
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Capacidade_pack = Capacidade_célula (inalterada)
+        </div>
+        <p>
+          Exemplo: 4 células de 3,2V, 100 Ah em série → Pack = 12,8V, 100 Ah. A tensão quadruplica; a capacidade fica em 100 Ah.
+        </p>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Conexão Paralelo: Aumentando a Capacidade</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          A conexão paralelo liga células lado a lado, unindo todos os positivos e todos os negativos. Em um banco paralelo, as capacidades se somam enquanto a tensão permanece a de uma célula. É assim que se aumenta a energia total sem mudar a tensão do sistema.
+        </p>
+        <p class="text-body-md text-body font-light">
+          Pegue as mesmas quatro células LFP de 3,2V, 100 Ah e ligue-as em paralelo. O banco resultante entrega 3,2V a 400 Ah (4 × 100 Ah). A energia total é 3,2V × 400 Ah = 1.280 Wh — a mesma do exemplo série, mas em tensão bem menor e maior capacidade de corrente. Células em paralelo dividem a carga, reduzindo o estresse individual e estendendo a vida em ciclos.
+        </p>
+      </section>
+
+      <FormulaBox title="Fórmulas de Conexão Paralelo">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Capacidade_pack = N_paralelo × Capacidade_célula
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          V_pack = V_célula (inalterada)
+        </div>
+        <p>
+          Exemplo: 4 células de 3,2V, 100 Ah em paralelo → Pack = 3,2V, 400 Ah. A capacidade quadruplica; a tensão fica em 3,2V.
+        </p>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Configuração Série-Paralelo</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Packs reais quase sempre combinam série e paralelo. As células são primeiro agrupadas em strings paralelas, e essas strings são ligadas em série. Esse arranjo permite atingir tensão e capacidade alvo simultaneamente.
+        </p>
+        <p class="text-body-md text-body font-light mb-6">
+          A notação da indústria segue o formato xSyP, onde x é o número de células em série e y o número de strings paralelas. Por exemplo, um pack 4S2P tem 4 células em série e 2 strings paralelas, totalizando 8 células.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Configuração</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Química</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Tensão Nominal</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Paralelas Típicas</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Aplicações Comuns</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">4S</td>
+                <td class="p-4 text-muted">LFP (3,2V)</td>
+                <td class="p-4 font-mono text-primary">12,8V</td>
+                <td class="p-4 text-muted">4P – 16P</td>
+                <td class="p-4 text-muted">Sistemas 12V, RVs, marítimo</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">7S</td>
+                <td class="p-4 text-muted">LFP (3,2V)</td>
+                <td class="p-4 font-mono text-primary">25,9V</td>
+                <td class="p-4 text-muted">4P – 8P</td>
+                <td class="p-4 text-muted">Solar off-grid 24V, telecom</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">16S</td>
+                <td class="p-4 text-muted">LFP (3,2V)</td>
+                <td class="p-4 font-mono text-primary">51,2V</td>
+                <td class="p-4 text-muted">2P – 8P</td>
+                <td class="p-4 text-muted">Armazenamento 48V, EV</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">10S</td>
+                <td class="p-4 text-muted">NMC (3,6V)</td>
+                <td class="p-4 font-mono text-primary">36V</td>
+                <td class="p-4 text-muted">4P – 12P</td>
+                <td class="p-4 text-muted">E-bikes, ferramentas</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">14S</td>
+                <td class="p-4 text-muted">NMC (3,7V)</td>
+                <td class="p-4 font-mono text-primary">51,8V</td>
+                <td class="p-4 text-muted">2P – 6P</td>
+                <td class="p-4 text-muted">EVs, armazenamento de alta potência</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Exemplo de Projeto</h2>
+        <CalculatorCard>
+          <h4 class="text-primary font-bold mb-4">Montar um Pack LFP 48V 200Ah com Células 3,2V 100Ah</h4>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Especificações alvo:</strong></p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li>Tensão alvo: 48V (nominal 51,2V para LFP)</li>
+              <li>Capacidade alvo: 200 Ah</li>
+              <li>Célula disponível: LFP prismática 3,2V, 100 Ah</li>
+            </ul>
+            <p class="mt-2"><strong>Etapa 1: Calcular contagem série</strong></p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              N_série = 51,2V / 3,2V = 16 células em série
+            </div>
+            <p><strong>Etapa 2: Calcular contagem paralela</strong></p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              N_paralelo = 200Ah / 100Ah = 2 strings paralelas
+            </div>
+            <p><strong>Etapa 3: Calcular total de células</strong></p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              Total de células = 16 × 2 = 32 células
+            </div>
+            <p class="mt-2"><strong>Especificações do pack:</strong></p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li>Tensão do pack = 16 × 3,2V = <strong>51,2V</strong></li>
+              <li>Capacidade do pack = 2 × 100Ah = <strong>200Ah</strong></li>
+              <li>Energia do pack = 51,2V × 200Ah = <strong>10.240 Wh (10,24 kWh)</strong></li>
+            </ul>
+            <p class="mt-2">A configuração é <strong>16S2P</strong>. Cada string paralela tem 16 células em série, e duas strings são ligadas em paralelo para dobrar a capacidade.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Considerações-Chave de Projeto</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Combinação de Células</h4>
+            <p class="text-body-sm text-muted">
+              Todas as células do pack devem ter mesma química, capacidade, resistência interna e lote de fabricação. Células incompatíveis criam desequilíbrios onde as mais fracas atingem os limites primeiro, reduzindo a capacidade utilizável total e acelerando a degradação das mais fracas.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Requisitos de BMS</h4>
+            <p class="text-body-sm text-muted">
+              O Sistema de Gerenciamento monitora tensão, corrente e temperatura de cada célula. Ele faz balanceamento na carga, impõe cortes por sobrecarga e sobredescarga e desconecta o pack em falhas. Sem BMS, células de lítio em série são um risco de segurança.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Gerenciamento Térmico</h4>
+            <p class="text-body-sm text-muted">
+              Células geram calor na carga e descarga por perdas I²R. Em altas correntes, esse calor pode levar as células além das temperaturas seguras. O projeto deve prever resfriamento — passivo (dissipadores, fluxo de ar) ou ativo (circuito líquido, ar forçado) — para manter temperatura uniforme.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Dimensionamento de Barramentos</h4>
+            <p class="text-body-sm text-muted">
+              Barramentos e interconexões devem conduzir a corrente total com resistência mínima. Barramentos subdimensionados criam pontos quentes, quedas de tensão e risco de incêndio. Calcule a seção necessária pela corrente contínua máxima, elevação de temperatura admissível e resistência de cada junção.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">C-Rate e Desempenho do Pack</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          O C-rate de um pack é determinado pelo C-rate das células individuais. Se cada célula é classificada para descarga contínua a 1C, o pack como um todo só pode entregar 1C no nível do pack — nada mais. O arranjo série-paralelo não aumenta o C-rate; só muda os valores absolutos de tensão e corrente.
+        </p>
+        <p class="text-body-md text-body font-light">
+          Uma regra crítica: a corrente máxima do pack é limitada pela célula mais fraca da string série. Se uma célula em um pack 16S tem resistência interna um pouco maior, ela aquecerá mais sob carga e pode fazer o BMS reduzir todo o pack. Por isso a combinação e o controle de qualidade são essenciais na montagem.
+        </p>
+      </section>
+
+      <FormulaBox title="Fórmula de C-Rate do Pack">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          I_max_pack = N_série × I_max_célula (limitado pela célula mais fraca)
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          C-Rate do Pack = C-Rate da Célula (inalterado)
+        </div>
+        <p>
+          Um pack 16S2P com células de 1C, 100 Ah: caminho de corrente equivalente a 16 × 100A, mas corrente máxima no nível do pack = 2 × 100A = 200A a 1C. O pack entrega 200A a 51,2V = 10,24 kW a 1C.
+        </p>
+      </FormulaBox>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Experimente</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use a Calculadora de Pack para projetar uma configuração personalizada para seus requisitos de tensão e capacidade.
+          </p>
+          <a href="/pt/tools/battery-pack-calculator/" class="btn-primary text-xs py-3 px-6 inline-block">Abrir Calculadora de Pack</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Experimente</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use a Calculadora de Strings Paralelas para determinar configurações paralelas ideais para sua capacidade alvo.
+          </p>
+          <a href="/pt/tools/parallel-string-calculator/" class="btn-primary text-xs py-3 px-6 inline-block">Abrir Calculadora de Strings Paralelas</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Artigos Relacionados</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">
+              <a href="/pt/learn/what-is-battery-c-rate/" class="hover:text-m-blue-light transition-colors">O Que É C-Rate de Bateria?</a>
+            </h4>
+            <p class="text-body-sm text-muted">
+              O C-rate determina a velocidade de carga e descarga. Entender o C-rate é essencial para dimensionar a corrente do pack e os sistemas térmicos.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">
+              <a href="/pt/learn/voltage-drop-explained/" class="hover:text-m-blue-light transition-colors">Queda de Tensão Explicada</a>
+            </h4>
+            <p class="text-body-sm text-muted">
+              A queda em barramentos e cabos reduz a tensão útil na carga. Minimizar a resistência das conexões é crítico em projetos de alta corrente.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

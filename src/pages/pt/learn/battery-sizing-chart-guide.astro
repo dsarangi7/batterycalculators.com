@@ -1,0 +1,276 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "Como leio o gráfico de dimensionamento de baterias?",
+    answer: "Encontre sua aplicação ou perfil de carga na coluna da esquerda. A linha correspondente mostra a faixa recomendada de Ah na tensão do seu sistema. Por exemplo, se você alimenta uma cabana pequena com iluminação, geladeira e laptop, o gráfico pode sugerir 200–400 Ah em 12V ou 100–200 Ah em 24V.",
+  },
+  {
+    question: "Qual Ah eu preciso para backup residencial?",
+    answer: "Para uma residência típica com cargas essenciais (geladeira, iluminação, roteador, dispositivos médicos) com 2–5 kWh/dia, um banco LFP 48V de 200–400 Ah (10–20 kWh) fornece 1–2 dias de autonomia. Residências maiores com consumo de 10+ kWh/dia podem precisar de 400–800 Ah em 48V.",
+  },
+  {
+    question: "Posso usar o gráfico para qualquer química?",
+    answer: "O gráfico mostra faixas de capacidade por necessidade de energia, não por química. No entanto, a capacidade utilizável varia por química. Um banco de 200 Ah em chumbo-ácido a 50% DoD fornece apenas 100 Ah utilizáveis, enquanto o mesmo banco LFP a 80% DoD fornece 160 Ah. O gráfico considera limites típicos de DoD por química.",
+  },
+  {
+    question: "E se minha aplicação ficar entre duas entradas do gráfico?",
+    answer: "Arredonde para o tamanho maior. É sempre melhor ter 20% de capacidade excedente do que ficar aquém. O custo de subdimensionar — desligamento, corte de cargas ou troca prematura — supera em muito o custo marginal de capacidade extra.",
+  },
+];
+---
+
+<Layout
+  title="Guia de Gráfico de Dimensionamento de Baterias | Calculadoras de Bateria"
+  description="Gráfico visual e tabela com tamanhos de bateria para perfis comuns de carga. Encontre o Ah ideal para sua aplicação, do portátil pequeno ao residencial grande."
+  canonical="https://batterycalculators.com/pt/learn/battery-sizing-chart-guide/"
+  schema="faqPage"
+  schemaName="Guia de Gráfico de Dimensionamento de Baterias"
+  schemaDescription="Gráfico de referência mapeando perfis de carga e aplicações para faixas recomendadas de capacidade."
+  schemaUrl="https://batterycalculators.com/pt/learn/battery-sizing-chart-guide/"
+  faqItems={faqItems}
+  lang="pt"
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/pt/learn/" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Voltar aos Guias</a>
+      <Breadcrumb items={[
+        { label: "Centro de Aprendizagem", href: "/pt/learn/" },
+        { label: "Guia de Gráfico de Dimensionamento" }
+      ]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">REFERÊNCIA</span>
+      <h1 class="text-display-md text-primary mb-6">Guia de Gráfico de Dimensionamento de Baterias</h1>
+      <p class="text-body-md text-body font-light">
+        Escolher o tamanho certo começa por entender seu perfil de carga. Este gráfico de referência mapeia aplicações comuns e faixas de consumo para capacidades recomendadas, ajudando a localizar rapidamente seu sistema sem um cálculo completo.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Como Usar Este Gráfico</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Identifique seu tipo de aplicação no gráfico abaixo. A coluna de carga diária dá uma faixa aproximada de consumo para aquela aplicação. As colunas de capacidade recomendada mostram o que você precisa em 12V, 24V e 48V. São estimativas iniciais — use a Calculadora de Dimensionamento para um cálculo preciso com seus números reais.
+        </p>
+        <p class="text-body-md text-body font-light">
+          Todos os valores assumem 80% DoD para lítio LFP e 50% DoD para chumbo-ácido. A capacidade utilizável é o que importa — a capacidade instalada deve ser maior para respeitar esses limites.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Gráfico Mestre de Dimensionamento</h2>
+        <div class="bg-surface-soft border border-hairline overflow-hidden overflow-x-auto">
+          <table class="w-full text-left text-body-sm min-w-[640px]">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Aplicação</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Carga Diária</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Ah em 12V</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Ah em 24V</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Ah em 48V</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">Só carga de celular / tablet</td>
+                <td class="p-4 font-mono text-primary">30–60 Wh</td>
+                <td class="p-4 font-mono text-primary">5–10</td>
+                <td class="p-4 font-mono text-primary">—</td>
+                <td class="p-4 font-mono text-primary">—</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Laptop + iluminação + roteador</td>
+                <td class="p-4 font-mono text-primary">200–500 Wh</td>
+                <td class="p-4 font-mono text-primary">50–100</td>
+                <td class="p-4 font-mono text-primary">25–50</td>
+                <td class="p-4 font-mono text-primary">—</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Cabana pequena (luz, geladeira, ventilador)</td>
+                <td class="p-4 font-mono text-primary">1–3 kWh</td>
+                <td class="p-4 font-mono text-primary">200–500</td>
+                <td class="p-4 font-mono text-primary">100–250</td>
+                <td class="p-4 font-mono text-primary">50–125</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">RV / camper (aparelhos 12V)</td>
+                <td class="p-4 font-mono text-primary">1–4 kWh</td>
+                <td class="p-4 font-mono text-primary">200–600</td>
+                <td class="p-4 font-mono text-primary">100–300</td>
+                <td class="p-4 font-mono text-primary">—</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Cargas essenciais residenciais (noite)</td>
+                <td class="p-4 font-mono text-primary">3–8 kWh</td>
+                <td class="p-4 font-mono text-primary">600–1.500</td>
+                <td class="p-4 font-mono text-primary">300–750</td>
+                <td class="p-4 font-mono text-primary">150–375</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Residência completa (uso moderado)</td>
+                <td class="p-4 font-mono text-primary">8–20 kWh</td>
+                <td class="p-4 font-mono text-primary">Não prático</td>
+                <td class="p-4 font-mono text-primary">1.000–2.500</td>
+                <td class="p-4 font-mono text-primary">400–1.000</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Residência grande / carga de EV</td>
+                <td class="p-4 font-mono text-primary">20–60 kWh</td>
+                <td class="p-4 font-mono text-primary">Não prático</td>
+                <td class="p-4 font-mono text-primary">Não prático</td>
+                <td class="p-4 font-mono text-primary">1.000–3.000</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Pequeno negócio / escritório</td>
+                <td class="p-4 font-mono text-primary">15–50 kWh</td>
+                <td class="p-4 font-mono text-primary">Não prático</td>
+                <td class="p-4 font-mono text-primary">2.000–5.000</td>
+                <td class="p-4 font-mono text-primary">800–2.500</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Telecom / torre de celular</td>
+                <td class="p-4 font-mono text-primary">5–30 kWh</td>
+                <td class="p-4 font-mono text-primary">Não prático</td>
+                <td class="p-4 font-mono text-primary">1.000–3.000</td>
+                <td class="p-4 font-mono text-primary">500–1.500</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-body-sm text-muted mt-2">Valores são faixas aproximadas para 1–2 dias de autonomia nos limites típicos de DoD. Use a Calculadora de Dimensionamento para valores precisos com seus parâmetros.</p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Categorias de Perfil de Carga</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Perfis de carga agrupam padrões comuns em três categorias amplas. Saber em qual categoria sua aplicação se encaixa ajuda a estreitar a faixa antes dos números exatos.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Carga Leve (300–2.000 Wh/dia)</h4>
+            <p class="text-body-sm text-muted">
+              Carga de celular, iluminação LED, laptop, ventilador pequeno, roteador Wi-Fi. Típico para barracas, cabanas básicas e iluminação de emergência. Uma única bateria 12V 100Ah cobre a maioria dos cenários leves.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Carga Média (2–10 kWh/dia)</h4>
+            <p class="text-body-sm text-muted">
+              Geladeira, bomba de poço, lavadora, TV, iluminação, pequenos aparelhos. Típico para cabanas off-grid, RVs e backup essencial. Um banco 24V 200Ah ou 48V 100Ah é o ponto de partida.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Carga Pesada (10–60 kWh/dia)</h4>
+            <p class="text-body-sm text-muted">
+              Residência completa com HVAC, fogão elétrico, secadora, carga de EV. Típico para backup total e instalações comerciais. Exige sistemas 48V com 400+ Ah.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Guia de Seleção de Tensão</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          A tensão do sistema afeta bitola, disponibilidade de inversores e requisitos práticos de Ah. Tensões maiores reduzem a corrente para a mesma potência, permitindo cabos mais finos e menores perdas.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Tensão</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Potência Máx. Prática</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Ideal Para</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Bitola</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">12V</td>
+                <td class="p-4 font-mono text-primary">~1,5 kW</td>
+                <td class="p-4 text-muted">Portátil, RV, marítimo, pequenos sistemas</td>
+                <td class="p-4 text-muted">4–6 AWG para percursos curtos</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">24V</td>
+                <td class="p-4 font-mono text-primary">~5 kW</td>
+                <td class="p-4 text-muted">Off-grid médio, residências pequenas</td>
+                <td class="p-4 text-muted">6–8 AWG para percursos típicos</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">48V</td>
+                <td class="p-4 font-mono text-primary">~15 kW</td>
+                <td class="p-4 text-muted">Residências, comercial, telecom</td>
+                <td class="p-4 text-muted">8–10 AWG para percursos típicos</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">400V</td>
+                <td class="p-4 font-mono text-primary">100+ kW</td>
+                <td class="p-4 text-muted">BESS em escala de utilidade</td>
+                <td class="p-4 text-muted">Cabo industrial de alta tensão</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Exemplo Prático: Escolhendo pelo Gráfico</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Cenário:</strong> Uma pequena cabana off-grid com as seguintes cargas:</p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li>Iluminação LED: 40W × 5h = 200 Wh</li>
+              <li>Frigobar: 80W × 12h (50% ciclo) = 480 Wh</li>
+              <li>Laptop: 65W × 3h = 195 Wh</li>
+              <li>Roteador Wi-Fi: 10W × 24h = 240 Wh</li>
+              <li>Carga de celular: 15W × 2h = 30 Wh</li>
+            </ul>
+            <p><strong>Carga diária total:</strong></p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              200 + 480 + 195 + 240 + 30 = 1.145 Wh (~1,1 kWh)
+            </div>
+            <p><strong>Pelo gráfico:</strong> Cai na linha "Cabana pequena (luz, geladeira, ventilador)" de 1–3 kWh/dia. O gráfico recomenda 200–500 Ah em 12V, ou 100–250 Ah em 24V.</p>
+            <p><strong>Seleção:</strong> Um banco LFP 24V 150Ah (3,6 kWh) dá cerca de 3 dias de autonomia nessa carga, com 80% DoD fornecendo 2,88 kWh utilizáveis. É uma escolha prática e econômica para cabana com carga solar confiável.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Experimente</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use a Calculadora de Dimensionamento para uma recomendação precisa com suas cargas exatas.
+          </p>
+          <a href="/pt/tools/battery-sizing-calculator/" class="btn-primary text-xs py-3 px-6 inline-block">Abrir Calculadora de Dimensionamento</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Backup Residencial</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Dimensionando para backup? Use a Calculadora de Backup com priorização de cargas críticas.
+          </p>
+          <a href="/pt/tools/home-backup-battery-calculator/" class="btn-primary-outline text-xs py-3 px-6 inline-block">Abrir Calculadora de Backup</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Artigos Relacionados</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">O Que É Dimensionamento de Bateria?</h4>
+            <p class="text-body-sm text-muted mb-3">Visão geral do processo, por que importa e principais considerações.</p>
+            <a href="/pt/learn/what-is-battery-sizing/" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Ler Guia →</a>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Guia de Dimensionamento Residencial</h4>
+            <p class="text-body-sm text-muted mb-3">Passo a passo para dimensionar backup residencial para cargas essenciais.</p>
+            <a href="/pt/learn/home-battery-sizing-guide/" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Ler Guia →</a>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

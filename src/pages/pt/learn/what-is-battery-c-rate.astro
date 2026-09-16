@@ -1,0 +1,159 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+
+const faqItems = [
+  {
+    question: "O que significa 1C para uma bateria de 100 Ah?",
+    answer: "1C significa a corrente de carga ou descarga que carrega ou descarrega totalmente a bateria em uma hora. Para uma bateria de 100 Ah, 1C = 100 A. Uma taxa de 0,5C (50 A) leva duas horas; uma taxa de 2C (200 A) leva trinta minutos.",
+  },
+  {
+    question: "Posso carregar uma bateria com C-rate maior que o especificado?",
+    answer: "Exceder o C-rate de carga recomendado pelo fabricante causa aquecimento interno excessivo e pode provocar deposição de lítio no ânodo. Isso danifica permanentemente a capacidade e pode criar riscos de segurança. Respeite sempre os limites do datasheet.",
+  },
+  {
+    question: "O C-rate afeta a vida útil da bateria?",
+    answer: "Sim. C-rates maiores geram mais calor interno (perdas I²R), o que acelera a degradação química. Uma bateria ciclada a 0,5C normalmente entrega significativamente mais ciclos que a mesma bateria ciclada a 2C.",
+  },
+  {
+    question: "Por que baterias de chumbo-ácido têm menor capacidade utilizável em C-rates altos?",
+    answer: "A química do chumbo-ácido depende da difusão do ácido no material das placas. Em altas correntes, o ácido próximo às placas se esgota mais rápido do que pode ser reposto, fazendo a tensão cair prematuramente. Isso se chama efeito Peukert.",
+  },
+];
+---
+
+<Layout
+  title="O Que É C-Rate de Bateria? | Calculadoras de Bateria"
+  description="Um guia prático de C-rate de bateria: o que significa, como calcular correntes de carga e descarga, e como o C-rate afeta a longevidade e o desempenho térmico."
+  canonical="https://batterycalculators.com/pt/learn/what-is-battery-c-rate/"
+  faqItems={faqItems}
+  lang="pt"
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/pt/learn/" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Voltar aos Guias</a>
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">FUNDAMENTOS DE CÉLULAS</span>
+      <h1 class="text-display-md text-primary mb-6">O Que É C-Rate de Bateria?</h1>
+      <p class="text-body-md text-body font-light">
+        C-rate é a razão entre a corrente de carga ou descarga e a capacidade nominal da bateria. Ele padroniza a velocidade com que uma bateria está sendo carregada ou descarregada, independentemente do seu tamanho absoluto.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">O Conceito Central</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Uma bateria de 100 Ah pode teoricamente entregar 100 ampères por uma hora. Isso é uma taxa de descarga de 1C. A mesma bateria entregando 50 ampères opera a 0,5C e teoricamente funciona por duas horas. Entregar 200 ampères é uma taxa de 2C, esgotando-a em trinta minutos.
+        </p>
+        <p class="text-body-md text-body font-light">
+          O C-rate remove a ambiguidade ao comparar baterias de tamanhos diferentes. Uma célula de 10 Ah e uma de 200 Ah operando a 0,5C descarregam com níveis de estresse proporcionalmente semelhantes, mesmo que suas correntes absolutas sejam muito diferentes.
+        </p>
+      </section>
+
+      <FormulaBox title="Fórmulas de C-Rate">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          C-Rate = Corrente (A) / Capacidade (Ah)
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Corrente (A) = C-Rate × Capacidade (Ah)
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Tempo (h) = 1 / C-Rate
+        </div>
+        <p>
+          Por exemplo, uma bateria de 200 Ah a 0,5C: Corrente = 0,5 × 200 = 100 A. Tempo = 1 / 0,5 = 2 horas.
+        </p>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Por Que o C-Rate Importa</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Estresse Térmico</h4>
+            <p class="text-body-sm text-muted">
+              A resistência interna produz calor proporcional ao quadrado da corrente (I²R). Dobrar o C-rate quadruplica a geração de calor. O gerenciamento térmico torna-se crítico acima de 1C para a maioria das células de lítio.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Vida Útil em Ciclos</h4>
+            <p class="text-body-sm text-muted">
+              C-rates altos aceleram a deposição de lítio e o crescimento da interfase sólido-eletrólito (SEI). Uma bateria ciclada a 0,3C pode entregar 5.000 ciclos, enquanto a mesma célula a 2C pode alcançar apenas 1.500 ciclos.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Capacidade Utilizável</h4>
+            <p class="text-body-sm text-muted">
+              Em altas taxas de descarga, a tensão cai abaixo do limite de corte antes de a bateria estar totalmente esgotada. Isso reduz a energia real entregue abaixo da capacidade nominal.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Velocidade de Carregamento</h4>
+            <p class="text-body-sm text-muted">
+              O carregamento rápido exige C-rates altos (1C a 3C). O compromisso é o aumento da temperatura da célula e possível deposição de lítio se a bateria estiver fria ou o perfil de carga não for bem controlado.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Referência Prática de C-Rate</h2>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">C-Rate</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Corrente em Bateria 100 Ah</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Tempo Aprox.</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Uso Típico</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">0.05C</td>
+                <td class="p-4 text-muted">5 A</td>
+                <td class="p-4 text-muted">~20 horas</td>
+                <td class="p-4 text-muted">Carga de manutenção, standby</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">0.2C</td>
+                <td class="p-4 text-muted">20 A</td>
+                <td class="p-4 text-muted">~5 horas</td>
+                <td class="p-4 text-muted">Carga lenta, longevidade LFP</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">0.5C</td>
+                <td class="p-4 text-muted">50 A</td>
+                <td class="p-4 text-muted">~2 horas</td>
+                <td class="p-4 text-muted">Carga/descarga padrão</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">1C</td>
+                <td class="p-4 text-muted">100 A</td>
+                <td class="p-4 text-muted">~1 hora</td>
+                <td class="p-4 text-muted">Carga rápida, condução de EV</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">2C</td>
+                <td class="p-4 text-muted">200 A</td>
+                <td class="p-4 text-muted">~30 minutos</td>
+                <td class="p-4 text-muted">Descarga de alta potência, carga rápida</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <CalculatorCard class="border-m-blue-light">
+        <h4 class="text-label-uppercase text-primary text-xs mb-3">Experimente</h4>
+        <p class="text-body-sm text-muted mb-4">
+          Use a Calculadora de C-Rate para converter entre corrente, capacidade e C-rate para sua bateria específica.
+        </p>
+        <a href="/pt/tools/c-rate-calculator/" class="btn-primary text-xs py-3 px-6 inline-block">Abrir Calculadora de C-Rate</a>
+      </CalculatorCard>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

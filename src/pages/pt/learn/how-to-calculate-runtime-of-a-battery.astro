@@ -1,0 +1,226 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "Qual é a forma mais simples de calcular a autonomia da bateria?",
+    answer: "Multiplique a capacidade (Ah) pela tensão (V) para obter o total em watt-hora, aplique seu limite de DoD e divida pela carga efetiva (potência da carga ÷ eficiência). Para uma LFP 100Ah 12,8V com 80% de DoD, carga de 100W e 90% de eficiência, a autonomia é (100 × 12,8 × 0,80) ÷ (100 ÷ 0,90) = 9,2 horas.",
+  },
+  {
+    question: "Por que não posso só dividir Ah por amperes para obter a autonomia?",
+    answer: "A divisão simples ignora perdas de eficiência, limites de DoD e o efeito Peukert. Sistemas reais perdem 8–15% no inversor e na fiação, e normalmente descarregamos só até 80% de DoD para preservar a vida útil. Isso torna a autonomia real 30–40% menor que o cálculo ingênuo.",
+  },
+  {
+    question: "A autonomia muda com tensões diferentes de bateria?",
+    answer: "Para a mesma potência de carga, uma bateria de tensão maior puxa menos corrente, reduzindo perdas nos cabos e melhorando a eficiência. Um sistema 48V perde menos energia na fiação que um 12V para a mesma potência, então a autonomia é um pouco maior em tensões maiores.",
+  },
+  {
+    question: "Qual a precisão dos cálculos de autonomia?",
+    answer: "Cálculos bem executados ficam normalmente dentro de 10–15% dos valores medidos. As principais fontes de erro são variações de temperatura, idade da bateria (SOH) e o efeito Peukert em chumbo-ácido. Baterias de lítio são mais previsíveis porque mantêm a tensão mais estável na descarga.",
+  },
+];
+---
+
+<Layout
+  title="Como Calcular a Autonomia de uma Bateria | Calculadoras de Bateria"
+  description="Método passo a passo para calcular a autonomia a partir de capacidade, tensão, carga, eficiência e profundidade de descarga. Inclui fórmulas, exemplos resolvidos e erros comuns."
+  canonical="https://batterycalculators.com/pt/learn/how-to-calculate-runtime-of-a-battery/"
+  schema="faqPage"
+  schemaName="Como Calcular a Autonomia de uma Bateria"
+  schemaDescription="Método de engenharia para calcular a autonomia da bateria com precisão."
+  schemaUrl="https://batterycalculators.com/pt/learn/how-to-calculate-runtime-of-a-battery/"
+  faqItems={faqItems}
+  lang="pt"
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/pt/learn/" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Voltar aos Guias</a>
+      <Breadcrumb items={[
+        { label: "Centro de Aprendizagem", href: "/pt/learn/" },
+        { label: "Como Calcular a Autonomia de uma Bateria" }
+      ]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">PROJETO DE SISTEMAS</span>
+      <h1 class="text-display-md text-primary mb-6">Como Calcular a Autonomia de uma Bateria</h1>
+      <p class="text-body-md text-body font-light">
+        Calcular a autonomia exige entender como a energia flui da bateria pelo sistema até a carga. Este guia mostra o método completo de engenharia, da capacidade nominal à estimativa final, considerando os fatores reais que cálculos ingênuos ignoram.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Por Que Cálculos Ingênuos Falham</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          A abordagem mais comum — dividir Ah pela corrente de carga — produz resultados otimistas demais. Uma bateria de 100Ah alimentando 10A parece durar 10 horas. Na realidade, o sistema perde energia no inversor, na fiação e no BMS, e você não descarrega até 0%.
+        </p>
+        <p class="text-body-md text-body font-light">
+          O método preciso considera cinco fatores: armazenamento total de energia, capacidade utilizável (DoD), eficiência do sistema, potência da carga e considerações de tensão. Cada fator reduz o máximo teórico numa medida quantificável.
+        </p>
+      </section>
+
+      <FormulaBox title="Fórmula Completa de Autonomia">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Energia total (Wh) = Capacidade (Ah) × Tensão nominal (V)
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Energia utilizável (Wh) = Energia total × (DoD% / 100)
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Carga efetiva (W) = Carga real (W) / (Eficiência% / 100)
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Autonomia (horas) = Energia utilizável (Wh) / Carga efetiva (W)
+        </div>
+        <p>
+          A eficiência inclui perdas de conversão do inversor, perdas na fiação CC, consumo do BMS e overhead de conversores CC-CC. Um valor típico é 85–92%.
+        </p>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Exemplo Resolvido</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Dados:</strong></p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li>Bateria: 200 Ah a 12,8V (pack LFP 4S)</li>
+              <li>Limite de DoD: 80%</li>
+              <li>Carga: 300W CA (via inversor senoidal puro)</li>
+              <li>Eficiência do sistema: 90%</li>
+            </ul>
+            <p><strong>Etapa 1:</strong> Energia total:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              200 Ah × 12,8V = 2.560 Wh
+            </div>
+            <p><strong>Etapa 2:</strong> Energia utilizável com 80% de DoD:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              2.560 Wh × 0,80 = 2.048 Wh
+            </div>
+            <p><strong>Etapa 3:</strong> Carga efetiva:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              300 W / 0,90 = 333,3 W
+            </div>
+            <p><strong>Etapa 4:</strong> Autonomia:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              2.048 Wh / 333,3 W = 6,14 horas ≈ 6 horas e 9 minutos
+            </div>
+            <p class="mt-2 text-muted">O cálculo ingênuo (200Ah ÷ 25A = 8 horas) superestima em 30%.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Método Passo a Passo</h2>
+        <div class="flex flex-col gap-6">
+          <CalculatorCard>
+            <div class="flex items-start gap-4">
+              <span class="text-display-sm text-m-blue-light font-bold shrink-0">1</span>
+              <div>
+                <h4 class="text-primary font-bold mb-1">Identifique as Especificações da Bateria</h4>
+                <p class="text-body-sm text-muted">Anote a capacidade nominal (Ah), a tensão nominal (V) e a química. A tensão nominal do LFP é 3,2V por célula (12,8V para 4S). NMC é 3,6–3,7V por célula.</p>
+              </div>
+            </div>
+          </CalculatorCard>
+          <CalculatorCard>
+            <div class="flex items-start gap-4">
+              <span class="text-display-sm text-m-blue-light font-bold shrink-0">2</span>
+              <div>
+                <h4 class="text-primary font-bold mb-1">Determine o DoD Utilizável</h4>
+                <p class="text-body-sm text-muted">Baterias LFP descarregam com segurança até 80–90% de DoD. Chumbo-ácido deve se limitar a 50% para vida útil. Defina seu DoD pela química e pelos requisitos de ciclagem.</p>
+              </div>
+            </div>
+          </CalculatorCard>
+          <CalculatorCard>
+            <div class="flex items-start gap-4">
+              <span class="text-display-sm text-m-blue-light font-bold shrink-0">3</span>
+              <div>
+                <h4 class="text-primary font-bold mb-1">Calcule a Carga Efetiva</h4>
+                <p class="text-body-sm text-muted">Divida a potência real pelo rendimento do sistema. Para cargas CA no inversor, considere perdas de 8–15%. Para cargas CC, considere perdas de fiação de 1–5%.</p>
+              </div>
+            </div>
+          </CalculatorCard>
+          <CalculatorCard>
+            <div class="flex items-start gap-4">
+              <span class="text-display-sm text-m-blue-light font-bold shrink-0">4</span>
+              <div>
+                <h4 class="text-primary font-bold mb-1">Divida a Energia Utilizável pela Carga Efetiva</h4>
+                <p class="text-body-sm text-muted">O resultado é sua autonomia em horas. Para cargas que ligam e desligam (como geladeira), use a potência média de 24 horas em vez do pico do compressor.</p>
+              </div>
+            </div>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Erros Comuns</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Ignorar a Eficiência</h4>
+            <p class="text-body-sm text-muted">
+              Pular a eficiência superestima a autonomia em 10–15%. Só o inversor consome 8–12% da energia, e esta é a maior fonte individual de erro.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Usar a Capacidade Total</h4>
+            <p class="text-body-sm text-muted">
+              Descarregar chumbo-ácido abaixo de 50% de DoD causa dano permanente. Até o lítio degrada mais rápido a 100% de DoD. Aplique sempre o limite recomendado para a química.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Ignorar a Temperatura</h4>
+            <p class="text-body-sm text-muted">
+              Baterias frias perdem 10–30% da capacidade nominal. Se sua bateria fica em compartimento sem aquecimento, aplique fator de redução de 0,85–0,90 para o inverno.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Pico vs. Potência Média</h4>
+            <p class="text-body-sm text-muted">
+              Motores e compressores puxam 3–5× a potência nominal na partida. Usar o pico em vez da média dá estimativa pessimista. Use o consumo médio ao longo do tempo.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Experimente</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use a Calculadora de Autonomia para estimar a duração da descarga para seu sistema específico.
+          </p>
+          <a href="/pt/tools/runtime-calculator/" class="btn-primary text-xs py-3 px-6 inline-block">Abrir Calculadora de Autonomia</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Relacionado</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Explore calculadoras Solar, de RV e de Backup Residencial para dimensionamento por aplicação.
+          </p>
+          <a href="/pt/solar/" class="btn-primary-outline text-xs py-3 px-6 inline-block">Calculadoras Solares</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Artigos Relacionados</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Fórmula de Autonomia de Bateria</h4>
+            <p class="text-body-sm text-muted mb-3">
+              Folha de referência com todas as fórmulas de autonomia, incluindo correções de tensão, eficiência e temperatura.
+            </p>
+            <a href="/pt/learn/battery-runtime-formula/" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Ler Guia →</a>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Autonomia 12V vs 24V vs 48V</h4>
+            <p class="text-body-sm text-muted mb-3">
+              Como a tensão do sistema afeta autonomia, eficiência e dimensionamento de cabos.
+            </p>
+            <a href="/pt/learn/12v-vs-24v-vs-48v-runtime/" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Ler Guia →</a>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

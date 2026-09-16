@@ -1,0 +1,147 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+
+const faqItems = [
+  {
+    question: "Por que a calculadora de autonomia pede a eficiência?",
+    answer: "Inversores, conversores CC-CC e a resistência dos cabos consomem energia entre a bateria e a carga. Um inversor de 90% significa que 10% da energia é perdida como calor antes de chegar à carga. Ignorar a eficiência superestima a autonomia.",
+  },
+  {
+    question: "Como a temperatura afeta a autonomia?",
+    answer: "Temperaturas baixas aumentam a resistência interna e reduzem a taxa da reação eletroquímica. A 0°C, uma bateria de lítio pode entregar 90% da capacidade nominal. A -20°C, a capacidade utilizável pode cair para 70% ou menos, reduzindo a autonomia proporcionalmente.",
+  },
+  {
+    question: "O que é Profundidade de Descarga (DoD)?",
+    answer: "DoD é o percentual da capacidade total que foi descarregado. Descarregar até 80% de DoD significa que 80% da capacidade foi usada. A maioria das baterias de lítio não deve ser regularmente descarregada além de 80-90% de DoD para preservar a vida útil.",
+  },
+  {
+    question: "Por que a autonomia difere de capacidade dividida pela carga?",
+    answer: "A divisão simples (capacidade / carga) assume 100% de eficiência, 100% de DoD e condições ideais. A autonomia real considera perdas do inversor, resistência dos cabos, efeitos de temperatura e o fato de normalmente não descarregarmos até 0%.",
+  },
+];
+---
+
+<Layout
+  title="Como Calcular a Autonomia da Bateria | Calculadoras de Bateria"
+  description="Guia passo a passo para calcular a autonomia de descarga a partir de capacidade, potência de carga, eficiência e profundidade de descarga. Inclui exemplos resolvidos e fórmulas."
+  canonical="https://batterycalculators.com/pt/learn/how-to-calculate-battery-runtime/"
+  faqItems={faqItems}
+  lang="pt"
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/pt/learn/" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Voltar aos Guias</a>
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">PROJETO DE SISTEMAS</span>
+      <h1 class="text-display-md text-primary mb-6">Como Calcular a Autonomia da Bateria</h1>
+      <p class="text-body-md text-body font-light">
+        Estimar por quanto tempo uma bateria alimentará uma carga exige mais que dividir capacidade por corrente. Este guia mostra o cálculo completo, incluindo eficiência, profundidade de descarga e tensão.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">O Princípio Básico</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          A autonomia é a razão entre a energia utilizável e a potência exigida pela carga. A energia utilizável depende da capacidade nominal, da tensão nominal e de quanto você aceita descarregar (limite de DoD).
+        </p>
+        <p class="text-body-md text-body font-light">
+          A potência vista pela bateria é maior que a da carga porque o inversor e a fiação consomem uma fração da energia. Por isso a eficiência do sistema precisa entrar no cálculo.
+        </p>
+      </section>
+
+      <FormulaBox title="Cálculo de Autonomia">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Energia utilizável (Wh) = Capacidade (Ah) × Tensão (V) × (DoD% / 100)
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Carga efetiva (W) = Carga (W) / (Eficiência% / 100)
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Autonomia (horas) = Energia utilizável (Wh) / Carga efetiva (W)
+        </div>
+        <p>
+          O fator de eficiência considera perdas de conversão do inversor, resistência dos cabos e consumo do BMS.
+        </p>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Exemplo Resolvido</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Dados:</strong></p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li>Bateria: 100 Ah a 12,8V (pack LFP 4S)</li>
+              <li>Limite de DoD: 80%</li>
+              <li>Eficiência do sistema: 90% (inversor + fiação)</li>
+              <li>Carga contínua: 250 W</li>
+            </ul>
+            <p><strong>Etapa 1:</strong> Calcular a energia utilizável:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              100 Ah × 12,8V × 0,80 = 1.024 Wh
+            </div>
+            <p><strong>Etapa 2:</strong> Calcular a carga efetiva vista pela bateria:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              250 W / 0,90 = 277,8 W
+            </div>
+            <p><strong>Etapa 3:</strong> Dividir a energia utilizável pela carga efetiva:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              1.024 Wh / 277,8 W = 3,69 horas ≈ 3 horas e 41 minutos
+            </div>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Fatores que Reduzem a Autonomia</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Temperatura</h4>
+            <p class="text-body-sm text-muted">
+              A 0°C, a capacidade do lítio cai cerca de 10%. A -20°C, pode cair 30% ou mais. O chumbo-ácido é ainda mais sensível ao frio.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Efeito Peukert</h4>
+            <p class="text-body-sm text-muted">
+              Baterias de chumbo-ácido entregam menos energia total em altas taxas de descarga. Uma bateria de 100 Ah a 1C pode entregar apenas 60-70 Ah utilizáveis.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Idade da Bateria</h4>
+            <p class="text-body-sm text-muted">
+              Com o envelhecimento, a resistência interna aumenta e a capacidade diminui. Uma bateria de 5 anos pode entregar 80% da capacidade original, reduzindo diretamente a autonomia.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Queda de Tensão</h4>
+            <p class="text-body-sm text-muted">
+              Sob carga pesada, a tensão dos terminais cai. Se o corte de baixa tensão do inversor disparar cedo, a bateria é desconectada antes de esgotar sua capacidade nominal.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Experimente</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use a Calculadora de Autonomia para estimar a duração da descarga para seu sistema específico.
+          </p>
+          <a href="/pt/tools/runtime-calculator/" class="btn-primary text-xs py-3 px-6 inline-block">Abrir Calculadora de Autonomia</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Relacionado</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Precisa dimensionar a bateria primeiro? Use a Calculadora de Dimensionamento para determinar a capacidade necessária.
+          </p>
+          <a href="/pt/tools/battery-sizing-calculator/" class="btn-primary-outline text-xs py-3 px-6 inline-block">Abrir Calculadora de Dimensionamento</a>
+        </CalculatorCard>
+      </div>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

@@ -1,0 +1,438 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+import CalculatorCard from "../../../components/CalculatorCard.astro";
+import FAQSection from "../../../components/FAQSection.astro";
+import ReferenceChart from "../../../components/ReferenceChart.astro";
+import ReferenceTable from "../../../components/ReferenceTable.astro";
+
+const faqItems = [
+  {
+    question: "Por que é difícil determinar o SOC do LiFePO4 pela tensão?",
+    answer:
+      "O LiFePO4 tem um patamar extremamente plano entre 20% e 80% de SOC. A diferença de tensão em toda essa faixa é de apenas ~0,2V por célula (0,8V num pack 12V). Um multímetro comum não resolve essa diferença com confiabilidade, tornando a estimativa por tensão impraticável nos 60% centrais da curva.",
+  },
+  {
+    question: "O que é contagem de coulombs?",
+    answer:
+      "Contagem de coulombs mede a carga total que entra e sai da bateria integrando a corrente no tempo. O BMS registra ampères-hora de entrada e saída para manter a estimativa de SOC. É mais precisa que a tensão no patamar plano, mas pode derivar com o tempo e precisa de recalibração periódica.",
+  },
+  {
+    question:
+      "Qual a diferença entre tensão de repouso e tensão sob carga?",
+    answer:
+      "Tensão de repouso (OCV) é medida após 30+ minutos sem corrente. Tensão sob carga é medida enquanto a bateria fornece corrente e é sempre menor pela resistência interna (V = OCV − I × R). A diferença pode passar de 0,5V sob carga pesada.",
+  },
+  {
+    question: "Como recalibro o SOC do meu BMS?",
+    answer:
+      "Faça uma carga total a 100% (absorção por 30+ minutos), depois descarga total até o corte do BMS e recarregue a 100%. Esse ciclo alinha o contador com os extremos reais de tensão. Alguns BMS permitem reset manual via Bluetooth ou ferramenta de configuração.",
+  },
+];
+
+const tableOfContents = [
+  { id: "the-flat-curve-problem", label: "O Problema da Curva Plana" },
+  { id: "coulomb-counting", label: "Contagem de Coulombs" },
+  { id: "resting-vs-loaded", label: "Tensão de Repouso vs. sob Carga" },
+  { id: "soc-table", label: "Tabela de Referência SOC" },
+  { id: "best-practices", label: "Boas Práticas" },
+  { id: "common-mistakes", label: "Erros Comuns" },
+];
+
+const relatedCalculators = [
+  { title: "Estimador de SOC", href: "/pt/tools/soc-estimator/" },
+  { title: "Calculadora de Autonomia de Bateria", href: "/pt/tools/runtime-calculator/" },
+];
+
+const references = [
+  {
+    title: "Battery University — Determinação de Estado de Carga",
+    url: "https://batteryuniversity.com/article/bu-902-how-to-measure-state-of-charge",
+  },
+  {
+    title: "Texas Instruments — Contagem de Coulombs para Li-ion",
+    url: "https://www.ti.com/lit/an/slua863a/slua863a.pdf",
+  },
+];
+---
+
+<Layout
+  title="Tabela SOC LiFePO4 — Estado de Carga vs Tensão | Calculadoras de Bateria"
+  description="Por que a tensão do LiFePO4 é plana no meio da faixa de SOC, como funciona a contagem de coulombs e a diferença entre tensão de repouso e sob carga em LFP."
+  canonical="https://batterycalculators.com/pt/learn/lifepo4-soc-chart/"
+  faqItems={faqItems}
+  lang="pt"
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a
+        href="/pt/learn/"
+        class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block"
+        >&larr; Voltar aos Guias</a
+      >
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4"
+        >REFERÊNCIA</span
+      >
+      <h1 class="text-display-md text-primary mb-6">Tabela SOC LiFePO4</h1>
+      <p class="text-body-md text-body font-light">
+        Entenda por que a tensão do LiFePO4 é um indicador ruim de SOC no meio da
+        faixa e por que a contagem de coulombs costuma ser o melhor método.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section id="the-flat-curve-problem">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          O Problema da Curva Plana
+        </h2>
+        <p class="text-body-md text-body font-light mb-4">
+          A maioria das químicas tem relação relativamente linear entre tensão e
+          estado de carga. Chumbo-ácido, por exemplo, mostra queda clara de tensão
+          conforme o SOC cai. O LiFePO4 não. A curva de descarga da célula LiFePO4
+          é quase plana entre 20% e 80% de SOC, em torno de 3,2V por célula.
+        </p>
+        <p class="text-body-md text-body font-light mb-4">
+          Esse patamar plano é uma vantagem para entrega de energia — a tensão fica
+          estável numa ampla faixa, e o equipamento vê tensão consistente. Mas cria
+          um desafio relevante para estimar o SOC. Quando a tensão a 30% é
+          essencialmente igual à de 70%, não dá para estimar o SOC só pela tensão.
+        </p>
+        <p class="text-body-md text-body font-light">
+          A tensão só vira um indicador útil nos extremos: acima de 80%, onde a curva
+          inclina rumo ao fim da carga, e abaixo de 20%, onde cai rumo ao corte. Para
+          os 60% centrais, é preciso outra abordagem.
+        </p>
+      </section>
+
+      <section id="coulomb-counting">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          Contagem de Coulombs
+        </h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Contagem de coulombs é o método que a maioria dos BMS usa para acompanhar
+          o SOC. Mede-se a corrente que entra e sai, integrando no tempo. Partindo
+          de 100%, ao drenar 10A por 5 horas o BMS calcula 50Ah removidos, reduzindo
+          o SOC em 50% numa bateria de 100Ah.
+        </p>
+        <p class="text-body-md text-body font-light mb-4">
+          A contagem é precisa no patamar plano, onde a tensão não informa nada.
+          Porém tem limitações próprias. Pequenos erros de medição se acumulam,
+          causando deriva do SOC. A temperatura afeta a capacidade real, e o BMS pode
+          não acompanhar isso perfeitamente. Ciclos periódicos de carga-descarga total
+          recalibram o contador contra os extremos conhecidos de tensão.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Vantagens</h4>
+            <p class="text-body-sm text-muted">
+              Precisa no patamar plano. Funciona sob carga. Fornece SOC contínuo.
+              Não exige repouso da bateria. Usada por praticamente todos os BMS modernos.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Limitações</h4>
+            <p class="text-body-sm text-muted">
+              Deriva com o tempo sem recalibração. O SOC inicial precisa estar correto
+              (normalmente carregando a 100%). A temperatura afeta a capacidade real.
+              A precisão do sensor de corrente importa.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <section id="resting-vs-loaded">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          Tensão de Repouso vs. sob Carga
+        </h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Tensão de repouso (tensão de circuito aberto, ou OCV) é medida sem corrente
+          fluindo. É a representação mais fiel do estado eletroquímico. Tensão sob
+          carga é medida fornecendo corrente e é sempre menor pela resistência interna.
+          A diferença segue a lei de Ohm: V_carga = V_OCV − (I × R_interna).
+        </p>
+        <p class="text-body-md text-body font-light mb-4">
+          Para uma célula LiFePO4 com 20mΩ de resistência interna sob 50A, a queda é
+          1,0V — desvio relevante do valor de repouso. Ou seja, uma bateria lendo 13,2V
+          em repouso pode ler 12,2V sob 50A num pack 12V. Estimar o SOC por leitura sob
+          carga dá resultado enganosamente baixo.
+        </p>
+        <p class="text-body-md text-body font-light">
+          Para estimar o SOC pela tensão com confiabilidade, meça após pelo menos 30
+          minutos em repouso. Para sistemas que precisam do SOC sob carga, confie no
+          contador do BMS em vez da tensão.
+        </p>
+      </section>
+
+      <section id="soc-table">
+        <ReferenceChart
+          type="line"
+          title="Tensão de Repouso vs SOC — LiFePO4"
+          description="Relação aproximada para um pack de 12V; a tensão é menos informativa no patamar central."
+          xLabel="SOC %"
+          yLabel="Tensão (V)"
+          data={[
+            { x: 0, y: 12.0, label: "0%" },
+            { x: 10, y: 12.6, label: "10%" },
+            { x: 20, y: 12.9, label: "20%" },
+            { x: 30, y: 13.0, label: "30%" },
+            { x: 40, y: 13.1, label: "40%" },
+            { x: 50, y: 13.1, label: "50%" },
+            { x: 60, y: 13.2, label: "60%" },
+            { x: 70, y: 13.2, label: "70%" },
+            { x: 80, y: 13.3, label: "80%" },
+            { x: 90, y: 13.4, label: "90%" },
+            { x: 100, y: 13.6, label: "100%" },
+          ]}
+          yMin={11.5}
+          yMax={14.0}
+          caption="Tensões aproximadas de repouso a 25°C. Valores reais variam por fabricante, idade, temperatura e condições de medição."
+        />
+
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          Tabela de Referência SOC
+        </h2>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-body-sm min-w-[640px]">
+              <thead>
+                <tr class="border-b border-hairline bg-surface-card">
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >SOC %</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >Tensão da célula (OCV)</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >Pack 12V</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >Pack 24V</th
+                  >
+                  <th
+                    class="p-4 text-label-uppercase text-primary text-xs tracking-wider"
+                    >Resolução necessária</th
+                  >
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-hairline">
+                <tr>
+                  <td class="p-4 font-mono text-primary">100%</td>
+                  <td class="p-4 text-muted">3.40V</td>
+                  <td class="p-4 text-muted">13.6V</td>
+                  <td class="p-4 text-muted">27.2V</td>
+                  <td class="p-4 text-muted">Fácil — sinal claro</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">90%</td>
+                  <td class="p-4 text-muted">3.35V</td>
+                  <td class="p-4 text-muted">13.4V</td>
+                  <td class="p-4 text-muted">26.8V</td>
+                  <td class="p-4 text-muted">Detectável</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">80%</td>
+                  <td class="p-4 text-muted">3.32V</td>
+                  <td class="p-4 text-muted">13.3V</td>
+                  <td class="p-4 text-muted">26.6V</td>
+                  <td class="p-4 text-muted">Ainda distinguível</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">70%</td>
+                  <td class="p-4 text-muted">3.30V</td>
+                  <td class="p-4 text-muted">13.2V</td>
+                  <td class="p-4 text-muted">26.4V</td>
+                  <td class="p-4 text-muted">Difícil</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">60%</td>
+                  <td class="p-4 text-muted">3.29V</td>
+                  <td class="p-4 text-muted">13.2V</td>
+                  <td class="p-4 text-muted">26.4V</td>
+                  <td class="p-4 text-muted">Indistinguível de 70%</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">50%</td>
+                  <td class="p-4 text-muted">3.28V</td>
+                  <td class="p-4 text-muted">13.1V</td>
+                  <td class="p-4 text-muted">26.2V</td>
+                  <td class="p-4 text-muted">Indistinguível de 40–60%</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">40%</td>
+                  <td class="p-4 text-muted">3.27V</td>
+                  <td class="p-4 text-muted">13.1V</td>
+                  <td class="p-4 text-muted">26.2V</td>
+                  <td class="p-4 text-muted">Indistinguível de 30–50%</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">30%</td>
+                  <td class="p-4 text-muted">3.26V</td>
+                  <td class="p-4 text-muted">13.0V</td>
+                  <td class="p-4 text-muted">26.0V</td>
+                  <td class="p-4 text-muted">Difícil</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">20%</td>
+                  <td class="p-4 text-muted">3.22V</td>
+                  <td class="p-4 text-muted">12.9V</td>
+                  <td class="p-4 text-muted">25.8V</td>
+                  <td class="p-4 text-muted">Detectável</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">10%</td>
+                  <td class="p-4 text-muted">3.15V</td>
+                  <td class="p-4 text-muted">12.6V</td>
+                  <td class="p-4 text-muted">25.2V</td>
+                  <td class="p-4 text-muted">Fácil — queda clara</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">0%</td>
+                  <td class="p-4 text-muted">3.00V</td>
+                  <td class="p-4 text-muted">12.0V</td>
+                  <td class="p-4 text-muted">24.0V</td>
+                  <td class="p-4 text-muted">Clara — tensão de corte</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <p class="text-caption text-muted mt-3">
+          Tensões aproximadas de repouso a 25°C. Valores reais variam por
+          fabricante e idade das células.
+        </p>
+      </section>
+
+      <section id="best-practices">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          Boas Práticas
+        </h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Para a maioria das aplicações, use um BMS com contagem de coulombs como método
+          principal de SOC e a tensão como verificação nos extremos de carga.
+          Calibre o BMS periodicamente carregando totalmente a 100% (o BMS zera o SOC
+          em 100% ao detectar a tensão de fim de carga).
+        </p>
+        <p class="text-body-md text-body font-light mb-4">
+          Se você monta um sistema próprio sem BMS sofisticado, dá para estimar o SOC
+          pela tensão — mas só nos extremos. Acima de 80% ou abaixo de 20%, a tensão dá
+          estimativa razoável. No meio, acompanhe ampères-hora manualmente ou aceite que
+          o SOC é desconhecido.
+        </p>
+        <p class="text-body-md text-body font-light">
+          Para aplicações críticas (medicina, telecom, BESS), use os dois métodos em
+          paralelo. O contador do BMS dá o SOC contínuo, enquanto verificações periódicas
+          de tensão em repouso confirmam que não houve deriva.
+        </p>
+      </section>
+
+      <section id="common-mistakes">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          Erros Comuns
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">
+              Usar Voltímetro para SOC Intermediário
+            </h4>
+            <p class="text-body-sm text-muted">
+              Um multímetro padrão com resolução de 0,1V não distingue 30% de 70% de
+              SOC num pack LiFePO4. A diferença é menor que a resolução do aparelho.
+              Não confie só na tensão no patamar plano.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">
+              Ignorar a Deriva de Calibração
+            </h4>
+            <p class="text-body-sm text-muted">
+              Contadores derivam com o tempo. Se você nunca carrega e descarrega
+              totalmente, a leitura do BMS fica cada vez menos precisa. Faça um ciclo
+              completo de calibração a cada 1–3 meses para melhor precisão.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">
+              Medir Tensão sob Carga
+            </h4>
+            <p class="text-body-sm text-muted">
+              A tensão sob descarga é menor que a de repouso pela resistência interna.
+              Isso dá estimativa falsamente baixa de SOC. Desconecte as cargas e aguarde
+              30+ minutos antes de estimar o SOC pela tensão.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">
+              Esperar Tensão Linear com o SOC
+            </h4>
+            <p class="text-body-sm text-muted">
+              Diferente do chumbo-ácido, a tensão do LiFePO4 não cai linearmente. Fica
+              plana e despenca nos extremos. Considere a tensão útil só acima de 80% ou
+              abaixo de 20%, salvo equipamento de alta precisão.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <CalculatorCard class="border-m-blue-light">
+        <h4 class="text-label-uppercase text-primary text-xs mb-3">Experimente</h4>
+        <p class="text-body-sm text-muted mb-4">
+          Use o Estimador de SOC para calcular o estado de carga pela tensão de
+          circuito aberto ou simular contagem de coulombs no seu LiFePO4.
+        </p>
+        <a
+          href="/pt/tools/soc-estimator/"
+          class="btn-primary text-xs py-3 px-6 inline-block"
+          >Abrir Estimador de SOC</a
+        >
+      </CalculatorCard>
+
+      <ReferenceTable
+        title="Tabela de Referência SOC-Tensão LiFePO4"
+        description="Baixe esta tabela para referência offline"
+        headers={["SOC %", "Tensão da célula (OCV)", "Pack 12V", "Pack 24V", "Resolução necessária"]}
+        rows={[
+          ["100%", "3.40V", "13.6V", "27.2V", "Fácil — sinal claro"],
+          ["90%", "3.35V", "13.4V", "26.8V", "Detectável"],
+          ["80%", "3.32V", "13.3V", "26.6V", "Ainda distinguível"],
+          ["70%", "3.30V", "13.2V", "26.4V", "Difícil"],
+          ["60%", "3.29V", "13.2V", "26.4V", "Indistinguível de 70%"],
+          ["50%", "3.28V", "13.1V", "26.2V", "Indistinguível de 40–60%"],
+          ["40%", "3.27V", "13.1V", "26.2V", "Indistinguível de 30–50%"],
+          ["30%", "3.26V", "13.0V", "26.0V", "Difícil"],
+          ["20%", "3.22V", "12.9V", "25.8V", "Detectável"],
+          ["10%", "3.15V", "12.6V", "25.2V", "Fácil — queda clara"],
+          ["0%", "3.00V", "12.0V", "24.0V", "Clara — tensão de corte"],
+        ]}
+        source="Battery University / Datasheets de fabricantes"
+      />
+
+      <FAQSection items={faqItems} />
+
+      <section class="border-t border-hairline pt-12">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          Referências
+        </h2>
+        <ul class="flex flex-col gap-2 text-body-sm text-muted">
+          {
+            references.map((ref) => (
+              <li class="flex gap-2">
+                <span class="text-m-blue-light shrink-0">—</span>
+                <a
+                  href={ref.url}
+                  class="hover:text-primary transition-colors underline underline-offset-2"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {ref.title}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+    </div>
+  </div>
+</Layout>

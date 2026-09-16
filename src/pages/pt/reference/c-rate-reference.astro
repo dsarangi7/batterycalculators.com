@@ -1,0 +1,129 @@
+---
+import ArticleLayout from '../../../layouts/ArticleLayout.astro';
+import ReferenceTable from '../../../components/ReferenceTable.astro';
+import ComparisonTable from '../../../components/ComparisonTable.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+
+const relatedCalculators = [
+  { title: 'Calculadora de Taxa C', href: '/pt/tools/c-rate-calculator/', type: 'calculator' as const },
+  { title: 'Calculadora de Autonomia', href: '/pt/tools/runtime-calculator/', type: 'calculator' as const },
+  { title: 'Calculadora de Tempo de Carga', href: '/pt/tools/charging-time-calculator/', type: 'calculator' as const },
+  { title: 'Calculadora de Dimensionamento de Bateria', href: '/pt/tools/battery-sizing-calculator/', type: 'calculator' as const },
+];
+
+const relatedGuides = [
+  { title: 'O Que é Taxa C de Bateria?', href: '/pt/learn/what-is-battery-c-rate/', type: 'guide' as const },
+  { title: 'Referência de Taxa C de Bateria', href: '/pt/learn/battery-c-rate-reference/', type: 'guide' as const },
+  { title: 'Guia de Dimensionamento de Carregador', href: '/pt/learn/charger-sizing-guide/', type: 'guide' as const },
+];
+
+const faqItems = [
+  {
+    question: 'O que significa 1C para uma bateria de 100Ah?',
+    answer: '1C para uma bateria de 100Ah significa uma corrente de 100A. Nessa taxa, a bateria descarrega totalmente em aproximadamente 1 hora. Uma taxa de 0.5C significa 50A (descarga de 2 horas), e uma taxa de 2C significa 200A (descarga de 30 minutos). A taxa C é a forma padrão de expressar a velocidade de carga e descarga em relação à capacidade da bateria.',
+  },
+  {
+    question: 'Qual taxa C é segura para baterias LiFePO4?',
+    answer: 'A maioria das baterias LiFePO4 é classificada para 1C de descarga contínua e 0.5C de carga contínua. Células de alto desempenho suportam 2C–3C de descarga. Exceder a taxa C nominal causa aquecimento excessivo, degradação acelerada e pode acionar o BMS. Verifique sempre as classificações específicas de taxa C das suas células junto ao fabricante.',
+  },
+  {
+    question: 'Como a taxa C afeta a capacidade da bateria?',
+    answer: 'Taxas C mais altas reduzem a capacidade utilizável devido ao efeito Peukert e ao aumento das perdas internas. A 0.1C, uma bateria pode entregar 100% de sua capacidade nominal. A 1C, você pode ver 95–98%. A 5C, a capacidade pode cair para 85–90%. Esse efeito é mais pronunciado em chumbo-ácido (expoente de Peukert ~1.2) do que em lítio (expoente de Peukert ~1.01–1.05).',
+  },
+  {
+    question: 'Qual é a diferença entre taxa C de carga e taxa C de descarga?',
+    answer: 'Taxa C de carga refere-se à corrente usada para carregar a bateria, enquanto taxa C de descarga refere-se à corrente consumida durante o uso. A maioria das baterias aceita carga em taxa menor do que consegue descarregar — por exemplo, LFP pode carregar a 0.5C, mas descarregar a 2C. Carregar com taxa C muito alta causa deposição de lítio, geração de calor e riscos à segurança.',
+  },
+  {
+    question: 'Como calculo a taxa C a partir de ampères?',
+    answer: 'Taxa C = Corrente (A) ÷ Capacidade (Ah). Para uma bateria de 200Ah sendo carregada a 100A: Taxa C = 100/200 = 0.5C. Para encontrar a corrente a partir da taxa C: Corrente = Taxa C × Capacidade. A 2C para uma bateria de 200Ah: Corrente = 2 × 200 = 400A.',
+  },
+  {
+    question: 'Posso carregar e descarregar com taxas C diferentes?',
+    answer: 'Sim, a maioria das baterias tem taxas C máximas de carga e descarga diferentes. Uma bateria LFP típica pode aceitar 0.5C de carga, mas suportar 2C de descarga. Células NMC costumam permitir 1C de carga e 3C de descarga. O BMS impõe esses limites de forma independente para proteção de carga e descarga.',
+  },
+];
+---
+
+<ArticleLayout
+  title="Referência de Taxa C | Calculadoras de Bateria"
+  description="Tabela completa de referência de taxa C de 0,05C a 5C com correntes de descarga para baterias de 50Ah, 100Ah, 200Ah e 300Ah. Inclui limites de taxa C por química de bateria."
+  canonical="https://batterycalculators.com/pt/reference/c-rate-reference/"
+  lang="pt"
+  category="REFERÊNCIA"
+  categoryHref="/pt/reference/"
+  breadcrumbItems={[{ label: 'Referência de Taxa C' }]}
+  relatedCalculators={relatedCalculators}
+  relatedGuides={relatedGuides}
+  faqItems={faqItems}
+>
+  <p class="text-body-md text-body font-light mb-8">
+    A taxa C expressa a velocidade de carga e descarga em relação à capacidade da bateria. Uma taxa de 1C significa que a bateria carrega ou descarrega totalmente em uma hora. Esta referência fornece valores de corrente para capacidades comuns em cada taxa C padrão, ajudando a dimensionar cabos, fusíveis e controladores de carga.
+  </p>
+
+  <ReferenceTable
+    lang="pt"
+    title="Corrente de Descarga por Taxa C e Capacidade"
+    description="Corrente em ampères para capacidades comuns de bateria em taxas C padrão."
+    headers={['Taxa C', 'Bateria 50Ah', 'Bateria 100Ah', 'Bateria 200Ah', 'Bateria 300Ah', 'Tempo de Descarga']}
+    rows={[
+      ['0.05C', '2.5A', '5A', '10A', '15A', '~20 horas'],
+      ['0.1C', '5A', '10A', '20A', '30A', '~10 horas'],
+      ['0.2C', '10A', '20A', '40A', '60A', '~5 horas'],
+      ['0.5C', '25A', '50A', '100A', '150A', '~2 horas'],
+      ['1C', '50A', '100A', '200A', '300A', '~1 hora'],
+      ['2C', '100A', '200A', '400A', '600A', '~30 minutos'],
+      ['3C', '150A', '300A', '600A', '900A', '~20 minutos'],
+      ['5C', '250A', '500A', '1000A', '1500A', '~12 minutos'],
+    ]}
+    source="Definições padrão de taxa C, IEC 61960"
+  />
+
+  <ReferenceTable
+    lang="pt"
+    title="Corrente de Carga por Taxa C e Capacidade"
+    description="Correntes típicas de carga para capacidades comuns de bateria. A taxa máxima de carga varia por química e fabricante."
+    headers={['Taxa C', 'Bateria 50Ah', 'Bateria 100Ah', 'Bateria 200Ah', 'Bateria 300Ah', 'Tempo de Carga (80%)']}
+    rows={[
+      ['0.05C', '2.5A', '5A', '10A', '15A', '~16 horas'],
+      ['0.1C', '5A', '10A', '20A', '30A', '~8 horas'],
+      ['0.2C', '10A', '20A', '40A', '60A', '~4 horas'],
+      ['0.5C', '25A', '50A', '100A', '150A', '~1.6 horas'],
+      ['1C', '50A', '100A', '200A', '300A', '~48 minutos'],
+      ['2C', '100A', '200A', '400A', '600A', '~24 minutos'],
+    ]}
+    source="Valores típicos, o tempo real de carga varia conforme perfil do BMS e temperatura"
+  />
+
+  <ComparisonTable
+    title="Limites Máximos de Taxa C por Química"
+    headers={['Química', 'Taxa C Máx. de Carga', 'Taxa C Máx. de Descarga', 'Descarga Contínua Típica', 'Observações']}
+    rows={[
+      ['LiFePO4 (LFP)', '1C', '3C', '0.5–1C', 'Mais comum para solar e marítimo. Longa vida útil em taxas C moderadas.'],
+      ['NMC (Li-íon)', '1C', '3C', '1C', 'Maior densidade de energia que LFP. Comum em VEs e eletrônicos.'],
+      ['NCA (Li-íon)', '0.7C', '3C', '1C', 'Usada em veículos Tesla. Alta densidade com limites térmicos mais rígidos.'],
+      ['Chumbo-ácido (Inundada)', '0.15C', '3C', '0.25C', 'Efeito Peukert reduz muito a capacidade em altas taxas de descarga.'],
+      ['Chumbo-ácido AGM', '0.25C', '5C', '0.3C', 'Melhor desempenho em alta taxa que inundada. Menor resistência interna.'],
+      ['Chumbo-ácido Gel', '0.15C', '3C', '0.2C', 'Melhor desempenho em ciclo profundo entre chumbo-ácido. Sensível à tensão de carga.'],
+    ]}
+    highlightCol={3}
+    caption="Taxas C são classificações contínuas. Pulsos breves podem ser maiores. Verifique sempre a folha de dados do fabricante."
+  />
+
+  <ReferenceTable
+    lang="pt"
+    title="Conversão de Taxa C para Autonomia"
+    description="Tempo aproximado de descarga para taxas C comuns considerando perdas de Peukert."
+    headers={['Taxa C', 'Autonomia Nominal', 'Autonomia Real LFP', 'Autonomia Real NMC', 'Autonomia Real Chumbo-ácido']}
+    rows={[
+      ['0.05C', '20 horas', '20 horas', '20 horas', '19 horas'],
+      ['0.1C', '10 horas', '10 horas', '10 horas', '9.2 horas'],
+      ['0.2C', '5 horas', '5 horas', '5 horas', '4.3 horas'],
+      ['0.5C', '2 horas', '2 horas', '2 horas', '1.5 horas'],
+      ['1C', '1 hora', '59 min', '59 min', '45 min'],
+      ['2C', '30 min', '29 min', '29 min', '18 min'],
+      ['5C', '12 min', '11.5 min', '11.5 min', '6 min'],
+    ]}
+    source="Equação de Peukert para chumbo-ácido (expoente 1.2), redução mínima para lítio em taxas C moderadas"
+  />
+</ArticleLayout>

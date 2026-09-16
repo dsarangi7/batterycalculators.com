@@ -1,0 +1,647 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "Uma bateria residencial vale o custo em 2026?",
+    answer: "Vale se você enfrenta apagões frequentes, vive em região com tarifa por horário, tem tarifas altas acima de $0,20/kWh ou tem painéis solares com baixa tarifa de injeção. Para compra avulsa sem solar em 2026, o caso financeiro é mais fraco sem o ITC federal. Paybacks variam de 5–8 anos em mercados caros com TOU a 15–20+ anos em áreas baratas.",
+  },
+  {
+    question: "Quanto custa uma bateria residencial em 2026?",
+    answer: "Uma bateria residencial custa $5.000–$35.000 instalada conforme a capacidade. Um sistema de 5 kWh sai $5.000–$8.000, um de 10 kWh $8.000–$13.000, um de 20 kWh $14.000–$24.000 e um de 30 kWh $22.000–$35.000. São preços instalados incluindo bateria, inversor, elétrica, licenças e mão de obra.",
+  },
+  {
+    question: "Qual o payback de uma bateria residencial?",
+    answer: "Depende de tarifas, precificação por horário e pareamento com solar. Em mercados caros com TOU como Califórnia ou Massachusetts, o payback vai de 5–8 anos com solar. Na tarifa média de $0,18/kWh, é 7–12 anos. Sem TOU ou em estados baratos, pode passar de 15 anos. Atribuir valor ao backup encurta o payback efetivo.",
+  },
+  {
+    question: "Baterias valem a pena sem painéis solares?",
+    answer: "Sem solar, a bateria só desloca energia da rede do horário barato para o caro. O caso financeiro depende só de arbitragem TOU e valor de backup. Em tarifas médias sem TOU, baterias avulsas raramente se pagam. Justificam-se como seguro contra apagões, não como investimento para economizar.",
+  },
+  {
+    question: "Quanto tempo duram as baterias residenciais?",
+    answer: "Baterias LiFePO4 duram 3.500–7.000 ciclos com 80% de profundidade de descarga, ou seja, 10–15+ anos de ciclagem diária. A maioria dos fabricantes garante 10–15 anos. A capacidade tipicamente cai para 70–80% da original nesse período: uma bateria de 10 kWh ainda entrega 7–8 kWh após a garantia.",
+  },
+  {
+    question: "Qual tamanho de bateria residencial preciso?",
+    answer: "A maioria das casas precisa de 10–20 kWh para backup de circuitos essenciais (geladeira, luzes, roteador, dispositivos médicos). Backup da casa inteira exige 20–50+ kWh conforme tamanho e climatização. Uma casa pequena de até ~140 m² pode precisar de 10–15 kWh, enquanto uma grande acima de ~230 m² pode precisar de 25–40 kWh para cobertura total.",
+  },
+  {
+    question: "Uma bateria alimenta minha casa inteira?",
+    answer: "Sim, se o banco for grande o suficiente e o inversor potente. Uma casa típica de 25–40 kWh por dia precisa de 30–50+ kWh para 24h de backup total, mais inversor de 8–15 kW para o pico. Backup só de cargas críticas é mais comum e econômico.",
+  },
+  {
+    question: "Ainda há crédito fiscal federal para baterias em 2026?",
+    answer: "O crédito federal de 30% para energia limpa residencial (Seção 25D) foi encerrado pelo One Big Beautiful Bill Act para sistemas instalados após 31 de dezembro de 2025. Quem compra bateria à vista em 2026 não pode pedir o crédito federal. Porém, baterias via leasing solar ou PPA ainda podem se enquadrar no ITC comercial (Seção 48E) até 2032.",
+  },
+  {
+    question: "Quais incentivos estaduais existem para baterias em 2026?",
+    answer: "Programas estaduais seguem com descontos relevantes. O SGIP da Califórnia chega a $1.100/kWh para famílias elegíveis. NYSERDA de Nova York, Connecticut, Colorado e outros estados oferecem $5.000–$16.000 combinados. Consulte a base DSIRE para programas atuais na sua região.",
+  },
+  {
+    question: "Quanto posso economizar com bateria residencial?",
+    answer: "Depende de tarifas, TOU e pareamento com solar. Em mercados caros com TOU e solar, economias anuais de $400–$800 são realistas. Em tarifas médias sem TOU, a economia pura pode ser $100–$300 por ano. Para muitos, o valor principal é o backup, não a economia na conta.",
+  },
+  {
+    question: "Qual a diferença entre LiFePO4 e NMC?",
+    answer: "LiFePO4 (LFP) oferece 3.500–7.000 ciclos, estabilidade térmica superior e zero cobalto. NMC tem maior densidade, mas só 1.500–3.000 ciclos e fuga térmica a 150–210°C contra 270°C do LFP. Todo grande fabricante residencial em 2026 usa LFP. Para armazenamento estacionário, LFP é a escolha recomendada.",
+  },
+  {
+    question: "Como a bateria afeta o payback do meu solar?",
+    answer: "A bateria eleva o autoconsumo solar de 25–40% para 60–90%, o que pesa quando a tarifa de injeção é baixa ($0,03–$0,08/kWh) e a tarifa de consumo alta ($0,25–$0,45/kWh). Cada kWh consumido localmente em vez de exportado economiza $0,17–$0,40 na Califórnia. Isso pode encurtar o payback do solar em 2–4 anos.",
+  },
+  {
+    question: "Compro agora ou espero?",
+    answer: "O hardware caiu cerca de 47% desde 2020 e segue barateando. Porém as tarifas sobem 3–5% ao ano. Se você vive em mercado caro com TOU e precisa de backup, comprar cedo captura economia imediata e proteção. Em mercados baratos, esperar novas quedas é razoável se a urgência for baixa.",
+  },
+  {
+    question: "Posso adicionar bateria ao meu solar existente?",
+    answer: "Sim. Adicionar bateria a um solar grid-tied exige inversor híbrido ou inversor battery-ready com bateria acoplada em CA. Se seu inversor atual já é battery-ready, o retrofit é direto. Se não, pode precisar de troca de inversor de $2.000–$5.000. A maioria dos inversores solares modernos já é battery-ready.",
+  },
+  {
+    question: "Quanto custa um backup residencial completo?",
+    answer: "Um backup completo custa $15.000–$40.000+ instalado. Inclui 20–50 kWh de bateria, inversor híbrido de 10–15 kW, integração ao quadro, chave de transferência, licenças e mão de obra. Sistemas só de cargas críticas custam $5.000–$15.000 e atendem apenas circuitos essenciais.",
+  },
+];
+---
+
+<Layout
+  title="Uma Bateria Residencial Vale a Pena em 2026? | Calculadoras de Bateria"
+  description="Análise honesta sobre bateria residencial em 2026: custos, economias, paybacks, valor do backup, dimensionamento e quando faz sentido financeiro."
+  canonical="https://batterycalculators.com/pt/learn/is-home-battery-worth-it-2026/"
+  schema="faqPage"
+  schemaName="Uma Bateria Residencial Vale a Pena em 2026?"
+  schemaDescription="Guia completo analisando se uma bateria residencial vale o investimento em 2026, cobrindo custos, economias, paybacks e recomendações práticas."
+  schemaUrl="https://batterycalculators.com/pt/learn/is-home-battery-worth-it-2026/"
+  faqItems={faqItems}
+  lang="pt"
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/pt/learn/" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Voltar aos Guias</a>
+      <Breadcrumb items={[
+        { label: "Centro de Aprendizagem", href: "/pt/learn/" },
+        { label: "Uma Bateria Residencial Vale a Pena em 2026?" }
+      ]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">BACKUP RESIDENCIAL</span>
+      <h1 class="text-display-md text-primary mb-6">Uma Bateria Residencial Vale a Pena em 2026?</h1>
+      <p class="text-body-md text-body font-light">
+        As tarifas de eletricidade nos Estados Unidos subiram 23% nos últimos quatro anos. Os apagões tiveram média de 11 horas por consumidor em 2024 — quase o dobro da média da década anterior. Enquanto isso, os custos de baterias caíram 47% desde 2020. Mais de 1,5 milhão de casas americanas já têm armazenamento, com mais de 600.000 sistemas instalados só em 2024.
+      </p>
+      <p class="text-body-md text-body font-light mt-4">
+        A pergunta de todo proprietário é se as contas fecham. Este guia traz uma análise de nível de engenharia, com base econômica, de quando uma bateria residencial faz sentido, quando não faz e como dimensioná-la corretamente para seu caso.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+
+      <!-- O Que É um Sistema de Bateria Residencial? -->
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">O Que É um Sistema de Bateria Residencial?</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Um sistema de bateria residencial armazena energia elétrica para uso posterior. Carrega da rede, de painéis solares ou de ambos, e descarrega para alimentar a casa quando a energia da rede está cara ou indisponível. Os componentes centrais são a bateria recarregável (normalmente lítio LiFePO4 em 2026), um inversor híbrido que converte CC em CA, um BMS que monitora saúde e segurança das células e uma plataforma de monitoramento com dados em tempo real.
+        </p>
+        <p class="text-body-md text-body font-light mb-4">
+          Baterias residenciais operam em três modos principais. Baterias conectadas à rede carregam fora de ponta e descarregam na ponta para reduzir a conta sob tarifas por horário (TOU). Baterias com solar guardam o excedente do dia para uso noturno, aumentando o autoconsumo. Sistemas de backup entram automaticamente em apagões para alimentar circuitos essenciais ou a casa inteira.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden mb-6">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Modo</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Uso principal</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Ideal para</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">Conectada à rede (TOU)</td>
+                <td class="p-4 text-muted">Carrega fora de ponta, descarrega na ponta</td>
+                <td class="p-4 text-muted">Casas com tarifa por horário</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">Conectada ao solar</td>
+                <td class="p-4 text-muted">Guarda o excedente solar do dia para a noite</td>
+                <td class="p-4 text-muted">Casas com solar e baixa tarifa de injeção</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">Backup</td>
+                <td class="p-4 text-muted">Alimenta circuitos em apagões</td>
+                <td class="p-4 text-muted">Casas com apagões frequentes ou cargas críticas</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-body-md text-body font-light">
+          A maioria dos sistemas modernos combina os três modos. Uma bateria com solar também faz arbitragem TOU e backup. O valor de cada modo depende de suas tarifas, da confiabilidade da rede e da configuração energética.
+        </p>
+      </section>
+
+      <!-- How Much Does a Home Battery Cost in 2026? -->
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Quanto Custa uma Bateria Residencial em 2026?</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Custos instalados em 2026 vão de $5.000 para um sistema pequeno de 5 kWh só de cargas críticas a $35.000 para 30 kWh de backup total. Os preços incluem bateria, inversor híbrido, elétrica, licenças, monitoramento e mão de obra. Só o hardware sai $400–$800 por kWh para LFP, mas inversor e instalação adicionam 30–50% ao total.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden mb-6">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Tamanho da bateria</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Faixa de custo instalado</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Aplicação típica</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">5 kWh</td>
+                <td class="p-4 font-mono text-primary">$5.000 – $8.000</td>
+                <td class="p-4 text-muted">Só críticas: geladeira, roteador, carga de celular, iluminação de emergência</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">10 kWh</td>
+                <td class="p-4 font-mono text-primary">$8.000 – $13.000</td>
+                <td class="p-4 text-muted">Backup essencial: geladeira, luzes, roteador, dispositivos médicos, bomba de poço</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">15 kWh</td>
+                <td class="p-4 font-mono text-primary">$11.000 – $18.000</td>
+                <td class="p-4 text-muted">Críticas estendidas com climatização moderada ou mais aparelhos</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">20 kWh</td>
+                <td class="p-4 font-mono text-primary">$14.000 – $24.000</td>
+                <td class="p-4 text-muted">Backup parcial total: críticas mais operação seletiva de aparelhos</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">30 kWh</td>
+                <td class="p-4 font-mono text-primary">$22.000 – $35.000</td>
+                <td class="p-4 text-muted">Backup total para a maioria das casas, ou dias de cargas críticas</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-body-md text-body font-light">
+          O crédito federal de 30% para energia limpa residencial (Seção 25D) foi encerrado pelo One Big Beautiful Bill Act para sistemas instalados após 31 de dezembro de 2025. Isso adiciona cerca de $2.000–$4.500 ao custo líquido de um sistema típico ante 2025. Porém o hardware caiu cerca de 47% desde 2020, absorvendo parte da mudança. Incentivos estaduais na Califórnia, Nova York, Connecticut, Colorado e outros seguem oferecendo $5.000–$16.000 em descontos para instalações elegíveis.
+        </p>
+      </section>
+
+      <!-- When Is a Home Battery Worth It? -->
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Quando uma Bateria Residencial Vale a Pena?</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Uma bateria entrega valor financeiro e operacional mensurável em situações específicas. Os cenários abaixo são os casos de uso mais fortes.
+        </p>
+
+        <h3 class="text-title-md text-primary mb-3">Apagões Frequentes</h3>
+        <p class="text-body-md text-body font-light mb-4">
+          Com mais de 2–3 apagões por ano, a bateria se paga evitando custos de gerador, perda de alimentos e produtividade. O apagão médio americano durou quase 11 horas em 2024, com estados sujeitos a furacões vendo 30–50+ horas. Falhas de equipamento e clima severo causam mais de 80% dos apagões, e o envelhecimento da infraestrutura não melhora a confiabilidade.
+        </p>
+
+        <h3 class="text-title-md text-primary mb-3">Tarifa por Horário (TOU)</h3>
+        <p class="text-body-md text-body font-light mb-4">
+          Tarifas TOU cobram 2–4x mais na ponta (normalmente 16h–21h). Na Califórnia, a ponta passa de $0,50/kWh enquanto fora de ponta cai para $0,25–$0,35/kWh. Uma bateria que carrega fora de ponta e descarrega na ponta captura a diferença como economia. Este é o maior vetor financeiro para baterias no mercado americano.
+        </p>
+
+        <h3 class="text-title-md text-primary mb-3">Otimização do Autoconsumo Solar</h3>
+        <p class="text-body-md text-body font-light mb-4">
+          Sem bateria, a maioria das casas consome só 25–40% da produção solar localmente. O resto é exportado a $0,03–$0,08/kWh — bem abaixo de tarifas de $0,25–$0,45/kWh. Com bateria, o autoconsumo sobe para 60–90%, capturando a diferença. Cada kWh consumido localmente em vez de exportado representa $0,17–$0,40 evitados em mercados caros.
+        </p>
+
+        <h3 class="text-title-md text-primary mb-3">Aplicações Off-Grid</h3>
+        <p class="text-body-md text-body font-light mb-4">
+          Para casas sem rede ou em busca de independência total, baterias são essenciais. Sistemas off-grid exigem bancos maiores (30–100+ kWh) com arranjos dimensionados ao clima local. A conta é direta: a alternativa é estender a rede a $15–$50 por metro linear ou depender de diesel a $0,30–$0,50/kWh.
+        </p>
+
+        <h3 class="text-title-md text-primary mb-3">Estados de Tarifa Alta</h3>
+        <p class="text-body-md text-body font-light mb-4">
+          Moradores do Havaí ($0,42/kWh), Massachusetts ($0,30/kWh), Connecticut ($0,30/kWh), Nova York ($0,29/kWh) e Califórnia ($0,30/kWh) pagam 1,5–2,5x a média nacional. Nessas tarifas, mesmo arbitragem modesta ou mais autoconsumo gera economia anual relevante.
+        </p>
+      </section>
+
+      <!-- When Is a Home Battery NOT Worth It? -->
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Quando NÃO Vale a Pena?</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Uma análise honesta exige identificar situações onde o retorno não justifica o investimento.
+        </p>
+
+        <h3 class="text-title-md text-primary mb-3">Tarifas Baixas</h3>
+        <p class="text-body-md text-body font-light mb-4">
+          Em estados como Louisiana ($0,08/kWh), Dakota do Norte ($0,08/kWh), Idaho ($0,13/kWh) e Utah ($0,10/kWh), a economia por kWh deslocado é mínima. A $0,08/kWh, deslocar 10 kWh diários da ponta para fora de ponta economiza só $1,46/mês ($17,50/ano) — longe de justificar o investimento.
+        </p>
+
+        <h3 class="text-title-md text-primary mb-3">Rede Confiável com Apagões Raros</h3>
+        <p class="text-body-md text-body font-light mb-4">
+          Algumas regiões mantêm excelente confiabilidade, com SAIDI abaixo de 60 minutos por ano. Se apagões são raros e curtos, o valor de backup é mínimo. Sem apagões nem TOU, a bateria fica ociosa quase sempre — custando dinheiro sem retorno.
+        </p>
+
+        <h3 class="text-title-md text-primary mb-3">Poucas Oportunidades de Ciclagem</h3>
+        <p class="text-body-md text-body font-light mb-4">
+          Baterias degradam mesmo sem uso. Uma bateria que cicla uma vez ao dia entrega 5–15 anos de vida útil. Uma que cicla 100 vezes ao ano pode durar 20+ anos, mas entrega bem menos valor por dólar investido. Sem TOU ou solar para ciclar regularmente, a bateria rende abaixo do potencial econômico.
+        </p>
+
+        <h3 class="text-title-md text-primary mb-3">Sistemas Superdimensionados</h3>
+        <p class="text-body-md text-body font-light mb-4">
+          Comprar mais capacidade que o necessário desperdiça dinheiro em hardware ocioso. Um sistema de 30 kWh para uma casa que precisa de 10 kWh não entrega 3x o valor — entrega a mesma proteção por 3x o custo. Dimensionar pelo consumo real é crítico.
+        </p>
+      </section>
+
+      <!-- Home Battery Savings Examples -->
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Exemplos de Economia com Bateria Residencial</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Os exemplos resolvidos abaixo mostram economias em três cenários realistas. Todos assumem um sistema LiFePO4 de 10 kWh. Em 2026, sem o ITC federal, usa-se o custo instalado cheio.
+        </p>
+
+        <h3 class="text-title-md text-primary mb-3">Exemplo 1: Caso de Baixa Economia</h3>
+        <div class="bg-surface-soft border border-hairline p-5 mb-4">
+          <p class="text-body-sm text-muted mb-2"><strong class="text-body-strong">Premissas:</strong> tarifa média $0,12/kWh, sem TOU, sem solar, só backup crítico (5 kWh/dia), sem incentivos estaduais.</p>
+          <p class="text-body-sm text-muted mb-2">Custo líquido: $10.000</p>
+          <p class="text-body-sm text-muted mb-2">Energia deslocada anual: 5 kWh × 365 = 1.825 kWh</p>
+          <p class="text-body-sm text-muted mb-2">Economia anual: 1.825 × $0,12 = $219</p>
+          <p class="text-body-sm text-muted mb-2">Valor de backup atribuído: $300/ano (alimentos evitados, conveniência)</p>
+          <p class="text-body-sm text-muted mb-2">Valor anual total: $519</p>
+          <p class="text-body-sm text-muted"><strong class="text-body-strong">Payback simples: $10.000 ÷ $519 = 19,3 anos</strong></p>
+        </div>
+
+        <h3 class="text-title-md text-primary mb-3">Exemplo 2: Caso Médio</h3>
+        <div class="bg-surface-soft border border-hairline p-5 mb-4">
+          <p class="text-body-sm text-muted mb-2"><strong class="text-body-strong">Premissas:</strong> tarifa média $0,18/kWh, TOU moderado (ponta $0,28, fora $0,12), solar com +30% de autoconsumo, sem incentivos.</p>
+          <p class="text-body-sm text-muted mb-2">Custo líquido: $10.000</p>
+          <p class="text-body-sm text-muted mb-2">Arbitragem TOU: 3 kWh/dia × ($0,28 – $0,12) × 365 = $175</p>
+          <p class="text-body-sm text-muted mb-2">Mais autoconsumo: 4 kWh/dia × ($0,18 – $0,05) × 365 = $189</p>
+          <p class="text-body-sm text-muted mb-2">Economia anual total: $364</p>
+          <p class="text-body-sm text-muted mb-2">Valor de backup atribuído: $400/ano</p>
+          <p class="text-body-sm text-muted mb-2">Valor anual total: $764</p>
+          <p class="text-body-sm text-muted"><strong class="text-body-strong">Payback simples: $10.000 ÷ $764 = 13,1 anos</strong></p>
+        </div>
+
+        <h3 class="text-title-md text-primary mb-3">Exemplo 3: Caso de Alta Economia</h3>
+        <div class="bg-surface-soft border border-hairline p-5 mb-4">
+          <p class="text-body-sm text-muted mb-2"><strong class="text-body-strong">Premissas:</strong> tarifa média $0,30/kWh, TOU agressivo (ponta $0,50, fora $0,15), solar com +50% de autoconsumo, incentivo SGIP Califórnia ($2.500).</p>
+          <p class="text-body-sm text-muted mb-2">Custo líquido: $10.000 – $2.500 = $7.500</p>
+          <p class="text-body-sm text-muted mb-2">Arbitragem TOU: 4 kWh/dia × ($0,50 – $0,15) × 365 = $511</p>
+          <p class="text-body-sm text-muted mb-2">Mais autoconsumo: 5 kWh/dia × ($0,30 – $0,05) × 365 = $456</p>
+          <p class="text-body-sm text-muted mb-2">Economia anual total: $967</p>
+          <p class="text-body-sm text-muted mb-2">Valor de backup atribuído: $500/ano</p>
+          <p class="text-body-sm text-muted mb-2">Valor anual total: $1.467</p>
+          <p class="text-body-sm text-muted"><strong class="text-body-strong">Payback simples: $7.500 ÷ $1.467 = 5,1 anos</strong></p>
+        </div>
+
+        <p class="text-body-md text-body font-light">
+          A diferença entre o pior e o melhor caso é dramática — 19 anos contra 5 anos. Sua situação define onde você fica nesse espectro. As variáveis-chave são tarifa, estrutura TOU, pareamento com solar e incentivos disponíveis.
+        </p>
+      </section>
+
+      <!-- Home Battery Payback Period Analysis -->
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Análise de Payback</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          A tabela abaixo resume paybacks em cenários comuns para um sistema LiFePO4 de 10 kWh a $10.000 instalado. Valores excluem o valor de backup — incluí-lo encurta o payback em 2–5 anos na maioria dos casos.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden mb-6">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Cenário</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Tarifa méd.</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Economia anual</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Payback</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">Tarifa baixa, sem TOU, sem solar</td>
+                <td class="p-4 font-mono text-primary">$0,10/kWh</td>
+                <td class="p-4 font-mono text-primary">$183</td>
+                <td class="p-4 font-mono text-primary">55 anos</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Tarifa média, TOU moderado</td>
+                <td class="p-4 font-mono text-primary">$0,18/kWh</td>
+                <td class="p-4 font-mono text-primary">$364</td>
+                <td class="p-4 font-mono text-primary">27 anos</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Tarifa média + autoconsumo solar</td>
+                <td class="p-4 font-mono text-primary">$0,18/kWh</td>
+                <td class="p-4 font-mono text-primary">$553</td>
+                <td class="p-4 font-mono text-primary">18 anos</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Tarifa alta + TOU agressivo + solar</td>
+                <td class="p-4 font-mono text-primary">$0,30/kWh</td>
+                <td class="p-4 font-mono text-primary">$967</td>
+                <td class="p-4 font-mono text-primary">10 anos</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Tarifa alta + TOU + solar + incentivo</td>
+                <td class="p-4 font-mono text-primary">$0,30/kWh</td>
+                <td class="p-4 font-mono text-primary">$967</td>
+                <td class="p-4 font-mono text-primary">7,8 anos</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-body-md text-body font-light">
+          Esses paybacks representam só economia na conta de luz. Não incluem valor do backup, troca de gerador, redução de demanda nem benefícios intangíveis como independência energética. A maioria dos compradores atribui $300–$500/ano ao backup, o que encurta o payback efetivo em 2–5 anos.
+        </p>
+        <p class="text-body-md text-body font-light">
+          <strong class="text-body-strong">Limitação importante:</strong> o payback simples não considera valor do dinheiro no tempo, inflação das tarifas nem degradação. Uma análise rigorosa de VPL ou TIR ajustaria esses números em 15–30%.
+        </p>
+      </section>
+
+      <!-- Financial Benefits Beyond Electricity Savings -->
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Benefícios Além da Economia na Conta</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          A economia pura na conta conta só parte da história. Uma bateria entrega múltiplas fontes de valor que se somam.
+        </p>
+
+        <h3 class="text-title-md text-primary mb-3">Valor do Backup</h3>
+        <p class="text-body-md text-body font-light mb-4">
+          Manter as luzes acesas no apagão tem valor real, ainda que difícil de quantificar. Para quem tem equipamento médico, home office ou alimentos estocados, um único apagão por ano já justifica o backup. Um gerador total custa $10.000–$20.000 instalado, exige combustível a $20–$50 por apagão, emite poluentes e precisa de manutenção anual. A bateria dá o mesmo backup sem combustível, sem emissões e sem manutenção.
+        </p>
+
+        <h3 class="text-title-md text-primary mb-3">Substituição do Gerador</h3>
+        <p class="text-body-md text-body font-light mb-4">
+          Um gerador total de 22 kW custa $10.000–$15.000 instalado, mais $200–$500/ano de manutenção. Em 15 anos, o custo total chega a $13.000–$22.500. Um sistema de bateria de 20 kWh a $14.000–$20.000 dá backup equivalente sem combustível nem manutenção, além de arbitragem TOU e autoconsumo.
+        </p>
+
+        <h3 class="text-title-md text-primary mb-3">Independência Energética</h3>
+        <p class="text-body-md text-body font-light mb-4">
+          Um sistema solar + bateria elimina a dependência da rede no dia a dia e dos reajustes. Com tarifas subindo 3–5% ao ano, o custo fixo da bateria fica cada vez mais atraente. Essa proteção contra a inflação tarifária vale muito para quem planeja ficar 10+ anos na casa.
+        </p>
+
+        <h3 class="text-title-md text-primary mb-3">Redução de Demanda Contratada</h3>
+        <p class="text-body-md text-body font-light mb-4">
+          Algumas distribuidoras cobram demanda conforme o pico de potência. Uma bateria com corte de pico reduz essas cobranças descarregando em períodos de alta carga. Mais comum no comercial, mas cobranças residenciais de demanda crescem em alguns mercados.
+        </p>
+
+        <h3 class="text-title-md text-primary mb-3">Flexibilidade Futura</h3>
+        <p class="text-body-md text-body font-light mb-4">
+          Baterias dão base para futuras expansões energéticas. Adicionar carregador de VE, ampliar o solar ou participar de usinas virtuais (VPP) fica mais prático com infraestrutura existente. Conforme serviços de rede evoluem, donos de bateria podem ganhar despachando energia armazenada nos picos.
+        </p>
+      </section>
+
+      <!-- How Much Battery Storage Does a Home Need? -->
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">De Quanto Armazenamento uma Casa Precisa?</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          O dimensionamento depende de duas perguntas: o que você quer manter ligado e por quanto tempo? Cargas essenciais (geladeira, luzes, roteador, dispositivos médicos) consomem 5–10 kWh por dia. A casa inteira com climatização, aparelhos e água quente consome 20–60+ kWh por dia.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden mb-6">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Tamanho da casa</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Uso diário</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Cargas críticas</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Bateria recomendada</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">Casa pequena / apartamento</td>
+                <td class="p-4 font-mono text-primary">10–15 kWh/dia</td>
+                <td class="p-4 font-mono text-primary">3–5 kWh/dia</td>
+                <td class="p-4 font-mono text-primary">5–10 kWh</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Casa média (140–230 m²)</td>
+                <td class="p-4 font-mono text-primary">20–30 kWh/dia</td>
+                <td class="p-4 font-mono text-primary">5–10 kWh/dia</td>
+                <td class="p-4 font-mono text-primary">10–20 kWh</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Casa grande (230–370 m²)</td>
+                <td class="p-4 font-mono text-primary">30–50 kWh/dia</td>
+                <td class="p-4 font-mono text-primary">8–15 kWh/dia</td>
+                <td class="p-4 font-mono text-primary">15–30 kWh</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Backup total (qualquer tamanho)</td>
+                <td class="p-4 font-mono text-primary">Uso diário cheio</td>
+                <td class="p-4 font-mono text-primary">N/A</td>
+                <td class="p-4 font-mono text-primary">20–50+ kWh</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-body-md text-body font-light">
+          Backup só de críticas é a estratégia mais econômica. Atendendo só circuitos essenciais, você reduz a bateria em 60–80% ante o backup total. Um subquadro de críticas custa $800–$2.000 para instalar e permite backup seletivo. Dá para expandir depois com mais módulos.
+        </p>
+      </section>
+
+      <!-- LiFePO4 vs Other Battery Chemistries -->
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">LiFePO4 vs. Outras Químicas Residenciais</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          A química define vida útil, segurança, custo e manutenção. Todo grande fabricante residencial em 2026 usa LiFePO4 (LFP) como química principal. A comparação abaixo explica o porquê.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden mb-6">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Química</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Vida útil</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Segurança</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Custo</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Manutenção</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">LiFePO4 (LFP)</td>
+                <td class="p-4 font-mono text-primary">3.500 – 7.000</td>
+                <td class="p-4 text-muted">Fuga térmica a ~270°C. Zero cobalto. Química de lítio mais segura.</td>
+                <td class="p-4 font-mono text-primary">$400 – $800/kWh</td>
+                <td class="p-4 text-muted">Nenhuma</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">NMC</td>
+                <td class="p-4 font-mono text-primary">1.500 – 3.000</td>
+                <td class="p-4 text-muted">Fuga térmica a 150–210°C. Cobalto levanta questões éticas e de segurança.</td>
+                <td class="p-4 font-mono text-primary">$400 – $700/kWh</td>
+                <td class="p-4 text-muted">Nenhuma</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">Chumbo-ácido</td>
+                <td class="p-4 font-mono text-primary">1.000 – 2.000</td>
+                <td class="p-4 text-muted">Não inflamável. Química conhecida. Risco de hidrogênio em locais fechados.</td>
+                <td class="p-4 font-mono text-primary">$150 – $300/kWh</td>
+                <td class="p-4 text-muted">Trimestral: água, equalização, limpeza de terminais</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">Sódio-íon</td>
+                <td class="p-4 font-mono text-primary">2.000 – 4.000</td>
+                <td class="p-4 text-muted">Segurança similar ao LFP. Sem risco de cadeia do lítio. Química emergente.</td>
+                <td class="p-4 font-mono text-primary">$200 – $500/kWh</td>
+                <td class="p-4 text-muted">Nenhuma</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-body-md text-body font-light">
+          <strong class="text-body-strong">Recomendação:</strong> LiFePO4 é a escolha clara para armazenamento residencial em 2026. Seus 3.500–7.000 ciclos entregam 10–15+ anos de uso diário. A estabilidade a 270°C dá a maior margem de segurança. Zero cobalto elimina dilemas éticos da cadeia. O custo inicial maior ante o chumbo-ácido se compensa com vida 3–5x maior e zero manutenção. Sódio-íon é uma alternativa emergente promissora em custo e segurança, mas com pouca oferta residencial em 2026.
+        </p>
+      </section>
+
+      <!-- Common Home Battery Buying Mistakes -->
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Erros Comuns ao Comprar Bateria Residencial</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Estes erros custam milhares de dólares e prejudicam o desempenho. Conhecê-los ajuda a decidir melhor.
+        </p>
+
+        <div class="flex flex-col gap-4">
+          <div class="bg-surface-soft border border-hairline p-5">
+            <h4 class="text-primary font-bold mb-2">1. Comprar Sem Calcular a Necessidade Real</h4>
+            <p class="text-body-sm text-muted">Muita gente compra pelo marketing em vez de análise de cargas. Um sistema de 30 kWh para uma casa que precisa de 10 kWh desperdiça $12.000–$15.000 em capacidade ociosa. Calcule sempre suas cargas críticas e a autonomia desejada antes de escolher o tamanho.</p>
+          </div>
+
+          <div class="bg-surface-soft border border-hairline p-5">
+            <h4 class="text-primary font-bold mb-2">2. Ignorar o Custo do Inversor</h4>
+            <p class="text-body-sm text-muted">Orçamentos que listam só o hardware omitem o inversor híbrido de $2.000–$5.000 que torna o sistema funcional. Peça sempre orçamento itemizado separando bateria, inversor, elétrica e licenças. O inversor representa 20–30% do custo total.</p>
+          </div>
+
+          <div class="bg-surface-soft border border-hairline p-5">
+            <h4 class="text-primary font-bold mb-2">3. Escolher Chumbo-Ácido em Vez de LiFePO4</h4>
+            <p class="text-body-sm text-muted">O custo inicial menor do chumbo-ácido ($150–$300/kWh) engana. Com 50% de profundidade, você precisa do dobro da capacidade nominal. Com 1.000–2.000 ciclos contra 3.500–7.000, o chumbo-ácido exige 3–5 trocas na vida do sistema. O custo total do chumbo-ácido é 40–60% maior que o LFP.</p>
+          </div>
+
+          <div class="bg-surface-soft border border-hairline p-5">
+            <h4 class="text-primary font-bold mb-2">4. Não Verificar o Quadro Elétrico</h4>
+            <p class="text-body-sm text-muted">Casas antigas com quadros de 100A ou 125A podem exigir upgrade de $1.500–$4.000 para receber a bateria. Esse custo surpresa aparece após assinar o contrato. Verifique a capacidade do quadro antes de fechar o tamanho.</p>
+          </div>
+
+          <div class="bg-surface-soft border border-hairline p-5">
+            <h4 class="text-primary font-bold mb-2">5. Desconsiderar Incentivos Estaduais</h4>
+            <p class="text-body-sm text-muted">SGIP da Califórnia, NYSERDA de Nova York, Connecticut, Colorado e outros oferecem $5.000–$16.000 em incentivos. Não consultar a base DSIRE antes de comprar é deixar dinheiro na mesa. Alguns programas têm requisitos de renda ou prazos.</p>
+          </div>
+
+          <div class="bg-surface-soft border border-hairline p-5">
+            <h4 class="text-primary font-bold mb-2">6. Comprar Sistema Grande Demais</h4>
+            <p class="text-body-sm text-muted">Baterias superdimensionadas que nunca descarregam totalmente desperdiçam capacidade paga. Um sistema de 20 kWh para uma casa que desloca 5 kWh diários opera a 25% de utilização. Dimensione pelo consumo real e expanda depois se preciso.</p>
+          </div>
+
+          <div class="bg-surface-soft border border-hairline p-5">
+            <h4 class="text-primary font-bold mb-2">7. Não Pedir Múltiplos Orçamentos</h4>
+            <p class="text-body-sm text-muted">Preços de instaladores variam 20–40% para o mesmo equipamento. Um único orçamento pode inflar custos ou empurrar upgrades desnecessários. Peça pelo menos 3 orçamentos de instaladores certificados e compare item por item, não só o total.</p>
+          </div>
+
+          <div class="bg-surface-soft border border-hairline p-5">
+            <h4 class="text-primary font-bold mb-2">8. Ignorar Termos de Garantia</h4>
+            <p class="text-body-sm text-muted">Garantias variam muito no que cobrem. Algumas garantem só 70% de retenção após 10 anos; outras, 80%. Algumas exigem instalação profissional; outras anulam para DIY. Leia o documento de garantia, não só o número de capa.</p>
+          </div>
+
+          <div class="bg-surface-soft border border-hairline p-5">
+            <h4 class="text-primary font-bold mb-2">9. Esquecer Monitoramento e Conectividade</h4>
+            <p class="text-body-sm text-muted">Algumas baterias exigem apps proprietários que não integram ao monitoramento solar existente. Outras cobram à parte pelo monitoramento em nuvem ($200–$500). Verifique compatibilidade e custos recorrentes antes de comprar.</p>
+          </div>
+
+          <div class="bg-surface-soft border border-hairline p-5">
+            <h4 class="text-primary font-bold mb-2">10. Achar que Bateria Funciona sem Solar</h4>
+            <p class="text-body-sm text-muted">Sem painéis, a bateria só desloca energia da rede de um horário para outro. Em tarifas médias sem TOU, isso economiza muito pouco. Baterias sem solar se justificam como backup, não como economia.</p>
+          </div>
+
+          <div class="bg-surface-soft border border-hairline p-5">
+            <h4 class="text-primary font-bold mb-2">11. Não Considerar o Local de Instalação</h4>
+            <p class="text-body-sm text-muted">O local afeta desempenho, segurança e custo. Instalações externas exigem gabinetes à prova de tempo. Em garagem, pode exigir ventilação por norma. Trechos longos até o quadro elevam a elétrica em $500–$2.000.</p>
+          </div>
+
+          <div class="bg-surface-soft border border-hairline p-5">
+            <h4 class="text-primary font-bold mb-2">12. Não Planejar Expansão</h4>
+            <p class="text-body-sm text-muted">Escolher um sistema não expansível limita a flexibilidade futura. Sistemas modulares permitem adicionar módulos conforme a necessidade cresce ou as tarifas sobem. Verifique se inversor e elétrica suportam futuras adições antes de fechar.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Use Our Home Battery Planning Tools -->
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Use Nossas Ferramentas de Planejamento</h2>
+        <p class="text-body-md text-body font-light mb-6">
+          Estas calculadoras gratuitas ajudam a dimensionar seu sistema, estimar a autonomia de backup e definir a configuração ideal para seu consumo e metas.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CalculatorCard>
+            <h3 class="text-primary font-bold mb-2">Calculadora de Bateria de Backup Residencial</h3>
+            <p class="text-body-sm text-muted mb-4">Calcule a capacidade para backup de cargas críticas em apagões. Informe seus circuitos essenciais, potência e autonomia desejada.</p>
+            <a href="/pt/tools/home-backup-battery-calculator/" class="text-m-blue-light hover:underline text-sm uppercase tracking-wider font-bold">Usar Calculadora →</a>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h3 class="text-primary font-bold mb-2">Calculadora de Dimensionamento de Bateria</h3>
+            <p class="text-body-sm text-muted mb-4">Dimensionamento geral para qualquer aplicação. Calcule capacidade, autonomia e contagem de células a partir de cargas e tensão.</p>
+            <a href="/pt/tools/battery-sizing-calculator/" class="text-m-blue-light hover:underline text-sm uppercase tracking-wider font-bold">Usar Calculadora →</a>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h3 class="text-primary font-bold mb-2">Calculadora de Dimensionamento Solar</h3>
+            <p class="text-body-sm text-muted mb-4">Determine o tamanho ideal para solar + armazenamento com base em consumo diário, autonomia, química e profundidade de descarga.</p>
+            <a href="/pt/tools/solar-battery-sizing-calculator/" class="text-m-blue-light hover:underline text-sm uppercase tracking-wider font-bold">Usar Calculadora →</a>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <!-- Guias Relacionados -->
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Guias Relacionados</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <a href="/pt/learn/home-battery-sizing-guide/" class="bg-surface-card border border-hairline p-5 hover:border-m-blue-light transition-colors">
+            <h3 class="text-primary font-bold mb-2">Guia de Dimensionamento Residencial</h3>
+            <p class="text-body-sm text-muted">Passo a passo para dimensionar um backup residencial com base no consumo real e nas necessidades.</p>
+          </a>
+          <a href="/pt/learn/solar-battery-cost-breakdown-2026/" class="bg-surface-card border border-hairline p-5 hover:border-m-blue-light transition-colors">
+            <h3 class="text-primary font-bold mb-2">Custos de Bateria Solar em 2026</h3>
+            <p class="text-body-sm text-muted">Detalhamento completo dos custos: preços, instalação, custo por kWh, paybacks e ROI.</p>
+          </a>
+          <a href="/pt/learn/solar-battery-storage-explained/" class="bg-surface-card border border-hairline p-5 hover:border-m-blue-light transition-colors">
+            <h3 class="text-primary font-bold mb-2">Armazenamento Solar Explicado</h3>
+            <p class="text-body-sm text-muted">Como funciona o armazenamento solar, da química às arquiteturas e integração com o solar residencial.</p>
+          </a>
+          <a href="/pt/learn/what-is-battery-sizing/" class="bg-surface-card border border-hairline p-5 hover:border-m-blue-light transition-colors">
+            <h3 class="text-primary font-bold mb-2">O Que É Dimensionamento de Bateria?</h3>
+            <p class="text-body-sm text-muted">Fundamentos: capacidade, tensão, C-rate e profundidade de descarga com fórmulas práticas.</p>
+          </a>
+        </div>
+      </section>
+
+      <!-- Formula Section -->
+      <section>
+        <FormulaBox title="Fórmulas-Chave">
+          <div class="bg-surface-soft border border-hairline p-5">
+            <p class="text-primary font-bold mb-2">Payback Simples</p>
+            <p class="text-muted">Custo líquido após incentivos ($) ÷ Economia anual ($) = Payback (anos)</p>
+          </div>
+          <div class="bg-surface-soft border border-hairline p-5">
+            <p class="text-primary font-bold mb-2">Economia Anual com Arbitragem TOU</p>
+            <p class="text-muted">kWh deslocados/dia × (Tarifa de ponta – Tarifa fora de ponta) × 365 = Economia anual ($)</p>
+          </div>
+          <div class="bg-surface-soft border border-hairline p-5">
+            <p class="text-primary font-bold mb-2">Melhoria do Autoconsumo Solar</p>
+            <p class="text-muted">kWh consumidos localmente/dia × (Tarifa de consumo – Tarifa de injeção) × 365 = Economia anual ($)</p>
+          </div>
+          <div class="bg-surface-soft border border-hairline p-5">
+            <p class="text-primary font-bold mb-2">Capacidade Total Necessária</p>
+            <p class="text-muted">Consumo diário (kWh) ÷ (DoD × Eficiência do inversor) = Capacidade necessária (kWh)</p>
+          </div>
+        </FormulaBox>
+      </section>
+
+      <!-- FAQ Section -->
+      <FAQSection items={faqItems} />
+
+      <!-- Disclaimer -->
+      <section class="border-t border-hairline pt-8">
+        <p class="text-body-sm text-muted">
+          <strong class="text-body-strong">Aviso:</strong> Este artigo traz informações gerais para fins educacionais e de planejamento. Não constitui aconselhamento financeiro, elétrico ou de engenharia. Custos, economias e paybacks reais variam por região, tarifas, equipamentos, complexidade de instalação e padrões de consumo. Preços refletem estimativas de mercado de 2026, sem garantia de valores específicos. Informações sobre créditos fiscais refletem a política na data de publicação e podem mudar. Obtenha sempre orçamentos itemizados de instaladores certificados e consulte um eletricista licenciado para o projeto final. BatteryCalculators.com não é afiliado a fabricantes ou instaladores. Use nossas calculadoras apenas para planejamento.
+        </p>
+      </section>
+
+    </div>
+  </div>
+</Layout>

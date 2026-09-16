@@ -1,0 +1,308 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "Quanto tempo dura uma bateria marítima de 100Ah?",
+    answer: "Com carga moderada de 50W, uma bateria 12V de 100Ah fornece cerca de 12 horas (1.200Wh ÷ 50W). A autonomia real depende de perfil de carga, química, temperatura e idade. Reduza sempre 15–20% para condições marítimas.",
+  },
+  {
+    question: "Qual é o maior dreno em um barco?",
+    answer: "A refrigeração é tipicamente a maior carga individual, drenando 40–80W contínuos. Motores de pesca podem picar 1.000W+ sob carga, mas rodam intermitentemente. Eletrônicos de navegação, iluminação, bombas d'água também contribuem bastante.",
+  },
+  {
+    question: "Devo dimensionar para 2 ou 3 dias?",
+    answer: "Para pescarias de fim de semana, 1–2 dias de autonomia é típico. Para cruzeiros ou liveaboards, 2–3 dias dá margem para atrasos climáticos ou fundeio estendido. Uma autonomia de 2 dias a 50% DoD dá reserva prática sem bancos gigantes.",
+  },
+  {
+    question: "Posso usar baterias de carro no barco?",
+    answer: "Não. Baterias de carro (partida) são feitas para picos curtos de alta corrente, não ciclagem profunda sustentada. Usá-las para serviços marítimos causa perda rápida e falha prematura. Use sempre marítimas de ciclo profundo classificadas para o perfil de descarga.",
+  },
+];
+---
+
+<Layout
+  title="Guia de Autonomia de Bateria para Barcos | Calculadoras de Bateria"
+  description="Calcule quanto tempo seu banco marítimo alimenta motores de pesca, sonares, navegação, luzes e outras cargas. Inclui tabelas e exemplos práticos."
+  canonical="https://batterycalculators.com/pt/learn/boat-battery-runtime-guide/"
+  schema="faqPage"
+  schemaName="Guia de Autonomia de Bateria para Barcos"
+  schemaDescription="Guia de engenharia para calcular autonomia marítima em barcos e iates."
+  schemaUrl="https://batterycalculators.com/pt/learn/boat-battery-runtime-guide/"
+  faqItems={faqItems}
+  lang="pt"
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/pt/learn/" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Voltar aos Guias</a>
+      <Breadcrumb items={[
+        { label: "Centro de Aprendizagem", href: "/pt/learn/" },
+        { label: "Guia de Autonomia para Barcos" }
+      ]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">MARÍTIMO</span>
+      <h1 class="text-display-md text-primary mb-6">Guia de Autonomia de Bateria para Barcos</h1>
+      <p class="text-body-md text-body font-light">
+        Autonomia no barco é uma restrição crítica de engenharia. Diferente de sistemas conectados, um banco marítimo deve carregar todas as cargas sozinho por horas — de fundeio noturno a longas sessões de pesca. Este guia cobre o método para estimar autonomia nas categorias comuns e explica os fatores que reduzem o desempenho real abaixo do nominal.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Entendendo a Autonomia Marítima</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          A autonomia marítima depende de três variáveis: energia total disponível (Wh), carga média (W) e eficiência do sistema. O cálculo fundamental é direto — dividir energia utilizável pela potência — mas aplicações marítimas complicam. Vibração, extremos térmicos, corrosão por maresia e altas correntes intermitentes (bombas, guincho) degradam a capacidade utilizável abaixo do nominal.
+        </p>
+        <p class="text-body-md text-body font-light mb-4">
+          O erro mais comum é usar o Ah nominal direto. Chumbo-ácido perde 20–40% da capacidade utilizável em taxas maiores pelo efeito Peukert. Lítio vai melhor, mas ainda perde no frio e com a idade. Reduza sempre 15–25% para condições marítimas.
+        </p>
+      </section>
+
+      <FormulaBox title="Fórmula de Autonomia">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Autonomia (h) = Energia Utilizável (Wh) / Carga Total (W)
+        </div>
+        <p>
+          Energia Utilizável = Capacidade (Ah) × Tensão (V) × DoD × Fator de Eficiência
+        </p>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Redução Marítima: Multiplique o resultado × 0,80 a 0,85
+        </div>
+        <p>
+          Isso cobre perdas Peukert (chumbo-ácido), redução por temperatura e consumos parasitas fora do inventário.
+        </p>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Cargas Marítimas Comuns e Autonomias</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          A tabela traz consumos típicos para cargas elétricas marítimas comuns. Valores assumem LED e eletrônicos modernos. Lâmpadas incandescentes ou instrumentos analógicos drenam bem mais.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Carga</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Potência Típica (W)</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Autonomia em 100Ah 12V</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">Motor de pesca (vel. média)</td>
+                <td class="p-4 font-mono text-primary">150–300 W</td>
+                <td class="p-4 font-mono text-primary">3–6 h</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Sonar / chartplotter</td>
+                <td class="p-4 font-mono text-primary">15–30 W</td>
+                <td class="p-4 font-mono text-primary">25–50 h</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Luzes de navegação (LED)</td>
+                <td class="p-4 font-mono text-primary">5–15 W</td>
+                <td class="p-4 font-mono text-primary">50–150 h</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Luzes da cabine (LED)</td>
+                <td class="p-4 font-mono text-primary">20–40 W</td>
+                <td class="p-4 font-mono text-primary">20–40 h</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Geladeira</td>
+                <td class="p-4 font-mono text-primary">40–80 W</td>
+                <td class="p-4 font-mono text-primary">10–20 h</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Rádio VHF</td>
+                <td class="p-4 font-mono text-primary">5–25 W</td>
+                <td class="p-4 font-mono text-primary">30–150 h</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Bomba d'água</td>
+                <td class="p-4 font-mono text-primary">5–10 W</td>
+                <td class="p-4 font-mono text-primary">70–140 h</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Luz de fundeio (LED)</td>
+                <td class="p-4 font-mono text-primary">5–10 W</td>
+                <td class="p-4 font-mono text-primary">70–140 h</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Bomba de porão</td>
+                <td class="p-4 font-mono text-primary">20–40 W</td>
+                <td class="p-4 font-mono text-primary">20–40 h</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-body-sm text-muted mt-4">
+          Estimativas assumem bateria 100Ah 12V a 80% DoD com 85% de eficiência. A autonomia real varia por ciclos de trabalho e idade.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Método de Perfil de Carga</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Uma carga isolada não conta a história. Barcos rodam múltiplas cargas simultâneas — pesca e navegação de dia, luzes e cabine à noite. Para estimar a autonomia real, monte um perfil por modo operacional e some os watt-horas de cada período.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Modo</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Cargas Ativas</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Consumo Combinado</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">Pesca diurna</td>
+                <td class="p-4 text-muted">Motor de pesca + sonar + navegação</td>
+                <td class="p-4 font-mono text-primary">180–350 W</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Fundeio noturno</td>
+                <td class="p-4 text-muted">Fundeio + cabine + geladeira + VHF</td>
+                <td class="p-4 font-mono text-primary">80–160 W</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Navegando</td>
+                <td class="p-4 text-muted">Eletrônicos + instrumentos + bombas</td>
+                <td class="p-4 font-mono text-primary">100–250 W</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Exemplo Prático: Fundeio Noturno</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Cenário:</strong> Banco AGM 12V 200Ah, fundeado à noite com as cargas:</p>
+            <table class="w-full text-left text-body-sm my-2">
+              <thead>
+                <tr class="border-b border-hairline">
+                  <th class="p-2 text-label-uppercase text-primary text-xs tracking-wider">Carga</th>
+                  <th class="p-2 text-label-uppercase text-primary text-xs tracking-wider">Potência</th>
+                  <th class="p-2 text-label-uppercase text-primary text-xs tracking-wider">Horas</th>
+                  <th class="p-2 text-label-uppercase text-primary text-xs tracking-wider">Wh</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-hairline">
+                <tr>
+                  <td class="p-2 text-muted">Luz de fundeio</td>
+                  <td class="p-2 font-mono text-primary">8 W</td>
+                  <td class="p-2 font-mono text-primary">12 h</td>
+                  <td class="p-2 font-mono text-primary">96 Wh</td>
+                </tr>
+                <tr>
+                  <td class="p-2 text-muted">Luzes da cabine</td>
+                  <td class="p-2 font-mono text-primary">30 W</td>
+                  <td class="p-2 font-mono text-primary">4 h</td>
+                  <td class="p-2 font-mono text-primary">120 Wh</td>
+                </tr>
+                <tr>
+                  <td class="p-2 text-muted">Geladeira</td>
+                  <td class="p-2 font-mono text-primary">50 W</td>
+                  <td class="p-2 font-mono text-primary">12 h</td>
+                  <td class="p-2 font-mono text-primary">600 Wh</td>
+                </tr>
+                <tr>
+                  <td class="p-2 text-muted">Rádio VHF</td>
+                  <td class="p-2 font-mono text-primary">8 W</td>
+                  <td class="p-2 font-mono text-primary">2 h</td>
+                  <td class="p-2 font-mono text-primary">16 Wh</td>
+                </tr>
+              </tbody>
+            </table>
+            <p><strong>Etapa 1:</strong> Energia noturna total:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              96 + 120 + 600 + 16 = 832 Wh
+            </div>
+            <p><strong>Etapa 2:</strong> Aplicar redução marítima (0,85):</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              832 Wh / 0,85 = 979 Wh necessários do banco
+            </div>
+            <p><strong>Etapa 3:</strong> Converter para Ah em 12V com 50% DoD (AGM):</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              979 Wh / (0,50 × 12V) = 163 Ah
+            </div>
+            <p><strong>Etapa 4:</strong> Um banco AGM de 200Ah fornece 100 Ah utilizáveis a 50% DoD — suficiente com margem. Um banco de 300Ah seria recomendado se houver pesca diurna também.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Fatores que Reduzem a Autonomia</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Temperatura</h4>
+            <p class="text-body-sm text-muted">
+              A capacidade cai 10–20% no frio (abaixo de 10°C). Fundeios frios de madrugada reduzem bastante a autonomia noturna ante cálculos de clima quente.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Idade da Bateria</h4>
+            <p class="text-body-sm text-muted">
+              Chumbo-ácido perde 20–30% após 300–500 ciclos. Um banco AGM com 2 anos pode entregar só 70–80% do nominal. Considere o envelhecimento ao dimensionar para várias temporadas.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Efeito Peukert</h4>
+            <p class="text-body-sm text-muted">
+              Chumbo-ácido perde capacidade utilizável em taxas maiores. Uma bateria de 100Ah descarregando a 10A pode entregar só 60–70Ah. A 2A chega mais perto dos 100Ah nominais.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Cargas Parasitas</h4>
+            <p class="text-body-sm text-muted">
+              Monitores, controladores de porão, relógios e alarmes drenam 5–20W contínuos. Em 12–24 horas, somam 60–480 Wh ao consumo.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Experimente</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use a Calculadora Marítima com suas cargas para uma recomendação de banco.
+          </p>
+          <a href="/pt/tools/marine-battery-sizing-calculator/" class="btn-primary text-xs py-3 px-6 inline-block">Abrir Calculadora Marítima</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Próxima Etapa</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Calcule quanto tempo seu banco dura com seu perfil usando a Calculadora de Autonomia.
+          </p>
+          <a href="/pt/tools/runtime-calculator/" class="btn-primary text-xs py-3 px-6 inline-block">Abrir Calculadora de Autonomia</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Artigos Relacionados</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <a href="/pt/learn/marine-battery-sizing-guide/" class="text-primary hover:underline font-bold block mb-2">Guia de Dimensionamento Marítimo</a>
+            <p class="text-body-sm text-muted">
+              O método completo para dimensionar bancos marítimos, incluindo cargas de hotel, modos e seleção de química.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <a href="/pt/learn/marine-hotel-load-guide/" class="text-primary hover:underline font-bold block mb-2">Guia de Cargas de Hotel Marítimas</a>
+            <p class="text-body-sm text-muted">
+              Como inventariar e calcular cargas de hotel — a base de autonomia e dimensionamento precisos.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

@@ -1,0 +1,255 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "Qual é a diferença entre ligações de bateria em série e em paralelo?",
+    answer: "Ligações em série somam tensões mantendo a capacidade constante — duas baterias 12V 100Ah em série produzem 24V 100Ah. Ligações em paralelo somam capacidade mantendo a tensão constante — duas baterias 12V 100Ah em paralelo produzem 12V 200Ah. A série aumenta a tensão para menor consumo de corrente; o paralelo aumenta a autonomia para cargas maiores.",
+  },
+  {
+    question: "Posso misturar baterias de capacidades diferentes em paralelo?",
+    answer: "Não recomendado. Baterias em paralelo devem ter mesma capacidade, idade, química e estado de carga. Baterias incompatíveis causam distribuição desigual de corrente — a bateria mais forte carrega a mais fraca, levando à degradação prematura. Use sempre baterias idênticas em strings paralelas.",
+  },
+  {
+    question: "Como calculo a energia total para configurações série-paralelo?",
+    answer: "Energia total (Wh) = Tensão Total × Capacidade Total. Para uma configuração 4S2P de células 3,2V 100Ah: 4 em série = 12,8V, 2 em paralelo = 200Ah. Energia = 12,8V × 200Ah = 2.560 Wh. A energia total é simplesmente a soma das energias de todas as células individuais, independentemente da configuração.",
+  },
+  {
+    question: "Qual configuração oferece mais autonomia — série ou paralelo?",
+    answer: "Para o mesmo total de baterias, a série oferece tensão maior (menor consumo de corrente para a mesma carga), enquanto o paralelo oferece maior capacidade. A autonomia depende da potência da carga e da energia disponível. Duas configurações idênticas armazenam a mesma energia total — a diferença está nas características de tensão e entrega de corrente.",
+  },
+];
+---
+
+<Layout
+  title="Baterias em Série vs Paralelo | Calculadoras de Bateria"
+  description="Entenda ligações de bateria em série vs paralelo: como tensão, capacidade e regras de configuração afetam o projeto de packs de bateria. Inclui exemplos resolvidos e cálculos."
+  canonical="https://batterycalculators.com/pt/learn/series-vs-parallel-batteries/"
+  schema="faqPage"
+  schemaName="Baterias em Série vs Paralelo"
+  schemaDescription="Guia de engenharia sobre ligações de bateria em série e paralelo para projeto de packs."
+  schemaUrl="https://batterycalculators.com/pt/learn/series-vs-parallel-batteries/"
+  faqItems={faqItems}
+  lang="pt"
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/pt/learn/" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Voltar aos Guias</a>
+      <Breadcrumb items={[
+        { label: "Centro de Aprendizagem", href: "/pt/learn/" },
+        { label: "Baterias em Série vs Paralelo" }
+      ]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">ELÉTRICA</span>
+      <h1 class="text-display-md text-primary mb-6">Baterias em Série vs Paralelo</h1>
+      <p class="text-body-md text-body font-light">
+        Todo pack de baterias é construído a partir de células individuais ligadas em série, em paralelo ou em uma combinação de ambos. O método de ligação determina a tensão, a capacidade e as características de entrega de corrente do pack. Entender as regras de série e paralelo é fundamental para projetar packs de bateria para qualquer aplicação — de bancos marítimos 12V a sistemas residenciais de 48V.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Ligações em Série</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Em uma ligação em série, o terminal positivo de uma célula conecta-se ao terminal negativo da seguinte. As tensões se somam enquanto a capacidade permanece a de uma única célula. Ligações em série são usadas para montar packs de tensão mais alta a partir de células de tensão menor — por exemplo, montar um pack 48V a partir de células LFP de 3,2V exige 16 células em série (16S).
+        </p>
+        <p class="text-body-md text-body font-light">
+          A principal vantagem das ligações em série é a corrente reduzida para a mesma potência. Um sistema 48V entregando 2.000W consome 41,7A, enquanto um sistema 12V entregando a mesma potência consome 166,7A. Menor corrente significa cabos mais finos, barramentos menores e perdas resistivas reduzidas.
+        </p>
+      </section>
+
+      <FormulaBox title="Regras de Ligação em Série">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          V_total = V_célula × Número em Série (Ns)
+          Ah_total = Ah_célula (inalterado)
+        </div>
+        <p>
+          Duas células LFP 3,2V 100Ah em série: V = 3,2 × 2 = 6,4V, Ah = 100Ah. Quatro células: V = 12,8V, Ah = 100Ah. Dezesseis células: V = 51,2V, Ah = 100Ah.
+        </p>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Energia (Wh) = V_total × Ah_total
+        </div>
+        <p>
+          A energia é a mesma independentemente do número em série — você está rearranjando células, não adicionando. Quatro células 3,2V 100Ah armazenam 1.280 Wh tanto em 1S4P (3,2V 400Ah) quanto em 4S1P (12,8V 100Ah).
+        </p>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Ligações em Paralelo</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Em uma ligação em paralelo, todos os terminais positivos conectam-se entre si e todos os terminais negativos conectam-se entre si. A capacidade se soma enquanto a tensão permanece a de uma única célula. Ligações em paralelo são usadas para aumentar o armazenamento total de energia e a capacidade de entrega de corrente de um pack.
+        </p>
+        <p class="text-body-md text-body font-light">
+          Strings paralelas devem ser cuidadosamente combinadas. Todas as células em paralelo devem ter capacidade, resistência interna, idade e estado de carga idênticos. Células incompatíveis causam distribuição desigual de corrente — a célula mais forte carrega a mais fraca durante o repouso, e a mais fraca limita o pack durante a descarga.
+        </p>
+      </section>
+
+      <FormulaBox title="Regras de Ligação em Paralelo">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          V_total = V_célula (inalterado)
+          Ah_total = Ah_célula × Número em Paralelo (Np)
+        </div>
+        <p>
+          Duas células LFP 3,2V 100Ah em paralelo: V = 3,2V, Ah = 200Ah. O pack pode entregar o dobro da corrente de uma única célula e armazena o dobro da energia.
+        </p>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Corrente Máx = I_célula × Número em Paralelo (Np)
+        </div>
+        <p>
+          Se cada célula pode entregar 100A contínuos com segurança, duas em paralelo podem entregar 200A. Este é o principal motivo para ligações em paralelo em aplicações de alta potência.
+        </p>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Configurações Série-Paralelo (Mistas)</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          A maioria dos packs reais usa uma combinação de ligações em série e paralelo, expressa como XSYP, onde X é o número em série e Y o número em paralelo. Por exemplo, uma configuração 4S2P significa 4 células em série, com cada posição em série tendo 2 células em paralelo.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Configuração</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Tensão</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Capacidade</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Energia</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">1S1P (célula única)</td>
+                <td class="p-4 font-mono text-primary">3.2V</td>
+                <td class="p-4 font-mono text-primary">100Ah</td>
+                <td class="p-4 font-mono text-primary">320 Wh</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">4S1P</td>
+                <td class="p-4 font-mono text-primary">12.8V</td>
+                <td class="p-4 font-mono text-primary">100Ah</td>
+                <td class="p-4 font-mono text-primary">1,280 Wh</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">4S2P</td>
+                <td class="p-4 font-mono text-primary">12.8V</td>
+                <td class="p-4 font-mono text-primary">200Ah</td>
+                <td class="p-4 font-mono text-primary">2,560 Wh</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">8S1P</td>
+                <td class="p-4 font-mono text-primary">25.6V</td>
+                <td class="p-4 font-mono text-primary">100Ah</td>
+                <td class="p-4 font-mono text-primary">2,560 Wh</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">16S1P</td>
+                <td class="p-4 font-mono text-primary">51.2V</td>
+                <td class="p-4 font-mono text-primary">100Ah</td>
+                <td class="p-4 font-mono text-primary">5,120 Wh</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">16S2P</td>
+                <td class="p-4 font-mono text-primary">51.2V</td>
+                <td class="p-4 font-mono text-primary">200Ah</td>
+                <td class="p-4 font-mono text-primary">10,240 Wh</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Exemplo Resolvido: Série vs Paralelo</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Cenário:</strong> Você tem oito células LFP 3,2V 100Ah. Compare as configurações 4S2P e 8S1P.</p>
+            <p><strong>Configuração 4S2P (12,8V, 200Ah):</strong></p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              V = 3.2 × 4 = 12.8V
+              Ah = 100 × 2 = 200Ah
+              Energia = 12.8 × 200 = 2,560 Wh
+              Corrente Máx (por célula 100A): 200A
+            </div>
+            <p><strong>Configuração 8S1P (25,6V, 100Ah):</strong></p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              V = 3.2 × 8 = 25.6V
+              Ah = 100 × 1 = 100Ah
+              Energia = 25.6 × 100 = 2,560 Wh
+              Corrente Máx (por célula 100A): 100A
+            </div>
+            <p><strong>Resultado:</strong> Ambas armazenam 2.560 Wh — energia total idêntica. A configuração 4S2P oferece maior capacidade de corrente (200A vs 100A) em tensão menor. A 8S1P oferece tensão maior (25,6V vs 12,8V) com menor consumo de corrente para a mesma carga. Escolha com base na tensão do seu sistema e nos requisitos de corrente da carga.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Diretrizes de Seleção de Configuração</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Use Série Quando</h4>
+            <p class="text-body-sm text-muted">
+              Você precisa de tensão maior no sistema para reduzir o consumo de corrente. Cargas de alta potência (inversores, motores) se beneficiam de sistemas 24V ou 48V que usam cabos mais finos e sofrem menor queda de tensão em longos percursos.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Use Paralelo Quando</h4>
+            <p class="text-body-sm text-muted">
+              Você precisa de maior capacidade ou entrega de corrente em uma tensão existente. Adicionar strings paralelas estende a autonomia e permite correntes de descarga maiores sem aumentar a tensão do sistema.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Combine Todas as Células</h4>
+            <p class="text-body-sm text-muted">
+              Todas as células de um pack devem ser do mesmo fabricante, mesmo lote, mesma capacidade e mesma idade. Células incompatíveis causam desequilíbrio, reduzem a capacidade utilizável e aceleram a degradação da célula mais fraca.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Requisitos de BMS</h4>
+            <p class="text-body-sm text-muted">
+              Ligações em série exigem balanceamento de células — passivo (sangria resistiva) ou ativo (transferência de energia). Um BMS monitora as tensões individuais das células e desconecta o pack se alguma célula exceder limites seguros.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Experimente</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use a Calculadora de Pack de Bateria para modelar configurações em série, paralelo e mistas para suas células.
+          </p>
+          <a href="/pt/tools/battery-pack-calculator/" class="btn-primary text-xs py-3 px-6 inline-block">Abrir Calculadora de Pack de Bateria</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Próxima Etapa</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Calcule a divisão de corrente e o equilíbrio de strings paralelas com a Calculadora de Strings Paralelas.
+          </p>
+          <a href="/pt/tools/parallel-string-calculator/" class="btn-primary text-xs py-3 px-6 inline-block">Abrir Calculadora de Strings Paralelas</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Artigos Relacionados</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <a href="/pt/learn/battery-pack-design-basics/" class="text-primary hover:underline font-bold block mb-2">Fundamentos de Projeto de Pack de Bateria</a>
+            <p class="text-body-sm text-muted">
+              Introdução ao projeto de packs de bateria cobrindo seleção de células, BMS, fiação e considerações de segurança.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <a href="/pt/learn/battery-voltage-systems/" class="text-primary hover:underline font-bold block mb-2">Sistemas de Tensão de Bateria</a>
+            <p class="text-body-sm text-muted">
+              Sistemas comuns de tensão de bateria (12V, 24V, 36V, 48V) e como são montados a partir de células individuais.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

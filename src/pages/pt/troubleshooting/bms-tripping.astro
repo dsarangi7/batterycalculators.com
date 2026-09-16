@@ -1,0 +1,186 @@
+---
+import ArticleLayout from '../../../layouts/ArticleLayout.astro';
+import TroubleshootingBlock from '../../../components/TroubleshootingBlock.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+
+const description = "Descubra por que seu BMS continua desconectando a bateria. Abrange gatilhos de proteção de sobretensão, subtensão, sobrecorrente, sobretemperatura e desequilíbrio de células com listas de verificação de diagnóstico.";
+
+const faqItems = [
+  {
+    question: "Como sei qual proteção do BMS acionou a desconexão?",
+    answer: "A maioria das unidades de BMS tem indicadores LED ou aplicativos Bluetooth que registram o último código de falha. Consulte o manual do BMS para definições dos códigos. Códigos comuns: OV (sobretensão), UV (subtensão), OC (sobrecorrente), OT (sobretemperatura). Se não houver registro disponível, o momento e as condições da desconexão dão pistas.",
+  },
+  {
+    question: "Um BMS pode ser sensível demais e desarmar sem motivo?",
+    answer: "Sim. Um BMS mal calibrado pode desarmar com a queda normal de tensão durante cargas de alta corrente, ou seu sensor de temperatura pode estar montado em um ponto quente que não representa a temperatura das células. Verifique os limites de disparo contra as especificações do fabricante da bateria e garanta que os sensores estejam bem posicionados.",
+  },
+  {
+    question: "O BMS protege contra curto-circuito total?",
+    answer: "Um BMS em bom funcionamento deve detectar sobrecorrente e desconectar em milissegundos. Porém, correntes de curto extremamente rápidas podem danificar os MOSFETs do BMS antes que desliguem totalmente. Sempre use um fusível como camada secundária de proteção.",
+  },
+  {
+    question: "Como reinicio um BMS desarmado?",
+    answer: "A maioria das unidades de BMS reinicia automaticamente quando a condição de falha é removida. Se o BMS travar desligado, desconecte a carga e o carregador, aguarde 30 segundos e reconecte. Algumas unidades exigem um pressionamento momentâneo de botão. Se o BMS desarmar de novo imediatamente, a falha subjacente persiste.",
+  },
+  {
+    question: "A temperatura pode causar disparos falsos do BMS?",
+    answer: "Sim. Se o sensor de temperatura estiver montado perto de uma fonte de calor, ele pode ler mais alto que a temperatura real das células. Mude o sensor para o centro do pacote, longe de fontes de calor. Garanta também ventilação adequada ao redor do gabinete da bateria.",
+  },
+];
+
+const relatedCalculators = [
+  { title: "Calculadora de Dimensionamento de Bateria", href: "/pt/tools/battery-sizing-calculator/", type: "calculator" as const },
+  { title: "Calculadora de Taxa C", href: "/pt/tools/c-rate-calculator/", type: "calculator" as const },
+  { title: "Estimador de SOC", href: "/pt/tools/soc-estimator/", type: "calculator" as const },
+];
+
+const relatedGuides = [
+  { title: "Como Montar um Pacote de Baterias", href: "/pt/learn/how-to-build-a-battery-pack/", type: "guide" as const },
+  { title: "Projeto de Pacote LiFePO4", href: "/pt/learn/lifepo4-pack-design/", type: "guide" as const },
+];
+---
+
+<ArticleLayout
+  title="BMS Desarmando — Guia de Solução de Problemas | Calculadoras de Bateria"
+  description={description}
+  canonical="https://batterycalculators.com/pt/troubleshooting/bms-tripping/"
+  category="SOLUÇÃO DE PROBLEMAS"
+  breadcrumbItems={[{ label: "BMS Desarmando" }]}
+  relatedCalculators={relatedCalculators}
+  relatedGuides={relatedGuides}
+  faqItems={faqItems}
+  lang="pt"
+>
+  <p class="text-body-md text-body font-light mb-8">
+    Quando um Sistema de Gerenciamento de Bateria desconecta repetidamente a bateria, ele está cumprindo seu papel — protegendo as células contra danos. Mas disparos persistentes indicam um problema real que deve ser identificado e resolvido. Este guia aborda as cinco causas mais comuns de disparo do BMS e como diagnosticar cada uma.
+  </p>
+
+  <TroubleshootingBlock
+    lang="pt"
+    problem="Proteção Contra Sobretensão"
+    causes={[
+      "Tensão do carregador excede a tensão máxima de carga da bateria",
+      "Configurações do controlador de carga ou inversor incorretas",
+      "Desequilíbrio de células faz uma célula atingir sobretensão antes de o pacote carregar totalmente",
+      "Limite de sobretensão do BMS configurado baixo demais para a química",
+    ]}
+    explanation="A sobretensão ocorre quando o carregador aplica uma tensão que empurra células individuais acima de seu máximo seguro. Para LiFePO4, isso é 3,65V por célula (14,6V para um pacote 4S de 12V). O BMS monitora cada célula e desconecta o carregador quando qualquer célula excede o limite. Disparos persistentes durante o carregamento geralmente significam que a tensão do carregador está alta demais ou que uma célula está mais alta que as demais."
+    checklist={[
+      "Meça a tensão de saída do carregador com um multímetro nos terminais da bateria sob carga",
+      "Compare com a especificação de tensão máxima de carga do fabricante",
+      "Verifique as tensões individuais das células durante o carregamento para identificar qual aciona o disparo",
+      "Confirme se as configurações do controlador correspondem à química da bateria (LiFePO4 vs. chumbo-ácido vs. NMC)",
+      "Inspecione a fiação por resistência excessiva que possa causar diferenças de queda de tensão",
+    ]}
+    solutions={[
+      "Ajuste a tensão do carregador ou controlador conforme a especificação do fabricante",
+      "Se uma célula está consistentemente mais alta, faça um ciclo completo de carga com balanceamento ativado",
+      "Recalibre a leitura de tensão das células do BMS — algumas unidades derivam com o tempo",
+      "Substitua o BMS se ele desarmar em tensões abaixo do limite especificado",
+    ]}
+  />
+
+  <TroubleshootingBlock
+    lang="pt"
+    problem="Proteção Contra Subtensão"
+    causes={[
+      "Carga drenando a bateria mais rápido que o esperado",
+      "Carregador não fornecendo corrente suficiente para acompanhar a carga",
+      "Uma célula fraca atingindo o corte de baixa tensão antes do resto do pacote",
+      "Limite de subtensão do BMS configurado mais alto que o necessário",
+    ]}
+    explanation="A proteção contra subtensão aciona quando qualquer célula cai abaixo da tensão mínima segura — normalmente 2,5V para LiFePO4 ou 1,75V para chumbo-ácido por célula. O BMS desconecta a carga para evitar dano permanente. Disparos frequentes de subtensão em uso normal sugerem bateria subdimensionada para a carga, célula fraca ou taxa de descarga alta demais."
+    checklist={[
+      "Meça as tensões individuais durante a descarga — identifique qual célula atinge o corte primeiro",
+      "Calcule a corrente total da carga e compare com a corrente nominal de descarga contínua",
+      "Verifique se o problema ocorre em um nível específico de SOC — isso aponta para uma célula fraca",
+      "Confirme se o limite de subtensão do BMS corresponde ao corte recomendado",
+      "Revise o perfil de carga — correntes de partida de motores ou compressores podem causar quedas breves de tensão",
+    ]}
+    solutions={[
+      "Reduza a carga ou adicione capacidade em paralelo para aumentar a autonomia",
+      "Substitua qualquer célula individual que consistentemente atinja o corte antes das demais",
+      "Ajuste o corte de baixa tensão do BMS apenas se a configuração atual for conservadora demais",
+      "Adicione um circuito de pré-carga para cargas com alta corrente de partida e evitar quedas momentâneas",
+    ]}
+  />
+
+  <TroubleshootingBlock
+    lang="pt"
+    problem="Proteção Contra Sobrecorrente"
+    causes={[
+      "Corrente da carga excede a corrente nominal de descarga do BMS",
+      "Corrente de partida de motores, compressores ou bombas excede o limite de disparo",
+      "Curto-circuito na fiação ou nos equipamentos conectados",
+      "Múltiplas cargas de alto consumo operando simultaneamente",
+    ]}
+    explanation="O BMS monitora a corrente que flui pelo pacote e desconecta se exceder o limite nominal. A proteção contra sobrecorrente evita danos à fiação, superaquecimento dos MOSFETs e degradação das células por taxas excessivas de descarga. O disparo pode ser instantâneo para curtos ou retardado para sobrecorrente sustentada."
+    checklist={[
+      "Verifique a corrente nominal contínua e de pico do BMS — compare com a carga real",
+      "Use um alicate amperímetro para medir o consumo real durante operação normal e partida",
+      "Identifique se o disparo ocorre em eventos específicos — partida de motor, ciclagem de compressor, surto do inversor",
+      "Verifique falhas de fiação ou curtos parciais que possam causar picos de corrente",
+      "Some a carga simultânea total — some os requisitos de corrente de todos os dispositivos conectados",
+    ]}
+    solutions={[
+      "Atualize para um BMS de maior corrente se a carga realmente exigir",
+      "Escalone cargas de alto consumo para evitar surtos simultâneos de partida",
+      "Adicione um limitador de corrente de partida ou soft-start para motores e compressores",
+      "Repare ou substitua qualquer fiação danificada causando curtos intermitentes",
+    ]}
+  />
+
+  <TroubleshootingBlock
+    lang="pt"
+    problem="Proteção Contra Sobretemperatura"
+    causes={[
+      "Bateria operando em ambiente acima de sua faixa nominal de temperatura",
+      "Alta taxa de descarga gerando calor interno excessivo",
+      "Sensor de temperatura posicionado incorretamente perto de fonte de calor",
+      "Má ventilação no gabinete prendendo o calor",
+    ]}
+    explanation="O BMS monitora a temperatura das células via termistores fixados nas superfícies. Se a temperatura exceder o limite seguro de operação (normalmente 60°C para descarga LiFePO4, 45°C para carga), o BMS desconecta para evitar dano térmico. Disparos persistentes de temperatura indicam um problema ambiental ou elétrico."
+    checklist={[
+      "Verifique a temperatura ambiente dentro do gabinete com um termômetro independente",
+      "Meça a temperatura real das células com um termopar — compare com a leitura do BMS",
+      "Confirme se o sensor está montado diretamente na superfície da célula, não solto no ar",
+      "Calcule a geração de calor na corrente de operação usando P = I² × R_interna",
+      "Inspecione as aberturas de ventilação por bloqueios, poeira ou falhas de ventilador",
+    ]}
+    solutions={[
+      "Melhore a ventilação — adicione ventiladores, amplie aberturas ou mude a bateria para local mais fresco",
+      "Reduza a corrente contínua de descarga para manter a geração de calor dentro do orçamento térmico",
+      "Reposicione os sensores no centro do pacote, longe de fontes de calor",
+      "Adicione resfriamento ativo (ar forçado ou líquido) para aplicações de alta potência",
+    ]}
+  />
+
+  <TroubleshootingBlock
+    lang="pt"
+    problem="Desequilíbrio de Células Acionando o BMS"
+    causes={[
+      "Células do pacote com capacidades diferentes por variação de fabricação ou envelhecimento",
+      "Uma célula com autodescarga maior que as demais",
+      "Balanceamento passivo não acompanha a taxa de desequilíbrio",
+      "Gradientes de temperatura no pacote fazem as células se comportarem diferente",
+    ]}
+    explanation="O desequilíbrio faz uma célula atingir os limites de tensão antes das demais. Durante a carga, a célula alta aciona a sobretensão. Durante a descarga, a célula baixa aciona a subtensão. O BMS vê o pacote fora dos limites seguros mesmo que a tensão média esteja normal. Isso reduz a capacidade utilizável e causa disparos incômodos."
+    checklist={[
+      "Meça todas as tensões individuais com carga total e com 50% de SOC — observe a dispersão",
+      "Dispersão maior que 0,1V entre duas células indica desequilíbrio significativo",
+      "Verifique se a função de balanceamento está ativa no estágio final do carregamento",
+      "Registre as tensões ao longo de vários ciclos para ver se o desequilíbrio é estável ou crescente",
+      "Verifique diferenças de temperatura no pacote que possam causar comportamento desigual",
+    ]}
+    solutions={[
+      "Faça uma carga total com balanceamento ativado — reserve 24–48 horas para o passivo equalizar",
+      "Use um balanceador ativo externo para equalização mais rápida de grandes desequilíbrios",
+      "Substitua qualquer célula que não equilibre dentro de 0,03V das demais após ciclo completo",
+      "Garanta que todas as células sejam do mesmo fabricante, lote e capacidade nominal",
+    ]}
+  />
+
+  <p class="text-caption text-muted border-t border-hairline pt-8 mt-12">
+    <strong>Aviso:</strong> Este guia é apenas para fins educacionais e de diagnóstico. A solução de problemas de baterias envolve riscos elétricos. Sempre siga os procedimentos de segurança do fabricante, use EPI adequado e consulte um técnico qualificado antes de tentar reparos. Nunca ignore as proteções do BMS.
+  </p>
+</ArticleLayout>

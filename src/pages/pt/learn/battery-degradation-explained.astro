@@ -1,0 +1,288 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "Quão rápido as baterias de lítio degradam?",
+    answer: "Em uso típico (0,5C, 25°C, 20-80% SOC), células LFP modernas retêm 80% da capacidade após 3.000-5.000 ciclos. Células NMC normalmente atingem 80% após 1.000-2.000 ciclos. O envelhecimento calendário também contribui: espere 1-3% de perda de capacidade por ano mesmo sem ciclar.",
+  },
+  {
+    question: "Carga rápida degrada as baterias mais rápido?",
+    answer: "Sim, mas o efeito é frequentemente superestimado. Células modernas projetadas para carga rápida (1C-2C) sofrem degradação adicional modesta em comparação com 0,5C. O fator principal é a geração de calor, não o C-rate em si. O gerenciamento térmico ativo mitiga a maior parte da degradação por carga rápida.",
+  },
+  {
+    question: "A capacidade degradada pode ser restaurada?",
+    answer: "A perda permanente de capacidade por crescimento da SEI e deposição de lítio não pode ser revertida. No entanto, a perda temporária por camadas de passivação às vezes pode ser recuperada com ciclos controlados de recondicionamento. Na prática, a capacidade degradada não é restaurável.",
+  },
+  {
+    question: "Com qual SoH devo substituir minha bateria?",
+    answer: "A maioria das aplicações considera baterias em fim de vida (EOL) com 70-80% de SoH. Aplicações críticas (médicas, telecomunicações) podem exigir substituição aos 80%. Eletrônicos de consumo frequentemente continuam operando com SoH menor. O limite depende se autonomia ou entrega de potência é o fator limitante.",
+  },
+];
+---
+
+<Layout
+  title="Degradação de Baterias Explicada | Calculadoras de Bateria"
+  description="Entenda por que as baterias perdem capacidade com o tempo e os ciclos. Conheça os dois tipos de degradação, os principais fatores que aceleram o envelhecimento e como estender a vida útil."
+  canonical="https://batterycalculators.com/pt/learn/battery-degradation-explained/"
+  faqItems={faqItems}
+  lang="pt"
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/pt/learn/" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Voltar aos Guias</a>
+      <Breadcrumb items={[{ label: "Centro de Aprendizagem", href: "/pt/learn/" }, { label: "Degradação de Baterias Explicada" }]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">FUNDAMENTOS DE CÉLULAS</span>
+      <h1 class="text-display-md text-primary mb-6">Degradação de Baterias Explicada</h1>
+      <p class="text-body-md text-body font-light">
+        Toda bateria perde capacidade com o tempo. Esteja parada na prateleira ou alimentando uma carga, as células eletroquímicas sofrem mudanças químicas irreversíveis que reduzem sua capacidade de armazenar e entregar energia. Entender esses mecanismos é o primeiro passo para maximizar a vida útil.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Dois Tipos de Degradação</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          A degradação se manifesta de duas formas distintas. Ambas ocorrem simultaneamente, mas seu impacto relativo depende de como a bateria é usada e armazenada.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Perda de Capacidade</h4>
+            <p class="text-body-sm text-muted">
+              Perda de capacidade é a redução gradual da energia armazenada. Uma célula que originalmente tinha 100 Ah pode reter apenas 80 Ah após anos de uso. A bateria ainda funciona, mas entrega menos autonomia por ciclo de carga. Esta é a forma mais visível de degradação e a principal métrica de fim de vida para a maioria das aplicações.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Aumento de Impedância</h4>
+            <p class="text-body-sm text-muted">
+              Aumento de impedância é o crescimento da resistência interna. Uma célula de alta impedância sofre maior queda de tensão sob carga, entrega menos potência e gera mais calor. Mesmo que a capacidade permaneça alta, a impedância elevada pode tornar a bateria inadequada para aplicações de alta corrente.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">O Que Causa Degradação</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          A degradação é causada por uma combinação de estresses mecânicos, químicos e térmicos. Cada fator acelera as reações subjacentes que consomem lítio ativo e degradam os materiais dos eletrodos.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Estresse de Ciclagem</h4>
+            <p class="text-body-sm text-muted">
+              Cada ciclo de carga e descarga força íons de lítio a entrar e sair da estrutura cristalina do eletrodo. Essa intercalação e desintercalação repetidas causam estresse mecânico, trincas de partículas e perda gradual de material eletricamente ativo. Ciclos mais profundos causam mais dano por evento.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Envelhecimento Calendário</h4>
+            <p class="text-body-sm text-muted">
+              Baterias degradam mesmo sem uso. O envelhecimento calendário é movido por tempo e temperatura. A camada de interfase sólido-eletrólito (SEI) no ânodo cresce lentamente com o tempo, consumindo lítio e aumentando a impedância. Temperaturas mais altas aceleram drasticamente esse processo.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">C-Rates Altos</h4>
+            <p class="text-body-sm text-muted">
+              Carregar ou descarregar em altas correntes gera calor interno excessivo por perdas I²R. A temperatura elevada acelera reações colaterais, incluindo crescimento da SEI e decomposição do eletrólito. A carga rápida também aumenta o risco de deposição de lítio na superfície do ânodo.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Temperaturas Extremas</h4>
+            <p class="text-body-sm text-muted">
+              O calor acelera todos os mecanismos de degradação exponencialmente. Temperaturas frias causam deposição de lítio durante a carga porque o ânodo não consegue aceitar íons rápido o suficiente. Ambos os extremos encurtam a vida útil, mas alta temperatura sustentada é o maior acelerador do envelhecimento calendário.
+            </p>
+          </CalculatorCard>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Armazenamento com SOC Alto</h4>
+            <p class="text-body-sm text-muted">
+              Armazenar baterias de lítio totalmente carregadas (100% SOC) mantém o cátodo em estado altamente oxidado, o que promove decomposição do eletrólito e instabilidade estrutural do cátodo. O armazenamento prolongado com SOC alto acelera significativamente o envelhecimento calendário em comparação com 40-60% SOC.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Armazenamento com SOC Baixo</h4>
+            <p class="text-body-sm text-muted">
+              Armazenar com SOC muito baixo (abaixo de 10%) por longos períodos risca a dissolução do coletor de corrente de cobre se a tensão cair demais. Embora menos prejudicial que o armazenamento com SOC alto, baterias extremamente descarregadas podem desenvolver curtos internos ao recarregar.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FormulaBox title="Fórmula de Retenção de Capacidade">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Retenção de Capacidade(%) = 100 × (1 − α × N<sup>β</sup>)
+        </div>
+        <p>
+          Onde <strong>N</strong> é o número de ciclos equivalentes completos, <strong>α</strong> é um coeficiente de degradação específico da química e <strong>β</strong> é um expoente que caracteriza a forma da curva de degradação. Ambos α e β são determinados experimentalmente para cada química de célula.
+        </p>
+        <p>
+          Valores típicos para células LFP: α ≈ 0,0001–0,0005, β ≈ 0,4–0,6. Para células NMC: α ≈ 0,0002–0,0008, β ≈ 0,5–0,7. O expoente sublinear (β &lt; 1) reflete que a degradação desacelera com o tempo à medida que as superfícies mais reativas são consumidas.
+        </p>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Limite de fim de vida (EOL): tipicamente 70–80% da capacidade inicial
+        </div>
+        <p>
+          A maioria das aplicações define o fim de vida como 70-80% de estado de saúde (SoH). Nesse ponto, a bateria pode ainda funcionar, mas não atende mais aos requisitos de autonomia ou entrega de potência da aplicação original.
+        </p>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Degradação por Química</h2>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Química</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Vida em Ciclos até 80% SoH</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Vida Calendário</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Mecanismo Principal de Degradação</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">LFP (LiFePO4)</td>
+                <td class="p-4 font-mono text-primary">3.000–6.000 ciclos</td>
+                <td class="p-4 font-mono text-primary">10–15 anos</td>
+                <td class="p-4 text-muted">Crescimento da SEI, dissolução de ferro</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">NMC (LiNiMnCoO2)</td>
+                <td class="p-4 font-mono text-primary">1.000–2.500 ciclos</td>
+                <td class="p-4 font-mono text-primary">8–12 anos</td>
+                <td class="p-4 text-muted">Trinca do cátodo, deposição de lítio</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">NCA (LiNiCoAlO2)</td>
+                <td class="p-4 font-mono text-primary">800–2.000 ciclos</td>
+                <td class="p-4 font-mono text-primary">8–10 anos</td>
+                <td class="p-4 text-muted">Transição de fase do cátodo, crescimento da SEI</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Chumbo-Ácido</td>
+                <td class="p-4 font-mono text-primary">300–800 ciclos</td>
+                <td class="p-4 font-mono text-primary">3–7 anos</td>
+                <td class="p-4 text-muted">Sulfatação, corrosão da grade, desprendimento</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Exemplo Prático</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Dados:</strong></p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li>Célula: 100 Ah LFP (LiFePO4)</li>
+              <li>Taxa de perda: 0,05% por ciclo</li>
+              <li>Fórmula: Capacidade = 100 × (1 − 0,0005 × N<sup>0,5</sup>)</li>
+            </ul>
+            <p><strong>Após 2.000 ciclos:</strong></p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              Capacidade = 100 × (1 − 0,0005 × 2000<sup>0,5</sup>)
+            </div>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              = 100 × (1 − 0,0005 × 44,72)
+            </div>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              = 100 × (1 − 0,0224)
+            </div>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              = 97,8 Ah (97,8% de retenção)
+            </div>
+            <p class="mt-2"><strong>Após 5.000 ciclos:</strong></p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              Capacidade = 100 × (1 − 0,0005 × 5000<sup>0,5</sup>)
+            </div>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              = 100 × (1 − 0,0005 × 70,71)
+            </div>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              = 100 × (1 − 0,0354)
+            </div>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              = 96,0 Ah (96,0% de retenção)
+            </div>
+            <p class="mt-2">Mesmo após 5.000 ciclos equivalentes completos, esta célula LFP retém 96% da capacidade original — bem acima do limite típico de fim de vida de 80%. A curva sublinear significa que a célula perde capacidade rápido nos primeiros ciclos e depois a taxa desacelera bastante.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Como Desacelerar a Degradação</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">C-Rates Moderados</h4>
+            <p class="text-body-sm text-muted">
+              Carregar e descarregar a 0,5C ou menos minimiza a geração de calor e reduz o estresse mecânico nos materiais dos eletrodos. Embora células modernas tolerem 1C-2C, a operação sustentada em C-rates moderados pode dobrar ou triplicar a vida em ciclos em comparação com carga rápida agressiva.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Evite Temperaturas Extremas</h4>
+            <p class="text-body-sm text-muted">
+              Mantenha as baterias entre 15°C e 35°C durante a operação. Cada aumento de 10°C acima de 25°C aproximadamente dobra a taxa de envelhecimento calendário. Evite carregar abaixo de 0°C, onde a deposição de lítio se torna um risco grave que danifica permanentemente o ânodo.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Fique em 20–80% SOC</h4>
+            <p class="text-body-sm text-muted">
+              Operar em uma janela moderada de SOC reduz o estresse do cátodo no topo e o risco do ânodo na base. Muitos sistemas de gerenciamento impõem essa faixa automaticamente. Para armazenamento, 40-60% SOC é ideal para minimizar o envelhecimento calendário.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Use Gerenciamento Térmico Ativo</h4>
+            <p class="text-body-sm text-muted">
+              Resfriamento líquido e sistemas de ar forçado mantêm as temperaturas das células uniformes e na faixa ideal. O gerenciamento térmico é especialmente crítico em packs de EV e armazenamento estacionário, onde as células enfrentam condições ambientes variáveis e altas correntes sustentadas.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Experimente</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use o Estimador de Degradação para prever a perda de capacidade da sua bateria e perfil de uso.
+          </p>
+          <a href="/pt/tools/battery-degradation-estimator/" class="btn-primary text-xs py-3 px-6 inline-block">Abrir Estimador de Degradação</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Relacionado</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Monitore o estado de carga atual da sua bateria com o Estimador de SOC.
+          </p>
+          <a href="/pt/tools/soc-estimator/" class="btn-primary-outline text-xs py-3 px-6 inline-block">Abrir Estimador de SOC</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Artigos Relacionados</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">
+              <a href="/pt/learn/what-is-battery-c-rate/" class="hover:text-m-blue-light transition-colors">O Que É C-Rate de Bateria?</a>
+            </h4>
+            <p class="text-body-sm text-muted">
+              O C-rate determina a velocidade de carga e descarga. Entender o C-rate é essencial para gerenciar a degradação, pois taxas maiores aceleram o envelhecimento.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">
+              <a href="/pt/learn/understanding-state-of-charge/" class="hover:text-m-blue-light transition-colors">Entendendo o Estado de Carga (SOC)</a>
+            </h4>
+            <p class="text-body-sm text-muted">
+              O SOC indica quanta energia resta na bateria. Manter-se na faixa ideal de SOC é uma das formas mais eficazes de desacelerar a degradação.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

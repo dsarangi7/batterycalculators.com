@@ -1,0 +1,651 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "Quanto custa uma bateria solar em 2026?",
+    answer: "Uma bateria solar residencial custa $6,000–$18,000 instalada, dependendo da capacidade. Um sistema LFP de 10 kWh custa $8,000–$12,000 instalado. Um sistema de 20 kWh custa $14,000–$20,000. Custos só da bateria são $400–$800 por kWh para a química LiFePO4. Instalação, inversor e obra elétrica normalmente adicionam 30–50% ao preço só da bateria.",
+  },
+  {
+    question: "Qual é o custo por kWh do armazenamento solar em bateria?",
+    answer: "O custo instalado total por kWh utilizável varia de $600–$1,200 para sistemas LiFePO4 e $300–$600 para chumbo-ácido. Porém, o custo por ciclo é uma métrica melhor: o LiFePO4 entrega 4.000–6.000 ciclos a $0,10–$0,20 por ciclo, enquanto o chumbo-ácido entrega 1.000–2.000 ciclos a $0,15–$0,40 por ciclo. O LiFePO4 é mais barato ao longo da vida do sistema apesar do maior custo inicial.",
+  },
+  {
+    question: "Em quanto tempo uma bateria solar se paga?",
+    answer: "O período de retorno depende das tarifas de eletricidade, da economia em horário de ponta e do valor do backup. Com tarifas médias de $0,15/kWh, o retorno é de 8–12 anos. A $0,25/kWh (Califórnia, Nordeste), cai para 5–8 anos. Com arbitragem agressiva de TOU a $0,35+/kWh, o retorno pode ser de 4–6 anos. Incentivos federais e estaduais reduzem ainda mais o tempo de retorno.",
+  },
+  {
+    question: "Baterias solares valem a pena em 2026?",
+    answer: "Baterias solares valem a pena se você enfrenta apagões frequentes, vive em região com tarifa por horário (TOU), tem tarifas altas ($0,20+/kWh) ou quer independência energética. São menos atraentes com tarifas baixas ($0,10/kWh) sem precificação por horário ou necessidade de backup. O caso financeiro se fortalece com painéis solares já instalados.",
+  },
+  {
+    question: "Qual tamanho de bateria solar preciso para minha casa?",
+    answer: "A maioria das casas precisa de 10–20 kWh para backup de cargas críticas (geladeira, luzes, roteador, dispositivos médicos). Backup da casa inteira exige 20–40+ kWh. Uma casa típica dos EUA usa 30 kWh/dia, mas cargas críticas são 5–10 kWh/dia. Dimensione com base no que você precisa alimentar e por quanto tempo.",
+  },
+  {
+    question: "Qual é a diferença entre custo só da bateria e custo instalado?",
+    answer: "O custo só da bateria cobre apenas a unidade ($400–$800/kWh para LiFePO4). O custo instalado adiciona o inversor híbrido ($2,000–$5,000), obra elétrica ($1,000–$3,000), licenças ($200–$1,000), sistema de monitoramento ($200–$500) e mão de obra ($1,500–$3,000). O custo instalado total é tipicamente 30–50% maior que só a bateria.",
+  },
+  {
+    question: "LiFePO4 vs chumbo-ácido: qual é mais barato para solar?",
+    answer: "O chumbo-ácido tem menor custo inicial ($150–$300/kWh), mas menor vida útil (1.000–2.000 ciclos). O LiFePO4 custa mais no início ($400–$800/kWh), mas dura 4.000–6.000 ciclos. Ao longo de 15 anos de vida do sistema, o LiFePO4 é 40–60% mais barato por energia total entregue. O LiFePO4 também oferece 90–100% de capacidade utilizável contra 50% do chumbo-ácido.",
+  },
+  {
+    question: "Baterias solares exigem manutenção?",
+    answer: "Baterias LiFePO4 são livres de manutenção — sem reposição de água, sem equalização, sem verificações de densidade. Baterias de chumbo-ácido exigem manutenção trimestral: verificações de nível de eletrólito, limpeza de terminais, cargas de equalização e verificação de ventilação. O custo de manutenção do chumbo-ácido adiciona $200–$500/ano em mão de obra e materiais.",
+  },
+  {
+    question: "Posso adicionar bateria ao meu sistema solar existente?",
+    answer: "Sim. Adicionar bateria a um sistema solar existente conectado à rede exige um inversor híbrido ou um inversor pronto para bateria com bateria acoplada em CA. Alguns sistemas precisam de upgrade do inversor ($2,000–$5,000). Muitos inversores solares modernos já são prontos para bateria, tornando retrofits simples. Verifique a compatibilidade do seu inversor antes de comprar.",
+  },
+  {
+    question: "Quais incentivos existem para baterias solares em 2026?",
+    answer: "O Crédito Fiscal de Investimento (ITC) federal cobre 30% do custo da bateria quando combinada com solar. Muitos estados oferecem reembolsos adicionais: SGIP da Califórnia ($200–$1,000/kWh), NY-Sun de Nova York ($250/kWh), programa SMART de Massachusetts. Programas de resposta à demanda de concessionárias podem pagar $50–$200/ano em pagamentos contínuos.",
+  },
+  {
+    question: "Como calculo o ROI de uma bateria solar?",
+    answer: "ROI = (Economia anual + valor do backup + valor dos incentivos) / Custo líquido do sistema. A economia anual vem de arbitragem TOU, redução de tarifa de demanda e compras evitadas da rede. Use nossa Calculadora de Dimensionamento de Bateria Solar para modelar seu cenário específico com tarifas reais e padrões de consumo.",
+  },
+  {
+    question: "O que mais afeta o custo da bateria solar?",
+    answer: "A capacidade (kWh) é o principal direcionador de custo — dobrar a capacidade aproximadamente dobra o custo. A química vem em segundo: o LiFePO4 custa 2–3x mais no início que o chumbo-ácido, mas entrega 3–5x mais ciclos. Complexidade de instalação, tipo de inversor, upgrades de quadro elétrico e taxas locais de licenciamento podem adicionar 30–50% ao preço só da bateria.",
+  },
+];
+---
+
+<Layout
+  title="Detalhamento de Custos de Bateria Solar 2026 | Calculadoras de Bateria"
+  description="Detalhamento completo dos custos de bateria solar em 2026: preços de bateria, custos de instalação, custo por kWh, períodos de retorno, LiFePO4 vs chumbo-ácido e análise de ROI."
+  canonical="https://batterycalculators.com/pt/learn/solar-battery-cost-breakdown-2026/"
+  schema="faqPage"
+  schemaName="Detalhamento de Custos de Bateria Solar 2026"
+  schemaDescription="Guia abrangente dos custos de bateria solar em 2026, cobrindo preços de bateria, custos de instalação, custo por kWh e análise de retorno."
+  schemaUrl="https://batterycalculators.com/pt/learn/solar-battery-cost-breakdown-2026/"
+  faqItems={faqItems}
+  lang="pt"
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/pt/learn/" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Voltar aos Guias</a>
+      <Breadcrumb items={[
+        { label: "Centro de Aprendizagem", href: "/pt/learn/" },
+        { label: "Detalhamento de Custos de Bateria Solar 2026" }
+      ]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">SOLAR</span>
+      <h1 class="text-display-md text-primary mb-6">Detalhamento de Custos de Bateria Solar 2026</h1>
+      <p class="text-body-md text-body font-light">
+        O interesse em baterias solares está em alta em 2026. Tarifas de eletricidade crescentes, instabilidade crescente da rede e expansão da precificação por horário de uso (TOU) estão levando proprietários a avaliar o armazenamento em bateria tanto como investimento financeiro quanto como estratégia de resiliência. Mas os preços continuam opacos — orçamentos só da bateria raramente refletem o custo total do sistema, valores de custo por kWh variam enormemente conforme as premissas, e cálculos de retorno dependem de variáveis que a maioria dos compradores nunca vê.
+      </p>
+      <p class="text-body-md text-body font-light mt-4">
+        Este guia detalha cada componente de custo de um sistema residencial de bateria solar em 2026: preços de bateria por capacidade, categorias de custo de instalação, comparações de química, matemática de retorno e estratégias acionáveis para reduzir o custo total do sistema.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+
+      <!-- Quanto Custa uma Bateria Solar em 2026? -->
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Quanto Custa uma Bateria Solar em 2026?</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          A resposta curta: uma bateria solar residencial custa $6,000–$18,000 instalada, dependendo da capacidade. A resposta longa exige entender pelo que você está pagando. Abaixo está o detalhamento dos custos típicos instalados por tamanho de bateria, com base em preços de mercado de 2026 para a química LiFePO4 — a tecnologia dominante de bateria residencial.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden mb-6">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Tamanho da Bateria</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Faixa de Custo Instalado</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Caso de Uso Típico</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">5 kWh</td>
+                <td class="p-4 font-mono text-primary">$5,000 – $7,500</td>
+                <td class="p-4 text-muted">Somente cargas críticas: geladeira, roteador, carga de celular, iluminação de emergência</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">10 kWh</td>
+                <td class="p-4 font-mono text-primary">$8,000 – $12,000</td>
+                <td class="p-4 text-muted">Backup residencial essencial: geladeira, luzes, roteador, dispositivos médicos, bomba de poço</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">15 kWh</td>
+                <td class="p-4 font-mono text-primary">$11,000 – $16,000</td>
+                <td class="p-4 text-muted">Cargas críticas estendidas com HVAC moderado ou aparelhos adicionais</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">20 kWh</td>
+                <td class="p-4 font-mono text-primary">$14,000 – $20,000</td>
+                <td class="p-4 text-muted">Backup parcial da casa inteira: cargas críticas + operação seletiva de aparelhos</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">30 kWh</td>
+                <td class="p-4 font-mono text-primary">$20,000 – $28,000</td>
+                <td class="p-4 text-muted">Backup da casa inteira para a maioria das residências, ou cobertura de cargas críticas por vários dias</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-body-md text-body font-light">
+          Essas faixas refletem o custo total instalado do sistema — bateria, inversor, obra elétrica, licenças, monitoramento e mão de obra. Preços só da bateria normalmente ficam em $400–$800 por kWh para células LiFePO4. A diferença entre só bateria e instalado é onde a maioria dos compradores se surpreende.
+        </p>
+      </section>
+
+      <!-- Custo por kWh da Bateria Solar -->
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Custo por kWh da Bateria Solar</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          O custo por kWh é a métrica mais citada — e a mais enganosa sem contexto. Há três formas distintas de calculá-lo, e cada uma conta uma história diferente.
+        </p>
+
+        <h3 class="text-title-md text-primary mb-3">Custo por kWh Só da Bateria</h3>
+        <p class="text-body-md text-body font-light mb-4">
+          Este é o preço bruto da unidade de bateria, excluindo inversor, instalação e obra elétrica. Para LiFePO4 em 2026, o custo só da bateria varia de $400–$800 por kWh dependendo de fabricante, termos de garantia e volume. Baterias de chumbo-ácido custam $150–$300 por kWh — mas esse valor engana porque baterias de chumbo-ácido só devem ser descarregadas até 50% de profundidade de descarga (DoD), dobrando efetivamente o custo por kWh utilizável.
+        </p>
+
+        <h3 class="text-title-md text-primary mb-3">Custo Instalado por kWh</h3>
+        <p class="text-body-md text-body font-light mb-4">
+          Inclui tudo: bateria, inversor, obra elétrica, licenças, monitoramento e mão de obra. Para um sistema LiFePO4 típico de 10 kWh, o custo instalado por kWh fica entre $800–$1,200. Sistemas maiores (20–30 kWh) alcançam melhor economia de escala, caindo para $700–$1,000 por kWh instalado. O inversor é um custo fixo ($2,000–$5,000) que se dilui melhor em capacidades maiores.
+        </p>
+
+        <h3 class="text-title-md text-primary mb-3">Custo por kWh Utilizável</h3>
+        <p class="text-body-md text-body font-light mb-4">
+          Considera a profundidade de descarga. Uma bateria LiFePO4 de 10 kWh com 90% de profundidade de descarga utilizável entrega 9 kWh utilizáveis. Uma bateria de chumbo-ácido de 10 kWh com 50% de DoD entrega apenas 5 kWh utilizáveis. Isso muda drasticamente a comparação de custo por kWh:
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden mb-6">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Métrica</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">LiFePO4 (10 kWh)</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Chumbo-Ácido (10 kWh)</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">Capacidade nominal</td>
+                <td class="p-4 font-mono text-primary">10 kWh</td>
+                <td class="p-4 font-mono text-primary">10 kWh</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">DoD Utilizável</td>
+                <td class="p-4 font-mono text-primary">90%</td>
+                <td class="p-4 font-mono text-primary">50%</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Capacidade utilizável</td>
+                <td class="p-4 font-mono text-primary">9 kWh</td>
+                <td class="p-4 font-mono text-primary">5 kWh</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Custo só da bateria</td>
+                <td class="p-4 font-mono text-primary">$6,000</td>
+                <td class="p-4 font-mono text-primary">$2,500</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Custo por kWh utilizável</td>
+                <td class="p-4 font-mono text-primary">$667</td>
+                <td class="p-4 font-mono text-primary">$500</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Vida útil em ciclos</td>
+                <td class="p-4 font-mono text-primary">5,000 ciclos</td>
+                <td class="p-4 font-mono text-primary">1,500 ciclos</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Custo por ciclo por kWh</td>
+                <td class="p-4 font-mono text-primary">$0.13</td>
+                <td class="p-4 font-mono text-primary">$0.33</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="text-title-md text-primary mb-3">Custo por Ciclo</h3>
+        <p class="text-body-md text-body font-light mb-4">
+          A métrica mais honesta para comparar o valor da bateria. Custo por ciclo = custo total da bateria ÷ ciclos totais de vida útil. O LiFePO4 a $6,000 com 5.000 ciclos entrega 45.000 kWh ao longo da vida a $0,13/kWh — mais barato que a eletricidade da rede na maioria dos mercados dos EUA. O chumbo-ácido a $2,500 com 1.500 ciclos entrega 7.500 kWh a $0,33/kWh — mais caro que a rede em muitas regiões.
+        </p>
+      </section>
+
+      <!-- O Que Determina o Custo da Bateria Solar? -->
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">O Que Determina o Custo da Bateria Solar?</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Oito fatores definem o preço final de um sistema residencial de bateria solar. Entendê-los ajuda a avaliar orçamentos e identificar onde os custos podem ser reduzidos.
+        </p>
+
+        <h3 class="text-title-md text-primary mb-3">Química da Bateria</h3>
+        <p class="text-body-md text-body font-light mb-4">
+          O LiFePO4 (fosfato de ferro-lítio) domina o solar residencial em 2026 devido à sua vida útil, segurança e estabilidade térmica. Custa 2–3x mais no início que o chumbo-ácido, mas entrega 3–5x mais energia ao longo da vida. O lítio ternário (NMC/NCA) oferece maior densidade energética a custo semelhante ao LiFePO4, mas traz risco de fuga térmica — menos comum em armazenamento estacionário residencial.
+        </p>
+
+        <h3 class="text-title-md text-primary mb-3">Capacidade (kWh)</h3>
+        <p class="text-body-md text-body font-light mb-4">
+          O maior direcionador individual de custo. Dobrar a capacidade aproximadamente dobra o custo da bateria, embora os custos de inversor e instalação fiquem relativamente fixos, melhorando a economia por kWh em tamanhos maiores. Um sistema de 20 kWh não custa exatamente 2x um sistema de 10 kWh — normalmente custa 1,7–1,8x devido a custos fixos compartilhados.
+        </p>
+
+        <h3 class="text-title-md text-primary mb-3">Potência Nominal (kW)</h3>
+        <p class="text-body-md text-body font-light mb-4">
+          A potência nominal determina quanta carga a bateria pode atender simultaneamente. Uma bateria de 5 kW alimenta facilmente uma geladeira (150W) e luzes (100W), mas não consegue partir um ar-condicionado de 3 toneladas (pico de 3.500W). Potências maiores exigem sistemas de gerenciamento de bateria e eletrônica de potência mais robustos, adicionando $500–$2,000 ao custo do sistema.
+        </p>
+
+        <h3 class="text-title-md text-primary mb-3">Compatibilidade do Inversor</h3>
+        <p class="text-body-md text-body font-light mb-4">
+          O inversor híbrido é o cérebro do sistema — gerencia o fluxo de energia entre painéis solares, bateria, rede e cargas da casa. Custa $2,000–$5,000 e deve ser compatível com o protocolo de comunicação da sua bateria (barramento CAN, RS485 ou proprietário). Algumas baterias exigem inversores da mesma marca, limitando a flexibilidade e aumentando o custo.
+        </p>
+
+        <h3 class="text-title-md text-primary mb-3">Complexidade de Instalação</h3>
+        <p class="text-body-md text-body font-light mb-4">
+          Uma instalação simples (bateria perto do quadro principal, fiação existente, obra elétrica padrão) custa $1,500–$3,000. Instalações complexas — longos percursos de cabo, adições de subpainel, upgrades de painel de cargas críticas ou bateria em locais difíceis — podem elevar a obra elétrica para $3,000–$6,000.
+        </p>
+
+        <h3 class="text-title-md text-primary mb-3">Upgrades de Quadro Elétrico</h3>
+        <p class="text-body-md text-body font-light mb-4">
+          Muitas casas construídas antes de 2020 têm quadros de 100A ou 125A que não comportam um sistema de bateria sem upgrade. Um upgrade de quadro custa $1,500–$4,000 e às vezes é exigido por norma. Quadros modernos de 200A com disjuntores prontos para bateria evitam esse custo.
+        </p>
+
+        <h3 class="text-title-md text-primary mb-3">Licenças e Conexão</h3>
+        <p class="text-body-md text-body font-light mb-4">
+          Jurisdições locais exigem licenças elétricas para instalação de baterias ($200–$1,000 dependendo do município). Acordos de conexão com a concessionária para sistemas que exportam energia da bateria de volta à rede podem exigir revisão adicional de engenharia ($300–$800). Prazos de licenciamento variam de 1–2 semanas a 3–6 meses conforme a jurisdição.
+        </p>
+
+        <h3 class="text-title-md text-primary mb-3">Garantia e Monitoramento</h3>
+        <p class="text-body-md text-body font-light mb-4">
+          Garantias de bateria variam de 10–15 anos. Garantias estendidas adicionam 5–10% ao custo do sistema. Sistemas de monitoramento em nuvem ($200–$500) fornecem dados em tempo real de estado de carga, contagem de ciclos e saúde do sistema. Alguns fabricantes incluem monitoramento no preço da bateria; outros cobram separadamente.
+        </p>
+      </section>
+
+      <!-- LiFePO4 vs Chumbo-Ácido: Comparação de Custos -->
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">LiFePO4 vs Chumbo-Ácido: Comparação de Custos</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          A decisão de química é a decisão de custo mais importante no dimensionamento de bateria solar. Aqui está uma comparação direta para um sistema de 10 kWh em um período de avaliação de 15 anos.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden mb-6">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Métrica</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">LiFePO4</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Chumbo-Ácido</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">Custo inicial (10 kWh)</td>
+                <td class="p-4 font-mono text-primary">$5,000 – $8,000</td>
+                <td class="p-4 font-mono text-primary">$1,500 – $3,000</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Profundidade de descarga utilizável</td>
+                <td class="p-4 font-mono text-primary">90 – 100%</td>
+                <td class="p-4 font-mono text-primary">50%</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Vida útil a 80% de DoD</td>
+                <td class="p-4 font-mono text-primary">4,000 – 6,000</td>
+                <td class="p-4 font-mono text-primary">1,000 – 2,000</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Capacidade utilizável</td>
+                <td class="p-4 font-mono text-primary">9 – 10 kWh</td>
+                <td class="p-4 font-mono text-primary">5 kWh</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Manutenção</td>
+                <td class="p-4 font-mono text-primary">Nenhuma</td>
+                <td class="p-4 font-mono text-primary">$200 – $500/ano</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Eficiência (ida e volta)</td>
+                <td class="p-4 font-mono text-primary">95 – 98%</td>
+                <td class="p-4 font-mono text-primary">80 – 85%</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Reposições em 15 anos</td>
+                <td class="p-4 font-mono text-primary">0 – 1</td>
+                <td class="p-4 font-mono text-primary">3 – 5</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Custo total em 15 anos (só bateria)</td>
+                <td class="p-4 font-mono text-primary">$5,000 – $8,000</td>
+                <td class="p-4 font-mono text-primary">$7,500 – $15,000</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Energia total entregue em 15 anos</td>
+                <td class="p-4 font-mono text-primary">36,000 – 54,000 kWh</td>
+                <td class="p-4 font-mono text-primary">7,500 – 15,000 kWh</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Custo de vida útil por kWh entregue</td>
+                <td class="p-4 font-mono text-primary">$0.10 – $0.22</td>
+                <td class="p-4 font-mono text-primary">$0.50 – $1.00</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-body-md text-body font-light">
+          <strong class="text-body-strong">Recomendação:</strong> O LiFePO4 é a escolha superior para armazenamento solar residencial em bateria. O maior custo inicial é compensado por vida útil 3–5x maior, zero manutenção, maior capacidade utilizável e menor custo de vida útil por kWh. O chumbo-ácido continua viável apenas para sistemas pequenos de backup com ciclagem infrequente, onde o custo inicial é a principal restrição.
+        </p>
+      </section>
+
+      <!-- Quanto Armazenamento uma Casa Típica Precisa? -->
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Quanto Armazenamento uma Casa Típica Precisa?</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          O dimensionamento depende do que você quer manter alimentado e por quanto tempo. Um sistema de cargas críticas (geladeira, luzes, roteador, dispositivos médicos) consome 5–10 kWh/dia. Um sistema da casa inteira (incluindo HVAC, aparelhos, aquecimento de água) pode consumir 20–60 kWh/dia.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden mb-6">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Tamanho da Casa</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Uso Diário</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Cargas Críticas</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Bateria Recomendada</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">Casa pequena / apartamento</td>
+                <td class="p-4 font-mono text-primary">10–15 kWh/dia</td>
+                <td class="p-4 font-mono text-primary">3–5 kWh/dia</td>
+                <td class="p-4 font-mono text-primary">5–10 kWh</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Casa média (140–230 m²)</td>
+                <td class="p-4 font-mono text-primary">20–30 kWh/dia</td>
+                <td class="p-4 font-mono text-primary">5–10 kWh/dia</td>
+                <td class="p-4 font-mono text-primary">10–20 kWh</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Casa grande (230–370 m²)</td>
+                <td class="p-4 font-mono text-primary">30–50 kWh/dia</td>
+                <td class="p-4 font-mono text-primary">8–15 kWh/dia</td>
+                <td class="p-4 font-mono text-primary">15–30 kWh</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Backup da casa inteira (qualquer tamanho)</td>
+                <td class="p-4 font-mono text-primary">Uso diário total</td>
+                <td class="p-4 font-mono text-primary">N/A</td>
+                <td class="p-4 font-mono text-primary">20–50+ kWh</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-body-md text-body font-light">
+          O backup de cargas críticas é a estratégia mais econômica. Ao alimentar apenas circuitos essenciais, você reduz o tamanho da bateria em 60–80% em comparação ao backup da casa inteira. Um painel de cargas críticas (subpainel com circuitos essenciais) custa $800–$2,000 para instalar e permite backup seletivo de circuitos.
+        </p>
+      </section>
+
+      <!-- Detalhamento de Custos de Instalação -->
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Detalhamento de Custos de Instalação de Bateria Solar</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Entender para onde vai cada dólar ajuda a avaliar orçamentos e identificar oportunidades de economia. Aqui está um detalhamento típico de custos para um sistema LiFePO4 de 10 kWh.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden mb-6">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Componente</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Faixa de Custo</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">% do Total</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">Unidade de bateria (LiFePO4 10 kWh)</td>
+                <td class="p-4 font-mono text-primary">$4,000 – $7,000</td>
+                <td class="p-4 font-mono text-primary">40 – 50%</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Inversor híbrido</td>
+                <td class="p-4 font-mono text-primary">$2,000 – $4,000</td>
+                <td class="p-4 font-mono text-primary">20 – 30%</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Obra elétrica</td>
+                <td class="p-4 font-mono text-primary">$1,000 – $3,000</td>
+                <td class="p-4 font-mono text-primary">10 – 20%</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Licenças e vistoria</td>
+                <td class="p-4 font-mono text-primary">$200 – $1,000</td>
+                <td class="p-4 font-mono text-primary">2 – 5%</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Sistema de monitoramento</td>
+                <td class="p-4 font-mono text-primary">$200 – $500</td>
+                <td class="p-4 font-mono text-primary">2 – 4%</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Mão de obra e comissionamento</td>
+                <td class="p-4 font-mono text-primary">$1,500 – $3,000</td>
+                <td class="p-4 font-mono text-primary">15 – 25%</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-body-md text-body font-light">
+          A bateria em si representa 40–50% do custo total do sistema. O inversor e a obra elétrica juntos respondem por 30–50%. Por isso os preços só da bateria ($400–$800/kWh) parecem tão diferentes dos preços instalados ($800–$1,200/kWh). Solicite sempre um orçamento detalhado que separe esses componentes.
+        </p>
+      </section>
+
+      <!-- Qual É o Período de Retorno? -->
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Qual É o Período de Retorno?</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          O período de retorno depende de três variáveis: sua tarifa de eletricidade, sua estrutura de tarifa por horário (TOU) e o valor de backup que você atribui à proteção contra apagões. Abaixo estão três exemplos resolvidos para um sistema LiFePO4 de 10 kWh ($10,000 instalado após 30% de ITC federal).
+        </p>
+
+        <h3 class="text-title-md text-primary mb-3">Exemplo 1: Tarifa Baixa ($0,10/kWh)</h3>
+        <div class="bg-surface-soft border border-hairline p-5 mb-4">
+          <p class="text-body-sm text-muted mb-2"><strong class="text-body-strong">Premissas:</strong> tarifa média de $0,10/kWh, sem precificação TOU, backup de cargas críticas (5 kWh/dia deslocados para a bateria), 30% de ITC federal aplicado.</p>
+          <p class="text-body-sm text-muted mb-2">Custo líquido após ITC: $10,000 × 0.70 = $7,000</p>
+          <p class="text-body-sm text-muted mb-2">Energia anual deslocada para a bateria: 5 kWh × 365 = 1,825 kWh</p>
+          <p class="text-body-sm text-muted mb-2">Economia anual: 1,825 × $0.10 = $182.50</p>
+          <p class="text-body-sm text-muted mb-2"><strong class="text-body-strong">Retorno simples: $7,000 ÷ $182.50 = 38,3 anos</strong></p>
+          <p class="text-body-sm text-muted">Com tarifas baixas e sem precificação TOU, baterias solares não se pagam financeiramente. O valor está na proteção de backup e na independência energética — não na economia de custos.</p>
+        </div>
+
+        <h3 class="text-title-md text-primary mb-3">Exemplo 2: Tarifa Média ($0,18/kWh)</h3>
+        <div class="bg-surface-soft border border-hairline p-5 mb-4">
+          <p class="text-body-sm text-muted mb-2"><strong class="text-body-strong">Premissas:</strong> tarifa média de $0,18/kWh, TOU moderado (ponta a $0,28, fora de ponta a $0,12), 60% da energia da bateria usada na ponta (economia de 3 kWh/dia na ponta), 30% de ITC federal aplicado.</p>
+          <p class="text-body-sm text-muted mb-2">Custo líquido após ITC: $10,000 × 0.70 = $7,000</p>
+          <p class="text-body-sm text-muted mb-2">Economia na ponta: 3 kWh × ($0.28 – $0.12) × 365 = $175.20</p>
+          <p class="text-body-sm text-muted mb-2">Economia fora de ponta: 2 kWh × ($0.12 – $0.10) × 365 = $14.60</p>
+          <p class="text-body-sm text-muted mb-2">Economia anual total: $189.80</p>
+          <p class="text-body-sm text-muted mb-2"><strong class="text-body-strong">Retorno simples: $7,000 ÷ $189.80 = 36,9 anos</strong></p>
+          <p class="text-body-sm text-muted">Ainda longo sem incluir o valor do backup. Se você atribuir $500/ano em valor de backup (evitando combustível de gerador, perda de alimentos, trabalho perdido), o retorno efetivo cai para 14,5 anos.</p>
+        </div>
+
+        <h3 class="text-title-md text-primary mb-3">Exemplo 3: Tarifa Alta ($0,30/kWh)</h3>
+        <div class="bg-surface-soft border border-hairline p-5 mb-4">
+          <p class="text-body-sm text-muted mb-2"><strong class="text-body-strong">Premissas:</strong> tarifa média de $0,30/kWh, TOU agressivo (ponta a $0,50, fora de ponta a $0,15), 70% da energia da bateria usada na ponta (economia de 3,5 kWh/dia na ponta), 30% de ITC federal aplicado.</p>
+          <p class="text-body-sm text-muted mb-2">Custo líquido após ITC: $10,000 × 0.70 = $7,000</p>
+          <p class="text-body-sm text-muted mb-2">Economia na ponta: 3.5 kWh × ($0.50 – $0.15) × 365 = $447.88</p>
+          <p class="text-body-sm text-muted mb-2">Economia fora de ponta: 1.5 kWh × ($0.15 – $0.10) × 365 = $27.38</p>
+          <p class="text-body-sm text-muted mb-2">Economia anual total: $475.26</p>
+          <p class="text-body-sm text-muted mb-2"><strong class="text-body-strong">Retorno simples: $7,000 ÷ $475.26 = 14,7 anos</strong></p>
+          <p class="text-body-sm text-muted">Adicione $500/ano de valor de backup e o retorno efetivo cai para 8,7 anos. Com incentivos estaduais (ex.: SGIP da Califórnia adicionando $1,500–$3,000), o retorno pode cair para 5–7 anos.</p>
+        </div>
+
+        <p class="text-body-md text-body font-light">
+          O padrão é claro: baterias solares se pagam mais rápido em regiões com TOU e tarifas altas e forte necessidade de backup. Em áreas de tarifa baixa, são uma compra de luxo justificada por resiliência e independência, não por retorno financeiro.
+        </p>
+      </section>
+
+      <!-- Baterias Solares Valem a Pena? -->
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Baterias Solares Valem a Pena?</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          A resposta depende das suas prioridades. Aqui está uma avaliação honesta de cada direcionador de valor.
+        </p>
+
+        <h3 class="text-title-md text-primary mb-3">Confiabilidade da Rede</h3>
+        <p class="text-body-md text-body font-light mb-4">
+          Se você enfrenta mais de 2–3 apagões por ano, um sistema de bateria se paga evitando custos de gerador, perda de alimentos e produtividade perdida. O apagão médio nos EUA durou 5,5 horas em 2025, e a frequência de apagões está aumentando. Em regiões com infraestrutura envelhecida (Sudeste, Nordeste), o backup em bateria oferece valor mensurável.
+        </p>
+
+        <h3 class="text-title-md text-primary mb-3">Arbitragem por Horário (TOU)</h3>
+        <p class="text-body-md text-body font-light mb-4">
+          Tarifas TOU cobram 2–4x mais nos horários de ponta (normalmente 16h–21h). Uma bateria que carrega fora de ponta ($0,08–$0,15/kWh) e descarrega na ponta ($0,25–$0,50/kWh) captura a diferença como economia. Este é o direcionador financeiro mais forte na Califórnia, Massachusetts, Nova York e outros mercados com TOU intenso.
+        </p>
+
+        <h3 class="text-title-md text-primary mb-3">Energia de Backup</h3>
+        <p class="text-body-md text-body font-light mb-4">
+          O valor do backup é real, mas difícil de quantificar. Um gerador para a casa inteira custa $10,000–$20,000 instalado, exige combustível, produz emissões e precisa de manutenção regular. Um sistema de bateria custa parecido no início, não exige combustível, não produz emissões e é livre de manutenção. Para proprietários que de todo modo precisam de backup, baterias são a tecnologia superior.
+        </p>
+
+        <h3 class="text-title-md text-primary mb-3">Independência Energética</h3>
+        <p class="text-body-md text-body font-light mb-4">
+          Alguns valorizam a independência em si. Um sistema solar + bateria elimina a dependência da rede e dos aumentos de tarifa. Com painéis solares cobrindo a geração diurna e a bateria cobrindo o consumo noturno, a dependência líquida da rede cai drasticamente. O valor econômico dessa independência varia por proprietário.
+        </p>
+
+        <h3 class="text-title-md text-primary mb-3">Impacto Ambiental</h3>
+        <p class="text-body-md text-body font-light mb-4">
+          Baterias permitem maior autoconsumo solar, reduzindo a dependência da rede e as emissões associadas. Em regiões onde a eletricidade da rede é pesada em carvão, o solar armazenado em bateria desloca geração mais suja. O caso ambiental é mais forte quando as baterias são combinadas com solar — sem solar, baterias apenas deslocam energia da rede de um horário para outro.
+        </p>
+      </section>
+
+      <!-- Dicas de Redução de Custos -->
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Dicas de Redução de Custos de Bateria Solar</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Estratégias práticas para reduzir o custo total do sistema sem comprometer o desempenho.
+        </p>
+
+        <div class="bg-surface-soft border border-hairline p-5 mb-4">
+          <h4 class="text-primary font-bold mb-2">1. Aproveite os 30% de ITC Federal</h4>
+          <p class="text-body-sm text-muted">O Crédito Fiscal de Investimento cobre 30% do custo total do sistema quando a bateria é combinada com solar. Em um sistema de $10,000, isso economiza $3,000. Garanta que seu instalador aplique o crédito corretamente — ele vale para o sistema inteiro, não só para a bateria.</p>
+        </div>
+
+        <div class="bg-surface-soft border border-hairline p-5 mb-4">
+          <h4 class="text-primary font-bold mb-2">2. Verifique Incentivos Estaduais e da Concessionária</h4>
+          <p class="text-body-sm text-muted">O SGIP da Califórnia oferece $200–$1,000/kWh para armazenamento em bateria. O NY-Sun de Nova York oferece $250/kWh. Massachusetts, Connecticut, Nova Jersey e Oregon têm programas ativos. Consulte a base DSIRE (dsireusa.org) para incentivos atuais na sua região.</p>
+        </div>
+
+        <div class="bg-surface-soft border border-hairline p-5 mb-4">
+          <h4 class="text-primary font-bold mb-2">3. Dimensione Só para Cargas Críticas</h4>
+          <p class="text-body-sm text-muted">Um sistema de cargas críticas (10 kWh) custa 40–60% menos que um sistema da casa inteira (25 kWh). Instale um subpainel de cargas críticas e alimente apenas circuitos essenciais. Você sempre pode expandir depois adicionando módulos de bateria.</p>
+        </div>
+
+        <div class="bg-surface-soft border border-hairline p-5 mb-4">
+          <h4 class="text-primary font-bold mb-2">4. Peça Vários Orçamentos</h4>
+          <p class="text-body-sm text-muted">Preços de instaladores variam 20–40% para equipamentos idênticos. Peça pelo menos 3 orçamentos de instaladores certificados. Garanta que os orçamentos sejam detalhados — compare bateria, inversor e mão de obra separadamente.</p>
+        </div>
+
+        <div class="bg-surface-soft border border-hairline p-5 mb-4">
+          <h4 class="text-primary font-bold mb-2">5. Considere Inversores Solares Prontos para Bateria</h4>
+          <p class="text-body-sm text-muted">Se você está instalando solar agora e adicionará bateria depois, escolha um inversor pronto para bateria. Isso evita um upgrade de inversor de $2,000–$5,000 ao adicionar armazenamento. A maioria dos inversores string modernos (Enphase, SolarEdge, Huawei) já é pronta para bateria.</p>
+        </div>
+
+        <div class="bg-surface-soft border border-hairline p-5 mb-4">
+          <h4 class="text-primary font-bold mb-2">6. Participe de Programas de Resposta à Demanda</h4>
+          <p class="text-body-sm text-muted">Algumas concessionárias pagam $50–$200/ano para donos de bateria que permitem despachar a energia armazenada nos picos da rede. Isso gera receita contínua que reduz o período efetivo de retorno. Os programas variam por concessionária — consulte seu fornecedor local.</p>
+        </div>
+
+        <div class="bg-surface-soft border border-hairline p-5 mb-4">
+          <h4 class="text-primary font-bold mb-2">7. Evite Superdimensionar</h4>
+          <p class="text-body-sm text-muted">Maior nem sempre é melhor. Uma bateria que nunca descarrega totalmente desperdiça capacidade paga. Dimensione corretamente com base nos seus padrões reais de consumo, não em piores cenários. Nossa <a href="/pt/tools/solar-battery-sizing-calculator/" class="text-m-blue-light hover:underline">Calculadora de Dimensionamento de Bateria Solar</a> ajuda a encontrar o tamanho ideal.</p>
+        </div>
+      </section>
+
+      <!-- Seção de Fórmulas -->
+      <section>
+        <FormulaBox title="Fórmulas-Chave">
+          <div class="bg-surface-soft border border-hairline p-5">
+            <p class="text-primary font-bold mb-2">Custo por kWh Só da Bateria</p>
+            <p class="text-muted">Custo da Bateria ($) ÷ Capacidade Nominal (kWh) = $/kWh só da bateria</p>
+          </div>
+          <div class="bg-surface-soft border border-hairline p-5">
+            <p class="text-primary font-bold mb-2">Custo Instalado por kWh</p>
+            <p class="text-muted">Custo Total do Sistema ($) ÷ Capacidade Nominal (kWh) = $/kWh instalado</p>
+          </div>
+          <div class="bg-surface-soft border border-hairline p-5">
+            <p class="text-primary font-bold mb-2">Custo por kWh Utilizável</p>
+            <p class="text-muted">Custo Total do Sistema ($) ÷ (Capacidade × DoD) = Custo por $/kWh utilizável</p>
+          </div>
+          <div class="bg-surface-soft border border-hairline p-5">
+            <p class="text-primary font-bold mb-2">Custo de Vida Útil por kWh Entregue</p>
+            <p class="text-muted">Custo Total do Sistema ($) ÷ (Capacidade Utilizável × Vida Útil em Ciclos) = $/kWh de vida útil</p>
+          </div>
+          <div class="bg-surface-soft border border-hairline p-5">
+            <p class="text-primary font-bold mb-2">Período de Retorno Simples</p>
+            <p class="text-muted">Custo Líquido Após Incentivos ($) ÷ Economia Anual ($) = Retorno (Anos)</p>
+          </div>
+        </FormulaBox>
+      </section>
+
+      <!-- Use Nossas Ferramentas de Planejamento -->
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Use Nossas Ferramentas de Planejamento de Custos</h2>
+        <p class="text-body-md text-body font-light mb-6">
+          Essas calculadoras gratuitas ajudam a dimensionar seu sistema, estimar custos e avaliar o ROI com base no seu consumo real e tarifas de eletricidade.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CalculatorCard>
+            <h3 class="text-primary font-bold mb-2">Calculadora de Dimensionamento de Bateria Solar</h3>
+            <p class="text-body-sm text-muted mb-4">Determine o tamanho ideal de bateria com base em consumo diário, dias de autonomia, química e profundidade de descarga.</p>
+            <a href="/pt/tools/solar-battery-sizing-calculator/" class="text-m-blue-light hover:underline text-sm uppercase tracking-wider font-bold">Usar Calculadora →</a>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h3 class="text-primary font-bold mb-2">Calculadora de Backup Residencial</h3>
+            <p class="text-body-sm text-muted mb-4">Calcule a capacidade de bateria necessária para backup de cargas críticas durante apagões. Insira seus circuitos essenciais e a autonomia desejada.</p>
+            <a href="/pt/tools/home-backup-battery-calculator/" class="text-m-blue-light hover:underline text-sm uppercase tracking-wider font-bold">Usar Calculadora →</a>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h3 class="text-primary font-bold mb-2">Calculadora de Dimensionamento de Bateria</h3>
+            <p class="text-body-sm text-muted mb-4">Dimensionamento geral de baterias para qualquer aplicação. Calcule capacidade, autonomia e contagem de células a partir das necessidades de carga.</p>
+            <a href="/pt/tools/battery-sizing-calculator/" class="text-m-blue-light hover:underline text-sm uppercase tracking-wider font-bold">Usar Calculadora →</a>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h3 class="text-primary font-bold mb-2">Calculadora de Autonomia de Bateria</h3>
+            <p class="text-body-sm text-muted mb-4">Estime por quanto tempo seu banco de baterias alimenta determinada carga. Útil para validar decisões de dimensionamento e duração de backup.</p>
+            <a href="/pt/tools/runtime-calculator/" class="text-m-blue-light hover:underline text-sm uppercase tracking-wider font-bold">Usar Calculadora →</a>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <!-- Guias Relacionados -->
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Guias Relacionados</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <a href="/pt/learn/solar-battery-storage-explained/" class="bg-surface-card border border-hairline p-5 hover:border-m-blue-light transition-colors">
+            <h3 class="text-primary font-bold mb-2">Armazenamento Solar em Bateria Explicado</h3>
+            <p class="text-body-sm text-muted">Como funciona o armazenamento solar em bateria, da química das células à arquitetura do sistema.</p>
+          </a>
+          <a href="/pt/learn/home-battery-sizing-guide/" class="bg-surface-card border border-hairline p-5 hover:border-m-blue-light transition-colors">
+            <h3 class="text-primary font-bold mb-2">Guia de Dimensionamento de Bateria Residencial</h3>
+            <p class="text-body-sm text-muted">Passo a passo para dimensionar um sistema residencial de backup em bateria.</p>
+          </a>
+          <a href="/pt/learn/what-is-battery-sizing/" class="bg-surface-card border border-hairline p-5 hover:border-m-blue-light transition-colors">
+            <h3 class="text-primary font-bold mb-2">O Que É Dimensionamento de Bateria?</h3>
+            <p class="text-body-sm text-muted">Fundamentos do dimensionamento de baterias: capacidade, tensão, C-rate e profundidade de descarga.</p>
+          </a>
+          <a href="/pt/learn/best-battery-chemistry-for-solar/" class="bg-surface-card border border-hairline p-5 hover:border-m-blue-light transition-colors">
+            <h3 class="text-primary font-bold mb-2">Melhor Química de Bateria para Energia Solar</h3>
+            <p class="text-body-sm text-muted">Comparação entre LiFePO4, chumbo-ácido e lítio ternário para aplicações de armazenamento solar.</p>
+          </a>
+        </div>
+      </section>
+
+      <!-- Seção FAQ -->
+      <FAQSection items={faqItems} />
+
+      <!-- Aviso -->
+      <section class="border-t border-hairline pt-8">
+        <p class="text-body-sm text-muted">
+          <strong class="text-body-strong">Aviso:</strong> Este artigo oferece informações gerais de preços para fins educacionais. Custos reais variam por região, instalador, seleção de equipamentos e condições do local. Os dados de preços refletem estimativas de mercado de 2026 e não garantem custos específicos. Obtenha sempre orçamentos detalhados de instaladores certificados antes de decidir a compra. BatteryCalculators.com não é afiliado a nenhum fabricante ou instalador de baterias. Use nossas calculadoras para planejamento — consulte um eletricista licenciado para o projeto final do sistema.
+        </p>
+      </section>
+
+    </div>
+  </div>
+</Layout>

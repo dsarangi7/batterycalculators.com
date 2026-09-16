@@ -1,0 +1,307 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "Qual é a fórmula para dimensionar um banco de baterias?",
+    answer: "A fórmula padrão é: Capacidade Necessária (Wh) = Carga Diária (Wh) × Dias de Autonomia / (DoD% / 100) / (Eficiência% / 100) / Fator de Temperatura. Converta para Ah dividindo pela tensão do sistema. Isso cobre as principais variáveis: demanda, duração, limites de descarga, perdas e condições ambientais.",
+  },
+  {
+    question: "Como a temperatura afeta a fórmula de dimensionamento?",
+    answer: "Fatores de redução por temperatura diminuem a capacidade efetiva. A 0°C, LFP entrega cerca de 90% e chumbo-ácido cerca de 80%. A -20°C, caem para 70% e 50%. O fator de temperatura é um divisor — fator menor significa mais capacidade instalada para compensar.",
+  },
+  {
+    question: "Qual profundidade de descarga devo usar na fórmula?",
+    answer: "Depende da química e da vida em ciclos desejada. LFP pode usar 80–90% DoD para 4.000+ ciclos. NMC normalmente usa 80% DoD. Chumbo-ácido deve ficar em 50% DoD para evitar degradação rápida. Um DoD menor estende a vida, mas exige banco maior — a fórmula captura esse trade-off.",
+  },
+  {
+    question: "Como considero a eficiência do inversor na fórmula?",
+    answer: "A eficiência do inversor é tipicamente 85–95% e entra como divisor de eficiência do sistema. Se seu inversor tem 90%, use 0,90 na fórmula. Para múltiplos estágios (conversor DC-DC + inversor), multiplique as eficiências de cada estágio.",
+  },
+];
+---
+
+<Layout
+  title="Fórmula de Dimensionamento de Bateria | Calculadoras de Bateria"
+  description="Referência completa de fórmulas de dimensionamento. Cobre cálculo de capacidade, tensão, profundidade de descarga, autonomia, redução por temperatura e eficiência com exemplos práticos."
+  canonical="https://batterycalculators.com/pt/learn/battery-sizing-formula/"
+  schema="faqPage"
+  schemaName="Fórmula de Dimensionamento de Bateria"
+  schemaDescription="Referência completa de engenharia para calcular a capacidade do banco em todos os sistemas."
+  schemaUrl="https://batterycalculators.com/pt/learn/battery-sizing-formula/"
+  faqItems={faqItems}
+  lang="pt"
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/pt/learn/" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Voltar aos Guias</a>
+      <Breadcrumb items={[
+        { label: "Centro de Aprendizagem", href: "/pt/learn/" },
+        { label: "Fórmula de Dimensionamento de Bateria" }
+      ]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">REFERÊNCIA</span>
+      <h1 class="text-display-md text-primary mb-6">Fórmula de Dimensionamento de Bateria</h1>
+      <p class="text-body-md text-body font-light">
+        Esta é a referência completa de fórmulas de dimensionamento. Cada variável é definida, cada fator explicado, e um exemplo totalmente resolvido mostra a aplicação em um sistema LFP 48V real.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Fórmula Principal de Dimensionamento</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          A fórmula principal calcula a energia total necessária em watt-horas. Todos os outros parâmetros — autonomia, limites de descarga, eficiência e temperatura — são divisores que aumentam a capacidade para cobrir perdas e restrições reais.
+        </p>
+        <FormulaBox title="Capacidade em Watt-Horas">
+          <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+            C_Wh = (E_diária × N_autonomia) / (D_DoD × η_sistema × K_temp)
+          </div>
+          <div class="flex flex-col gap-2 mt-2">
+            <p><strong>C_Wh</strong> — Capacidade necessária em watt-horas</p>
+            <p><strong>E_diária</strong> — Consumo diário total em watt-horas</p>
+            <p><strong>N_autonomia</strong> — Dias de autonomia (duração do backup)</p>
+            <p><strong>D_DoD</strong> — Profundidade máxima de descarga em decimal (ex.: 0,80 para 80%)</p>
+            <p><strong>η_sistema</strong> — Eficiência geral em decimal (inversor × controlador × fiação)</p>
+            <p><strong>K_temp</strong> — Fator de redução por temperatura (1,0 a 25°C, menor no frio)</p>
+          </div>
+        </FormulaBox>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Capacidade em Ampères-Hora</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Com a capacidade em watt-horas, converta para ampères-hora dividindo pela tensão do sistema. É esse valor que você usa ao escolher baterias, pois a maioria é classificada em Ah em uma tensão específica.
+        </p>
+        <FormulaBox title="Capacidade em Ampères-Hora">
+          <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+            C_Ah = C_Wh / V_sistema
+          </div>
+          <p>
+            Para um sistema 48V que precisa de 9.600 Wh: 9.600 / 48 = 200 Ah. Para um sistema 12V que precisa de 2.400 Wh: 2.400 / 12 = 200 Ah. Mesma energia, classificações Ah diferentes por causa da tensão.
+          </p>
+        </FormulaBox>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Detalhamento da Eficiência</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          A eficiência do sistema é o produto de todas as perdas de conversão e transmissão entre a bateria e a carga. Cada etapa se multiplica para dar o η_sistema total usado na fórmula.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Etapa de Perda</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Eficiência Típica</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Notas</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">Inversor (DC→AC)</td>
+                <td class="p-4 font-mono text-primary">88–95%</td>
+                <td class="p-4 text-muted">Senoidais puros no topo da faixa</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Controlador de Carga</td>
+                <td class="p-4 font-mono text-primary">95–98%</td>
+                <td class="p-4 text-muted">MPPT mais eficiente que PWM</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Ciclo da Bateria</td>
+                <td class="p-4 font-mono text-primary">90–98%</td>
+                <td class="p-4 text-muted">LFP 96–98%, chumbo-ácido 80–85%</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Fiação / Conexões</td>
+                <td class="p-4 font-mono text-primary">97–99%</td>
+                <td class="p-4 text-muted">Depende de bitola e comprimento</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted"><strong>η_sistema combinado</strong></td>
+                <td class="p-4 font-mono text-primary"><strong>78–90%</strong></td>
+                <td class="p-4 text-muted">Multiplique todas as etapas</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Fatores de Redução por Temperatura</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Baterias são classificadas a 25°C. O frio desacelera as reações químicas, reduzindo a energia extraível. O fator K_temp entra como divisor — K_temp menor exige mais capacidade instalada.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Temperatura</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">LFP (K_temp)</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Chumbo-Ácido (K_temp)</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">NMC (K_temp)</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">30°C</td>
+                <td class="p-4 font-mono text-primary">1,02</td>
+                <td class="p-4 font-mono text-primary">1,00</td>
+                <td class="p-4 font-mono text-primary">1,01</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">25°C</td>
+                <td class="p-4 font-mono text-primary">1,00</td>
+                <td class="p-4 font-mono text-primary">1,00</td>
+                <td class="p-4 font-mono text-primary">1,00</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">10°C</td>
+                <td class="p-4 font-mono text-primary">0,95</td>
+                <td class="p-4 font-mono text-primary">0,90</td>
+                <td class="p-4 font-mono text-primary">0,93</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">0°C</td>
+                <td class="p-4 font-mono text-primary">0,90</td>
+                <td class="p-4 font-mono text-primary">0,80</td>
+                <td class="p-4 font-mono text-primary">0,85</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">-10°C</td>
+                <td class="p-4 font-mono text-primary">0,80</td>
+                <td class="p-4 font-mono text-primary">0,65</td>
+                <td class="p-4 font-mono text-primary">0,75</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">-20°C</td>
+                <td class="p-4 font-mono text-primary">0,70</td>
+                <td class="p-4 font-mono text-primary">0,50</td>
+                <td class="p-4 font-mono text-primary">0,60</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-body-sm text-muted mt-2">Valores aproximados variam por fabricante. Consulte a folha de dados específica para curvas precisas.</p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Exemplo Prático: Banco LFP 48V</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Cenário:</strong> Dimensionar um banco LFP 48V para residência com consumo de 10 kWh/dia e 2 dias de autonomia.</p>
+            <p><strong>Dados:</strong></p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li>Consumo diário: 10.000 Wh (10 kWh)</li>
+              <li>Autonomia: 2 dias</li>
+              <li>Limite DoD: 80% (química LFP)</li>
+              <li>Eficiência do inversor: 92%</li>
+              <li>Eficiência do controlador: 97%</li>
+              <li>Eficiência de ciclo: 96%</li>
+              <li>Perdas de fiação: 98%</li>
+              <li>Fator de temperatura: 0,95 (clima ameno, média 10°C)</li>
+              <li>Tensão do sistema: 48V</li>
+            </ul>
+
+            <p><strong>Etapa 1:</strong> Eficiência combinada:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              η_sistema = 0,92 × 0,97 × 0,96 × 0,98 = 0,839
+            </div>
+
+            <p><strong>Etapa 2:</strong> Capacidade necessária em Wh:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              C_Wh = (10.000 × 2) / 0,80 / 0,839 / 0,95
+              C_Wh = 20.000 / 0,638
+              C_Wh = 31.348 Wh (31,3 kWh)
+            </div>
+
+            <p><strong>Etapa 3:</strong> Converter para Ah em 48V:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              C_Ah = 31.348 / 48 = 653 Ah
+            </div>
+
+            <p><strong>Etapa 4:</strong> Escolha a configuração prática. Um sistema LFP 48V com 16 células em série e células de 280 Ah rende cerca de 13,4 kWh. Para 31,3 kWh, use 4 strings paralelas de 280 Ah: 4 × 280 Ah = 1.120 Ah em 48V = 53,8 kWh. Isso dá margem ampla para 10+ anos de perda de capacidade e crescimento de carga.</p>
+            <p class="mt-2"><strong>Alternativa:</strong> um módulo comercial LFP 48V 200Ah (9,6 kWh) em paralelo: 4 módulos = 38,4 kWh, com 22% de margem sobre os 31,3 kWh necessários.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Referência Rápida: Ah por kWh por Tensão</h2>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Tensão do Sistema</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Ah por 1 kWh</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Uso Típico</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">12V</td>
+                <td class="p-4 font-mono text-primary">83,3 Ah</td>
+                <td class="p-4 text-muted">RV, marítimo, pequeno off-grid</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">24V</td>
+                <td class="p-4 font-mono text-primary">41,7 Ah</td>
+                <td class="p-4 text-muted">Off-grid médio, residência pequena</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">48V</td>
+                <td class="p-4 font-mono text-primary">20,8 Ah</td>
+                <td class="p-4 text-muted">Solar residencial, comercial, telecom</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">400V</td>
+                <td class="p-4 font-mono text-primary">2,5 Ah</td>
+                <td class="p-4 text-muted">BESS em escala de utilidade</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-body-sm text-muted mt-2">Sistemas de maior tensão precisam de menos Ah para a mesma energia, reduzindo bitola e perdas.</p>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Experimente</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use a Calculadora de Dimensionamento para aplicar essas fórmulas com seus números.
+          </p>
+          <a href="/pt/tools/battery-sizing-calculator/" class="btn-primary text-xs py-3 px-6 inline-block">Abrir Calculadora de Dimensionamento</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Verifique a Autonomia</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Após dimensionar, verifique a estimativa com a Calculadora de Autonomia.
+          </p>
+          <a href="/pt/tools/runtime-calculator/" class="btn-primary-outline text-xs py-3 px-6 inline-block">Abrir Calculadora de Autonomia</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Artigos Relacionados</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">O Que É Dimensionamento de Bateria?</h4>
+            <p class="text-body-sm text-muted mb-3">Visão geral do processo, por que importa e principais considerações.</p>
+            <a href="/pt/learn/what-is-battery-sizing/" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Ler Guia →</a>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Guia de Gráfico de Dimensionamento</h4>
+            <p class="text-body-sm text-muted mb-3">Gráfico visual mostrando qual Ah cabe em cada aplicação e perfil.</p>
+            <a href="/pt/learn/battery-sizing-chart-guide/" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Ler Guia →</a>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

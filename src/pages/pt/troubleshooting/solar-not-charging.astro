@@ -1,0 +1,209 @@
+---
+import ArticleLayout from '../../../layouts/ArticleLayout.astro';
+import TroubleshootingBlock from '../../../components/TroubleshootingBlock.astro';
+
+const relatedCalculators = [
+  { title: 'Calculadora de Dimensionamento de Bateria Solar', href: '/pt/tools/solar-battery-sizing-calculator/', type: 'calculator' as const },
+  { title: 'Calculadora de Tempo de Carga', href: '/pt/tools/charging-time-calculator/', type: 'calculator' as const },
+  { title: 'Calculadora de Taxa C', href: '/pt/tools/c-rate-calculator/', type: 'calculator' as const },
+  { title: 'Calculadora de Perda em Cabos DC', href: '/pt/tools/dc-cable-loss-calculator/', type: 'calculator' as const },
+];
+
+const relatedGuides = [
+  { title: 'Como Dimensionar um Banco de Baterias Solar', href: '/pt/learn/how-to-size-solar-battery-bank/', type: 'guide' as const },
+  { title: 'Guia de Backup Solar com Bateria', href: '/pt/learn/solar-battery-backup-guide/', type: 'guide' as const },
+  { title: 'Planejamento de Baterias Off-Grid', href: '/pt/learn/off-grid-battery-planning/', type: 'guide' as const },
+];
+
+const faqItems = [
+  {
+    question: 'Como testo se meus painéis solares estão gerando energia?',
+    answer: 'Use um multímetro para medir a tensão de circuito aberto (Voc) de cada painel sob luz solar direta. Compare com o Voc nominal do painel (na etiqueta). Depois meça a corrente de curto-circuito (Isc) — compare com o Isc nominal. Se a tensão estiver normal mas a corrente baixa, o painel pode estar sujo ou degradado. Se a tensão estiver baixa, o painel pode estar danificado ou superaquecido.',
+  },
+  {
+    question: 'O que é MPPT e por que importa?',
+    answer: 'MPPT (Rastreamento do Ponto de Máxima Potência) é um algoritmo do controlador de carga que ajusta continuamente o ponto elétrico de operação do painel para extrair a máxima potência. Um controlador MPPT pode colher 15–30% mais energia que um PWM, especialmente quando a tensão do painel é bem maior que a da bateria. Se o MPPT estiver com defeito, ele pode operar em modo PWM, reduzindo a corrente de carga.',
+  },
+  {
+    question: 'Sombreamento parcial pode parar totalmente o carregamento solar?',
+    answer: 'Sim. Painéis conectados em série são limitados pela célula mais fraca — sombrear uma única célula pode reduzir a saída de toda a string em 50–80%. Diodos de bypass ajudam, mas só mitigam o sombreamento em substrings inteiras (normalmente 1/3 do painel). Para sombreamento severo ou variável, use microinversores, otimizadores CC ou configurações tolerantes a sombra.',
+  },
+  {
+    question: 'Como verifico se meu fusível solar queimou?',
+    answer: 'Use um multímetro em modo de continuidade no fusível, ou meça a tensão nos dois lados do porta-fusível — se houver tensão no lado do painel mas não no lado da bateria, o fusível queimou. Sempre substitua por fusíveis da especificação correta — um fusível subdimensionado queimará repetidamente, enquanto um superdimensionado pode não proteger contra corrente de falha.',
+  },
+  {
+    question: 'Por que meu controlador MPPT mostra 0 ampères?',
+    answer: 'Causas comuns incluem: (1) tensão do painel abaixo da tensão da bateria (painéis não conseguem carregar uma bateria em tensão maior), (2) painel conectado nos terminais errados, (3) conectores MC4 mal encaixados, (4) fusível queimado entre painel e controlador, (5) controlador em modo noturno (sem tensão FV detectada). Verifique o Voc dos painéis, a fiação e os indicadores LED.',
+  },
+  {
+    question: 'Quanto tempo os painéis devem levar para carregar minha bateria?',
+    answer: 'Tempo de carga = Ah da bateria ÷ (watts dos painéis × horas de sol pleno × eficiência do controlador ÷ tensão do sistema). Uma bateria de 200Ah 12V com 400W de painéis e 5 horas de sol pleno carrega em aproximadamente 200Ah ÷ (400W × 5h × 0,9 ÷ 12V) = 6,7 horas. Na prática, o tempo é maior devido à redução dos painéis, perdas do MPPT e à desaceleração da fase CV acima de 80% de SOC.',
+  },
+];
+---
+
+<ArticleLayout
+  title="Solar Não Carrega — Guia de Solução de Problemas | Calculadoras de Bateria"
+  description="Descubra por que seus painéis solares não estão carregando sua bateria. Solucione sombreamento, problemas de MPPT, incompatibilidade de tensão, dano nos painéis e problemas de fiação com listas de verificação passo a passo."
+  canonical="https://batterycalculators.com/pt/troubleshooting/solar-not-charging/"
+  category="SOLUÇÃO DE PROBLEMAS"
+  breadcrumbItems={[{ label: 'Solar Não Carrega' }]}
+  relatedCalculators={relatedCalculators}
+  relatedGuides={relatedGuides}
+  faqItems={faqItems}
+  lang="pt"
+>
+  <p class="text-body-md text-body font-light mb-8">
+    Sistemas de carga solar têm múltiplos pontos de falha — dos próprios painéis até o controlador de carga e a bateria. Um sistema que produzia potência total na semana passada pode não produzir nada hoje por sombreamento, fusível queimado ou falha do controlador. Este guia percorre os cinco motivos mais comuns pelos quais painéis solares não carregam baterias, com procedimentos práticos de diagnóstico.
+  </p>
+
+  <TroubleshootingBlock
+    lang="pt"
+    problem="Sombreamento — Obstrução Parcial Matando a Saída dos Painéis"
+    causes={[
+      'Crescimento de árvores projetando sombras em um ou mais painéis',
+      'Sujeira, fezes de pássaros ou detritos bloqueando células',
+      'Acúmulo de neve na superfície do painel',
+      'Estruturas ou equipamentos próximos criando padrões de sombra',
+      'Orientação dos painéis causando autossombreamento no arranjo',
+    ]}
+    explanation="Células solares em um painel são ligadas em strings em série, normalmente três substrings de 20–24 células cada com diodos de bypass. Quando uma única célula de uma string é sombreada, sua resistência aumenta drasticamente, estrangulando toda a string. O diodo de bypass ativa para desviar a corrente pela substring sombreada, mas isso ainda reduz a saída em cerca de um terço por substring sombreada. Se múltiplas substrings forem afetadas, a saída cai para quase zero. O sombreamento parcial é a causa número um de baixo desempenho solar inesperado porque a perda é não linear — 10% de cobertura de sombra pode causar 30–50% de perda de potência dependendo do padrão. Mesmo uma pequena obstrução como um galho ou antena pode causar perda desproporcional."
+    checklist={[
+      'Inspecione visualmente todos os painéis por sombras de árvores, prédios ou detritos',
+      'Verifique a superfície por sujeira, fezes de pássaros ou neve',
+      'Monitore a saída em diferentes horários para identificar sombra variável',
+      'Use câmera infravermelha ou imagem térmica para identificar pontos quentes de sombreamento parcial',
+      'Verifique se a saída melhora após limpar a superfície',
+      'Revise o ângulo e a orientação para autossombreamento no arranjo',
+    ]}
+    solutions={[
+      'Pode árvores ou remova obstruções que projetam sombra nos painéis',
+      'Limpe a superfície com água e escova macia (sem abrasivos)',
+      'Ajuste a altura ou o ângulo de montagem para evitar sombras sazonais',
+      'Reconfigure a fiação do arranjo para colocar painéis sombreados em entradas MPPT separadas',
+      'Instale microinversores ou otimizadores CC para isolar o impacto do painel sombreado',
+      'Considere mudar os painéis para área do telhado ou solo sem sombra',
+    ]}
+  />
+
+  <TroubleshootingBlock
+    lang="pt"
+    problem="Problemas no Controlador MPPT — Controlador Não Colhendo Energia"
+    causes={[
+      'Controlador não detectando tensão FV (modo noturno ou falha de fiação)',
+      'Algoritmo MPPT travado ou bug de firmware',
+      'Controlador sobrecarregado — arranjo excede a especificação',
+      'Tensão da bateria maior que a tensão FV (controlador não consegue elevar)',
+      'Falha de display/LED mascarando a operação real de carga',
+    ]}
+    explanation="Controladores de Rastreamento do Ponto de Máxima Potência ajustam continuamente o ponto elétrico de operação do arranjo para extrair a máxima potência. O algoritmo MPPT varre a curva tensão-corrente do painel para achar o ponto onde a potência (V × I) é máxima. Se o controlador não detectar tensão FV de entrada, ele entra em modo de espera. Causas comuns incluem conectores MC4 abertos, fusíveis queimados ou tensão do painel abaixo da tensão mínima de partida do controlador (normalmente 12–16V para sistemas 12V). Um modo de falha menos óbvio ocorre quando a bateria está totalmente carregada — o controlador reduz a corrente para quase zero para evitar sobrecarga, o que pode ser confundido com defeito. Além disso, se a tensão do arranjo for menor que a da bateria (ex.: painel de 12V tentando carregar bateria de 24V), o controlador não eleva a tensão e não produz saída."
+    checklist={[
+      'Verifique no display a tensão FV, a tensão da bateria e a corrente de carga',
+      'Confirme a tensão FV nos terminais de entrada (deve ser >tensão da bateria + 2V)',
+      'Se a tensão FV ler 0V, verifique a fiação dos painéis ao controlador',
+      'Verifique os LEDs por códigos de erro ou status de falha',
+      'Confirme se a tensão do arranjo está na faixa de entrada do controlador',
+      'Compare a corrente nominal de entrada com a saída real dos painéis',
+      'Reinicie o controlador desconectando bateria e FV e reconectando a bateria primeiro',
+    ]}
+    solutions={[
+      'Corrija as conexões para restaurar a tensão FV na entrada',
+      'Garanta que a tensão dos painéis exceda a da bateria em pelo menos 3–5V para partida do MPPT',
+      'Atualize o firmware do controlador, se disponível',
+      'Substitua o controlador se o algoritmo MPPT não funcionar após reiniciar',
+      'Atualize para um controlador de maior capacidade se o arranjo exceder a nominal',
+      'Consulte o manual para resolução de códigos de erro específicos',
+    ]}
+  />
+
+  <TroubleshootingBlock
+    lang="pt"
+    problem="Incompatibilidade de Tensão — Painel e Bateria Incompatíveis"
+    causes={[
+      'Voc do painel baixo demais para carregar a bateria (painel 12V em bateria 24V)',
+      'Voc do painel alto demais para a entrada do controlador',
+      'Coeficiente de temperatura fazendo o Voc cair abaixo do limite no calor',
+      'Configuração série/paralelo incorreta dos painéis',
+      'Painéis incompatíveis em série com valores de Voc diferentes',
+    ]}
+    explanation="Para um painel solar carregar uma bateria, sua tensão no ponto de máxima potência (Vmp) deve exceder a tensão da bateria com margem suficiente para o controlador operar. Para controladores MPPT, o Vmp deve exceder a tensão da bateria em pelo menos 3–5V. Para PWM, o Vmp deve corresponder de perto à tensão de carga (14,4V para LFP 12V). A temperatura afeta muito a tensão do painel — painéis têm coeficiente negativo de aproximadamente -0,3%/°C para o Voc. Um painel com 21,5V de Voc a 25°C cai para 18,6V a 60°C (temperatura comum em telhados). Se a bateria está a 14,6V de carga e o Vmp quente cai para 15V, um MPPT que exige 3V de diferencial mínimo falhará em rastrear o ponto de máxima potência."
+    checklist={[
+      'Meça o Voc dos painéis com multímetro sob luz solar direta',
+      'Compare o Voc medido com a especificação da etiqueta',
+      'Verifique o Vmp (tensão de máxima potência) na folha de dados',
+      'Confirme se o Voc excede a tensão de carga em pelo menos 3V',
+      'Considere a temperatura: o Voc cai ~0,3%/°C acima de 25°C',
+      'Confirme se a fiação série/paralelo está na faixa de entrada do controlador',
+      'Verifique se todos os painéis em série têm especificações iguais',
+    ]}
+    solutions={[
+      'Adicione painéis em série para elevar a tensão da string acima do limite',
+      'Migre para um sistema de maior tensão (24V ou 48V) para melhor casamento',
+      'Use um MPPT adequado à sua faixa de Voc e tensão de bateria',
+      'Garanta que todos os painéis em série sejam idênticos em marca e modelo',
+      'Considere a queda de tensão no calor ao dimensionar a string',
+      'Consulte a Calculadora de Dimensionamento de Bateria Solar para casamento correto',
+    ]}
+  />
+
+  <TroubleshootingBlock
+    lang="pt"
+    problem="Dano nos Painéis — Falha Física ou Elétrica"
+    causes={[
+      'Microtrincas por impacto de granizo ou estresse mecânico',
+      'Pontos quentes por dano nas células causando superaquecimento localizado',
+      'Delaminação permitindo entrada de umidade e corrosão',
+      'Juntas de solda rompidas por ciclagem térmica',
+      'Falha de diodo de bypass causando perda permanente de substring',
+    ]}
+    explanation="Painéis solares degradam com o tempo (normalmente 0,5–0,7% ao ano), mas danos físicos podem causar perda súbita e severa. Impactos de granizo criam microtrincas nas células de silício que podem não ser visíveis, mas interrompem o fluxo de corrente. Pontos quentes ocorrem quando uma célula danificada ou sombreada fica reversamente polarizada, dissipando potência como calor em vez de gerar — isso pode queimar o backsheet e criar risco de incêndio. A delaminação permite que a umidade corroa as interconexões, reduzindo progressivamente a saída. Diodos de bypass em curto desabilitam permanentemente uma substring, enquanto diodos abertos permitem o desenvolvimento de pontos quentes. A ciclagem térmica (aquecimento e resfriamento diários) estressa soldas e conexões, eventualmente causando circuitos abertos."
+    checklist={[
+      'Inspecione visualmente o vidro por trincas, lascas ou impactos',
+      'Verifique o backsheet por marcas de queimado, descoloração ou delaminação',
+      'Use câmera infravermelha para identificar pontos quentes sob sol pleno',
+      'Meça Voc e Isc — compare com a etiqueta e painéis vizinhos',
+      'Verifique conectores MC4 por corrosão ou umidade interna',
+      'Compare a saída do painel suspeito com um painel idêntico adjacente',
+      'Revise a idade e os termos de garantia (normalmente 25 anos de garantia de desempenho)',
+    ]}
+    solutions={[
+      'Substitua painéis com dano físico visível ou falha elétrica confirmada',
+      'Substitua conectores MC4 se houver umidade ou corrosão interna',
+      'Entre em contato com o fabricante para substituição em garantia de painéis com pontos quentes',
+      'Melhore a montagem para reduzir estresse mecânico de vento e ciclagem térmica',
+      'Instale monitoramento por painel (microinversores ou otimizadores) para detectar falhas cedo',
+      'Mantenha as superfícies limpas e inspecione anualmente por sinais de degradação',
+    ]}
+  />
+
+  <TroubleshootingBlock
+    lang="pt"
+    problem="Problemas de Fiação e Fusíveis — Caminho Interrompido Entre Painel e Bateria"
+    causes={[
+      'Fusível CC ou disjuntor queimado entre painéis e controlador',
+      'Conector MC4 frouxo mal encaixado',
+      'Roedores roendo o cabo solar',
+      'Conexão corroída em caixa de junção externa',
+      'Polaridade invertida (positivo e negativo trocados)',
+    ]}
+    explanation="O circuito CC dos painéis ao controlador é um caminho contínuo que deve estar íntegro para a corrente fluir. Um único ponto de falha interrompe todo o carregamento. Fusíveis e disjuntores são o ponto mais comum — eles protegem contra sobrecorrente, mas também podem queimar por disparos incômodos de surtos induzidos por raios, conexões frouxas com arco, ou sobretensão temporária. Conectores MC4 são projetados para resistir ao tempo, mas podem afrouxar com ciclos de expansão/contração térmica. Caixas de junção externas são vulneráveis à umidade, que corrói terminais e cria conexões de alta resistência. Danos por roedores, UV ou abrasão física podem criar circuitos abertos ou intermitentes difíceis de diagnosticar."
+    checklist={[
+      'Verifique o fusível/disjuntor CC — se queimado, substitua e investigue o motivo',
+      'Desconecte e reconecte todos os MC4, garantindo o clique de trava',
+      'Meça a tensão na saída do painel, no fusível/disjuntor e na entrada do controlador',
+      'Se houver tensão antes do fusível mas não depois, o fusível queimou ou o porta-fusível corroeu',
+      'Percorra todo o cabo por danos físicos, degradação UV ou marcas de roedores',
+      'Confirme a polaridade correta em todos os pontos de conexão',
+      'Inspecione caixas de junção externas por umidade ou corrosão',
+    ]}
+    solutions={[
+      'Substitua fusíveis queimados pela especificação correta (Isc do painel × 1,56 pela NEC)',
+      'Substitua porta-fusíveis corroídos por unidades à prova de intempéries IP67',
+      'Reencaixe ou substitua MC4 frouxos (use peças de reposição MC4 genuínas)',
+      'Substitua cabos danificados por cabo USE-2 ou FV para uso externo',
+      'Vede todas as caixas externas com silicone e instale alças de gotejamento',
+      'Use a Calculadora de Perda em Cabos DC para verificar se a bitola é adequada',
+    ]}
+  />
+</ArticleLayout>

@@ -1,9 +1,10 @@
 import en from '../i18n/en.json';
 import pt from '../i18n/pt.json';
+import zh from '../i18n/zh.json';
 
-export type Locale = 'en' | 'pt';
+export type Locale = 'en' | 'pt' | 'zh';
 
-const dictionaries: Record<Locale, typeof en> = { en, pt };
+const dictionaries: Record<Locale, typeof en> = { en, pt, zh };
 
 export function t(key: string, lang: Locale = 'en'): string {
   const dict = dictionaries[lang] || dictionaries.en;
@@ -20,7 +21,8 @@ export function t(key: string, lang: Locale = 'en'): string {
 }
 
 export function getLocaleFromPath(pathname: string): Locale {
-  if (pathname.startsWith('/pt/')) return 'pt';
+  if (pathname.startsWith('/pt/') || pathname === '/pt') return 'pt';
+  if (pathname.startsWith('/zh/') || pathname === '/zh') return 'zh';
   return 'en';
 }
 
@@ -28,16 +30,41 @@ export function getOppositeLocale(lang: Locale): Locale {
   return lang === 'en' ? 'pt' : 'en';
 }
 
+export const SUPPORTED_LOCALES: Locale[] = ['en', 'pt', 'zh'];
+
+export const LOCALE_LABELS: Record<Locale, string> = {
+  en: 'English',
+  pt: 'Português',
+  zh: '中文(简体)',
+};
+
 export function getLocalePrefix(lang: Locale): string {
-  return lang === 'en' ? '' : '/pt';
+  if (lang === 'pt') return '/pt';
+  if (lang === 'zh') return '/zh';
+  return '';
+}
+
+export function stripLocalePrefix(pathname: string): string {
+  if (pathname.startsWith('/pt/')) return pathname.replace('/pt/', '/');
+  if (pathname === '/pt') return '/';
+  if (pathname.startsWith('/zh/')) return pathname.replace('/zh/', '/');
+  if (pathname === '/zh') return '/';
+  return pathname;
+}
+
+export function localizePath(pathname: string, lang: Locale): string {
+  const stripped = stripLocalePrefix(pathname);
+  const normalized = stripped.startsWith('/') ? stripped : `/${stripped}`;
+  if (lang === 'en') return normalized;
+  return `/${lang}${normalized}`;
 }
 
 export function getAlternateLinks(pathname: string): { lang: Locale; href: string }[] {
-  const isPt = pathname.startsWith('/pt/');
-  const enPath = isPt ? pathname.replace('/pt/', '/') : pathname;
-  const ptPath = isPt ? pathname : '/pt' + pathname;
+  const stripped = stripLocalePrefix(pathname);
+  const normalized = stripped.startsWith('/') ? stripped : `/${stripped}`;
   return [
-    { lang: 'en', href: `https://batterycalculators.com${enPath}` },
-    { lang: 'pt', href: `https://batterycalculators.com${ptPath}` },
+    { lang: 'en', href: `https://batterycalculators.com${normalized}` },
+    { lang: 'pt', href: `https://batterycalculators.com/pt${normalized === '/' ? '/' : normalized}` },
+    { lang: 'zh', href: `https://batterycalculators.com/zh${normalized === '/' ? '/' : normalized}` },
   ];
 }

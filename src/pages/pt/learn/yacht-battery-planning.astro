@@ -1,0 +1,228 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "Quanta capacidade de bateria um passeio de fim de semana de iate precisa?",
+    answer: "Um passeio típico de fim de semana de iate (2 dias, 2 pessoas) consome 2–4 kWh por dia em cargas hoteleiras. Com 2 dias de reserva de autonomia e 50% de DoD, você precisa de aproximadamente 8–16 kWh de energia armazenada. A 12V, isso equivale a 667–1.333 Ah. Um sistema 24V ou 48V reduz proporcionalmente a necessidade em Ah.",
+  },
+  {
+    question: "Qual é a diferença entre cargas hoteleiras e cargas de navegação em iates?",
+    answer: "Cargas hoteleiras são a demanda elétrica de base com os motores desligados — luzes, refrigeração, bombas de água, eletrônicos. Cargas de navegação incluem instrumentos adicionais, displays de navegação e bombas do motor, mas são compensadas pela carga do alternador. Cargas hoteleiras são o cenário crítico de projeto para dimensionamento.",
+  },
+  {
+    question: "Iates devem usar sistemas de 12V ou 24V?",
+    answer: "Para barcos de até 45 pés, sistemas 12V são comuns pela compatibilidade com eletrônicos marítimos padrão. Para iates maiores com demandas maiores, sistemas 24V ou 48V reduzem a corrente, permitindo cabos mais finos e barramentos menores. Muitos iates modernos usam 48V para cargas hoteleiras com conversores DC-DC para subsistemas 12V.",
+  },
+  {
+    question: "Painéis solares alimentam totalmente as cargas hoteleiras de um iate?",
+    answer: "Em latitudes tropicais, 400–800W de solar podem compensar 3–6 kWh/dia. Em regiões temperadas com nebulosidade, o solar normalmente cobre 30–50% das necessidades hoteleiras. O solar é um excelente complemento, mas não deve ser a única fonte para cargas hoteleiras críticas sem backup de bateria.",
+  },
+];
+---
+
+<Layout
+  title="Guia de Planejamento de Bateria para Iates | Calculadoras de Bateria"
+  description="Guia completo de planejamento de bateria para iates: cargas hoteleiras, navegação, modos fundeado vs navegando e exemplos resolvidos para passeios de fim de semana com consumo de 3kWh/dia."
+  canonical="https://batterycalculators.com/pt/learn/yacht-battery-planning/"
+  schema="faqPage"
+  schemaName="Guia de Planejamento de Bateria para Iates"
+  schemaDescription="Guia de engenharia para planejamento de sistemas de bateria em iates e gerenciamento de cargas hoteleiras."
+  schemaUrl="https://batterycalculators.com/pt/learn/yacht-battery-planning/"
+  faqItems={faqItems}
+  lang="pt"
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/pt/learn/" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Voltar aos Guias</a>
+      <Breadcrumb items={[
+        { label: "Centro de Aprendizagem", href: "/pt/learn/" },
+        { label: "Guia de Planejamento de Bateria para Iates" }
+      ]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">MARÍTIMO</span>
+      <h1 class="text-display-md text-primary mb-6">Guia de Planejamento de Bateria para Iates</h1>
+      <p class="text-body-md text-body font-light">
+        Iates operam em um ambiente elétrico único. Ao contrário de barcos menores, iates têm cargas hoteleiras substanciais — equipamentos de cozinha, climatização, sistemas de entretenimento e dessalinizadores — que devem ser sustentadas em travessias de vários dias e longos períodos fundeados. Este guia percorre o método de engenharia para planejar um sistema de baterias que atenda cargas hoteleiras e de navegação com confiabilidade.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Entendendo as Cargas Elétricas de Iates</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          O planejamento elétrico de iates gira em torno de dois modos operacionais distintos: fundeado (só cargas hoteleiras) e navegando (cargas hoteleiras mais navegação e sistemas do motor). O cenário fundeado é o caso crítico de projeto porque não há entrada do alternador — o banco deve sustentar todas as cargas sozinho por 12–18 horas à noite ou mais em estadias prolongadas.
+        </p>
+        <p class="text-body-md text-body font-light mb-4">
+          Um passeio de fim de semana com cargas moderadas normalmente consome 2–4 kWh por dia. Iates maiores com dessalinizadores, ar-condicionado ou sistemas extensos de entretenimento podem facilmente consumir 8–15 kWh por dia. O segredo é inventariar cada carga, estimar o consumo diário e dimensionar o banco para o período de autonomia necessário.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Categoria de Carga</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Consumo Diário Típico</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Observações</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">Refrigeração</td>
+                <td class="p-4 font-mono text-primary">0.8–1.5 kWh</td>
+                <td class="p-4 text-muted">Funciona 24h, liga e desliga</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Iluminação da cabine</td>
+                <td class="p-4 font-mono text-primary">0.2–0.5 kWh</td>
+                <td class="p-4 text-muted">LED preferível, 4–6h à noite</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Eletrônicos de navegação</td>
+                <td class="p-4 font-mono text-primary">0.5–1.0 kWh</td>
+                <td class="p-4 text-muted">Chartplotter, radar, AIS navegando</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Bomba de água</td>
+                <td class="p-4 font-mono text-primary">0.1–0.3 kWh</td>
+                <td class="p-4 text-muted">Intermitente, pressostato</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Comunicação</td>
+                <td class="p-4 font-mono text-primary">0.1–0.3 kWh</td>
+                <td class="p-4 text-muted">VHF, SSB, telefone via satélite</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Dessalinizador</td>
+                <td class="p-4 font-mono text-primary">1.5–3.0 kWh</td>
+                <td class="p-4 text-muted">Só operando, alto consumo</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Entretenimento</td>
+                <td class="p-4 font-mono text-primary">0.3–0.8 kWh</td>
+                <td class="p-4 text-muted">TV, áudio, carga de dispositivos</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <FormulaBox title="Fórmula de Dimensionamento para Iates">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Energia Necessária (Wh) = Carga Diária (Wh) × Dias de Autonomia × Fator de Segurança
+        </div>
+        <p>
+          O fator de segurança considera envelhecimento da bateria, redução por temperatura e cargas parasitas. Para aplicações marítimas, use 1,20–1,30 conforme as condições.
+        </p>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Capacidade Necessária (Ah) = Energia Necessária / (Tensão do Sistema × DoD)
+        </div>
+        <p>
+          Use 50% de DoD para AGM de chumbo-ácido, 80% para LFP de lítio. Arredonde sempre para o tamanho padrão mais próximo.
+        </p>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Fundeado vs Navegando</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          A diferença crítica entre fundeado e navegando é a entrada de carga. Navegando, o alternador (ou geradores) recarrega continuamente o banco, então a bateria só precisa cobrir breves períodos com o motor desligado. Fundeado, não há entrada de carga e o banco é a única fonte de energia para todas as cargas hoteleiras — normalmente 12–18 horas à noite.
+        </p>
+        <p class="text-body-md text-body font-light mb-4">
+          Projete seu banco para o cenário fundeado. O alternador cuida das cargas de navegação. Se planeja longas estadias fundeado (vários dias), considere adicionar solar ou um gerador dedicado para reduzir a profundidade de ciclagem e estender a vida da bateria.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Exemplo Resolvido: Passeio de Fim de Semana</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Cenário:</strong> Cruzeiro de fim de semana (2 dias), 2 pessoas, consumo de 3 kWh/dia, fundeado à noite por 14 horas a cada noite. Sistema LFP 24V.</p>
+            <p><strong>Etapa 1:</strong> Calcular a necessidade total de energia:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              3,000 Wh/dia × 1.25 fator de segurança = 3,750 Wh
+            </div>
+            <p><strong>Etapa 2:</strong> Converter para Ah a 24V com 80% de DoD (LFP):</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              3,750 Wh / (0.80 × 24V) = 195 Ah
+            </div>
+            <p><strong>Etapa 3:</strong> Dimensionar para 2 dias de autonomia:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              195 Ah × 2 = 390 Ah
+            </div>
+            <p><strong>Etapa 4:</strong> Selecione a configuração. Duas baterias LFP 24V 200Ah em paralelo oferecem 400 Ah a 24V — 9.600 Wh no total. Com 80% de DoD, a energia utilizável é 7.680 Wh, suportando 2,56 dias a 3.000 Wh/dia com margem para crescimento de cargas.</p>
+            <p><strong>Etapa 5:</strong> Verifique a descarga noturna. Fundeado 14 horas com carga hoteleira média de 125W = 1.750 Wh. O banco oferece 7.680 Wh utilizáveis — suficiente para 4,4 ciclos noturnos antes de precisar recarregar.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Opções de Fonte de Energia</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Carga pelo Alternador</h4>
+            <p class="text-body-sm text-muted">
+              Principal fonte de carga navegando. Um alternador de 120A em sistema 24V repõe 2.880 Wh/hora. Eficaz navegando de dia, mas indisponível fundeado sem marcha lenta ou gerador dedicado.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Painéis Solares</h4>
+            <p class="text-body-sm text-muted">
+              400–800W de solar geram 2–6 kWh/dia conforme latitude e estação. Excelente para estender estadias fundeado sem motor. Exige controlador MPPT e área suficiente de convés/teto para montagem.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Energia de Cais</h4>
+            <p class="text-body-sm text-muted">
+              Atracado, a energia de cais via carregador mantém o banco cheio e elimina a ciclagem. Use um carregador marítimo multiestágio compatível com sua química para evitar sobrecarga e maximizar a vida útil.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Gerador</h4>
+            <p class="text-body-sm text-muted">
+              Um gerador dedicado a diesel ou propano oferece carga independente do motor principal. Dimensionado em 5–15 kW para cargas hoteleiras de iates. Mais eficaz para fundeios de vários dias onde o solar é insuficiente e a marcha lenta é impraticável.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Experimente</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use a Calculadora de Dimensionamento de Bateria Marítima para inserir as cargas específicas do seu iate e obter uma recomendação de banco.
+          </p>
+          <a href="/pt/tools/marine-battery-sizing-calculator/" class="btn-primary text-xs py-3 px-6 inline-block">Abrir Calculadora de Bateria Marítima</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Próxima Etapa</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Calcule por quanto tempo seu banco alimenta suas cargas hoteleiras no pernoite fundeado.
+          </p>
+          <a href="/pt/tools/runtime-calculator/" class="btn-primary text-xs py-3 px-6 inline-block">Abrir Calculadora de Autonomia</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Artigos Relacionados</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <a href="/pt/learn/marine-battery-sizing-guide/" class="text-primary hover:underline font-bold block mb-2">Guia de Dimensionamento de Bateria Marítima</a>
+            <p class="text-body-sm text-muted">
+              O método padrão para dimensionar bancos residenciais marítimos — cobre cargas hoteleiras, fatores ambientais e seleção de química.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <a href="/pt/learn/lithium-marine-batteries/" class="text-primary hover:underline font-bold block mb-2">Baterias Marítimas de Lítio</a>
+            <p class="text-body-sm text-muted">
+              Por que o LFP está substituindo o chumbo-ácido em aplicações marítimas — economia de peso, vida útil e resistência à vibração comparadas.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

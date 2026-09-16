@@ -1,0 +1,233 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "Quanto tempo leva para carregar uma bateria de lítio?",
+    answer: "O tempo de carga depende do C-rate, da capacidade da bateria e da corrente do carregador. Uma bateria LFP de 100Ah a 0,5C (carregador de 50A) carrega de 20% a 100% em aproximadamente 1,6 horas. A 0,2C (carregador de 20A), leva aproximadamente 4 horas. A fase CC é rápida; a fase CV adiciona 20–30 minutos enquanto o carregador reduz a corrente perto da carga total.",
+  },
+  {
+    question: "Qual é o melhor C-rate para carregar baterias de lítio?",
+    answer: "Para LFP, o C-rate de carga recomendado é 0,5C para uso diário e até 1C para carga rápida. Para NMC, 0,5C é a taxa padrão recomendada. C-rates mais altos reduzem a vida útil. Verifique sempre a especificação do fabricante — algumas células são classificadas para 0,5C contínuo, outras para 1C ou mais.",
+  },
+  {
+    question: "Posso carregar baterias de lítio com carregador de chumbo-ácido?",
+    answer: "Não, não diretamente. Carregadores de chumbo-ácido usam perfis de bulk/absorção/flutuação com tensões mais altas (14,4–14,8V para sistemas de 12V) que podem sobrecarregar e danificar células LFP (que carregam a 14,2–14,6V). Use um carregador com perfil dedicado de lítio ou um carregador multiquímica que suporte ajustes de tensão LFP.",
+  },
+  {
+    question: "A temperatura afeta o tempo de carga do lítio?",
+    answer: "Sim. Baterias LFP carregam mais devagar no frio. Abaixo de 0°C, a maioria das unidades de BMS reduz ou desabilita a carga para evitar deposição de lítio. Entre 0–10°C, a corrente de carga é normalmente limitada a 0,2–0,3C. A temperatura ideal de carga é 10–35°C, onde as taxas máximas de carga estão disponíveis.",
+  },
+];
+---
+
+<Layout
+  title="Quanto Tempo para Carregar uma Bateria de Lítio | Calculadoras de Bateria"
+  description="Tempos de carga de baterias de lítio explicados: perfis CC-CV de LFP e NMC, C-rates recomendados por química e exemplos resolvidos para capacidades comuns."
+  canonical="https://batterycalculators.com/pt/learn/how-long-to-charge-a-lithium-battery/"
+  schema="faqPage"
+  schemaName="Quanto Tempo para Carregar uma Bateria de Lítio"
+  schemaDescription="Guia de engenharia sobre tempos de carga de baterias de lítio e perfis CC-CV."
+  schemaUrl="https://batterycalculators.com/pt/learn/how-long-to-charge-a-lithium-battery/"
+  faqItems={faqItems}
+  lang="pt"
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/pt/learn/" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Voltar aos Guias</a>
+      <Breadcrumb items={[
+        { label: "Centro de Aprendizagem", href: "/pt/learn/" },
+        { label: "Quanto Tempo para Carregar uma Bateria de Lítio" }
+      ]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">CARGA</span>
+      <h1 class="text-display-md text-primary mb-6">Quanto Tempo para Carregar uma Bateria de Lítio</h1>
+      <p class="text-body-md text-body font-light">
+        Baterias de lítio — tanto LFP (LiFePO4) quanto NMC — carregam mais rápido e com mais eficiência que as de chumbo-ácido, mas o tempo de carga depende da química, do C-rate, da corrente do carregador e do estado de carga inicial. Este guia cobre o perfil de carga CC-CV, os C-rates recomendados por química e cálculos práticos de tempo de carga para tamanhos comuns.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">O Perfil de Carga CC-CV</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Baterias de lítio usam perfil de carga de Corrente Constante – Tensão Constante (CC-CV). Durante a fase CC, o carregador fornece corrente fixa (determinada pelo C-rate) enquanto a tensão sobe. Quando a bateria atinge sua tensão máxima, o carregador muda para o modo CV — mantendo a tensão constante enquanto a corrente diminui. A bateria é considerada cheia quando a corrente cai para um limite, normalmente 0,02–0,05C.
+        </p>
+        <p class="text-body-md text-body font-light mb-4">
+          A fase CC representa a maior parte do ciclo de carga, normalmente fornecendo 70–80% da capacidade total. A fase CV adiciona os 20–30% restantes, mas leva proporcionalmente mais tempo porque a corrente está diminuindo. Por isso carregar de 20% a 80% é significativamente mais rápido que carregar de 80% a 100%.
+        </p>
+      </section>
+
+      <FormulaBox title="Fórmula de Tempo de Carga do Lítio">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Tempo fase CC (h) = Capacidade a carregar (Ah) / Corrente de carga (A)
+        </div>
+        <p>
+          Corrente de carga = Capacidade da bateria (Ah) × C-rate. Exemplo: 100Ah × 0,5C = 50A de corrente de carga.
+        </p>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Tempo fase CV (h) ≈ 0,5–1,0 h (estimado)
+        </div>
+        <p>
+          O tempo da fase CV varia com o projeto da bateria e a corrente de corte. Para estimativa, adicione 0,5–1,0 hora ao tempo da fase CC para uma carga completa de 0–100%. Para cargas de 20–80%, a fase CV é desprezível.
+        </p>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">C-Rates Recomendados por Química</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          O C-rate determina a velocidade de carga da bateria em relação à sua capacidade. C-rates mais altos carregam mais rápido, mas geram mais calor e podem reduzir a vida útil. O C-rate ideal equilibra velocidade de carga e longevidade da bateria.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Química</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">C-Rate máx.</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Recomendado</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Observações</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">LFP (LiFePO4)</td>
+                <td class="p-4 font-mono text-primary">1C</td>
+                <td class="p-4 font-mono text-primary">0.5C</td>
+                <td class="p-4 text-muted">Mais robusta, tolera taxas maiores</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">NMC</td>
+                <td class="p-4 font-mono text-primary">1C</td>
+                <td class="p-4 font-mono text-primary">0.5C</td>
+                <td class="p-4 text-muted">Mais sensível ao calor, manter abaixo de 45°C</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">NCA</td>
+                <td class="p-4 font-mono text-primary">0.7C</td>
+                <td class="p-4 font-mono text-primary">0.3–0.5C</td>
+                <td class="p-4 text-muted">Taxa máxima menor, gestão térmica crítica</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Chumbo-ácido (AGM)</td>
+                <td class="p-4 font-mono text-primary">0.3C</td>
+                <td class="p-4 font-mono text-primary">0.2C</td>
+                <td class="p-4 text-muted">Bem mais lenta, requer perfil multiestágio</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Exemplo Resolvido: LFP de 100Ah a 0,5C</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Dados:</strong> Bateria LFP de 100Ah 12,8V, carregador de 50A (0,5C), carregando de 20% a 100%</p>
+            <p><strong>Etapa 1:</strong> Calcular os Ah a carregar:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              100Ah × (1,00 - 0,20) = 80 Ah
+            </div>
+            <p><strong>Etapa 2:</strong> Calcular o tempo da fase CC:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              80 Ah / 50A = 1,6 horas (96 minutos)
+            </div>
+            <p><strong>Etapa 3:</strong> Adicionar estimativa da fase CV:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              1,6 h + 0,5 h = 2,1 horas no total
+            </div>
+            <p><strong>Etapa 4:</strong> Energia consumida incluindo perdas do carregador (95% de eficiência):</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              80 Ah × 12,8V = 1.024 Wh ÷ 0,95 = 1.078 Wh do carregador
+            </div>
+            <p>Carregar de 20% a 80% (60 Ah) leva apenas 1,2 horas — a janela prática de carga rápida para uso diário.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Tempos de Carga em Diferentes C-Rates</h2>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">C-Rate</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Corrente de carga</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Tempo 0→100%</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Tempo 20→80%</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">0.1C</td>
+                <td class="p-4 font-mono text-primary">10A</td>
+                <td class="p-4 font-mono text-primary">~11 h</td>
+                <td class="p-4 font-mono text-primary">~6 h</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">0.2C</td>
+                <td class="p-4 font-mono text-primary">20A</td>
+                <td class="p-4 font-mono text-primary">~5,5 h</td>
+                <td class="p-4 font-mono text-primary">~3 h</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">0.5C</td>
+                <td class="p-4 font-mono text-primary">50A</td>
+                <td class="p-4 font-mono text-primary">~2,5 h</td>
+                <td class="p-4 font-mono text-primary">~1,2 h</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">1.0C</td>
+                <td class="p-4 font-mono text-primary">100A</td>
+                <td class="p-4 font-mono text-primary">~1,5 h</td>
+                <td class="p-4 font-mono text-primary">~0,7 h</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-body-sm text-muted mt-4">
+          Tempos para uma bateria LFP de 100Ah. Escale proporcionalmente para outras capacidades. A fase CV adiciona 20–60 minutos dependendo da corrente de corte.
+        </p>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Experimente</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use a Calculadora de Tempo de Carga para calcular tempos exatos de carga para sua combinação de bateria e carregador.
+          </p>
+          <a href="/pt/tools/charging-time-calculator/" class="btn-primary text-xs py-3 px-6 inline-block">Abrir Calculadora de Tempo de Carga</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Próxima Etapa</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Entenda os fundamentos do C-rate e como afetam o desempenho de carga e descarga.
+          </p>
+          <a href="/pt/tools/c-rate-calculator/" class="btn-primary text-xs py-3 px-6 inline-block">Abrir Calculadora de C-Rate</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Artigos Relacionados</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <a href="/pt/learn/how-long-to-charge-a-battery/" class="text-primary hover:underline font-bold block mb-2">Quanto Tempo Leva para Carregar uma Bateria</a>
+            <p class="text-body-sm text-muted">
+              Guia geral de tempo de carga cobrindo todas as químicas — chumbo-ácido, lítio e NiMH.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <a href="/pt/learn/battery-charging-formula/" class="text-primary hover:underline font-bold block mb-2">Fórmula de Carga de Bateria</a>
+            <p class="text-body-sm text-muted">
+              Referência completa de fórmulas para tempo da fase CC, estimativa da fase CV e cálculos de tempo total de carga.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

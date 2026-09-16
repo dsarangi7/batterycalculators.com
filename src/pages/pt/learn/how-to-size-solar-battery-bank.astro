@@ -1,0 +1,291 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "De quantas baterias preciso para energia solar?",
+    answer: "O número depende do seu consumo diário e da autonomia desejada. Uma casa típica de 10 kWh/dia com 2 dias de autonomia precisa de aproximadamente 24 kWh de capacidade utilizável. Com baterias LFP 48V 100Ah (5,12 kWh cada), você precisaria de 5 baterias.",
+  },
+  {
+    question: "Posso usar chumbo-ácido no solar?",
+    answer: "Sim, mas chumbo-ácido tem menor profundidade utilizável (50% vs. 80-90% do lítio), menor vida útil (500-1.000 vs. 3.000-5.000 ciclos) e exige mais manutenção. O custo inicial maior do lítio costuma resultar em menor custo por kWh ao longo da vida.",
+  },
+  {
+    question: "Qual tamanho de arranjo solar para carregar minha bateria?",
+    answer: "Uma regra geral é que o arranjo deve recarregar totalmente o banco em um bom dia de sol. Para um banco de 10 kWh com 5 horas de sol pleno, você precisa de pelo menos 2 kW de arranjo. Superdimensionar 20-30% cobre dias nublados e perdas.",
+  },
+  {
+    question: "Devo superdimensionar o banco de baterias?",
+    answer: "Superdimensionar dá autonomia extra para períodos nublados prolongados e reduz o estresse operando com DoD médio menor. Porém aumenta o custo inicial. Um superdimensionamento de 20-30% além do mínimo é um equilíbrio razoável para a maioria das instalações.",
+  },
+];
+---
+
+<Layout
+  title="Como Dimensionar um Banco de Baterias Solares | Calculadoras de Bateria"
+  description="Guia passo a passo para dimensionar um banco solar a partir de consumo diário, dias de autonomia, profundidade de descarga e eficiência. Inclui exemplos resolvidos e dicas de projeto."
+  canonical="https://batterycalculators.com/pt/learn/how-to-size-solar-battery-bank/"
+  faqItems={faqItems}
+  lang="pt"
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/pt/learn/" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Voltar aos Guias</a>
+      <Breadcrumb items={[
+        { label: "Centro de Aprendizagem", href: "/pt/learn/" },
+        { label: "Como Dimensionar um Banco de Baterias Solares" }
+      ]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">SOLAR</span>
+      <h1 class="text-display-md text-primary mb-6">Como Dimensionar um Banco de Baterias Solares</h1>
+      <p class="text-body-md text-body font-light">
+        Dimensionar um banco solar exige igualar a energia armazenada ao seu consumo diário, aos dias de autonomia necessários e às características da química. Este guia mostra o método de engenharia em quatro etapas para determinar o tamanho ideal para qualquer instalação solar off-grid ou híbrida.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Etapa 1: Determinar o Consumo Diário</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Comece calculando o total em watt-hora que sua casa ou instalação consome num dia típico. Liste cada aparelho que funcionará no banco, anote sua potência em watts e estime as horas diárias de cada um. Multiplique potência por tempo para obter watt-hora por dia e some tudo.
+        </p>
+        <p class="text-body-md text-body font-light mb-4">
+          Por exemplo, considere uma pequena cabana off-grid com as seguintes cargas:
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden mb-4">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Aparelho</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Consumo diário</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">Geladeira</td>
+                <td class="p-4 font-mono text-primary">1,5 kWh/dia</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Iluminação LED</td>
+                <td class="p-4 font-mono text-primary">0,5 kWh/dia</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Bomba de poço</td>
+                <td class="p-4 font-mono text-primary">0,3 kWh/dia</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Internet / Roteador</td>
+                <td class="p-4 font-mono text-primary">0,1 kWh/dia</td>
+              </tr>
+              <tr class="bg-surface-card">
+                <td class="p-4 font-bold text-primary">Total</td>
+                <td class="p-4 font-mono font-bold text-primary">2,4 kWh/dia (2.400 Wh)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-body-md text-body font-light">
+          Esse total é a base do cálculo. Seja conservador — é melhor superestimar um pouco o consumo que subdimensionar o banco e ficar sem energia em períodos nublados prolongados.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Etapa 2: Escolher os Dias de Autonomia</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Autonomia é o número de dias consecutivos que o banco precisa alimentar suas cargas sem nenhuma entrada solar. A escolha depende do clima local, da criticidade das cargas e de ter gerador de backup. Em desertos ensolarados e estáveis, um dia pode ser aceitável. Em regiões com nuvens frequentes ou cargas que não toleram interrupção, três ou mais dias é prudente.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Dias de autonomia</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Recomendado para</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">1 dia</td>
+                <td class="p-4 text-muted">Backup mínimo, climas sempre ensolarados</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">2 dias</td>
+                <td class="p-4 text-muted">Instalações residenciais padrão</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">3+ dias</td>
+                <td class="p-4 text-muted">Regiões nubladas, cargas críticas, sem gerador</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <FormulaBox title="Fórmulas de Dimensionamento Solar">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Capacidade necessária (Wh) = Consumo diário (Wh) × Dias de autonomia / (DoD × Eficiência)
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Capacidade necessária (Ah) = Capacidade necessária (Wh) / Tensão do sistema
+        </div>
+        <p>
+          A eficiência considera perdas do inversor, resistência da fiação e overhead do controlador. Um valor típico é 0,90–0,95 para equipamentos modernos.
+        </p>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Etapa 3: Considerar a Profundidade de Descarga</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Profundidade de descarga (DoD) é o percentual da capacidade total usado com segurança antes de recarregar. Descarregar mais fundo reduz a vida útil. Químicas diferentes toleram DoDs diferentes, e sua escolha afeta diretamente o tamanho do banco. Uma bateria com 50% de DoD precisa ter o dobro do tamanho de uma com 100% de DoD para entregar a mesma energia utilizável.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Química</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">DoD recomendado</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Vida útil no DoD</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">LFP (LiFePO4)</td>
+                <td class="p-4 font-mono text-primary">80–90%</td>
+                <td class="p-4 text-muted">3.000–5.000 ciclos</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">NMC (Lítio)</td>
+                <td class="p-4 font-mono text-primary">80–90%</td>
+                <td class="p-4 text-muted">2.000–3.000 ciclos</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">Chumbo-ácido</td>
+                <td class="p-4 font-mono text-primary">50%</td>
+                <td class="p-4 text-muted">500–1.000 ciclos</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-body-md text-body font-light mt-4">
+          Para solar, o LFP é a escolha mais popular porque permite ciclagem profunda com longa vida útil e excelente estabilidade térmica. O chumbo-ácido é viável em projetos com orçamento apertado, mas você precisará do dobro da capacidade nominal para a mesma energia utilizável.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Exemplo Resolvido</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Dados:</strong></p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li>Consumo diário: 2.400 Wh (2,4 kWh)</li>
+              <li>Autonomia necessária: 2 dias</li>
+              <li>Limite de DoD: 85% (bateria LFP)</li>
+              <li>Eficiência do sistema: 92%</li>
+              <li>Tensão do sistema: 48V</li>
+            </ul>
+            <p><strong>Etapa 1:</strong> Calcular a capacidade necessária em watt-hora:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              2.400 Wh × 2 / (0,85 × 0,92) = 4.800 / 0,782 = 6.094 Wh
+            </div>
+            <p><strong>Etapa 2:</strong> Converter para ampères-hora a 48V:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              6.094 Wh / 48V = 127 Ah
+            </div>
+            <p><strong>Etapa 3:</strong> Arredonde para a capacidade prática mais próxima. Você precisa de aproximadamente um <strong>banco LFP 48V 130Ah</strong> para atender essa cabana com dois dias inteiros de autonomia.</p>
+            <p class="text-muted">Em termos práticos, isso equivale a cerca de três módulos LFP 48V 50Ah ou uma bateria rack 48V 130Ah pronta. Para margem de crescimento futuro, subir para 200 Ah dá espaço para expandir.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Etapa 4: Considerar a Recarga Solar</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          O banco é só metade da equação. O arranjo solar precisa ser grande o suficiente para repor a energia consumida a cada dia dentro das horas de sol pleno disponíveis. Se o arranjo for pequeno demais, as baterias nunca recarregam totalmente e falham por subcarga crônica.
+        </p>
+        <p class="text-body-md text-body font-light mb-4">
+          Uma regra confiável é:
+        </p>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Potência mínima do arranjo (W) ≥ Consumo diário (Wh) / Horas de sol pleno
+        </div>
+        <p class="text-body-md text-body font-light mb-4">
+          Para nossa cabana com 2.400 Wh/dia e 5 horas de sol pleno, o arranjo mínimo é 2.400 / 5 = 480 W. Superdimensionar 20–30% cobre dias nublados, degradação e perdas — então um arranjo de 600–700 W seria uma escolha prática.
+        </p>
+        <p class="text-body-md text-body font-light">
+          Lembre-se de que dimensionar o arranjo afeta a escolha do controlador. Ele precisa suportar a tensão de circuito aberto e a corrente máxima do arranjo, com perfil de carga adequado à química da bateria.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Considerações de Projeto</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Redução por Temperatura</h4>
+            <p class="text-body-sm text-muted">
+              Baterias perdem capacidade utilizável no frio. Células LFP perdem cerca de 10% a 0°C e até 30% a -20°C. Se o gabinete não for isolado ou ficar em clima frio, multiplique a capacidade por um fator de 0,85–0,90 para não subdimensionar.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Compatibilidade do Controlador</h4>
+            <p class="text-body-sm text-muted">
+              Controladores MPPT são o padrão no solar. Garanta que a tensão máxima de entrada supere a tensão de circuito aberto do arranjo e que a corrente nominal atenda a taxa de carga recomendada do banco. Um banco LFP 48V 130Ah normalmente carrega a 50–80A.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Seleção da Química</h4>
+            <p class="text-body-sm text-muted">
+              O LFP domina o armazenamento solar estacionário pela longa vida útil, estabilidade térmica e ausência de risco de fuga térmica. O NMC tem maior densidade, mas exige mais gestão térmica. O chumbo-ácido segue viável em sistemas pequenos e baratos onde peso e ciclagem pesam menos.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Strings em Paralelo vs. em Série</h4>
+            <p class="text-body-sm text-muted">
+              Baterias combinam-se em série para aumentar tensão e em paralelo para aumentar capacidade. Para um banco 48V, quatro módulos 12V ligam-se em série. Se o total em Ah exceder um módulo, adicione strings em paralelo. Mantenha equilíbrio — módulos idênticos, cabos de igual comprimento e BMS compartilhado se possível.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Experimente</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use a Calculadora de Dimensionamento Solar para determinar a capacidade necessária para sua instalação específica.
+          </p>
+          <a href="/pt/tools/solar-battery-sizing-calculator/" class="btn-primary text-xs py-3 px-6 inline-block">Abrir Calculadora Solar</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Próxima Etapa</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Após dimensionar, estime por quanto tempo sua bateria alimenta uma carga com a Calculadora de Autonomia.
+          </p>
+          <a href="/pt/tools/runtime-calculator/" class="btn-primary-outline text-xs py-3 px-6 inline-block">Abrir Calculadora de Autonomia</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Artigos Relacionados</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Como Calcular a Autonomia da Bateria</h4>
+            <p class="text-body-sm text-muted mb-3">
+              Aprenda a estimar a duração da descarga a partir de capacidade, potência, eficiência e limites de DoD.
+            </p>
+            <a href="/pt/learn/how-to-calculate-battery-runtime/" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Ler Guia →</a>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Como Dimensionar um Banco de Baterias</h4>
+            <p class="text-body-sm text-muted mb-3">
+              O método geral de dimensionamento cobrindo autonomia, redução por temperatura e conversão de tensão.
+            </p>
+            <a href="/pt/learn/how-to-size-a-battery-bank/" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Ler Guia →</a>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

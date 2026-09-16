@@ -1,0 +1,270 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "Quanto tempo uma bateria solar dura à noite?",
+    answer: "A autonomia noturna da bateria solar depende de sua capacidade utilizável e das cargas que ela alimenta. Um banco LFP utilizável de 10 kWh alimentando 500W de cargas noturnas (geladeira, luzes, roteador) funciona por aproximadamente 16 horas — do pôr ao nascer do sol com margem.",
+  },
+  {
+    question: "Quantos dias uma bateria solar alimenta uma casa?",
+    answer: "Depende da capacidade da bateria e do consumo diário. Uma bateria utilizável de 13,5 kWh (tamanho típico de Powerwall) alimentando uma casa que consome 30 kWh/dia fornece cerca de 0,45 dia de autonomia. A maioria das casas precisa de 2–3 dias de autonomia, exigindo 60–90 kWh de capacidade utilizável.",
+  },
+  {
+    question: "O solar recarrega a bateria durante o dia?",
+    answer: "Sim, se o arranjo solar estiver bem dimensionado. Um arranjo corretamente dimensionado gera energia suficiente nas horas de sol pleno para alimentar as cargas diurnas e recarregar a bateria. Se o arranjo for subdimensionado, a bateria nunca se recupera totalmente, reduzindo a autonomia noturna.",
+  },
+  {
+    question: "O que acontece quando a bateria solar esvazia?",
+    answer: "Se a bateria atinge seu SOC mínimo (normalmente 10–20% para LFP), o sistema alterna para a rede (sistemas híbridos) ou desconecta as cargas (off-grid). A bateria permanece em espera até a produção solar retornar e recarregá-la acima do limite mínimo.",
+  },
+];
+---
+
+<Layout
+  title="Quanto Tempo Dura Minha Bateria Solar? | Calculadoras de Bateria"
+  description="Aprenda a estimar a autonomia da bateria solar à noite e em períodos nublados. Inclui exemplos resolvidos para sistemas solares off-grid e híbridos."
+  canonical="https://batterycalculators.com/pt/learn/how-long-will-my-solar-battery-last/"
+  schema="faqPage"
+  schemaName="Quanto Tempo Dura Minha Bateria Solar"
+  schemaDescription="Guia para estimar a autonomia da bateria solar à noite e em períodos nublados."
+  schemaUrl="https://batterycalculators.com/pt/learn/how-long-will-my-solar-battery-last/"
+  faqItems={faqItems}
+  lang="pt"
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/pt/learn/" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Voltar aos Guias</a>
+      <Breadcrumb items={[
+        { label: "Centro de Aprendizagem", href: "/pt/learn/" },
+        { label: "Quanto Tempo Dura Minha Bateria Solar" }
+      ]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">SOLAR</span>
+      <h1 class="text-display-md text-primary mb-6">Quanto Tempo Dura Minha Bateria Solar?</h1>
+      <p class="text-body-md text-body font-light">
+        Baterias solares enfrentam um desafio único: precisam armazenar energia suficiente durante o dia para alimentar cargas à noite e sobreviver a períodos prolongados sem sol. A resposta depende da capacidade da bateria, do consumo diário e de quão bem o arranjo solar repõe o que você usa.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Operação Diurna vs. Noturna</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Durante o dia, os painéis solares alimentam diretamente suas cargas e o excedente carrega a bateria. À noite, só a bateria precisa suprir todas as cargas até o nascer do sol. A pergunta crítica de autonomia é: quanto tempo a energia armazenada dura do pôr ao nascer do sol?
+        </p>
+        <p class="text-body-md text-body font-light">
+          Isso é fundamentalmente diferente de um cenário simples de backup porque o sistema solar foi projetado para ciclar diariamente — carregar de dia, descarregar à noite. A bateria não precisa alimentar sua casa por dias seguidos (a menos que você esteja dimensionando para autonomia em dias nublados). Ela precisa cobrir o intervalo noturno.
+        </p>
+      </section>
+
+      <FormulaBox title="Fórmulas de Autonomia da Bateria Solar">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Energia noturna = Carga noturna (W) × Horas de escuridão (h)
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Energia utilizável da bateria = Capacidade (Ah) × Tensão (V) × DoD%
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Autonomia noturna (h) = Energia utilizável da bateria / (Carga noturna / Eficiência)
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Autonomia (dias) = Energia utilizável da bateria / (Consumo diário / Eficiência)
+        </div>
+        <p>
+          A eficiência considera perdas do inversor à noite e do controlador de carga durante o dia. Use 0,90–0,92 para equipamentos modernos.
+        </p>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Exemplo Resolvido: Autonomia Noturna</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Dados:</strong></p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li>Bateria solar: 200 Ah a 48V LFP (10.240 Wh no total)</li>
+              <li>Limite de DoD: 80%</li>
+              <li>Eficiência do sistema: 92%</li>
+              <li>Cargas noturnas: geladeira (60W) + roteador (10W) + 4 lâmpadas LED (24W) + carga de celular (15W) = 109W</li>
+              <li>Horas de escuridão: 12 horas</li>
+            </ul>
+            <p><strong>Etapa 1:</strong> Energia utilizável da bateria:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              200 Ah × 48V × 0,80 = 7.680 Wh
+            </div>
+            <p><strong>Etapa 2:</strong> Carga noturna efetiva:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              109 W / 0,92 = 118,5 W
+            </div>
+            <p><strong>Etapa 3:</strong> Autonomia noturna:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              7.680 Wh / 118,5 W = 64,8 horas
+            </div>
+            <p class="text-muted mt-2">Esta bateria alimenta essas cargas noturnas por mais de 5 noites consecutivas sem nenhuma entrada solar — mais que suficiente para sobreviver a períodos nublados prolongados.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Autonomia em Períodos Nublados</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          A autonomia em dias nublados é o número de dias que sua bateria alimenta suas cargas sem produção solar relevante. Este é o parâmetro de dimensionamento mais crítico para sistemas off-grid em regiões de clima variável.
+        </p>
+        <p class="text-body-md text-body font-light mb-4">
+          A fórmula da autonomia é direta:
+        </p>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-4">
+          Autonomia (dias) = Energia utilizável da bateria (Wh) / (Consumo diário (Wh) / Eficiência)
+        </div>
+        <p class="text-body-md text-body font-light">
+          Um banco maior fornece mais dias de autonomia, mas custa mais. O equilíbrio ideal depende do seu clima local, da criticidade das cargas e de ter ou não um gerador de backup.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Referência de Autonomia por Tamanho de Bateria</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          A tabela abaixo mostra dias de autonomia para bancos LFP comuns de 48V com 80% de DoD e 92% de eficiência, para diferentes níveis de consumo diário.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Tamanho da bateria</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">5 kWh/dia</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">10 kWh/dia</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">20 kWh/dia</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">30 kWh/dia</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">5 kWh (50Ah 48V)</td>
+                <td class="p-4 text-muted">0,7 dias</td>
+                <td class="p-4 text-muted">0,4 dias</td>
+                <td class="p-4 text-muted">0,2 dias</td>
+                <td class="p-4 text-muted">0,1 dias</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">10 kWh (100Ah 48V)</td>
+                <td class="p-4 text-muted">1,5 dias</td>
+                <td class="p-4 text-muted">0,7 dias</td>
+                <td class="p-4 text-muted">0,4 dias</td>
+                <td class="p-4 text-muted">0,2 dias</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">20 kWh (200Ah 48V)</td>
+                <td class="p-4 text-muted">2,9 dias</td>
+                <td class="p-4 text-muted">1,5 dias</td>
+                <td class="p-4 text-muted">0,7 dias</td>
+                <td class="p-4 text-muted">0,5 dias</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">40 kWh (400Ah 48V)</td>
+                <td class="p-4 text-muted">5,9 dias</td>
+                <td class="p-4 text-muted">2,9 dias</td>
+                <td class="p-4 text-muted">1,5 dias</td>
+                <td class="p-4 text-muted">1,0 dias</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">80 kWh (800Ah 48V)</td>
+                <td class="p-4 text-muted">11,8 dias</td>
+                <td class="p-4 text-muted">5,9 dias</td>
+                <td class="p-4 text-muted">2,9 dias</td>
+                <td class="p-4 text-muted">2,0 dias</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">O Papel da Recarga Solar</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Seu arranjo solar precisa gerar energia suficiente nas horas de sol pleno para alimentar as cargas diurnas e recarregar a bateria para uso noturno. O tamanho mínimo do arranjo é:
+        </p>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-4">
+          Arranjo mínimo (W) ≥ Consumo diário (Wh) / Horas de sol pleno
+        </div>
+        <p class="text-body-md text-body font-light mb-4">
+          Para uma casa que consome 15 kWh/dia com 5 horas de sol pleno, o arranjo mínimo é 3.000W (3 kW). Superdimensionar em 20–30% considera dias nublados e perdas do sistema, tornando um arranjo de 4 kW uma escolha prática.
+        </p>
+        <p class="text-body-md text-body font-light">
+          Se o arranjo for subdimensionado, a bateria não recarrega totalmente a cada dia. Com o tempo, o SOC cairá até a bateria esvaziar. Esta é a causa mais comum de baixo desempenho de sistemas solares.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Fatores que Reduzem a Autonomia da Bateria Solar</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Variação Sazonal</h4>
+            <p class="text-body-sm text-muted">
+              O inverno tem dias mais curtos, menor ângulo solar e mais nuvens. Um sistema que funciona bem no verão pode sofrer no inverno. Dimensione para sua pior estação se a confiabilidade for crítica.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Degradação dos Painéis</h4>
+            <p class="text-body-sm text-muted">
+              Painéis solares perdem 0,5–0,7% de eficiência por ano. Após 10 anos, a saída é cerca de 93–95% da nominal. Isso reduz a energia diária de recarga e aumenta o tempo para repor a bateria.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Crescimento das Cargas</h4>
+            <p class="text-body-sm text-muted">
+              Adicionar aparelhos sem ampliar o banco de baterias reduz a autonomia. Um aquecedor novo ou carregador de VE pode aumentar drasticamente o consumo diário além do dimensionado.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Redução por Temperatura</h4>
+            <p class="text-body-sm text-muted">
+              Baterias frias aceitam menos carga do solar e entregam menos energia à noite. Em climas frios, supredimensione as baterias em 15–20% para compensar a menor capacidade de inverno.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Experimente</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use a Calculadora de Dimensionamento Solar para determinar o tamanho ideal do banco para seu consumo diário e requisitos de autonomia.
+          </p>
+          <a href="/pt/tools/solar-battery-sizing-calculator/" class="btn-primary text-xs py-3 px-6 inline-block">Abrir Calculadora Solar</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Relacionado</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Estime por quanto tempo sua bateria alimenta cargas específicas com a Calculadora de Autonomia.
+          </p>
+          <a href="/pt/tools/runtime-calculator/" class="btn-primary-outline text-xs py-3 px-6 inline-block">Abrir Calculadora de Autonomia</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Artigos Relacionados</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Como Dimensionar um Banco de Baterias Solares</h4>
+            <p class="text-body-sm text-muted mb-3">
+              O método completo para dimensionar armazenamento solar a partir de consumo, autonomia e DoD.
+            </p>
+            <a href="/pt/learn/how-to-size-solar-battery-bank/" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Ler Guia →</a>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Quanto Tempo Durará uma Bateria?</h4>
+            <p class="text-body-sm text-muted mb-3">
+              O método geral para calcular a autonomia da bateria a partir de capacidade e carga.
+            </p>
+            <a href="/pt/learn/how-long-will-a-battery-last/" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Ler Guia →</a>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

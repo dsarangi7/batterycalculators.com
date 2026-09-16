@@ -1,0 +1,96 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+const newsFiles = import.meta.glob('./*.astro', {
+  eager: true,
+  query: '?raw',
+  import: 'default',
+}) as Record<string, string>;
+
+function extractMeta(raw: string) {
+  const fm = raw.match(/^---\n([\s\S]*?)\n---/)?.[1] || '';
+  const get = (k: string) =>
+    fm.match(new RegExp(`const\\s+${k}\\s*=\\s*["'](.+?)["']`))?.[1] || '';
+  return {
+    title: get('title'),
+    description: get('description'),
+    publishDate: get('publishDate'),
+    lastUpdated: get('lastUpdated'),
+    readingTime: Number(get('readingTime')) || 0,
+  };
+}
+
+const weeklyEditions = Object.entries(newsFiles)
+  .filter(([path]) => !path.endsWith('/index.astro'))
+  .map(([path, raw]) => {
+    const slug = path.replace('./', '').replace('.astro', '');
+    const meta = extractMeta(raw as string);
+    const weekMatch = slug.match(/week-(\d+)/);
+    const yearMatch = slug.match(/(\d{4})/);
+    const week = weekMatch?.[1] || '';
+    const year = yearMatch?.[1] || '';
+    const cleanTitle = meta.title.replace(/\s*\|\s*(Battery Calculators|Calculadoras de Bateria)\s*$/, '');
+    const dateDisplay = week ? `Semana ${week}, ${year}` : meta.publishDate || '';
+    return {
+      title: cleanTitle,
+      slug,
+      date: dateDisplay,
+      description: meta.description,
+      publishDate: meta.publishDate,
+      readingTime: meta.readingTime,
+      yearNum: Number(year) || 0,
+      weekNum: Number(week) || 0,
+    };
+  })
+  .sort((a, b) => b.yearNum - a.yearNum || b.weekNum - a.weekNum);
+---
+
+<Layout
+  title="Notícias da Indústria de Baterias | Calculadoras de Bateria"
+  description="Notícias semanais da indústria de baterias e análises de engenharia cobrindo baterias para veículos elétricos, armazenamento de energia em escala de rede, regulamentação de baterias e avanços tecnológicos."
+  canonical="https://batterycalculators.com/pt/news/"
+  breadcrumbs={[{ label: 'Notícias' }]}
+  lang="pt"
+>
+  <div class="max-w-4xl mx-auto">
+
+    <!-- Hero -->
+    <div class="mb-12">
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">NOTÍCIAS E ANÁLISES</span>
+      <h1 class="text-display-lg text-primary mb-4">Notícias da Indústria de Baterias</h1>
+      <p class="text-body-md text-body font-light max-w-2xl">
+        Cobertura semanal da indústria de baterias — baterias para veículos elétricos, armazenamento em escala de rede, eletrificação marítima, regulamentação e fabricação. Escrito para engenheiros e projetistas de sistemas.
+      </p>
+    </div>
+
+    <!-- Weekly Editions -->
+    <section class="mb-16">
+      {weeklyEditions.length > 0 ? (
+        <div class="flex flex-col gap-6">
+          {weeklyEditions.map((edition) => (
+            <a href={`/pt/news/${edition.slug}/`} class="block group">
+              <CalculatorCard class="h-full">
+                <div>
+                  <div class="flex flex-wrap items-center gap-3 mb-3">
+                    <span class="text-label-uppercase text-m-blue-light text-[10px]">EDIÇÃO SEMANAL</span>
+                    <span class="text-caption text-muted">{edition.date}</span>
+                    {edition.readingTime > 0 && (
+                      <span class="text-caption text-muted">{edition.readingTime} min de leitura</span>
+                    )}
+                  </div>
+                  <h2 class="text-title-lg text-primary mb-3 group-hover:text-m-blue-light transition-colors">{edition.title}</h2>
+                  <p class="text-body-sm text-muted">{edition.description}</p>
+                </div>
+              </CalculatorCard>
+            </a>
+          ))}
+        </div>
+      ) : (
+        <div class="bg-surface-card border border-hairline p-8 text-center">
+          <p class="text-body-md text-muted">Nenhuma edição publicada ainda. Volte em breve.</p>
+        </div>
+      )}
+    </section>
+
+  </div>
+</Layout>

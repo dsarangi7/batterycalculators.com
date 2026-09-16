@@ -1,0 +1,138 @@
+---
+import ArticleLayout from '../../../layouts/ArticleLayout.astro';
+import ReferenceTable from '../../../components/ReferenceTable.astro';
+import ComparisonTable from '../../../components/ComparisonTable.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+
+const relatedCalculators = [
+  { title: 'Calculadora de Dimensionamento de Bateria Solar', href: '/pt/tools/solar-battery-sizing-calculator/', type: 'calculator' as const },
+  { title: 'Calculadora de Bateria para Backup Residencial', href: '/pt/tools/home-backup-battery-calculator/', type: 'calculator' as const },
+  { title: 'Calculadora de Autonomia', href: '/pt/tools/runtime-calculator/', type: 'calculator' as const },
+  { title: 'Calculadora de Dimensionamento de Bateria', href: '/pt/tools/battery-sizing-calculator/', type: 'calculator' as const },
+];
+
+const relatedGuides = [
+  { title: 'Guia de Dimensionamento de Bateria Solar', href: '/pt/learn/how-to-size-solar-battery-bank/', type: 'guide' as const },
+  { title: 'Melhor Química de Bateria para Energia Solar', href: '/pt/learn/best-battery-chemistry-for-solar/', type: 'guide' as const },
+  { title: 'Armazenamento com Bateria Solar Explicado', href: '/pt/learn/solar-battery-storage-explained/', type: 'guide' as const },
+];
+
+const faqItems = [
+  {
+    question: 'De quantas horas de sol pleno preciso para dimensionar o sistema solar?',
+    answer: 'As horas de sol pleno (PSH) variam por localidade e estação. Nos EUA continentais, as médias anuais vão de 3.5 PSH no Noroeste do Pacífico a 6.5 PSH no Sudoeste. Para sistemas off-grid, dimensione pelo pior mês (por ex., 2.5 PSH em dezembro para localidades do norte). Use o NREL PVWatts ou dados locais de recurso solar para valores precisos.',
+  },
+  {
+    question: 'Como dimensiono um arranjo solar para meu banco de baterias?',
+    answer: 'Uma regra prática comum é dimensionar o arranjo solar em 1kW por 100Ah de capacidade de bateria a 12V. Para um banco de 400Ah e 12V (4.8kWh), um arranjo de 4kW fornece cerca de uma recarga completa por dia em condições médias de sol. Para recarga mais rápida ou climas nublados, superdimensione em 20–30%. A fórmula: Tamanho do Arranjo (kW) = Carga Diária (Wh) ÷ (PSH × Eficiência do Sistema).',
+  },
+  {
+    question: 'Qual capacidade de bateria preciso para armazenamento solar?',
+    answer: 'Dimensione a capacidade da bateria para cobrir 1–3 dias de autonomia (sem sol). Para uma residência com carga diária de 10kWh e 4 horas de sol pleno: 1 dia de autonomia = 10kWh ÷ 0.9 (eficiência) = 11.1kWh. A 48V, isso equivale a aproximadamente 232Ah. Para cargas críticas exigindo 2 dias de autonomia: 22.2kWh ou 463Ah a 48V.',
+  },
+  {
+    question: 'Qual tensão de sistema é melhor para energia solar?',
+    answer: '48V é recomendado para sistemas solares acima de 2kW. Oferece o melhor equilíbrio entre eficiência, bitola de cabos e disponibilidade de componentes. Sistemas 12V funcionam para pequenos sistemas portáteis abaixo de 500W. 24V é um meio-termo para sistemas de 500W–2kW. Combine sempre a tensão do banco de baterias com os requisitos de entrada do inversor e do controlador de carga.',
+  },
+  {
+    question: 'De quantos painéis solares preciso?',
+    answer: 'Divida sua necessidade diária de energia (Wh) pela potência do painel × horas de sol pleno × eficiência do sistema (tipicamente 0.85). Exemplo: carga diária de 5,000Wh ÷ (painel de 400W × 5 PSH × 0.85) = 2.9 painéis → mínimo de 3 painéis. Para confiabilidade, superdimensione em 20–30% para compensar dias nublados e perdas do sistema.',
+  },
+  {
+    question: 'Preciso de um controlador de carga para energia solar?',
+    answer: 'Sim. Controladores de carga PWM ou MPPT regulam a tensão dos painéis solares para o banco de baterias e evitam sobrecarga. Controladores MPPT são mais eficientes (95–99%) e aceitam tensões de painel mais altas, sendo a escolha padrão para sistemas acima de 200W. Controladores PWM são mais baratos, mas menos eficientes, adequados para pequenos sistemas 12V com tensão de painel compatível.',
+  },
+];
+---
+
+<ArticleLayout
+  title="Referência de Dimensionamento Solar | Calculadoras de Bateria"
+  description="Referência rápida para dimensionamento de sistemas solares: horas de sol pleno por localidade nos EUA, fórmulas de dimensionamento de arranjos, configurações de sistemas para aplicações comuns e diretrizes de compatibilidade entre bateria e solar."
+  canonical="https://batterycalculators.com/pt/reference/solar-sizing-reference/"
+  lang="pt"
+  category="REFERÊNCIA"
+  categoryHref="/pt/reference/"
+  breadcrumbItems={[{ label: 'Referência de Dimensionamento Solar' }]}
+  relatedCalculators={relatedCalculators}
+  relatedGuides={relatedGuides}
+  faqItems={faqItems}
+>
+  <p class="text-body-md text-body font-light mb-8">
+    O dimensionamento correto do sistema solar exige compatibilizar o arranjo solar, o banco de baterias e o perfil de carga. Esta referência fornece horas de sol pleno para localidades dos EUA, dimensionamento de arranjos para cargas comuns e configurações de sistemas para ajudar a projetar um sistema de energia solar confiável.
+  </p>
+
+  <ReferenceTable
+    lang="pt"
+    title="Média de Horas de Sol Pleno por Localidade nos EUA"
+    description="Média anual e sazonal de horas de sol pleno (PSH) para as principais cidades dos EUA. Use o valor do pior mês para projetos off-grid."
+    headers={['Localidade', 'PSH Anual', 'PSH Inverno (Dez)', 'PSH Verão (Jun)', 'Zona Climática']}
+    rows={[
+      ['Phoenix, AZ', '6.5', '5.0', '8.0', 'Quente-Seco'],
+      ['Las Vegas, NV', '6.3', '4.8', '7.8', 'Quente-Seco'],
+      ['Denver, CO', '5.5', '4.0', '7.0', 'Frio-Seco'],
+      ['Miami, FL', '5.0', '4.0', '5.5', 'Quente-Úmido'],
+      ['Houston, TX', '4.8', '3.5', '6.0', 'Quente-Úmido'],
+      ['Atlanta, GA', '4.5', '3.2', '5.5', 'Misto-Úmido'],
+      ['Los Angeles, CA', '5.5', '4.5', '7.0', 'Ameno-Seco'],
+      ['San Francisco, CA', '5.0', '3.5', '6.5', 'Ameno'],
+      ['New York, NY', '4.2', '2.8', '5.5', 'Misto-Úmido'],
+      ['Chicago, IL', '4.0', '2.5', '5.5', 'Frio-Úmido'],
+      ['Seattle, WA', '3.5', '1.8', '5.0', 'Frio-Úmido'],
+      ['Portland, OR', '3.8', '2.0', '5.5', 'Frio-Úmido'],
+      ['Minneapolis, MN', '4.2', '2.3', '6.0', 'Frio'],
+      ['Boise, ID', '5.0', '3.0', '7.0', 'Frio-Seco'],
+    ]}
+    source="NREL PVWatts, Solar Energy Research Institute (SERI)"
+  />
+
+  <ComparisonTable
+    title="Tamanhos de Sistema para Aplicações Comuns"
+    headers={['Aplicação', 'Carga Diária', 'Arranjo Recomendado', 'Capacidade de Bateria (48V)', 'Observações']}
+    rows={[
+      ['Celular + lâmpadas LED', '0.1–0.3 kWh', '100–200W', '100Ah (4.8kWh)', 'Portátil, pequeno off-grid'],
+      ['Viagem de RV (fim de semana)', '1–2 kWh', '200–400W', '200Ah (9.6kWh)', 'Calculadora de bateria para RV'],
+      ['Cabana Remota', '3–5 kWh', '800–1.2kW', '400Ah (19.2kWh)', '1–2 dias de autonomia'],
+      ['Backup Residencial Pequeno', '5–10 kWh', '2–4kW', '400Ah (19.2kWh)', 'Somente cargas críticas'],
+      ['Backup Residencial Completo', '15–30 kWh', '6–12kW', '800Ah (38.4kWh)', 'Casa inteira com solar'],
+      ['Residência Off-Grid', '10–20 kWh', '5–10kW', '600–1000Ah', 'Exige entrada solar diária'],
+      ['Pequeno Comércio', '20–50 kWh', '10–20kW', '1000+Ah', 'BESS comercial'],
+      ['Marítimo (Cruzeiro)', '2–5 kWh', '400–800W', '200–400Ah', 'Dimensionamento de bateria marítima'],
+    ]}
+    highlightCol={2}
+    caption="Capacidade de bateria a 48V. Para sistemas 12V, divida Ah por 4 para energia equivalente."
+  />
+
+  <ReferenceTable
+    lang="pt"
+    title="Referência de Fórmulas de Dimensionamento de Arranjo Solar"
+    description="Fórmulas principais para dimensionar arranjos solares, baterias e controladores de carga."
+    headers={['Cálculo', 'Fórmula', 'Exemplo', 'Observações']}
+    rows={[
+      ['Tamanho do Arranjo (kW)', 'Carga Diária (Wh) ÷ (PSH × 0.85)', '10,000 ÷ (5 × 0.85) = 2.35kW', '0.85 = eficiência do sistema'],
+      ['Capacidade da Bateria (Ah)', 'Carga Diária (Wh) ÷ Tensão × Dias de Autonomia', '10,000 ÷ 48 × 2 = 417Ah', 'Adicione 20% de margem'],
+      ['Quantidade de Painéis', 'Tamanho do Arranjo (kW) ÷ Potência do Painel', '2.35kW ÷ 0.4kW = 6 painéis', 'Arredonde para cima'],
+      ['Controlador de Carga (A)', 'Potência do Arranjo ÷ Tensão da Bateria', '2,400W ÷ 48V = 50A', 'Dimensione a 1.25× por segurança'],
+      ['Entrada Solar Diária (Wh)', 'Potência do Arranjo × PSH × 0.85', '2,400 × 5 × 0.85 = 10,200Wh', 'Deve exceder a carga diária'],
+      ['Autonomia (Dias)', 'Capacidade da Bateria (Wh) ÷ Carga Diária (Wh)', '19,200 ÷ 10,000 = 1.92 dias', 'Para projeto off-grid'],
+    ]}
+    source="Metodologia padrão de dimensionamento solar, documentação NREL PVWatts"
+  />
+
+  <ReferenceTable
+    lang="pt"
+    title="Dimensionamento de Controlador de Carga por Tensão do Sistema"
+    description="Amperagem mínima do controlador de carga para tamanhos comuns de arranjo solar em cada tensão de bateria."
+    headers={['Tamanho do Arranjo', 'Controlador 12V (A)', 'Controlador 24V (A)', 'Controlador 48V (A)', 'Tensão Recomendada']}
+    rows={[
+      ['100W', '10A', '5A', '3A', '12V'],
+      ['200W', '20A', '10A', '5A', '12V ou 24V'],
+      ['400W', '40A', '20A', '10A', '24V'],
+      ['800W', '80A', '40A', '20A', '24V ou 48V'],
+      ['1.2kW', '100A', '60A', '30A', '48V'],
+      ['2.4kW', '200A (2×100A)', '100A', '50A', '48V'],
+      ['4.8kW', '400A (4×100A)', '200A (2×100A)', '100A', '48V'],
+      ['9.6kW', 'Não prático', '400A (4×100A)', '200A (2×100A)', '48V'],
+    ]}
+    source="Dimensionamento de controlador MPPT: Watts do arranjo ÷ Tensão da bateria × fator de segurança 1.25"
+  />
+</ArticleLayout>

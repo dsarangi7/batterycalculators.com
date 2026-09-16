@@ -1,0 +1,328 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "De quanto armazenamento de bateria minha casa precisa?",
+    answer: "Uma casa típica consumindo 10–15 kWh/dia precisa de 25–50 kWh de armazenamento utilizável para 2 dias de autonomia com 85% de DoD. O número exato depende do consumo, da duração desejada e da química. Use a fórmula: Capacidade necessária = Consumo diário × Dias de autonomia / (DoD × Eficiência).",
+  },
+  {
+    question: "10 kWh de armazenamento é suficiente?",
+    answer: "10 kWh utilizáveis fornecem cerca de 1 dia de backup para uma casa de 10 kWh/dia, ou meio dia para uma de 20 kWh/dia. Para a maioria das casas, 10 kWh é um ponto de partida — adequado para cobrir a noite, mas insuficiente para apagões de dias sem recarga solar.",
+  },
+  {
+    question: "Devo dimensionar pelo pico ou pelo consumo médio?",
+    answer: "Dimensione pelo consumo diário médio multiplicado pelos dias de autonomia. O pico de demanda é atendido pela potência do inversor, não pela energia da bateria. A bateria armazena watt-hora (energia); o inversor entrega watts (potência). São especificações separadas.",
+  },
+  {
+    question: "Como a profundidade de descarga afeta o tamanho?",
+    answer: "Menor DoD exige mais capacidade total para a mesma energia utilizável. Com 50% de DoD (chumbo-ácido), um banco de 20 kWh entrega só 10 kWh utilizáveis. Com 85% de DoD (LFP), o mesmo banco de 20 kWh entrega 17 kWh. A química LFP permite bancos menores para a mesma energia útil.",
+  },
+];
+---
+
+<Layout
+  title="De Quanto Armazenamento de Bateria Preciso? | Calculadoras de Bateria"
+  description="Calcule exatamente quanta capacidade de armazenamento você precisa com base em consumo diário, dias de autonomia e química. Inclui tabelas de referência e exemplos resolvidos."
+  canonical="https://batterycalculators.com/pt/learn/how-much-battery-storage-do-i-need/"
+  schema="faqPage"
+  schemaName="De Quanto Armazenamento de Bateria Preciso"
+  schemaDescription="Guia para calcular a capacidade total de armazenamento a partir de consumo diário e autonomia."
+  schemaUrl="https://batterycalculators.com/pt/learn/how-much-battery-storage-do-i-need/"
+  faqItems={faqItems}
+  lang="pt"
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/pt/learn/" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Voltar aos Guias</a>
+      <Breadcrumb items={[
+        { label: "Centro de Aprendizagem", href: "/pt/learn/" },
+        { label: "De Quanto Armazenamento de Bateria Preciso" }
+      ]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">SOLAR</span>
+      <h1 class="text-display-md text-primary mb-6">De Quanto Armazenamento de Bateria Preciso?</h1>
+      <p class="text-body-md text-body font-light">
+        A capacidade de armazenamento é medida em quilowatts-hora (kWh) — a energia total que suas baterias armazenam e entregam. Dimensionar corretamente garante que o sistema alimente suas cargas à noite e sobreviva a dias nublados sem esgotar. Este guia explica como calcular a capacidade exata que sua instalação exige.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Capacidade Utilizável vs. Nominal</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Toda bateria tem capacidade nominal (de placa) e capacidade utilizável. A porção utilizável é definida pelo limite de profundidade de descarga (DoD) — o percentual da capacidade total que pode ser usado com segurança antes de recarregar. Exceder esse limite danifica as células e encurta a vida útil.
+        </p>
+        <p class="text-body-md text-body font-light mb-4">
+          Por exemplo, uma bateria LFP 48V 200Ah tem capacidade nominal de 9.600 Wh (9,6 kWh). Com 85% de DoD, sua capacidade utilizável é 8.160 Wh (8,16 kWh). No dimensionamento, trabalhe sempre com a capacidade utilizável, não a nominal.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Química</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">DoD típico</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Utilizável por kWh nominal</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">LFP (LiFePO4)</td>
+                <td class="p-4 font-mono text-primary">80–90%</td>
+                <td class="p-4 text-muted">0,80–0,90 kWh utilizáveis por 1 kWh nominal</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">NMC (Lítio)</td>
+                <td class="p-4 font-mono text-primary">80–90%</td>
+                <td class="p-4 text-muted">0,80–0,90 kWh utilizáveis por 1 kWh nominal</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">Chumbo-ácido (AGM/Gel)</td>
+                <td class="p-4 font-mono text-primary">50%</td>
+                <td class="p-4 text-muted">0,50 kWh utilizáveis por 1 kWh nominal</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <FormulaBox title="Fórmula de Dimensionamento de Armazenamento">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Armazenamento utilizável necessário (Wh) = Consumo diário (Wh) × Dias de autonomia / Eficiência
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Armazenamento nominal necessário (Wh) = Armazenamento utilizável (Wh) / DoD
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Armazenamento nominal (kWh) = Armazenamento nominal (Wh) / 1.000
+        </div>
+        <p>
+          A eficiência do sistema (normalmente 0,90–0,95) considera perdas do inversor, da fiação e do BMS. O DoD é expresso em decimal (p. ex., 0,85 para 85%).
+        </p>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Método de Dimensionamento Passo a Passo</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          O processo segue três etapas diretas. Comece com seu consumo diário em watt-hora, multiplique pelos dias de autonomia para obter a energia utilizável total e divida por DoD e eficiência para achar a capacidade nominal a comprar.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Etapa 1</h4>
+            <p class="text-body-sm text-muted">Levante seu consumo diário. Liste cada carga, multiplique potência por tempo de uso e some o total em watt-hora por dia.</p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Etapa 2</h4>
+            <p class="text-body-sm text-muted">Multiplique pelos dias de autonomia. Dois dias é o padrão; três ou mais para cargas críticas ou regiões nubladas.</p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Etapa 3</h4>
+            <p class="text-body-sm text-muted">Divida por DoD e eficiência. Isso dá os kWh nominais a comprar. Arredonde para o tamanho comercial mais próximo.</p>
+          </CalculatorCard>
+        </div>
+        <p class="text-body-md text-body font-light">
+          O resultado é sua capacidade nominal mínima. Adicionar 20–30% de margem para crescimento de cargas, redução por temperatura e envelhecimento é prática padrão.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Armazenamento por Consumo Diário</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          A tabela abaixo mostra o armazenamento nominal necessário (em kWh) para níveis comuns de consumo. Valores assumem 85% de DoD (LFP), 92% de eficiência e os dias de autonomia indicados.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Consumo diário</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">1 dia de autonomia</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">2 dias de autonomia</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">3 dias de autonomia</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">5 kWh/dia</td>
+                <td class="p-4 text-muted">6,4 kWh nominais</td>
+                <td class="p-4 text-muted">12,8 kWh nominais</td>
+                <td class="p-4 text-muted">19,2 kWh nominais</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">10 kWh/dia</td>
+                <td class="p-4 text-muted">12,8 kWh nominais</td>
+                <td class="p-4 text-muted">25,6 kWh nominais</td>
+                <td class="p-4 text-muted">38,4 kWh nominais</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">15 kWh/dia</td>
+                <td class="p-4 text-muted">19,2 kWh nominais</td>
+                <td class="p-4 text-muted">38,4 kWh nominais</td>
+                <td class="p-4 text-muted">57,6 kWh nominais</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">20 kWh/dia</td>
+                <td class="p-4 text-muted">25,6 kWh nominais</td>
+                <td class="p-4 text-muted">51,1 kWh nominais</td>
+                <td class="p-4 text-muted">76,7 kWh nominais</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">30 kWh/dia</td>
+                <td class="p-4 text-muted">38,4 kWh nominais</td>
+                <td class="p-4 text-muted">76,7 kWh nominais</td>
+                <td class="p-4 text-muted">115,1 kWh nominais</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-body-md text-body font-light mt-4">
+          Como referência, um Tesla Powerwall típico armazena 13,5 kWh. Uma casa de 10 kWh/dia com 2 dias de autonomia precisa de cerca de dois Powerwalls (27 kWh nominais).
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Exemplo Resolvido</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Dados:</strong></p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li>Consumo diário: 10.000 Wh (10 kWh)</li>
+              <li>Autonomia desejada: 2 dias</li>
+              <li>Química: LFP com 85% de DoD</li>
+              <li>Eficiência do sistema: 92%</li>
+            </ul>
+            <p><strong>Etapa 1:</strong> Calcular o armazenamento utilizável necessário:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              10.000 Wh × 2 / 0,92 = 21.739 Wh utilizáveis
+            </div>
+            <p><strong>Etapa 2:</strong> Converter para capacidade nominal:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              21.739 Wh / 0,85 = 25.575 Wh nominais
+            </div>
+            <p><strong>Etapa 3:</strong> Converter para kWh:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              25.575 Wh / 1.000 = 25,6 kWh nominais
+            </div>
+            <p class="text-muted mt-2">Você precisa de aproximadamente <strong>25,6 kWh de armazenamento LFP nominal</strong>. Na prática, podem ser três módulos 48V 100Ah (15,36 kWh nominais) mais um módulo 48V 200Ah (10,24 kWh), ou qualquer combinação LFP totalizando pelo menos 25,6 kWh de placa. Com 20% de margem para crescimento, a meta vai para cerca de 30,7 kWh.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Tamanhos Comuns para Armazenamento Solar</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          A tabela abaixo relaciona níveis típicos de consumo às configurações recomendadas com módulos LFP padrão de 48V.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Consumo</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Armazenamento p/ 2 dias</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Configuração recomendada</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">5 kWh/dia</td>
+                <td class="p-4 text-muted">~12,8 kWh</td>
+                <td class="p-4 text-muted">3 × 48V 100Ah (15,4 kWh)</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">10 kWh/dia</td>
+                <td class="p-4 text-muted">~25,6 kWh</td>
+                <td class="p-4 text-muted">5 × 48V 100Ah (25,6 kWh)</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">15 kWh/dia</td>
+                <td class="p-4 text-muted">~38,4 kWh</td>
+                <td class="p-4 text-muted">8 × 48V 100Ah (41,0 kWh)</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">20 kWh/dia</td>
+                <td class="p-4 text-muted">~51,1 kWh</td>
+                <td class="p-4 text-muted">10 × 48V 100Ah (51,2 kWh)</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">30 kWh/dia</td>
+                <td class="p-4 text-muted">~76,7 kWh</td>
+                <td class="p-4 text-muted">15 × 48V 100Ah (76,8 kWh)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Quando Superdimensionar</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Reserva Sazonal</h4>
+            <p class="text-body-sm text-muted">
+              O inverno produz 30–50% menos energia solar que o verão. Se o sistema precisa manter autonomia o ano todo, dimensione para a pior estação. Um superdimensionamento de 30–40% além do verão cobre o inverno.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Margem de Crescimento</h4>
+            <p class="text-body-sm text-muted">
+              O consumo doméstico tende a crescer — novos aparelhos, carga de VE, home office. Adicionar 20–30% de margem agora evita o custo de reformar o banco depois.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Envelhecimento da Bateria</h4>
+            <p class="text-body-sm text-muted">
+              Baterias LFP retêm 80% da capacidade após 3.000–5.000 ciclos. Dimensionar exatamente para a necessidade atual significa ficar subdimensionado em cinco anos. Um superdimensionamento de 15–20% compensa a perda ao longo da vida útil.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Cargas Críticas</h4>
+            <p class="text-body-sm text-muted">
+              Equipamentos médicos, refrigeração de medicamentos ou comunicação não toleram interrupção. Para cargas críticas, dimensione para 3–5 dias de autonomia independentemente do clima e considere um gerador de backup.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Experimente</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use a Calculadora de Dimensionamento Solar para determinar a capacidade exata para seu consumo e autonomia.
+          </p>
+          <a href="/pt/tools/solar-battery-sizing-calculator/" class="btn-primary text-xs py-3 px-6 inline-block">Abrir Calculadora Solar</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Próxima Etapa</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Compare necessidades entre químicas com a Calculadora de Dimensionamento de Bateria.
+          </p>
+          <a href="/pt/tools/battery-sizing-calculator/" class="btn-primary-outline text-xs py-3 px-6 inline-block">Abrir Calculadora de Dimensionamento</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Artigos Relacionados</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Quantas Baterias para Energia Solar?</h4>
+            <p class="text-body-sm text-muted mb-3">
+              Calcule o número exato de módulos que seu sistema solar exige.
+            </p>
+            <a href="/pt/learn/how-many-batteries-for-solar/" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Ler Guia →</a>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Como Dimensionar um Banco de Baterias Solares</h4>
+            <p class="text-body-sm text-muted mb-3">
+              O método completo de engenharia para dimensionar bancos solares passo a passo.
+            </p>
+            <a href="/pt/learn/how-to-size-solar-battery-bank/" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Ler Guia →</a>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

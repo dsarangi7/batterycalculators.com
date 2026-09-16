@@ -1,0 +1,301 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "Quais são os sistemas comuns de tensão de bateria?",
+    answer: "Os mais comuns são 12V (automotivo, marítimo, RV pequeno), 24V (marítimo maior, veículos comerciais), 36V (bikes elétricas, motores de pesca) e 48V (residencial, EVs, solar grande). Tensões maiores reduzem a corrente, permitindo cabos mais finos e entrega mais eficiente.",
+  },
+  {
+    question: "Quantas células LFP formam uma bateria 12V?",
+    answer: "Uma bateria LFP 12V usa 4 células em série (4S). Cada célula tem 3,2V nominal, logo 4 × 3,2V = 12,8V nominal. A tensão de carga é 14,4–14,6V e o corte é cerca de 10,0V (2,5V por célula).",
+  },
+  {
+    question: "Quantas células NMC formam uma bateria 12V?",
+    answer: "Uma bateria NMC 12V usa 3 células em série (3S). Cada célula NMC tem 3,6V nominal, logo 3 × 3,6V = 10,8V nominal (muitas vezes vendida como 12V). A tensão de carga é 12,6V. Packs NMC normalmente usam 4S para 14,4V nominal compatível com sistemas 12V.",
+  },
+  {
+    question: "Por que usar 48V em vez de 12V em sistemas residenciais?",
+    answer: "Sistemas 48V drenam 1/4 da corrente do 12V para a mesma potência. Uma carga de 5kW em 48V drena 104A; em 12V drena 417A. Menor corrente significa cabos mais finos, barramentos menores, menor queda e maior eficiência. 48V é o padrão para armazenamento residencial e solar acima de 3kW.",
+  },
+];
+---
+
+<Layout
+  title="Guia de Sistemas de Tensão de Bateria | Calculadoras de Bateria"
+  description="Sistemas comuns 12V, 24V, 36V, 48V explicados. Configurações de células para químicas LFP e NMC e como montar cada sistema."
+  canonical="https://batterycalculators.com/pt/learn/battery-voltage-systems/"
+  schema="faqPage"
+  schemaName="Guia de Sistemas de Tensão de Bateria"
+  schemaDescription="Guia de engenharia dos sistemas comuns de tensão e configurações de células."
+  schemaUrl="https://batterycalculators.com/pt/learn/battery-voltage-systems/"
+  faqItems={faqItems}
+  lang="pt"
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/pt/learn/" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Voltar aos Guias</a>
+      <Breadcrumb items={[
+        { label: "Centro de Aprendizagem", href: "/pt/learn/" },
+        { label: "Guia de Sistemas de Tensão" }
+      ]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">ELÉTRICA</span>
+      <h1 class="text-display-md text-primary mb-6">Sistemas de Tensão de Bateria</h1>
+      <p class="text-body-md text-body font-light">
+        Sistemas de bateria são classificados pela tensão nominal — 12V, 24V, 36V ou 48V. A tensão determina bitola, corrente, eficiência e compatibilidade com cargas e carregadores. Entender como os sistemas são montados a partir de células é essencial para projetar packs, escolher componentes e diagnosticar incompatibilidades.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Sistemas Comuns de Tensão</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Cada sistema atende uma faixa específica. A escolha depende de potência, comprimento de cabo, componentes disponíveis e normas. Sistemas de maior tensão são mais eficientes em alta potência, mas exigem componentes classificados e práticas de segurança.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Sistema</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Tensão Nominal</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Aplicações Típicas</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Carga Máx. Prática</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">12V</td>
+                <td class="p-4 font-mono text-primary">12,8V (LFP) / 12,6V (NMC)</td>
+                <td class="p-4 text-muted">Carros, barcos pequenos, RVs, portátil</td>
+                <td class="p-4 font-mono text-primary">~2 kW</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">24V</td>
+                <td class="p-4 font-mono text-primary">25,6V (LFP) / 25,2V (NMC)</td>
+                <td class="p-4 text-muted">Barcos maiores, caminhões, comerciais</td>
+                <td class="p-4 font-mono text-primary">~5 kW</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">36V</td>
+                <td class="p-4 font-mono text-primary">38,4V (LFP) / 36,0V (NMC)</td>
+                <td class="p-4 text-muted">Bikes elétricas, pesca, golf carts</td>
+                <td class="p-4 font-mono text-primary">~3 kW</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">48V</td>
+                <td class="p-4 font-mono text-primary">51,2V (LFP) / 48,0V (NMC)</td>
+                <td class="p-4 text-muted">Residencial, solar, EVs, telecom</td>
+                <td class="p-4 font-mono text-primary">~20 kW</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <FormulaBox title="Fórmula de Contagem de Células">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Células Série (Ns) = Tensão Alvo / Tensão Nominal da Célula
+        </div>
+        <p>
+          LFP nominal: 3,2V/célula. NMC nominal: 3,6V/célula. Arredonde para o inteiro mais próximo.
+        </p>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Strings Paralelas (Np) = Ah Alvo / Ah da Célula
+        </div>
+        <p>
+          Para montar um pack LFP 48V 200Ah com células 3,2V 100Ah: Ns = 51,2/3,2 = 16S, Np = 200/100 = 2P → configuração 16S2P.
+        </p>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Configurações de Células LFP</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Células LFP de 3,2V nominal são as mais comuns em armazenamento. A configuração 4S (12,8V) é o bloco básico de todos os sistemas padrão. Sistemas maiores empilham módulos 4S em série.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Sistema</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Células LFP</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Tensão de Carga</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Tensão de Corte</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">12V</td>
+                <td class="p-4 font-mono text-primary">4S</td>
+                <td class="p-4 font-mono text-primary">14,4–14,6V</td>
+                <td class="p-4 font-mono text-primary">10,0V (2,5V/célula)</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">24V</td>
+                <td class="p-4 font-mono text-primary">8S</td>
+                <td class="p-4 font-mono text-primary">28,8–29,2V</td>
+                <td class="p-4 font-mono text-primary">20,0V (2,5V/célula)</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">36V</td>
+                <td class="p-4 font-mono text-primary">12S</td>
+                <td class="p-4 font-mono text-primary">43,2–43,8V</td>
+                <td class="p-4 font-mono text-primary">30,0V (2,5V/célula)</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">48V</td>
+                <td class="p-4 font-mono text-primary">16S</td>
+                <td class="p-4 font-mono text-primary">57,6–58,4V</td>
+                <td class="p-4 font-mono text-primary">40,0V (2,5V/célula)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Configurações de Células NMC</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Células NMC de 3,6V nominal são comuns em EV e eletrônicos. Menos células por nível de tensão que LFP. A configuração 3S (10,8V) aproxima 12V, enquanto 4S (14,4V) casa melhor com sistemas 12V.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Sistema</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Células NMC</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Tensão de Carga</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Tensão de Corte</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">12V (nominal)</td>
+                <td class="p-4 font-mono text-primary">3S</td>
+                <td class="p-4 font-mono text-primary">12,6V</td>
+                <td class="p-4 font-mono text-primary">7,5V (2,5V/célula)</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">12V (real)</td>
+                <td class="p-4 font-mono text-primary">4S</td>
+                <td class="p-4 font-mono text-primary">16,8V</td>
+                <td class="p-4 font-mono text-primary">12,0V (3,0V/célula)</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">24V</td>
+                <td class="p-4 font-mono text-primary">7S</td>
+                <td class="p-4 font-mono text-primary">29,4V</td>
+                <td class="p-4 font-mono text-primary">21,0V (3,0V/célula)</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">48V</td>
+                <td class="p-4 font-mono text-primary">13S</td>
+                <td class="p-4 font-mono text-primary">54,6V</td>
+                <td class="p-4 font-mono text-primary">39,0V (3,0V/célula)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Exemplo Prático: Montando 48V</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Meta:</strong> Montar um pack LFP 48V 200Ah com células individuais 3,2V 100Ah</p>
+            <p><strong>Etapa 1:</strong> Contagem série:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              Ns = 51,2V / 3,2V = 16 células em série (16S)
+            </div>
+            <p><strong>Etapa 2:</strong> Contagem paralela:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              Np = 200Ah / 100Ah = 2 strings em paralelo (2P)
+            </div>
+            <p><strong>Etapa 3:</strong> Total de células:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              16S × 2P = 32 células no total
+            </div>
+            <p><strong>Etapa 4:</strong> Especificações do pack:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              Tensão: 16 × 3,2V = 51,2V nominal
+              Capacidade: 2 × 100Ah = 200Ah
+              Energia: 51,2V × 200Ah = 10.240 Wh (10,24 kWh)
+              Peso: 32 × 3,5 kg = 112 kg
+            </div>
+            <p><strong>Etapa 5:</strong> Requisito de BMS. É necessário um BMS 16S com balanceamento. Balanceamento ativo é recomendado para packs acima de 5kWh para manter o equilíbrio entre células na ciclagem.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Guia de Seleção de Tensão</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Sistemas 12V</h4>
+            <p class="text-body-sm text-muted">
+              Ideal para cargas abaixo de 2kW com percursos curtos. Compatibilidade universal com acessórios automotivos e marítimos. Fiação simples. Limitado pela alta corrente em potências maiores.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Sistemas 24V</h4>
+            <p class="text-body-sm text-muted">
+              Ideal para barcos, caminhões e aplicações de média potência. Metade da corrente do 12V para a mesma carga. Bom equilíbrio entre eficiência e disponibilidade. Comum em instalações marítimas comerciais e RV.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Sistemas 36V</h4>
+            <p class="text-body-sm text-muted">
+              Padrão para bikes elétricas, golf carts e motores de pesca. Tensão adequada para eficiência do motor mantendo-se abaixo de limites perigosos. Ecossistema menor que 12V/24V/48V.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Sistemas 48V</h4>
+            <p class="text-body-sm text-muted">
+              Preferido para armazenamento residencial, solar e EVs de alta potência. Menor corrente para a mesma potência — cabos mais finos e maior eficiência. Exige componentes e práticas de segurança de baixa tensão.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Experimente</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use a Calculadora de Pack para modelar configurações para qualquer tensão e capacidade alvo.
+          </p>
+          <a href="/pt/tools/battery-pack-calculator/" class="btn-primary text-xs py-3 px-6 inline-block">Abrir Calculadora de Pack</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Próxima Etapa</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Compare a autonomia em 12V, 24V e 48V para seu perfil de carga.
+          </p>
+          <a href="/pt/learn/12v-vs-24v-vs-48v-runtime/" class="btn-primary text-xs py-3 px-6 inline-block">Ler Autonomia 12V vs 24V vs 48V</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Artigos Relacionados</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <a href="/pt/learn/series-vs-parallel-batteries/" class="text-primary hover:underline font-bold block mb-2">Baterias Série vs Paralelo</a>
+            <p class="text-body-sm text-muted">
+              Explicação detalhada das regras de ligação série e paralelo para montar packs.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <a href="/pt/learn/12v-vs-24v-vs-48v-runtime/" class="text-primary hover:underline font-bold block mb-2">Autonomia 12V vs 24V vs 48V</a>
+            <p class="text-body-sm text-muted">
+              Como a tensão afeta autonomia, cabos e eficiência para o mesmo perfil de carga.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

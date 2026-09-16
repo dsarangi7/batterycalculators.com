@@ -1,0 +1,287 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "Quanto tempo uma bateria de 10kWh alimenta minha casa?",
+    answer: "Depende da carga. Uma bateria de 10kWh a 85% DoD fornece 8,5kWh utilizáveis. Com 1kW crítico (geladeira, luzes, internet), dura ~8,5 horas. Com 500W, dura ~17 horas. Cargas maiores esgotam mais rápido.",
+  },
+  {
+    question: "Preciso de gerador se tenho baterias?",
+    answer: "Baterias sozinhas têm autonomia limitada. Um gerador estende o backup em blecautes de dias. Muitos combinam: a bateria cobre blecautes curtos em silêncio, e o gerador recarrega em blecautes longos. É a configuração mais resiliente.",
+  },
+  {
+    question: "Qual tamanho de inversor preciso para backup?",
+    answer: "Dimensione para o pico de todos os críticos simultâneos. Para essenciais típicos (geladeira, luzes, internet, médicos), um inversor de 3.000-5.000W basta. Se incluir HVAC ou bombas de poço, pode precisar de 7.500-10.000W.",
+  },
+  {
+    question: "Posso adicionar baterias ao meu solar existente?",
+    answer: "Sim, a maioria dos sistemas grid-tie pode receber backup com inversor híbrido ou bateria acoplada em CA. A complexidade depende do inversor atual e das normas locais. Consulte um instalador certificado para avaliação de retrofit.",
+  },
+];
+---
+
+<Layout
+  title="Guia de Planejamento de Backup Residencial | Calculadoras de Bateria"
+  description="Passo a passo para dimensionar backup residencial: identifique cargas críticas, defina a duração, dimensione a bateria e escolha a estratégia."
+  canonical="https://batterycalculators.com/pt/learn/home-battery-backup-planning/"
+  faqItems={faqItems}
+  lang="pt"
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <Breadcrumb items={[
+        { label: "Centro de Aprendizagem", href: "/pt/learn/" },
+        { label: "Guia de Planejamento de Backup Residencial" },
+      ]} />
+      <a href="/pt/learn/" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Voltar aos Guias</a>
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">BACKUP RESIDENCIAL</span>
+      <h1 class="text-display-md text-primary mb-6">Planejamento de Backup Residencial</h1>
+      <p class="text-body-md text-body font-light">
+        Planejar o backup significa decidir o que alimentar, por quanto tempo, e dimensionar a bateria para entregar essa energia com confiabilidade. Este guia percorre o processo de engenharia em três etapas para um projeto residencial defensável.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Etapa 1: Identifique as Cargas Críticas</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Nem todo circuito precisa de backup. O primeiro passo é classificar suas cargas em três níveis por necessidade no blecaute. Essa triagem controla diretamente tamanho e custo — cobrir todos os circuitos aumenta muito a bateria necessária.
+        </p>
+        <p class="text-body-md text-body font-light mb-6">
+          Cargas críticas são as indispensáveis: refrigeração, equipamentos médicos, comunicação e segurança. Importantes melhoram conforto e função. Não essenciais como HVAC e pesados ficam tipicamente fora, pois exigiriam bateria impraticável.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Prioridade</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Cargas Típicas</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Energia Diária Est.</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-primary font-bold">Crítica</td>
+                <td class="p-4 text-muted">Geladeira, médicos, segurança, carga de celular</td>
+                <td class="p-4 font-mono text-primary">2 – 5 kWh/dia</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-primary font-bold">Importante</td>
+                <td class="p-4 text-muted">Iluminação interna, roteador, bomba de porão, portão</td>
+                <td class="p-4 font-mono text-primary">1 – 3 kWh/dia</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-primary font-bold">Não essencial</td>
+                <td class="p-4 text-muted">HVAC, forno elétrico, secadora, chuveiro</td>
+                <td class="p-4 font-mono text-primary">10 – 30 kWh/dia</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-body-sm text-muted mt-4">
+          Percorra sua casa e liste cada circuito desejado no blecaute. Some a potência de cada dispositivo e estime as horas diárias. A soma é sua potência crítica — a entrada da fórmula.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Etapa 2: Defina a Duração do Backup</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          A duração define quantas horas ou dias o banco deve sustentar as cargas críticas sem recarga. Blecautes curtos (horas) exigem bem menos que falhas de dias. O histórico da concessionária e o clima local devem guiar a decisão.
+        </p>
+        <p class="text-body-md text-body font-light mb-6">
+          Para a maioria dos sistemas residenciais, 24 horas é o alvo padrão. Cobre a noite e avança bem pelo dia seguinte. Aplicações médicas ou de segurança críticas podem exigir 48-72 horas autônomas.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Duração</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Caso de Uso</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Bateria Típica</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">8 horas</td>
+                <td class="p-4 text-muted">Cobertura noturna, piscas curtos</td>
+                <td class="p-4 font-mono text-primary">5 – 10 kWh</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">24 horas</td>
+                <td class="p-4 text-muted">Blecaute de um dia, alvo mais comum</td>
+                <td class="p-4 font-mono text-primary">10 – 20 kWh</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">48 – 72 horas</td>
+                <td class="p-4 text-muted">Blecaute longo, sistemas críticos</td>
+                <td class="p-4 font-mono text-primary">20 – 40+ kWh</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <FormulaBox title="Fórmulas de Dimensionamento">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Capacidade (Wh) = Carga Crítica (W) × Horas / (DoD × Eficiência do Inversor)
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Capacidade (Ah) = Capacidade (Wh) / Tensão do Sistema
+        </div>
+        <p>
+          Profundidade de descarga (DoD) é a fração utilizável com segurança. LFP tipicamente 80-90% DoD. A eficiência cobre perdas DC-CA, geralmente 90-95%.
+        </p>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Etapa 3: Dimensione a Bateria</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Exemplo prático:</strong> Uma casa quer 24 horas de backup crítico em sistema LFP 48V.</p>
+            <p><strong>Dados:</strong></p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li>Cargas críticas: 2.500W</li>
+              <li>Duração: 24 horas</li>
+              <li>Tensão: 48V LFP</li>
+              <li>Profundidade (DoD): 85%</li>
+              <li>Eficiência do inversor: 92%</li>
+            </ul>
+            <p><strong>Etapa 1:</strong> Energia total em watt-horas:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              2.500W × 24h = 60.000 Wh
+            </div>
+            <p><strong>Etapa 2:</strong> Considerar DoD e eficiência:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              60.000 / (0,85 × 0,92) = 76.830 Wh
+            </div>
+            <p><strong>Etapa 3:</strong> Converter para ampères-hora em 48V:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              76.830 Wh / 48V = 1.601 Ah
+            </div>
+            <p><strong>Etapa 4:</strong> Quantidade de baterias. Equivale a ~16 baterias LFP 48V 100Ah, ou uma unidade 48V 15kWh com capacidade adequada. Um sistema prático pode usar duas unidades 48V 8kWh por redundância e modularidade.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Comparação de Estratégias</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Backup da Casa Toda</h4>
+            <p class="text-body-sm text-muted mb-3">
+              Cobre todas as cargas incluindo HVAC, aparelhos e iluminação. Comutação automática perfeita na falha. Opção mais cara — exige 20-40+ kWh conforme tamanho e clima.
+            </p>
+            <span class="font-mono text-m-blue-light text-sm">20 – 40+ kWh</span>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Só Cargas Essenciais</h4>
+            <p class="text-body-sm text-muted mb-3">
+              Alimenta só circuitos críticos: geladeira, médicos, iluminação, internet e celular. Abordagem mais econômica com 5-15 kWh. Ideal para backup típico com orçamento moderado.
+            </p>
+            <span class="font-mono text-m-blue-light text-sm">5 – 15 kWh</span>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Abordagem Híbrida</h4>
+            <p class="text-body-sm text-muted mb-3">
+              Combina críticas com importantes selecionadas como bomba de porão, portão ou circuitos extras. Custo moderado com 10-25 kWh. Equilibra resiliência e orçamento.
+            </p>
+            <span class="font-mono text-m-blue-light text-sm">10 – 25 kWh</span>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Backup com Solar</h4>
+            <p class="text-body-sm text-muted mb-3">
+              Combina banco com painéis para recarregar de dia. Máxima resiliência — sustenta cargas indefinidamente com sol. Exige bateria e arranjo maiores.
+            </p>
+            <span class="font-mono text-m-blue-light text-sm">Máxima resiliência</span>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Componentes do Sistema</h2>
+        <p class="text-body-md text-body font-light mb-6">
+          Um backup completo exige mais que baterias. Cada componente tem um papel em converter, controlar e entregar a energia ao quadro. Entender cada peça ajuda a planejar instalação e orçamento.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Banco de Baterias</h4>
+            <p class="text-body-sm text-muted">
+              Armazena energia elétrica como química. LFP (LiFePO4) é o padrão residencial por vida longa, estabilidade térmica e 80-90% de profundidade. O tamanho sai das fórmulas acima.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Inversor</h4>
+            <p class="text-body-sm text-muted">
+              Converte DC em CA doméstica (120/240V). Deve suportar o pico simultâneo de todos os circuitos. Híbridos integram controle de carga e grid-tie em uma unidade.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Controlador de Carga</h4>
+            <p class="text-body-sm text-muted">
+              Necessário se há solar carregando. MPPT maximiza a colheita e regula a tensão para proteger a bateria. Dispensa em sistemas só de rede.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Chave de Transferência</h4>
+            <p class="text-body-sm text-muted">
+              Desconecta da rede e comuta para bateria no blecaute automaticamente. Essencial para segurança — evita energizar a rede. Manuais são alternativa mais barata.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard class="md:col-span-2">
+            <h4 class="text-primary font-bold mb-2">Sistema de Monitoramento</h4>
+            <p class="text-body-sm text-muted">
+              Acompanha estado de carga, fluxos e saúde em tempo real. A maioria inclui app ou painel web. Monitorar é crítico para detectar falhas cedo e otimizar ciclos para estender a vida útil.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Experimente</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use a Calculadora de Backup para dimensionar o sistema completo para suas cargas críticas.
+          </p>
+          <a href="/pt/tools/home-backup-battery-calculator/" class="btn-primary text-xs py-3 px-6 inline-block">Abrir Calculadora de Backup</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Ferramenta Relacionada</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Calcule o tempo de recarga via solar ou rede com a Calculadora de Tempo de Carga.
+          </p>
+          <a href="/pt/tools/charging-time-calculator/" class="btn-primary text-xs py-3 px-6 inline-block">Abrir Calculadora de Tempo de Carga</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Artigos Relacionados</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <a href="/pt/learn/how-to-size-a-battery-bank/" class="text-primary font-bold mb-2 block hover:text-m-blue-light transition-colors">
+              Como Dimensionar um Banco de Baterias
+            </a>
+            <p class="text-body-sm text-muted">
+              O método padrão de engenharia a partir de consumo diário, autonomia, temperatura e limites de profundidade.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <a href="/pt/learn/how-to-calculate-battery-runtime/" class="text-primary font-bold mb-2 block hover:text-m-blue-light transition-colors">
+              Como Calcular a Autonomia da Bateria
+            </a>
+            <p class="text-body-sm text-muted">
+              Como determinar a duração sob uma carga, cobrindo Ah, expoente de Peukert e perdas.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

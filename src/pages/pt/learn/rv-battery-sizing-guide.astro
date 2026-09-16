@@ -1,0 +1,305 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "Por quanto tempo minha bateria de RV dura acampando?",
+    answer: "Um RV típico com luzes LED, geladeira 12V e carga de celular usa 1.500-2.500 Wh por dia. Uma bateria LFP 12V 200Ah (2.400 Wh) oferece aproximadamente 1-2 dias de acampamento livre. Adicionar uma segunda bateria ou painéis solares estende isso significativamente.",
+  },
+  {
+    question: "Devo usar lítio ou chumbo-ácido no meu RV?",
+    answer: "Baterias LFP de lítio custam mais no início, mas oferecem 80-90% de capacidade utilizável (contra 50% do chumbo-ácido), pesam 50-70% menos, carregam mais rápido e duram 5-10x mais ciclos. Para acampamento livre sério, o lítio normalmente tem menor custo total de propriedade.",
+  },
+  {
+    question: "Preciso de monitor de bateria para meu RV?",
+    answer: "Um monitor de bateria é altamente recomendado, especialmente para baterias de lítio. Ele acompanha SOC em tempo real, corrente consumida e capacidade restante. Sem ele, você corre o risco de sobredescarregar e danificar baterias caras de lítio.",
+  },
+  {
+    question: "Posso misturar baterias velhas e novas no meu RV?",
+    answer: "Nunca misture baterias de idades, químicas ou capacidades diferentes em um banco em paralelo. A bateria mais fraca limita todo o banco e degrada mais rápido. Substitua sempre todas as baterias de um banco ao mesmo tempo.",
+  },
+];
+---
+
+<Layout
+  title="Guia de Dimensionamento de Bateria para RV | Calculadoras de Bateria"
+  description="Guia completo para dimensionar baterias residenciais de RV: inventarie suas cargas, calcule o consumo diário, escolha a tensão do sistema, selecione a química da bateria e dimensione para suas necessidades de acampamento livre."
+  canonical="https://batterycalculators.com/pt/learn/rv-battery-sizing-guide/"
+  faqItems={faqItems}
+  lang="pt"
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <Breadcrumb items={[
+        { label: "Centro de Aprendizagem", href: "/pt/learn/" },
+        { label: "Guia de Dimensionamento de Bateria para RV" },
+      ]} />
+      <a href="/pt/learn/" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Voltar aos Guias</a>
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">RV E CAMPER</span>
+      <h1 class="text-display-md text-primary mb-6">Guia de Dimensionamento de Bateria para RV</h1>
+      <p class="text-body-md text-body font-light">
+        Dimensionar um sistema de baterias para um RV significa equilibrar a capacidade de armazenamento de energia com restrições de peso, espaço e custo. Este guia apresenta um processo estruturado para determinar exatamente quanta capacidade de bateria seu veículo precisa para um acampamento livre confortável.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Etapa 1: Inventarie Suas Cargas</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          O primeiro passo em qualquer projeto de bateria para RV é catalogar cada dispositivo elétrico que você planeja usar. As cargas de RV dividem-se em duas categorias: cargas DC que funcionam diretamente da bateria residencial (sistemas 12V) e cargas CA que exigem um inversor para converter a energia da bateria em 120V. Cada dispositivo deve ser classificado em watts com estimativa de quantas horas por dia vai operar.
+        </p>
+        <p class="text-body-md text-body font-light mb-6">
+          Percorra seu RV de frente para trás e anote cada aparelho, luz, ventilador e carregador. Preste atenção especial a itens de alto consumo como micro-ondas, cafeteira ou aquecedor elétrico — estes costumam ser a carga dominante e influenciam fortemente as decisões de dimensionamento.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Carga</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Potência (W)</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Uso Diário (h)</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Energia (Wh)</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">Luzes LED (4 luminárias)</td>
+                <td class="p-4 font-mono text-primary">5 – 10 cada</td>
+                <td class="p-4 font-mono text-primary">4 – 8</td>
+                <td class="p-4 font-mono text-primary">80 – 320</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Geladeira 12V</td>
+                <td class="p-4 font-mono text-primary">40 – 60</td>
+                <td class="p-4 font-mono text-primary">24</td>
+                <td class="p-4 font-mono text-primary">960 – 1,440</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Bomba de água</td>
+                <td class="p-4 font-mono text-primary">5 – 8</td>
+                <td class="p-4 font-mono text-primary">0.5</td>
+                <td class="p-4 font-mono text-primary">2.5 – 4</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Carga de celular / notebook</td>
+                <td class="p-4 font-mono text-primary">30 – 65</td>
+                <td class="p-4 font-mono text-primary">2 – 4</td>
+                <td class="p-4 font-mono text-primary">60 – 260</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">TV</td>
+                <td class="p-4 font-mono text-primary">30 – 80</td>
+                <td class="p-4 font-mono text-primary">2 – 4</td>
+                <td class="p-4 font-mono text-primary">60 – 320</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Exaustor de teto</td>
+                <td class="p-4 font-mono text-primary">5 – 15</td>
+                <td class="p-4 font-mono text-primary">4 – 8</td>
+                <td class="p-4 font-mono text-primary">20 – 120</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Cargas do inversor (CA)</td>
+                <td class="p-4 font-mono text-primary">Varia</td>
+                <td class="p-4 font-mono text-primary">Varia</td>
+                <td class="p-4 font-mono text-primary">Varia</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Etapa 2: Calcular o Consumo Diário</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Multiplique a potência de cada dispositivo pelo tempo diário estimado de operação para obter o consumo de energia em watt-horas. Depois some todos os dispositivos para encontrar seu consumo diário total. Esse número é a base de todo o cálculo de dimensionamento da bateria.
+        </p>
+        <p class="text-body-md text-body font-light mb-6">
+          Para cargas CA que passam por um inversor, você também deve considerar as perdas de conversão do inversor. Um inversor típico opera com 85-92% de eficiência, ou seja, 8-15% da energia é perdida como calor. Adicione cerca de 20% ao consumo total das cargas CA para obter o consumo real da bateria.
+        </p>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Exemplo resolvido:</strong> Cargas típicas de campista de fim de semana.</p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li>4 luzes LED × 8W × 6h = <strong class="text-primary">192 Wh</strong></li>
+              <li>Geladeira 12V: 50W × 24h = <strong class="text-primary">1,200 Wh</strong></li>
+              <li>Bomba de água: 6W × 0.5h = <strong class="text-primary">3 Wh</strong></li>
+              <li>Celulares: 40W × 3h = <strong class="text-primary">120 Wh</strong></li>
+              <li>TV: 50W × 3h = <strong class="text-primary">150 Wh</strong></li>
+            </ul>
+            <p class="pt-2 border-t border-hairline"><strong>Total diário:</strong> <span class="font-mono text-primary">1,665 Wh/dia</span></p>
+            <p class="text-xs text-muted">Adicione ~20% para perdas do inversor nas cargas CA se usar inversor para algum dispositivo.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <FormulaBox title="Fórmulas de Dimensionamento de Bateria">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Capacidade da Bateria (Wh) = Consumo Diário Total (Wh) / DoD
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Capacidade da Bateria (Ah) = Capacidade da Bateria (Wh) / Tensão do Sistema
+        </div>
+        <p>
+          A profundidade de descarga (DoD) é a fração da capacidade total que você pode usar com segurança sem danificar a bateria. Baterias LFP de lítio são normalmente classificadas com 80-90% de DoD, enquanto baterias de chumbo-ácido não devem ser regularmente descarregadas além de 50%.
+        </p>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Etapa 3: Escolher a Tensão do Sistema</h2>
+        <p class="text-body-md text-body font-light mb-6">
+          Sistemas residenciais de bateria para RV normalmente operam em 12V porque a maioria dos aparelhos e acessórios é projetada para 12V DC. No entanto, à medida que as necessidades de potência crescem — especialmente em veículos maiores com vários inversores — tensões mais altas reduzem o consumo de corrente, permitindo fiação mais fina e fusíveis menores. A escolha da tensão afeta diretamente custo, complexidade e eficiência.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Tensão</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Ideal Para</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Faixa de Carga</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Observações</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">12V</td>
+                <td class="p-4 text-muted">Maioria dos RVs, campers, vans</td>
+                <td class="p-4 font-mono text-primary">Abaixo de 2 kW</td>
+                <td class="p-4 text-muted">Simples, padrão, maior compatibilidade de acessórios</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">24V</td>
+                <td class="p-4 text-muted">Motorhomes maiores, veículos de expedição</td>
+                <td class="p-4 font-mono text-primary">Abaixo de 3 kW</td>
+                <td class="p-4 text-muted">Menor corrente, cabo mais fino, menos baterias em paralelo</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">48V</td>
+                <td class="p-4 text-muted">RVs comerciais, ônibus de turismo</td>
+                <td class="p-4 font-mono text-primary">Acima de 3 kW</td>
+                <td class="p-4 text-muted">Raro em RVs, usado em instalações extremas de alta potência</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Etapa 4: Selecionar a Química da Bateria</h2>
+        <p class="text-body-md text-body font-light mb-6">
+          A química da bateria escolhida determina a capacidade utilizável, o peso, a vida útil e o custo total de propriedade. Para aplicações em RV, o compromisso entre custo inicial e valor de longo prazo é significativo. A tabela abaixo compara as opções mais comuns usadas em sistemas móveis de energia.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Chumbo-Ácido AGM</h4>
+            <p class="text-body-sm text-muted mb-3">
+              Menor custo inicial. Pesada e volumosa. Máximo de 50% de profundidade de descarga para preservar a vida útil. Adequada para campistas de fim de semana que ficam perto de energia de cais e não fazem ciclagem profunda.
+            </p>
+            <div class="font-mono text-m-blue-light text-xs">50% DoD · 300 – 500 ciclos · Mais pesada</div>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Célula de Gel</h4>
+            <p class="text-body-sm text-muted mb-3">
+              Melhor desempenho em ciclo profundo que chumbo-ácido ventilado. Custo moderado. Tolera melhor a operação em estado parcial de carga que a AGM. Bom meio-termo para quem acampa livre com orçamento limitado e ciclagem moderada.
+            </p>
+            <div class="font-mono text-m-blue-light text-xs">50% DoD · 400 – 600 ciclos · Peso moderado</div>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Lítio LFP</h4>
+            <p class="text-body-sm text-muted mb-3">
+              Melhor custo-benefício geral para acampamento livre sério. Leve, 80-90% de capacidade utilizável, carrega rápido e dura 3.000+ ciclos. O maior custo inicial se paga em 5-10 anos de uso regular.
+            </p>
+            <div class="font-mono text-m-blue-light text-xs">80 – 90% DoD · 3,000+ ciclos · Mais leve</div>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Lítio NMC</h4>
+            <p class="text-body-sm text-muted mb-3">
+              Maior densidade de energia — armazena mais energia por quilo. Vida útil moderada em comparação ao LFP. Mais sensível a altas temperaturas. Usado em algumas aplicações móveis premium onde o peso é crítico.
+            </p>
+            <div class="font-mono text-m-blue-light text-xs">80% DoD · 1,500 – 2,000 ciclos · Mais leve por Wh</div>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Exemplo Resolvido</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Cenário:</strong> Campista de fim de semana, consumo de 1,665 Wh/dia, meta de 2 dias de autonomia.</p>
+            <p><strong>Dados:</strong></p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li>Consumo diário: 1,665 Wh/dia</li>
+              <li>Autonomia: 2 dias sem carregar</li>
+              <li>Química da bateria: Lítio LFP (85% de DoD)</li>
+              <li>Tensão do sistema: 12V</li>
+            </ul>
+            <p><strong>Etapa 1:</strong> Multiplique o consumo diário pelos dias de autonomia:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              1,665 Wh × 2 = 3,330 Wh
+            </div>
+            <p><strong>Etapa 2:</strong> Divida pela profundidade de descarga para obter a capacidade total necessária:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              3,330 Wh / 0.85 = 3,918 Wh
+            </div>
+            <p><strong>Etapa 3:</strong> Converta para ampères-horas na tensão de 12V do sistema:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              3,918 Wh / 12V = 327 Ah
+            </div>
+            <p><strong>Etapa 4:</strong> Selecione uma configuração prática de bateria:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              Opção A: 3 × LFP 12V 100Ah em paralelo (300 Ah no total — um pouco subdimensionado, aceitável para uso ocasional)<br/>
+              Opção B: 2 × LFP 12V 200Ah em paralelo (400 Ah no total — recomendado, oferece margem para envelhecimento e temperatura)
+            </div>
+            <p class="pt-2 border-t border-hairline"><strong>Recomendação:</strong> Escolha o banco de 400 Ah. A capacidade da bateria degrada com o tempo, e o frio reduz a capacidade utilizável. A margem extra garante desempenho confiável em todas as estações.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Experimente</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use a Calculadora de Bateria para RV para dimensionar um sistema residencial completo para seu veículo com base no seu inventário real de aparelhos.
+          </p>
+          <a href="/pt/tools/rv-battery-calculator/" class="btn-primary text-xs py-3 px-6 inline-block">Abrir Calculadora de Bateria para RV</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Ferramenta Relacionada</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Calcule por quanto tempo sua bateria alimenta aparelhos CA via inversor com a Calculadora de Bateria para Inversor.
+          </p>
+          <a href="/pt/tools/inverter-battery-calculator/" class="btn-primary-outline text-xs py-3 px-6 inline-block">Abrir Calculadora de Inversor</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Artigos Relacionados</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <a href="/pt/learn/how-to-size-a-battery-bank/" class="text-primary font-bold mb-2 block hover:text-m-blue-light transition-colors">
+              Como Dimensionar um Banco de Baterias
+            </a>
+            <p class="text-body-sm text-muted">
+              Cobre o método padrão de engenharia para dimensionar bancos de baterias a partir do consumo diário de energia, dias de autonomia, redução por temperatura e limites de profundidade de descarga.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <a href="/pt/learn/how-to-calculate-battery-runtime/" class="text-primary font-bold mb-2 block hover:text-m-blue-light transition-colors">
+              Como Calcular a Autonomia da Bateria
+            </a>
+            <p class="text-body-sm text-muted">
+              Explica como determinar por quanto tempo uma bateria dura sob determinada carga, cobrindo classificações em ampères-horas, expoente de Peukert e perdas de eficiência.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

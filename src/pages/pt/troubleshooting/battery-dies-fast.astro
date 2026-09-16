@@ -1,0 +1,205 @@
+---
+import ArticleLayout from '../../../layouts/ArticleLayout.astro';
+import TroubleshootingBlock from '../../../components/TroubleshootingBlock.astro';
+
+const relatedCalculators = [
+  { title: 'Calculadora de Autonomia', href: '/pt/tools/runtime-calculator/', type: 'calculator' as const },
+  { title: 'Estimador de Degradação de Bateria', href: '/pt/tools/battery-degradation-estimator/', type: 'calculator' as const },
+  { title: 'Estimador de SOC', href: '/pt/tools/soc-estimator/', type: 'calculator' as const },
+  { title: 'Calculadora de Taxa C', href: '/pt/tools/c-rate-calculator/', type: 'calculator' as const },
+];
+
+const relatedGuides = [
+  { title: 'Degradação de Baterias Explicada', href: '/pt/learn/battery-degradation-explained/', type: 'guide' as const },
+  { title: 'Entendendo o Estado de Carga', href: '/pt/learn/understanding-state-of-charge/', type: 'guide' as const },
+  { title: 'Referência de Eficiência de Baterias', href: '/pt/learn/battery-efficiency-reference/', type: 'guide' as const },
+];
+
+const faqItems = [
+  {
+    question: 'Como testo a capacidade real da minha bateria?',
+    answer: 'Faça um teste de capacidade: carregue totalmente a bateria e depois descarregue a uma taxa constante (normalmente 0,2C) medindo os ampères-hora entregues. Uma bateria de 100Ah que entrega 85Ah perdeu 15% da capacidade. Use um analisador de baterias ou um monitor com shunt para medições precisas. Compare o resultado com a capacidade nominal na mesma taxa C e temperatura.',
+  },
+  {
+    question: 'Por que a tensão da minha bateria cai tão rápido sob carga?',
+    answer: 'Uma queda rápida de tensão sob carga normalmente indica alta resistência interna, que aumenta com a idade, o frio ou más conexões. Baterias LiFePO4 mantêm uma curva de tensão plana até quase esvaziar, então uma queda acentuada sugere que a bateria já está profundamente descarregada ou tem resistência interna significativa. Verifique primeiro as conexões e depois teste a resistência interna com um medidor LCR.',
+  },
+  {
+    question: 'Quanta autodescarga é normal em baterias de lítio?',
+    answer: 'Baterias LiFePO4 têm autodescarga de aproximadamente 1–3% por mês a 25°C. Baterias de lítio NMC perdem cerca de 2–5% por mês. Baterias de chumbo-ácido perdem 5–15% por mês dependendo do tipo. Se sua bateria perde mais de 5% por mês (lítio) ou 20% por mês (chumbo-ácido), uma célula pode ter autodescarga excessiva, indicando falha iminente.',
+  },
+  {
+    question: 'A temperatura pode afetar a autonomia da bateria?',
+    answer: 'Sim, significativamente. A 0°C, uma bateria de lítio pode entregar apenas 70–80% de sua capacidade nominal. A -20°C, a capacidade pode cair para 50–60%. Altas temperaturas (acima de 40°C) aceleram a autodescarga e podem aumentar temporariamente a capacidade disponível, mas reduzem permanentemente a vida útil em ciclos. Sempre reduza a capacidade da bateria em 10–20% para aplicações em clima frio.',
+  },
+  {
+    question: 'Quando devo substituir uma bateria degradada?',
+    answer: 'Substitua a bateria quando sua capacidade cair abaixo de 70–80% da capacidade nominal na maioria das aplicações. Para energia de backup crítica, substitua aos 80%. Uma bateria com 60% da capacidade entrega metade da autonomia de uma bateria nova e pode não suportar sua carga nominal. Verifique os termos de garantia do fabricante — a maioria das baterias de lítio tem garantia de 70% da capacidade em uma contagem de ciclos especificada.',
+  },
+  {
+    question: 'O que é dreno parasita e como encontrá-lo?',
+    answer: 'Dreno parasita é qualquer carga elétrica que consome corrente quando o sistema está nominalmente desligado. Os culpados comuns incluem corrente de standby do inversor, controladores de carga, módulos Bluetooth, displays e alarmes. Meça o consumo de corrente com um alicate amperímetro ou shunt quando todas as cargas estiverem desligadas. Qualquer valor acima de 50mA deve ser investigado. Um dreno parasita de 100mA esvaziará uma bateria de 100Ah em cerca de 42 dias.',
+  },
+];
+---
+
+<ArticleLayout
+  title="Bateria Descarrega Rápido — Guia de Solução de Problemas | Calculadoras de Bateria"
+  description="Descubra por que sua bateria descarrega rápido ou tem pouca autonomia. Solucione capacidade real vs. nominal, autodescarga, cargas parasitas, efeitos de temperatura e degradação de células."
+  canonical="https://batterycalculators.com/pt/troubleshooting/battery-dies-fast/"
+  category="SOLUÇÃO DE PROBLEMAS"
+  breadcrumbItems={[{ label: 'Bateria Descarrega Rápido' }]}
+  relatedCalculators={relatedCalculators}
+  relatedGuides={relatedGuides}
+  faqItems={faqItems}
+  lang="pt"
+>
+  <p class="text-body-md text-body font-light mb-8">
+    Quando uma bateria descarrega mais rápido que o esperado, o problema pode estar na própria bateria, em cargas ocultas consumindo energia, nas condições ambientais ou simplesmente em uma diferença entre a capacidade nominal e o desempenho no mundo real. Este guia aborda as cinco causas mais comuns de autonomia inesperadamente curta.
+  </p>
+
+  <TroubleshootingBlock
+    lang="pt"
+    problem="Capacidade Real vs. Capacidade Nominal — Os Números Não Batem"
+    causes={[
+      'Capacidade nominal da bateria medida em taxa C diferente da sua carga',
+      'Redução por temperatura não considerada na estimativa de autonomia',
+      'Limite de profundidade de descarga reduz a capacidade utilizável abaixo da especificação nominal',
+      'Bateria nova fora de especificação devido a variação de fabricação',
+      'Capacidade anunciada inflada além da verdadeira capacidade das células',
+    ]}
+    explanation="As capacidades nominais de baterias são medidas em condições específicas que raramente correspondem à sua aplicação real. Uma bateria de 100Ah com capacidade nominal a 0,2C (descarga de 20A) pode entregar apenas 85Ah a 1C (descarga de 100A) devido ao efeito Peukert (chumbo-ácido) ou perdas por resistência interna (lítio). Além disso, baterias LiFePO4 são normalmente especificadas com 100% de DoD, mas muitas aplicações limitam a descarga a 80% para estender a vida útil em ciclos — reduzindo imediatamente a capacidade utilizável para 80Ah. A temperatura reduz ainda mais a capacidade: a 0°C, uma bateria de lítio entrega cerca de 80% de sua capacidade a 25°C. Sempre calcule a capacidade utilizável como: Ah nominal × %DoD × Fator de Temperatura × Fator de Taxa C."
+    checklist={[
+      'Verifique a taxa C na qual a capacidade da sua bateria foi especificada',
+      'Calcule a capacidade utilizável: Ah × limite de DoD × fator de redução por temperatura',
+      'Faça um teste controlado de capacidade com sua corrente de carga típica',
+      'Compare a capacidade testada com a capacidade nominal nas mesmas condições',
+      'Verifique se a bateria está operando dentro da faixa de temperatura do fabricante',
+      'Consulte as especificações do fabricante para curvas de capacidade vs. taxa de descarga',
+    ]}
+    solutions={[
+      'Use a Calculadora de Autonomia com sua corrente de carga real e limite de DoD',
+      'Reduza a capacidade em 10–20% para ambientes frios abaixo de 10°C',
+      'Escolha uma bateria com maior capacidade nominal para compensar as perdas reais',
+      'Limite a profundidade de descarga a 80% no lítio para equilibrar capacidade e vida útil em ciclos',
+      'Se o teste de capacidade mostrar <80% da capacidade nominal, entre em contato com o fabricante',
+    ]}
+  />
+
+  <TroubleshootingBlock
+    lang="pt"
+    problem="Autodescarga Elevada — Bateria Perde Carga Parada"
+    causes={[
+      'Uma ou mais células com taxa de autodescarga excessiva',
+      'BMS ou eletrônica da bateria consumindo corrente contínua em standby',
+      'Entrada de umidade causando microcurtos entre células',
+      'Contaminação química no eletrólito por defeito de fabricação',
+      'Bateria armazenada com alto estado de carga acelera a degradação',
+    ]}
+    explanation="Todas as baterias perdem carga com o tempo por reações químicas internas — isso é a autodescarga normal. Para LiFePO4, espere 1–3% por mês a 25°C. Chumbo-ácido perde 5–15% por mês. Porém, se uma bateria perde carga significativamente mais rápido que essas taxas, uma ou mais células podem ter autodescarga elevada causada por microcurtos internos, contaminação ou dano mecânico. Uma única célula ruim em uma série arrasta todo o pacote. O circuito de balanceamento do BMS tenta compensar, mas tem capacidade de corrente limitada (normalmente 50–200mA para balanceamento passivo). Se a autodescarga exceder a corrente de balanceamento, o pacote perderá capacidade progressivamente ao longo de semanas."
+    checklist={[
+      'Carregue totalmente a bateria e registre a tensão',
+      'Armazene em temperatura ambiente (20–25°C) sem nenhuma carga conectada',
+      'Meça a tensão semanalmente por 4 semanas',
+      'Calcule a taxa mensal de autodescarga: (queda_V / V_total) × 100%',
+      'Compare com a especificação do fabricante (normalmente 1–3%/mês para LFP)',
+      'Se a autodescarga for >5%/mês, é necessário testar células individuais',
+    ]}
+    solutions={[
+      'Se a autodescarga for moderada (3–5%/mês), recargas periódicas podem bastar',
+      'Faça um ciclo completo de carga-descarga-carga para recondicionar as células',
+      'Para autodescarga alta (>5%/mês), identifique e substitua o grupo de células defeituoso',
+      'Armazene baterias com 50–60% de SOC para minimizar autodescarga e degradação',
+      'Garanta um ambiente de armazenamento seco e com temperatura controlada',
+      'Entre em contato com o fabricante se houver alta autodescarga dentro do período de garantia',
+    ]}
+  />
+
+  <TroubleshootingBlock
+    lang="pt"
+    problem="Cargas Parasitas — Drenos Ocultos Esvaziando a Bateria"
+    causes={[
+      'Consumo em standby do inversor (50–500W para inversores grandes)',
+      'Corrente quiescente do controlador de carga',
+      'Módulos Bluetooth, Wi-Fi ou displays consumindo energia continuamente',
+      'Entrada solar subdimensionada não repondo o dreno parasita diário',
+      'Falha de aterramento ou curto-circuito criando carga fantasma',
+    ]}
+    explanation="Cargas parasitas são consumos elétricos que operam continuamente, muitas vezes despercebidos, drenando a bateria mesmo quando nenhuma carga ativa está ligada. Um inversor de 1000W com 3–5% de consumo em standby drena 30–50W continuamente — isso é 24–40Ah por dia de uma bateria de 12V, o suficiente para esvaziar um banco de 200Ah em 5–8 dias sem nenhum uso ativo. Monitores de bateria, resistores shunt, eletrônica do BMS e controladores solares de carga somam 5–50mA cada. Embora individualmente pequenos, o efeito cumulativo de múltiplas cargas parasitas pode ser significativo. O método de diagnóstico mais eficaz é medir o consumo total de corrente com todas as cargas ativas desconectadas usando um alicate amperímetro no cabo principal da bateria."
+    checklist={[
+      'Desconecte todas as cargas ativas da bateria',
+      'Meça o consumo de corrente com um alicate amperímetro no cabo positivo principal',
+      'Compare a corrente em standby medida com o orçamento esperado de carga parasita',
+      'Desligue o inversor e meça novamente para isolar o consumo em standby do inversor',
+      'Desconecte o controlador solar de carga e meça para isolar seu consumo',
+      'Verifique se há fios ou componentes quentes indicando fluxo de corrente inesperado',
+      'Use um monitor de bateria com shunt para registrar a taxa de dreno noturna',
+    ]}
+    solutions={[
+      'Desligue ou desconecte inversores quando não estiverem em uso para eliminar o dreno em standby',
+      'Escolha controladores de carga de baixa corrente quiescente para sistemas off-grid',
+      'Use uma chave desconectadora para isolar totalmente a bateria durante armazenamento prolongado',
+      'Instale um arranjo solar maior para compensar o consumo parasita diário',
+      'Adicione uma desconexão por baixa tensão para evitar que cargas parasitas descarreguem profundamente a bateria',
+      'Audite todos os dispositivos conectados e remova eletrônicos sempre ligados desnecessários',
+    ]}
+  />
+
+  <TroubleshootingBlock
+    lang="pt"
+    problem="Efeitos da Temperatura — Frio ou Calor Reduzindo a Capacidade Disponível"
+    causes={[
+      'Eletrólito frio aumenta a resistência interna, reduzindo a capacidade entregue',
+      'Calor acelera a autodescarga e a degradação química',
+      'Sensor de temperatura impreciso, fazendo o BMS calcular o SOC incorretamente',
+      'Bateria instalada em compartimento sem isolamento exposto a extremos',
+      'Variações sazonais de temperatura causando condensação dentro da bateria',
+    ]}
+    explanation="A temperatura tem um efeito profundo na capacidade e na autonomia da bateria. A 0°C, baterias de íons de lítio normalmente entregam 70–80% de sua capacidade a 25°C. A -20°C, isso cai para 50–60%. O mecanismo é cinético: a mobilidade dos íons no eletrólito diminui com a queda da temperatura, aumentando a resistência interna e reduzindo a margem de queda de tensão. Para chumbo-ácido, temperaturas frias reduzem a capacidade e ao mesmo tempo aumentam a energia necessária para recarregar — uma penalidade dupla. Altas temperaturas (acima de 40°C) aumentam temporariamente a capacidade disponível ao reduzir a resistência interna, mas isso custa envelhecimento acelerado. Cada aumento de 10°C acima de 25°C aproximadamente dobra a taxa de degradação. O sensor de temperatura do BMS também pode ler a temperatura ambiente em vez da temperatura central das células, levando a estimativas imprecisas de SOC."
+    checklist={[
+      'Registre a temperatura ambiente no local da bateria durante a descarga',
+      'Compare a autonomia da bateria em diferentes estações ou condições de temperatura',
+      'Verifique a leitura de temperatura do BMS contra um termômetro ambiente',
+      'Confirme que a bateria não está em local com variações extremas de temperatura',
+      'Calcule a redução de capacidade esperada para sua faixa de temperatura',
+      'Monitore a temperatura da superfície da bateria durante descargas intensas',
+    ]}
+    solutions={[
+      'Mude a bateria para um ambiente com temperatura estável (ideal de 10–30°C)',
+      'Isole o compartimento da bateria em climas frios para reter o calor da descarga',
+      'Adicione ventilação ou sombra para baterias em climas quentes',
+      'Reduza a capacidade da bateria em 15–20% nos cálculos de autonomia em clima frio',
+      'Use uma bateria com manta de aquecimento integrada para ambientes abaixo de zero',
+      'Considere a temperatura em suas estimativas de autonomia usando a Calculadora de Autonomia',
+    ]}
+  />
+
+  <TroubleshootingBlock
+    lang="pt"
+    problem="Envelhecimento e Degradação — Capacidade Perdida ao Longo do Tempo"
+    causes={[
+      'Envelhecimento de calendário degrada a capacidade mesmo sem uso',
+      'Envelhecimento por ciclos de carga-descarga repetidos reduz o material ativo',
+      'Exposição a altas temperaturas acelera o crescimento da camada SEI',
+      'Descargas profundas frequentes encurtam drasticamente a vida útil em ciclos',
+      'Carga acima da tensão recomendada acelera a degradação',
+    ]}
+    explanation="Todas as baterias perdem capacidade com o tempo por dois mecanismos: envelhecimento de calendário e envelhecimento por ciclos. O envelhecimento de calendário ocorre independentemente do uso — o eletrólito se decompõe lentamente e a camada de interfase de eletrólito sólido (SEI) cresce no ânodo, consumindo lítio ativo. O envelhecimento por ciclos ocorre durante carga-descarga, pois o estresse mecânico da intercalação/desintercalação de lítio causa trincas nas partículas e perda de contato elétrico. LiFePO4 normalmente retém 80% da capacidade após 3.000–5.000 ciclos (a 80% de DoD, 25°C). NMC retém 80% após 1.000–2.000 ciclos. Chumbo-ácido retém 80% após 300–500 ciclos. Operar em altas temperaturas ou DoD profundo acelera drasticamente ambos os mecanismos de envelhecimento. Uma bateria que perdeu 30% da capacidade entregará 30% menos autonomia — isso não é defeito, mas degradação de fim de vida."
+    checklist={[
+      'Determine a idade da bateria (meses desde a fabricação)',
+      'Calcule a contagem aproximada de ciclos a partir do histórico de uso',
+      'Faça um teste de capacidade e compare com a capacidade nominal',
+      'Verifique se a bateria foi operada em altas temperaturas',
+      'Revise o histórico de profundidade de descarga — ciclagem profunda frequente acelera o envelhecimento',
+      'Compare o desempenho atual com o de quando a bateria era nova',
+    ]}
+    solutions={[
+      'Se a capacidade for >80% da nominal, a degradação é normal — ajuste as expectativas',
+      'Se a capacidade estiver em 60–80%, reduza as cargas ou adicione baterias em paralelo para compensar',
+      'Se a capacidade for <60%, planeje a substituição da bateria',
+      'Reduza o DoD para 50–70% para estender a vida útil restante em ciclos',
+      'Reduza a temperatura de operação para retardar a degradação futura',
+      'Use o Estimador de Degradação de Bateria para prever a vida útil restante',
+    ]}
+  />
+</ArticleLayout>

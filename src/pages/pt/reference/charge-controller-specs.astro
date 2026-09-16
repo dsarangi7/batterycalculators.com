@@ -1,0 +1,134 @@
+---
+import ArticleLayout from '../../../layouts/ArticleLayout.astro';
+import ReferenceTable from '../../../components/ReferenceTable.astro';
+import ComparisonTable from '../../../components/ComparisonTable.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+
+const faqItems = [
+  {
+    question: "Qual é a diferença entre controladores de carga MPPT e PWM?",
+    answer: "Controladores PWM (Modulação por Largura de Pulso) conectam os painéis diretamente à bateria, reduzindo a tensão para igualar a tensão da bateria. Isso desperdiça o excesso de tensão dos painéis. Controladores MPPT (Rastreamento do Ponto de Máxima Potência) convertem o excesso de tensão em corrente adicional, captando 15–30% mais energia. MPPT é recomendado para todos os sistemas acima de 200W e qualquer sistema em que a tensão dos painéis exceda a tensão da bateria.",
+  },
+  {
+    question: "Como dimensiono um controlador de carga para meus painéis solares?",
+    answer: "Divida a potência total dos painéis pela tensão da bateria para obter a corrente mínima nominal. Para 600W em 12V: 600/12 = 50A. Adicione 25% de margem de segurança: 62.5A → use um controlador de 60A. Para MPPT, verifique também se o controlador suporta o Voc dos painéis no frio, pois a tensão aumenta com a queda da temperatura.",
+  },
+  {
+    question: "Posso conectar painéis de 24V a uma bateria de 12V com MPPT?",
+    answer: "Sim. Essa é a principal vantagem dos controladores MPPT. Um controlador MPPT aceita tensão de painéis mais alta (por ex., 36V Vmp) e a converte eficientemente para a tensão de carga da bateria de 12V. Você pode conectar dois painéis de 12V em série (36V Vmp) a um banco de baterias de 12V por meio de um controlador MPPT sem perda de energia por incompatibilidade de tensão.",
+  },
+  {
+    question: "Qual é o número máximo de painéis solares que posso conectar a um controlador?",
+    answer: "O máximo é determinado por: (1) potência total dos painéis ÷ tensão da bateria ≤ corrente nominal do controlador, e (2) Voc dos painéis (na temperatura mais fria) ≤ tensão máxima de entrada do controlador. Para um MPPT de 60A em 12V: máx. 720W (60A × 12V). Para 24V: máx. 1,440W. Verifique sempre os limites de tensão e corrente.",
+  },
+  {
+    question: "Preciso de um controlador de carga para meus painéis solares?",
+    answer: "Sim. Painéis solares produzem 16–22V (para painéis nominais de 12V), o que sobrecarrega e destrói baterias se conectados diretamente. Um controlador de carga regula tensão e corrente para carregar as baterias com segurança. Mesmo pequenos painéis de carga de manutenção (5–10W) se beneficiam de um controlador para evitar sobrecarga.",
+  },
+  {
+    question: "Quais recursos devo procurar em um controlador MPPT?",
+    answer: "Principais recursos: (1) Tensão máxima de entrada ≥ o Voc dos seus painéis, (2) Corrente nominal ≥ corrente de curto-circuito dos painéis × número de painéis, (3) Compatibilidade com tensão da bateria (12/24/48V), (4) Compensação de temperatura para chumbo-ácido, (5) Monitoramento remoto (Bluetooth/app), (6) Terminais de carga para desconexão CC, (7) Múltiplos estágios de carga (bulk, absorção, flutuação).",
+  },
+];
+
+const relatedCalculators = [
+  { title: 'Calculadora de Dimensionamento de Bateria Solar', href: '/pt/tools/solar-battery-sizing-calculator/', type: 'calculator' },
+  { title: 'Calculadora de Dimensionamento de Gerador Solar', href: '/pt/solar-generator-sizing-calculator/', type: 'calculator' },
+  { title: 'Calculadora de Tempo de Carga', href: '/pt/tools/charging-time-calculator/', type: 'calculator' },
+];
+
+const relatedGuides = [
+  { title: 'Guia de Dimensionamento de Carregador', href: '/pt/learn/charger-sizing-guide/', type: 'guide' },
+  { title: 'Melhor Química de Bateria para Energia Solar', href: '/pt/learn/best-battery-chemistry-for-solar/', type: 'guide' },
+];
+
+const tableOfContents = [
+  { id: 'mppt-specs', label: 'Especificações de Controladores MPPT' },
+  { id: 'pwm-specs', label: 'Especificações de Controladores PWM' },
+  { id: 'mppt-vs-pwm', label: 'Comparativo MPPT vs PWM' },
+];
+---
+
+<ArticleLayout
+  title="Referência de Especificações de Controladores de Carga | Calculadoras de Bateria"
+  description="Referência completa de controladores de carga solar abrangendo controladores MPPT e PWM com entrada FV máxima, tensão de bateria, corrente nominal, recursos e comparativo de eficiência."
+  canonical="https://batterycalculators.com/pt/reference/charge-controller-specs/"
+  lang="pt"
+  category="REFERÊNCIA"
+  categoryHref="/pt/reference/"
+  breadcrumbItems={[{ label: 'Especificações de Controladores de Carga' }]}
+  relatedCalculators={relatedCalculators}
+  relatedGuides={relatedGuides}
+  tableOfContents={tableOfContents}
+  faqItems={faqItems}
+>
+  <p class="text-body-md text-body font-light mb-8">
+    Controladores de carga solar regulam a tensão e a corrente dos painéis solares para carregar baterias com segurança. Esta referência abrange os controladores MPPT e PWM mais comuns usados em sistemas solares residenciais, de RV, marítimos e off-grid.
+  </p>
+
+  <div id="mppt-specs">
+    <ReferenceTable
+    lang="pt"
+      title="Especificações de Controladores de Carga MPPT"
+      description="Controladores MPPT populares com entrada FV máxima, faixa de tensão de bateria, corrente nominal e principais recursos."
+      headers={['Modelo/Classe', 'Entrada FV Máx. (W)', 'Tensão da Bateria', 'Corrente Máx.', 'Tensão FV Máx.', 'Recursos']}
+      rows={[
+        ['Classe 15A', '200W (12V)', '12/24V', '15A', '75V', 'Display LCD, sensor de temperatura'],
+        ['Classe 20A', '260W (12V)', '12/24V', '20A', '100V', 'LCD, Bluetooth, MPPT'],
+        ['Classe 30A', '400W (12V)', '12/24V', '30A', '100V', 'LCD, Bluetooth, controle de carga'],
+        ['Classe 40A', '550W (12V)', '12/24V', '40A', '150V', 'LCD, MPPT, compensação de temperatura'],
+        ['Classe 50A', '700W (12V)', '12/24/48V', '50A', '150V', 'LCD, Bluetooth, controle de carga'],
+        ['Classe 60A', '850W (12V)', '12/24/48V', '60A', '150V', 'LCD colorido, monitoramento por app'],
+        ['Classe 80A', '1,100W (12V)', '12/24/48V', '80A', '200V', 'LCD colorido, app, relé'],
+        ['Classe 100A', '1,400W (12V)', '12/24/48V', '100A', '200V', 'LCD colorido, WiFi/BT, MPPT duplo'],
+      ]}
+      source="Especificações das linhas Victron SmartSolar, EPEver, Renogy e Morningstar"
+    />
+  </div>
+
+  <div id="pwm-specs">
+    <ReferenceTable
+    lang="pt"
+      title="Especificações de Controladores de Carga PWM"
+      description="Controladores PWM econômicos para pequenos sistemas solares e carga de manutenção."
+      headers={['Modelo/Classe', 'Entrada FV Máx. (W)', 'Tensão da Bateria', 'Corrente Máx.', 'Principais Recursos']}
+      rows={[
+        ['PWM 5A', '60W (12V)', '12/24V', '5A', 'Indicadores LED, básico'],
+        ['PWM 10A', '130W (12V)', '12/24V', '10A', 'LCD, porta USB, sensor de temperatura'],
+        ['PWM 15A', '200W (12V)', '12/24V', '15A', 'LCD, USB, controle de carga'],
+        ['PWM 20A', '260W (12V)', '12/24V', '20A', 'LCD, USB, compensação de temperatura'],
+        ['PWM 30A', '400W (12V)', '12/24V', '30A', 'LCD, USB duplo, controle de carga'],
+        ['PWM 40A', '520W (12V)', '12/24V', '40A', 'LCD, USB duplo, temporizador'],
+        ['PWM 60A', '800W (12V)', '12/24V', '60A', 'LCD, terminais reforçados'],
+      ]}
+      source="Especificações das linhas Renogy, Victron BlueSolar e controladores PWM genéricos"
+    />
+  </div>
+
+  <div id="mppt-vs-pwm">
+    <ComparisonTable
+      title="Eficiência e Custo: MPPT vs PWM"
+      headers={['Recurso', 'MPPT', 'PWM', 'Vencedor']}
+      rows={[
+        ['Aproveitamento de Energia', '93–98% de eficiência', '75–85% de eficiência', 'MPPT'],
+        ['Energia Adicional vs PWM', '+15–30%', 'Referência', 'MPPT'],
+        ['Preço (classe 30A)', '$150–350', '$30–80', 'PWM'],
+        ['Compatibilidade de Painéis', 'Qualquer Vmp', 'Vmp deve igualar a bateria', 'MPPT'],
+        ['Suporte a Painéis em Série', 'Sim (tensão maior)', 'Não (queda de tensão)', 'MPPT'],
+        ['Complexidade', 'Maior', 'Menor', 'PWM'],
+        ['Tamanho Ideal do Sistema', '>200W ou 24/48V', '<200W, somente 12V', '—'],
+        ['Desempenho no Inverno', 'Excelente', 'Ruim (desperdício de tensão)', 'MPPT'],
+        ['Arranjos com Múltiplos Painéis', 'Ideal', 'Limitado', 'MPPT'],
+        ['Recomendado Para', 'Todo sistema solar sério', 'Carga de manutenção, econômico', 'MPPT'],
+      ]}
+      caption="Controladores MPPT custam mais inicialmente, mas se pagam em 1–2 anos com o aumento da energia captada. PWM é aceitável apenas para pequenos sistemas 12V (<200W)."
+    />
+  </div>
+
+  <div class="bg-surface-card border border-hairline p-6 mb-12">
+    <h3 class="text-title-lg text-primary uppercase tracking-wider mb-3">Aviso Legal</h3>
+    <p class="text-body-sm text-muted font-light">
+      As especificações de controladores de carga variam por fabricante e modelo. Verifique sempre a tensão máxima de entrada FV (Voc na temperatura mais fria) e a corrente máxima de carga antes da instalação. O dimensionamento incorreto pode danificar baterias ou o controlador. Siga as diretrizes de fiação do fabricante e os códigos elétricos locais. Esta referência é apenas para fins informativos e educacionais.
+    </p>
+  </div>
+</ArticleLayout>

@@ -1,0 +1,244 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "Qual é a fórmula do tempo de carga da bateria?",
+    answer: "Tempo básico de carga = Ah a Carregar / Corrente de Carga (A). Para LFP, o tempo total inclui uma fase de afunilamento CV de aproximadamente 0,3–0,5 horas. Para chumbo-ácido, a fase de absorção pode adicionar 2–4 horas. Energia total consumida = Ah × Tensão ÷ Eficiência (tipicamente 0,95 para lítio, 0,80 para chumbo-ácido).",
+  },
+  {
+    question: "O que é a fase CC no carregamento de baterias?",
+    answer: "A fase de Corrente Constante (CC) é o estágio de carga em massa, onde o carregador entrega uma corrente máxima fixa enquanto a tensão da bateria sobe. Para LFP, essa fase entrega aproximadamente 70–80% da capacidade total. A fase CC termina quando a bateria atinge sua tensão máxima, momento em que o carregador muda para o modo CV.",
+  },
+  {
+    question: "O que é a fase CV no carregamento de baterias?",
+    answer: "A fase de Tensão Constante (CV) segue a fase CC. O carregador mantém a tensão no máximo da bateria enquanto a corrente diminui. Essa fase completa os 20–30% restantes da capacidade. Para LFP, a fase CV adiciona 20–60 minutos. Para chumbo-ácido, a fase de absorção (CV) pode durar 2–4 horas.",
+  },
+  {
+    question: "Como a eficiência do carregador afeta o tempo de carga?",
+    answer: "A eficiência do carregador determina quanta energia é perdida como calor durante a conversão. Um carregador com 95% de eficiência significa que 5% da energia de entrada é perdida. Para uma carga de 1.024 Wh, o carregador drena 1.078 Wh da fonte. Carregadores menos eficientes drenam mais potência e levam um pouco mais para entregar a mesma carga.",
+  },
+];
+---
+
+<Layout
+  title="Referência de Fórmula de Carga de Bateria | Calculadoras de Bateria"
+  description="Referência completa de fórmulas para cálculos de carga de bateria: tempo da fase CC, estimativa da fase CV, tempo total de carga e consumo de energia para todas as químicas."
+  canonical="https://batterycalculators.com/pt/learn/battery-charging-formula/"
+  schema="faqPage"
+  schemaName="Referência de Fórmula de Carga de Bateria"
+  schemaDescription="Referência completa de fórmulas para cálculos de tempo e energia de carga de baterias."
+  schemaUrl="https://batterycalculators.com/pt/learn/battery-charging-formula/"
+  faqItems={faqItems}
+  lang="pt"
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/pt/learn/" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Voltar aos Guias</a>
+      <Breadcrumb items={[
+        { label: "Centro de Aprendizagem", href: "/pt/learn/" },
+        { label: "Referência de Fórmula de Carga de Bateria" }
+      ]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">REFERÊNCIA</span>
+      <h1 class="text-display-md text-primary mb-6">Referência de Fórmula de Carga de Bateria</h1>
+      <p class="text-body-md text-body font-light">
+        Esta referência consolida todas as fórmulas necessárias para cálculos de carga de bateria — da estimativa básica do tempo da fase CC ao consumo total de energia considerando a eficiência do carregador. Use essas fórmulas para dimensionar carregadores, estimar tempos de carga e planejar orçamentos de energia para qualquer química de bateria.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Fórmulas Fundamentais</h2>
+        <FormulaBox title="Tempo de Carga (Fase CC)">
+          <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+            Tempo CC (horas) = Ah a Carregar / Corrente de Carga (A)
+          </div>
+          <p>
+            Esta é a fórmula principal para estimar o tempo de carga em massa. O Ah a Carregar é a diferença entre o estado de carga inicial e final multiplicada pela capacidade nominal.
+          </p>
+          <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+            Ah a Carregar = Capacidade (Ah) × (SOC Final% - SOC Inicial%)
+          </div>
+          <p>
+            Exemplo: bateria de 100Ah, 20% a 100% → Ah a Carregar = 100 × 0,80 = 80 Ah. Com corrente de 50A: 80/50 = 1,6 horas.
+          </p>
+        </FormulaBox>
+      </section>
+
+      <FormulaBox title="Corrente de Carga a partir do C-Rate">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Corrente de Carga (A) = Capacidade da Bateria (Ah) × C-Rate
+        </div>
+        <p>
+          O C-rate define a velocidade de carga em relação à capacidade. Uma taxa de 0,5C em uma bateria de 100Ah = 50A. Uma taxa de 0,2C = 20A. C-rates maiores carregam mais rápido, mas aumentam o calor e podem reduzir a vida útil em ciclos.
+        </p>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          C-Rate = Corrente de Carga (A) / Capacidade da Bateria (Ah)
+        </div>
+        <p>
+          Para achar o C-rate do seu carregador: divida a corrente do carregador pela capacidade da bateria. Um carregador de 30A em uma bateria de 100Ah = 0,3C.
+        </p>
+      </FormulaBox>
+
+      <FormulaBox title="Estimativa do Tempo da Fase CV">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Tempo CV (horas) ≈ 0,3–0,5 h (LFP)
+          Tempo CV (horas) ≈ 2–4 h (Chumbo-Ácido)
+        </div>
+        <p>
+          O tempo da fase CV depende do projeto da bateria e da corrente de corte. Para LFP, a fase CV é relativamente curta porque a curva de tensão é plana e a corrente cai rápido. Para chumbo-ácido, a fase de absorção é bem mais longa, pois o carregador precisa empurrar corrente para placas cada vez mais resistentes.
+        </p>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Tempo Total de Carga = Tempo CC + Tempo CV
+        </div>
+        <p>
+          Para fins práticos, carregar de 20% a 80% evita a maior parte da fase CV, sendo significativamente mais rápido que uma carga completa de 0–100%.
+        </p>
+      </FormulaBox>
+
+      <FormulaBox title="Consumo de Energia">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Energia para a Bateria (Wh) = Ah a Carregar × Tensão Nominal (V)
+        </div>
+        <p>
+          Tensão nominal LFP: 3,2V/célula (12,8V para 4S, 25,6V para 8S, 51,2V para 16S). Tensão nominal NMC: 3,6V/célula.
+        </p>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Energia da Fonte (Wh) = Energia para a Bateria / Eficiência do Carregador
+        </div>
+        <p>
+          A eficiência do carregador é tipicamente 90–98% para carregadores chaveados modernos. Um carregador com 95% de eficiência significa que 5% da energia de entrada é perdida como calor.
+        </p>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Consumo do Carregador (W) = Tensão de Carga × Corrente de Carga / Eficiência
+        </div>
+        <p>
+          Exemplo: 50A a 14,6V com 95% de eficiência → 50 × 14,6 / 0,95 = 768W da fonte de energia.
+        </p>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Parâmetros por Química</h2>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Parâmetro</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">LFP</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">NMC</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Chumbo-Ácido</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">Tensão nominal da célula</td>
+                <td class="p-4 font-mono text-primary">3,2V</td>
+                <td class="p-4 font-mono text-primary">3,6V</td>
+                <td class="p-4 font-mono text-primary">2,0V</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Tensão de carga (pack 12V)</td>
+                <td class="p-4 font-mono text-primary">14,4–14,6V</td>
+                <td class="p-4 font-mono text-primary">16,8V</td>
+                <td class="p-4 font-mono text-primary">14,4–14,8V</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">C-rate recomendado</td>
+                <td class="p-4 font-mono text-primary">0,5C</td>
+                <td class="p-4 font-mono text-primary">0,5C</td>
+                <td class="p-4 font-mono text-primary">0,2C</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Eficiência de carga</td>
+                <td class="p-4 font-mono text-primary">95–98%</td>
+                <td class="p-4 font-mono text-primary">95–98%</td>
+                <td class="p-4 font-mono text-primary">80–85%</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Duração da fase CV</td>
+                <td class="p-4 font-mono text-primary">0,3–0,5 h</td>
+                <td class="p-4 font-mono text-primary">0,3–0,5 h</td>
+                <td class="p-4 font-mono text-primary">2–4 h</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Exemplo Prático: Cálculo de Carga Completa</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Dados:</strong> bateria LFP 200Ah 48V, carregador 100A (0,5C), 20% a 100% SOC, eficiência do carregador 96%</p>
+            <p><strong>Etapa 1:</strong> Ah a carregar:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              200 Ah × 0,80 = 160 Ah
+            </div>
+            <p><strong>Etapa 2:</strong> Tempo da fase CC:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              160 Ah / 100A = 1,6 horas
+            </div>
+            <p><strong>Etapa 3:</strong> Tempo total com afunilamento CV:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              1,6 h + 0,4 h = 2,0 horas
+            </div>
+            <p><strong>Etapa 4:</strong> Energia para a bateria:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              160 Ah × 51,2V = 8.192 Wh
+            </div>
+            <p><strong>Etapa 5:</strong> Energia da fonte:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              8.192 Wh / 0,96 = 8.533 Wh
+            </div>
+            <p><strong>Etapa 6:</strong> Consumo médio do carregador:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              8.533 Wh / 2,0 h = 4.267W (~4,3 kW)
+            </div>
+            <p>Este é um carregador robusto — típico para sistemas grandes de RV, marítimos ou residenciais. Garanta que sua entrada CA ou gerador suporte esse consumo durante toda a carga.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Experimente</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use a Calculadora de Tempo de Carga para calcular tempos exatos com essas fórmulas para sua bateria e carregador.
+          </p>
+          <a href="/pt/tools/charging-time-calculator/" class="btn-primary text-xs py-3 px-6 inline-block">Abrir Calculadora de Tempo de Carga</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Próxima Etapa</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Calcule o C-rate de qualquer combinação de carregador e bateria com a Calculadora de C-Rate.
+          </p>
+          <a href="/pt/tools/c-rate-calculator/" class="btn-primary text-xs py-3 px-6 inline-block">Abrir Calculadora de C-Rate</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Artigos Relacionados</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <a href="/pt/learn/how-long-to-charge-a-battery/" class="text-primary hover:underline font-bold block mb-2">Quanto Tempo para Carregar uma Bateria</a>
+            <p class="text-body-sm text-muted">
+              Guia prático de tempos de carga para capacidades e carregadores comuns.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <a href="/pt/learn/charger-sizing-guide/" class="text-primary hover:underline font-bold block mb-2">Guia de Dimensionamento de Carregadores</a>
+            <p class="text-body-sm text-muted">
+              Como escolher o carregador certo para sua bateria por química, capacidade e caso de uso.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

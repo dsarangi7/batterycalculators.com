@@ -1,0 +1,186 @@
+---
+import ArticleLayout from '../../../layouts/ArticleLayout.astro';
+import TroubleshootingBlock from '../../../components/TroubleshootingBlock.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+
+const description = "Descubra por que sua bateria está inchando ou deformando fisicamente. Abrange sobrecarga, geração interna de gases, defeitos de fabricação, calor excessivo e descarga profunda com listas de verificação de segurança.";
+
+const faqItems = [
+  {
+    question: "Uma bateria inchada é perigosa?",
+    answer: "Sim. Uma bateria inchada contém gás preso de reações químicas internas. A carcaça está sob pressão e pode romper, liberando eletrólito inflamável. Em casos extremos, o inchaço precede a fuga térmica. Aposente qualquer bateria inchada imediatamente e manuseie com cuidado durante o descarte.",
+  },
+  {
+    question: "Posso desinchar uma bateria inchada pressionando-a?",
+    answer: "Nunca tente achatar, perfurar ou comprimir uma bateria inchada. As camadas internas podem estar danificadas, e aplicar pressão pode causar um curto-circuito interno levando a incêndio ou explosão. A bateria deve ser aposentada com segurança e reciclada.",
+  },
+  {
+    question: "O inchaço sempre significa que a bateria acabou?",
+    answer: "Em quase todos os casos, sim. O inchaço indica dano interno irreversível — geração de gás por decomposição do eletrólito, curtos internos ou falha do separador. A bateria não pode ser restaurada. Não tente recarregar uma bateria inchada.",
+  },
+  {
+    question: "Como devo descartar uma bateria inchada?",
+    answer: "Não jogue baterias inchadas no lixo doméstico. Coloque-as em um recipiente à prova de fogo e leve-as a uma instalação de reciclagem de baterias ou a um revendedor que aceite baterias de lítio. Alguns corpos de bombeiros também aceitam baterias para descarte seguro.",
+  },
+  {
+    question: "O inchaço pode acontecer com qualquer química de bateria?",
+    answer: "O inchaço é mais comum em baterias de íons de lítio e lítio-polímero, que geram gás quando o eletrólito se decompõe. Baterias de chumbo-ácido também podem inchar por acúmulo de gás hidrogênio durante sobrecarga, mas isso é menos comum com projetos selados modernos. Baterias NiMH raramente incham.",
+  },
+];
+
+const relatedCalculators = [
+  { title: "Estimador de Degradação de Bateria", href: "/pt/tools/battery-degradation-estimator/", type: "calculator" as const },
+  { title: "Calculadora de Tempo de Carga", href: "/pt/tools/charging-time-calculator/", type: "calculator" as const },
+  { title: "Estimador de SOC", href: "/pt/tools/soc-estimator/", type: "calculator" as const },
+];
+
+const relatedGuides = [
+  { title: "Projeto de Pacote LiFePO4", href: "/pt/learn/lifepo4-pack-design/", type: "guide" as const },
+  { title: "Como Montar um Pacote de Baterias", href: "/pt/learn/how-to-build-a-battery-pack/", type: "guide" as const },
+];
+---
+
+<ArticleLayout
+  title="Inchaço da Bateria — Guia de Solução de Problemas | Calculadoras de Bateria"
+  description={description}
+  canonical="https://batterycalculators.com/pt/troubleshooting/battery-swelling/"
+  category="SOLUÇÃO DE PROBLEMAS"
+  breadcrumbItems={[{ label: "Inchaço da Bateria" }]}
+  relatedCalculators={relatedCalculators}
+  relatedGuides={relatedGuides}
+  faqItems={faqItems}
+  lang="pt"
+>
+  <p class="text-body-md text-body font-light mb-8">
+    O inchaço da bateria — abaulamento visível ou deformação da carcaça — é um sério sinal de alerta de segurança. Ele indica acúmulo de gás de reações químicas internas que não deveriam estar ocorrendo. Este guia aborda as cinco causas raiz e os procedimentos de segurança para manusear uma bateria inchada.
+  </p>
+
+  <TroubleshootingBlock
+    lang="pt"
+    problem="Sobrecarga"
+    causes={[
+      "Tensão do carregador excede a tensão máxima nominal da bateria",
+      "Controlador de carga mal configurado ou travado na posição ligado",
+      "Proteção contra sobretensão do BMS falhou em desconectar o carregador",
+      "Carga de flutuação em bateria LiFePO4 totalmente carregada em alta tensão",
+    ]}
+    explanation="A sobrecarga força o excesso de íons de lítio no ânodo além de sua capacidade. O ânodo fica saturado e o lítio metálico se deposita na superfície. Esse lítio depositado reage com o eletrólito, gerando gás (principalmente CO2 e etileno). O gás não tem para onde escapar em uma célula selada, fazendo a carcaça inchar. A sobrecarga é a causa mais comum de inchaço e uma das principais causas de eventos de fuga térmica."
+    checklist={[
+      "Verifique a tensão de saída do carregador contra a especificação de tensão máxima de carga da bateria",
+      "Confirme se a proteção contra sobretensão do BMS está funcional testando com uma fonte ajustável",
+      "Inspecione o controlador de carga quanto às configurações corretas de química (LiFePO4, chumbo-ácido, NMC)",
+      "Verifique se a bateria foi deixada em um carregador projetado para outra química",
+      "Procure evidências de inchaço antes e depois de sessões recentes de carga",
+    ]}
+    solutions={[
+      "Aposente a bateria inchada imediatamente — não tente recarregá-la",
+      "Substitua o carregador ou controlador de carga se ele falhou em limitar a tensão corretamente",
+      "Instale um dispositivo secundário de proteção contra sobretensão como reserva do BMS",
+      "Sempre combine as configurações do carregador com a química e configuração específicas da bateria",
+    ]}
+  />
+
+  <TroubleshootingBlock
+    lang="pt"
+    problem="Geração Interna de Gases"
+    causes={[
+      "Decomposição do eletrólito em altas temperaturas ou altas tensões",
+      "Eletrólito reagindo com o material do eletrodo em condições anormais",
+      "Contaminação por água no eletrólito produzindo gás hidrogênio",
+      "Decomposição química da camada de interfase de eletrólito sólido (SEI)",
+    ]}
+    explanation="Dentro de uma célula de lítio, o eletrólito é um solvente orgânico que pode se decompor sob estresse. Alta tensão, alta temperatura e contaminação aceleram a decomposição. Os produtos da decomposição incluem gases como CO2, CO e H2. Esses gases se acumulam dentro da célula selada, aumentando a pressão interna e fazendo a carcaça abaular para fora. Mesmo pequenas quantidades de gás indicam que ocorreu dano químico irreversível."
+    checklist={[
+      "Verifique se a bateria foi exposta a temperaturas acima de 60°C durante operação ou armazenamento",
+      "Confirme se a bateria não foi carregada acima de sua tensão nominal",
+      "Procure sinais de entrada de água se a bateria foi usada em ambientes marinhos ou externos",
+      "Verifique a idade da bateria — células mais antigas são mais propensas à decomposição do eletrólito",
+      "Meça a impedância das células — um aumento significativo sugere degradação química interna",
+    ]}
+    solutions={[
+      "Aposente a bateria — a geração interna de gás indica dano irreversível ao eletrólito",
+      "Investigue e elimine a causa raiz (sobretensão, superaquecimento ou contaminação)",
+      "Melhore os controles ambientais — temperatura, umidade e regulação de tensão",
+      "Para aplicações marítimas, garanta que os gabinetes estejam bem vedados e ventilados",
+    ]}
+  />
+
+  <TroubleshootingBlock
+    lang="pt"
+    problem="Defeito de Fabricação"
+    causes={[
+      "Contaminação por partículas metálicas durante a fabricação dos eletrodos",
+      "Separador inadequado permitindo contato elétrico interno entre eletrodos",
+      "Má qualidade de solda nas conexões internas criando pontos quentes",
+      "Revestimento inconsistente dos eletrodos causando áreas localizadas de alta corrente",
+    ]}
+    explanation="Defeitos de fabricação podem causar inchaço mesmo em condições normais de operação. Uma partícula metálica microscópica incorporada durante a fabricação do eletrodo pode crescer lentamente através do separador, criando um microcurto que gera calor e gás. O controle de qualidade deficiente no revestimento dos eletrodos cria distribuição desigual de corrente, levando a sobrecarga localizada e geração de gás. Esses defeitos podem não se manifestar imediatamente."
+    checklist={[
+      "Verifique se o inchaço ocorreu no início da vida da bateria — falha precoce sugere problema de fabricação",
+      "Confira o número do lote e verifique se outras unidades do mesmo lote têm falhas semelhantes",
+      "Inspecione a bateria por sinais visíveis de inchaço desigual ou abaulamento localizado",
+      "Verifique o status da garantia — defeitos de fabricação normalmente são cobertos",
+      "Reporte a falha ao fabricante com informações de lote e série",
+    ]}
+    solutions={[
+      "Aposente a bateria e entre em contato com o fabricante para substituição em garantia",
+      "Reporte a falha para ajudar o fabricante a identificar e recolher lotes defeituosos",
+      "Compre baterias de fabricantes confiáveis com processos comprovados de controle de qualidade",
+      "Considere baterias com recursos adicionais de segurança, como separadores com revestimento cerâmico",
+    ]}
+  />
+
+  <TroubleshootingBlock
+    lang="pt"
+    problem="Exposição Excessiva ao Calor"
+    causes={[
+      "Bateria instalada em compartimento sem isolamento exposto à luz solar direta",
+      "Proximidade de fontes de calor — motores, escapamentos, inversores",
+      "Ambiente de alta temperatura sem resfriamento adequado",
+      "Calor gerado pela própria bateria durante descarga em alta taxa sem dissipação",
+    ]}
+    explanation="O calor acelera todos os mecanismos de degradação em uma bateria. Em temperaturas elevadas, o eletrólito se decompõe mais rápido, a camada SEI engrossa e a geração de gás aumenta. A equação de Arrhenius descreve essa relação — a cada aumento de 10°C na temperatura, a taxa de degradação aproximadamente dobra. Uma bateria operada a 50°C envelhece cerca de quatro vezes mais rápido que uma a 25°C."
+    checklist={[
+      "Meça a temperatura dentro do gabinete da bateria durante operação de pico",
+      "Verifique fontes de calor a menos de 30cm da bateria — motores, escapamento, inversores, transformadores",
+      "Confirme que as aberturas de ventilação estão desobstruídas e os ventiladores operacionais",
+      "Verifique se o inchaço ocorreu durante meses de verão ou em clima quente",
+      "Sinta a carcaça da bateria por pontos quentes que possam indicar superaquecimento localizado",
+    ]}
+    solutions={[
+      "Mude a bateria para longe de todas as fontes de calor e melhore a ventilação",
+      "Instale resfriamento ativo — ventiladores de ar forçado ou líquido para aplicações de alta potência",
+      "Use gabinetes isolados em climas extremos para amortecer variações de temperatura",
+      "Aposente qualquer bateria que inchou por exposição ao calor — o dano é permanente",
+    ]}
+  />
+
+  <TroubleshootingBlock
+    lang="pt"
+    problem="Dano por Descarga Profunda"
+    causes={[
+      "Bateria descarregada abaixo de seu corte mínimo seguro de tensão",
+      "Proteção contra subtensão do BMS falhou ou foi ignorada",
+      "Bateria armazenada descarregada por período prolongado",
+      "Descarga profunda causou dissolução de cobre do coletor de corrente do ânodo",
+    ]}
+    explanation="Descarga profunda abaixo da tensão mínima pode causar dissolução do coletor de corrente de cobre em células de lítio. Quando a célula é recarregada em seguida, o cobre dissolvido se deposita na superfície do eletrodo, podendo criar curtos internos. Os depósitos de cobre podem perfurar o separador, causando aquecimento localizado e geração de gás. Mesmo que a bateria sobreviva à descarga profunda, o dano interno pode causar inchaço tardio."
+    checklist={[
+      "Verifique se a bateria já foi descarregada abaixo de sua tensão mínima nominal",
+      "Confirme se a proteção contra subtensão do BMS estava ativa e configurada corretamente",
+      "Procure sinais de que a bateria foi armazenada profundamente descarregada",
+      "Verifique se o inchaço apareceu dias ou semanas após um evento de descarga profunda",
+      "Meça a impedância das células — a dissolução de cobre aumenta a resistência interna",
+    ]}
+    solutions={[
+      "Aposente qualquer bateria que foi profundamente descarregada e depois inchou",
+      "Garanta que a proteção contra subtensão do BMS esteja ativa e no limite correto",
+      "Nunca armazene baterias totalmente descarregadas — armazene com 40–60% de SOC",
+      "Adicione um alarme de baixa tensão para alertar antes que a bateria atinja níveis perigosos",
+    ]}
+  />
+
+  <p class="text-caption text-muted border-t border-hairline pt-8 mt-12">
+    <strong>Aviso:</strong> Este guia é apenas para fins educacionais e de diagnóstico. O inchaço da bateria é uma séria preocupação de segurança. Nunca tente carregar, usar ou reparar uma bateria inchada. Aposente-a imediatamente e descarte-a em uma instalação certificada de reciclagem de baterias. Não perfure, esmague ou incinere baterias inchadas.
+  </p>
+</ArticleLayout>

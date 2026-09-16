@@ -1,0 +1,184 @@
+---
+import ArticleLayout from '../../../layouts/ArticleLayout.astro';
+import ReferenceTable from '../../../components/ReferenceTable.astro';
+import ComparisonTable from '../../../components/ComparisonTable.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+
+const faqItems = [
+  {
+    question: "Qual bitola de fio AWG preciso para um serviço de 30 ampères em RV?",
+    answer: "Use fio 10 AWG para trechos de serviço de 30 ampères em RV de até 50 ft. Para trechos acima de 50 ft, passe para 8 AWG para compensar a queda de tensão. Verifique sempre a ampacidade na classificação de temperatura da isolação do fio. NM-B (Romex) e THHN/THWN são os tipos de isolação mais comuns para esta aplicação.",
+  },
+  {
+    question: "Como calculo a queda de tensão na fiação CC?",
+    answer: "Queda de tensão = (2 × Comprimento × Corrente × Resistência) / 1000. Para circuitos CC, use a resistência por 1000 pés da tabela AWG. Para um trecho de 50 ft a 30A com 10 AWG (1.21 Ω/1000ft): Queda = (2 × 50 × 30 × 1.21) / 1000 = 3.63V. A 12V, isso representa uma queda de 30% — muito alta. Use 8 AWG (0.764 Ω/1000ft) para uma queda de 1.15V (9.5%).",
+  },
+  {
+    question: "Qual é a diferença entre os fios THHN e THWN?",
+    answer: "O THHN é classificado para 90°C apenas em locais secos. O THWN é classificado para 75°C em locais úmidos ou secos. O THWN-2 é classificado para 90°C em locais úmidos ou secos. Para aplicações marítimas e externas, use fio THWN-2 ou de grau marítimo. Em eletrodutos expostos à umidade, aplicam-se as classificações THWN mesmo que o fio esteja marcado como THHN.",
+  },
+  {
+    question: "Posso usar fio de alumínio em vez de cobre?",
+    answer: "Sim, mas com ressalvas. O fio de alumínio tem 60% da condutividade do cobre, por isso você precisa de uma bitola AWG maior. O equivalente em cobre ao 10 AWG é o 8 AWG em alumínio. O alumínio é mais leve e mais barato, mas exige composto antioxidante nas conexões, terminais maiores e torque cuidadoso. É comumente usado na entrada de serviço (4/0 AWG), mas não é recomendado para circuitos de distribuição em uso residencial ou marítimo.",
+  },
+  {
+    question: "Qual bitola de fio preciso para um inversor de 2000W em 12V?",
+    answer: "Um inversor de 2000W a 12V consome aproximadamente 167A em plena carga. Use fio de cobre 2/0 AWG para trechos de até 5 ft, ou 4/0 AWG para trechos de até 10 ft. A 24V, a corrente cai para 83A, permitindo 4 AWG para trechos de 5 ft. Sempre instale fusível ou disjuntor conforme as especificações do fabricante.",
+  },
+  {
+    question: "Como a temperatura afeta a ampacidade do fio?",
+    answer: "As classificações de ampacidade assumem temperatura ambiente de 30°C. Para cada 1°C acima de 30°C, reduza a ampacidade em aproximadamente 0.5%. A 40°C, um fio classificado para 30A a 30°C é seguro apenas para 28.5A. Em casas de máquinas ou sótãos onde as temperaturas excedem 50°C, use fio com classificação superior (por ex., THHN de 105°C) e aplique os fatores de redução conforme a Tabela NEC 310.15(B)(2)(a).",
+  },
+];
+
+const relatedCalculators = [
+  { title: 'Calculadora de Perdas em Cabos CC', href: '/pt/tools/dc-cable-loss-calculator/', type: 'calculator' },
+  { title: 'Calculadora de Queda de Tensão', href: '/pt/tools/voltage-drop-calculator/', type: 'calculator' },
+  { title: 'Calculadora de Bateria para Inversor', href: '/pt/tools/inverter-battery-calculator/', type: 'calculator' },
+];
+
+const relatedGuides = [
+  { title: 'Referência de Dimensionamento de Bateria', href: '/pt/learn/battery-sizing-reference/', type: 'guide' },
+  { title: 'Como Dimensionar um Banco de Baterias', href: '/pt/learn/how-to-size-a-battery-bank/', type: 'guide' },
+];
+
+const tableOfContents = [
+  { id: 'awg-metric', label: 'Conversão AWG para Métrico' },
+  { id: 'resistance-ampacity', label: 'Resistência e Ampacidade' },
+  { id: 'fusing-current', label: 'Corrente de Fusão' },
+  { id: 'application-wiring', label: 'Guia de Fiação por Aplicação' },
+];
+---
+
+<ArticleLayout
+  title="Tabela de Bitolas de Fio AWG | Calculadoras de Bateria"
+  description="Tabela completa de referência de bitolas de fio AWG com conversão para mm², resistência, ampacidade, corrente de fusão e guias de fiação por aplicação para sistemas marítimos, automotivos, solares e de telecom."
+  canonical="https://batterycalculators.com/pt/reference/awg-wire-size-chart/"
+  lang="pt"
+  category="REFERÊNCIA"
+  categoryHref="/pt/reference/"
+  breadcrumbItems={[{ label: 'Tabela de Bitolas AWG' }]}
+  relatedCalculators={relatedCalculators}
+  relatedGuides={relatedGuides}
+  tableOfContents={tableOfContents}
+  faqItems={faqItems}
+>
+  <p class="text-body-md text-body font-light mb-8">
+    American Wire Gauge (AWG) é o padrão de bitolas de fio na América do Norte. Esta tabela abrange bitolas de 4/0 (107 mm²) a 30 AWG (0.0509 mm²), com valores de resistência para condutores de cobre a 20°C. Use estes valores para cálculos de queda de tensão, redução de ampacidade (derating) e seleção de cabos.
+  </p>
+
+  <div id="awg-metric">
+    <ReferenceTable
+    lang="pt"
+      title="Conversão AWG para Métrico"
+      description="Bitolas AWG padrão com área de seção transversal métrica equivalente e diâmetro."
+      headers={['AWG', 'Diâmetro (mm)', 'Seção Transversal (mm²)', 'Mils Circulares']}
+      rows={[
+        ['4/0', '11.68', '107.2', '211,600'],
+        ['3/0', '10.40', '85.01', '167,800'],
+        ['2/0', '9.266', '67.41', '133,100'],
+        ['1/0', '8.252', '53.49', '105,600'],
+        ['1', '7.348', '42.41', '83,690'],
+        ['2', '6.544', '33.63', '66,360'],
+        ['4', '5.189', '21.15', '41,740'],
+        ['6', '4.115', '13.30', '26,240'],
+        ['8', '3.264', '8.366', '16,510'],
+        ['10', '2.588', '5.261', '10,380'],
+        ['12', '2.053', '3.309', '6,530'],
+        ['14', '1.628', '2.081', '4,109'],
+        ['16', '1.291', '1.309', '2,583'],
+        ['18', '1.024', '0.8234', '1,624'],
+        ['20', '0.8118', '0.5189', '1,022'],
+        ['22', '0.6438', '0.3262', '642.4'],
+        ['24', '0.5106', '0.2047', '404.0'],
+        ['26', '0.4049', '0.1288', '253.9'],
+        ['28', '0.3211', '0.08098', '159.8'],
+        ['30', '0.2546', '0.05093', '100.5'],
+      ]}
+      source="Tabelas padrão de bitolas de fio do NIST e da International Electrotechnical Commission"
+    />
+  </div>
+
+  <div id="resistance-ampacity">
+    <ReferenceTable
+    lang="pt"
+      title="Resistência e Ampacidade (Cobre a 20°C)"
+      description="Resistência CC por 1000 pés e ampacidade para tipos comuns de isolação ao ar livre."
+      headers={['AWG', 'Resistência (Ω/1000ft)', 'Resistência (Ω/km)', 'Ampacidade (THHN 90°C)', 'Ampacidade (THWN 75°C)']}
+      rows={[
+        ['4/0', '0.0490', '0.161', '230A', '195A'],
+        ['3/0', '0.0618', '0.203', '200A', '170A'],
+        ['2/0', '0.0780', '0.256', '175A', '150A'],
+        ['1/0', '0.0983', '0.322', '150A', '130A'],
+        ['1', '0.1240', '0.407', '130A', '110A'],
+        ['2', '0.1563', '0.513', '115A', '95A'],
+        ['4', '0.2485', '0.815', '85A', '70A'],
+        ['6', '0.3951', '1.296', '65A', '55A'],
+        ['8', '0.6282', '2.061', '50A', '40A'],
+        ['10', '0.9989', '3.277', '40A', '30A'],
+        ['12', '1.588', '5.210', '30A', '25A'],
+        ['14', '2.525', '8.284', '25A', '20A'],
+        ['16', '4.016', '13.17', '18A', '15A'],
+        ['18', '6.385',  '20.95', '14A', '10A'],
+        ['20', '10.15', '33.30', '11A', '7.5A'],
+        ['22', '16.14', '52.95', '—', '5A'],
+        ['24', '25.67', '84.22', '—', '3.5A'],
+        ['26', '40.81', '133.9', '—', '2.5A'],
+        ['28', '64.90', '212.9', '—', '1.5A'],
+        ['30', '103.2', '338.6', '—', '1A'],
+      ]}
+      source="Tabela NEC 310.15(B)(16) e folhas de dados de fabricantes"
+    />
+  </div>
+
+  <div id="fusing-current">
+    <ReferenceTable
+    lang="pt"
+      title="Corrente de Fusão (Fio de Cobre)"
+      description="Corrente aproximada para fundir um fio de cobre em 10 segundos (com base na equação de Onderdonk). Use apenas para dimensionamento de proteção contra curto-circuito."
+      headers={['AWG', 'Corrente de Fusão (10s)', 'Corrente de Fusão (1s)', 'Fusível Máx. NEC (típico)']}
+      rows={[
+        ['4/0', '5,900A', '13,600A', '400A'],
+        ['2/0', '4,170A', '9,610A', '300A'],
+        ['1/0', '3,310A', '7,640A', '250A'],
+        ['2', '2,070A', '4,780A', '175A'],
+        ['4', '1,310A', '3,020A', '100A'],
+        ['6', '820A', '1,900A', '60A'],
+        ['8', '520A', '1,200A', '40A'],
+        ['10', '320A', '740A', '30A'],
+        ['12', '200A', '460A', '20A'],
+        ['14', '125A', '290A', '15A'],
+        ['16', '80A', '180A', '10A'],
+        ['18', '49A', '110A', '7A'],
+        ['20', '31A', '72A', '5A'],
+        ['24', '12A', '27A', '3A'],
+      ]}
+      source="Equação de Onderdonk e valores de referência UL 1987"
+    />
+  </div>
+
+  <div id="application-wiring">
+    <ComparisonTable
+      title="Seleção de Fio por Aplicação"
+      headers={['Aplicação', 'Bitola Mín. do Fio', 'Observações']}
+      rows={[
+        ['Bateria Residencial Marítima (50A)', '6 AWG', 'Use cobre estanhado, conforme ABYC. Dimensione para 50A contínuos + queda de tensão.'],
+        ['Som Automotivo (1000W)', '4 AWG', 'Trechos curtos da bateria ao amplificador. Use cobre OFC.'],
+        ['Arranjo de Painéis Solares (30A)', '10 AWG', 'Use fio USE-2 ou fotovoltaico para trechos externos. Verifique a queda de tensão na tensão do sistema.'],
+        ['Telecom 48V CC (100A)', '2/0 AWG', 'Circuitos NEC Classe 2. Use cobre encordoado em eletrocalha.'],
+        ['Serviço 30A para RV (50ft)', '10 AWG', 'Cabo NM-B (Romex) ou SOOW. Queda máxima de 3% a 120V.'],
+        ['Carregamento de VE (40A)', '8 AWG', 'Use THHN/THWN-2 em eletroduto. Circuito com proteção GFCI obrigatório.'],
+        ['Bateria ao Inversor (200A)', '2/0 AWG', 'Trechos curtos (<5ft). Use cabo de solda pela flexibilidade. Fusível conforme espec. do inversor.'],
+        ['Motor de Popa Elétrico (50A)', '6 AWG', 'Use fio estanhado de grau marítimo com terminais termo-retráteis.'],
+      ]}
+      caption="Verifique sempre a bitola do fio para sua amperagem, comprimento do trecho e tensão específicos. Use a Tabela NEC 310.15(B)(16) para ampacidade e aplique os fatores de redução."
+    />
+  </div>
+
+  <div class="bg-surface-card border border-hairline p-6 mb-12">
+    <h3 class="text-title-lg text-primary uppercase tracking-wider mb-3">Aviso Legal</h3>
+    <p class="text-body-sm text-muted font-light">
+      O dimensionamento de fios é crítico para a segurança. Bitola incorreta pode causar superaquecimento, incêndio ou danos aos equipamentos. Siga sempre o National Electrical Code (NEC), as normas ABYC para sistemas marítimos e os códigos elétricos locais. Esta referência é apenas para fins educacionais. Consulte um eletricista licenciado para instalações reais.
+    </p>
+  </div>
+</ArticleLayout>

@@ -3,7 +3,7 @@ import '../styles/global.css';
 import Header from '../components/Header.astro';
 import HeadSEO from '../components/HeadSEO.astro';
 import Analytics from '../components/Analytics.astro';
-import { t, type Locale } from '../utils/i18n';
+import { t, type Locale, getLocalePrefix } from '../utils/i18n';
 
 interface Props {
   title?: string;
@@ -37,11 +37,16 @@ const {
 
 const currentPath = Astro.url.pathname;
 const isPt = lang === 'pt';
-const enPath = isPt ? currentPath.replace('/pt/', '/') : currentPath;
-const ptPath = isPt ? currentPath : '/pt' + currentPath;
+const isZh = lang === 'zh';
+const prefix = getLocalePrefix(lang);
+const stripPrefix = (p: string) => p.replace(/^\/pt(?=\/|$)/, '').replace(/^\/zh(?=\/|$)/, '') || '/';
+const basePath = stripPrefix(currentPath);
+const enPath = basePath;
+const ptPath = basePath === '/' ? '/pt/' : `/pt${basePath}`;
+const zhPath = basePath === '/' ? '/zh/' : `/zh${basePath}`;
 ---
 <!doctype html>
-<html lang={lang}>
+<html lang={lang === 'zh' ? 'zh-CN' : lang}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -52,6 +57,9 @@ const ptPath = isPt ? currentPath : '/pt' + currentPath;
     <meta name="apple-mobile-web-app-title" content="Battery Calculators" />
     <link rel="manifest" href="/site.webmanifest" />
     <meta name="generator" content={Astro.generator} />
+    {import.meta.env.PUBLIC_BAIDU_VERIFICATION && (
+      <meta name="baidu-site-verification" content={import.meta.env.PUBLIC_BAIDU_VERIFICATION} />
+    )}
 
     <!-- FOUC prevention: apply saved theme before first paint -->
     <script is:inline>
@@ -84,6 +92,8 @@ const ptPath = isPt ? currentPath : '/pt' + currentPath;
     <!-- Hreflang alternate links -->
     <link rel="alternate" hreflang="en" href={`https://batterycalculators.com${enPath}`} />
     <link rel="alternate" hreflang="pt" href={`https://batterycalculators.com${ptPath}`} />
+    <link rel="alternate" hreflang="zh-CN" href={`https://batterycalculators.com${zhPath}`} />
+    <link rel="alternate" hreflang="zh" href={`https://batterycalculators.com${zhPath}`} />
     <link rel="alternate" hreflang="x-default" href={`https://batterycalculators.com${enPath}`} />
 
     <!-- Fonts -->

@@ -1,0 +1,268 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "Qual é a melhor configuração LFP para armazenamento residencial?",
+    answer: "Para armazenamento residencial, 16S (48V) é a configuração LFP padrão. Dá alta tensão para entrega eficiente, compatibilidade com inversores 48V padrão e menor corrente ante 12V ou 24V. Um pack 16S 200Ah fornece 10,24 kWh — suficiente para a maioria do consumo diário doméstico.",
+  },
+  {
+    question: "Como balanceio as células LFP num pack?",
+    answer: "Use BMS com balanceamento passivo ou ativo. O passivo drena o excedente via resistores — simples, mas lento (50–100mA). O ativo transfere energia entre células a 1–5A — mais rápido e eficiente. Para células bem casadas, o passivo costuma bastar. Para packs acima de 5kWh, recomenda-se o ativo.",
+  },
+  {
+    question: "Qual gestão térmica packs LFP precisam?",
+    answer: "Células LFP operam com segurança de -20°C a 60°C, mas carregam melhor entre 10–35°C. Abaixo de 0°C, a carga deve ser limitada ou desabilitada para evitar deposição de lítio. Na maioria das instalações internas, resfriamento passivo a ar basta. Packs externos ou de alta corrente podem precisar de ventilação forçada ou aquecimento para climas frios.",
+  },
+  {
+    question: "Quanto tempo duram os packs LFP?",
+    answer: "Packs LFP normalmente atingem 3.000–6.000 ciclos com 80% de DoD antes de chegar a 80% de SOH. A vida de calendário é 10–15 anos. A duração real depende de profundidade, temperatura e taxa de carga. Manter o DoD abaixo de 80% e operar entre 15–35°C maximiza a vida útil.",
+  },
+];
+---
+
+<Layout
+  title="Guia de Projeto de Pack LFP | Calculadoras de Bateria"
+  description="Projeto de pack LFP: casamento de células, estratégias de balanceamento, gestão térmica e configurações comuns (4S, 8S, 16S) para aplicações residenciais, marítimas e de RV."
+  canonical="https://batterycalculators.com/pt/learn/lifepo4-pack-design/"
+  schema="faqPage"
+  schemaName="Guia de Projeto de Pack LFP"
+  schemaDescription="Guia de engenharia para projeto e configuração de packs LFP (LiFePO4)."
+  schemaUrl="https://batterycalculators.com/pt/learn/lifepo4-pack-design/"
+  faqItems={faqItems}
+  lang="pt"
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/pt/learn/" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Voltar aos Guias</a>
+      <Breadcrumb items={[
+        { label: "Centro de Aprendizagem", href: "/pt/learn/" },
+        { label: "Guia de Projeto de Pack LFP" }
+      ]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">ELÉTRICA</span>
+      <h1 class="text-display-md text-primary mb-6">Guia de Projeto de Pack LFP</h1>
+      <p class="text-body-md text-body font-light">
+        O fosfato de ferro-lítio (LFP) é a química dominante no armazenamento estacionário por segurança, longa vida útil e estabilidade térmica. Projetar um pack LFP exige atenção a casamento de células, estratégia de balanceamento, gestão térmica e seleção de configuração. Este guia cobre os princípios de engenharia específicos do LFP.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Características das Células LFP</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Células LFP têm tensão nominal de 3,2V, curva plana de descarga de 90% a 10% de SOC e estabilidade térmica excepcional. Não entram em fuga térmica — a estrutura cristalina de olivina é inerentemente estável mesmo em altas temperaturas. Isso faz do LFP a química de lítio mais segura para packs grandes.
+        </p>
+        <p class="text-body-md text-body font-light">
+          A curva plana traz um desafio: diferenças de tensão são pequenas na maior parte do SOC, dificultando estimar o SOC só pela tensão. O balanceamento ganha importância no topo da carga (acima de 90% de SOC), onde as diferenças ficam relevantes.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Configurações LFP Comuns</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Packs LFP usam configurações série padronizadas que correspondem às tensões comuns. O módulo 4S (12,8V) é o bloco fundamental — sistemas de tensão maior empilham módulos 4S em série.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Configuração</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Tensão nominal</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Tensão de carga</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Uso típico</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">4S</td>
+                <td class="p-4 font-mono text-primary">12.8V</td>
+                <td class="p-4 font-mono text-primary">14.4–14.6V</td>
+                <td class="p-4 text-muted">Marítimo 12V, automotivo, portátil</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">8S</td>
+                <td class="p-4 font-mono text-primary">25.6V</td>
+                <td class="p-4 font-mono text-primary">28.8–29.2V</td>
+                <td class="p-4 text-muted">Marítimo 24V, caminhões, comercial</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">12S</td>
+                <td class="p-4 font-mono text-primary">38.4V</td>
+                <td class="p-4 font-mono text-primary">43.2–43.8V</td>
+                <td class="p-4 text-muted">Motores de popa 36V, e-bikes</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">16S</td>
+                <td class="p-4 font-mono text-primary">51.2V</td>
+                <td class="p-4 font-mono text-primary">57.6–58.4V</td>
+                <td class="p-4 text-muted">Residencial 48V, solar, telecom</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <FormulaBox title="Fórmulas de Projeto LFP">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Tensão do pack = Tensão da célula × Contagem série (Ns)
+          Capacidade do pack = Capacidade da célula × Contagem paralela (Np)
+          Energia do pack = Tensão × Capacidade
+        </div>
+        <p>
+          Um pack 16S2P com células de 280Ah: 51,2V × 560Ah = 28.672 Wh (28,7 kWh). Cada célula tem 3,2V × 280Ah = 896 Wh. Total: 32 células × 896 Wh = 28.672 Wh.
+        </p>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Corrente máx. de descarga = Corrente máx. da célula × Np
+        </div>
+        <p>
+          Se cada célula entrega 1C (280A), duas em paralelo entregam 560A. Dimensione BMS, barramentos e fiação para essa corrente máxima com fator de segurança 1,5×.
+        </p>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Casamento de Células</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          O casamento é crítico em packs LFP. A curva plana faz pequenas diferenças de capacidade gerarem grandes desequilíbrios de SOC no topo da carga. Células mal casadas fazem o BMS disparar cortes por célula alta ou baixa com frequência, reduzindo capacidade utilizável e vida útil.
+        </p>
+        <p class="text-body-md text-body font-light">
+          Em packs DIY, teste cada célula com ciclo completo para medir a capacidade real. Agrupe células com capacidade dentro de ±2% da média. Meça a resistência interna com medidor de impedância CA — rejeite células com resistência além de ±5% da média.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Estratégia de Balanceamento</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Células LFP precisam de balanceamento sobretudo no topo da carga. A curva plana faz células a 50% de SOC diferirem por poucos milivolts mesmo com descasamento relevante — mas a 100%, as diferenças ficam grandes o bastante para o BMS detectar e corrigir.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Balanceamento Passivo</h4>
+            <p class="text-body-sm text-muted">
+              O BMS drena energia das células mais altas via resistores em paralelo quando divergem perto da carga total. Corrente: 50–100mA. Suficiente para células bem casadas em packs até 5kWh. Baixo custo e implementação simples.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Balanceamento Ativo</h4>
+            <p class="text-body-sm text-muted">
+              O BMS transfere energia das células mais altas para as mais baixas via capacitores ou indutores chaveados. Corrente: 1–5A. Recomendado para packs acima de 5kWh, células de lotes diferentes ou ciclagem profunda e frequente.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Gestão Térmica</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Células LFP têm ampla faixa operacional, mas rendem melhor entre 15–35°C. Abaixo de 0°C, a carga deve se limitar a 0,1–0,2C ou ser desabilitada para evitar deposição de lítio no ânodo. Acima de 45°C, a vida útil cai mais rápido. A maioria das instalações internas dispensa gestão ativa.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Faixa de temperatura</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Taxa de carga</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Taxa de descarga</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Observações</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                  <td class="p-4 text-muted">Abaixo de 0°C (32°F)</td>
+                <td class="p-4 font-mono text-primary">0.1C ou nenhuma</td>
+                <td class="p-4 font-mono text-primary">0.5C</td>
+                <td class="p-4 text-muted">BMS pode desabilitar a carga</td>
+              </tr>
+              <tr>
+                  <td class="p-4 text-muted">0–10°C (32–50°F)</td>
+                <td class="p-4 font-mono text-primary">0.2–0.3C</td>
+                <td class="p-4 font-mono text-primary">1C</td>
+                <td class="p-4 text-muted">Carga reduzida, descarga total OK</td>
+              </tr>
+              <tr>
+                  <td class="p-4 text-muted">10–35°C (50–95°F)</td>
+                <td class="p-4 font-mono text-primary">0.5–1C</td>
+                <td class="p-4 font-mono text-primary">1C+</td>
+                <td class="p-4 text-muted">Faixa ideal de operação</td>
+              </tr>
+              <tr>
+                  <td class="p-4 text-muted">35–45°C (95–113°F)</td>
+                <td class="p-4 font-mono text-primary">0.5C</td>
+                <td class="p-4 font-mono text-primary">0.5C</td>
+                <td class="p-4 text-muted">Taxas reduzidas para limitar calor</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Exemplo Resolvido: Bateria Residencial 48V</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Objetivo:</strong> Projetar um pack LFP 48V 200Ah para armazenamento residencial com células prismáticas de 280Ah</p>
+            <p><strong>Etapa 1:</strong> Contagem série:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              Ns = 51,2V / 3,2V = 16 células (16S)
+            </div>
+            <p><strong>Etapa 2:</strong> Contagem paralela (arredondando a partir de 200Ah):</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              Np = 200Ah / 280Ah = 0,71 → use 1P (280Ah supera a meta de 200Ah)
+            </div>
+            <p><strong>Etapa 3:</strong> Especificações do pack:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              Configuração: 16S1P
+              Células: 16 × LFP prismáticas 280Ah
+              Tensão: 51,2V nominal
+              Capacidade: 280Ah
+              Energia: 51,2V × 280Ah = 14.336 Wh (14,3 kWh)
+              Peso: 16 × 5,5 kg = 88 kg (~194 lbs)
+            </div>
+            <p><strong>Etapa 4:</strong> Seleção do BMS: BMS 16S com 100A contínuos (suporta 5kW), balanceamento passivo, sensores de temperatura e comunicação CAN/RS485 para monitoramento.</p>
+            <p><strong>Etapa 5:</strong> Com 80% de DoD, a energia utilizável é 11,5 kWh — suficiente para 1–2 dias de consumo doméstico típico (5–10 kWh/dia).</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Experimente</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use a Calculadora de Pack de Baterias para modelar sua configuração LFP e calcular especificações.
+          </p>
+          <a href="/pt/tools/battery-pack-calculator/" class="btn-primary text-xs py-3 px-6 inline-block">Abrir Calculadora de Pack</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Próxima Etapa</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Calcule a divisão de corrente entre strings e os requisitos de balanceamento do seu pack LFP.
+          </p>
+          <a href="/pt/tools/parallel-string-calculator/" class="btn-primary-outline text-xs py-3 px-6 inline-block">Abrir Calculadora de Strings</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Artigos Relacionados</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <a href="/pt/learn/battery-pack-design-basics/" class="text-primary hover:underline font-bold block mb-2">Fundamentos de Projeto de Packs</a>
+            <p class="text-body-sm text-muted">
+              Introdução ao projeto de packs cobrindo conceitos fundamentais, tipos de célula e arquitetura de sistemas.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <a href="/pt/learn/how-to-build-a-battery-pack/" class="text-primary hover:underline font-bold block mb-2">Como Montar um Pack de Baterias</a>
+            <p class="text-body-sm text-muted">
+              Guia passo a passo para montar um pack a partir de células — montagem, fiação e segurança.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

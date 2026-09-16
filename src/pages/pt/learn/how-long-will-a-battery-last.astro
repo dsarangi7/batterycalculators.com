@@ -1,0 +1,273 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "Como calculo quanto tempo minha bateria vai durar?",
+    answer: "Divida a energia utilizável (capacidade × tensão × DoD) pela carga efetiva (potência da carga ÷ eficiência). Por exemplo, uma bateria LFP de 100 Ah 12,8V com 80% de DoD e 90% de eficiência do sistema alimentando uma carga de 200W dura aproximadamente 4,6 horas.",
+  },
+  {
+    question: "A química da bateria afeta quanto tempo ela dura?",
+    answer: "Sim. Baterias de chumbo-ácido sofrem o efeito Peukert, entregando menos energia em altas taxas de descarga. Baterias de lítio mantêm capacidade mais consistente entre taxas de descarga. A química LFP também tolera descarga mais profunda, oferecendo mais energia utilizável por ciclo.",
+  },
+  {
+    question: "Por que minha bateria descarrega mais rápido no frio?",
+    answer: "Temperaturas baixas aumentam a resistência interna e desaceleram a reação eletroquímica. A 0°C, baterias de lítio perdem cerca de 10% da capacidade nominal. A -20°C, a capacidade utilizável pode cair 30% ou mais, reduzindo a autonomia proporcionalmente.",
+  },
+  {
+    question: "O que mais reduz a autonomia da bateria?",
+    answer: "Os maiores fatores são alta potência de carga, baixa eficiência do sistema (inversor ruim ou cabos longos), limites de descarga profunda em baterias de chumbo-ácido e temperaturas frias. Corrigir perdas de eficiência costuma dar o maior ganho de autonomia.",
+  },
+];
+---
+
+<Layout
+  title="Quanto Tempo Durará uma Bateria? | Calculadoras de Bateria"
+  description="Aprenda a calcular a autonomia da bateria a partir de capacidade, carga, eficiência e profundidade de descarga. Inclui exemplos resolvidos, fórmulas e dicas práticas."
+  canonical="https://batterycalculators.com/pt/learn/how-long-will-a-battery-last/"
+  schema="faqPage"
+  schemaName="Quanto Tempo Durará uma Bateria"
+  schemaDescription="Guia para calcular a autonomia da bateria a partir de capacidade, potência de carga, eficiência e profundidade de descarga."
+  schemaUrl="https://batterycalculators.com/pt/learn/how-long-will-a-battery-last/"
+  faqItems={faqItems}
+  lang="pt"
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/pt/learn/" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Voltar aos Guias</a>
+      <Breadcrumb items={[
+        { label: "Centro de Aprendizagem", href: "/pt/learn/" },
+        { label: "Quanto Tempo Durará uma Bateria" }
+      ]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">PROJETO DE SISTEMAS</span>
+      <h1 class="text-display-md text-primary mb-6">Quanto Tempo Durará uma Bateria?</h1>
+      <p class="text-body-md text-body font-light">
+        Seja para dimensionar um sistema de backup, planejar uma viagem de RV ou projetar uma instalação solar, estimar a autonomia da bateria é uma das perguntas de engenharia mais práticas que você pode fazer. A resposta depende de quatro variáveis: capacidade, tensão, carga e eficiência.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Por Que a Divisão Simples Não Basta</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          O erro mais comum é dividir a capacidade (Ah) diretamente pela corrente de carga (A) para obter a autonomia. Isso só funciona se o sistema for 100% eficiente, se você descarregar a bateria até 0% e se a bateria entregar sua capacidade nominal total nessa taxa de descarga. Na prática, nenhuma dessas condições se cumpre.
+        </p>
+        <p class="text-body-md text-body font-light">
+          A autonomia real é sempre menor que o cálculo ideal porque há perda de energia no inversor, na fiação e no sistema de gerenciamento da bateria. A química da bateria também determina quanto da capacidade nominal está realmente disponível, especialmente em taxas de descarga maiores.
+        </p>
+      </section>
+
+      <FormulaBox title="Fórmulas de Autonomia">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Energia utilizável (Wh) = Capacidade (Ah) × Tensão (V) × (DoD% / 100)
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Carga efetiva (W) = Carga (W) / (Eficiência% / 100)
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Autonomia (horas) = Energia utilizável (Wh) / Carga efetiva (W)
+        </div>
+        <p>
+          DoD (profundidade de descarga) representa o percentual da capacidade total que você está disposto a usar. A eficiência considera perdas de conversão do inversor, resistência dos cabos e consumo do BMS.
+        </p>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Etapa 1: Determinar a Energia Utilizável</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Energia utilizável é a quantidade de energia que sua bateria pode realmente entregar antes de atingir o corte de baixa tensão ou o limite de DoD. Multiplique a capacidade nominal (Ah) pela tensão nominal para obter a energia total em watt-hora, depois multiplique pelo percentual de DoD.
+        </p>
+        <p class="text-body-md text-body font-light">
+          Por exemplo, uma bateria LFP de 200 Ah a 12,8V tem energia total de 2.560 Wh. Com 80% de DoD, a energia utilizável é 2.048 Wh. Uma bateria de chumbo-ácido da mesma classificação com 50% de DoD forneceria apenas 1.280 Wh de energia utilizável.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Etapa 2: Considerar a Eficiência do Sistema</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          A carga não consome energia diretamente da bateria. A energia passa por um inversor (para cargas CA), pela fiação e potencialmente por um conversor CC-CC. Cada estágio consome um percentual da energia na forma de calor.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Componente</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Eficiência típica</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">Inversor de onda senoidal pura</td>
+                <td class="p-4 font-mono text-primary">85–92%</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Fiação CC (trecho curto)</td>
+                <td class="p-4 font-mono text-primary">97–99%</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Fiação CC (trecho longo)</td>
+                <td class="p-4 font-mono text-primary">90–96%</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Controlador de carga MPPT</td>
+                <td class="p-4 font-mono text-primary">95–98%</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Sistema total (típico)</td>
+                <td class="p-4 font-mono text-primary">85–92%</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-body-md text-body font-light mt-4">
+          Um sistema com 90% de eficiência significa que a bateria precisa fornecer 11% mais energia do que a carga realmente consome. Ignorar isso leva a uma superestimação significativa da autonomia.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Exemplo Resolvido</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Dados:</strong></p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li>Bateria: 100 Ah a 12,8V (pack LFP 4S)</li>
+              <li>Limite de DoD: 80%</li>
+              <li>Eficiência do sistema: 90%</li>
+              <li>Carga contínua: 200 W (via inversor)</li>
+            </ul>
+            <p><strong>Etapa 1:</strong> Energia utilizável:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              100 Ah × 12,8V × 0,80 = 1.024 Wh
+            </div>
+            <p><strong>Etapa 2:</strong> Carga efetiva vista pela bateria:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              200 W / 0,90 = 222,2 W
+            </div>
+            <p><strong>Etapa 3:</strong> Autonomia:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              1.024 Wh / 222,2 W = 4,61 horas ≈ 4 horas e 36 minutos
+            </div>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Referência Rápida: Autonomias Comuns</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          A tabela abaixo mostra autonomias aproximadas para baterias LFP comuns de 12V alimentando cargas típicas com 90% de eficiência do sistema e 80% de DoD.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Bateria</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Carga de 100W</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Carga de 250W</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Carga de 500W</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">50 Ah 12.8V</td>
+                <td class="p-4 text-muted">2,3 h</td>
+                <td class="p-4 text-muted">54 min</td>
+                <td class="p-4 text-muted">27 min</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">100 Ah 12.8V</td>
+                <td class="p-4 text-muted">4,6 h</td>
+                <td class="p-4 text-muted">1,8 h</td>
+                <td class="p-4 text-muted">54 min</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">200 Ah 12.8V</td>
+                <td class="p-4 text-muted">9,1 h</td>
+                <td class="p-4 text-muted">3,6 h</td>
+                <td class="p-4 text-muted">1,8 h</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">300 Ah 12.8V</td>
+                <td class="p-4 text-muted">13,7 h</td>
+                <td class="p-4 text-muted">5,5 h</td>
+                <td class="p-4 text-muted">2,7 h</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Fatores que Reduzem a Autonomia</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Temperatura</h4>
+            <p class="text-body-sm text-muted">
+              Ambientes frios reduzem a capacidade disponível. O LFP perde cerca de 10% a 0°C e até 30% a -20°C. O chumbo-ácido é ainda mais sensível, perdendo até 50% da capacidade a -20°C.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Efeito Peukert</h4>
+            <p class="text-body-sm text-muted">
+              Baterias de chumbo-ácido entregam menos energia total em altas taxas de descarga. Uma bateria de chumbo-ácido de 100 Ah a 1C pode entregar apenas 60–70 Ah de capacidade utilizável. Baterias de lítio são bem menos afetadas.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Idade da Bateria</h4>
+            <p class="text-body-sm text-muted">
+              Com o envelhecimento, a capacidade diminui. Uma bateria com 80% de Estado de Saúde (SOH) entrega apenas 80% de sua capacidade original. Após 2.000 ciclos, a maioria das baterias LFP está com 80% de SOH.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Queda de Tensão sob Carga</h4>
+            <p class="text-body-sm text-muted">
+              Descarga pesada faz a tensão dos terminais cair. Se o corte de baixa tensão do inversor disparar cedo, a bateria é desconectada antes de esgotar totalmente, desperdiçando capacidade restante.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Experimente</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use a Calculadora de Autonomia para estimar a duração da descarga para sua configuração específica.
+          </p>
+          <a href="/pt/tools/runtime-calculator/" class="btn-primary text-xs py-3 px-6 inline-block">Abrir Calculadora de Autonomia</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Relacionado</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Precisa dimensionar a bateria primeiro? Use a Calculadora de Dimensionamento para determinar a capacidade necessária.
+          </p>
+          <a href="/pt/tools/battery-sizing-calculator/" class="btn-primary-outline text-xs py-3 px-6 inline-block">Abrir Calculadora de Dimensionamento</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Artigos Relacionados</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Como Calcular a Autonomia da Bateria</h4>
+            <p class="text-body-sm text-muted mb-3">
+              O método detalhado de engenharia para calcular a autonomia de descarga passo a passo.
+            </p>
+            <a href="/pt/learn/how-to-calculate-battery-runtime/" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Ler Guia →</a>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Quanto Tempo Dura uma Bateria de 200Ah?</h4>
+            <p class="text-body-sm text-muted mb-3">
+              Exemplos específicos de autonomia para baterias de 200Ah em cenários comuns de carga.
+            </p>
+            <a href="/pt/learn/how-long-will-a-200ah-battery-last/" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Ler Guia →</a>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

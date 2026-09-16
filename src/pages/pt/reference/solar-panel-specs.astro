@@ -1,0 +1,113 @@
+---
+import ArticleLayout from '../../../layouts/ArticleLayout.astro';
+import ReferenceTable from '../../../components/ReferenceTable.astro';
+import ComparisonTable from '../../../components/ComparisonTable.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+
+const faqItems = [
+  {
+    question: "Qual é a diferença entre Vmp, Imp, Voc e Isc?",
+    answer: "Vmp (Tensão no Ponto de Máxima Potência) é a tensão do painel na saída de pico. Imp (Corrente no Ponto de Máxima Potência) é a corrente na saída de pico. Voc (Tensão de Circuito Aberto) é a tensão máxima sem carga. Isc (Corrente de Curto-Circuito) é a corrente máxima com resistência zero. Use sempre Vmp/Imp para o projeto do sistema e Voc/Isc para dimensionar controlador de carga e fusíveis.",
+  },
+  {
+    question: "Como escolho entre painéis solares de 12V, 24V e 48V?",
+    answer: "Combine o Vmp dos painéis com a tensão do banco de baterias. Para sistemas 12V, use painéis com Vmp ~18–20V. Para sistemas 24V, use Vmp ~36–40V. Para sistemas 48V, use Vmp ~70–80V ou conecte painéis em série. Controladores de carga MPPT aceitam tensão de painéis mais alta e a reduzem para a tensão da bateria com eficiência.",
+  },
+  {
+    question: "Quantos painéis solares preciso para uma bateria de 100Ah?",
+    answer: "Uma bateria de 100Ah e 12V armazena 1,280 Wh. Para um dia de 5 horas de sol, você precisa de ~256W de painéis. Dois painéis de 150W (300W no total) oferecem uma margem confortável. Considere a eficiência do controlador de carga (90–95%), perdas por temperatura (5–10%) e sombreamento. Para carregamento mais rápido, superdimensione em 20–30%.",
+  },
+  {
+    question: "Qual é a diferença entre painéis monocristalinos e policristalinos?",
+    answer: "Painéis monocristalinos têm 19–22% de eficiência, melhor desempenho com pouca luz e vida útil mais longa (25–30 anos). Painéis policristalinos têm 15–17% de eficiência, custam 10–20% menos, mas degradam mais rápido e ocupam mais área de telhado. O monocristalino é hoje o padrão para instalações residenciais e marítimas.",
+  },
+  {
+    question: "Qual tamanho de controlador de carga preciso para meus painéis solares?",
+    answer: "Divida a potência total dos painéis pela tensão da bateria e adicione 25% de margem de segurança. Para 600W de painéis em um sistema 12V: 600W / 12V = 50A. Use um controlador MPPT de 60A. Verifique sempre se o controlador suporta o Voc dos painéis no frio, pois a tensão aumenta com a queda da temperatura.",
+  },
+  {
+    question: "Como a temperatura afeta a geração dos painéis solares?",
+    answer: "Painéis solares perdem aproximadamente 0.3–0.5% por grau Celsius acima de 25°C. A 45°C de temperatura da célula, a geração cai 6–10%. O frio na verdade aumenta a tensão (Voc sobe ~0.3%/°C abaixo de 25°C). Dimensione sempre para a temperatura mais fria esperada para garantir que o Voc não exceda os limites do controlador.",
+  },
+];
+
+const relatedCalculators = [
+  { title: 'Calculadora de Dimensionamento de Bateria Solar', href: '/pt/tools/solar-battery-sizing-calculator/', type: 'calculator' },
+  { title: 'Calculadora de Dimensionamento de Gerador Solar', href: '/pt/solar-generator-sizing-calculator/', type: 'calculator' },
+  { title: 'Calculadora de Tempo de Carga', href: '/pt/tools/charging-time-calculator/', type: 'calculator' },
+];
+
+const relatedGuides = [
+  { title: 'Melhor Química de Bateria para Energia Solar', href: '/pt/learn/best-battery-chemistry-for-solar/', type: 'guide' },
+  { title: 'Guia de Backup com Bateria Solar', href: '/pt/learn/solar-battery-backup-guide/', type: 'guide' },
+  { title: 'Guia de Dimensionamento de Carregador', href: '/pt/learn/charger-sizing-guide/', type: 'guide' },
+];
+
+const tableOfContents = [
+  { id: 'panel-specs', label: 'Especificações dos Painéis' },
+  { id: 'system-voltage', label: 'Seleção por Tensão do Sistema' },
+];
+---
+
+<ArticleLayout
+  title="Referência de Especificações de Painéis Solares | Calculadoras de Bateria"
+  description="Referência completa de especificações de painéis solares com Vmp, Imp, Voc, Isc, dimensões e peso para painéis de 100W a 500W. Inclui guia de seleção por tensão do sistema."
+  canonical="https://batterycalculators.com/pt/reference/solar-panel-specs/"
+  lang="pt"
+  category="REFERÊNCIA"
+  categoryHref="/pt/reference/"
+  breadcrumbItems={[{ label: 'Especificações de Painéis Solares' }]}
+  relatedCalculators={relatedCalculators}
+  relatedGuides={relatedGuides}
+  tableOfContents={tableOfContents}
+  faqItems={faqItems}
+>
+  <p class="text-body-md text-body font-light mb-8">
+    Esta referência abrange os tamanhos mais comuns de painéis solares monocristalinos de 100W a 500W para instalações residenciais, de RV, marítimas e off-grid. Todos os valores são STC (Condições Padrão de Teste: 1000 W/m², 25°C, AM 1.5).
+  </p>
+
+  <div id="panel-specs">
+    <ReferenceTable
+    lang="pt"
+      title="Especificações de Painéis Solares (STC)"
+      description="Painéis monocristalinos comuns com especificações elétricas e físicas."
+      headers={['Potência', 'Vmp (V)', 'Imp (A)', 'Voc (V)', 'Isc (A)', 'Dimensões (mm)', 'Peso (kg)', 'Eficiência']}
+      rows={[
+        ['100W', '18.9', '5.29', '22.5', '5.75', '1060 × 508 × 35', '6.5', '19.1%'],
+        ['150W', '18.8', '7.98', '22.8', '8.58', '1485 × 668 × 35', '11.5', '20.2%'],
+        ['200W', '18.5', '10.81', '22.6', '11.56', '1580 × 808 × 35', '14.5', '20.7%'],
+        ['250W', '18.6', '13.44', '22.7', '14.38', '1640 × 990 × 35', '18.0', '21.0%'],
+        ['300W', '32.8', '9.15', '39.5', '9.85', '1640 × 990 × 35', '19.5', '21.3%'],
+        ['350W', '32.6', '10.74', '39.4', '11.46', '1688 × 1006 × 35', '20.5', '21.5%'],
+        ['400W', '32.4', '12.35', '39.3', '13.18', '1722 × 1050 × 35', '21.8', '21.8%'],
+        ['450W', '32.2', '13.98', '39.1', '14.92', '1755 × 1090 × 35', '22.5', '22.0%'],
+        ['500W', '34.5', '14.49', '41.5', '15.45', '1825 × 1134 × 35', '25.5', '22.4%'],
+      ]}
+      source="Valores típicos dos principais fabricantes (LONGi, JinkoSolar, Canadian Solar, REC) em STC"
+    />
+  </div>
+
+  <div id="system-voltage">
+    <ComparisonTable
+      title="Seleção de Painéis por Tensão do Sistema"
+      headers={['Tensão do Sistema', 'Painel Recomendado', 'Configuração', 'Observações']}
+      rows={[
+        ['Banco de Baterias 12V', '100–200W (Vmp 18V)', '1 painel em paralelo', 'Vmp 18–20V ideal para carga 12V. PWM ou MPPT aceitáveis.'],
+        ['Banco de Baterias 24V', '200–300W (Vmp 32V)', '1 painel em série ou 2× em paralelo', 'Use painéis de Vmp 30V. MPPT recomendado para eficiência.'],
+        ['Banco de Baterias 48V', '350–500W (Vmp 32V)', '2 painéis em série', 'Dois painéis de Vmp 32V em série para Vmp 65–70V. MPPT obrigatório.'],
+        ['12V (Controlador PWM)', '100–200W', '1 painel', 'PWM desperdiça o excesso de tensão. Combine o Vmp próximo à tensão da bateria.'],
+        ['12V (Controlador MPPT)', '200–400W', '1 painel ou em série', 'MPPT aceita Voc maior e converte com eficiência. Mais flexível.'],
+        ['24V (Controlador MPPT)', '300–500W', '1–2 painéis em série', 'MPPT gerencia a conversão de tensão. Melhor eficiência para arranjos maiores.'],
+        ['48V (Controlador MPPT)', '400–500W', '2–3 painéis em série', 'Arranjos de alta tensão para escala comercial. MPPT obrigatório para redução de tensão.'],
+      ]}
+      caption="Controladores MPPT são recomendados para todas as instalações acima de 200W. Controladores PWM são aceitáveis para pequenos sistemas 12V abaixo de 200W."
+    />
+  </div>
+
+  <div class="bg-surface-card border border-hairline p-6 mb-12">
+    <h3 class="text-title-lg text-primary uppercase tracking-wider mb-3">Aviso Legal</h3>
+    <p class="text-body-sm text-muted font-light">
+      As especificações de painéis solares são em Condições Padrão de Teste (STC: 1000 W/m², 25°C, AM 1.5). A geração real é tipicamente 75–85% dos valores nominais STC devido a temperatura, sombreamento, orientação e perdas no inversor. Consulte sempre as folhas de dados dos fabricantes para especificações de produtos específicos. Esta referência é apenas para fins informativos e educacionais.
+    </p>
+  </div>
+</ArticleLayout>

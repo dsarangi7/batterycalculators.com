@@ -1,0 +1,211 @@
+---
+import ArticleLayout from '../../../layouts/ArticleLayout.astro';
+import TroubleshootingBlock from '../../../components/TroubleshootingBlock.astro';
+
+const relatedCalculators = [
+  { title: 'Calculadora de Taxa C', href: '/pt/tools/c-rate-calculator/', type: 'calculator' as const },
+  { title: 'Calculadora de Autonomia', href: '/pt/tools/runtime-calculator/', type: 'calculator' as const },
+  { title: 'Calculadora de Tempo de Carga', href: '/pt/tools/charging-time-calculator/', type: 'calculator' as const },
+  { title: 'Calculadora de Dimensionamento de Bateria', href: '/pt/tools/battery-sizing-calculator/', type: 'calculator' as const },
+];
+
+const relatedGuides = [
+  { title: 'Tabela de Correção de Temperatura de Bateria', href: '/pt/learn/battery-temperature-correction-chart/', type: 'guide' as const },
+  { title: 'Projeto de Pacote LiFePO4', href: '/pt/learn/lifepo4-pack-design/', type: 'guide' as const },
+  { title: 'Degradação de Baterias Explicada', href: '/pt/learn/battery-degradation-explained/', type: 'guide' as const },
+];
+
+const faqItems = [
+  {
+    question: 'Qual temperatura é quente demais para uma bateria de lítio?',
+    answer: 'Células LiFePO4 devem operar abaixo de 60°C durante a descarga e abaixo de 45°C durante o carregamento. Células NMC de íons de lítio têm limites mais rígidos: abaixo de 45°C para descarga e abaixo de 40°C para carga. A operação sustentada acima dessas temperaturas acelera a degradação e pode levar à fuga térmica. Uma bateria quente ao toque (>50°C na superfície) precisa de atenção imediata.',
+  },
+  {
+    question: 'O superaquecimento pode danificar permanentemente uma bateria?',
+    answer: 'Sim. Altas temperaturas sustentadas causam crescimento acelerado da camada SEI no ânodo, decomposição do eletrólito e perda de lítio ativo — tudo isso reduz permanentemente a capacidade. Um único evento de sobreaquecimento acima de 70°C pode causar perda imediata de capacidade. A exposição repetida a 50–60°C pode reduzir a vida útil em ciclos em 50% ou mais. Se uma bateria superaqueceu significativamente, faça um teste de capacidade para avaliar o dano permanente.',
+  },
+  {
+    question: 'Por que minha bateria esquenta durante a carga rápida?',
+    answer: 'Algum aquecimento durante o carregamento é normal — a resistência interna converte parte da energia de carga em calor (Q = I²R). Com taxa de carga de 0,5C, uma bateria bem ventilada pode subir 5–10°C acima do ambiente. A 1C, espere 10–20°C de aumento. Se a bateria ficar quente demais para tocar ou exceder 45°C, a taxa de carga é alta demais para a capacidade de resfriamento, ou a resistência interna está elevada por envelhecimento ou dano nas células.',
+  },
+  {
+    question: 'Como melhoro a ventilação da bateria?',
+    answer: 'Garanta pelo menos 5–10cm de folga em todos os lados da bateria para circulação de ar. Em espaços fechados, instale ventiladores para exaurir o calor. Monte as baterias na vertical, se possível, para melhorar a convecção natural. Evite colocar baterias em compartimentos selados e sem isolamento. Em veículos, garanta que as caixas de bateria tenham entradas e saídas de ar. Considere resfriamento ativo (ar forçado ou líquido) para aplicações de alta potência.',
+  },
+  {
+    question: 'O que significa um desligamento térmico do BMS?',
+    answer: 'O BMS tem sensores de temperatura nas células ou barramentos. Quando a temperatura excede o limite seguro, o BMS desconecta os MOSFETs de carga e descarga para evitar danos. Isso é uma ação de proteção, não uma falha. A bateria voltará a operar quando esfriar abaixo do limite (normalmente com 5°C de histerese). Se o desligamento térmico ocorrer com frequência, a causa raiz (alta taxa C, má ventilação ou calor ambiente) deve ser tratada.',
+  },
+  {
+    question: 'Posso usar um ventilador para resfriar minha bateria?',
+    answer: 'Sim, o resfriamento por ar forçado é eficaz para baterias em espaços fechados. Um pequeno ventilador movendo ar sobre as superfícies da bateria pode reduzir a temperatura em 5–15°C. Posicione o ventilador para soprar ar sobre os terminais e barramentos, que geram mais calor. Garanta que o ventilador não introduza umidade ou poeira no gabinete da bateria. Para aplicações críticas, considere controle termostático do ventilador que ativa acima de uma temperatura definida.',
+  },
+];
+---
+
+<ArticleLayout
+  title="Superaquecimento da Bateria — Guia de Solução de Problemas | Calculadoras de Bateria"
+  description="Descubra por que sua bateria esquenta durante a carga ou descarga. Solucione taxa C excessiva, temperatura ambiente, ventilação, falhas internas e defeito do BMS com listas de verificação passo a passo."
+  canonical="https://batterycalculators.com/pt/troubleshooting/battery-overheating/"
+  category="SOLUÇÃO DE PROBLEMAS"
+  breadcrumbItems={[{ label: 'Superaquecimento da Bateria' }]}
+  relatedCalculators={relatedCalculators}
+  relatedGuides={relatedGuides}
+  faqItems={faqItems}
+  lang="pt"
+>
+  <p class="text-body-md text-body font-light mb-8">
+    O superaquecimento da bateria é um dos problemas operacionais mais graves — ele acelera a degradação, reduz a vida útil em ciclos e, em casos extremos, pode levar à fuga térmica e incêndio. Entender a causa raiz da geração excessiva de calor é fundamental tanto para a segurança quanto para a saúde da bateria a longo prazo. Este guia aborda as cinco causas mais comuns de superaquecimento com ações de diagnóstico e correção.
+  </p>
+
+  <TroubleshootingBlock
+    lang="pt"
+    problem="Taxa C Excessiva — Carga ou Descarga Rápida Demais"
+    causes={[
+      'Corrente de carga ou descarga excede a especificação do fabricante',
+      'Banco de baterias subdimensionado para a carga conectada',
+      'Eletrodomésticos de alta potência drenando mais corrente do que a bateria suporta',
+      'Carga rápida de arranjo solar superdimensionado ou carregador de alta corrente',
+      'Desequilíbrio de strings em paralelo fazendo uma string carregar corrente desproporcional',
+    ]}
+    explanation="A taxa C mede a corrente de carga/descarga em relação à capacidade da bateria. Uma bateria de 100Ah a 1C carrega ou descarrega a 100A; a 0,5C, opera com 50A. Toda bateria tem uma taxa C máxima recomendada — excedê-la gera calor excessivo por perdas I²R na resistência interna da célula. Por exemplo, uma célula LiFePO4 de 100Ah com 2mΩ de resistência interna gera 20W de calor a 1C (100A), mas 80W a 2C (200A) — quatro vezes mais calor para o dobro da corrente. Baterias de chumbo-ácido são particularmente sensíveis: carregar acima de 0,3C causa gaseificação e acúmulo de calor que pode deformar placas e secar o eletrólito. A relação entre corrente e geração de calor é quadrática (I²), então mesmo uma sobrecorrente modesta causa aquecimento desproporcional."
+    checklist={[
+      'Meça a corrente de carga e descarga com um alicate amperímetro',
+      'Compare a corrente medida com a especificação de taxa C máxima da bateria',
+      'Calcule a taxa C: Corrente (A) ÷ Capacidade da Bateria (Ah)',
+      'Verifique se múltiplas cargas operam simultaneamente durante a descarga',
+      'Confirme se a corrente nominal do carregador é adequada à capacidade da bateria',
+      'Verifique o equilíbrio de corrente das strings em paralelo, se aplicável',
+      'Monitore a temperatura da bateria durante períodos de pico de carga',
+    ]}
+    solutions={[
+      'Reduza a corrente de carga/descarga para dentro da especificação do fabricante (normalmente ≤0,5C para LFP)',
+      'Adicione baterias em paralelo para dividir a carga e reduzir a corrente por bateria',
+      'Limite cargas simultâneas de alta potência ou escalone sua operação',
+      'Use um carregador com limite de corrente ajustável adequado à capacidade da bateria',
+      'Use a Calculadora de Taxa C para verificar se a corrente está dentro de limites seguros',
+      'Para sistemas solares, garanta que a corrente do controlador MPPT corresponda à capacidade da bateria',
+    ]}
+  />
+
+  <TroubleshootingBlock
+    lang="pt"
+    problem="Temperatura Ambiente — Bateria Operando em Ambiente Quente Demais"
+    causes={[
+      'Bateria instalada sob luz solar direta ou em gabinete sem isolamento',
+      'Proximidade de motor, gerador ou outras fontes de calor',
+      'Compartimento fechado sem ventilação (veículo, barco, galpão)',
+      'Clima quente com temperaturas ambientes sustentadas acima de 35°C',
+      'Calor gerado por eletrônicos próximos irradiando para a bateria',
+    ]}
+    explanation="Baterias têm duas fontes de calor: calor interno por perdas I²R durante carga/descarga, e calor externo do ambiente. Quando a temperatura ambiente é alta, o diferencial de temperatura entre a bateria e o ambiente é reduzido, retardando a dissipação de calor. Uma bateria operando a 25°C de ambiente com 10°C de autoaquecimento chega a 35°C — bem dentro dos limites. A mesma bateria a 40°C de ambiente chega a 50°C — aproximando-se da zona de perigo. A alta temperatura ambiente também acelera o envelhecimento de calendário independentemente da ciclagem. Baterias de chumbo-ácido são particularmente afetadas: cada aumento de 10°C acima de 25°C aproximadamente reduz pela metade a vida útil em flutuação. LiFePO4 é mais tolerante, mas ainda sofre degradação acelerada acima de 40°C."
+    checklist={[
+      'Meça a temperatura ambiente no local da bateria com termômetro',
+      'Verifique exposição à luz solar direta no gabinete da bateria',
+      'Identifique fontes de calor próximas (motores, escapamento, transformadores, eletrônicos)',
+      'Confirme que o gabinete da bateria não está selado ou mal ventilado',
+      'Verifique se o superaquecimento coincide com o horário do dia (sol da tarde)',
+      'Meça o diferencial de temperatura entre a bateria e o ambiente',
+    ]}
+    solutions={[
+      'Mude a bateria para um ambiente sombreado e com temperatura controlada',
+      'Adicione isolamento ou blindagem refletiva ao gabinete contra calor radiante',
+      'Aumente a ventilação com entradas e saídas de ar para convecção natural',
+      'Instale ventiladores de ar forçado para baterias em climas quentes',
+      'Mantenha a temperatura ambiente abaixo de 30°C para vida útil ideal da bateria',
+      'Considere resfriamento líquido ativo para aplicações de alta potência em ambientes quentes',
+    ]}
+  />
+
+  <TroubleshootingBlock
+    lang="pt"
+    problem="Ventilação Inadequada — Calor Preso no Gabinete da Bateria"
+    causes={[
+      'Caixa ou gabinete da bateria sem aberturas de ventilação',
+      'Aberturas de ventilação bloqueadas por detritos, isolamento ou instalação',
+      'Bateria montada em compartimento selado (sob banco de RV, paiol de barco)',
+      'Ventilador de resfriamento com defeito ou desconectado',
+      'Gabinete pequeno demais para o tamanho da bateria — volume de ar insuficiente',
+    ]}
+    explanation="Mesmo uma bateria corretamente dimensionada gera calor durante a operação que deve ser dissipado para o ambiente. Em um espaço fechado, esse calor se acumula sem rota de escape, fazendo a temperatura da bateria subir continuamente até atingir o equilíbrio térmico — que pode estar bem acima dos limites seguros. O problema se agrava durante o carregamento porque a bateria gera calor E o carregador gera calor (normalmente 10–20% da potência de carga). Um carregador de 100A em compartimento selado com uma bateria adiciona aproximadamente 150–300W de calor ao gabinete. Sem ventilação, esse calor eleva rapidamente a temperatura do ar interno. A convecção natural exige aberturas de ventilação tanto em pontos baixos (entrada) quanto altos (saída) para criar fluxo de ar. Uma única abertura é insuficiente para remoção eficaz de calor."
+    checklist={[
+      'Inspecione o gabinete da bateria por aberturas de ventilação',
+      'Confirme que as aberturas de ventilação não estão bloqueadas ou obstruídas',
+      'Verifique se o volume do gabinete é pelo menos 3× o volume da bateria',
+      'Sinta se há saída de ar quente no topo do gabinete durante o carregamento',
+      'Teste os ventiladores de resfriamento (se instalados)',
+      'Meça a temperatura dentro do gabinete vs. o ambiente externo',
+      'Verifique o posicionamento correto de entrada (baixa) e saída (alta)',
+    ]}
+    solutions={[
+      'Adicione aberturas de ventilação: mínimo de 1 polegada quadrada por 100Ah de capacidade',
+      'Instale entrada de ar embaixo e saída em cima para convecção natural',
+      'Adicione exaustores com controle termostático para compartimentos fechados',
+      'Garanta que o gabinete tenha pelo menos 3× o volume da bateria para circulação de ar',
+      'Remova obstruções das aberturas de ventilação existentes',
+      'Use a Calculadora de Dimensionamento de Bateria para verificar os requisitos do gabinete',
+    ]}
+  />
+
+  <TroubleshootingBlock
+    lang="pt"
+    problem="Falha Interna — Dano na Célula Causando Geração Anormal de Calor"
+    causes={[
+      'Microcurto interno em uma célula criando aquecimento localizado',
+      'Crescimento de dendritos causando curto intermitente entre eletrodos',
+      'Contaminação do eletrólito aumentando a resistência interna',
+      'Dano mecânico por impacto ou vibração causando contato interno',
+      'Defeito de fabricação no separador permitindo contato entre eletrodos',
+    ]}
+    explanation="Uma falha interna de célula cria uma fonte de calor localizada fundamentalmente diferente do aquecimento normal por I²R. Um microcurto entre eletrodos permite que a corrente flua continuamente pelo ponto de falha, gerando calor concentrado que pode aquecer as células vizinhas. O calor é localizado em vez de distribuído pela célula, criando pontos quentes detectáveis com imagem infravermelha. Falhas internas são particularmente perigosas porque podem ser progressivas — o microcurto inicial gera calor que danifica o material ao redor, ampliando a falha e aumentando a geração de calor em um ciclo de realimentação positiva. Se a taxa de geração de calor exceder a taxa de resfriamento, pode ocorrer fuga térmica. A detecção precoce por monitoramento de temperatura é fundamental para evitar falha catastrófica."
+    checklist={[
+      'Sinta se há distribuição desigual de temperatura no pacote',
+      'Use termômetro infravermelho para mapear a temperatura nas superfícies das células',
+      'Identifique qualquer célula significativamente mais quente que as vizinhas (>5°C de diferença)',
+      'Monitore se o ponto quente persiste ou piora ao longo de vários ciclos',
+      'Verifique inchaço ou deformação incomum da carcaça da bateria',
+      'Escute chiados ou estalos indicando decomposição do eletrólito',
+      'Sinta se há odor químico incomum perto da bateria',
+    ]}
+    solutions={[
+      'Reduza imediatamente a corrente de carga/descarga para minimizar a geração de calor',
+      'Aumente o resfriamento da área afetada (ventilador, dissipador ou bolsa de gelo em emergência)',
+      'Isole o grupo de células afetado, se possível, desconectando as conexões em série',
+      'NÃO continue carregando uma bateria com falha interna ativa',
+      'Entre em contato com o fabricante para inspeção e possível substituição em garantia',
+      'Se houver suspeita de fuga térmica (temperatura subindo rápido, fumaça ou fogo), evacue e chame os bombeiros',
+      'Descarte baterias danificadas em instalações de reciclagem certificadas',
+    ]}
+  />
+
+  <TroubleshootingBlock
+    lang="pt"
+    problem="Falha do BMS — Sistema de Gerenciamento Não Regulando Corretamente"
+    causes={[
+      'Sensor de temperatura do BMS com defeito ou desconectado',
+      'Sensor de corrente do BMS lendo baixo, permitindo corrente excessiva',
+      'MOSFETs do BMS parcialmente defeituosos, criando resistência e calor',
+      'Circuito de balanceamento do BMS travado ligado, dissipando energia continuamente',
+      'Bug de firmware do BMS causando cálculo incorreto de limite de corrente',
+    ]}
+    explanation="O BMS é responsável por manter a bateria dentro de limites seguros de operação. Se o BMS não medir com precisão temperatura, corrente ou tensão, ele não consegue aplicar as proteções corretas. Um sensor de temperatura defeituoso pode ler baixo, fazendo o BMS permitir correntes maiores do que a bateria suporta com segurança. MOSFETs de carga/descarga defeituosos podem desenvolver alta resistência de condução, gerando calor significativo em altas correntes (um MOSFET com 5mΩ de resistência gera 50W de calor a 100A). Um circuito de balanceamento travado drena corrente continuamente pelos resistores de balanceamento, gerando calor localizado na placa do BMS. Falhas de BMS são particularmente insidiosas porque a bateria parece operar normalmente enquanto está desprotegida contra condições prejudiciais."
+    checklist={[
+      'Verifique as leituras de temperatura do BMS via aplicativo Bluetooth ou display',
+      'Compare a leitura de temperatura do BMS com um termômetro externo na bateria',
+      'Se as leituras diferirem muito (>10°C), o sensor do BMS pode estar defeituoso',
+      'Verifique pontos quentes na placa do BMS com termômetro infravermelho',
+      'Confirme se a leitura de corrente do BMS corresponde à medição do alicate amperímetro',
+      'Escute zumbidos ou sinta cheiro de queimado perto da placa do BMS',
+      'Verifique os registros de erro do BMS por códigos de falha',
+    ]}
+    solutions={[
+      'Substitua o sensor de temperatura defeituoso (mesma resistência e calibração)',
+      'Substitua o BMS se o sensor de corrente for impreciso e não puder ser recalibrado',
+      'Substitua os MOSFETs ou toda a placa do BMS se os MOSFETs falharam',
+      'Redefina o BMS para os padrões de fábrica se houver suspeita de bug de firmware',
+      'Atualize o firmware do BMS para a versão mais recente do fabricante',
+      'Para sistemas críticos, instale um monitor de temperatura independente secundário',
+      'Entre em contato com o fabricante para substituição ou reparo do BMS em garantia',
+    ]}
+  />
+</ArticleLayout>

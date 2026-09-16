@@ -1,0 +1,314 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "Qual tamanho de bateria preciso para backup residencial?",
+    answer: "Só para essenciais (geladeira, luzes, roteador, médicos), uma bateria de 10–15 kWh cobre 1–2 dias. Para a casa toda incluindo HVAC e aparelhos, precisa de 20–40+ kWh. O tamanho certo depende do consumo diário, dos dias de backup e se há solar para recarregar no blecaute.",
+  },
+  {
+    question: "Qual é a diferença entre cargas críticas e backup total?",
+    answer: "Críticas são circuitos essenciais — geladeira, médicos, iluminação, comunicação, poço. Totalizam tipicamente 3–8 kWh/dia e cabem em bateria moderada. Backup total inclui HVAC, fogão, secadora, EV — levando a 20–60 kWh/dia e exigindo sistema bem maior (e mais caro).",
+  },
+  {
+    question: "Quanto tempo dura uma bateria residencial no blecaute?",
+    answer: "Uma bateria de 10 kWh com 5 kWh de críticas dura ~20 horas (a 80% utilizável). A mesma com 15 kWh de casa toda dura ~3,2 horas. A autonomia escala linearmente — reduzir o consumo estende proporcionalmente.",
+  },
+  {
+    question: "Devo combinar minha bateria com solar?",
+    answer: "Painéis estendem a autonomia recarregando de dia. Um arranjo de 5 kW gera 15–25 kWh/dia conforme local e estação. Com solar, uma bateria menor sustenta blecautes de dias porque é reposta diariamente. Sem solar, a bateria carrega tudo sozinha da capacidade armazenada.",
+  },
+];
+---
+
+<Layout
+  title="Guia de Dimensionamento Residencial | Calculadoras de Bateria"
+  description="Como dimensionar backup residencial. Cobre seleção de cargas críticas, planejamento de duração, tensão e exemplos para cobertura essencial noturna."
+  canonical="https://batterycalculators.com/pt/learn/home-battery-sizing-guide/"
+  schema="faqPage"
+  schemaName="Guia de Dimensionamento Residencial"
+  schemaDescription="Passo a passo para dimensionar backup residencial para cargas essenciais em blecautes."
+  schemaUrl="https://batterycalculators.com/pt/learn/home-battery-sizing-guide/"
+  faqItems={faqItems}
+  lang="pt"
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/pt/learn/" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Voltar aos Guias</a>
+      <Breadcrumb items={[
+        { label: "Centro de Aprendizagem", href: "/pt/learn/" },
+        { label: "Guia de Dimensionamento Residencial" }
+      ]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">BACKUP RESIDENCIAL</span>
+      <h1 class="text-display-md text-primary mb-6">Guia de Dimensionamento Residencial</h1>
+      <p class="text-body-md text-body font-light">
+        Um backup residencial mantém circuitos essenciais em blecautes. Diferente de um UPS de minutos, uma bateria bem dimensionada sustenta cargas críticas por horas ou dias. Este guia mostra como identificar cargas críticas, calcular a energia e escolher a capacidade.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Etapa 1: Identifique as Cargas Críticas</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Nem todo circuito precisa de backup. Identificar as críticas mantém o sistema acessível e gerenciável. Críticas são as que devem ficar ligadas — por segurança, saúde ou habitabilidade básica.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Categoria</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Potência Típica</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Horas/Dia</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Energia (Wh)</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">Geladeira</td>
+                <td class="p-4 font-mono text-primary">150W</td>
+                <td class="p-4 font-mono text-primary">8h (40% ciclo)</td>
+                <td class="p-4 font-mono text-primary">1.200</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Iluminação LED (5 cômodos)</td>
+                <td class="p-4 font-mono text-primary">50W</td>
+                <td class="p-4 font-mono text-primary">6h</td>
+                <td class="p-4 font-mono text-primary">300</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Roteador + modem</td>
+                <td class="p-4 font-mono text-primary">20W</td>
+                <td class="p-4 font-mono text-primary">24h</td>
+                <td class="p-4 font-mono text-primary">480</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Médicos (CPAP, oxigênio)</td>
+                <td class="p-4 font-mono text-primary">100W</td>
+                <td class="p-4 font-mono text-primary">8h</td>
+                <td class="p-4 font-mono text-primary">800</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Celular / laptop</td>
+                <td class="p-4 font-mono text-primary">60W</td>
+                <td class="p-4 font-mono text-primary">3h</td>
+                <td class="p-4 font-mono text-primary">180</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Bomba de poço (se houver)</td>
+                <td class="p-4 font-mono text-primary">750W</td>
+                <td class="p-4 font-mono text-primary">1h</td>
+                <td class="p-4 font-mono text-primary">750</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Portão de garagem</td>
+                <td class="p-4 font-mono text-primary">350W</td>
+                <td class="p-4 font-mono text-primary">0,1h</td>
+                <td class="p-4 font-mono text-primary">35</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Etapa 2: Calcule a Carga Crítica Total</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Some o consumo de todas as críticas. Isso dá a necessidade diária em watt-horas. Para backup, defina também as horas de cobertura — noite (12h), dia cheio (24h) ou dias (48–72h).
+        </p>
+        <FormulaBox title="Fórmula de Backup Residencial">
+          <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+            Capacidade (Wh) = Carga Crítica Total (Wh) × Horas / 24 / DoD / η_sistema
+          </div>
+          <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+            Capacidade (Ah) = Capacidade (Wh) / Tensão do Sistema (V)
+          </div>
+          <p>
+            A eficiência residencial com inversor é tipicamente 85–90%. DoD depende da química: 80% para LFP, 50% para chumbo-ácido. Horas de cobertura é quanto tempo sem recarga.
+          </p>
+        </FormulaBox>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Etapa 3: Escolha a Tensão do Sistema</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Sistemas residenciais tipicamente operam em 48V acima de 3 kW. Tensões menores (12V ou 24V) servem para pequenos, mas exigem cabos grossos e mais perdas. A maioria dos produtos residenciais (Tesla Powerwall, Enphase, SolarEdge) opera internamente a 400V DC com inversor integrado.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Tensão</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Carga Máx. Prática</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Ideal Para</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">12V DC</td>
+                <td class="p-4 font-mono text-primary">~1,5 kW</td>
+                <td class="p-4 text-muted">Cabana pequena, RV, backup mínimo</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">24V DC</td>
+                <td class="p-4 font-mono text-primary">~5 kW</td>
+                <td class="p-4 text-muted">Residência pequena, só essenciais</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">48V DC</td>
+                <td class="p-4 font-mono text-primary">~15 kW</td>
+                <td class="p-4 text-muted">Residencial padrão, maioria dos backups</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">400V DC</td>
+                <td class="p-4 font-mono text-primary">100+ kW</td>
+                <td class="p-4 text-muted">Sistemas integrados bateria-inversor</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Exemplo Prático: Essenciais à Noite</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Cenário:</strong> Dimensionar para essenciais por 14 horas noturnas em blecaute de inverno.</p>
+            <p><strong>Cargas críticas:</strong></p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li>Geladeira: 150W × 8h (ciclando) = 1.200 Wh</li>
+              <li>LED: 50W × 6h = 300 Wh</li>
+              <li>Wi-Fi + modem: 20W × 14h = 280 Wh</li>
+              <li>CPAP: 100W × 8h = 800 Wh</li>
+              <li>Celular: 15W × 3h = 45 Wh</li>
+              <li>Ventilador da fornalha a gás: 300W × 14h = 4.200 Wh</li>
+            </ul>
+            <p><strong>Carga crítica total:</strong></p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              1.200 + 300 + 280 + 800 + 45 + 4.200 = 6.825 Wh (~6,8 kWh)
+            </div>
+            <p><strong>Etapa 1:</strong> Parâmetros:</p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li>Cobertura: 14 horas noturnas</li>
+              <li>Limite DoD: 80% (LFP)</li>
+              <li>Eficiência: 88% (inversor + fiação)</li>
+            </ul>
+            <p><strong>Etapa 2:</strong> Capacidade necessária:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              6.825 Wh / 0,80 / 0,88 = 9.690 Wh (~9,7 kWh)
+            </div>
+            <p><strong>Etapa 3:</strong> Em 48V:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              9.690 Wh / 48V = 201,9 Ah
+            </div>
+            <p><strong>Etapa 4:</strong> Escolha. Uma LFP 48V 200Ah (9,6 kWh) atende quase exato. Para margem contra degradação e frio, uma 48V 280Ah (13,4 kWh) dá 38% de folga — recomendada para confiabilidade em invernos rigorosos.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Críticas vs Casa Toda</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          A diferença entre backup crítico e total é dramática em capacidade e custo. Entender o trade-off ajusta expectativas.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Parâmetro</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Cargas Críticas</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Casa Toda</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">Energia diária</td>
+                <td class="p-4 font-mono text-primary">3–8 kWh</td>
+                <td class="p-4 font-mono text-primary">20–60 kWh</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Bateria necessária</td>
+                <td class="p-4 font-mono text-primary">10–20 kWh</td>
+                <td class="p-4 font-mono text-primary">40–120 kWh</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Custo 1 dia (est.)</td>
+                <td class="p-4 font-mono text-primary">$5.000–$10.000</td>
+                <td class="p-4 font-mono text-primary">$20.000–$60.000</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Peso (LFP)</td>
+                <td class="p-4 font-mono text-primary">80–160 kg</td>
+                <td class="p-4 font-mono text-primary">320–960 kg</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Complexidade</td>
+                <td class="p-4 text-muted">Subquadro, painel crítico</td>
+                <td class="p-4 text-muted">Transferência total</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Integração Solar</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Combinar bateria com solar transforma o sistema de reserva finita em renovável. Em blecaute diurno, os painéis recarregam enquanto alimentam cargas. Isso estende a autonomia de horas para potencialmente dias ilimitados, conforme o clima.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Com Solar (5 kW)</h4>
+            <p class="text-body-sm text-muted">
+              Um arranjo de 5 kW gera 15–25 kWh/dia conforme o local. Se as críticas são 7 kWh/dia, o solar dá 2–3× de sobra de dia. A bateria só precisa cobrir a noite (3–5 kWh), permitindo banco menor e mais barato.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Sem Solar</h4>
+            <p class="text-body-sm text-muted">
+              Sem solar, a bateria carrega tudo sozinha. Um blecaute de 3 dias a 7 kWh/dia exige 21 kWh utilizáveis — um banco de 26 kWh a 80% DoD. Bem mais caro que a abordagem com solar.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Experimente</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use a Calculadora de Backup com suas críticas para uma recomendação.
+          </p>
+          <a href="/pt/tools/home-backup-battery-calculator/" class="btn-primary text-xs py-3 px-6 inline-block">Abrir Calculadora de Backup</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Dimensionamento Geral</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Para cálculo completo com todos os parâmetros, use a Calculadora de Dimensionamento.
+          </p>
+          <a href="/pt/tools/battery-sizing-calculator/" class="btn-primary-outline text-xs py-3 px-6 inline-block">Abrir Calculadora de Dimensionamento</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Artigos Relacionados</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">O Que É Dimensionamento?</h4>
+            <p class="text-body-sm text-muted mb-3">Visão geral do processo, por que importa e considerações-chave.</p>
+            <a href="/pt/learn/what-is-battery-sizing/" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Ler Guia →</a>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">De Quantos kWh Preciso?</h4>
+            <p class="text-body-sm text-muted mb-3">Entenda o consumo total e o que significa para a bateria.</p>
+            <a href="/pt/learn/how-to-size-solar-battery-bank/" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Ler Guia →</a>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

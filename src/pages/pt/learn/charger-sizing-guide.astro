@@ -1,0 +1,250 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "Qual tamanho de carregador preciso para minha bateria?",
+    answer: "A regra geral é 0,2C para chumbo-ácido e 0,5C para lítio. Para uma LFP de 200Ah, um carregador de 100A (0,5C) dá 2–3 horas. Para AGM de 200Ah, um de 40A (0,2C) é recomendado para 5–6 horas. Case a tensão do carregador com a do banco.",
+  },
+  {
+    question: "Posso usar um carregador maior que o recomendado?",
+    answer: "Para lítio com BMS integrado, taxas um pouco maiores (até 1C) são aceitáveis se o BMS suportar. Para chumbo-ácido, exceder 0,3C causa superaquecimento, gaseificação e menor vida útil. Verifique sempre a taxa máxima do fabricante.",
+  },
+  {
+    question: "O que é um carregador multiestágio?",
+    answer: "Um carregador multiestágio percorre bulk (corrente constante), absorção (tensão constante) e flutuação (tensão de manutenção). Esse perfil otimiza o tempo protegendo contra sobrecarga. Carregadores modernos para lítio usam perfil CC-CV simplificado sem flutuação.",
+  },
+  {
+    question: "Preciso de carregador diferente para lítio vs chumbo-ácido?",
+    answer: "Sim. Lítio e chumbo-ácido têm tensões distintas. LFP carrega a 14,2–14,6V (sistema 12V), enquanto chumbo-ácido carrega a 14,4–14,8V com flutuação a 13,2–13,6V. Usar carregador de chumbo-ácido no lítio pode sobrecarregar. Use multiquímica ou dedicado a lítio.",
+  },
+];
+---
+
+<Layout
+  title="Guia de Dimensionamento de Carregadores | Calculadoras de Bateria"
+  description="Como escolher o carregador certo. C-rates recomendados por química, tipos de carregador, perfis multiestágio e exemplos práticos."
+  canonical="https://batterycalculators.com/pt/learn/charger-sizing-guide/"
+  schema="faqPage"
+  schemaName="Guia de Dimensionamento de Carregadores"
+  schemaDescription="Guia de engenharia para escolher o carregador ideal."
+  schemaUrl="https://batterycalculators.com/pt/learn/charger-sizing-guide/"
+  faqItems={faqItems}
+  lang="pt"
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/pt/learn/" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Voltar aos Guias</a>
+      <Breadcrumb items={[
+        { label: "Centro de Aprendizagem", href: "/pt/learn/" },
+        { label: "Guia de Dimensionamento de Carregadores" }
+      ]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">CARGA</span>
+      <h1 class="text-display-md text-primary mb-6">Guia de Dimensionamento de Carregadores</h1>
+      <p class="text-body-md text-body font-light">
+        Escolher o carregador certo é tão importante quanto dimensionar o banco. Um carregador pequeno deixa baterias parcialmente carregadas e encurta sua vida. Um grande demais pode superaquecer, disparar proteções do BMS e desperdiçar energia. Este guia mostra como casar tamanho, química e aplicação.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Carregador por Química</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          O tamanho ideal depende principalmente da química. Cada uma tem um C-rate máximo que equilibra velocidade e longevidade. Excedê-lo acelera a degradação — especialmente no chumbo-ácido, onde alta corrente causa gaseificação, calor e dano às placas.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Química</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">C-Rate Máx.</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Recomendado</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Perfil de Carga</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">LFP (LiFePO4)</td>
+                <td class="p-4 font-mono text-primary">1C</td>
+                <td class="p-4 font-mono text-primary">0,5C</td>
+                <td class="p-4 text-muted">CC-CV (sem flutuação)</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">NMC</td>
+                <td class="p-4 font-mono text-primary">1C</td>
+                <td class="p-4 font-mono text-primary">0,5C</td>
+                <td class="p-4 text-muted">CC-CV</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">AGM Chumbo-Ácido</td>
+                <td class="p-4 font-mono text-primary">0,3C</td>
+                <td class="p-4 font-mono text-primary">0,2C</td>
+                <td class="p-4 text-muted">Bulk/Absorção/Flutuação</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Inundada Chumbo-Ácido</td>
+                <td class="p-4 font-mono text-primary">0,25C</td>
+                <td class="p-4 font-mono text-primary">0,15C</td>
+                <td class="p-4 text-muted">Bulk/Absorção/Flutuação</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Gel</td>
+                <td class="p-4 font-mono text-primary">0,25C</td>
+                <td class="p-4 font-mono text-primary">0,2C</td>
+                <td class="p-4 text-muted">Bulk/Absorção/Flutuação</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <FormulaBox title="Fórmula de Dimensionamento">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Corrente do Carregador (A) = Capacidade (Ah) × C-Rate Recomendado
+        </div>
+        <p>
+          Exemplo: LFP 200Ah a 0,5C → 200 × 0,5 = carregador de 100A. Exemplo: AGM 200Ah a 0,2C → 200 × 0,2 = 40A.
+        </p>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Tensão do Carregador = Tensão Nominal do Banco
+        </div>
+        <p>
+          Case a tensão: 12V para bancos 12V, 24V para 24V, 48V para 48V. Nunca ligue carregador com tensão incompatível.
+        </p>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Tipos de Carregador</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Carregador Linear</h4>
+            <p class="text-body-sm text-muted">
+              Projeto simples e barato com regulação linear. Gera muito calor — só para baterias pequenas (abaixo de 50Ah) e taxas baixas (0,1–0,2C). Ineficiente em correntes maiores. Comum em flutuadores básicos.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Carregador Chaveado</h4>
+            <p class="text-body-sm text-muted">
+              Alta eficiência (90–98%) com chaveamento PWM ou ressonante. Gera menos calor, suporta correntes maiores e perfis multiestágio. Padrão moderno para marítimo, RV e residencial. Disponível em 12V, 24V e 48V.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Carregador Multiestágio</h4>
+            <p class="text-body-sm text-muted">
+              Percorre bulk, absorção e flutuação para otimizar tempo e proteção. Essencial para chumbo-ácido. Muitos suportam perfis de lítio por modo selecionável ou detecção automática.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Controlador Solar MPPT</h4>
+            <p class="text-body-sm text-muted">
+              Controladores MPPT otimizam a saída solar para a carga. Dimensionados por potência dos painéis, não por C-rate. Um arranjo de 400W em 12V produz ~30A — adequado para 100–200Ah a 0,15–0,3C.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Perfis Multiestágio</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          A carga multiestágio protege enquanto maximiza a velocidade. Cada etapa tem um papel específico. Entendê-las ajuda a escolher e a diagnosticar problemas.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Etapa</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Tensão</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Corrente</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Propósito</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">Bulk</td>
+                <td class="p-4 font-mono text-primary">Subindo</td>
+                <td class="p-4 font-mono text-primary">Máxima constante</td>
+                <td class="p-4 text-muted">Entregar 70–80% rápido</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Absorção</td>
+                <td class="p-4 font-mono text-primary">Máxima constante</td>
+                <td class="p-4 font-mono text-primary">Caindo</td>
+                <td class="p-4 text-muted">Completar 20–30% com segurança</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Flutuação</td>
+                <td class="p-4 font-mono text-primary">Reduzida</td>
+                <td class="p-4 font-mono text-primary">Mínima</td>
+                <td class="p-4 text-muted">Manter cheio sem sobrecarregar</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-body-sm text-muted mt-4">
+          LFP normalmente não usa flutuação — o BMS cuida da proteção. Após cheia, o carregador pode manter tensão reduzida ou entrar em espera.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Exemplo Prático: Seleção</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Dados:</strong> Banco LFP 12V 300Ah, precisa recarregar 80% (240 Ah) em 3 horas de motor ligado</p>
+            <p><strong>Etapa 1:</strong> Corrente necessária:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              240 Ah / 3 h = 80A
+            </div>
+            <p><strong>Etapa 2:</strong> Verificar C-rate:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              80A / 300 Ah = 0,27C
+            </div>
+            <p><strong>Etapa 3:</strong> Conferir com o recomendado. 0,27C está bem abaixo do máximo de 0,5C para LFP — tamanho adequado.</p>
+            <p><strong>Etapa 4:</strong> Escolha. Um alternador marítimo 12V 100A com regulador externo ou carregador standalone de 100A dá a corrente com margem para as cargas do sistema.</p>
+            <p><strong>Etapa 5:</strong> Entrada CA. Para 100A: 100A × 14,6V / 0,95 = 1.537W. Um inversor de 2.000W ou circuito 120V 20A basta.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Experimente</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use a Calculadora de Tempo de Carga para saber quanto tempo seu carregador leva para encher a bateria.
+          </p>
+          <a href="/pt/tools/charging-time-calculator/" class="btn-primary text-xs py-3 px-6 inline-block">Abrir Calculadora de Tempo de Carga</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Próxima Etapa</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Calcule o C-rate da sua combinação com a Calculadora de C-Rate.
+          </p>
+          <a href="/pt/tools/c-rate-calculator/" class="btn-primary text-xs py-3 px-6 inline-block">Abrir Calculadora de C-Rate</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Artigos Relacionados</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <a href="/pt/learn/battery-charging-formula/" class="text-primary hover:underline font-bold block mb-2">Fórmula de Carga de Bateria</a>
+            <p class="text-body-sm text-muted">
+              Referência completa de tempo CC, estimativa CV e consumo de energia.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <a href="/pt/learn/how-long-to-charge-a-lithium-battery/" class="text-primary hover:underline font-bold block mb-2">Quanto Tempo para Carregar Lítio</a>
+            <p class="text-body-sm text-muted">
+              Tempos de lítio com perfis CC-CV e C-rates por química.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

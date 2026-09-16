@@ -1,0 +1,414 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "Qual é a melhor forma de dimensionar o armazenamento solar em bateria?",
+    answer: "Comece com uma auditoria completa de cargas para determinar o consumo diário em watt-horas. Multiplique pelos dias de autonomia desejados (normalmente 2–3). Divida pela profundidade de descarga e pela eficiência do sistema para obter a capacidade nominal. Este método em quatro etapas considera todas as variáveis e indica o tamanho mínimo de banco a comprar.",
+  },
+  {
+    question: "Como escolho entre baterias LFP e NMC para solar?",
+    answer: "O LFP (LiFePO4) é preferido para armazenamento solar estacionário devido à sua maior vida útil (3.000–5.000 contra 2.000–3.000), melhor estabilidade térmica e menor custo por kWh. O NMC oferece maior densidade energética, mas exige mais gerenciamento térmico e custa mais. Para solar, o LFP é a escolha padrão.",
+  },
+  {
+    question: "Devo superdimensionar meu armazenamento solar?",
+    answer: "Sim, em 20–30% além dos cálculos mínimos. Isso considera o envelhecimento da bateria (a capacidade cai 15–20% em 10 anos), variação sazonal, crescimento de cargas e redução por temperatura. Superdimensionar agora é mais barato que adaptar depois, e reduz o estresse da bateria ao operar com profundidade média de descarga menor.",
+  },
+  {
+    question: "Como a tensão do sistema afeta o dimensionamento do armazenamento?",
+    answer: "A tensão do sistema não muda a capacidade de energia necessária (kWh), mas afeta o número de módulos e a complexidade da fiação. Um sistema 48V exige menos strings paralelas que 12V ou 24V, reduzindo perdas no cobre e simplificando a instalação. Para sistemas acima de 10 kWh, 48V é fortemente recomendado.",
+  },
+];
+---
+
+<Layout
+  title="Guia de Dimensionamento de Armazenamento Solar | Calculadoras de Bateria"
+  description="Guia completo para dimensionar armazenamento solar em bateria: da análise de consumo à seleção da química. Inclui tabelas de referência, exemplos resolvidos e melhores práticas de projeto."
+  canonical="https://batterycalculators.com/pt/learn/solar-storage-sizing-guide/"
+  schema="faqPage"
+  schemaName="Guia de Dimensionamento de Armazenamento Solar"
+  schemaDescription="Guia abrangente de engenharia para dimensionar sistemas de armazenamento solar em bateria, da análise de consumo à seleção final."
+  schemaUrl="https://batterycalculators.com/pt/learn/solar-storage-sizing-guide/"
+  faqItems={faqItems}
+  lang="pt"
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/pt/learn/" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Voltar aos Guias</a>
+      <Breadcrumb items={[
+        { label: "Centro de Aprendizagem", href: "/pt/learn/" },
+        { label: "Guia de Dimensionamento de Armazenamento Solar" }
+      ]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">SOLAR</span>
+      <h1 class="text-display-md text-primary mb-6">Guia de Dimensionamento de Armazenamento Solar</h1>
+      <p class="text-body-md text-body font-light">
+        Dimensionar o armazenamento solar em bateria é a decisão de projeto mais importante em um sistema de energia solar. Acertando, seu sistema entrega energia confiável por uma década ou mais. Errando, você enfrenta subdesempenho crônico, degradação acelerada da bateria ou custo desnecessário. Este guia cobre o processo completo de engenharia — da análise de consumo à seleção da química.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">O Marco de Dimensionamento</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          O dimensionamento de armazenamento solar segue um processo determinístico de engenharia. Quatro variáveis definem o resultado: consumo diário, dias de autonomia, profundidade de descarga e eficiência do sistema. Entender como cada variável afeta o resultado permite fazer trocas informadas entre custo, resiliência e desempenho.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Consumo Diário</h4>
+            <p class="text-body-sm text-muted">
+              O total de watt-horas que sua casa ou instalação usa por dia. É a base de todos os cálculos de dimensionamento. Auditorias precisas de carga evitam tanto o superdimensionamento (custo desperdiçado) quanto o subdimensionamento (falta de energia).
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Dias de Autonomia</h4>
+            <p class="text-body-sm text-muted">
+              Por quantos dias a bateria deve alimentar as cargas sem entrada solar. Varia de 1 dia (clima ensolarado, gerador de backup) a 5+ dias (região nublada, cargas críticas, sem gerador).
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Profundidade de Descarga</h4>
+            <p class="text-body-sm text-muted">
+              O percentual da capacidade total que você pode usar com segurança. O LFP permite 80–90%; o chumbo-ácido é limitado a 50%. Menor DoD significa bancos maiores para a mesma energia utilizável.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Eficiência do Sistema</h4>
+            <p class="text-body-sm text-muted">
+              Considera perdas do inversor, resistência da fiação e consumo do BMS. Normalmente 0,90–0,95 para equipamentos modernos. Maior eficiência significa menor capacidade necessária.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FormulaBox title="Fórmulas Principais de Dimensionamento">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Capacidade Utilizável Necessária (Wh) = Consumo Diário (Wh) × Dias de Autonomia / Eficiência
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Capacidade Nominal Necessária (Wh) = Capacidade Utilizável Necessária (Wh) / DoD
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Capacidade Nominal Necessária (kWh) = Capacidade Nominal Necessária (Wh) / 1,000
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Arranjo Solar Mínimo (W) = Consumo Diário (Wh) / (Horas de Sol Pleno × Eficiência)
+        </div>
+        <p>
+          Essas fórmulas são universais — aplicam-se a qualquer química de bateria, tensão de sistema ou tipo de instalação. As variáveis mudam; o método não.
+        </p>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Etapa 1: Análise de Consumo</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Comece catalogando cada carga elétrica que o sistema solar deve suportar. Para cada dispositivo, registre o consumo em watts e o tempo diário estimado de operação em horas. O produto dá watt-horas por dia. Some todos os dispositivos para obter o consumo diário total.
+        </p>
+        <p class="text-body-md text-body font-light mb-4">
+          O consumo doméstico comum varia de 5–30 kWh/dia dependendo de tamanho, clima e nível de eletrificação. Casas com aquecimento elétrico, ar-condicionado e carga de EV consomem 20–40 kWh/dia. Casas pequenas eficientes com bombas de calor e LED podem usar 5–10 kWh/dia.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Tipo de Casa</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Consumo Típico</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Cargas-Chave</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">Casa pequena eficiente</td>
+                <td class="p-4 font-mono text-primary">5–8 kWh/dia</td>
+                <td class="p-4 text-muted">Luzes LED, geladeira eficiente, notebook, roteador</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Casa média de 3 quartos</td>
+                <td class="p-4 font-mono text-primary">15–25 kWh/dia</td>
+                <td class="p-4 text-muted">Aparelhos padrão, AC/bomba de calor, lavadora</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Casa grande totalmente elétrica</td>
+                <td class="p-4 font-mono text-primary">25–40 kWh/dia</td>
+                <td class="p-4 text-muted">Aquecimento elétrico, carga de EV, secadora, hidromassagem</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Cabana off-grid</td>
+                <td class="p-4 font-mono text-primary">3–8 kWh/dia</td>
+                <td class="p-4 text-muted">Cargas mínimas, só aparelhos eficientes</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Etapa 2: Tabela de Referência de Armazenamento</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          A tabela abaixo mapeia níveis de consumo diário para o armazenamento nominal necessário em cenários comuns de autonomia. Todos os valores assumem química LFP com 85% de DoD e 92% de eficiência do sistema.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Consumo Diário</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">1 Dia de Autonomia</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">2 Dias de Autonomia</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">3 Dias de Autonomia</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Com 25% de Margem</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">5 kWh/dia</td>
+                <td class="p-4 text-muted">6.4 kWh</td>
+                <td class="p-4 text-muted">12.8 kWh</td>
+                <td class="p-4 text-muted">19.2 kWh</td>
+                <td class="p-4 font-mono text-primary">24.0 kWh</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">10 kWh/dia</td>
+                <td class="p-4 text-muted">12.8 kWh</td>
+                <td class="p-4 text-muted">25.6 kWh</td>
+                <td class="p-4 text-muted">38.4 kWh</td>
+                <td class="p-4 font-mono text-primary">48.0 kWh</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">15 kWh/dia</td>
+                <td class="p-4 text-muted">19.2 kWh</td>
+                <td class="p-4 text-muted">38.4 kWh</td>
+                <td class="p-4 text-muted">57.6 kWh</td>
+                <td class="p-4 font-mono text-primary">72.0 kWh</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">20 kWh/dia</td>
+                <td class="p-4 text-muted">25.6 kWh</td>
+                <td class="p-4 text-muted">51.1 kWh</td>
+                <td class="p-4 text-muted">76.7 kWh</td>
+                <td class="p-4 font-mono text-primary">95.9 kWh</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">30 kWh/dia</td>
+                <td class="p-4 text-muted">38.4 kWh</td>
+                <td class="p-4 text-muted">76.7 kWh</td>
+                <td class="p-4 text-muted">115.1 kWh</td>
+                <td class="p-4 font-mono text-primary">143.9 kWh</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-body-md text-body font-light mt-4">
+          A coluna "Com 25% de Margem" considera envelhecimento da bateria, redução por temperatura e crescimento de cargas ao longo da vida do sistema. Esta é a coluna recomendada para decisões reais de dimensionamento.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Etapa 3: Seleção da Química da Bateria</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          A química da bateria determina a capacidade utilizável, a vida útil, o perfil de segurança e o custo por kWh. Para armazenamento solar, o LFP (LiFePO4) tornou-se a escolha dominante devido à sua combinação de capacidade de descarga profunda, longa vida útil e estabilidade térmica.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Química</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">DoD</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Vida Útil em Ciclos</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Custo/kWh</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Segurança</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">LFP (LiFePO4)</td>
+                <td class="p-4 font-mono text-primary">85–90%</td>
+                <td class="p-4 text-muted">3,000–5,000</td>
+                <td class="p-4 text-muted">$250–400</td>
+                <td class="p-4 text-muted">Excelente — sem fuga térmica</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">NMC (Lítio)</td>
+                <td class="p-4 font-mono text-primary">80–90%</td>
+                <td class="p-4 text-muted">2,000–3,000</td>
+                <td class="p-4 text-muted">$300–500</td>
+                <td class="p-4 text-muted">Boa — exige gerenciamento térmico</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">Chumbo-Ácido (AGM)</td>
+                <td class="p-4 font-mono text-primary">50%</td>
+                <td class="p-4 text-muted">500–1,000</td>
+                <td class="p-4 text-muted">$150–250</td>
+                <td class="p-4 text-muted">Boa — tecnologia madura</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">Sódio-Íon</td>
+                <td class="p-4 font-mono text-primary">80–90%</td>
+                <td class="p-4 text-muted">2,000–4,000</td>
+                <td class="p-4 text-muted">$150–300</td>
+                <td class="p-4 text-muted">Excelente — tecnologia emergente</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-body-md text-body font-light mt-4">
+          Ao comparar custos, considere o custo de vida útil por kWh entregue, não apenas o preço inicial. Uma bateria LFP de $350/kWh entregando 4.000 ciclos a 85% de DoD custa $0,10 por kWh entregue. Uma bateria de chumbo-ácido de $200/kWh entregando 800 ciclos a 50% de DoD custa $0,50 por kWh entregue — cinco vezes mais caro ao longo da vida.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Exemplo Resolvido: Dimensionamento Completo</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Dados:</strong></p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li>Tipo de casa: Casa média de 3 quartos, totalmente elétrica</li>
+              <li>Consumo diário: 15,000 Wh (15 kWh)</li>
+              <li>Autonomia: 2 dias</li>
+              <li>Bateria: LFP com 85% de DoD</li>
+              <li>Eficiência do sistema: 92%</li>
+              <li>Tensão do sistema: 48V</li>
+              <li>Horas de sol pleno: 5</li>
+            </ul>
+            <p><strong>Etapa 1:</strong> Capacidade utilizável necessária:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              15,000 Wh × 2 / 0.92 = 32,609 Wh utilizáveis
+            </div>
+            <p><strong>Etapa 2:</strong> Capacidade nominal necessária:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              32,609 Wh / 0.85 = 38,363 Wh nominais (38.4 kWh)
+            </div>
+            <p><strong>Etapa 3:</strong> Adicionar 25% de margem:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              38,363 Wh × 1.25 = 47,954 Wh → 48.0 kWh nominais
+            </div>
+            <p><strong>Etapa 4:</strong> Arranjo solar mínimo:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              15,000 Wh / (5 h × 0.92) = 3,261 W → superdimensionar para 4,200 W (1.3×)
+            </div>
+            <p class="text-muted mt-2">Esta casa precisa de um <strong>banco LFP nominal de 48 kWh</strong> e um <strong>arranjo solar de 4,2 kW</strong>. Na prática, poderiam ser nove módulos LFP 48V 100Ah (46,1 kWh) ou uma combinação de baterias 48V em rack. O arranjo de 4,2 kW recarrega o consumo diário de 15 kWh em aproximadamente 4,1 horas de sol pleno, deixando margem para perdas do sistema e dias nublados.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Configurações Recomendadas de Bateria</h2>
+        <div class="bg-surface-soft border border-hairline overflow-hidden mb-4">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Consumo Diário</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Armazenamento (2 dias + 25%)</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Config. Recomendada de Bateria</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Arranjo Solar</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">5 kWh/dia</td>
+                <td class="p-4 text-muted">~16 kWh</td>
+                <td class="p-4 text-muted">3 × LFP 48V 100Ah</td>
+                <td class="p-4 font-mono text-primary">1.7 kW</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">10 kWh/dia</td>
+                <td class="p-4 text-muted">~32 kWh</td>
+                <td class="p-4 text-muted">6 × LFP 48V 100Ah</td>
+                <td class="p-4 font-mono text-primary">3.4 kW</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">15 kWh/dia</td>
+                <td class="p-4 text-muted">~48 kWh</td>
+                <td class="p-4 text-muted">9 × LFP 48V 100Ah</td>
+                <td class="p-4 font-mono text-primary">4.2 kW</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">20 kWh/dia</td>
+                <td class="p-4 text-muted">~64 kWh</td>
+                <td class="p-4 text-muted">12 × LFP 48V 100Ah</td>
+                <td class="p-4 font-mono text-primary">5.6 kW</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">30 kWh/dia</td>
+                <td class="p-4 text-muted">~96 kWh</td>
+                <td class="p-4 text-muted">18 × LFP 48V 100Ah</td>
+                <td class="p-4 font-mono text-primary">8.4 kW</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Melhores Práticas de Projeto</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Dimensione para o Inverno</h4>
+            <p class="text-body-sm text-muted">
+              A produção solar cai 30–50% no inverno. Se seu sistema deve manter autonomia o ano todo, dimensione o arranjo para as horas de sol pleno de inverno e a bateria para o pior mês. Um sistema dimensionado só para o verão falha em janeiro.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Use Arquitetura 48V</h4>
+            <p class="text-body-sm text-muted">
+              Para sistemas acima de 10 kWh, 48V é o padrão da indústria. Reduz perdas no cobre em 75% em comparação a 12V, simplifica a fiação e é compatível com todos os inversores híbridos e controladores MPPT modernos.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Combine a Idade das Baterias</h4>
+            <p class="text-body-sm text-muted">
+              Ao expandir um banco existente, use baterias da mesma química, capacidade e idealmente do mesmo lote de fabricação. Misturar células velhas e novas cria desequilíbrio e reduz o desempenho e a vida útil geral do banco.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Monitore o Desempenho</h4>
+            <p class="text-body-sm text-muted">
+              Instale monitoramento que acompanhe SOC, tensão, corrente e temperatura. O registro de dados revela tendências de perda de capacidade, identifica desequilíbrio de células cedo e confirma que suas premissas de dimensionamento se sustentam na prática.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Experimente</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use a Calculadora de Dimensionamento de Bateria Solar para calcular a capacidade exata de armazenamento e o tamanho do arranjo para sua instalação.
+          </p>
+          <a href="/pt/tools/solar-battery-sizing-calculator/" class="btn-primary text-xs py-3 px-6 inline-block">Abrir Calculadora de Bateria Solar</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Comparar Químicas</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use a Calculadora de Dimensionamento de Bateria para comparar configurações LFP, NMC e chumbo-ácido lado a lado.
+          </p>
+          <a href="/pt/tools/battery-sizing-calculator/" class="btn-primary-outline text-xs py-3 px-6 inline-block">Abrir Calculadora de Dimensionamento</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Artigos Relacionados</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Quanta Armazenagem em Bateria Preciso?</h4>
+            <p class="text-body-sm text-muted mb-3">
+              Calcule a capacidade total de armazenamento a partir do consumo diário e dos dias de autonomia.
+            </p>
+            <a href="/pt/learn/how-much-battery-storage-do-i-need/" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Ler Guia →</a>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">LiFePO4 para Armazenamento Solar</h4>
+            <p class="text-body-sm text-muted mb-3">
+              Por que a química LFP é a escolha ideal para sistemas estacionários de bateria solar.
+            </p>
+            <a href="/pt/learn/best-battery-chemistry-for-solar/" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Ler Guia →</a>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

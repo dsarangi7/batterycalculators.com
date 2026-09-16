@@ -1,0 +1,323 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "O que é uma carga hoteleira marítima?",
+    answer: "Cargas hoteleiras são todas as cargas elétricas de um barco quando os motores estão desligados, normalmente fundeado ou no porto. Isso inclui luzes de navegação, iluminação da cabine, refrigeração, equipamentos de comunicação, bombas e eletrônicos. Calcular as cargas hoteleiras é essencial para dimensionar bancos residenciais de bateria.",
+  },
+  {
+    question: "Devo usar baterias AGM ou ventiladas no meu barco?",
+    answer: "Baterias AGM (Absorbed Glass Mat) são geralmente preferidas para uso marítimo porque são seladas (sem risco de derramamento), livres de manutenção, resistentes à vibração e podem ser montadas em várias orientações. Baterias ventiladas são mais baratas, mas exigem manutenção regular e ventilação adequada.",
+  },
+  {
+    question: "Como evito a corrosão da bateria no ambiente marítimo?",
+    answer: "Baterias marítimas corroem mais rápido devido ao ar salino e à umidade. Use cabo de cobre estanhado de padrão marítimo, aplique graxa dielétrica nos terminais, instale caixas de bateria para proteção e garanta ventilação adequada. A limpeza regular com solução de bicarbonato de sódio ajuda a evitar acúmulo.",
+  },
+  {
+    question: "Posso usar baterias de carro no meu barco?",
+    answer: "Baterias de carro (de partida) são projetadas para pulsos curtos de alta corrente e não são adequadas para ciclagem profunda. Baterias marítimas de ciclo profundo são construídas para descarga sustentada ao longo de horas. Usar baterias de partida para cargas hoteleiras resulta em falha prematura.",
+  },
+];
+---
+
+<Layout
+  title="Guia de Dimensionamento de Bateria Marítima | Calculadoras de Bateria"
+  description="Aprenda a dimensionar um banco de baterias marítimo calculando cargas hoteleiras, considerando cargas fundeado vs navegando e selecionando a química certa para o ambiente marítimo."
+  canonical="https://batterycalculators.com/pt/learn/marine-battery-sizing-guide/"
+  faqItems={faqItems}
+  lang="pt"
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/pt/learn/" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Voltar aos Guias</a>
+      <Breadcrumb items={[{ label: "Centro de Aprendizagem", href: "/pt/learn/" }, { label: "Guia de Dimensionamento de Bateria Marítima" }]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">MARÍTIMO</span>
+      <h1 class="text-display-md text-primary mb-6">Guia de Dimensionamento de Bateria Marítima</h1>
+      <p class="text-body-md text-body font-light">
+        Dimensionar um banco de baterias para um barco é fundamentalmente diferente de dimensionar um sistema residencial ou de EV. Barcos operam em um ambiente marítimo severo com vibração, umidade e ar salino. As cargas alternam entre os modos fundeado e navegando, e você tem orçamentos limitados de espaço e peso. Este guia apresenta o método padrão de engenharia para dimensionar um banco residencial de bateria marítima.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Etapa 1: Calcular as Cargas Hoteleiras</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Cargas hoteleiras são todas as cargas elétricas da sua embarcação quando os motores estão desligados. São as cargas de base que seu banco de baterias deve suportar enquanto você está fundeado, no porto ou na marina sem energia de cais. Todo circuito que consome energia do banco residencial contribui para a carga hoteleira.
+        </p>
+        <p class="text-body-md text-body font-light mb-4">
+          O primeiro passo é inventariar cada dispositivo e estimar seu consumo médio de potência em watts. Algumas cargas funcionam continuamente (refrigeração, luz de fundeio), enquanto outras são intermitentes (bomba de porão, bomba de água). Para cargas intermitentes, estime o ciclo de trabalho ou as horas médias de uso por dia.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Carga</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Potência Típica (W)</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Observações</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">Eletrônicos de navegação</td>
+                <td class="p-4 font-mono text-primary">50–150 W</td>
+                <td class="p-4 text-muted">Chartplotter, radar, AIS</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Luzes da cabine</td>
+                <td class="p-4 font-mono text-primary">20–60 W</td>
+                <td class="p-4 text-muted">LED preferível pelo baixo consumo</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Bomba de porão</td>
+                <td class="p-4 font-mono text-primary">20–40 W</td>
+                <td class="p-4 text-muted">Ciclo de trabalho intermitente</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Rádio VHF</td>
+                <td class="p-4 font-mono text-primary">5–25 W</td>
+                <td class="p-4 text-muted">Recepção ≈ 5 W, transmissão ≈ 25 W</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Luz de fundeio</td>
+                <td class="p-4 font-mono text-primary">5–15 W</td>
+                <td class="p-4 text-muted">Luz de fundeio LED, acesa a noite toda</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Refrigeração</td>
+                <td class="p-4 font-mono text-primary">40–80 W</td>
+                <td class="p-4 text-muted">Compressor liga e desliga</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Bomba de água</td>
+                <td class="p-4 font-mono text-primary">5–8 W</td>
+                <td class="p-4 text-muted">Intermitente, pressostato</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Painel de instrumentos</td>
+                <td class="p-4 font-mono text-primary">10–30 W</td>
+                <td class="p-4 text-muted">Instrumentos do motor, displays</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Etapa 2: Determinar Cargas Navegando vs Fundeado</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Suas cargas elétricas mudam significativamente se você está navegando ou fundeado. Navegando, o alternador carrega o banco residencial, então você tem fornecimento contínuo de energia. Eletrônicos de navegação, instrumentos e bombas relacionadas ao motor operam em ciclos de trabalho maiores. Fundeado, o alternador está desligado e o banco de baterias deve sustentar todas as cargas sozinho por períodos prolongados — muitas vezes 12 a 18 horas por noite.
+        </p>
+        <p class="text-body-md text-body font-light mb-4">
+          Para fins de dimensionamento, projete o banco de baterias para o cenário fundeado. Este é o pior caso: tempo máximo de descarga sem entrada de carga. Cargas de navegação são menos críticas porque o alternador mantém as baterias carregadas.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Modo</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Cargas Típicas</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Duração</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">Fundeado</td>
+                <td class="p-4 text-muted">Luzes, geladeira, VHF, luz de fundeio, eletrônicos</td>
+                <td class="p-4 text-muted">12–18 horas por noite</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Navegando</td>
+                <td class="p-4 text-muted">Navegação, instrumentos, bombas, eletrônicos</td>
+                <td class="p-4 text-muted">4–8 horas (alternador carrega)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <FormulaBox title="Fórmula de Dimensionamento de Bateria Marítima">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Capacidade Necessária (Ah) = Σ(Potência × Horas) / (DoD × Tensão do Sistema)
+        </div>
+        <p>
+          Some os watt-horas de todas as cargas durante o período mais longo de descarga (normalmente à noite fundeado), depois divida pela profundidade de descarga e pela tensão do sistema para obter ampères-horas.
+        </p>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Margem de Segurança Marítima: Multiplique o total em Wh × 1.20
+        </div>
+        <p>
+          Para aplicações marítimas, inclua uma margem de segurança de 20% para considerar picos da bomba de porão, cargas parasitas desconhecidas e perda de capacidade por vibração e extremos de temperatura. Essa margem é mais generosa que os cálculos residenciais típicos.
+        </p>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Etapa 3: Considerar o Ambiente Marítimo</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Um barco é um dos ambientes mais severos para baterias. O ar salino acelera a corrosão dos terminais. A vibração do motor e o impacto das ondas afrouxam as conexões da bateria e estressam as placas internas. Oscilações de temperatura — de fundeios frios à noite a casas de máquinas quentes — afetam a capacidade e a aceitação de carga. Umidade e condensação podem causar curtos e acelerar a degradação. Esses fatores devem ser tratados na seleção e instalação da bateria.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Selada / AGM Preferível</h4>
+            <p class="text-body-sm text-muted">
+              Baterias seladas eliminam o risco de derramamento em mar agitado. Baterias AGM (Absorbed Glass Mat) são à prova de vazamento, livres de manutenção e podem ser montadas de lado — ideais para compartimentos apertados de barcos onde a montagem vertical não é possível.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Resistência à Vibração</h4>
+            <p class="text-body-sm text-muted">
+              Baterias marítimas sofrem vibração constante de motores e ondas. Baterias AGM e de gel toleram vibração melhor que as ventiladas. Fixe as baterias com suportes adequados e use coxins de borracha para amortecer a vibração do motor.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Compensação de Temperatura</h4>
+            <p class="text-body-sm text-muted">
+              Baterias marítimas enfrentam amplas faixas de temperatura — de fundeios frios à noite a casas de máquinas quentes. Controladores de carga devem ter sensores de temperatura. Baterias de chumbo-ácido precisam de compensação de tensão de aproximadamente -3 mV por célula por grau abaixo de 25°C.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Proteção contra Corrosão</h4>
+            <p class="text-body-sm text-muted">
+              Use cabo de cobre estanhado de padrão marítimo e terminais. Aplique graxa dielétrica ou inibidor de corrosão em todas as conexões. Instale as baterias em caixas ventiladas para limitar a exposição ao ar salino. Inspecione e limpe os terminais a cada 30 dias em ambientes de água salgada.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Exemplo Resolvido</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Cenário:</strong> Fundeado por 14 horas à noite com as seguintes cargas:</p>
+            <table class="w-full text-left text-body-sm my-2">
+              <thead>
+                <tr class="border-b border-hairline">
+                  <th class="p-2 text-label-uppercase text-primary text-xs tracking-wider">Carga</th>
+                  <th class="p-2 text-label-uppercase text-primary text-xs tracking-wider">Potência</th>
+                  <th class="p-2 text-label-uppercase text-primary text-xs tracking-wider">Horas</th>
+                  <th class="p-2 text-label-uppercase text-primary text-xs tracking-wider">Wh</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-hairline">
+                <tr>
+                  <td class="p-2 text-muted">Luz de navegação</td>
+                  <td class="p-2 font-mono text-primary">10 W</td>
+                  <td class="p-2 font-mono text-primary">14 h</td>
+                  <td class="p-2 font-mono text-primary">140 Wh</td>
+                </tr>
+                <tr>
+                  <td class="p-2 text-muted">Luzes da cabine</td>
+                  <td class="p-2 font-mono text-primary">40 W</td>
+                  <td class="p-2 font-mono text-primary">5 h</td>
+                  <td class="p-2 font-mono text-primary">200 Wh</td>
+                </tr>
+                <tr>
+                  <td class="p-2 text-muted">Geladeira</td>
+                  <td class="p-2 font-mono text-primary">60 W</td>
+                  <td class="p-2 font-mono text-primary">14 h</td>
+                  <td class="p-2 font-mono text-primary">840 Wh</td>
+                </tr>
+                <tr>
+                  <td class="p-2 text-muted">Rádio VHF</td>
+                  <td class="p-2 font-mono text-primary">10 W</td>
+                  <td class="p-2 font-mono text-primary">2 h</td>
+                  <td class="p-2 font-mono text-primary">20 Wh</td>
+                </tr>
+                <tr>
+                  <td class="p-2 text-muted">Luz de fundeio</td>
+                  <td class="p-2 font-mono text-primary">10 W</td>
+                  <td class="p-2 font-mono text-primary">12 h</td>
+                  <td class="p-2 font-mono text-primary">120 Wh</td>
+                </tr>
+              </tbody>
+            </table>
+            <p><strong>Etapa 1:</strong> Consumo total de energia:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              140 + 200 + 840 + 20 + 120 = 1,320 Wh
+            </div>
+            <p><strong>Etapa 2:</strong> Aplicar margem de segurança marítima de 20%:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              1,320 Wh × 1.20 = 1,584 Wh
+            </div>
+            <p><strong>Etapa 3:</strong> Converter para Ah a 12V com 85% de DoD:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              1,584 Wh / (0.85 × 12V) = 155 Ah
+            </div>
+            <p><strong>Etapa 4:</strong> Arredonde para o tamanho padrão de banco mais próximo. Um banco AGM 12V 200Ah fornece 155 Ah de capacidade utilizável (200 × 0.85 = 170 Ah), dando margem confortável para crescimento de cargas e perda de capacidade ao longo da vida útil da bateria.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Química de Bateria para Aplicações Marítimas</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Chumbo-Ácido Ventilado</h4>
+            <p class="text-body-sm text-muted">
+              Menor custo inicial. Exige manutenção regular (reposição de água, limpeza de terminais). Deve ser montado na vertical e ventilado devido à emissão de gás hidrogênio. Não recomendado para barcos onde o acesso para manutenção é limitado ou o movimento é constante.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">AGM (Absorbed Glass Mat)</h4>
+            <p class="text-body-sm text-muted">
+              Selada e livre de manutenção. Excelente resistência à vibração — o eletrólito é absorvido em mantas de fibra de vidro. Pode ser montada em qualquer orientação. À prova de vazamento, sendo a escolha padrão para barcos de recreio e comerciais. Custo maior que ventilada, mas justificado pela durabilidade.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Gel</h4>
+            <p class="text-body-sm text-muted">
+              Baterias de gel de ciclo profundo suportam bem descargas repetidas. Sensíveis à tensão de carregamento — a sobrecarga causa geleificação irreversível e perda de capacidade. Exigem perfil de carregador específico para gel. Boas para aplicações com ciclos lentos e profundos de descarga.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Lítio LFP</h4>
+            <p class="text-body-sm text-muted">
+              Opção mais leve, com cerca de metade do peso do chumbo-ácido para a mesma capacidade utilizável. Maior vida útil (4.000–6.000 ciclos) e maior custo inicial. Crescendo no uso marítimo com a queda dos preços. Excelente desempenho em aplicações exigentes de cruzeiro e liveaboard.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Experimente</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use a Calculadora de Dimensionamento de Bateria Marítima para inserir suas cargas específicas e obter uma recomendação de banco.
+          </p>
+          <a href="/pt/tools/marine-battery-sizing-calculator/" class="btn-primary text-xs py-3 px-6 inline-block">Abrir Calculadora de Bateria Marítima</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Próxima Etapa</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Calcule por quanto tempo seu banco dimensionado alimenta suas cargas fundeado com a Calculadora de Autonomia.
+          </p>
+          <a href="/pt/tools/runtime-calculator/" class="btn-primary text-xs py-3 px-6 inline-block">Abrir Calculadora de Autonomia</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Artigos Relacionados</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <a href="/pt/learn/voltage-drop-explained/" class="text-primary hover:underline font-bold block mb-2">Queda de Tensão Explicada</a>
+            <p class="text-body-sm text-muted">
+              Entenda como o comprimento e a bitola do cabo afetam a entrega de tensão em sistemas de bateria DC — crítico para longos percursos de cabo em barcos maiores.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <a href="/pt/learn/how-to-size-a-battery-bank/" class="text-primary hover:underline font-bold block mb-2">Como Dimensionar um Banco de Baterias</a>
+            <p class="text-body-sm text-muted">
+              O método geral de dimensionamento de baterias cobrindo autonomia, redução por temperatura e profundidade de descarga — aplicável a sistemas marítimos.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

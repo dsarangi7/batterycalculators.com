@@ -1,0 +1,477 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "O que é armazenamento solar em bateria?",
+    answer: "Armazenamento solar em bateria é um sistema que armazena a energia gerada por painéis solares em baterias recarregáveis para uso posterior. Durante o dia, os painéis solares geram eletricidade DC que carrega as baterias. À noite ou durante apagões, as baterias descarregam através de um inversor para alimentar aparelhos CA domésticos.",
+  },
+  {
+    question: "Quanto armazenamento solar em bateria preciso?",
+    answer: "A maioria das casas precisa de 10-20 kWh de armazenamento utilizável para deslocamento diário de carga (usar energia solar à noite). Para backup durante apagões, dimensione a bateria para cobrir suas cargas críticas por 1-3 dias. Uma casa típica dos EUA usa 30 kWh/dia, mas cargas críticas representam apenas 10-15 kWh/dia.",
+  },
+  {
+    question: "Qual tipo de bateria é melhor para armazenamento solar?",
+    answer: "LiFePO4 (fosfato de ferro-lítio) é a melhor química para armazenamento solar. Oferece 80-90% de capacidade utilizável, vida útil de 3.000-5.000+ ciclos, excelente segurança térmica e nenhuma manutenção. Baterias de chumbo-ácido custam menos no início, mas oferecem apenas 50% de capacidade utilizável e duram 300-500 ciclos.",
+  },
+  {
+    question: "Quanto tempo duram as baterias solares?",
+    answer: "Baterias solares LiFePO4 normalmente duram 10-15 anos ou 3.000-5.000 ciclos a 80% de profundidade de descarga. Baterias de chumbo-ácido duram 3-7 anos dependendo do uso e da manutenção. A maioria das baterias solares de lítio vem com garantias de 10 anos assegurando 70-80% de retenção de capacidade.",
+  },
+  {
+    question: "Baterias solares alimentam minha casa inteira?",
+    answer: "Sim, com dimensionamento adequado. Um sistema de bateria para a casa inteira normalmente exige 20-40 kWh de capacidade de armazenamento e um inversor de 10-15 kW. Isso cobre a maioria das cargas domésticas por 8-24 horas dependendo do consumo. Para energia da casa inteira por tempo indefinido, combine baterias com painéis solares suficientes e backup da rede/gerador.",
+  },
+  {
+    question: "Preciso de baterias para painéis solares?",
+    answer: "Não. Sistemas solares conectados à rede podem operar sem baterias exportando o excedente para a rede e importando à noite. No entanto, baterias oferecem backup durante apagões e permitem usar a energia solar armazenada à noite em vez de comprar eletricidade da rede em horários de ponta.",
+  },
+  {
+    question: "Quanto custa o armazenamento solar em bateria?",
+    answer: "Sistemas residenciais de bateria solar custam $8,000-$16,000 instalados para um sistema de 10-20 kWh. Isso inclui bateria, inversor, controlador de carga e instalação. O ITC federal de 30% (quando combinado com solar) e incentivos estaduais podem reduzir esse custo em 30-50% em muitas regiões.",
+  },
+  {
+    question: "Qual é a diferença entre baterias solares acopladas em CA e em CC?",
+    answer: "Sistemas acoplados em CC conectam baterias diretamente ao controlador de carga solar, oferecendo maior eficiência (95-98%) e menor custo. Sistemas acoplados em CA conectam baterias através do quadro CA da casa, permitindo retrofit mais fácil, mas com eficiência um pouco menor (90-94%) devido a etapas extras de conversão.",
+  },
+  {
+    question: "Como calculo a capacidade da bateria solar?",
+    answer: "Divida seu consumo diário de energia (kWh) pela tensão do sistema para obter ampères-horas, depois divida pela profundidade de descarga para considerar a capacidade utilizável. Por exemplo, 10 kWh de consumo diário a 48V com 80% de DoD exige 260 Ah (10,000 Wh / 48V / 0.80 = 260 Ah).",
+  },
+  {
+    question: "Posso adicionar baterias ao meu sistema solar existente?",
+    answer: "Sim. A maioria dos sistemas solares existentes conectados à rede pode receber retrofit de baterias com um inversor híbrido ou kit de retrofit. O processo normalmente leva 1-2 dias e exige uma chave de transferência para isolar as cargas com backup da rede durante apagões.",
+  },
+];
+---
+
+<Layout
+  title="Armazenamento Solar em Bateria Explicado | Calculadoras de Bateria"
+  description="Guia completo de armazenamento solar em bateria: como funciona, cálculos de dimensionamento, comparação de químicas de bateria e exemplos reais para sistemas residenciais e off-grid."
+  canonical="https://batterycalculators.com/pt/learn/solar-battery-storage-explained/"
+  schema="faqPage"
+  schemaName="Armazenamento Solar em Bateria Explicado"
+  schemaDescription="Guia abrangente de sistemas de armazenamento solar em bateria com cálculos de dimensionamento e comparações de química."
+  schemaUrl="https://batterycalculators.com/pt/learn/solar-battery-storage-explained/"
+  faqItems={faqItems}
+  lang="pt"
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/pt/learn/" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Voltar aos Guias</a>
+      <Breadcrumb items={[
+        { label: "Centro de Aprendizagem", href: "/pt/learn/" },
+        { label: "Armazenamento Solar em Bateria Explicado" }
+      ]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">SOLAR</span>
+      <h1 class="text-display-md text-primary mb-6">Armazenamento Solar em Bateria Explicado</h1>
+      <p class="text-body-md text-body font-light">
+        O armazenamento solar em bateria transforma um sistema de painéis solares de fonte de energia só diurna em uma solução de energia 24 horas. Ao armazenar o excedente de energia solar em baterias, você pode alimentar sua casa à noite, durante apagões e em períodos de tarifa de ponta. Este guia explica como funciona o armazenamento solar em bateria, como dimensioná-lo e como escolher a química certa para suas necessidades.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Como Funciona o Armazenamento Solar em Bateria</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Um sistema de armazenamento solar em bateria consiste em quatro componentes principais trabalhando juntos: painéis solares geram eletricidade DC da luz solar, um controlador de carga regula a corrente e a tensão de carregamento para carregar as baterias com segurança, o banco de baterias armazena a energia quimicamente, e um inversor converte a energia DC armazenada de volta em CA para seus aparelhos domésticos.
+        </p>
+        <p class="text-body-md text-body font-light mb-6">
+          Nos horários de pico de sol, seus painéis solares normalmente geram mais eletricidade do que sua casa consome. Sem baterias, esse excedente é exportado para a rede (em sistemas conectados). Com baterias, o excedente carrega o banco de baterias. Quando o sol se põe, as baterias descarregam através do inversor para alimentar sua casa, reduzindo ou eliminando sua dependência da rede no pico noturno.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Componentes-Chave de um Sistema Solar com Bateria</h2>
+
+        <div class="flex flex-col gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Painéis Solares</h4>
+            <p class="text-body-sm text-muted">
+              Sistemas residenciais típicos usam 20-30 painéis de 350-450W cada, produzindo 6-12 kW de potência de pico. A produção dos painéis depende de orientação, inclinação, sombreamento e localização. Um telhado voltado ao sul no sudoeste dos EUA recebe 5-7 horas de sol pleno por dia, enquanto o noroeste do Pacífico pode receber apenas 3-4 horas.
+            </p>
+          </CalculatorCard>
+
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Controlador de Carga</h4>
+            <p class="text-body-sm text-muted">
+              Controladores de carga MPPT (Rastreamento do Ponto de Máxima Potência) otimizam a tensão e a corrente dos painéis solares para carregar baterias com eficiência. Normalmente operam com 95-98% de eficiência. O controlador deve ser dimensionado para suportar a corrente máxima do arranjo solar e compatível com a tensão do banco de baterias.
+            </p>
+          </CalculatorCard>
+
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Banco de Baterias</h4>
+            <p class="text-body-sm text-muted">
+              O banco de baterias armazena energia quimicamente. Para sistemas residenciais, baterias LFP de lítio 48V são as mais comuns, oferecendo 5-15 kWh por módulo. Vários módulos podem ser ligados em paralelo para maior capacidade. A tensão do banco (48V para a maioria dos sistemas residenciais) determina a corrente para um dado nível de potência, afetando bitola de cabos e eficiência.
+            </p>
+          </CalculatorCard>
+
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Inversor</h4>
+            <p class="text-body-sm text-muted">
+              O inversor converte a energia DC da bateria em CA doméstica. Inversores híbridos modernos gerenciam entrada solar, carregamento de bateria, conexão com a rede e gerenciamento de cargas de backup em uma única unidade. A eficiência varia de 90-96% conforme o nível de carga. Dimensione o inversor para sua carga doméstica de pico mais 20% de margem.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Fatores que Determinam o Dimensionamento da Bateria</h2>
+
+        <div class="flex flex-col gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Consumo Diário de Energia</h4>
+            <p class="text-body-sm text-muted">
+              Seu uso diário de eletricidade em quilowatt-horas (kWh) é a base do dimensionamento. Consulte sua conta de luz para o consumo diário médio. Uma casa típica dos EUA usa 25-30 kWh/dia, mas isso varia muito por clima, tamanho da casa e estilo de vida. Para backup, identifique quais cargas são críticas versus adiáveis.
+            </p>
+          </CalculatorCard>
+
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Duração do Backup (Autonomia)</h4>
+            <p class="text-body-sm text-muted">
+              De quantos dias de backup você precisa? Para deslocamento noturno de carga (usar solar à noite), 1 dia de armazenamento basta. Para proteção contra tempestades, 2-3 dias oferecem margem confortável. Para vida off-grid, 3-5 dias cobrem períodos nublados prolongados. Cada dia adicional de autonomia exige proporcionalmente mais capacidade.
+            </p>
+          </CalculatorCard>
+
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Profundidade de Descarga (DoD)</h4>
+            <p class="text-body-sm text-muted">
+              Você não pode usar 100% da capacidade da bateria sem danificá-la. Baterias LiFePO4 são classificadas para 80-90% de DoD, ou seja, uma bateria de 10 kWh oferece 8-9 kWh de energia utilizável. Baterias de chumbo-ácido só devem ser descarregadas até 50%, cortando a capacidade utilizável pela metade. Esse fator afeta diretamente quanta capacidade total você precisa.
+            </p>
+          </CalculatorCard>
+
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Temperatura</h4>
+            <p class="text-body-sm text-muted">
+              A capacidade da bateria diminui no frio. Baterias LiFePO4 perdem 10-20% da capacidade a 0°C e até 30% a -10°C. Baterias de chumbo-ácido perdem cerca de 20% a 0°C. Se sua instalação fica em garagem sem aquecimento ou abrigo externo, aplique fatores de redução por temperatura aos seus cálculos.
+            </p>
+          </CalculatorCard>
+
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Tamanho do Arranjo Solar</h4>
+            <p class="text-body-sm text-muted">
+              Seu arranjo solar deve gerar energia suficiente para recarregar as baterias nas horas de sol disponíveis. Uma bateria de 10 kWh exige pelo menos 3-4 kW de painéis em condições médias dos EUA para recarregar em um dia. Arranjos solares subdimensionados deixam baterias parcialmente descarregadas, reduzindo sua capacidade efetiva e vida útil.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FormulaBox title="Fórmulas de Dimensionamento de Bateria Solar">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Capacidade da Bateria (kWh) = Consumo Diário (kWh) × Dias de Autonomia / DoD
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Capacidade da Bateria (Ah) = Capacidade da Bateria (kWh) × 1000 / Tensão do Sistema (V)
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Solar Mínimo (kW) = Consumo Diário (kWh) / Horas de Sol Pleno / Eficiência do Sistema
+        </div>
+        <p class="text-body-sm text-muted mt-2">
+          A eficiência do sistema considera perdas de controlador de carga, inversor e fiação (normalmente 90-95% para um sistema bem projetado). As horas de sol pleno dependem da sua localização e orientação dos painéis.
+        </p>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Exemplo Resolvido 1: Deslocamento Típico de Carga Residencial</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Cenário:</strong> Armazenar energia solar diurna para uso noturno. Sem necessidade de proteção contra apagões.</p>
+            <p><strong>Dados:</strong></p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li>Consumo noturno: 15 kWh (18h - 6h)</li>
+              <li>Química da bateria: LiFePO4 (85% de DoD)</li>
+              <li>Tensão do sistema: 48V</li>
+              <li>Eficiência do sistema: 93%</li>
+            </ul>
+            <p><strong>Etapa 1:</strong> Capacidade necessária da bateria:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              15 kWh / 0.85 = 17.6 kWh
+            </div>
+            <p><strong>Etapa 2:</strong> Converter para Ah a 48V:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              17,600 Wh / 48V = 367 Ah
+            </div>
+            <p><strong>Etapa 3:</strong> Ajustar para perdas do sistema:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              17.6 kWh / 0.93 = 18.9 kWh de capacidade total necessária
+            </div>
+            <p class="pt-2 border-t border-hairline"><strong>Recomendação:</strong> Um banco LFP de 20 kWh (ex.: 2 × módulos de 10 kWh) oferece capacidade confortável para deslocamento noturno de carga com margem para dias nublados e perdas do sistema.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Exemplo Resolvido 2: Sistema de Backup para Tempestades</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Cenário:</strong> Backup de 3 dias para cargas críticas durante apagões.</p>
+            <p><strong>Dados:</strong></p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li>Cargas críticas: geladeira (1.5 kWh), luzes (0.5 kWh), carga de celular (0.2 kWh), internet (0.3 kWh), bomba de poço (0.5 kWh)</li>
+              <li>Carga crítica diária: 3.0 kWh</li>
+              <li>Autonomia: 3 dias</li>
+              <li>Química da bateria: LiFePO4 (85% de DoD)</li>
+            </ul>
+            <p><strong>Etapa 1:</strong> Energia total para 3 dias:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              3.0 kWh × 3 dias = 9.0 kWh
+            </div>
+            <p><strong>Etapa 2:</strong> Capacidade necessária da bateria:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              9.0 kWh / 0.85 = 10.6 kWh
+            </div>
+            <p class="pt-2 border-t border-hairline"><strong>Recomendação:</strong> Um banco LFP de 12 kWh oferece 3 dias de backup para cargas críticas. Combine com um arranjo solar de 5 kW (mínimo) para recarregar parcialmente durante o apagão. Um arranjo solar de 10 kW recarrega totalmente a bateria em um dia ensolarado.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">Exemplo Resolvido 3: Cabana Off-Grid</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Cenário:</strong> Cabana off-grid com 5 dias de autonomia para tempo nublado.</p>
+            <p><strong>Dados:</strong></p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li>Consumo diário: 8 kWh</li>
+              <li>Autonomia: 5 dias</li>
+              <li>Química da bateria: LiFePO4 (80% de DoD)</li>
+              <li>Redução por temperatura: 10% (clima ameno)</li>
+            </ul>
+            <p><strong>Etapa 1:</strong> Energia total para 5 dias:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              8 kWh × 5 dias = 40 kWh
+            </div>
+            <p><strong>Etapa 2:</strong> Capacidade necessária (DoD):</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              40 kWh / 0.80 = 50 kWh
+            </div>
+            <p><strong>Etapa 3:</strong> Redução por temperatura:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              50 kWh / 0.90 = 55.6 kWh
+            </div>
+            <p class="pt-2 border-t border-hairline"><strong>Recomendação:</strong> Um banco LFP de 60 kWh (ex.: 6 × módulos de 10 kWh) oferece 5 dias de autonomia com margem de temperatura. O arranjo solar deve ter pelo menos 8-10 kW para recarregar em 1-2 dias ensolarados. É um sistema substancial, mas oferece energia off-grid confiável.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Comparação de Químicas para Armazenamento Solar</h2>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Química</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">DoD</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Vida Útil em Ciclos</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Eficiência</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Custo ($/kWh)</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">LiFePO4</td>
+                <td class="p-4 font-mono text-primary">80–90%</td>
+                <td class="p-4 font-mono text-primary">3,000–5,000</td>
+                <td class="p-4 font-mono text-primary">95–98%</td>
+                <td class="p-4 text-muted">$400–$800</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">NMC Lítio</td>
+                <td class="p-4 font-mono text-primary">80%</td>
+                <td class="p-4 font-mono text-primary">1,500–2,500</td>
+                <td class="p-4 font-mono text-primary">92–96%</td>
+                <td class="p-4 text-muted">$350–$700</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">AGM Chumbo-Ácido</td>
+                <td class="p-4 font-mono text-primary">50%</td>
+                <td class="p-4 font-mono text-primary">300–500</td>
+                <td class="p-4 font-mono text-primary">80–85%</td>
+                <td class="p-4 text-muted">$150–$300</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">Chumbo-Ácido Ventilado</td>
+                <td class="p-4 font-mono text-primary">50%</td>
+                <td class="p-4 font-mono text-primary">200–400</td>
+                <td class="p-4 font-mono text-primary">75–80%</td>
+                <td class="p-4 text-muted">$100–$200</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">Água Salgada</td>
+                <td class="p-4 font-mono text-primary">80%</td>
+                <td class="p-4 font-mono text-primary">3,000+</td>
+                <td class="p-4 font-mono text-primary">85–90%</td>
+                <td class="p-4 text-muted">$500–$900</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-caption text-muted mt-2">O LiFePO4 é recomendado para a maioria das aplicações de armazenamento solar devido à sua combinação de segurança, vida útil e custo total de propriedade.</p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Cenários Reais</h2>
+
+        <div class="flex flex-col gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Cenário 1: Casa Suburbana (Rede + Backup)</h4>
+            <p class="text-body-sm text-muted mb-3">
+              Casa de 230 m² no Texas com arranjo solar de 8 kW e bateria LFP de 13,5 kWh. Consumo diário: 30 kWh. O solar gera 35 kWh/dia no verão, 20 kWh/dia no inverno. A bateria desloca 10-13 kWh de solar diurno para uso noturno, reduzindo importações da rede em 30-40%. Durante o raro apagão de inverno, a bateria cobre cargas críticas por 1,5 dias.
+            </p>
+            <div class="font-mono text-m-blue-light text-xs">LFP 13.5 kWh + solar 8 kW · 30-40% de independência da rede</div>
+          </CalculatorCard>
+
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Cenário 2: Propriedade Rural (Parcialmente Off-Grid)</h4>
+            <p class="text-body-sm text-muted mb-3">
+              Casa rural com rede instável. Arranjo solar de 15 kW com banco LFP de 30 kWh. Consumo diário: 25 kWh. A bateria oferece 1,2 dias de backup total. Durante apagões prolongados (2-3 dias), os painéis recarregam a bateria a 60-80% ao dia, mantendo cargas críticas indefinidamente em tempo ensolarado.
+            </p>
+            <div class="font-mono text-m-blue-light text-xs">LFP 30 kWh + solar 15 kW · independência energética quase total</div>
+          </CalculatorCard>
+
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Cenário 3: Cabana Remota (Totalmente Off-Grid)</h4>
+            <p class="text-body-sm text-muted mb-3">
+              Cabana off-grid sem conexão com a rede. Arranjo solar de 10 kW com banco LFP de 40 kWh. Consumo diário: 8 kWh. A bateria oferece 4 dias de autonomia. O solar gera 30-40 kWh/dia no verão (recarga total em 1 dia), 15-20 kWh/dia no inverno (2-3 dias para recarregar). O sistema funciona o ano todo com ajuste sazonal do consumo.
+            </p>
+            <div class="font-mono text-m-blue-light text-xs">LFP 40 kWh + solar 10 kW · vida totalmente off-grid</div>
+          </CalculatorCard>
+
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Cenário 4: Edifício Comercial (Corte de Pico)</h4>
+            <p class="text-body-sm text-muted mb-3">
+              Pequeno edifício comercial usando baterias para reduzir tarifas de demanda. Arranjo solar de 200 kW com bateria LFP de 500 kWh. A bateria armazena o excedente solar diurno e descarrega nos picos de demanda (14h-18h), reduzindo a demanda de pico de 300 kW para 150 kW. Isso economiza $2,000-$5,000/mês em tarifas de demanda dependendo da estrutura tarifária.
+            </p>
+            <div class="font-mono text-m-blue-light text-xs">LFP 500 kWh + solar 200 kW · redução de tarifa de demanda</div>
+          </CalculatorCard>
+
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Cenário 5: Região Propensa a Furacões</h4>
+            <p class="text-body-sm text-muted mb-3">
+              Casa em zona de furacões na Flórida. Arranjo solar de 12 kW com bateria LFP de 27 kWh (2 × Powerwall ou equivalente). Cargas críticas: geladeira, bomba de poço, internet, iluminação (5 kWh/dia). A bateria cobre 5 dias de cargas críticas. O solar recarrega a 60-80% ao dia mesmo com sol parcial. Após a passagem do furacão, o sistema mantém serviços críticos até a restauração da rede.
+            </p>
+            <div class="font-mono text-m-blue-light text-xs">LFP 27 kWh + solar 12 kW · backup de cargas críticas por 5 dias</div>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Erros Comuns</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Dimensionar para a Casa Inteira em Vez de Cargas Críticas</h4>
+            <p class="text-body-sm text-muted">
+              Muitos proprietários tentam alimentar todos os aparelhos, exigindo bancos enormes (e caros). Identifique primeiro as cargas críticas — geladeira, bomba de poço, luzes, internet, dispositivos médicos. Estas normalmente representam 10-15 kWh/dia, muito menos que o consumo da casa inteira de 25-30 kWh/dia.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Ignorar a Taxa de Recarga Solar</h4>
+            <p class="text-body-sm text-muted">
+              Um banco de baterias sem capacidade solar suficiente nunca recarrega totalmente. Se sua bateria tem 20 kWh e seu arranjo gera apenas 10 kWh/dia, leva 2+ dias para recarregar (considerando perdas). Dimensione seu arranjo para recarregar a bateria em 1 dia em condições médias.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Usar Chumbo-Ácido para Ciclagem Diária</h4>
+            <p class="text-body-sm text-muted">
+              Baterias de chumbo-ácido degradam rapidamente com ciclagem diária. Uma bateria de chumbo-ácido ciclada diariamente a 50% de DoD pode durar apenas 2-3 anos. Baterias LiFePO4 cicladas diariamente a 80% de DoD duram 10+ anos. O maior custo inicial do lítio é rapidamente compensado por vida mais longa e menores custos de reposição.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Esquecer a Eficiência do Inversor</h4>
+            <p class="text-body-sm text-muted">
+              O inversor consome 5-10% da energia na conversão DC-CA. Uma bateria de 10 kWh oferece apenas 9-9,5 kWh de energia CA utilizável. Inclua sempre a eficiência do inversor nos cálculos de capacidade para evitar subdimensionar o sistema.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Tamanhos Recomendados de Sistema</h2>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Aplicação</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Bateria (LFP)</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Arranjo Solar</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Cobertura</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">Deslocamento noturno de carga</td>
+                <td class="p-4 font-mono text-primary">10–15 kWh</td>
+                <td class="p-4 font-mono text-primary">6–10 kW</td>
+                <td class="p-4 text-muted">Uso noturno de energia solar</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Autoconsumo diário</td>
+                <td class="p-4 font-mono text-primary">15–20 kWh</td>
+                <td class="p-4 font-mono text-primary">8–12 kW</td>
+                <td class="p-4 text-muted">Maximizar o autoconsumo solar</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Backup para tempestades (1–2 dias)</td>
+                <td class="p-4 font-mono text-primary">15–30 kWh</td>
+                <td class="p-4 font-mono text-primary">8–12 kW</td>
+                <td class="p-4 text-muted">Cargas críticas em apagões</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Backup estendido (3–5 dias)</td>
+                <td class="p-4 font-mono text-primary">30–60 kWh</td>
+                <td class="p-4 font-mono text-primary">10–15 kW</td>
+                <td class="p-4 text-muted">Cargas críticas por vários dias</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Totalmente off-grid</td>
+                <td class="p-4 font-mono text-primary">40–80 kWh</td>
+                <td class="p-4 font-mono text-primary">10–20 kW</td>
+                <td class="p-4 text-muted">Todas as cargas domésticas, sem rede</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Calcule Sua Necessidade Exata de Bateria</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use a Calculadora de Dimensionamento de Bateria Solar para determinar o tamanho exato do banco para seu sistema solar com base no seu consumo e necessidades de backup.
+          </p>
+          <a href="/pt/tools/solar-battery-sizing-calculator/" class="btn-primary text-xs py-3 px-6 inline-block">Abrir Calculadora de Bateria Solar</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Ferramenta Relacionada</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Estime por quanto tempo sua bateria solar dura à noite ou em períodos nublados com a Calculadora de Autonomia.
+          </p>
+          <a href="/pt/tools/runtime-calculator/" class="btn-primary-outline text-xs py-3 px-6 inline-block">Abrir Calculadora de Autonomia</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Artigos Relacionados</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Como Dimensionar um Banco de Baterias Solar</h4>
+            <p class="text-body-sm text-muted mb-3">Passo a passo para dimensionar seu banco de baterias solares, da análise de consumo à seleção de bateria.</p>
+            <a href="/pt/learn/how-to-size-solar-battery-bank/" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Ler Guia →</a>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Planejamento de Bateria Off-Grid</h4>
+            <p class="text-body-sm text-muted mb-3">Guia completo para planejar sistemas de bateria para instalações solares off-grid.</p>
+            <a href="/pt/learn/off-grid-battery-planning/" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">Ler Guia →</a>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

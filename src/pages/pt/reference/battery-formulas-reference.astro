@@ -1,0 +1,152 @@
+---
+import ArticleLayout from '../../../layouts/ArticleLayout.astro';
+import ReferenceTable from '../../../components/ReferenceTable.astro';
+import ComparisonTable from '../../../components/ComparisonTable.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+
+const relatedCalculators = [
+  { title: 'Calculadora de Taxa C', href: '/pt/tools/c-rate-calculator/', type: 'calculator' as const },
+  { title: 'Calculadora de Queda de Tensão', href: '/pt/tools/voltage-drop-calculator/', type: 'calculator' as const },
+  { title: 'Calculadora de Autonomia', href: '/pt/tools/runtime-calculator/', type: 'calculator' as const },
+  { title: 'Calculadora de Dimensionamento de Bateria', href: '/pt/tools/battery-sizing-calculator/', type: 'calculator' as const },
+  { title: 'Calculadora de Perdas em Cabos CC', href: '/pt/tools/dc-cable-loss-calculator/', type: 'calculator' as const },
+  { title: 'Calculadora de Tempo de Carga', href: '/pt/tools/charging-time-calculator/', type: 'calculator' as const },
+];
+
+const relatedGuides = [
+  { title: 'Fórmula de Dimensionamento de Bateria', href: '/pt/learn/battery-sizing-formula/', type: 'guide' as const },
+  { title: 'Fórmula de Autonomia de Bateria', href: '/pt/learn/battery-runtime-formula/', type: 'guide' as const },
+  { title: 'Fórmula de Carregamento de Bateria', href: '/pt/learn/battery-charging-formula/', type: 'guide' as const },
+];
+
+const faqItems = [
+  {
+    question: 'Qual é a fórmula mais importante de bateria?',
+    answer: 'A fórmula fundamental é Energia (Wh) = Tensão (V) × Capacidade (Ah). Ela relaciona tensão, capacidade e energia total armazenada. A partir dela, você pode derivar autonomia (Autonomia = Ah ÷ Corrente da Carga), taxa C (Taxa C = Corrente ÷ Ah) e requisitos de dimensionamento. Dominar essa relação é a base de todos os cálculos de bateria.',
+  },
+  {
+    question: 'Como calculo a autonomia da bateria?',
+    answer: 'Autonomia (horas) = Capacidade da Bateria (Ah) ÷ Corrente da Carga (A). Para uma bateria de 200Ah alimentando uma carga de 25A: 200 ÷ 25 = 8 horas. Para cálculo baseado em energia: Autonomia (horas) = Energia da Bateria (Wh) × Eficiência do Sistema ÷ Potência da Carga (W). A eficiência do sistema é tipicamente 0.85–0.95 para lítio e 0.75–0.85 para chumbo-ácido.',
+  },
+  {
+    question: 'Como calculo a queda de tensão em um cabo?',
+    answer: 'Queda de Tensão (V) = (2 × L × I × R) / 1000, onde L é o comprimento de ida do cabo em pés, I é a corrente em ampères e R é a resistência em ohms por 1000 pés. Para métrico: VD = (2 × L × I × ρ) / A, onde L é o comprimento em metros, ρ é a resistividade (1.68×10⁻⁸ Ω·m para cobre) e A é a área da seção transversal em m².',
+  },
+  {
+    question: 'Como calculo a taxa C a partir da corrente e da capacidade?',
+    answer: 'Taxa C = Corrente (A) ÷ Capacidade (Ah). Uma bateria de 100Ah descarregada a 50A está a 0.5C. Para encontrar a corrente a partir da taxa C: Corrente = Taxa C × Capacidade. A 2C para uma bateria de 200Ah: 2 × 200 = 400A. A taxa C é adimensional e independe da tensão.',
+  },
+  {
+    question: 'Como converto entre Wh e Ah?',
+    answer: 'Para converter Wh em Ah: Ah = Wh ÷ Tensão. Uma bateria de 4,800Wh a 48V tem 100Ah de capacidade. Para converter Ah em Wh: Wh = Ah × Tensão. Uma bateria de 200Ah a 12V armazena 2,400Wh. A tensão é a ponte entre essas duas unidades.',
+  },
+  {
+    question: 'Qual fator de eficiência devo usar nos cálculos de bateria?',
+    answer: 'Use 0.90–0.95 para eficiência de ciclo completo de lítio (LFP/NMC). Use 0.75–0.85 para eficiência de ciclo completo de chumbo-ácido. Para eficiência de carga (energia que entra na bateria vs. energia que sai do carregador), use 0.98–1.00 para lítio e 0.80–0.90 para chumbo-ácido. A eficiência do inversor (CC para CA) é tipicamente 0.90–0.95 e deve ser aplicada separadamente.',
+  },
+];
+---
+
+<ArticleLayout
+  title="Referência de Fórmulas de Bateria | Calculadoras de Bateria"
+  description="Referência completa de todas as fórmulas essenciais de bateria: lei de Ohm, cálculo de taxa C, queda de tensão, dimensionamento de bateria, capacidade de energia, autonomia e fórmulas de carregamento com exemplos resolvidos."
+  canonical="https://batterycalculators.com/pt/reference/battery-formulas-reference/"
+  lang="pt"
+  category="REFERÊNCIA"
+  categoryHref="/pt/reference/"
+  breadcrumbItems={[{ label: 'Referência de Fórmulas de Bateria' }]}
+  relatedCalculators={relatedCalculators}
+  relatedGuides={relatedGuides}
+  faqItems={faqItems}
+>
+  <p class="text-body-md text-body font-light mb-8">
+    Todo cálculo de bateria é construído a partir de algumas fórmulas fundamentais. Esta referência consolida todas as equações essenciais de dimensionamento, autonomia, seleção de cabos, energia e carregamento em uma única tabela baixável. Use estas fórmulas junto com as calculadoras para um projeto preciso do sistema.
+  </p>
+
+  <ReferenceTable
+    lang="pt"
+    title="Fórmulas Principais de Bateria"
+    description="Equações fundamentais para cálculos de sistemas de baterias."
+    headers={['Nome da Fórmula', 'Equação', 'Unidades', 'Variáveis']}
+    rows={[
+      ['Capacidade de Energia', 'E = V × Ah', 'Wh ou kWh', 'V = tensão nominal, Ah = capacidade'],
+      ['Autonomia (horas)', 't = Ah ÷ I', 'horas', 'Ah = capacidade, I = corrente da carga (A)'],
+      ['Autonomia (baseada em energia)', 't = (E × η) ÷ P', 'horas', 'E = energia (Wh), η = eficiência, P = carga (W)'],
+      ['Taxa C', 'C = I ÷ Ah', 'adimensional', 'I = corrente (A), Ah = capacidade'],
+      ['Corrente a partir da Taxa C', 'I = C × Ah', 'Ampères (A)', 'C = taxa C, Ah = capacidade'],
+      ['Contagem de Coulombs', 'SOC = SOC₀ + (I × t / Ah) × 100', '%', 'SOC₀ = SOC inicial, I = corrente, t = tempo'],
+      ['Tensão de Circuito Aberto', 'OCV = V_min + (SOC × (V_max - V_min))', 'Volts (V)', 'V_min/max = limites de tensão'],
+    ]}
+    source="Fórmulas padrão de engenharia de baterias"
+  />
+
+  <ReferenceTable
+    lang="pt"
+    title="Fórmulas Elétricas (Lei de Ohm)"
+    description="Relações elétricas básicas usadas no projeto de sistemas de baterias."
+    headers={['Nome da Fórmula', 'Equação', 'Reorganizada', 'Caso de Uso']}
+    rows={[
+      ['Tensão', 'V = I × R', 'I = V ÷ R', 'Calcular a queda de tensão na resistência'],
+      ['Corrente', 'I = V ÷ R', 'V = I × R', 'Calcular a corrente a partir de tensão e resistência'],
+      ['Potência (CC)', 'P = V × I', 'I = P ÷ V', 'Calcular potência ou corrente da carga'],
+      ['Potência (resistiva)', 'P = I² × R', 'R = P ÷ I²', 'Calcular perda de potência nos cabos'],
+      ['Potência (baseada em tensão)', 'P = V² ÷ R', 'R = V² ÷ P', 'Calcular resistência a partir de tensão e potência'],
+      ['Energia', 'E = P × t', 'P = E ÷ t', 'Calcular energia a partir de potência e tempo'],
+      ['Energia (bateria)', 'E = V × Ah', 'Ah = E ÷ V', 'Converter entre Wh e Ah'],
+    ]}
+    source="Lei de Ohm, Leis de Kirchhoff"
+  />
+
+  <ReferenceTable
+    lang="pt"
+    title="Fórmulas de Cabos e Queda de Tensão"
+    description="Fórmulas para dimensionar cabos e calcular queda de tensão em sistemas CC."
+    headers={['Nome da Fórmula', 'Equação', 'Unidades', 'Observações']}
+    rows={[
+      ['Queda de Tensão (unidades EUA)', 'VD = (2 × L × I × R) / 1000', 'Volts (V)', 'L = comprimento de ida (ft), R = ohms/1000ft'],
+      ['Queda de Tensão (métrico)', 'VD = (2 × L × I × ρ) / A', 'Volts (V)', 'L = comprimento (m), ρ = 1.68×10⁻⁸, A = m²'],
+      ['Resistência do Cabo', 'R = (ρ × L) / A', 'Ohms (Ω)', 'ρ = resistividade, L = comprimento, A = área'],
+      ['Comprimento Máx. do Cabo', 'L = (VD_max × 1000) / (2 × I × R)', 'feet', 'Para uma queda de tensão máxima dada'],
+      ['Área Mín. do Cabo', 'A = (2 × L × I × ρ) / VD_max', 'm²', 'Seção transversal mínima para VD máx.'],
+    ]}
+    source="NEC Capítulo 9, IEC 60364"
+  />
+
+  <ComparisonTable
+    title="Guia de Seleção de Fórmulas por Tipo de Cálculo"
+    headers={['O Que Você Precisa', 'Fórmula Principal', 'Fórmula Secundária', 'Aplicação Típica']}
+    rows={[
+      ['Capacidade da bateria a partir da carga', 'Ah = (P × t) / (V × η)', 'E = P × t ÷ η', 'Dimensionar banco de baterias para autonomia'],
+      ['Autonomia a partir da bateria', 't = Ah ÷ I', 't = (V × Ah × η) ÷ P', 'Estimar tempo de funcionamento'],
+      ['Taxa C a partir da corrente', 'C = I ÷ Ah', 'I = C × Ah', 'Verificar limites de descarga'],
+      ['Queda de tensão no cabo', 'VD = (2 × L × I × R) / 1000', 'L = (VD × 1000) / (2 × I × R)', 'Dimensionar cabos para trechos CC'],
+      ['Energia a partir da capacidade', 'E = V × Ah', 'Ah = E ÷ V', 'Converter entre Wh e Ah'],
+      ['Tempo de carga', 't = Ah ÷ (C × Ah)', 't = Ah ÷ I_charge', 'Estimar duração da recarga'],
+      ['Potência a partir de tensão/corrente', 'P = V × I', 'I = P ÷ V', 'Calcular carga ou corrente'],
+      ['Número de painéis', 'N = (E_daily) / (W_panel × PSH × η)', 'Array = E_daily ÷ (PSH × η)', 'Dimensionar arranjo solar'],
+      ['Capacidade em paralelo', 'Ah_total = Ah_cell × N_parallel', 'Np = Ah_target ÷ Ah_cell', 'Montar capacidade a partir de células'],
+      ['Tensão em série', 'V_total = V_cell × N_series', 'Ns = V_target ÷ V_cell', 'Montar tensão a partir de células'],
+    ]}
+    highlightCol={1}
+    caption="η = eficiência do sistema (0.85–0.95 para lítio, 0.75–0.85 para chumbo-ácido)"
+  />
+
+  <ReferenceTable
+    lang="pt"
+    title="Conversões Comuns de Unidades"
+    description="Fatores de conversão rápida para cálculos de engenharia de baterias."
+    headers={['De', 'Para', 'Multiplicar Por', 'Exemplo']}
+    rows={[
+      ['Ah → Wh', 'Wh', 'Tensão (V)', '100Ah × 12V = 1,200Wh'],
+      ['Wh → Ah', 'Ah', '÷ Tensão (V)', '2,400Wh ÷ 24V = 100Ah'],
+      ['Wh → kWh', 'kWh', '÷ 1,000', '4,800Wh ÷ 1,000 = 4.8kWh'],
+      ['kWh → Wh', 'Wh', '× 1,000', '5kWh × 1,000 = 5,000Wh'],
+      ['W → kW', 'kW', '÷ 1,000', '2,500W ÷ 1,000 = 2.5kW'],
+      ['Ah → Coulombs', 'C', '× 3,600', '100Ah × 3,600 = 360,000C'],
+      ['C → Ah', 'Ah', '÷ 3,600', '360,000C ÷ 3,600 = 100Ah'],
+      ['kW → HP', 'HP', '× 1.341', '5kW × 1.341 = 6.7 HP'],
+      ['BTU/h → W', 'W', '÷ 3.412', '10,000 BTU/h ÷ 3.412 = 2,931W'],
+    ]}
+    source="Conversões padrão de unidades de engenharia"
+  />
+</ArticleLayout>

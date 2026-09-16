@@ -1,0 +1,306 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "De quantas baterias preciso para van life?",
+    answer: "Depende do seu consumo diário e de quanto tempo quer ficar off-grid. Uma configuração típica de van life com geladeira, iluminação, bomba de água, carga de dispositivos e notebook usa 1.500-3.000 Wh por dia. Para 2 dias de autonomia sem solar, você precisa de 200-400Ah de capacidade LFP. Com 200W de solar, muitas vezes dá para usar um banco menor.",
+  },
+  {
+    question: "Preciso de painéis solares para van life?",
+    answer: "Painéis solares não são estritamente obrigatórios, mas são altamente recomendados. Eles recarregam sua bateria durante o dia, estendendo sua capacidade off-grid indefinidamente. Um painel de 200W gera 800-1.000 Wh por dia em boas condições. Sem solar, você depende apenas de carga pelo alternador e energia de cais.",
+  },
+  {
+    question: "Qual é a melhor química de bateria para van life?",
+    answer: "Lítio LFP (LiFePO4) é a melhor escolha para van life. Oferece 80-90% de capacidade utilizável (contra 50% do chumbo-ácido), pesa 50-70% menos, carrega mais rápido e dura 3.000+ ciclos. O maior custo inicial se paga em 2-3 anos de uso regular em comparação a repor baterias de chumbo-ácido repetidamente.",
+  },
+  {
+    question: "Como carrego minhas baterias de van life?",
+    answer: "Três métodos principais: painéis solares (controlador de carga MPPT), carga pelo alternador dirigindo (carregador DC-DC) e energia de cais em campings ou casas (carregador CA). Um sistema completo de van life normalmente inclui as três fontes de carga para máxima flexibilidade.",
+  },
+];
+---
+
+<Layout
+  title="Planejamento de Bateria para Van Life | Calculadoras de Bateria"
+  description="Guia completo de planejamento de bateria para van life: inventário de cargas, cálculo de consumo diário, estratégia de carga solar, dimensionamento de bateria e arquitetura do sistema para vida off-grid."
+  canonical="https://batterycalculators.com/pt/learn/van-life-battery-planning/"
+  schema="faqPage"
+  schemaName="Planejamento de Bateria para Van Life"
+  schemaDescription="Guia completo de planejamento de bateria para van life."
+  schemaUrl="https://batterycalculators.com/pt/learn/van-life-battery-planning/"
+  faqItems={faqItems}
+  lang="pt"
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/pt/learn/" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← Voltar aos Guias</a>
+      <Breadcrumb items={[
+        { label: "Centro de Aprendizagem", href: "/pt/learn/" },
+        { label: "Planejamento de Bateria para Van Life" },
+      ]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">RV E CAMPER</span>
+      <h1 class="text-display-md text-primary mb-6">Planejamento de Bateria para Van Life</h1>
+      <p class="text-body-md text-body font-light">
+        O planejamento de bateria é a base de uma van funcional para van life. Sem energia confiável, você não consegue operar geladeira, carregar dispositivos, bombear água ou usar iluminação à noite. Este guia percorre o processo completo de engenharia — do inventário de cargas à carga solar até a arquitetura final do sistema — para que seu sistema elétrico de van life funcione com confiabilidade por anos na estrada.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Etapa 1: Monte um Inventário de Cargas</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Todo sistema elétrico de van life começa com um inventário completo de cada dispositivo que vai consumir energia. Percorra sua van do banco do motorista às portas traseiras e anote cada dispositivo elétrico: luzes, ventilador, geladeira, bomba, tomadas, portas USB, inversores e itens especiais como controlador de aquecedor a diesel ou maxxfan. Registre a potência de cada dispositivo em watts e estime o tempo diário de operação em horas.
+        </p>
+        <p class="text-body-md text-body font-light mb-6">
+          O erro mais comum é subestimar o tempo de uso. A geladeira funciona 24 horas por dia embora o compressor ligue e desligue. As luzes são usadas mais do que se imagina — normalmente 4-6 horas por noite. A carga de celulares e dispositivos acontece diariamente. Seja conservador nas estimativas; é melhor superdimensionar um pouco o sistema do que ficar sem energia em um dia chuvoso sem solar.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Dispositivo</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Potência (W)</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Uso Diário (h)</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Energia (Wh)</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">Geladeira 12V</td>
+                <td class="p-4 font-mono text-primary">45</td>
+                <td class="p-4 font-mono text-primary">24 (ciclos)</td>
+                <td class="p-4 font-mono text-primary">1,080</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Luzes LED (x6)</td>
+                <td class="p-4 font-mono text-primary">3 cada</td>
+                <td class="p-4 font-mono text-primary">5</td>
+                <td class="p-4 font-mono text-primary">90</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Maxxfan / exaustor de teto</td>
+                <td class="p-4 font-mono text-primary">10</td>
+                <td class="p-4 font-mono text-primary">8</td>
+                <td class="p-4 font-mono text-primary">80</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Bomba de água</td>
+                <td class="p-4 font-mono text-primary">6</td>
+                <td class="p-4 font-mono text-primary">0.3</td>
+                <td class="p-4 font-mono text-primary">1.8</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Carga de dispositivos USB</td>
+                <td class="p-4 font-mono text-primary">20</td>
+                <td class="p-4 font-mono text-primary">3</td>
+                <td class="p-4 font-mono text-primary">60</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Notebook</td>
+                <td class="p-4 font-mono text-primary">45</td>
+                <td class="p-4 font-mono text-primary">4</td>
+                <td class="p-4 font-mono text-primary">180</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Controlador do aquecedor a diesel</td>
+                <td class="p-4 font-mono text-primary">1</td>
+                <td class="p-4 font-mono text-primary">12</td>
+                <td class="p-4 font-mono text-primary">12</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Detector de CO / propano</td>
+                <td class="p-4 font-mono text-primary">0.5</td>
+                <td class="p-4 font-mono text-primary">24</td>
+                <td class="p-4 font-mono text-primary">12</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Etapa 2: Calcular o Consumo Diário</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Some todos os valores de energia dos dispositivos do seu inventário para obter o consumo diário total em watt-horas. Para cargas CA que passam por inversor, adicione 10-15% para considerar perdas de conversão. O resultado é a quantidade de energia que seu sistema de baterias deve armazenar ou que seu sistema solar deve gerar a cada dia.
+        </p>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Exemplo resolvido:</strong> Usando o inventário de cargas acima.</p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li>Cargas DC (geladeira, luzes, ventilador, bomba, USB): 1,252 Wh</li>
+              <li>Cargas CA (notebook): 180 Wh x 1.12 (perda do inversor) = 202 Wh</li>
+              <li>Sempre ligadas (controlador do aquecedor, detector): 24 Wh</li>
+            </ul>
+            <p class="pt-2 border-t border-hairline"><strong>Consumo diário total:</strong> <span class="font-mono text-primary">1,478 Wh/dia</span></p>
+            <p class="text-xs text-muted">Este é um perfil moderado de carga para van life. Adicionar itens de alto consumo como cooktop por indução, cafeteira ou aquecedor elétrico aumentaria significativamente o consumo.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <FormulaBox title="Fórmulas de Dimensionamento para Van Life">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Bateria Necessária (Wh) = Consumo Diário (Wh) x Dias de Autonomia / DoD
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Ah da Bateria = Bateria Necessária (Wh) / Tensão do Sistema
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          Solar Necessário (W) = (Consumo Diário - Entrada do Alternador) / Horas de Sol Pleno
+        </div>
+        <p>
+          Dias de autonomia é o número de dias que você quer ficar off-grid sem nenhuma entrada de carga. Para viagens de fim de semana, 1-2 dias é típico. Para van life em tempo integral, 0,5-1 dia combinado com carga solar ou do alternador diária é a abordagem padrão.
+        </p>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Etapa 3: Estratégia de Carga Solar</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Painéis solares convertem luz solar em energia elétrica que recarrega sua bateria durante o dia. A quantidade de energia gerada depende da potência dos painéis, exposição ao sol, ângulo e clima. Em condições ideais, um painel de 200W gera 800-1.000 Wh por dia — suficiente para compensar a maior parte do consumo de van life. Na prática, espere 500-800 Wh por dia de um arranjo de 200W no teto.
+        </p>
+        <p class="text-body-md text-body font-light mb-6">
+          O princípio-chave de projeto é combinar seu arranjo solar com seu consumo diário. Se você consome 1.500 Wh por dia e seu solar gera 800 Wh, tem um déficit diário de 700 Wh que deve vir da bateria. Com uma bateria de 200Ah (2.040 Wh utilizáveis), você sustenta esse déficit por aproximadamente 3 dias antes de esgotar a bateria. Essa é sua autonomia off-grid.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Arranjo Solar</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Produção Diária</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Cobre</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">100W</td>
+                <td class="p-4 font-mono text-primary">400 - 500 Wh</td>
+                <td class="p-4 text-muted">Luzes, ventiladores, carga de dispositivos</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">200W</td>
+                <td class="p-4 font-mono text-primary">800 - 1,000 Wh</td>
+                <td class="p-4 text-muted">Geladeira + maioria das cargas diárias</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">300W</td>
+                <td class="p-4 font-mono text-primary">1,200 - 1,500 Wh</td>
+                <td class="p-4 text-muted">Perfil completo de van life</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">400W+</td>
+                <td class="p-4 font-mono text-primary">1,600 - 2,000 Wh</td>
+                <td class="p-4 text-muted">Configurações de alto consumo com cooktop</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Etapa 4: Dimensionamento da Bateria</h2>
+        <p class="text-body-md text-body font-light mb-6">
+          A capacidade da bateria deve cobrir seu consumo diário pelo número desejado de dias de autonomia. Para van life em tempo integral com carga solar e do alternador, um banco LFP de 200-400Ah a 12V é a faixa padrão. Para quem viaja só nos fins de semana sem solar, 300-500Ah oferece margem confortável.
+        </p>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>Exemplo resolvido:</strong> Van life em tempo integral, 1,478 Wh/dia, 1 dia de autonomia.</p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li>Consumo diário: 1,478 Wh</li>
+              <li>Autonomia: 1 dia</li>
+              <li>Bateria: LFP (85% de DoD)</li>
+              <li>Tensão do sistema: 12V</li>
+            </ul>
+            <p><strong>Etapa 1:</strong> Calcular o total de bateria necessário:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              1,478 x 1 / 0.85 = 1,739 Wh
+            </div>
+            <p><strong>Etapa 2:</strong> Converter para ampères-horas:</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              1,739 / 12 = 145 Ah
+            </div>
+            <p><strong>Recomendação:</strong> Uma bateria LFP de 200Ah oferece 2.040 Wh utilizáveis — suficiente para 1,4 dias deste perfil de carga. Para 2 dias de autonomia, migre para 300Ah. Com 200W de solar gerando ~800 Wh/dia, um banco de 200Ah sustenta o déficit diário de 678 Wh por aproximadamente 3 dias.</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Etapa 5: Arquitetura do Sistema</h2>
+        <p class="text-body-md text-body font-light mb-6">
+          Um sistema elétrico completo de van life inclui bateria, fontes de carga, cargas e monitoramento. A arquitetura do sistema determina como esses componentes se conectam e interagem. A configuração mais comum para uma van 12V usa um sistema único baseado em barramento com entradas paralelas de carga.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Banco de Baterias</h4>
+            <p class="text-body-sm text-muted">
+              Baterias LFP 12V ligadas em paralelo para capacidade. Um banco de 200Ah (duas unidades de 100Ah) oferece redundância — se uma bateria falhar, a outra ainda alimenta cargas essenciais. Use um monitor de bateria para acompanhar o estado de carga.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Solar + MPPT</h4>
+            <p class="text-body-sm text-muted">
+              Painéis solares no teto conectados a um controlador de carga MPPT. O controlador regula a tensão e maximiza a captação de energia. Dimensione o controlador para 1,25x a potência do seu arranjo solar.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Carregador DC-DC</h4>
+            <p class="text-body-sm text-muted">
+              Carrega a bateria residencial a partir do alternador dirigindo. Essencial para van life — uma viagem de 30 minutos pode adicionar 200-400 Wh. Use um carregador DC-DC (não um relé simples) para regular a entrada do alternador e proteger ambas as baterias.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Inversor + Distribuição</h4>
+            <p class="text-body-sm text-muted">
+              Um inversor de onda senoidal pura para cargas CA (notebook, pequenos aparelhos). Painel de distribuição DC com fusíveis para todas as cargas 12V. Identifique cada circuito para facilitar a solução de problemas na estrada.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Experimente</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use a Calculadora de Bateria para RV para dimensionar um sistema completo de van life com base no seu inventário específico de cargas.
+          </p>
+          <a href="/pt/tools/rv-battery-calculator/" class="btn-primary text-xs py-3 px-6 inline-block">Abrir Calculadora de Bateria para RV</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Ferramenta Relacionada</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Use a Calculadora de Dimensionamento de Bateria Solar para combinar seu arranjo solar e banco de baterias para desempenho off-grid ideal.
+          </p>
+          <a href="/pt/tools/solar-battery-sizing-calculator/" class="btn-primary-outline text-xs py-3 px-6 inline-block">Abrir Calculadora de Bateria Solar</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Artigos Relacionados</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <a href="/pt/learn/camper-battery-runtime-guide/" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors mb-2 block">
+              Guia de Autonomia de Bateria para Camper
+            </a>
+            <p class="text-body-sm text-muted">
+              Detalhamento do consumo de cargas de camper e estimativas de autonomia para cenários comuns de acampamento.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <a href="/pt/learn/how-many-batteries-for-rv/" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors mb-2 block">
+              Quantas Baterias para RV
+            </a>
+            <p class="text-body-sm text-muted">
+              Explica como determinar o número exato de baterias para seu RV com base em padrões de uso e consumo.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

@@ -1,0 +1,344 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "O que é um sistema de armazenamento de energia em embarcação?",
+    answer: "Um sistema de armazenamento de energia em embarcação (VESS) é uma instalação de baterias de padrão marítimo integrada ao sistema de gerenciamento de energia da embarcação para armazenar, fornecer e gerenciar energia elétrica. Suporta propulsão, cargas hoteleiras e modos operacionais incluindo corte de pico, nivelamento de carga, operação zero emissão no porto e propulsão híbrida diesel-elétrica.",
+  },
+  {
+    question: "Qual química de bateria é usada no armazenamento marítimo de energia?",
+    answer: "O fosfato de ferro-lítio (LFP) é a química dominante para armazenamento marítimo de energia devido à sua estabilidade térmica, longa vida útil (4.000–6.000 ciclos) e perfil de segurança. O LFP não entra em fuga térmica, sendo a escolha preferida para certificação por sociedades classificadoras. A química NMC oferece maior densidade energética, mas é menos comum em aplicações marítimas devido aos requisitos de gerenciamento térmico.",
+  },
+  {
+    question: "Como sistemas marítimos de bateria diferem dos terrestres?",
+    answer: "Sistemas marítimos de bateria devem suportar vibração, umidade, ar salino e extremos de temperatura. Exigem certificação por sociedade classificadora (DNV, Lloyd's Register, Bureau Veritas), supressão de incêndio de padrão marítimo, projeto compartimentalizado e integração com o sistema de gerenciamento de energia da embarcação. Restrições de peso e volume são mais críticas no mar que em terra.",
+  },
+  {
+    question: "Qual é a vida útil típica de um sistema marítimo de baterias?",
+    answer: "Sistemas marítimos de bateria LFP normalmente têm vida útil de 8–15 anos, dependendo das condições operacionais, profundidade de descarga e gerenciamento térmico. A maioria dos sistemas é projetada para 4.000–6.000 ciclos completos de carga-descarga. Sistemas de gerenciamento otimizam os perfis de carga/descarga para maximizar a vida útil.",
+  },
+  {
+    question: "Quanto pesam os sistemas marítimos de bateria?",
+    answer: "Sistemas marítimos de bateria LFP têm densidade energética gravimétrica de aproximadamente 150–180 Wh/kg no nível do pack. Um sistema de 1 MWh pesa aproximadamente 5.500–6.700 kg. Peso e distribuição de peso são considerações críticas de projeto — particularmente para balsas e embarcações offshore onde as margens de estabilidade são apertadas.",
+  },
+];
+---
+
+<Layout
+  title="Sistemas de Armazenamento de Energia em Embarcações Explicados | Calculadoras de Bateria"
+  description="Guia técnico de sistemas marítimos de armazenamento em bateria cobrindo arquitetura, química LFP vs NMC, integração marítima, considerações de peso e volume, sistemas de segurança e visão geral do BMS."
+  canonical="https://batterycalculators.com/pt/learn/vessel-energy-storage-systems-explained/"
+  schema="faqPage"
+  schemaName="Sistemas de Armazenamento de Energia em Embarcações Explicados"
+  schemaDescription="Guia técnico de sistemas marítimos de armazenamento em bateria cobrindo arquitetura, química LFP vs NMC, integração marítima, considerações de peso e volume, sistemas de segurança e visão geral do BMS."
+  schemaUrl="https://batterycalculators.com/pt/learn/vessel-energy-storage-systems-explained/"
+  faqItems={faqItems}
+  lang="pt"
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/pt/learn/" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">&larr; Voltar aos Guias</a>
+      <Breadcrumb items={[{ label: "Centro de Aprendizagem", href: "/pt/learn/" }, { label: "Sistemas de Armazenamento de Energia Explicados" }]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">MARÍTIMO</span>
+      <h1 class="text-display-md text-primary mb-6">Sistemas de Armazenamento de Energia em Embarcações Explicados</h1>
+      <p class="text-body-md text-body font-light">
+        Sistemas de armazenamento de energia são a tecnologia habilitadora da eletrificação marítima. Seja operando em modo híbrido diesel-elétrico ou totalmente elétrico a bateria, o sistema de baterias determina desempenho, segurança e economia. Este guia cobre a arquitetura técnica, seleção de química, requisitos de integração e considerações de segurança que definem os sistemas marítimos de armazenamento de energia.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section id="architecture">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Arquitetura da Bateria</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Sistemas marítimos de bateria são construídos a partir de células individuais organizadas em arquitetura hierárquica: células agrupadas em módulos, módulos em racks e racks em um contêiner completo de baterias. Cada nível inclui monitoramento, balanceamento e sistemas de segurança.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Nível</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Descrição</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Componentes</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">Célula</td>
+                <td class="p-4 text-muted">Unidade eletroquímica básica — prismática, pouch ou cilíndrica</td>
+                <td class="p-4 text-muted">Conjunto de eletrodos LFP ou NMC</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Módulo</td>
+                <td class="p-4 text-muted">Grupo de células em série/paralelo com monitoramento local</td>
+                <td class="p-4 text-muted">Barramentos, sensores de tensão, sensores de temperatura</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Rack</td>
+                <td class="p-4 text-muted">Módulos empilhados com BMS de nível de módulo</td>
+                <td class="p-4 text-muted">BMS do módulo, contatores, fusíveis, refrigeração</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Contêiner</td>
+                <td class="p-4 text-muted">Sistema completo — contêiner ISO de 20 ou 40 pés</td>
+                <td class="p-4 text-muted">BMS do pack, supressão de incêndio, HVAC, interface PMS</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-body-md text-body font-light mb-4 mt-4">
+          Contêineres marítimos de bateria são normalmente configurados como contêineres ISO de 20 pés (para instalações menores de 500 kWh–2 MWh) ou 40 pés (para instalações maiores de 2–10 MWh). Vários contêineres podem ser ligados em paralelo para instalações acima de 10 MWh. A abordagem conteinerizada simplifica instalação, manutenção e certificação de classificação.
+        </p>
+      </section>
+
+      <section id="lfp-vs-nmc">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">LFP vs NMC: Seleção de Química</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          As duas químicas dominantes de íon-lítio para armazenamento marítimo de energia são fosfato de ferro-lítio (LFP, LiFePO₄) e níquel manganês cobalto (NMC, LiNiMnCoO₂). Cada uma tem características distintas que influenciam a adequação para diferentes aplicações marítimas.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Parâmetro</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">LFP</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">NMC</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">Densidade de energia</td>
+                <td class="p-4 font-mono text-primary">90–120 Wh/kg (célula)</td>
+                <td class="p-4 font-mono text-primary">150–220 Wh/kg (célula)</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Vida útil em ciclos</td>
+                <td class="p-4 font-mono text-primary">4,000–6,000 ciclos</td>
+                <td class="p-4 font-mono text-primary">1,000–3,000 ciclos</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Estabilidade térmica</td>
+                <td class="p-4 font-mono text-primary">Excelente — sem fuga térmica</td>
+                <td class="p-4 font-mono text-primary">Moderada — exige refrigeração ativa</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Vida de calendário</td>
+                <td class="p-4 font-mono text-primary">15–20 anos</td>
+                <td class="p-4 font-mono text-primary">8–12 anos</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Custo por kWh</td>
+                <td class="p-4 font-mono text-primary">Menor ($150–250/kWh pack)</td>
+                <td class="p-4 font-mono text-primary">Maior ($200–350/kWh pack)</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Classificação marítima</td>
+                <td class="p-4 font-mono text-primary">Preferido — amplamente certificado</td>
+                <td class="p-4 font-mono text-primary">Certificado com requisitos térmicos adicionais</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Ideal para</td>
+                <td class="p-4 text-muted">Balsas, embarcações portuárias, offshore, cruzeiros — maioria das aplicações marítimas</td>
+                <td class="p-4 text-muted">Aplicações críticas em peso (balsas rápidas, embarcações de transferência de tripulação)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-body-md text-body font-light mb-4 mt-4">
+          O LFP é a química dominante para armazenamento marítimo de energia porque sua estabilidade térmica elimina o risco de fuga térmica — a principal preocupação de segurança para instalações marítimas de bateria. As sociedades classificadoras geralmente exigem medidas adicionais de segurança para instalações NMC, incluindo monitoramento térmico reforçado, compartimentalização e supressão de incêndio mais sofisticada.
+        </p>
+      </section>
+
+      <section id="marine-integration">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Integração Marítima</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Integrar um sistema de baterias à arquitetura elétrica de uma embarcação exige engenharia cuidadosa para garantir operação confiável, segurança e compatibilidade com sistemas existentes. As principais considerações de integração incluem:
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Arquitetura de Barramento DC</h4>
+            <p class="text-body-sm text-muted">
+              A maioria dos sistemas marítimos de bateria conecta-se a um barramento DC que interage com geradores diesel, energia de cais, acionamentos de propulsão e distribuição de cargas hoteleiras através de conversores DC-DC. A topologia de barramento DC permite comutação contínua de fontes e gerenciamento ideal do fluxo de energia.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Sistema de Gerenciamento de Energia</h4>
+            <p class="text-body-sm text-muted">
+              O BMS do sistema de baterias comunica-se com o sistema de gerenciamento de energia (PMS) da embarcação para coordenar carga/descarga, gerenciar a divisão de carga entre geradores e baterias e implementar modos operacionais (corte de pico, só elétrico, boost híbrido).
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Seleção de Tensão</h4>
+            <p class="text-body-sm text-muted">
+              Sistemas marítimos de bateria normalmente operam em 600–1500V DC. Tensões maiores reduzem a corrente para a mesma potência, permitindo seções menores de cabo e menores perdas. A tensão do sistema deve ser compatível com as especificações do quadro da embarcação e dos acionamentos de propulsão.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Sistemas de Carregamento</h4>
+            <p class="text-body-sm text-muted">
+              O carregamento a partir de energia de cais, geradores ou fontes regenerativas exige perfis controlados (CC-CV para lítio) gerenciados pelo BMS. Potência de carga, limites de tensão e limites de corrente são específicos da química e dependentes da temperatura.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <section id="weight-volume">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Considerações de Peso e Volume</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          Peso e volume são restrições críticas para instalações marítimas de bateria. Ao contrário de sistemas terrestres onde o espaço é relativamente abundante, embarcações têm orçamentos rígidos de deslocamento e estabilidade. A localização das baterias afeta trim, estabilidade e carregamento estrutural.
+        </p>
+
+        <FormulaBox title="Estimativa de Peso e Volume da Bateria">
+          <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+            Peso da Bateria (kg) = Capacidade (kWh) / Densidade Energética do Pack (Wh/kg)
+          </div>
+          <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+            Volume da Bateria (L) = Capacidade (kWh) / Densidade Volumétrica do Pack (Wh/L)
+          </div>
+          <p>
+            Densidades típicas de pack LFP marítimo: 120–160 Wh/kg (gravimétrica) e 200–300 Wh/L (volumétrica). Um sistema de 2 MWh pesa aproximadamente 12.500–16.700 kg e ocupa aproximadamente 6.700–10.000 litros — equivalente a um contêiner ISO de 20 pés.
+          </p>
+        </FormulaBox>
+
+        <p class="text-body-md text-body font-light mb-4 mt-4">
+          A localização das baterias na embarcação é crítica para a estabilidade. Baterias são normalmente instaladas abaixo da linha d'água em salas ou compartimentos dedicados, com reforço estrutural para suportar o peso concentrado. O arquiteto naval deve verificar que a instalação não exceda margens de estabilidade, limites estruturais ou requisitos de subdivisão.
+        </p>
+      </section>
+
+      <section id="safety-systems">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Sistemas de Segurança</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          A segurança de baterias marítimas é tratada com uma abordagem abrangente em camadas exigida pelas sociedades classificadoras. A arquitetura de segurança cobre química das células, gerenciamento térmico, prevenção, detecção e supressão de incêndio e procedimentos da tripulação.
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Camada de Segurança</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">Finalidade</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">Química LFP</td>
+                <td class="p-4 text-muted">Estabilidade térmica inerente — sem fuga térmica</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Sistema de Gerenciamento de Bateria</td>
+                <td class="p-4 text-muted">Monitoramento em tempo real de tensão, temperatura, corrente; balanceamento; detecção e isolamento de falhas</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Gerenciamento térmico</td>
+                <td class="p-4 text-muted">Refrigeração líquida ou a ar para manter a faixa ideal de temperatura operacional</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Compartimentalização</td>
+                <td class="p-4 text-muted">Compartimentos com classificação contra fogo isolam módulos para evitar eventos em cascata</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Detecção de incêndio</td>
+                <td class="p-4 text-muted">Sensores de fumaça, gás (emanação do eletrólito) e térmicos</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Supressão de incêndio</td>
+                <td class="p-4 text-muted">Supressão automática (névoa de água, agente limpo) conforme regras de classificação</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Ventilação</td>
+                <td class="p-4 text-muted">Ventilação dedicada para remover emanações e manter a qualidade do ar</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Desconexão de emergência</td>
+                <td class="p-4 text-muted">Isolamento remoto e local da bateria do sistema elétrico da embarcação</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="bms-overview">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Visão Geral do BMS</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          O Sistema de Gerenciamento de Bateria (BMS) é o controlador inteligente que monitora, protege e otimiza o pack. Opera em vários níveis — célula, módulo, rack e pack — e interage com o sistema de gerenciamento de energia da embarcação para coordenar o fluxo de energia.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Funções de Monitoramento</h4>
+            <ul class="flex flex-col gap-1 text-body-sm text-muted">
+              <li>• Medição individual de tensão das células</li>
+              <li>• Monitoramento de temperatura de módulos e racks</li>
+              <li>• Sensoriamento de corrente do pack (carga e descarga)</li>
+              <li>• Cálculo do estado de carga (SOC)</li>
+              <li>• Acompanhamento do estado de saúde (SOH)</li>
+              <li>• Monitoramento de resistência de isolamento</li>
+            </ul>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">Funções de Proteção</h4>
+            <ul class="flex flex-col gap-1 text-body-sm text-muted">
+              <li>• Proteção contra sobrecarga e sobredescarga</li>
+              <li>• Limitação e desconexão por sobrecorrente</li>
+              <li>• Desligamento por sobretemperatura</li>
+              <li>• Balanceamento de células (passivo ou ativo)</li>
+              <li>• Isolamento de falhas e desconexão de módulos</li>
+              <li>• Comunicação com o PMS da embarcação</li>
+            </ul>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Experimente</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Determine a capacidade ideal de armazenamento de energia para sua embarcação com a Calculadora de Armazenamento de Energia.
+          </p>
+          <a href="/pt/tools/vessel-energy-storage-calculator/" class="btn-primary text-xs py-3 px-6 inline-block">Abrir Calculadora de Armazenamento da Embarcação</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">Experimente</h4>
+          <p class="text-body-sm text-muted mb-4">
+            Dimensione o banco de baterias para as cargas hoteleiras e requisitos operacionais da sua embarcação.
+          </p>
+          <a href="/pt/tools/marine-battery-sizing-calculator/" class="btn-primary text-xs py-3 px-6 inline-block">Abrir Calculadora de Bateria Marítima</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">Artigos Relacionados</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <a href="/pt/learn/what-is-marine-electrification/" class="text-primary hover:underline font-bold block mb-2">O Que É Eletrificação Marítima?</a>
+            <p class="text-body-sm text-muted">
+              Visão geral das tecnologias de eletrificação marítima e o papel dos sistemas de armazenamento de energia.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <a href="/pt/learn/hybrid-propulsion-systems-explained/" class="text-primary hover:underline font-bold block mb-2">Sistemas de Propulsão Híbrida Explicados</a>
+            <p class="text-body-sm text-muted">
+              Como o armazenamento de energia se integra às arquiteturas de propulsão híbrida diesel-elétrica.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <a href="/pt/learn/battery-electric-ferries-explained/" class="text-primary hover:underline font-bold block mb-2">Balsas Elétricas a Bateria Explicadas</a>
+            <p class="text-body-sm text-muted">
+              Considerações de projeto de armazenamento de energia específicas para eletrificação de balsas de rotas curtas.
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <a href="/pt/marine/" class="text-primary hover:underline font-bold block mb-2">Centro de Eletrificação Marítima</a>
+            <p class="text-body-sm text-muted">
+              Explore todas as calculadoras, ferramentas e recursos marítimos para o planejamento de descarbonização de embarcações.
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>
