@@ -1,14 +1,27 @@
 name: Weekly Battery News
 
 on:
-  schedule:
-    - cron: '0 10 * * 5' # Every Friday at 10:00 UTC
-  workflow_dispatch: # Allow manual trigger
+  # Cron trigger DISABLED — news publishing is now manual-only.
+  # To generate a draft locally: npm run news:generate -- --year YYYY --week NN
+  # To publish: review files, translate to PT/ZH, then push to trigger Cloudflare deploy.
+  # schedule:
+  #   - cron: '0 10 * * 5'
+  workflow_dispatch:
+    inputs:
+      year:
+        description: 'Year (e.g. 2026)'
+        required: false
+        default: ''
+      week:
+        description: 'ISO week number (e.g. 39)'
+        required: false
+        default: ''
 
 jobs:
-  generate-and-deploy:
+  generate-draft:
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 10
 
     permissions:
       contents: write
@@ -29,39 +42,26 @@ jobs:
       - name: Determine week number
         id: week
         run: |
-          YEAR=$(date -u +%Y)
-          WEEK=$(date -u +%V)
+          if [ -n "${{ github.event.inputs.year }}" ] && [ -n "${{ github.event.inputs.week }}" ]; then
+            YEAR="${{ github.event.inputs.year }}"
+            WEEK="${{ github.event.inputs.week }}"
+          else
+            YEAR=$(date -u +%Y)
+            WEEK=$(date -u +%V)
+          fi
           echo "year=$YEAR" >> "$GITHUB_OUTPUT"
           echo "week=$WEEK" >> "$GITHUB_OUTPUT"
-          echo "Generating news for Year=$YEAR Week=$WEEK"
+          echo "Generating draft for Year=$YEAR Week=$WEEK"
 
-      - name: Generate weekly article
+      - name: Generate draft article
         run: node scripts/generate-weekly-battery-news.mjs --year ${{ steps.week.outputs.year }} --week ${{ steps.week.outputs.week }}
 
-      - name: Check for new file
-        id: changes
-        run: |
-          FILE="src/pages/news/battery-industry-weekly-${{ steps.week.outputs.year }}-week-${{ steps.week.outputs.week }}.astro"
-          if [ -f "$FILE" ]; then
-            echo "exists=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "exists=false" >> "$GITHUB_OUTPUT"
-          fi
+      - name: Validate news
+        run: node scripts/validate-news.mjs
 
-      - name: Commit new article
-        if: steps.changes.outputs.exists == 'true'
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add "src/pages/news/battery-industry-weekly-${{ steps.week.outputs.year }}-week-${{ steps.week.outputs.week }}.astro"
-          git commit -m "news: add battery industry weekly ${{ steps.week.outputs.year }} week ${{ steps.week.outputs.week }}" || echo "No changes to commit"
-          git push
-
-      - name: Build site
-        run: npm run build
-
-      - name: Deploy to Cloudflare
-        run: npm run deploy
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: news-draft-week-${{ steps.week.outputs.week }}
+          path: src/pages/news/battery-industry-weekly-${{ steps.week.outputs.year }}-week-${{ steps.week.outputs.week }}.astro
+          retention-days: 7

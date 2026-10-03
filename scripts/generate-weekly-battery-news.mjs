@@ -483,13 +483,22 @@ async function main() {
   // Fetch RSS feeds
   console.log('📡 Fetching RSS feeds...');
   let allStories = [];
+  let failedFeeds = 0;
 
   for (const feed of sources.rssFeeds) {
     const items = await fetchRSSFeed(feed);
     if (items.length > 0) {
       console.log(`  ✓ ${feed.name}: ${items.length} items`);
+    } else {
+      failedFeeds++;
     }
     allStories.push(...items);
+  }
+
+  if (failedFeeds > sources.rssFeeds.length / 2) {
+    console.log(`\n⚠ WARNING: ${failedFeeds}/${sources.rssFeeds.length} RSS feeds failed.`);
+    console.log('  The generated article may have low quality or placeholder content.');
+    console.log('  Review carefully before publishing.');
   }
 
   // Add manual sources
@@ -552,6 +561,7 @@ async function main() {
 
   if (topStories.length === 0) {
     console.log('\n⚠ No stories could be fetched. Generating draft with placeholder content.');
+    console.log('  WARNING: This article needs manual review before publishing.');
     // Generate minimal placeholder stories
     for (let i = 0; i < 3; i++) {
       topStories.push({
@@ -582,6 +592,10 @@ async function main() {
 
   console.log(`\n✅ Article generated: src/pages/news/battery-industry-weekly-${year}-week-${week}.astro`);
   console.log(`   Route: /news/battery-industry-weekly-${year}-week-${week}`);
+  console.log('');
+  console.log('⚠ Remember: This only generates the ENGLISH article.');
+  console.log('  You must manually create PT and ZH translations before publishing.');
+  console.log('  Run: node scripts/validate-news.mjs');
   console.log('');
 }
 
