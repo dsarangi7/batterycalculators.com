@@ -1,6 +1,7 @@
 ---
 import MStripe from './MStripe.astro';
 import { t, type Locale, getLocalePrefix } from '../utils/i18n';
+import { hrefFor, switcherHref } from '../utils/published-routes';
 
 interface Props {
   lang?: Locale;
@@ -9,13 +10,10 @@ interface Props {
 const { lang = 'en' } = Astro.props as Props;
 const currentPath = Astro.url.pathname;
 const prefix = getLocalePrefix(lang);
-
-// Strip /pt or /zh prefix to get the language-neutral path, then rebuild per locale.
-const basePath = currentPath.replace(/^\/pt(?=\/|$)/, '').replace(/^\/zh(?=\/|$)/, '') || '/';
-const normalizedBase = basePath.startsWith('/') ? basePath : `/${basePath}`;
-const enHref = normalizedBase;
-const ptHref = normalizedBase === '/' ? '/pt/' : `/pt${normalizedBase}`;
-const zhHref = normalizedBase === '/' ? '/zh/' : `/zh${normalizedBase}`;
+const learnHref = hrefFor('/learn/', lang);
+const enHref = switcherHref(currentPath, 'en');
+const ptHref = switcherHref(currentPath, 'pt');
+const zhHref = switcherHref(currentPath, 'zh');
 
 const localeShort: Record<Locale, string> = { en: 'EN', pt: 'PT', zh: '中文' };
 ---
@@ -50,7 +48,7 @@ const localeShort: Record<Locale, string> = { en: 'EN', pt: 'PT', zh: '中文' }
     <nav class="hidden lg:flex items-center gap-5 xl:gap-7 shrink-0" aria-label="Primary">
       <a href={`${prefix}/`} class="text-nav-link text-body hover:text-primary transition-colors py-2 whitespace-nowrap shrink-0">{t('nav.home', lang)}</a>
       <a href={`${prefix}/tools/`} class="text-nav-link text-body hover:text-primary transition-colors py-2 whitespace-nowrap shrink-0">{t('nav.tools', lang)}</a>
-      <a href={`${prefix}/learn/`} class="text-nav-link text-body hover:text-primary transition-colors py-2 whitespace-nowrap shrink-0">{t('nav.learn', lang)}</a>
+      <a href={learnHref} class="text-nav-link text-body hover:text-primary transition-colors py-2 whitespace-nowrap shrink-0">{t('nav.learn', lang)}</a>
       <a href={`${prefix}/solar/`} class="text-nav-link text-body hover:text-primary transition-colors py-2 whitespace-nowrap shrink-0">{t('nav.solar', lang)}</a>
       <a href={`${prefix}/rv/`} class="text-nav-link text-body hover:text-primary transition-colors py-2 whitespace-nowrap shrink-0">{t('nav.rv', lang)}</a>
       <a href={`${prefix}/marine/`} class="text-nav-link text-body hover:text-primary transition-colors py-2 whitespace-nowrap shrink-0">{t('nav.marine', lang)}</a>
@@ -154,7 +152,7 @@ const localeShort: Record<Locale, string> = { en: 'EN', pt: 'PT', zh: '中文' }
     <a href={`${prefix}/search/`} class="text-nav-link text-primary hover:opacity-80 py-3 border-b border-hairline-strong min-h-[44px] flex items-center">{t('nav.search', lang)}</a>
     <a href={`${prefix}/`} class="text-nav-link text-primary hover:opacity-80 py-3 border-b border-hairline-strong min-h-[44px] flex items-center">{t('nav.home', lang)}</a>
     <a href={`${prefix}/tools/`} class="text-nav-link text-primary hover:opacity-80 py-3 border-b border-hairline-strong min-h-[44px] flex items-center">{t('nav.tools', lang)}</a>
-    <a href={`${prefix}/learn/`} class="text-nav-link text-primary hover:opacity-80 py-3 border-b border-hairline-strong min-h-[44px] flex items-center">{t('nav.learn', lang)}</a>
+    <a href={learnHref} class="text-nav-link text-primary hover:opacity-80 py-3 border-b border-hairline-strong min-h-[44px] flex items-center">{t('nav.learn', lang)}</a>
     <a href={`${prefix}/solar/`} class="text-nav-link text-primary hover:opacity-80 py-3 border-b border-hairline-strong min-h-[44px] flex items-center">{t('nav.solar', lang)}</a>
     <a href={`${prefix}/rv/`} class="text-nav-link text-primary hover:opacity-80 py-3 border-b border-hairline-strong min-h-[44px] flex items-center">{t('nav.rv', lang)}</a>
     <a href={`${prefix}/marine/`} class="text-nav-link text-primary hover:opacity-80 py-3 border-b border-hairline-strong min-h-[44px] flex items-center">{t('nav.marine', lang)}</a>
