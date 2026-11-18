@@ -1,6 +1,8 @@
 import en from '../i18n/en.json';
 import pt from '../i18n/pt.json';
 import zh from '../i18n/zh.json';
+import { localePath } from '../seo/plan.mjs';
+import { publishedPaths } from './published-routes';
 
 export type Locale = 'en' | 'pt' | 'zh';
 
@@ -60,11 +62,10 @@ export function localizePath(pathname: string, lang: Locale): string {
 }
 
 export function getAlternateLinks(pathname: string): { lang: Locale; href: string }[] {
-  const stripped = stripLocalePrefix(pathname);
-  const normalized = stripped.startsWith('/') ? stripped : `/${stripped}`;
-  return [
-    { lang: 'en', href: `https://batterycalculators.com${normalized}` },
-    { lang: 'pt', href: `https://batterycalculators.com/pt${normalized === '/' ? '/' : normalized}` },
-    { lang: 'zh', href: `https://batterycalculators.com/zh${normalized === '/' ? '/' : normalized}` },
-  ];
+  const published = publishedPaths();
+  return SUPPORTED_LOCALES.flatMap((lang) => {
+    const path = localePath(pathname, lang);
+    if (!published.has(path)) return [];
+    return [{ lang, href: `https://batterycalculators.com${path}` }];
+  });
 }

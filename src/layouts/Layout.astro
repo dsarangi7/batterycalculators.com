@@ -4,6 +4,8 @@ import Header from '../components/Header.astro';
 import HeadSEO from '../components/HeadSEO.astro';
 import Analytics from '../components/Analytics.astro';
 import { t, type Locale, getLocalePrefix } from '../utils/i18n';
+import { hrefFor, publishedPaths } from '../utils/published-routes';
+import { localePath } from '../seo/plan.mjs';
 
 interface Props {
   title?: string;
@@ -18,6 +20,7 @@ interface Props {
   faqItems?: Array<{ question: string; answer: string }>;
   breadcrumbs?: Array<{ label: string; href?: string }>;
   lang?: Locale;
+  noindex?: boolean;
 }
 
 const { 
@@ -33,17 +36,25 @@ const {
   faqItems,
   breadcrumbs,
   lang = 'en',
+  noindex = false,
 } = Astro.props;
 
 const currentPath = Astro.url.pathname;
-const isPt = lang === 'pt';
-const isZh = lang === 'zh';
 const prefix = getLocalePrefix(lang);
-const stripPrefix = (p: string) => p.replace(/^\/pt(?=\/|$)/, '').replace(/^\/zh(?=\/|$)/, '') || '/';
-const basePath = stripPrefix(currentPath);
-const enPath = basePath;
-const ptPath = basePath === '/' ? '/pt/' : `/pt${basePath}`;
-const zhPath = basePath === '/' ? '/zh/' : `/zh${basePath}`;
+const published = publishedPaths();
+const learnHref = (slug = '') => hrefFor(slug ? `/learn/${slug}/` : '/learn/', lang);
+const hreflangLocales = [
+  { code: 'en', locale: 'en' as const },
+  { code: 'pt', locale: 'pt' as const },
+  { code: 'zh-CN', locale: 'zh' as const },
+  { code: 'zh', locale: 'zh' as const },
+];
+const alternateLinks = hreflangLocales
+  .map(({ code, locale }) => ({ code, path: localePath(currentPath, locale) }))
+  .filter((item) => published.has(item.path));
+const xDefaultPath = published.has(localePath(currentPath, 'en'))
+  ? localePath(currentPath, 'en')
+  : localePath(currentPath, lang);
 ---
 <!doctype html>
 <html lang={lang === 'zh' ? 'zh-CN' : lang}>
@@ -101,12 +112,13 @@ const zhPath = basePath === '/' ? '/zh/' : `/zh${basePath}`;
       breadcrumbs={breadcrumbs}
     />
 
-    <!-- Hreflang alternate links -->
-    <link rel="alternate" hreflang="en" href={`https://batterycalculators.com${enPath}`} />
-    <link rel="alternate" hreflang="pt" href={`https://batterycalculators.com${ptPath}`} />
-    <link rel="alternate" hreflang="zh-CN" href={`https://batterycalculators.com${zhPath}`} />
-    <link rel="alternate" hreflang="zh" href={`https://batterycalculators.com${zhPath}`} />
-    <link rel="alternate" hreflang="x-default" href={`https://batterycalculators.com${enPath}`} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+    {!noindex && alternateLinks.map((item) => (
+      <link rel="alternate" hreflang={item.code} href={`https://batterycalculators.com${item.path}`} />
+    ))}
+    {!noindex && (
+      <link rel="alternate" hreflang="x-default" href={`https://batterycalculators.com${xDefaultPath}`} />
+    )}
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -173,13 +185,13 @@ const zhPath = basePath === '/' ? '/zh/' : `/zh${basePath}`;
     <div class="flex flex-col gap-2">
       <span class="text-label-uppercase text-primary text-xs font-bold">{t('footer.learning_center_label', lang)}</span>
       <ul class="flex flex-col gap-1 text-body-sm text-muted">
-        <li><a href={`${prefix}/learn/`} class="hover:text-primary transition-colors">{t('footer.runtime_guides', lang)}</a></li>
-        <li><a href={`${prefix}/learn/`} class="hover:text-primary transition-colors">{t('footer.sizing_guides', lang)}</a></li>
-        <li><a href={`${prefix}/learn/`} class="hover:text-primary transition-colors">{t('footer.soc_soh_guides', lang)}</a></li>
-        <li><a href={`${prefix}/learn/`} class="hover:text-primary transition-colors">{t('footer.bess_guides', lang)}</a></li>
+        <li><a href={learnHref()} class="hover:text-primary transition-colors">{t('footer.runtime_guides', lang)}</a></li>
+        <li><a href={learnHref()} class="hover:text-primary transition-colors">{t('footer.sizing_guides', lang)}</a></li>
+        <li><a href={learnHref()} class="hover:text-primary transition-colors">{t('footer.soc_soh_guides', lang)}</a></li>
+        <li><a href={learnHref()} class="hover:text-primary transition-colors">{t('footer.bess_guides', lang)}</a></li>
         <li><a href={`${prefix}/news/`} class="hover:text-primary transition-colors">{t('footer.news_insights', lang)}</a></li>
-        <li><a href={`${prefix}/learn/`} class="hover:text-primary transition-colors">{t('footer.reference_charts', lang)}</a></li>
-        <li><a href={`${prefix}/learn/`} class="hover:text-primary transition-colors">{t('footer.view_all', lang)} →</a></li>
+        <li><a href={learnHref()} class="hover:text-primary transition-colors">{t('footer.reference_charts', lang)}</a></li>
+        <li><a href={learnHref()} class="hover:text-primary transition-colors">{t('footer.view_all', lang)} →</a></li>
       </ul>
     </div>
     <div class="flex flex-col gap-2">
@@ -220,10 +232,10 @@ const zhPath = basePath === '/' ? '/zh/' : `/zh${basePath}`;
   <div class="max-w-7xl mx-auto px-4 md:px-8 py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-t border-hairline">
     <span class="text-label-uppercase text-primary text-xs font-bold whitespace-nowrap">{t('footer.battery_reference_center', lang)}</span>
     <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-body-sm text-muted">
-      <a href={`${prefix}/learn/lifepo4-voltage-chart/`} class="hover:text-primary transition-colors">{t('footer.voltage_charts', lang)}</a>
-      <a href={`${prefix}/learn/lifepo4-soc-chart/`} class="hover:text-primary transition-colors">{t('footer.soc_tables', lang)}</a>
-      <a href={`${prefix}/learn/battery-c-rate-reference/`} class="hover:text-primary transition-colors">{t('footer.c_rate_reference', lang)}</a>
-      <a href={`${prefix}/learn/battery-sizing-reference/`} class="hover:text-primary transition-colors">{t('footer.dod_charts', lang)}</a>
+      <a href={learnHref('lifepo4-voltage-chart')} class="hover:text-primary transition-colors">{t('footer.voltage_charts', lang)}</a>
+      <a href={learnHref('lifepo4-soc-chart')} class="hover:text-primary transition-colors">{t('footer.soc_tables', lang)}</a>
+      <a href={learnHref('battery-c-rate-reference')} class="hover:text-primary transition-colors">{t('footer.c_rate_reference', lang)}</a>
+      <a href={learnHref('battery-sizing-reference')} class="hover:text-primary transition-colors">{t('footer.dod_charts', lang)}</a>
       <a href={`${prefix}/resources/`} class="text-primary hover:text-muted transition-colors ml-2">{t('footer.browse_reference_center', lang)} →</a>
     </div>
   </div>
