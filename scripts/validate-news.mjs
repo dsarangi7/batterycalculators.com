@@ -238,7 +238,89 @@ for (const [week, enData] of enWeeks) {
   }
 }
 
-// ─── 4. Summary ───
+// ─── 4. Cross-week duplicate titles and source URLs ───
+function normalizeNewsTitle(title) {
+  return title
+    .toLowerCase()
+    .replace(/&amp;/g, '&')
+    .replace(/&#8217;|&rsquo;|’/g, "'")
+    .replace(/[^a-z0-9\u00c0-\u024f\u4e00-\u9fff\s]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function normalizeNewsUrl(url) {
+  try {
+    const u = new URL(url);
+    const host = u.hostname.replace(/^www\./, '').toLowerCase();
+    const path = u.pathname.replace(/\/+$/, '').toLowerCase();
+    return `${host}${path}`;
+  } catch {
+    return url.split('?')[0].replace(/\/+$/, '').toLowerCase();
+  }
+}
+
+const NON_STORY_HEADINGS = new Set([
+  'the week in context',
+  'what to watch next week',
+  'sources',
+  'disclaimer',
+  'a semana em contexto',
+  'o que observar na próxima semana',
+  'fontes',
+  'aviso legal',
+  '本周聚焦',
+  '下周关注',
+  '来源',
+  '免责声明',
+]);
+
+console.log('\nCross-week duplicate check:');
+for (const [locale, config] of Object.entries(LOCALES)) {
+  const files = getNewsFiles(config.dir);
+  const titles = new Map();
+  const urls = new Map();
+
+  for (const file of files) {
+    const info_ = extractWeekInfo(file);
+    if (!info_) continue;
+    const content = readFileSync(join(config.dir, file), 'utf-8');
+    for (const match of content.matchAll(/<h2[^>]*>([\s\S]*?)<\/h2>/g)) {
+      const heading = match[1].replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
+      const key = normalizeNewsTitle(heading);
+      if (!key || NON_STORY_HEADINGS.has(key)) continue;
+      if (!titles.has(key)) titles.set(key, []);
+      titles.get(key).push({ week: info_.week, heading });
+    }
+    const sources = content.match(/<!-- Sources -->[\s\S]*?<\/ul>/);
+    if (!sources) continue;
+    for (const match of sources[0].matchAll(/href="(https?:\/\/[^"]+)"/g)) {
+      const key = normalizeNewsUrl(match[1]);
+      if (!key || key.includes('batterycalculators.com')) continue;
+      if (!urls.has(key)) urls.set(key, []);
+      urls.get(key).push(info_.week);
+    }
+  }
+
+  let localeDupes = 0;
+  for (const [, entries] of titles) {
+    const weeks = [...new Set(entries.map((entry) => entry.week))];
+    if (weeks.length > 1) {
+      error(`${config.label}: story title repeats in weeks ${weeks.join(', ')} — ${entries[0].heading}`);
+      localeDupes++;
+    }
+  }
+  for (const [url, weeksRaw] of urls) {
+    const weeks = [...new Set(weeksRaw)];
+    if (weeks.length > 1) {
+      error(`${config.label}: source URL repeats in weeks ${weeks.join(', ')} — ${url}`);
+      localeDupes++;
+    }
+  }
+  if (localeDupes === 0) info(`${config.label}: no cross-week title or source-URL duplicates`);
+}
+
+// ─── 5. Summary ───
 console.log('\n' + '─'.repeat(50));
 console.log(`Errors:   ${errors}`);
 console.log(`Warnings: ${warnings}`);

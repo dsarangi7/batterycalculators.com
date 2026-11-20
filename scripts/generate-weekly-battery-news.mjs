@@ -11,7 +11,7 @@
  *   node scripts/generate-weekly-battery-news.mjs --year 2026 --week 26
  */
 
-import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -183,6 +183,123 @@ function deduplicateStories(stories) {
   }
 
   return unique;
+}
+
+const SKIP_HEADINGS = new Set([
+  'The Week in Context',
+  'What to Watch Next Week',
+  'Sources',
+  'Disclaimer',
+]);
+
+function normalizeUrl(url) {
+  if (!url) return '';
+  try {
+    const u = new URL(url);
+    const host = u.hostname.replace(/^www\./, '').toLowerCase();
+    const path = u.pathname.replace(/\/+$/, '').toLowerCase();
+    return `${host}${path}`;
+  } catch {
+    return url.split('?')[0].replace(/\/+$/, '').toLowerCase();
+  }
+}
+
+function loadPublishedStoryIndex(excludeFileName) {
+  const titles = [];
+  const urls = new Set();
+  const historyPath = join(ROOT, 'data', 'published-weekly-stories.json');
+
+  if (existsSync(historyPath)) {
+    try {
+      const history = JSON.parse(readFileSync(historyPath, 'utf-8'));
+      for (const item of history.stories || []) {
+        if (item.title) titles.push(normalizeTitle(item.title));
+        if (item.url) urls.add(normalizeUrl(item.url));
+      }
+    } catch (err) {
+      console.log(`  ⚠ Could not read published story history: ${err.message}`);
+    }
+  }
+
+  const newsDir = join(ROOT, 'src', 'pages', 'news');
+  if (existsSync(newsDir)) {
+    for (const file of readdirSync(newsDir)) {
+      if (!file.startsWith('battery-industry-weekly-') || !file.endsWith('.astro')) continue;
+      if (file === excludeFileName) continue;
+      const content = readFileSync(join(newsDir, file), 'utf-8');
+      for (const match of content.matchAll(/<h2[^>]*>([\s\S]*?)<\/h2>/g)) {
+        const heading = cleanHTML(match[1]);
+        if (!heading || SKIP_HEADINGS.has(heading)) continue;
+        titles.push(normalizeTitle(heading));
+      }
+      for (const match of content.matchAll(/href="(https?:\/\/[^"]+)"/g)) {
+        urls.add(normalizeUrl(match[1]));
+      }
+    }
+  }
+
+  return { titles, urls };
+}
+
+function isAlreadyPublished(story, index) {
+  const url = normalizeUrl(story.link || '');
+  if (url && index.urls.has(url)) return true;
+  const norm = normalizeTitle(story.title || '');
+  if (!norm) return false;
+  for (const title of index.titles) {
+    if (title && (norm === title || similarity(norm, title) > 0.6)) return true;
+  }
+  return false;
+}
+
+function writePublishedStoryHistory() {
+  const newsDir = join(ROOT, 'src', 'pages', 'news');
+  const stories = [];
+  if (existsSync(newsDir)) {
+    const files = readdirSync(newsDir)
+      .filter((file) => file.startsWith('battery-industry-weekly-') && file.endsWith('.astro'))
+      .sort();
+    for (const file of files) {
+      const weekInfo = file.match(/weekly-(\d{4})-week-(\d+)/);
+      if (!weekInfo) continue;
+      const content = readFileSync(join(newsDir, file), 'utf-8');
+      const headings = [];
+      for (const match of content.matchAll(/<h2[^>]*>([\s\S]*?)<\/h2>/g)) {
+        const heading = cleanHTML(match[1]);
+        if (!heading || SKIP_HEADINGS.has(heading)) continue;
+        headings.push(heading);
+      }
+      const sourcesBlock = content.match(/<!-- Sources -->[\s\S]*?<\/ul>/);
+      const urls = sourcesBlock
+        ? [...sourcesBlock[0].matchAll(/href="(https?:\/\/[^"]+)"/g)].map((match) => match[1])
+        : [];
+      const paired = headings.length === urls.length;
+      headings.forEach((title, i) => {
+        stories.push({
+          year: Number(weekInfo[1]),
+          week: Number(weekInfo[2]),
+          title,
+          url: paired ? urls[i] : '',
+        });
+      });
+      if (!paired) {
+        for (const url of urls) {
+          stories.push({
+            year: Number(weekInfo[1]),
+            week: Number(weekInfo[2]),
+            title: '',
+            url,
+          });
+        }
+      }
+    }
+  }
+
+  const historyPath = join(ROOT, 'data', 'published-weekly-stories.json');
+  writeFileSync(historyPath, JSON.stringify({
+    note: 'Titles and source URLs already used in published English weekly editions. Regenerated from src/pages/news when a week is generated. The generator also reads the pages directly.',
+    stories,
+  }, null, 2) + '\n', 'utf-8');
 }
 
 // ─── Categorization ───
@@ -378,41 +495,6 @@ const breadcrumbs = [
 
 ${storySections}
 
-    <!-- Analysis -->
-    <section class="mb-12 border-t border-hairline pt-12">
-      <h2 class="text-display-sm text-primary mb-6">The Week in Context</h2>
-      <div class="bg-surface-card border border-hairline p-6">
-        <p class="text-body-md text-body font-light mb-4">
-          Three themes worth tracking from this week's news:
-        </p>
-        <ul class="flex flex-col gap-4 text-body-sm text-muted">
-          <li>
-            <strong class="text-primary">Scale is the new normal.</strong> Battery deployment continues to grow across every segment — EVs, grid storage, and marine — making batteries a core infrastructure technology rather than a niche market.
-          </li>
-          <li>
-            <strong class="text-primary">Chemistry diversity is accelerating.</strong> LFP, solid-state, sodium-ion, and silicon-anode chemistries are all progressing simultaneously, each targeting different cost and performance tradeoffs.
-          </li>
-          <li>
-            <strong class="text-primary">Regulation is reshaping supply chains.</strong> EU battery passport requirements and domestic manufacturing incentives are forcing companies to rethink sourcing, documentation, and compliance timelines.
-          </li>
-        </ul>
-      </div>
-    </section>
-
-    <!-- What to Watch -->
-    <section class="mb-12 border-t border-hairline pt-12">
-      <h2 class="text-display-sm text-primary mb-6">What to Watch Next Week</h2>
-      <div class="bg-surface-card border border-hairline p-6">
-        <ul class="flex flex-col gap-3 text-body-sm text-muted list-disc pl-5">
-          <li>Continued updates on solid-state battery commercialization timelines</li>
-          <li>EU Battery Regulation implementation guidance from the European Commission</li>
-          <li>New grid-scale BESS project commissioning and capacity milestone reports</li>
-          <li>Lithium and critical mineral pricing trends affecting battery economics</li>
-          <li>Sodium-ion and next-generation chemistry production scaling announcements</li>
-        </ul>
-      </div>
-    </section>
-
     <!-- Sources -->
     <section class="mb-12 border-t border-hairline pt-12">
       <h2 class="text-display-sm text-primary mb-4">Sources</h2>
@@ -518,36 +600,56 @@ async function main() {
 
   console.log(`\n📊 Total stories collected: ${allStories.length}`);
 
-  // Deduplicate
+  // Deduplicate within this run, then against editions already on disk.
   const uniqueStories = deduplicateStories(allStories);
-  console.log(`📊 After deduplication: ${uniqueStories.length}`);
+  console.log(`📊 After within-run deduplication: ${uniqueStories.length}`);
 
-  // Filter stories by target week date range
+  const outputFileName = `battery-industry-weekly-${year}-week-${week}.astro`;
+  const published = loadPublishedStoryIndex(outputFileName);
+  const freshStories = [];
+  let alreadyPublished = 0;
+  for (const story of uniqueStories) {
+    if (isAlreadyPublished(story, published)) {
+      alreadyPublished++;
+      continue;
+    }
+    freshStories.push(story);
+  }
+  console.log(`📊 Excluded as already published (title or URL): ${alreadyPublished}`);
+
+  // Keep only stories with a parseable date inside the ISO week.
+  // Missing dates are not in range. Do not backfill from older or undated items.
   const weekStart = new Date(dateRange.start);
   weekStart.setUTCHours(0, 0, 0, 0);
   const weekEnd = new Date(dateRange.end);
   weekEnd.setUTCHours(23, 59, 59, 999);
 
-  const withinWeek = uniqueStories.filter(s => {
-    if (!s.pubDate) return false;
+  let undated = 0;
+  let outOfWeek = 0;
+  const withinWeek = freshStories.filter(s => {
     const d = parseRSSDate(s.pubDate);
-    if (!d) return false;
-    return d >= weekStart && d <= weekEnd;
+    if (!d) {
+      undated++;
+      return false;
+    }
+    if (d < weekStart || d > weekEnd) {
+      outOfWeek++;
+      return false;
+    }
+    return true;
   });
 
-  // Fallback: include stories up to 7 days after the week end
-  const extendedEnd = new Date(weekEnd);
-  extendedEnd.setDate(extendedEnd.getDate() + 7);
-  const recentFallback = uniqueStories.filter(s => {
-    if (!s.pubDate) return true;
-    const d = parseRSSDate(s.pubDate);
-    if (!d) return true;
-    return d <= extendedEnd;
-  });
-
-  const filteredStories = withinWeek.length >= 5 ? withinWeek : recentFallback;
+  console.log(`📊 Undated or unparseable (excluded): ${undated}`);
+  console.log(`📊 Dated but outside this ISO week (excluded): ${outOfWeek}`);
   console.log(`📊 Stories within week range: ${withinWeek.length}`);
-  console.log(`📊 Stories used (filtered): ${filteredStories.length}`);
+
+  if (withinWeek.length < 5) {
+    console.log(`\n⚠ WARNING: Only ${withinWeek.length} stories have a publication date inside this ISO week.`);
+    console.log('  Writing that shorter edition. Missing dates are not treated as in-range,');
+    console.log('  and out-of-week items are not added to reach 10 stories.');
+  }
+
+  const filteredStories = withinWeek;
 
   // Categorize
   const categorized = {};
@@ -560,20 +662,9 @@ async function main() {
   console.log(`📊 Top stories selected: ${topStories.length}`);
 
   if (topStories.length === 0) {
-    console.log('\n⚠ No stories could be fetched. Generating draft with placeholder content.');
-    console.log('  WARNING: This article needs manual review before publishing.');
-    // Generate minimal placeholder stories
-    for (let i = 0; i < 3; i++) {
-      topStories.push({
-        title: `Battery Industry Update — Placeholder Story ${i + 1}`,
-        link: '',
-        pubDate: todayStr,
-        summary: 'Details limited from source; verify before publishing. RSS feeds may have been unavailable during generation.',
-        source: 'Draft',
-        category: 'research',
-      });
-      categorized[topStories[i].title] = 'research';
-    }
+    console.log('\n❌ No dated in-week stories were available. Not writing a page.');
+    console.log('  Undated items and stories from other weeks were not used as filler.');
+    process.exit(1);
   }
 
   // Generate article page
@@ -587,8 +678,9 @@ async function main() {
     mkdirSync(outputDir, { recursive: true });
   }
 
-  const outputPath = join(outputDir, `battery-industry-weekly-${year}-week-${week}.astro`);
+  const outputPath = join(outputDir, outputFileName);
   writeFileSync(outputPath, articleContent, 'utf-8');
+  writePublishedStoryHistory();
 
   console.log(`\n✅ Article generated: src/pages/news/battery-industry-weekly-${year}-week-${week}.astro`);
   console.log(`   Route: /news/battery-industry-weekly-${year}-week-${week}`);
