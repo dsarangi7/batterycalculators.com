@@ -64,6 +64,7 @@ test('index aliases 301 to the directory URL', () => {
 });
 
 test('missing Chinese learn, reference, and troubleshooting URLs 301 to English', () => {
+  // This fixture intentionally omits /zh/learn/. The published hub is covered below.
   for (const pathname of [
     '/zh/learn',
     '/zh/learn/',
@@ -81,6 +82,52 @@ test('missing Chinese learn, reference, and troubleshooting URLs 301 to English'
     '/learn/battery-c-rate-reference/',
   );
   assert.equal(plan({ hostname: 'batterycalculators.com', pathname: '/zh/learn/' }, published).pathname, '/learn/');
+});
+
+test('published Chinese learn hub stays in Chinese', () => {
+  const live = new Set(collectPublishedPaths());
+  const zhLearn = [...live].filter((path) => path.startsWith('/zh/learn')).sort();
+  assert.deepEqual(zhLearn, ['/zh/learn/']);
+
+  assert.equal(plan({ hostname: 'batterycalculators.com', pathname: '/zh/learn/' }, live).action, 'asset');
+  assert.deepEqual(plan({ hostname: 'batterycalculators.com', pathname: '/zh/learn' }, live), {
+    action: 'redirect',
+    status: 301,
+    pathname: '/zh/learn/',
+    search: '',
+  });
+  assert.equal(
+    plan({ hostname: 'batterycalculators.com', pathname: '/zh/learn/index' }, live).pathname,
+    '/zh/learn/',
+  );
+  assert.equal(
+    plan({ hostname: 'batterycalculators.com', pathname: '/zh/learn/battery-c-rate-reference/' }, live).pathname,
+    '/learn/battery-c-rate-reference/',
+  );
+  assert.equal(
+    plan({ hostname: 'batterycalculators.com', pathname: '/zh/reference/awg-wire-size-chart/' }, live).pathname,
+    '/reference/awg-wire-size-chart/',
+  );
+  assert.equal(plan({ hostname: 'batterycalculators.com', pathname: '/learn/' }, live).action, 'asset');
+  assert.equal(plan({ hostname: 'batterycalculators.com', pathname: '/pt/learn/' }, live).action, 'asset');
+  assert.equal(
+    plan({ hostname: 'batterycalculators.com', pathname: '/pt/learn/battery-c-rate-reference/' }, live).action,
+    'asset',
+  );
+
+  assert.equal(hrefFor('/learn/', 'zh', live), '/zh/learn/');
+  assert.equal(hrefFor('/learn/battery-c-rate-reference/', 'zh', live), '/learn/battery-c-rate-reference/');
+  assert.equal(switcherHref('/learn/', 'zh', live), '/zh/learn/');
+  assert.equal(switcherHref('/zh/learn/', 'en', live), '/learn/');
+  assert.equal(switcherHref('/zh/learn/', 'pt', live), '/pt/learn/');
+
+  const rules = redirectRules(live);
+  assert.equal(rules.includes('/zh/learn/ /learn/ 301'), false);
+  assert.equal(rules.includes('/zh/learn /learn/ 301'), false);
+  assert.ok(rules.includes('/zh/learn /zh/learn/ 301'));
+  assert.ok(rules.includes('/zh/learn/battery-c-rate-reference/ /learn/battery-c-rate-reference/ 301'));
+  assert.equal(rules.some((rule) => rule.startsWith('/learn/ ')), false);
+  assert.equal(rules.some((rule) => rule.startsWith('/pt/learn/ ')), false);
 });
 
 test('unknown localized URLs are not redirected onto a 404', () => {

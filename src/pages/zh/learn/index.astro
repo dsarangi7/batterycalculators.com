@@ -1,0 +1,182 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import { t } from '../../../utils/i18n';
+
+/**
+ * Index of published Chinese guides only.
+ * Add a card after `src/pages/zh/learn/<slug>.astro` exists.
+ * A slug without that page still 301s to the English guide.
+ */
+const articles: {
+  title: string;
+  slug: string;
+  category: string;
+  description: string;
+  tools: string[];
+}[] = [];
+
+const calculators = [
+  {
+    title: '电池续航时间计算器',
+    href: '/zh/tools/runtime-calculator/',
+    category: '系统设计',
+    description: '由容量、负载与效率估算放电续航，页面上写有公开公式。',
+  },
+  {
+    title: '电池容量计算器',
+    href: '/zh/tools/battery-sizing-calculator/',
+    category: '系统设计',
+    description: '由日耗电、备用天数、放电深度和温度估算电池组容量。',
+  },
+  {
+    title: 'C率计算器',
+    href: '/zh/tools/c-rate-calculator/',
+    category: '电芯基础',
+    description: '把容量和电流换算成 C 率，核对充放电是否超出常用范围。',
+  },
+  {
+    title: '充电时间计算器',
+    href: '/zh/tools/charging-time-calculator/',
+    category: '充电',
+    description: '由充电电流、容量和效率估算充电时间。',
+  },
+  {
+    title: '太阳能蓄电池计算器',
+    href: '/zh/tools/solar-battery-sizing-calculator/',
+    category: '太阳能',
+    description: '由日负载、备用天数和系统电压估算太阳能蓄电池容量。',
+  },
+  {
+    title: '家庭备用电池计算器',
+    href: '/zh/tools/home-backup-battery-calculator/',
+    category: '家庭备用',
+    description: '按关键负载和备用时长估算家庭备用电池与逆变器需求。',
+  },
+  {
+    title: '房车电池计算器',
+    href: '/zh/tools/rv-battery-calculator/',
+    category: '房车',
+    description: '按房车电器清单估算离网用电与电池容量。',
+  },
+  {
+    title: '船用电池计算器',
+    href: '/zh/tools/marine-battery-sizing-calculator/',
+    category: '船用',
+    description: '按船用生活负载估算蓄电池容量与续航。',
+  },
+];
+
+const otherLanguages = [
+  {
+    title: 'Engineering Guides',
+    href: '/learn/',
+    lang: 'en',
+    label: 'English',
+    description: '英文学习中心，包含已发布的工程指南全文。',
+  },
+  {
+    title: 'Guias de Engenharia',
+    href: '/pt/learn/',
+    lang: 'pt',
+    label: 'Português',
+    description: '葡萄牙语学习中心，结构与英文指南库相同。',
+  },
+];
+---
+
+<Layout
+  title="工程指南 | 电池计算器"
+  description="中文电池工程学习中心索引。已发布的中文指南在此汇总，并链接到对应的中文计算器。本页是中文索引，不会自动跳转到英文指南。"
+  canonical="https://batterycalculators.com/zh/learn/"
+  schema="collectionPage"
+  schemaName="工程指南"
+  schemaDescription="中文电池工程学习中心索引。已发布的中文指南在此汇总，并链接到对应计算器。"
+  schemaUrl="https://batterycalculators.com/zh/learn/"
+  lang="zh"
+>
+  <div class="mb-12 border-b border-hairline pb-8">
+    <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">学习中心</span>
+    <h1 class="text-display-md text-primary mb-6">工程指南</h1>
+    <p class="text-body-md text-body max-w-2xl font-light">
+      这里汇总已发布的中文电池工程指南。每篇指南都会链到对应的中文计算器，便于直接核对公开公式。
+    </p>
+  </div>
+
+  {articles.length > 0 && (
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
+      {articles.map((article) => (
+        <a href={`/zh/learn/${article.slug}/`} class="block group">
+          <CalculatorCard class="h-full flex flex-col justify-between">
+            <div>
+              <span class="text-label-uppercase text-m-blue-light text-[10px] block mb-2">{article.category}</span>
+              <h2 class="text-title-lg text-primary mb-3 group-hover:text-m-blue-light transition-colors">{article.title}</h2>
+              <p class="text-body-sm text-muted mb-4">{article.description}</p>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              {article.tools.map((tool) => (
+                <span class="text-[10px] text-primary border border-hairline px-2 py-0.5 uppercase tracking-wider">{tool}</span>
+              ))}
+            </div>
+          </CalculatorCard>
+        </a>
+      ))}
+    </div>
+  )}
+
+  {articles.length === 0 && (
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
+      <CalculatorCard class="md:col-span-2 h-full flex flex-col justify-between">
+        <div>
+          <span class="text-label-uppercase text-m-blue-light text-[10px] block mb-2">索引</span>
+          <h2 class="text-title-lg text-primary mb-3">中文指南将发布在本页</h2>
+          <p class="text-body-sm text-muted">
+            目前还没有单独的中文指南文章。新指南上线后，会以与英文和葡萄牙语学习中心相同的卡片列在这里。在此之前，可以使用下方的中文计算器核对续航、容量、C 率和充电时间。
+          </p>
+        </div>
+      </CalculatorCard>
+    </div>
+  )}
+
+  <section class="mb-16" aria-labelledby="zh-learn-calculators">
+    <h2 id="zh-learn-calculators" class="text-title-lg text-primary mb-6">相关中文计算器</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {calculators.map((calculator) => (
+        <a href={calculator.href} class="block group">
+          <CalculatorCard class="h-full flex flex-col justify-between">
+            <div>
+              <span class="text-label-uppercase text-m-blue-light text-[10px] block mb-2">{calculator.category}</span>
+              <h3 class="text-title-lg text-primary mb-3 group-hover:text-m-blue-light transition-colors">{calculator.title}</h3>
+              <p class="text-body-sm text-muted">{calculator.description}</p>
+            </div>
+          </CalculatorCard>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <section class="mb-16" aria-labelledby="zh-learn-other-languages">
+    <h2 id="zh-learn-other-languages" class="text-title-lg text-primary mb-3">英文与葡萄牙语指南库</h2>
+    <p class="text-body-sm text-muted max-w-2xl mb-6">
+      完整图文指南目前提供英文和葡萄牙语版本。下面的链接会打开对应语言的学习中心。
+    </p>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {otherLanguages.map((library) => (
+        <a href={library.href} class="block group">
+          <CalculatorCard class="h-full">
+            <span lang={library.lang} class="text-label-uppercase text-m-blue-light text-[10px] block mb-2">{library.label}</span>
+            <h3 lang={library.lang} class="text-title-lg text-primary mb-3 group-hover:text-m-blue-light transition-colors">{library.title}</h3>
+            <p class="text-body-sm text-muted">{library.description}</p>
+          </CalculatorCard>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <section class="bg-surface-soft border border-hairline p-6 text-caption text-muted mb-8">
+    <span class="text-primary font-bold text-[10px] tracking-wider uppercase border border-hairline px-1.5 py-0.5 mr-2 inline-block mb-3">
+      {t('calculator_layout.engineering_disclaimer', 'zh')}
+    </span>
+    {t('calculator_layout.disclaimer_text', 'zh')}
+  </section>
+</Layout>
