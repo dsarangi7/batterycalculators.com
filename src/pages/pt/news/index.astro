@@ -25,12 +25,19 @@ const weeklyEditions = Object.entries(newsFiles)
   .map(([path, raw]) => {
     const slug = path.replace('./', '').replace('.astro', '');
     const meta = extractMeta(raw as string);
-    const weekMatch = slug.match(/week-(\d+)/);
+    const catchUpMatch = slug.match(/catch-up-(\d{4})-weeks-(\d+)-(\d+)/);
+    // Weekly slugs are `week-N`. Do not treat `weeks-41-46` as Week 41.
+    const weekMatch = catchUpMatch ? null : slug.match(/(?:^|-)week-(\d+)(?:-|$)/);
     const yearMatch = slug.match(/(\d{4})/);
     const week = weekMatch?.[1] || '';
     const year = yearMatch?.[1] || '';
     const cleanTitle = meta.title.replace(/\s*\|\s*(Battery Calculators|Calculadoras de Bateria)\s*$/, '');
-    const dateDisplay = week ? `Semana ${week}, ${year}` : meta.publishDate || '';
+    const isCatchUp = Boolean(catchUpMatch);
+    const dateDisplay = isCatchUp
+      ? `Retrospectiva · Semanas ${catchUpMatch?.[2]}–${catchUpMatch?.[3]}, ${catchUpMatch?.[1]}`
+      : week
+        ? `Semana ${week}, ${year}`
+        : meta.publishDate || '';
     return {
       title: cleanTitle,
       slug,
@@ -40,9 +47,18 @@ const weeklyEditions = Object.entries(newsFiles)
       readingTime: meta.readingTime,
       yearNum: Number(year) || 0,
       weekNum: Number(week) || 0,
+      isCatchUp,
+      badge: isCatchUp ? 'RETROSPECTIVA' : 'EDIÇÃO SEMANAL',
     };
   })
-  .sort((a, b) => b.yearNum - a.yearNum || b.weekNum - a.weekNum);
+  .sort((a, b) => {
+    // Catch-up pages sort by publishDate. Weekly editions keep year-then-week order.
+    if (a.isCatchUp || b.isCatchUp) {
+      const byDate = b.publishDate.localeCompare(a.publishDate);
+      if (byDate !== 0) return byDate;
+    }
+    return b.yearNum - a.yearNum || b.weekNum - a.weekNum;
+  });
 ---
 
 <Layout
@@ -72,7 +88,7 @@ const weeklyEditions = Object.entries(newsFiles)
               <CalculatorCard class="h-full">
                 <div>
                   <div class="flex flex-wrap items-center gap-3 mb-3">
-                    <span class="text-label-uppercase text-m-blue-light text-[10px]">EDIÇÃO SEMANAL</span>
+                    <span class="text-label-uppercase text-m-blue-light text-[10px]">{edition.badge}</span>
                     <span class="text-caption text-muted">{edition.date}</span>
                     {edition.readingTime > 0 && (
                       <span class="text-caption text-muted">{edition.readingTime} min de leitura</span>
