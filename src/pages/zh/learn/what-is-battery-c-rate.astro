@@ -1,0 +1,159 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+
+const faqItems = [
+  {
+    question: "对 100 Ah 电池来说，1C 是什么意思？",
+    answer: "1C 是指在一小时内将电池完全充满或完全放完的充电或放电电流。对于 100 Ah 电池，1C = 100 A。0.5C 倍率（50 A）需要两小时；2C 倍率（200 A）需要三十分钟。",
+  },
+  {
+    question: "我能以高于规定的 C率给电池充电吗？",
+    answer: "超过制造商建议的充电 C率会造成内部过热，并可能在负极引发析锂。这会永久损伤容量，还可能带来安全风险。务必遵守数据手册中的限值。",
+  },
+  {
+    question: "C率会影响电池寿命吗？",
+    answer: "会。更高的 C率会产生更多内部热量（I²R 损耗），从而加速化学衰减。以 0.5C 循环的电池，通常比同一块以 2C 循环的电池提供显著更多的循环次数。",
+  },
+  {
+    question: "为什么铅酸电池在高 C率下可用容量更低？",
+    answer: "铅酸化学体系依赖酸向极板材料中的扩散。在高电流下，极板附近的酸消耗速度快于补充速度，导致电压过早下降。这称为佩克特效应（Peukert effect）。",
+  },
+];
+---
+
+<Layout
+  title="什么是电池 C率？ | 电池计算器"
+  description="实用的电池 C率指南：它是什么意思、如何计算充放电电流，以及 C率如何影响电芯寿命和热性能。"
+  canonical="https://batterycalculators.com/zh/learn/what-is-battery-c-rate/"
+  faqItems={faqItems}
+  lang="zh"
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/zh/learn/" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← 返回指南</a>
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">电芯基础</span>
+      <h1 class="text-display-md text-primary mb-6">什么是电池 C率？</h1>
+      <p class="text-body-md text-body font-light">
+        C率是充电或放电电流与电池额定容量之比。它把电池充放电的快慢标准化，而不受其绝对容量大小的影响。
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">核心概念</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          一块额定 100 Ah 的电池理论上可以以 100 安培放电一小时。这就是 1C 放电倍率。同一块电池以 50 安培放电时工作在 0.5C，理论上可持续两小时。以 200 安培放电则是 2C 倍率，会在三十分钟内耗尽。
+        </p>
+        <p class="text-body-md text-body font-light">
+          在比较不同容量的电池时，C率可以消除歧义。一块 10 Ah 电芯和一块 200 Ah 电芯都在 0.5C 下工作，虽然绝对电流相差很大，但放电所受的相对应力水平是相近的。
+        </p>
+      </section>
+
+      <FormulaBox title="C率公式">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          C率 = 电流 (A) / 容量 (Ah)
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          电流 (A) = C率 × 容量 (Ah)
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          时间 (h) = 1 / C率
+        </div>
+        <p>
+          例如，一块 200 Ah 电池在 0.5C 下：电流 = 0.5 × 200 = 100 A。时间 = 1 / 0.5 = 2 小时。
+        </p>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">为什么 C率很重要</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">热应力</h4>
+            <p class="text-body-sm text-muted">
+              内阻产生的热量与电流的平方成正比（I²R）。C率加倍，发热量变为四倍。对大多数锂电芯而言，超过 1C 后热管理就变得至关重要。
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">循环寿命</h4>
+            <p class="text-body-sm text-muted">
+              高 C率会加速析锂和固体电解质界面（SEI）生长。以 0.3C 循环的电池可能达到 5,000 次循环，而同一电芯在 2C 下可能只有 1,500 次循环。
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">可用容量</h4>
+            <p class="text-body-sm text-muted">
+              在高放电倍率下，电压会在电池尚未完全放完之前就跌破截止阈值。这会使实际放出的能量低于额定容量。
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">充电速度</h4>
+            <p class="text-body-sm text-muted">
+              快充需要高 C率（1C 至 3C）。代价是电芯温度升高，并且在电池温度过低或充电曲线控制不当的情况下可能发生析锂。
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">实用 C率参考</h2>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">C率</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">100 Ah 电池电流</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">大约时间</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">典型用途</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">0.05C</td>
+                <td class="p-4 text-muted">5 A</td>
+                <td class="p-4 text-muted">约 20 小时</td>
+                <td class="p-4 text-muted">涓流充电、待机</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">0.2C</td>
+                <td class="p-4 text-muted">20 A</td>
+                <td class="p-4 text-muted">约 5 小时</td>
+                <td class="p-4 text-muted">慢充，利于 LFP 寿命</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">0.5C</td>
+                <td class="p-4 text-muted">50 A</td>
+                <td class="p-4 text-muted">约 2 小时</td>
+                <td class="p-4 text-muted">标准充放电</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">1C</td>
+                <td class="p-4 text-muted">100 A</td>
+                <td class="p-4 text-muted">约 1 小时</td>
+                <td class="p-4 text-muted">快充、电动汽车行驶</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">2C</td>
+                <td class="p-4 text-muted">200 A</td>
+                <td class="p-4 text-muted">约 30 分钟</td>
+                <td class="p-4 text-muted">高功率放电、快充</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <CalculatorCard class="border-m-blue-light">
+        <h4 class="text-label-uppercase text-primary text-xs mb-3">试用</h4>
+        <p class="text-body-sm text-muted mb-4">
+          使用 C率计算器，按你的具体电池在电流、容量和 C率之间换算。
+        </p>
+        <a href="/zh/tools/c-rate-calculator/" class="btn-primary text-xs py-3 px-6 inline-block">打开 C率计算器</a>
+      </CalculatorCard>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

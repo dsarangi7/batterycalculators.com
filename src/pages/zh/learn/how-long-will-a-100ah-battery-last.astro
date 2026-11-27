@@ -1,0 +1,250 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "100Ah 电池能带 1000W 逆变器运行多久？",
+    answer: "一块 100Ah 12.8V LFP 电池在 80% DoD 下可提供 1,024 Wh 可用能量。经 90% 效率的逆变器后，有效负载为 1,111W。续航时间约为 0.92 小时，也就是大约 55 分钟。",
+  },
+  {
+    question: "100Ah 铅酸电池能用多久？",
+    answer: "铅酸电池可用容量较低（50% DoD），并且在较高负载下会受佩克特效应影响。一块 100Ah AGM 电池在 50% DoD 下仅有 640 Wh 可用能量。在 100W 下，续航时间约为 5.8 小时——大约是同等 LFP 电池的一半。",
+  },
+  {
+    question: "给 100Ah 电池回充需要多少块太阳能板？",
+    answer: "一块 100Ah 12.8V LFP 电池储存 1,280 Wh。一块 200W 太阳能板在 5 个峰值日照小时内大约发电 900 Wh（已计入损耗）。要在一天内完全回充，大约需要两块 200W 板，或一块 300W 板。",
+  },
+  {
+    question: "100Ah 电池能带动冰箱吗？",
+    answer: "典型的 12V 露营冰箱平均功耗为 40–60W（压缩机间歇工作）。一块 100Ah LFP 电池在 80% DoD 下可提供 1,024 Wh。按平均 50W 计算，续航时间约为 16.4 小时。对于家用全尺寸冰箱（平均 150W），续航时间会降至约 5.5 小时。",
+  },
+];
+---
+
+<Layout
+  title="100Ah 电池能用多久？ | 电池计算器"
+  description="100Ah 电池在 12V、24V 和 48V 下的详细续航时间示例。涵盖 LFP、NMC 和铅酸化学体系，并给出房车、船用和家庭备用的计算例题。"
+  canonical="https://batterycalculators.com/zh/learn/how-long-will-a-100ah-battery-last/"
+  schema="faqPage"
+  schemaName="100Ah 电池能用多久？"
+  schemaDescription="100Ah 电池在常见负载场景下的续航时间示例。"
+  schemaUrl="https://batterycalculators.com/zh/learn/how-long-will-a-100ah-battery-last/"
+  faqItems={faqItems}
+  lang="zh"
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/zh/learn/" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← 返回指南</a>
+      <Breadcrumb items={[
+        { label: "学习中心", href: "/zh/learn/" },
+        { label: "100Ah 电池能用多久" }
+      ]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">实用示例</span>
+      <h1 class="text-display-md text-primary mb-6">100Ah 电池能用多久？</h1>
+      <p class="text-body-md text-body font-light">
+        100Ah 电池是便携电源、房车生活系统、船用应用和小型太阳能系统中最常见的规格之一。了解它在实际使用中的续航时间，有助于规划真正满足需求的系统。
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">按电压看能量</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          100Ah 标称值告诉你的是电荷容量，但能量取决于电压。同样是 100Ah，在不同电压下储存的能量相差很大：
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">电压</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">总能量</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">可用（80% DoD）</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">12.8V (4S LFP)</td>
+                <td class="p-4 text-muted">1,280 Wh</td>
+                <td class="p-4 font-mono text-primary">1,024 Wh</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">25.6V (8S LFP)</td>
+                <td class="p-4 text-muted">2,560 Wh</td>
+                <td class="p-4 font-mono text-primary">2,048 Wh</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">51.2V (16S LFP)</td>
+                <td class="p-4 text-muted">5,120 Wh</td>
+                <td class="p-4 font-mono text-primary">4,096 Wh</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <FormulaBox title="续航时间公式">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          续航时间 (h) = 容量 (Ah) × 电压 (V) × DoD / (负载 (W) / 效率)
+        </div>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">续航时间表：100Ah 12.8V LFP</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          在 80% DoD 和 90% 系统效率下，一块 100Ah 12.8V LFP 电池可提供 1,024 Wh 可用能量：
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">负载</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">功率 (W)</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">续航时间</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">手机充电</td>
+                <td class="p-4 font-mono text-primary">15 W</td>
+                <td class="p-4 font-mono text-primary">约 60 小时</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">LED 灯（×4）</td>
+                <td class="p-4 font-mono text-primary">24 W</td>
+                <td class="p-4 font-mono text-primary">约 38 小时</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">笔记本电脑</td>
+                <td class="p-4 font-mono text-primary">60 W</td>
+                <td class="p-4 font-mono text-primary">约 15 小时</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">12V 露营冰箱</td>
+                <td class="p-4 font-mono text-primary">50 W</td>
+                <td class="p-4 font-mono text-primary">约 18 小时</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">电视 + 流媒体</td>
+                <td class="p-4 font-mono text-primary">100 W</td>
+                <td class="p-4 font-mono text-primary">约 9.1 小时</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">咖啡机</td>
+                <td class="p-4 font-mono text-primary">800 W</td>
+                <td class="p-4 font-mono text-primary">约 1.1 小时</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">取暖器</td>
+                <td class="p-4 font-mono text-primary">1,500 W</td>
+                <td class="p-4 font-mono text-primary">约 36 分钟</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">化学体系比较</h2>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">化学体系</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">可用 DoD</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">可用能量</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">100W 下的续航时间</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">LFP (LiFePO4)</td>
+                <td class="p-4 text-muted">80%</td>
+                <td class="p-4 font-mono text-primary">1,024 Wh</td>
+                <td class="p-4 text-muted">约 9.2 小时</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">NMC（三元锂）</td>
+                <td class="p-4 text-muted">80%</td>
+                <td class="p-4 font-mono text-primary">1,024 Wh</td>
+                <td class="p-4 text-muted">约 9.2 小时</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">AGM 铅酸</td>
+                <td class="p-4 text-muted">50%</td>
+                <td class="p-4 font-mono text-primary">640 Wh</td>
+                <td class="p-4 text-muted">约 5.8 小时</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">富液式铅酸</td>
+                <td class="p-4 text-muted">50%</td>
+                <td class="p-4 font-mono text-primary">640 Wh</td>
+                <td class="p-4 text-muted">约 5.0 小时*</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-caption text-muted mt-2">* 富液式铅酸的续航时间更短，是因为在中等放电倍率下会受佩克特效应影响。</p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">例题</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>已知：</strong>100 Ah，12.8V LFP，80% DoD，90% 效率，150W 交流负载</p>
+            <p><strong>第 1 步：</strong>可用能量：</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              100 × 12.8 × 0.80 = 1,024 Wh
+            </div>
+            <p><strong>第 2 步：</strong>有效负载：</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              150 / 0.90 = 166.7 W
+            </div>
+            <p><strong>第 3 步：</strong>续航时间：</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              1,024 / 166.7 = 6.14 小时
+            </div>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">试用</h4>
+          <p class="text-body-sm text-muted mb-4">
+            使用续航时间计算器，按你的具体负载和电池配置进行估算。
+          </p>
+          <a href="/zh/tools/runtime-calculator/" class="btn-primary text-xs py-3 px-6 inline-block">打开续航时间计算器</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">相关</h4>
+          <p class="text-body-sm text-muted mb-4">
+            与更大系统的 200Ah 和 300Ah 续航时间示例做比较。
+          </p>
+          <a href="/learn/how-long-will-a-200ah-battery-last/" class="btn-primary-outline text-xs py-3 px-6 inline-block">200Ah 指南</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">相关文章</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">200Ah 电池能用多久？</h4>
+            <p class="text-body-sm text-muted mb-3">200Ah 电池在房车、船用和家庭备用负载下的续航时间示例。</p>
+            <a href="/learn/how-long-will-a-200ah-battery-last/" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">阅读指南 →</a>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">电池能用多久？</h4>
+            <p class="text-body-sm text-muted mb-3">由任意容量和负载计算续航时间的通用方法。</p>
+            <a href="/learn/how-long-will-a-battery-last/" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">阅读指南 →</a>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

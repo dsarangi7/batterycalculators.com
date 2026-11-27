@@ -1,0 +1,498 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+import CalculatorCard from "../../../components/CalculatorCard.astro";
+import FAQSection from "../../../components/FAQSection.astro";
+import ReferenceChart from "../../../components/ReferenceChart.astro";
+import ReferenceTable from "../../../components/ReferenceTable.astro";
+
+const faqItems = [
+  {
+    question:
+      "充满电的 12V 铅酸电池静置电压是多少？",
+    answer:
+      "充满电的富液式铅酸电池静置电压大约为 12.6–12.8V。AGM 和胶体电池通常略高，为 12.8–13.0V。充电后，表面电荷可能把读数抬高到 13.0–13.4V，因此测量静置电压前至少等待 30 分钟。",
+  },
+  {
+    question: "温度如何影响铅酸电压读数？",
+    answer:
+      "温度会影响电芯的化学平衡。低温会增加内阻并降低电压读数。在 0°C 时，一块充满电的电池读数可能比 25°C 时低 0.2–0.3V。在高温（高于 40°C）下，电压读数可能略有升高。由电压估算 SOC 时，务必做温度补偿。",
+  },
+  {
+    question: "什么是表面电荷？",
+    answer:
+      "表面电荷是充电后出现的暂时电压升高。它由极板表面附近酸浓度不均匀引起，会在静置 30–60 分钟内消散。刚充完电就测量电压，会得到偏高的 SOC 读数。务必先让电池静置，再测量电压。",
+  },
+  {
+    question:
+      "富液式、AGM 和胶体电池的电压曲线不同吗？",
+    answer:
+      "不同。在相同 SOC 下，AGM 和胶体电池的静置电压略高于富液式电池。AGM 通常比富液式高出 0.1–0.2V。胶体电池与 AGM 相近。差异不大，但在由电压估算 SOC 时仍有意义。请使用与你的电池类型对应的电压曲线。",
+  },
+];
+
+const tableOfContents = [
+  { id: "flooded-lead-acid", label: "富液式铅酸" },
+  { id: "agm-gel", label: "AGM 和胶体" },
+  { id: "surface-charge", label: "表面电荷" },
+  { id: "temperature-effects", label: "温度影响" },
+  { id: "common-mistakes", label: "常见错误" },
+];
+
+const relatedCalculators = [
+  {
+    title: "电池容量计算器",
+    href: "/zh/tools/battery-sizing-calculator/",
+  },
+  { title: "电池续航时间计算器", href: "/zh/tools/runtime-calculator/" },
+];
+
+const references = [
+  {
+    title: "Battery University — 铅酸电压",
+    url: "https://batteryuniversity.com/article/bu-403-lead-acid",
+  },
+  {
+    title: "Concorde Battery — AGM 规格",
+    url: "https://www.concordebattery.com/products/sealed-lead-acid/",
+  },
+];
+---
+
+<Layout
+  title="铅酸电池电压图表 — SOC 参考 | 电池计算器"
+  description="富液式、AGM 和胶体铅酸电池在 12V、24V 和 48V 下的电压参考表。按荷电状态给出近似静置电压。"
+  canonical="https://batterycalculators.com/zh/learn/lead-acid-voltage-chart/"
+  faqItems={faqItems}
+  lang="zh"
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a
+        href="/zh/learn/"
+        class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block"
+        >&larr; 返回指南</a
+      >
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4"
+        >参考</span
+      >
+      <h1 class="text-display-md text-primary mb-6">
+        铅酸电池电压图表
+      </h1>
+      <p class="text-body-md text-body font-light">
+        富液式、AGM 和胶体铅酸电池在常见电池组电压下的近似静置电压。用本表由电压读数估算荷电状态。
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section id="flooded-lead-acid">
+        <ReferenceChart
+          type="line"
+          title="富液式铅酸静置电压与 SOC"
+          description="标称 12V 电池组的近似关系；铅酸电压通常比磷酸铁锂更接近线性。"
+          xLabel="SOC %"
+          yLabel="电压 (V)"
+          data={[
+            { x: 0, y: 11.5, label: "0%" },
+            { x: 10, y: 11.64, label: "10%" },
+            { x: 20, y: 11.76, label: "20%" },
+            { x: 30, y: 11.88, label: "30%" },
+            { x: 40, y: 12.0, label: "40%" },
+            { x: 50, y: 12.12, label: "50%" },
+            { x: 60, y: 12.24, label: "60%" },
+            { x: 70, y: 12.34, label: "70%" },
+            { x: 80, y: 12.46, label: "80%" },
+            { x: 90, y: 12.58, label: "90%" },
+            { x: 100, y: 12.7, label: "100%" },
+          ]}
+          yMin={11.0}
+          yMax={13.2}
+          caption="富液式铅酸数值以 25°C 为准。实际电压因制造商、老化、温度和测量条件而异。"
+        />
+
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          富液式铅酸电压图表
+        </h2>
+        <p class="text-body-md text-body font-light mb-4">
+          富液式铅酸电池的静置电压与 SOC 之间有较明确的对应关系。与磷酸铁锂不同，电压在整个 SOC 范围内下降相对线性，因此电压是实用的 SOC 指标——前提是电池已经静置，并计入了温度。
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-body-sm min-w-[640px]">
+              <thead>
+                <tr class="border-b border-hairline bg-surface-card">
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">SOC %</th>
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">12V 电池组</th>
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">24V 电池组</th>
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">48V 电池组</th>
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">说明</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-hairline">
+                <tr>
+                  <td class="p-4 font-mono text-primary">100%</td>
+                  <td class="p-4 text-muted">12.70V</td>
+                  <td class="p-4 text-muted">25.40V</td>
+                  <td class="p-4 text-muted">50.80V</td>
+                  <td class="p-4 text-muted">充满电，静置</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">90%</td>
+                  <td class="p-4 text-muted">12.58V</td>
+                  <td class="p-4 text-muted">25.16V</td>
+                  <td class="p-4 text-muted">50.32V</td>
+                  <td class="p-4 text-muted">可能仍有轻微表面电荷</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">80%</td>
+                  <td class="p-4 text-muted">12.46V</td>
+                  <td class="p-4 text-muted">24.92V</td>
+                  <td class="p-4 text-muted">49.84V</td>
+                  <td class="p-4 text-muted">良好工作范围</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">70%</td>
+                  <td class="p-4 text-muted">12.34V</td>
+                  <td class="p-4 text-muted">24.68V</td>
+                  <td class="p-4 text-muted">49.36V</td>
+                  <td class="p-4 text-muted">日常使用可接受</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">60%</td>
+                  <td class="p-4 text-muted">12.24V</td>
+                  <td class="p-4 text-muted">24.48V</td>
+                  <td class="p-4 text-muted">48.96V</td>
+                  <td class="p-4 text-muted">应尽快开始回充</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">50%</td>
+                  <td class="p-4 text-muted">12.12V</td>
+                  <td class="p-4 text-muted">24.24V</td>
+                  <td class="p-4 text-muted">48.48V</td>
+                  <td class="p-4 text-muted">建议回充</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">40%</td>
+                  <td class="p-4 text-muted">12.00V</td>
+                  <td class="p-4 text-muted">24.00V</td>
+                  <td class="p-4 text-muted">48.00V</td>
+                  <td class="p-4 text-muted">有硫酸盐化风险</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">30%</td>
+                  <td class="p-4 text-muted">11.88V</td>
+                  <td class="p-4 text-muted">23.76V</td>
+                  <td class="p-4 text-muted">47.52V</td>
+                  <td class="p-4 text-muted">深度放电区</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">20%</td>
+                  <td class="p-4 text-muted">11.76V</td>
+                  <td class="p-4 text-muted">23.52V</td>
+                  <td class="p-4 text-muted">47.04V</td>
+                  <td class="p-4 text-muted">电池处于风险中</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">10%</td>
+                  <td class="p-4 text-muted">11.64V</td>
+                  <td class="p-4 text-muted">23.28V</td>
+                  <td class="p-4 text-muted">46.56V</td>
+                  <td class="p-4 text-muted">严重放电</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">0%</td>
+                  <td class="p-4 text-muted">11.50V</td>
+                  <td class="p-4 text-muted">23.00V</td>
+                  <td class="p-4 text-muted">46.00V</td>
+                  <td class="p-4 text-muted">完全放完</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <p class="text-caption text-muted mt-3">
+          富液式铅酸数值以 25°C 为准。实际电压因制造商、老化和温度而异。
+        </p>
+      </section>
+
+      <section id="agm-gel">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          AGM 和胶体电压图表
+        </h2>
+        <p class="text-body-md text-body font-light mb-4">
+          AGM（吸液玻璃纤维隔板，Absorbent Glass Mat）和胶体电池的电压特性与富液式电芯略有不同。AGM 电池通常内阻更低，在相同 SOC 下静置电压略高。胶体电池与 AGM 相近，但充电接受能力略低。
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-body-sm min-w-[640px]">
+              <thead>
+                <tr class="border-b border-hairline bg-surface-card">
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">SOC %</th>
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">AGM 12V</th>
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">胶体 12V</th>
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">AGM 24V</th>
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">说明</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-hairline">
+                <tr>
+                  <td class="p-4 font-mono text-primary">100%</td>
+                  <td class="p-4 text-muted">12.90V</td>
+                  <td class="p-4 text-muted">12.85V</td>
+                  <td class="p-4 text-muted">25.80V</td>
+                  <td class="p-4 text-muted">充满电，静置</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">90%</td>
+                  <td class="p-4 text-muted">12.75V</td>
+                  <td class="p-4 text-muted">12.70V</td>
+                  <td class="p-4 text-muted">25.50V</td>
+                  <td class="p-4 text-muted">接近满电</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">80%</td>
+                  <td class="p-4 text-muted">12.60V</td>
+                  <td class="p-4 text-muted">12.55V</td>
+                  <td class="p-4 text-muted">25.20V</td>
+                  <td class="p-4 text-muted">良好工作范围</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">70%</td>
+                  <td class="p-4 text-muted">12.48V</td>
+                  <td class="p-4 text-muted">12.43V</td>
+                  <td class="p-4 text-muted">24.96V</td>
+                  <td class="p-4 text-muted">可接受</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">60%</td>
+                  <td class="p-4 text-muted">12.36V</td>
+                  <td class="p-4 text-muted">12.31V</td>
+                  <td class="p-4 text-muted">24.72V</td>
+                  <td class="p-4 text-muted">应尽快开始回充</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">50%</td>
+                  <td class="p-4 text-muted">12.24V</td>
+                  <td class="p-4 text-muted">12.19V</td>
+                  <td class="p-4 text-muted">24.48V</td>
+                  <td class="p-4 text-muted">建议回充</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">40%</td>
+                  <td class="p-4 text-muted">12.12V</td>
+                  <td class="p-4 text-muted">12.07V</td>
+                  <td class="p-4 text-muted">24.24V</td>
+                  <td class="p-4 text-muted">有损伤风险</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">30%</td>
+                  <td class="p-4 text-muted">12.00V</td>
+                  <td class="p-4 text-muted">11.95V</td>
+                  <td class="p-4 text-muted">24.00V</td>
+                  <td class="p-4 text-muted">深度放电区</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">20%</td>
+                  <td class="p-4 text-muted">11.88V</td>
+                  <td class="p-4 text-muted">11.83V</td>
+                  <td class="p-4 text-muted">23.76V</td>
+                  <td class="p-4 text-muted">电池处于风险中</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">10%</td>
+                  <td class="p-4 text-muted">11.76V</td>
+                  <td class="p-4 text-muted">11.71V</td>
+                  <td class="p-4 text-muted">23.52V</td>
+                  <td class="p-4 text-muted">严重放电</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">0%</td>
+                  <td class="p-4 text-muted">11.60V</td>
+                  <td class="p-4 text-muted">11.55V</td>
+                  <td class="p-4 text-muted">23.20V</td>
+                  <td class="p-4 text-muted">完全放完</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <p class="text-caption text-muted mt-3">
+          AGM 和胶体数值以 25°C 为准。AGM 静置电压略高于富液式。胶体静置电压略低于 AGM。
+        </p>
+      </section>
+
+      <section id="surface-charge">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          表面电荷
+        </h2>
+        <p class="text-body-md text-body font-light mb-4">
+          表面电荷是铅酸电池特有的现象。充电后，极板表面附近的酸浓度暂时高于电解液主体，这会把端电压抬高 0.1–0.3V，高于真正的静置电压。
+        </p>
+        <p class="text-body-md text-body font-light mb-4">
+          表面电荷会在 30–60 分钟内随着酸在电解液中均匀扩散而消散。如果刚充完电就测量电压，你会得到偏高的 SOC 读数。要准确用电压估算 SOC，务必在充电器断开后至少让电池静置 30 分钟。
+        </p>
+        <p class="text-body-md text-body font-light">
+          一些充电器带有表面电荷消除功能——通过短暂的大电流放电来打破酸浓度梯度。这在船用和房车充电器中很常见。如果你的充电器具有此功能，在依靠电压估算 SOC 之前应使用它。
+        </p>
+      </section>
+
+      <section id="temperature-effects">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          温度影响
+        </h2>
+        <p class="text-body-md text-body font-light mb-4">
+          铅酸电池电压会受温度影响。在低温下，化学反应变慢、内阻增加，电压读数会偏低。在高温下，反应加快，电压读数可能略有升高。
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">温度</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">电压修正</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">容量影响</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">−20°C（−4°F）</td>
+                <td class="p-4 text-muted">每 12V 电池组 −0.4V</td>
+                <td class="p-4 text-muted">约 50% 容量可用</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">0°C（32°F）</td>
+                <td class="p-4 text-muted">每 12V 电池组 −0.2V</td>
+                <td class="p-4 text-muted">约 75% 容量可用</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">10°C（50°F）</td>
+                <td class="p-4 text-muted">每 12V 电池组 −0.1V</td>
+                <td class="p-4 text-muted">约 85% 容量可用</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">25°C（77°F）</td>
+                <td class="p-4 text-muted">无需修正</td>
+                <td class="p-4 text-muted">100% 容量</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">40°C（104°F）</td>
+                <td class="p-4 text-muted">每 12V 电池组 +0.1V</td>
+                <td class="p-4 text-muted">略有升高，老化更快</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-caption text-muted mt-3">
+          在极端条件下，温度补偿对准确估算 SOC 至关重要。
+        </p>
+      </section>
+
+      <section id="common-mistakes">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          常见错误
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">刚充完电就测量</h4>
+            <p class="text-body-sm text-muted">
+              表面电荷会把电压抬高 0.1–0.3V。一块看起来处于 100% SOC 的电池，在表面电荷消散后实际可能只有 70–80%。充电后务必等待 30 分钟以上再测量。
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">用错化学体系的曲线</h4>
+            <p class="text-body-sm text-muted">
+              富液式、AGM 和胶体电池具有不同的电压曲线。把富液式电压值套用到 AGM 电池上（或反过来）会导致 SOC 估计错误。请先确认电池类型。
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">忽视温度</h4>
+            <p class="text-body-sm text-muted">
+              放在寒冷发动机舱或未加热存储间的电池，读数会低于图表数值。一块 12V 电池在 0°C 满电时可能读到 12.4V，在表上看起来像是 50% SOC。务必做温度补偿。
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">经常放电到 50% 以下</h4>
+            <p class="text-body-sm text-muted">
+              铅酸电池如果经常放电到 50% SOC 以下，会显著损失容量。富液式电池在 50% DoD 下可能损失 50% 的循环寿命。使用电压图表，确保在到达这一阈值之前回充。
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <CalculatorCard class="border-m-blue-light">
+        <h4 class="text-label-uppercase text-primary text-xs mb-3">试用</h4>
+        <p class="text-body-sm text-muted mb-4">
+          使用电池容量计算器，按合适的 DoD 上限和温度折减为铅酸电池组选型。
+        </p>
+        <a
+          href="/zh/tools/battery-sizing-calculator/"
+          class="btn-primary text-xs py-3 px-6 inline-block"
+          >打开电池容量计算器</a
+        >
+      </CalculatorCard>
+
+      <ReferenceTable
+        title="富液式铅酸电压-SOC 参考表"
+        description="下载此表供离线参考"
+        headers={["SOC %", "12V 电池组", "24V 电池组", "48V 电池组", "说明"]}
+        rows={[
+          ["100%", "12.70V", "25.40V", "50.80V", "充满电，静置"],
+          ["90%", "12.58V", "25.16V", "50.32V", "可能仍有轻微表面电荷"],
+          ["80%", "12.46V", "24.92V", "49.84V", "良好工作范围"],
+          ["70%", "12.34V", "24.68V", "49.36V", "日常使用可接受"],
+          ["60%", "12.24V", "24.48V", "48.96V", "应尽快开始回充"],
+          ["50%", "12.12V", "24.24V", "48.48V", "建议回充"],
+          ["40%", "12.00V", "24.00V", "48.00V", "有硫酸盐化风险"],
+          ["30%", "11.88V", "23.76V", "47.52V", "深度放电区"],
+          ["20%", "11.76V", "23.52V", "47.04V", "电池处于风险中"],
+          ["10%", "11.64V", "23.28V", "46.56V", "严重放电"],
+          ["0%", "11.50V", "23.00V", "46.00V", "完全放完"],
+        ]}
+        source="Battery University / Concorde Battery"
+      />
+
+      <ReferenceTable
+        title="AGM 和胶体电压-SOC 参考表"
+        description="下载此表供离线参考"
+        headers={["SOC %", "AGM 12V", "胶体 12V", "AGM 24V", "说明"]}
+        rows={[
+          ["100%", "12.90V", "12.85V", "25.80V", "充满电，静置"],
+          ["90%", "12.75V", "12.70V", "25.50V", "接近满电"],
+          ["80%", "12.60V", "12.55V", "25.20V", "良好工作范围"],
+          ["70%", "12.48V", "12.43V", "24.96V", "可接受"],
+          ["60%", "12.36V", "12.31V", "24.72V", "应尽快开始回充"],
+          ["50%", "12.24V", "12.19V", "24.48V", "建议回充"],
+          ["40%", "12.12V", "12.07V", "24.24V", "有损伤风险"],
+          ["30%", "12.00V", "11.95V", "24.00V", "深度放电区"],
+          ["20%", "11.88V", "11.83V", "23.76V", "电池处于风险中"],
+          ["10%", "11.76V", "11.71V", "23.52V", "严重放电"],
+          ["0%", "11.60V", "11.55V", "23.20V", "完全放完"],
+        ]}
+        source="Battery University / Concorde Battery"
+      />
+
+      <FAQSection items={faqItems} />
+
+      <section class="border-t border-hairline pt-12">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">
+          参考文献
+        </h2>
+        <ul class="flex flex-col gap-2 text-body-sm text-muted">
+          {
+            references.map((ref) => (
+              <li class="flex gap-2">
+                <span class="text-m-blue-light shrink-0">—</span>
+                <a
+                  href={ref.url}
+                  class="hover:text-primary transition-colors underline underline-offset-2"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {ref.title}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+    </div>
+  </div>
+</Layout>
