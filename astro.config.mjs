@@ -7,7 +7,12 @@ import tailwind from '@tailwindcss/vite';
 import sitemap from '@astrojs/sitemap';
 import cloudflare from '@astrojs/cloudflare';
 import { collectPublishedPaths } from './scripts/collect-published-paths.mjs';
+import { lastmodForUrl, loadPageLastmods } from './scripts/sitemap-lastmod.mjs';
 import { redirectRules } from './src/seo/plan.mjs';
+
+// Per-URL dates for @astrojs/sitemap serialize(). The integration then stamps
+// sitemap-index.xml with the newest lastmod in each child sitemap.
+const pageLastmods = loadPageLastmods();
 
 /** @param {string} page */
 function isUtilityOrErrorUrl(page) {
@@ -76,6 +81,11 @@ export default defineConfig({
   integrations: [
     sitemap({
       filter: (page) => !isUtilityOrErrorUrl(page),
+      serialize(item) {
+        const lastmod = lastmodForUrl(item.url, pageLastmods);
+        if (!lastmod) return item;
+        return { ...item, lastmod };
+      },
       i18n: {
         defaultLocale: 'en',
         locales: {
