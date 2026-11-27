@@ -86,24 +86,41 @@ test('missing Chinese learn, reference, and troubleshooting URLs 301 to English'
 
 test('published Chinese learn hub stays in Chinese', () => {
   const live = new Set(collectPublishedPaths());
+  const zhGuides = [
+    '/zh/learn/how-long-will-a-100ah-battery-last/',
+    '/zh/learn/how-long-will-a-battery-run-a-diesel-heater/',
+    '/zh/learn/how-to-calculate-battery-runtime/',
+    '/zh/learn/lead-acid-voltage-chart/',
+    '/zh/learn/lifepo4-soc-chart/',
+    '/zh/learn/lifepo4-voltage-chart/',
+    '/zh/learn/what-is-battery-c-rate/',
+  ];
   const zhLearn = [...live].filter((path) => path.startsWith('/zh/learn')).sort();
-  assert.deepEqual(zhLearn, ['/zh/learn/']);
+  assert.deepEqual(zhLearn, ['/zh/learn/', ...zhGuides].sort());
 
-  assert.equal(plan({ hostname: 'batterycalculators.com', pathname: '/zh/learn/' }, live).action, 'asset');
-  assert.deepEqual(plan({ hostname: 'batterycalculators.com', pathname: '/zh/learn' }, live), {
-    action: 'redirect',
-    status: 301,
-    pathname: '/zh/learn/',
-    search: '',
-  });
+  for (const path of ['/zh/learn/', ...zhGuides]) {
+    assert.equal(plan({ hostname: 'batterycalculators.com', pathname: path }, live).action, 'asset', path);
+    assert.deepEqual(plan({ hostname: 'batterycalculators.com', pathname: path.slice(0, -1) }, live), {
+      action: 'redirect',
+      status: 301,
+      pathname: path,
+      search: '',
+    }, path);
+  }
   assert.equal(
     plan({ hostname: 'batterycalculators.com', pathname: '/zh/learn/index' }, live).pathname,
     '/zh/learn/',
   );
-  assert.equal(
-    plan({ hostname: 'batterycalculators.com', pathname: '/zh/learn/battery-c-rate-reference/' }, live).pathname,
-    '/learn/battery-c-rate-reference/',
-  );
+  for (const pathname of [
+    '/zh/learn/battery-c-rate-reference/',
+    '/zh/learn/how-to-calculate-runtime-of-a-battery/',
+    '/zh/learn/how-long-will-a-200ah-battery-last/',
+    '/zh/learn/how-long-will-a-battery-last/',
+    '/zh/learn/camper-battery-runtime-guide/',
+    '/zh/learn/rv-battery-sizing-guide/',
+  ]) {
+    assert.equal(plan({ hostname: 'batterycalculators.com', pathname }, live).pathname, pathname.replace('/zh', ''), pathname);
+  }
   assert.equal(
     plan({ hostname: 'batterycalculators.com', pathname: '/zh/reference/awg-wire-size-chart/' }, live).pathname,
     '/reference/awg-wire-size-chart/',
@@ -117,6 +134,13 @@ test('published Chinese learn hub stays in Chinese', () => {
 
   assert.equal(hrefFor('/learn/', 'zh', live), '/zh/learn/');
   assert.equal(hrefFor('/learn/battery-c-rate-reference/', 'zh', live), '/learn/battery-c-rate-reference/');
+  assert.equal(hrefFor('/learn/how-to-calculate-runtime-of-a-battery/', 'zh', live), '/learn/how-to-calculate-runtime-of-a-battery/');
+  for (const path of zhGuides) {
+    const english = path.replace('/zh', '');
+    assert.equal(hrefFor(english, 'zh', live), path);
+    assert.equal(switcherHref(english, 'zh', live), path);
+    assert.equal(switcherHref(path, 'en', live), english);
+  }
   assert.equal(switcherHref('/learn/', 'zh', live), '/zh/learn/');
   assert.equal(switcherHref('/zh/learn/', 'en', live), '/learn/');
   assert.equal(switcherHref('/zh/learn/', 'pt', live), '/pt/learn/');
@@ -125,7 +149,12 @@ test('published Chinese learn hub stays in Chinese', () => {
   assert.equal(rules.includes('/zh/learn/ /learn/ 301'), false);
   assert.equal(rules.includes('/zh/learn /learn/ 301'), false);
   assert.ok(rules.includes('/zh/learn /zh/learn/ 301'));
+  for (const path of zhGuides) {
+    assert.equal(rules.includes(`${path} ${path.replace('/zh', '')} 301`), false);
+    assert.ok(rules.includes(`${path.slice(0, -1)} ${path} 301`));
+  }
   assert.ok(rules.includes('/zh/learn/battery-c-rate-reference/ /learn/battery-c-rate-reference/ 301'));
+  assert.ok(rules.includes('/zh/learn/how-to-calculate-runtime-of-a-battery/ /learn/how-to-calculate-runtime-of-a-battery/ 301'));
   assert.equal(rules.some((rule) => rule.startsWith('/learn/ ')), false);
   assert.equal(rules.some((rule) => rule.startsWith('/pt/learn/ ')), false);
 });

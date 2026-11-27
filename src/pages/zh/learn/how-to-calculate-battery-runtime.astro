@@ -1,0 +1,147 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+
+const faqItems = [
+  {
+    question: "为什么续航时间计算器要询问效率？",
+    answer: "逆变器、DC-DC 变换器和线缆电阻都会在电池与负载之间消耗功率。效率为 90% 的逆变器意味着，有 10% 的电池能量在到达负载之前就以热量形式损失了。忽略效率会高估续航时间。",
+  },
+  {
+    question: "温度如何影响续航时间？",
+    answer: "低温会增加内阻并降低电化学反应速率。在 0°C 时，锂电池可能放出额定容量的 90%。在 -20°C 时，可用容量可能降至 70% 或更低，续航时间会按相应比例缩短。",
+  },
+  {
+    question: "什么是放电深度（DoD）？",
+    answer: "DoD 是已放出的容量占总容量的百分比。放电至 80% DoD 表示已使用 80% 的容量。为保护循环寿命，大多数锂电池不应经常放电超过 80-90% DoD。",
+  },
+  {
+    question: "为什么续航时间不等于容量除以负载？",
+    answer: "简单相除（容量 / 负载）假定效率为 100%、DoD 为 100%，且处于理想条件。实际续航时间需要计入逆变器损耗、线缆电阻、温度影响，以及通常不会放到 0% 这一事实。",
+  },
+];
+---
+
+<Layout
+  title="如何计算电池续航时间 | 电池计算器"
+  description="分步指南：由容量、负载功率、效率和放电深度计算电池放电续航时间。包含例题和公式。"
+  canonical="https://batterycalculators.com/zh/learn/how-to-calculate-battery-runtime/"
+  faqItems={faqItems}
+  lang="zh"
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/zh/learn/" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← 返回指南</a>
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">系统设计</span>
+      <h1 class="text-display-md text-primary mb-6">如何计算电池续航时间</h1>
+      <p class="text-body-md text-body font-light">
+        估算电池能为给定负载供电多久，不能只把容量除以电流。本指南将完整计算过程走一遍，包括效率、放电深度和电压。
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">基本原理</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          电池续航时间是可用能量与负载所需功率之比。可用能量取决于电池的额定容量、标称电压，以及你愿意放出多少容量（DoD 上限）。
+        </p>
+        <p class="text-body-md text-body font-light">
+          电池侧看到的负载功率高于负载本身，因为逆变器和线路会消耗一部分能量。这就是必须计入系统效率的原因。
+        </p>
+      </section>
+
+      <FormulaBox title="续航时间计算">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          可用能量 (Wh) = 容量 (Ah) × 电压 (V) × (DoD% / 100)
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          有效负载 (W) = 负载 (W) / (效率% / 100)
+        </div>
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          续航时间 (小时) = 可用能量 (Wh) / 有效负载 (W)
+        </div>
+        <p>
+          效率系数用于计入逆变器转换损耗、线缆电阻和电池管理系统的额外开销。
+        </p>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">例题</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>已知：</strong></p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li>电池：100 Ah，12.8V（LFP 4S 电池组）</li>
+              <li>DoD 上限：80%</li>
+              <li>系统效率：90%（逆变器 + 线路）</li>
+              <li>持续负载：250 W</li>
+            </ul>
+            <p><strong>第 1 步：</strong>计算可用能量：</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              100 Ah × 12.8V × 0.80 = 1,024 Wh
+            </div>
+            <p><strong>第 2 步：</strong>计算电池侧看到的有效负载：</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              250 W / 0.90 = 277.8 W
+            </div>
+            <p><strong>第 3 步：</strong>用可用能量除以有效负载：</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              1,024 Wh / 277.8 W = 3.69 小时 ≈ 3 小时 41 分钟
+            </div>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">会缩短续航时间的因素</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">温度</h4>
+            <p class="text-body-sm text-muted">
+              在 0°C 时，锂电容量大约下降 10%。在 -20°C 时，可能下降 30% 或更多。铅酸对低温更加敏感。
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">佩克特效应</h4>
+            <p class="text-body-sm text-muted">
+              铅酸电池在高放电倍率下放出的总能量更少。一块 100 Ah 铅酸电池在 1C 下可能只能放出 60-70 Ah 可用容量。
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">电池老化</h4>
+            <p class="text-body-sm text-muted">
+              随着电池老化，内阻上升、容量衰减。一块使用 5 年的电池可能只剩原来容量的 80%，续航时间会直接缩短。
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">电压跌落</h4>
+            <p class="text-body-sm text-muted">
+              在重载下，电池端电压会下降。如果逆变器的欠压保护提前触发，电池会在额定容量尚未放完之前就被切断。
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">试用</h4>
+          <p class="text-body-sm text-muted mb-4">
+            使用续航时间计算器，按你的具体系统估算放电时长。
+          </p>
+          <a href="/zh/tools/runtime-calculator/" class="btn-primary text-xs py-3 px-6 inline-block">打开续航时间计算器</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">相关</h4>
+          <p class="text-body-sm text-muted mb-4">
+            需要先选定电池容量？使用电池容量计算器确定所需容量。
+          </p>
+          <a href="/zh/tools/battery-sizing-calculator/" class="btn-primary-outline text-xs py-3 px-6 inline-block">打开容量计算器</a>
+        </CalculatorCard>
+      </div>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>

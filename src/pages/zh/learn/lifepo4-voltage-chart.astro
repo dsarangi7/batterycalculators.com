@@ -1,0 +1,324 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import ReferenceChart from '../../../components/ReferenceChart.astro';
+import ReferenceTable from '../../../components/ReferenceTable.astro';
+
+const faqItems = [
+  {
+    question: "充满电的磷酸铁锂（LiFePO4）电池静置电压是多少？",
+    answer: "充满电的磷酸铁锂电芯静置电压大约为 3.35–3.40V。对于标称 12V 电池组（4 只电芯串联），大约是 13.4–13.6V。24V 电池组（8 只电芯）静置电压为 26.8–27.2V，48V 电池组（16 只电芯）为 53.6–54.4V。",
+  },
+  {
+    question: "为什么磷酸铁锂电压在 SOC 中段很平？",
+    answer: "磷酸铁锂在大约 20% 到 90% SOC 之间有一段极其平坦的放电平台。在这一范围内的大部分区间，电压都维持在每只电芯约 3.2V 附近，因此在中段用电压估算 SOC 并不可靠。这也是更推荐采用库仑计数，或带电芯均衡的 BMS 的原因。",
+  },
+  {
+    question: "温度会影响磷酸铁锂的静置电压吗？",
+    answer: "会。低温会略微降低开路电压，并增加内阻，从而在带载时造成电压跌落。在室温（25°C）下，图表中的数值最为准确。在 0°C 时，带载下每只电芯大约会低 0.05–0.1V。",
+  },
+  {
+    question: "我可以用万用表检查磷酸铁锂的 SOC 吗？",
+    answer: "万用表可以给出粗略估计，但前提是电池已经静置（既不充电也不放电）至少 30 分钟至数小时。刚充完电产生的表面电荷会抬高读数。要得到准确的 SOC，应使用带库仑计数的 BMS。",
+  },
+];
+
+const tableOfContents = [
+  { id: "why-voltage-matters", label: "为什么电压很重要" },
+  { id: "voltage-chart", label: "磷酸铁锂电压图表" },
+  { id: "reading-the-table", label: "如何读表" },
+  { id: "accuracy-notes", label: "精度说明" },
+  { id: "practical-tips", label: "实用提示" },
+  { id: "common-mistakes", label: "常见错误" },
+];
+
+const relatedCalculators = [
+  { title: "SOC估算器", href: "/zh/tools/soc-estimator/" },
+  { title: "电池续航时间计算器", href: "/zh/tools/runtime-calculator/" },
+  { title: "电池容量计算器", href: "/zh/tools/battery-sizing-calculator/" },
+];
+
+const references = [
+  { title: "Battery University — 磷酸铁锂（LiFePO4）电压特性", url: "https://batteryuniversity.com/article/bu-402-types-of-lithium-ion" },
+  { title: "Wikipedia — 磷酸铁锂电池", url: "https://en.wikipedia.org/wiki/Lithium_iron_phosphate_battery" },
+];
+---
+
+<Layout
+  title="磷酸铁锂（LiFePO4）电压图表 — 按 SOC 的静置电压 | 电池计算器"
+  description="磷酸铁锂电池在 12V、24V 和 48V 下的近似静置电压表。参考图表给出各 SOC 水平的电压，并说明精度限制。"
+  canonical="https://batterycalculators.com/zh/learn/lifepo4-voltage-chart/"
+  faqItems={faqItems}
+  lang="zh"
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/zh/learn/" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">&larr; 返回指南</a>
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">参考</span>
+      <h1 class="text-display-md text-primary mb-6">磷酸铁锂（LiFePO4）电压图表</h1>
+      <p class="text-body-md text-body font-light">
+        磷酸铁锂（LFP）电池在常见电池组电压下的近似静置电压。把本表作为由开路电压估算荷电状态（SOC）的快速参考。
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+      <section id="why-voltage-matters">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">为什么电压很重要</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          电池电压是最容易获得的荷电状态指标。把万用表接到电池端子上，就可以大致看出电池充到了什么程度——前提是你知道化学体系和电池组配置。对磷酸铁锂电芯而言，开路电压与 SOC 的关系有一条较明确的曲线，但在中段明显很平。
+        </p>
+        <p class="text-body-md text-body font-light">
+          了解静置电压有助于核对 BMS 读数、诊断充电问题，并在没有专用设备的情况下估算剩余容量。不过，用电压估算磷酸铁锂的 SOC 有实际局限，这也是许多系统把库仑计数作为主要方法的原因。
+        </p>
+      </section>
+
+      <section id="voltage-chart">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">磷酸铁锂电压图表</h2>
+        <ReferenceChart
+          type="line"
+          title="磷酸铁锂静置电压与 SOC"
+          description="标称 12V 电池组（4S）——注意 30–70% SOC 之间的平坦平台"
+          xLabel="SOC %"
+          yLabel="电压 (V)"
+          data={[
+            { x: 0, y: 12.0, label: '0%' },
+            { x: 10, y: 12.6, label: '10%' },
+            { x: 20, y: 12.9, label: '20%' },
+            { x: 30, y: 13.0, label: '30%' },
+            { x: 40, y: 13.1, label: '40%' },
+            { x: 50, y: 13.1, label: '50%' },
+            { x: 60, y: 13.2, label: '60%' },
+            { x: 70, y: 13.2, label: '70%' },
+            { x: 80, y: 13.3, label: '80%' },
+            { x: 90, y: 13.4, label: '90%' },
+            { x: 100, y: 13.6, label: '100%' },
+          ]}
+          yMin={11.5}
+          yMax={14.0}
+          caption="数值为 25°C 下的近似静置电压。实际数值因制造商而异。"
+        />
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-body-sm min-w-[640px]">
+              <thead>
+                <tr class="border-b border-hairline bg-surface-card">
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">SOC %</th>
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">12V 电池组 (4S)</th>
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">24V 电池组 (8S)</th>
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">48V 电池组 (16S)</th>
+                  <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">说明</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-hairline">
+                <tr>
+                  <td class="p-4 font-mono text-primary">100%</td>
+                  <td class="p-4 text-muted">13.6V</td>
+                  <td class="p-4 text-muted">27.2V</td>
+                  <td class="p-4 text-muted">54.4V</td>
+                  <td class="p-4 text-muted">充满电，静置</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">90%</td>
+                  <td class="p-4 text-muted">13.4V</td>
+                  <td class="p-4 text-muted">26.8V</td>
+                  <td class="p-4 text-muted">53.6V</td>
+                  <td class="p-4 text-muted">接近曲线顶部</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">80%</td>
+                  <td class="p-4 text-muted">13.3V</td>
+                  <td class="p-4 text-muted">26.6V</td>
+                  <td class="p-4 text-muted">53.2V</td>
+                  <td class="p-4 text-muted">进入平坦平台</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">70%</td>
+                  <td class="p-4 text-muted">13.2V</td>
+                  <td class="p-4 text-muted">26.4V</td>
+                  <td class="p-4 text-muted">52.8V</td>
+                  <td class="p-4 text-muted">平坦区间开始</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">60%</td>
+                  <td class="p-4 text-muted">13.2V</td>
+                  <td class="p-4 text-muted">26.4V</td>
+                  <td class="p-4 text-muted">52.8V</td>
+                  <td class="p-4 text-muted">电压几乎不变</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">50%</td>
+                  <td class="p-4 text-muted">13.1V</td>
+                  <td class="p-4 text-muted">26.2V</td>
+                  <td class="p-4 text-muted">52.4V</td>
+                  <td class="p-4 text-muted">平坦平台中点</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">40%</td>
+                  <td class="p-4 text-muted">13.1V</td>
+                  <td class="p-4 text-muted">26.2V</td>
+                  <td class="p-4 text-muted">52.4V</td>
+                  <td class="p-4 text-muted">电压与 50–60% 几乎无法区分</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">30%</td>
+                  <td class="p-4 text-muted">13.0V</td>
+                  <td class="p-4 text-muted">26.0V</td>
+                  <td class="p-4 text-muted">52.0V</td>
+                  <td class="p-4 text-muted">仍处于平坦区间</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">20%</td>
+                  <td class="p-4 text-muted">12.9V</td>
+                  <td class="p-4 text-muted">25.8V</td>
+                  <td class="p-4 text-muted">51.6V</td>
+                  <td class="p-4 text-muted">开始下降</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">10%</td>
+                  <td class="p-4 text-muted">12.6V</td>
+                  <td class="p-4 text-muted">25.2V</td>
+                  <td class="p-4 text-muted">50.4V</td>
+                  <td class="p-4 text-muted">电压陡降</td>
+                </tr>
+                <tr>
+                  <td class="p-4 font-mono text-primary">0%</td>
+                  <td class="p-4 text-muted">12.0V</td>
+                  <td class="p-4 text-muted">24.0V</td>
+                  <td class="p-4 text-muted">48.0V</td>
+                  <td class="p-4 text-muted">完全放完（截止）</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <p class="text-caption text-muted mt-3">数值为近似值。实际电压因制造商、电芯老化、温度和负载历史而异。</p>
+      </section>
+
+      <section id="reading-the-table">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">如何读表</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          本表给出的是开路电压（OCV）——即电池在无负载下静置至少 30 分钟后测得的电压。12V 磷酸铁锂电池组使用 4 只电芯串联（4S），24V 电池组使用 8 只电芯（8S），48V 电池组使用 16 只电芯（16S）。
+        </p>
+        <p class="text-body-md text-body font-light">
+          注意 30% 到 70% SOC 之间极其平坦的电压平台。在这一范围内，整个电池组的电压差距只有 0.1–0.2V。这是磷酸铁锂化学体系的典型特征，也使得在中段用电压估算 SOC 并不可靠。只有在充电曲线靠近顶部（高于 80%）和底部（低于 20%）时，电压才成为有用的 SOC 指标。
+        </p>
+      </section>
+
+      <section id="accuracy-notes">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">精度说明</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">制造商差异</h4>
+            <p class="text-body-sm text-muted">
+              不同磷酸铁锂电芯制造商生产的电芯，OCV 曲线会略有不同。一家制造商的 A 级电芯，静置电压可能与另一家相差 0.02–0.05V。务必对照你所用制造商的具体数据手册进行核对。
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">温度影响</h4>
+            <p class="text-body-sm text-muted">
+              低温会降低开路电压。在 0°C 时，读数预计比 25°C 时每只电芯低 0.05–0.1V。BMS 中的温度补偿，或经过温度修正的查表，可以提高精度。
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">静置要求</h4>
+            <p class="text-body-sm text-muted">
+              刚充完电产生的表面电荷会抬高电压读数。要准确测量 OCV，电池必须在充电或放电后至少静置 30 分钟。一些制造商建议静置 2–4 小时以获得最佳精度。
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">BMS 校准</h4>
+            <p class="text-body-sm text-muted">
+              许多 BMS 将基于电压的 SOC 估算与库仑计数结合使用。如果 BMS 的 SOC 读数与电压读数不一致，可能需要重新校准。进行一次完整的充电—放电—再充电循环即可复位。
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <section id="practical-tips">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">实用提示</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          用电压读数确认电池处于合理的 SOC 范围。例如，如果你的 12V 磷酸铁锂电池组静置后读数为 12.8V，可以估计大约在 20–25% SOC。如果读数为 13.4V，则电池接近满电。
+        </p>
+        <p class="text-body-md text-body font-light mb-4">
+          对于需要准确 SOC 的应用（例如太阳能储能或房车野外离网停驻），应将电压监测与带库仑计数的 BMS 结合使用。在平坦平台区间，仅靠电压不足以精确判定 SOC。
+        </p>
+        <p class="text-body-md text-body font-light">
+          比较电压读数时，务必在电池闲置后再测量。带载条件会显著改变电压。一块 100Ah 磷酸铁锂电池在 50A 负载下的电压，会低于同一块电池在相同 SOC 下的静置电压。
+        </p>
+      </section>
+
+      <section id="common-mistakes">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">常见错误</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">在带载下测量</h4>
+            <p class="text-body-sm text-muted">
+              由于内阻，带载电压总是低于静置电压（V = OCV − I × R）。在放电时测量会得到偏低的 SOC 估计。务必断开负载并等待后再测量。
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">忽视温度</h4>
+            <p class="text-body-sm text-muted">
+              寒冷的电池读数会低于图表数值。把室温电压表套用到存放在寒冷车库中的电池上，会低估 SOC。在寒冷环境中应使用经过温度修正的数值。
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">仅凭电压判断 SOC</h4>
+            <p class="text-body-sm text-muted">
+              30% 到 70% SOC 之间的平坦平台意味着电压差不到 0.1V。廉价电压表无法可靠区分 12V 磷酸铁锂电池组上 40% 与 60% 的 SOC。在中段应依靠库仑计数。
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">把电池组电压和电芯电压搞混</h4>
+            <p class="text-body-sm text-muted">
+              务必分清你读到的是电芯电压（3.0–3.65V）还是电池组电压（12–54V）。两者混淆会导致 SOC 估计完全错误。本表数值针对标称电池组电压，而不是单只电芯。
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <CalculatorCard class="border-m-blue-light">
+        <h4 class="text-label-uppercase text-primary text-xs mb-3">试用</h4>
+        <p class="text-body-sm text-muted mb-4">
+          使用 SOC估算器，根据开路电压测量值为你的具体磷酸铁锂电池组插值估算荷电状态。
+        </p>
+        <a href="/zh/tools/soc-estimator/" class="btn-primary text-xs py-3 px-6 inline-block">打开 SOC估算器</a>
+      </CalculatorCard>
+
+      <ReferenceTable
+        title="磷酸铁锂电压-SOC 参考表"
+        description="下载此表供离线参考"
+        headers={["SOC %", "12V 电池组 (4S)", "24V 电池组 (8S)", "48V 电池组 (16S)", "说明"]}
+        rows={[
+          ["100%", "13.6V", "27.2V", "54.4V", "充满电，静置"],
+          ["90%", "13.4V", "26.8V", "53.6V", "接近曲线顶部"],
+          ["80%", "13.3V", "26.6V", "53.2V", "进入平坦平台"],
+          ["70%", "13.2V", "26.4V", "52.8V", "平坦区间开始"],
+          ["60%", "13.2V", "26.4V", "52.8V", "电压几乎不变"],
+          ["50%", "13.1V", "26.2V", "52.4V", "平坦平台中点"],
+          ["40%", "13.1V", "26.2V", "52.4V", "电压与 50–60% 几乎无法区分"],
+          ["30%", "13.0V", "26.0V", "52.0V", "仍处于平坦区间"],
+          ["20%", "12.9V", "25.8V", "51.6V", "开始下降"],
+          ["10%", "12.6V", "25.2V", "50.4V", "电压陡降"],
+          ["0%", "12.0V", "24.0V", "48.0V", "完全放完（截止）"],
+        ]}
+        source="Battery University / 制造商数据手册"
+      />
+
+      <FAQSection items={faqItems} />
+
+      <section class="border-t border-hairline pt-12">
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">参考文献</h2>
+        <ul class="flex flex-col gap-2 text-body-sm text-muted">
+          {references.map((ref) => (
+            <li class="flex gap-2">
+              <span class="text-m-blue-light shrink-0">—</span>
+              <a href={ref.url} class="hover:text-primary transition-colors underline underline-offset-2" target="_blank" rel="noopener noreferrer">{ref.title}</a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    </div>
+  </div>
+</Layout>

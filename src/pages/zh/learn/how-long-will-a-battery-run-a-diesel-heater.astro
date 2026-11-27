@@ -1,0 +1,463 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import CalculatorCard from '../../../components/CalculatorCard.astro';
+import FormulaBox from '../../../components/FormulaBox.astro';
+import FAQSection from '../../../components/FAQSection.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+
+const faqItems = [
+  {
+    question: "电池能让柴油加热器运行多久？",
+    answer: "典型的 12V 柴油加热器在正常运行时功耗为 10–30W（燃油泵、预热塞、风扇和控制器）。一块 100Ah 12.8V LFP 电池大约可以连续为柴油加热器供电 30–80 小时。预热塞在启动时功耗为 80–120W，但只持续 2–5 分钟，因此启动对总续航时间的影响很小。",
+  },
+  {
+    question: "12V 柴油加热器耗电多少？",
+    answer: "正常运行时，12V 柴油加热器的功耗为 10–30W，取决于型号和加热档位。燃油泵功耗 3–8W，风扇功耗 5–15W，控制器功耗 1–3W。预热塞功耗为 80–120W，但只在 2–5 分钟的启动周期内工作。日均耗电通常为 200–500 Wh。",
+  },
+  {
+    question: "我可以用生活电池给柴油加热器供电吗？",
+    answer: "可以，柴油加热器就是按由 12V 生活电池供电来设计的。其功耗很低（10–30W），是对电池最友好的取暖方式之一。单独一块 100Ah LFP 电池就可以为柴油加热器供电数天而无需回充。",
+  },
+  {
+    question: "柴油加热器会消耗多少安时？",
+    answer: "一台在 12V 下消耗 20W 的柴油加热器，大约持续取用 1.7 安培。24 小时大约消耗 40Ah。按一周夜间使用（每晚 8 小时）计算，大约消耗 11Ah——只占典型生活电池容量的一小部分。",
+  },
+  {
+    question: "柴油加热器很耗电吗？",
+    answer: "不。柴油加热器是移动场景中能效最高的取暖方式之一。其电耗很小（10–30W），相比电暖器（1,000–1,500W）或带鼓风机的丙烷炉（50–100W）要低得多。提供热能的是燃料（柴油），而不是电池。",
+  },
+  {
+    question: "柴油加热器需要多大的电池？",
+    answer: "周末使用时，一块 50Ah LFP 电池就足以带动柴油加热器。若要一周夜间使用且中途不充电，一块 100Ah LFP 电池能提供较充裕的余量。若要长时间离网使用，可将 100Ah 电池与一块小型太阳能板（50–100W）搭配，系统即可长期自行维持。",
+  },
+  {
+    question: "太阳能板能维持柴油加热器持续运行吗？",
+    answer: "可以。柴油加热器日均 200–500 Wh 的耗电，即使是较小的太阳能板也容易覆盖。一块 50W 太阳能板在 4 个峰值日照小时内大约发电 150–170 Wh，足以覆盖夜间加热器用电。一块 100W 板则为阴天提供了充足余量。",
+  },
+  {
+    question: "柴油加热器会把电池耗尽吗？",
+    answer: "柴油加热器耗电很少（10–30W）。在典型的夜间使用场景（8 小时）中，它消耗 80–240 Wh——从 12V 电池大约取出 7–20Ah。这是很小的消耗，第二天很容易通过行驶、太阳能或岸电补回。",
+  },
+];
+---
+
+<Layout
+  title="电池能让柴油加热器运行多久？ | 电池计算器"
+  description="计算 12V 柴油加热器的电池续航时间。涵盖功耗、启动电流，以及房车、露营车和离网取暖的电池选型。"
+  canonical="https://batterycalculators.com/zh/learn/how-long-will-a-battery-run-a-diesel-heater/"
+  schema="faqPage"
+  schemaName="电池能让柴油加热器运行多久？"
+  schemaDescription="房车、露营车和离网场景中 12V 柴油加热器的电池续航时间计算。"
+  schemaUrl="https://batterycalculators.com/zh/learn/how-long-will-a-battery-run-a-diesel-heater/"
+  faqItems={faqItems}
+  lang="zh"
+>
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-12 border-b border-hairline pb-8">
+      <a href="/zh/learn/" class="text-label-uppercase text-xs text-muted hover:text-primary transition-colors mb-4 inline-block">← 返回指南</a>
+      <Breadcrumb items={[
+        { label: "学习中心", href: "/zh/learn/" },
+        { label: "电池能让柴油加热器运行多久？" }
+      ]} />
+      <span class="text-label-uppercase text-m-blue-light text-xs block mb-4">房车 / 露营车</span>
+      <h1 class="text-display-md text-primary mb-6">电池能让柴油加热器运行多久？</h1>
+      <p class="text-body-md text-body font-light">
+        柴油加热器已成为厢式车改装、越野旅居车和露营车的首选取暖方案。它们耗油很少、供热出色，而且——与电暖器不同——从电池取电非常少。了解其电耗，有助于选配能让你整晚保暖、又不会把电池组耗尽的电池系统。
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-12">
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">简要结论</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          一台 12V 柴油加热器在正常运行时大约消耗 <strong class="text-primary">10–30W</strong>，只需 1–2.5 安培。一块 100Ah 磷酸铁锂电池可以连续为柴油加热器供电 <strong class="text-primary">30–80 小时</strong>——足够 3–8 个夜间取暖而无需回充。柴油加热器是目前最省电的取暖方式之一。
+        </p>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">电池</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">可用能量</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">加热器续航时间（20W）</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 font-mono text-primary">50Ah LFP (12.8V)</td>
+                <td class="p-4 font-mono text-primary">512 Wh</td>
+                <td class="p-4 font-mono text-primary">约 25.6 小时</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">100Ah LFP (12.8V)</td>
+                <td class="p-4 font-mono text-primary">1,024 Wh</td>
+                <td class="p-4 font-mono text-primary">约 51.2 小时</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">200Ah LFP (12.8V)</td>
+                <td class="p-4 font-mono text-primary">2,048 Wh</td>
+                <td class="p-4 font-mono text-primary">约 102.4 小时</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-mono text-primary">100Ah AGM (12V)</td>
+                <td class="p-4 font-mono text-primary">640 Wh</td>
+                <td class="p-4 font-mono text-primary">约 32 小时</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-caption text-muted mt-2">按 20W 平均功耗估算（典型 5kW 柴油加热器中档）。实际功耗因型号和加热档位而异。</p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">理解柴油加热器的功耗</h2>
+        <p class="text-body-md text-body font-light mb-4">
+          电暖器是把电能直接转换成热（1,000–1,500W），柴油加热器则是燃烧柴油来产生热量。电池只为控制电路、燃油泵、风扇和预热塞供电——这些部件合在一起取电很少。这就是柴油加热器在离网取暖中如此受欢迎的原因：燃料提供能量，电池只需驱动控制系统。
+        </p>
+
+        <div class="flex flex-col gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">正常运行（10–30W）</h4>
+            <p class="text-body-sm text-muted">
+              加热器运行后，燃油泵循环输送柴油，风扇循环暖风，控制器维持设定温度。总功耗通常为 10–30W，取决于型号和加热档位。更高档位会提高风扇转速和燃油泵频率，功耗会略有增加。
+            </p>
+          </CalculatorCard>
+
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">启动阶段（80–120W，持续 2–5 分钟）</h4>
+            <p class="text-body-sm text-muted">
+              预热塞（或陶瓷点火器）升温以点燃柴油。这一过程功耗为 80–120W，但每次启动周期只持续 2–5 分钟。燃料开始燃烧后，预热塞就会关闭。在整晚运行中，启动能耗可以忽略不计——通常不到总耗电的 2%。
+            </p>
+          </CalculatorCard>
+
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">风扇转速与热量输出</h4>
+            <p class="text-body-sm text-muted">
+              大多数柴油加热器具有可变风扇转速。低档功耗更低（8–12W），但热量也更少。高档功耗更高（20–30W），但能提供最大热量输出。风扇转速与功耗大致呈线性关系——转速加倍，功耗大约增加 60–80%。
+            </p>
+          </CalculatorCard>
+
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">环境温度的影响</h4>
+            <p class="text-body-sm text-muted">
+              在更寒冷的条件下，加热器会更频繁地运行以维持设定温度，平均功耗随之增加。在 -10°C（14°F）时，一台在 0°C 下平均 15W 的加热器可能平均达到 20–25W。不过，即使在最大工作循环下，电耗相对于热量输出仍然不大。
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FormulaBox title="续航时间公式">
+        <div class="bg-surface-soft p-4 font-mono text-primary border border-hairline my-2">
+          续航时间 (h) = (电池 Ah × 电压 × DoD) / 加热器平均功率 (W)
+        </div>
+        <p class="text-body-sm text-muted mt-2">
+          对柴油加热器而言，系统效率损失很小，因为加热器直接接入 12V 直流系统（不需要逆变器）。直流回路可按 95% 效率计算，以计入线路和连接器损耗。
+        </p>
+      </FormulaBox>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">例题 1：露营车夜间取暖</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>场景：</strong>用一台 5kW 柴油加热器中档，为露营车夜间取暖（10 小时）。</p>
+            <p><strong>已知：</strong></p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li>加热器：5kW 柴油，平均功耗 20W</li>
+              <li>电池：100Ah 12.8V 磷酸铁锂</li>
+              <li>DoD：80%</li>
+              <li>直流回路效率：95%</li>
+              <li>运行时间：10 小时（夜间）</li>
+            </ul>
+            <p><strong>第 1 步：</strong>电池可用能量：</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              100 Ah × 12.8V × 0.80 = 1,024 Wh
+            </div>
+            <p><strong>第 2 步：</strong>计入直流回路损耗后：</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              1,024 Wh × 0.95 = 972.8 Wh
+            </div>
+            <p><strong>第 3 步：</strong>总续航时间：</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              972.8 Wh / 20W = 48.6 小时
+            </div>
+            <p><strong>第 4 步：</strong>每晚消耗的能量：</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              20W × 10h = 200 Wh（电池的 19.5%）
+            </div>
+            <p class="pt-2 border-t border-hairline"><strong>结果：</strong>这块 100Ah LFP 电池可以连续为柴油加热器供电 48.6 小时。一次 10 小时的夜间使用只消耗 200 Wh——大约是电池可用容量的 19.5%。在需要回充之前，你可以取暖 4–5 个夜晚。</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">例题 2：多晚出行并搭配太阳能</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>场景：</strong>7 晚露营，柴油加热器每晚运行 10 小时，配备 100W 太阳能板。</p>
+            <p><strong>已知：</strong></p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li>加热器：平均功耗 20W</li>
+              <li>夜间使用：10 小时</li>
+              <li>电池：100Ah 12.8V LFP</li>
+              <li>太阳能：100W 板，4 个峰值日照小时，效率 85%</li>
+            </ul>
+            <p><strong>第 1 步：</strong>加热器夜间耗电：</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              20W × 10h = 200 Wh/晚
+            </div>
+            <p><strong>第 2 步：</strong>日均太阳能发电：</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              100W × 4h × 0.85 = 340 Wh/天
+            </div>
+            <p><strong>第 3 步：</strong>每日净平衡：</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              发电 340 Wh - 消耗 200 Wh = +140 Wh 盈余
+            </div>
+            <p class="pt-2 border-t border-hairline"><strong>结果：</strong>太阳能板发出的能量多于加热器消耗。电池实际上每天都在增加电量。即使在太阳能出力只有 50% 的阴天（170 Wh），系统也能覆盖加热器耗电的 85%。一块 100Ah LFP 电池可为连续阴天提供 5 晚的缓冲。</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-6">例题 3：极寒条件下使用高档加热</h2>
+        <CalculatorCard>
+          <div class="flex flex-col gap-4 text-body-sm text-muted">
+            <p><strong>场景：</strong>在 -15°C（5°F）冬季露营，加热器开高档（平均 25W），每晚运行 14 小时。</p>
+            <p><strong>已知：</strong></p>
+            <ul class="list-disc pl-6 flex flex-col gap-1">
+              <li>加热器：平均 25W（高档，寒冷条件）</li>
+              <li>夜间使用：14 小时（傍晚至清晨）</li>
+              <li>电池：200Ah 12.8V LFP</li>
+              <li>DoD：80%</li>
+            </ul>
+            <p><strong>第 1 步：</strong>夜间耗电：</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              25W × 14h = 350 Wh/晚
+            </div>
+            <p><strong>第 2 步：</strong>电池可用容量：</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              200 Ah × 12.8V × 0.80 = 2,048 Wh
+            </div>
+            <p><strong>第 3 步：</strong>仅靠电池的续航时间：</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              2,048 Wh / 25W = 81.9 小时
+            </div>
+            <p><strong>第 4 步：</strong>满电电池可取暖的夜晚数：</p>
+            <div class="font-mono text-primary pl-4 border-l-2 border-m-blue-light">
+              81.9 小时 / 每晚 14h = 5.8 晚
+            </div>
+            <p class="pt-2 border-t border-hairline"><strong>结果：</strong>这块 200Ah LFP 电池在极寒条件下、完全不回充，也能提供接近 6 晚的取暖。需要注意，LFP 电池在低温下会损失容量——在 -15°C 时，实际可用容量可能只有额定容量的 70–80%。计入低温折减后，大约可取暖 4.5–5 晚。</p>
+          </div>
+        </CalculatorCard>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">各型号加热器的功耗</h2>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">加热器类型</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">热量输出</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">平均功耗 (W)</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">日用电量 (Wh)</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">100Ah LFP 续航时间</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">2kW 中国产柴油加热器</td>
+                <td class="p-4 font-mono text-primary">2kW</td>
+                <td class="p-4 font-mono text-primary">10–15W</td>
+                <td class="p-4 font-mono text-primary">120–180</td>
+                <td class="p-4 font-mono text-primary">约 57–85 小时</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">5kW 中国产柴油加热器</td>
+                <td class="p-4 font-mono text-primary">5kW</td>
+                <td class="p-4 font-mono text-primary">15–25W</td>
+                <td class="p-4 font-mono text-primary">180–300</td>
+                <td class="p-4 font-mono text-primary">约 34–57 小时</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">8kW 中国产柴油加热器</td>
+                <td class="p-4 font-mono text-primary">8kW</td>
+                <td class="p-4 font-mono text-primary">20–30W</td>
+                <td class="p-4 font-mono text-primary">240–360</td>
+                <td class="p-4 font-mono text-primary">约 28–42 小时</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Webasto Thermo Top</td>
+                <td class="p-4 font-mono text-primary">5kW</td>
+                <td class="p-4 font-mono text-primary">15–30W</td>
+                <td class="p-4 font-mono text-primary">180–360</td>
+                <td class="p-4 font-mono text-primary">约 28–57 小时</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">Eberspächer Airtronic</td>
+                <td class="p-4 font-mono text-primary">4kW</td>
+                <td class="p-4 font-mono text-primary">10–25W</td>
+                <td class="p-4 font-mono text-primary">120–300</td>
+                <td class="p-4 font-mono text-primary">约 34–85 小时</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-caption text-muted mt-2">日用电量按运行 12 小时计算。续航时间基于 100Ah 12.8V LFP、80% DoD。</p>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">实际使用场景</h2>
+
+        <div class="flex flex-col gap-6">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">场景 1：周末冬季露营</h4>
+            <p class="text-body-sm text-muted mb-3">
+              周五傍晚到周日早晨——2 晚取暖（每晚 10 小时）。使用 5kW 柴油加热器，平均 20W，搭配 100Ah LFP 电池。总耗电：400 Wh。电池从 100% 大约降至 61% SOC。周末出行无需回充。
+            </p>
+            <div class="font-mono text-m-blue-light text-xs">100Ah LFP · 20W 加热器 · 共计 20 小时 · 使用电池 39%</div>
+          </CalculatorCard>
+
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">场景 2：为期一周的越野旅居</h4>
+            <p class="text-body-sm text-muted mb-3">
+              露营车中用 5kW 柴油加热器夜间取暖 7 晚（每晚 10 小时）。使用 200Ah LFP 电池和 100W 太阳能板。夜间耗电：200 Wh。日均太阳能发电：340 Wh。太阳能板每天都能把电池补满，并有 140 Wh 盈余。整个行程中电池 SOC 保持在 90% 以上。
+            </p>
+            <div class="font-mono text-m-blue-light text-xs">200Ah LFP + 100W 太阳能 · 200 Wh/晚 · 可无限续航</div>
+          </CalculatorCard>
+
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">场景 3：全职厢式车旅居生活（冬季）</h4>
+            <p class="text-body-sm text-muted mb-3">
+              全职厢式车居住者在冬季每晚运行柴油加热器 12 小时。耗电：240 Wh/晚。使用 200Ah LFP 电池和 400W 车顶太阳能。即使在冬季，太阳能每天也能发出 600–1,000 Wh。系统可以轻松维持电池 SOC。在冬季日照最短的日子，电池仍可提供 6 天以上的缓冲。
+            </p>
+            <div class="font-mono text-m-blue-light text-xs">200Ah LFP + 400W 太阳能 · 240 Wh/晚 · 可无限续航</div>
+          </CalculatorCard>
+
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">场景 4：货车驾驶室过夜</h4>
+            <p class="text-body-sm text-muted mb-3">
+              长途货车司机在驾驶室过夜，用 2kW 柴油加热器每晚运行 8 小时。使用 50Ah LFP 电池（货车辅助电池）。耗电：100–120 Wh/晚。电池每晚大约下降 12%。第二天行驶 30 分钟内，货车发电机即可将其回充。
+            </p>
+            <div class="font-mono text-m-blue-light text-xs">50Ah LFP · 12W 加热器 · 96 Wh/晚 · 发电机每日回充</div>
+          </CalculatorCard>
+
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">场景 5：无太阳能，使用岸电</h4>
+            <p class="text-body-sm text-muted mb-3">
+              在有岸电的营地，柴油加热器夜间运行，白天通过岸电充电器给电池充电。使用 100Ah LFP 电池和 10A 充电器。充电器在一整天内大约可补入 1,280 Wh——远多于夜间消耗的 200 Wh。系统可以长期保持满电。
+            </p>
+            <div class="font-mono text-m-blue-light text-xs">100Ah LFP + 10A 充电器 · 200 Wh/晚 · 每天完全回充</div>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">常见错误</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">把燃油消耗和电耗混为一谈</h4>
+            <p class="text-body-sm text-muted">
+              柴油加热器消耗柴油来提供热能——而不是消耗电池电能。一台 5kW 加热器每小时燃烧 0.5L，使用的是燃料的化学能（大约每升 4.5 kWh 热量），而不是 5kW 电能。电池只为控制系统供电（10–30W）。
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">把电池选得过大</h4>
+            <p class="text-body-sm text-muted">
+              由于柴油加热器取电很少，很多人会不必要地把电池选得过大。一块 100Ah LFP 电池就能提供 3–5 晚取暖。除非还有其他较大负载，否则只为取暖配备超大电池组是过剩的。
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">忽视低温对 LFP 的影响</h4>
+            <p class="text-body-sm text-muted">
+              磷酸铁锂电池在低温下会损失容量。在 -10°C 时，可用容量会降至额定容量的 70–80%。在 -20°C 时，可能降至 50–60%。如果电池放在未加热的隔舱中，计算续航时间时必须计入这一折减。
+            </p>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">没有为启动电流预留余量</h4>
+            <p class="text-body-sm text-muted">
+              预热塞在启动时功耗为 80–120W。如果电池几乎耗尽时加热器尝试启动，电压跌落可能造成点火失败。要确保电池有足够电量应对多次启动尝试——至少保留 20% SOC 作为余量。
+            </p>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">柴油加热器推荐电池容量</h2>
+        <div class="bg-surface-soft border border-hairline overflow-hidden">
+          <table class="w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-hairline bg-surface-card">
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">使用场景</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">电池（LFP）</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">可取暖夜晚数</th>
+                <th class="p-4 text-label-uppercase text-primary text-xs tracking-wider">说明</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-hairline">
+              <tr>
+                <td class="p-4 text-muted">周末露营</td>
+                <td class="p-4 font-mono text-primary">50Ah</td>
+                <td class="p-4 font-mono text-primary">3–5 晚</td>
+                <td class="p-4 text-muted">短途出行无需太阳能</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">较长时间出行（1 周）</td>
+                <td class="p-4 font-mono text-primary">100Ah</td>
+                <td class="p-4 font-mono text-primary">5–8 晚</td>
+                <td class="p-4 text-muted">加装 50–100W 太阳能即可长期使用</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">厢式车旅居 / 越野旅居</td>
+                <td class="p-4 font-mono text-primary">200Ah</td>
+                <td class="p-4 font-mono text-primary">10–15 晚</td>
+                <td class="p-4 text-muted">搭配 200W 以上太阳能供全职使用</td>
+              </tr>
+              <tr>
+                <td class="p-4 text-muted">极寒（-15°C 及以下）</td>
+                <td class="p-4 font-mono text-primary">200Ah+</td>
+                <td class="p-4 font-mono text-primary">4–6 晚</td>
+                <td class="p-4 text-muted">对 LFP 容量按 20–30% 做低温折减</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">计算你所需的精确电池容量</h4>
+          <p class="text-body-sm text-muted mb-4">
+            使用续航时间计算器，按柴油加热器的具体功耗和你的电池配置，确定精确的电池续航时间。
+          </p>
+          <a href="/zh/tools/runtime-calculator/" class="btn-primary text-xs py-3 px-6 inline-block">打开续航时间计算器</a>
+        </CalculatorCard>
+        <CalculatorCard class="border-m-blue-light">
+          <h4 class="text-label-uppercase text-primary text-xs mb-3">相关工具</h4>
+          <p class="text-body-sm text-muted mb-4">
+            正在规划完整的露营车或房车电气系统？用房车电池计算器为整个生活电池组选型。
+          </p>
+          <a href="/zh/tools/rv-battery-calculator/" class="btn-primary-outline text-xs py-3 px-6 inline-block">打开房车电池计算器</a>
+        </CalculatorCard>
+      </div>
+
+      <section>
+        <h2 class="text-title-lg text-primary uppercase tracking-wider mb-4">相关文章</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">露营车电池续航时间指南</h4>
+            <p class="text-body-sm text-muted mb-3">露营车常见负载表和周末出行示例下的电池续航时间。</p>
+            <a href="/learn/camper-battery-runtime-guide/" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">阅读指南 →</a>
+          </CalculatorCard>
+          <CalculatorCard>
+            <h4 class="text-primary font-bold mb-2">房车电池选型指南</h4>
+            <p class="text-body-sm text-muted mb-3">为野外离网停驻选配房车生活电池的完整指南，含负载清单。</p>
+            <a href="/learn/rv-battery-sizing-guide/" class="text-label-uppercase text-m-blue-light text-xs hover:text-primary transition-colors">阅读指南 →</a>
+          </CalculatorCard>
+        </div>
+      </section>
+
+      <FAQSection items={faqItems} />
+    </div>
+  </div>
+</Layout>
